@@ -1,0 +1,13 @@
+/* @theme: default; */
+
+.no-data {
+    display: none;
+    margin: $no-data-offset;
+    padding: $no-data-inner-offset;
+
+    text-align: $no-data-text-align;
+    font-size: $no-data-font-size;
+
+    background: $no-data-background;
+    border-radius: $no-data-border-radius;
+}

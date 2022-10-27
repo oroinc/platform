@@ -6,26 +6,17 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ActivityOwner
-     */
-    protected $entity;
+    /** @var ActivityOwner */
+    private $entity;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new ActivityOwner();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entity);
     }
 
     public function testGetId()
@@ -33,28 +24,21 @@ class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getId());
 
         $value = 42;
-        $idReflection = new \ReflectionProperty(get_class($this->entity), 'id');
-        $idReflection->setAccessible(true);
-        $idReflection->setValue($this->entity, $value);
-        $this->assertEquals($value, $this->entity->getId());
+        ReflectionUtil::setId($this->entity, $value);
+        $this->assertSame($value, $this->entity->getId());
     }
 
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($this->entity, $property, $value);
         $this->assertEquals($value, $accessor->getValue($this->entity, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['activity', new ActivityList()],

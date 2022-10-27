@@ -2,7 +2,14 @@
 
 namespace Oro\Bundle\ImportExportBundle\Twig;
 
-class BasenameTwigExtension extends \Twig_Extension
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+
+/**
+ * Provides a Twig filter to remove namespaces for a PHP class name:
+ *   - basename
+ */
+class BasenameTwigExtension extends AbstractExtension
 {
     /**
      * @return array
@@ -10,14 +17,12 @@ class BasenameTwigExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('basename', [$this, 'basenameFilter'])
+            new TwigFilter('basename', [$this, 'basenameFilter'])
         ];
     }
 
     /**
      * @var string $value
-     *
-     * @return string
      */
     public function basenameFilter(string $value): string
     {

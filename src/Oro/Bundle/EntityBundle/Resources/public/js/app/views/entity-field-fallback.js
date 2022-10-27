@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var EntityFallbackView;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
 
     /**
      * @export orolocale/js/app/views/fallback-view
      * @extends oroui.app.views.base.View
      * @class oroentity.app.views.EntityFallbackView
      */
-    EntityFallbackView = BaseView.extend({
+    const EntityFallbackView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -19,19 +18,20 @@ define(function(require) {
             selectors: {
                 useFallbackCheckbox: '.use-fallback-checkbox',
                 entityFieldValue: '.entity-field-value',
-                fallbackSelect: '.fallback-select'
+                fallbackSelect: '.fallback-select',
+                fallbackContainer: '.entity-fallback-container'
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EntityFallbackView() {
-            EntityFallbackView.__super__.constructor.apply(this, arguments);
+        constructor: function EntityFallbackView(options) {
+            EntityFallbackView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -39,21 +39,23 @@ define(function(require) {
         },
 
         handleUseFallbackCheckbox: function() {
-            var self = this;
-            var $checkboxes = $(this.options.selectors.useFallbackCheckbox);
+            const self = this;
+            const $checkboxes = $(this.options.selectors.useFallbackCheckbox);
 
             $checkboxes.each(function() {
-                var $checkbox = $(this);
+                const $checkbox = $(this);
                 self.handleCheckboxValue($checkbox);
-                $checkbox.on('click', function() {
+                $checkbox.on('change', function() {
                     self.handleCheckboxValue($checkbox);
                 });
             });
         },
 
         handleCheckboxValue: function($checkbox) {
-            var $fieldValue = $checkbox.parents('table').find(this.options.selectors.entityFieldValue);
-            var $fallbackValue = $checkbox.parents('table').find(this.options.selectors.fallbackSelect);
+            const container = $checkbox.parents(this.options.selectors.fallbackContainer);
+            const $fieldValue = container.find(this.options.selectors.entityFieldValue);
+            const $fallbackValue = container.find(this.options.selectors.fallbackSelect);
+
             if ($checkbox.is(':checked')) {
                 this.disableElement($fieldValue);
                 this.enableElement($fallbackValue);

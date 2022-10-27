@@ -23,12 +23,6 @@ class WorkflowItemListener
     /** @var WorkflowAwareCache */
     protected $cache;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowManagerRegistry $workflowManagerRegistry
-     * @param WorkflowEntityConnector $entityConnector
-     * @param WorkflowAwareCache $cache
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         WorkflowManagerRegistry $workflowManagerRegistry,
@@ -43,9 +37,6 @@ class WorkflowItemListener
 
     /**
      * Set workflow item entity ID
-     *
-     * @param WorkflowItem       $workflowItem
-     * @param LifecycleEventArgs $args
      *
      * @throws WorkflowException
      */
@@ -85,8 +76,6 @@ class WorkflowItemListener
 
     /**
      * Remove related workflow items
-     *
-     * @param LifecycleEventArgs $args
      */
     public function preRemove(LifecycleEventArgs $args)
     {

@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -34,8 +34,6 @@ class OroOrganizationBundle implements Migration
 
     /**
      * Modify table oro_organization
-     *
-     * @param Schema $schema
      */
     public static function updateOrganizationTable(Schema $schema)
     {
@@ -59,9 +57,6 @@ class OroOrganizationBundle implements Migration
 
     /**
      * Modify entity config to exclude currency and currency_precision fields
-     *
-     * @param Schema   $schema
-     * @param QueryBag $queries
      */
     public static function updateConfigs(Schema $schema, QueryBag $queries)
     {
@@ -86,7 +81,7 @@ class OroOrganizationBundle implements Migration
                     ],
                     [
                         'field_names' => Connection::PARAM_STR_ARRAY,
-                        'class_name'  => Type::STRING
+                        'class_name'  => Types::STRING
                     ]
                 )
             );
@@ -103,7 +98,7 @@ class OroOrganizationBundle implements Migration
                     ],
                     [
                         'field_names' => Connection::PARAM_STR_ARRAY,
-                        'class_name'  => Type::STRING
+                        'class_name'  => Types::STRING
                     ]
                 )
             );

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 
 /**
  * Email Attachment
@@ -19,7 +18,6 @@ class EmailAttachmentContent
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -28,7 +26,6 @@ class EmailAttachmentContent
      *
      * @ORM\OneToOne(targetEntity="EmailAttachment", inversedBy="attachmentContent")
      * @ORM\JoinColumn(name="attachment_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @JMS\Exclude
      */
     protected $emailAttachment;
 
@@ -36,7 +33,6 @@ class EmailAttachmentContent
      * @var string
      *
      * @ORM\Column(name="content", type="text", nullable=false)
-     * @JMS\Type("string")
      */
     protected $content;
 
@@ -44,7 +40,6 @@ class EmailAttachmentContent
      * @var string
      *
      * @ORM\Column(name="content_transfer_encoding", type="string", length=20, nullable=false)
-     * @JMS\Type("string")
      */
     protected $contentTransferEncoding;
 

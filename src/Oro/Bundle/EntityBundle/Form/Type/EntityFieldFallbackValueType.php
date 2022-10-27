@@ -27,9 +27,6 @@ class EntityFieldFallbackValueType extends AbstractType
      */
     protected $fallbackResolver;
 
-    /**
-     * @param EntityFallbackResolver $fallbackResolver
-     */
     public function __construct(EntityFallbackResolver $fallbackResolver)
     {
         $this->fallbackResolver = $fallbackResolver;

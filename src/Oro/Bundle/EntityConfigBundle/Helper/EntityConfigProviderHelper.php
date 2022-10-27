@@ -8,40 +8,36 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
 /**
- * Logic moved from ConfigController to enable it for attributes also
+ * Provides a set of reusable methods for entity configs and attributes controllers.
  */
 class EntityConfigProviderHelper
 {
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
     /**
-     * Return configured layout actions and requirejs modules
+     * Return configured layout actions and js modules
      *
-     * @param  EntityConfigModel $entity
-     * @param null $displayOnly Param used to bind layout action with certain flag. If it is passed only actions
-     * which has it will be showed
+     * @param EntityConfigModel $entity
+     * @param string|null       $displayOnly It is used to bind layout action with certain flag.
+     *                                       If it is passed only actions which has it will be showed.
+     *
      * @return array
      */
     public function getLayoutParams(EntityConfigModel $entity, $displayOnly = null)
     {
         $actions = [];
-        $requireJsModules = [];
-
+        $jsModules = [];
         $providers = $this->configManager->getProviders();
-        /** @var ConfigProvider $provider */
         foreach ($providers as $provider) {
             $propertyConfig = $provider->getPropertyConfig();
-            $layoutActions = $propertyConfig->getLayoutActions(PropertyConfigContainer::TYPE_FIELD);
-            foreach ($layoutActions as $action) {
+            $providerActions = $propertyConfig->getLayoutActions(PropertyConfigContainer::TYPE_FIELD);
+            foreach ($providerActions as $action) {
                 if ($this->isLayoutActionApplicable($action, $entity, $provider, $displayOnly)) {
                     if (isset($action['entity_id']) && $action['entity_id']) {
                         $action['args'] = ['id' => $entity->getId()];
@@ -49,18 +45,20 @@ class EntityConfigProviderHelper
                     $actions[] = $action;
                 }
             }
-
-            $requireJsModules = array_merge($requireJsModules, $propertyConfig->getRequireJsModules());
+            $providerModules = $propertyConfig->getJsModules();
+            foreach ($providerModules as $module) {
+                $jsModules[] = $module;
+            }
         }
 
-        return [$actions, $requireJsModules];
+        return [$actions, $jsModules];
     }
 
     /**
-     * @param array $action
+     * @param array             $action
      * @param EntityConfigModel $entity
-     * @param ConfigProvider $provider
-     * @param null $displayOnly
+     * @param ConfigProvider    $provider
+     * @param null              $displayOnly
      *
      * @return bool
      */
@@ -72,9 +70,11 @@ class EntityConfigProviderHelper
     ) {
         if ($displayOnly && (!isset($action['display_only']) || $action['display_only'] !== $displayOnly)) {
             return false;
-        } elseif (!$displayOnly && isset($action['display_only'])) {
+        }
+        if (!$displayOnly && isset($action['display_only'])) {
             return false;
-        } elseif (!isset($action['filter'])) {
+        }
+        if (!isset($action['filter'])) {
             return true;
         }
 
@@ -82,9 +82,9 @@ class EntityConfigProviderHelper
     }
 
     /**
-     * @param array $action
+     * @param array             $action
      * @param EntityConfigModel $entity
-     * @param ConfigProvider $provider
+     * @param ConfigProvider    $provider
      *
      * @return bool
      */

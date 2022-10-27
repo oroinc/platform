@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType;
@@ -22,31 +20,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 {
     /** @var WorkflowDefinitionChoicesGroupProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $choicesProvider;
+    private $choicesProvider;
 
     /** @var WorkflowDefinitionType */
-    protected $formType;
+    private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->choicesProvider = $this->createMock(WorkflowDefinitionChoicesGroupProvider::class);
         $this->formType = new WorkflowDefinitionType($this->choicesProvider);
         parent::setUp();
     }
 
-    protected function tearDown()
-    {
-        unset($this->formType);
-
-        parent::tearDown();
-    }
-
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array $fields
-     * @param array $submittedData
-     * @param array $expectedData
      */
     public function testSubmit(array $fields, array $submittedData, array $expectedData)
     {
@@ -70,6 +57,7 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
 
         foreach ($expectedData as $field => $data) {
             $this->assertTrue($form->has($field));
@@ -77,10 +65,7 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             [
@@ -114,9 +99,10 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver \PHPUnit\Framework\MockObject\MockObject|OptionsResolver */
-        $resolver = $this->getMockBuilder(OptionsResolver::class)->disableOriginalConstructor()->getMock();
-        $resolver->expects($this->once())->method('setDefaults')->with(['data_class' => WorkflowDefinition::class]);
+        $resolver = $this->createMock(OptionsResolver::class);
+        $resolver->expects($this->once())
+            ->method('setDefaults')
+            ->with(['data_class' => WorkflowDefinition::class]);
 
         $this->formType->configureOptions($resolver);
     }
@@ -127,21 +113,14 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider $configProvider */
-        $configProvider = $this->getMockBuilder(ConfigProvider::class)->disableOriginalConstructor()->getMock();
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Translator $translator */
-        $translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
-
-        $choiceType = $this->getMockBuilder(OroChoiceType::class)
-            ->setMethods(['configureOptions', 'getParent'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
+        $choiceType = $this->createMock(OroChoiceType::class);
+        $choiceType->expects($this->any())
+            ->method('getParent')
+            ->willReturn(ChoiceType::class);
 
         return array_merge(
             parent::getExtensions(),
@@ -149,12 +128,12 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
                 new PreloadedExtension(
                     [
                         $this->formType,
+                        $choiceType,
                         OroIconType::class => new OroIconTypeStub(),
-                        OroChoiceType::class => $choiceType,
                         ApplicableEntitiesType::class => new ApplicableEntitiesTypeStub()
                     ],
                     [
-                        FormType::class => [new TooltipFormExtension($configProvider, $translator)],
+                        FormType::class => [new TooltipFormExtensionStub($this)]
                     ]
                 ),
                 $this->getValidatorExtension(false)

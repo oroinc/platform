@@ -1,21 +1,25 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Async;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByRangeTopic;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
+/**
+ * Message queue processor that indexes a range of entities of specified class.
+ */
 class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
@@ -34,14 +38,8 @@ class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface,
      */
     private $logger;
 
-    /**
-     * @param RegistryInterface $doctrine
-     * @param IndexerInterface $indexer
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
     public function __construct(
-        RegistryInterface $doctrine,
+        ManagerRegistry $doctrine,
         IndexerInterface $indexer,
         JobRunner $jobRunner,
         LoggerInterface $logger
@@ -57,7 +55,7 @@ class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface,
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $payload = JSON::decode($message->getBody());
+        $payload = $message->getBody();
 
         $result = $this->jobRunner->runDelayed($payload['jobId'], function () use ($message, $payload) {
             if (! isset($payload['entityClass'], $payload['offset'], $payload['limit'])) {
@@ -110,6 +108,6 @@ class IndexEntitiesByRangeMessageProcessor implements MessageProcessorInterface,
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::INDEX_ENTITY_BY_RANGE];
+        return [IndexEntitiesByRangeTopic::getName()];
     }
 }

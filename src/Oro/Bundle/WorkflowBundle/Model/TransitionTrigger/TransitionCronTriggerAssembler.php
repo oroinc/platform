@@ -11,9 +11,6 @@ class TransitionCronTriggerAssembler extends AbstractTransitionTriggerAssembler
     /** @var TransitionTriggerCronVerifier */
     protected $triggerCronVerifier;
 
-    /**
-     * @param TransitionTriggerCronVerifier $triggerCronVerifier
-     */
     public function __construct(TransitionTriggerCronVerifier $triggerCronVerifier)
     {
         $this->triggerCronVerifier = $triggerCronVerifier;

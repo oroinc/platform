@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
 
 class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'Oro\Bundle\CronBundle\Entity\Schedule';
+    private const CLASS_NAME = Schedule::class;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $registry;
@@ -22,9 +22,9 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ScheduleManager */
     private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->schedulesByArgumentsFilter = $this->createMock(SchedulesByArgumentsFilterInterface::class);
 
         $this->manager = new ScheduleManager(
@@ -32,11 +32,6 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
             $this->schedulesByArgumentsFilter,
             self::CLASS_NAME
         );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->manager, $this->registry);
     }
 
     public function testHasSchedule()
@@ -51,12 +46,12 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertRepositoryCalled($command, $definition, $repositorySchedules);
 
-        $this->schedulesByArgumentsFilter->expects(static::once())
+        $this->schedulesByArgumentsFilter->expects(self::once())
             ->method('filter')
             ->with($repositorySchedules, $arguments)
             ->willReturn([$repositorySchedules[1]]);
 
-        static::assertTrue($this->manager->hasSchedule($command, $arguments, $definition));
+        self::assertTrue($this->manager->hasSchedule($command, $arguments, $definition));
     }
 
     public function testCreateSchedule()
@@ -65,7 +60,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
         $arguments = ['arg1', 'arg2'];
         $definition = '* * * * *';
 
-        $this->schedulesByArgumentsFilter->expects(static::once())
+        $this->schedulesByArgumentsFilter->expects(self::once())
             ->method('filter')
             ->willReturn([]);
 
@@ -78,21 +73,20 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider createScheduleExceptionProvider
-     *
-     * @param string $command
-     * @param string $definition
-     * @param array $schedules
-     * @param string $exception
-     * @param string $message
      */
-    public function testCreateScheduleException($command, $definition, array $schedules, $exception, $message)
-    {
+    public function testCreateScheduleException(
+        ?string $command,
+        ?string $definition,
+        array $schedules,
+        string $exception,
+        string $message
+    ) {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
 
         if ($schedules) {
             $this->assertRepositoryCalled($command, $definition, $schedules);
-            $this->schedulesByArgumentsFilter->expects(static::once())
+            $this->schedulesByArgumentsFilter->expects(self::once())
                 ->method('filter')
                 ->willReturn([$schedules[0]]);
         }
@@ -100,10 +94,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->createSchedule($command, [], $definition);
     }
 
-    /**
-     * @return array
-     */
-    public function createScheduleExceptionProvider()
+    public function createScheduleExceptionProvider(): array
     {
         $schedule = $this->createSchedule('oro:test', [], '* * * * *');
 
@@ -143,38 +134,31 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertRepositoryCalled($command, '', $repositorySchedules);
 
-        $this->schedulesByArgumentsFilter->expects(static::once())
+        $this->schedulesByArgumentsFilter->expects(self::once())
             ->method('filter')
             ->with($repositorySchedules, $arguments)
             ->willReturn($repositorySchedules[1]);
 
-        static::assertSame(
+        self::assertSame(
             $repositorySchedules[1],
             $this->manager->getSchedulesByCommandAndArguments($command, $arguments)
         );
     }
 
-    /**
-     * @param $command
-     * @param $definition
-     * @param array|Schedule[] $schedules
-     */
-    protected function assertRepositoryCalled($command, $definition = '', array $schedules = [])
+    private function assertRepositoryCalled(string $command, string $definition = '', array $schedules = [])
     {
         $findBy = ['command' => $command];
         if ($definition !== '') {
             $findBy['definition'] = $definition;
         }
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectRepository $repository */
-        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock(ObjectRepository::class);
         $repository->expects($this->once())
             ->method('findBy')
             ->with($findBy)
             ->willReturn($schedules);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager $em */
-        $em = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $em = $this->createMock(ObjectManager::class);
         $em->expects($this->once())
             ->method('getRepository')
             ->with(self::CLASS_NAME)
@@ -186,13 +170,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($em);
     }
 
-    /**
-     * @param string $command
-     * @param array $arguments
-     * @param string $definition
-     * @return Schedule
-     */
-    private function createSchedule($command, array $arguments, $definition)
+    private function createSchedule(string $command, array $arguments, string $definition): Schedule
     {
         $schedule = new Schedule();
         $schedule

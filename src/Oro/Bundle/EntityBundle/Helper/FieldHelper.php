@@ -48,11 +48,6 @@ class FieldHelper
     /** @var array */
     protected $identityFieldsCache = [];
 
-    /**
-     * @param EntityFieldProvider $fieldProvider
-     * @param ConfigProvider      $configProvider
-     * @param FieldTypeHelper     $fieldTypeHelper
-     */
     public function __construct(
         EntityFieldProvider $fieldProvider,
         ConfigProvider $configProvider,
@@ -64,38 +59,24 @@ class FieldHelper
     }
 
     /**
-     * @see \Oro\Bundle\EntityBundle\Provider\EntityFieldProvider::getFields
+     * @see \Oro\Bundle\EntityBundle\Provider\EntityFieldProvider::getEntityFields
      *
      * @param string $entityName
-     * @param bool   $withRelations
-     * @param bool   $withVirtualFields
-     * @param bool   $withEntityDetails
-     * @param bool   $withUnidirectional
-     * @param bool   $applyExclusions
-     * @param bool   $translate
+     * @param int $options Bit mask of options, see EntityFieldProvider::OPTION_*
+     *
      * @return array
      */
-    public function getFields(
-        $entityName,
-        $withRelations = false,
-        $withVirtualFields = false,
-        $withEntityDetails = false,
-        $withUnidirectional = false,
-        $applyExclusions = false,
-        $translate = true
-    ) {
+    public function getEntityFields(string $entityName, int $options = EntityFieldProvider::OPTION_TRANSLATE): array
+    {
         $args = func_get_args();
+        $locale = $this->fieldProvider->getLocale();
+        if ($options & EntityFieldProvider::OPTION_TRANSLATE && null !== $locale) {
+            $args[] = $locale;
+        }
+
         $cacheKey = implode(':', $args);
         if (!array_key_exists($cacheKey, $this->fieldsCache)) {
-            $this->fieldsCache[$cacheKey] = $this->fieldProvider->getFields(
-                $entityName,
-                $withRelations,
-                $withVirtualFields,
-                $withEntityDetails,
-                $withUnidirectional,
-                $applyExclusions,
-                $translate
-            );
+            $this->fieldsCache[$cacheKey] = $this->fieldProvider->getEntityFields($entityName, $options);
         }
 
         return $this->fieldsCache[$cacheKey];
@@ -168,7 +149,13 @@ class FieldHelper
      */
     protected function getCacheKey($entityName, $fieldName)
     {
-        return $entityName . ':' . $fieldName;
+        $args = [$entityName, $fieldName];
+
+        if (null !== $this->fieldProvider->getLocale()) {
+            $args[] = $this->fieldProvider->getLocale();
+        }
+
+        return implode(':', $args);
     }
 
     /**
@@ -243,28 +230,38 @@ class FieldHelper
         return !empty($field['type']) && in_array($field['type'], ['datetime', 'date', 'time']);
     }
 
-    /**
-     * @param object $object
-     * @param string $fieldName
-     * @return mixed
-     * @throws \Exception
-     */
     public function getObjectValue($object, $fieldName)
     {
         try {
             return $this->getPropertyAccessor()->getValue($object, $fieldName);
         } catch (\Exception $e) {
-            $class = ClassUtils::getClass($object);
-            while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
-            }
+            return $this->getObjectValueWithReflection($object, $fieldName, $e);
+        }
+    }
 
-            if ($class) {
-                $reflection = new \ReflectionProperty($class, $fieldName);
-                $reflection->setAccessible(true);
-                return $reflection->getValue($object);
-            } else {
-                throw $e;
-            }
+    public function getObjectValueWithReflection($object, string $fieldName, \Throwable $exception = null)
+    {
+        $class = ClassUtils::getClass($object);
+        while ($class && !property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+        }
+
+        if ($exception === null) {
+            $exception = new NoSuchPropertyException(
+                sprintf(
+                    'Property "%s" does not exist in class "%s"',
+                    $fieldName,
+                    $class
+                )
+            );
+        }
+
+        if ($class) {
+            $reflection = new \ReflectionProperty($class, $fieldName);
+            $reflection->setAccessible(true);
+
+            return $reflection->getValue($object);
+        } else {
+            throw $exception;
         }
     }
 
@@ -304,7 +301,7 @@ class FieldHelper
     protected function setObjectValueWithReflection($object, $fieldName, $value, $exception = null)
     {
         $class = ClassUtils::getClass($object);
-        while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+        while ($class && !property_exists($class, $fieldName) && $class = get_parent_class($class)) {
         }
 
         if ($exception === null) {
@@ -378,7 +375,10 @@ class FieldHelper
         if (!array_key_exists($entityName, $this->identityFieldsCache)) {
             $this->identityFieldsCache[$entityName] = [];
 
-            $fields = $this->getFields($entityName, true);
+            $fields = $this->getEntityFields(
+                $entityName,
+                EntityFieldProvider::OPTION_WITH_RELATIONS | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+            );
             foreach ($fields as $field) {
                 $fieldName = $field['name'];
                 if (!$this->getConfigValue($entityName, $fieldName, 'excluded', false)
@@ -425,5 +425,45 @@ class FieldHelper
     public function setLocale($locale)
     {
         $this->fieldProvider->setLocale($locale);
+    }
+
+    /**
+     * Exclude fields marked as "excluded" and skipped not identity fields
+     *
+     * @param string           $entityName
+     * @param string           $fieldName
+     * @param array|mixed|null $itemData
+     *
+     * @return bool
+     */
+    public function isFieldExcluded($entityName, $fieldName, $itemData = null)
+    {
+        if ($this->getConfigValue($entityName, $fieldName, 'excluded', false)) {
+            return true;
+        }
+
+        $isIdentity = $this->isIdentityField($entityName, $fieldName, $itemData);
+        $isSkipped  = $itemData !== null && !array_key_exists($fieldName, $itemData);
+
+        return $isSkipped && !$isIdentity;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $fieldName
+     * @param array|null $itemData
+     *
+     * @return bool
+     */
+    protected function isIdentityField($entityName, $fieldName, $itemData = null)
+    {
+        $isIdentity = $this->getConfigValue($entityName, $fieldName, 'identity', false);
+        if (false === $isIdentity) {
+            return $isIdentity;
+        }
+
+        $isInputDataContainsField = is_array($itemData) && array_key_exists($fieldName, $itemData);
+
+        return $this->isRequiredIdentityField($entityName, $fieldName) || $isInputDataContainsField;
     }
 }

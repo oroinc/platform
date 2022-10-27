@@ -2,21 +2,17 @@
 
 namespace Oro\Bundle\DashboardBundle\Controller\Api\Rest;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
+use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @Rest\RouteResource("dashboard")
- * @Rest\NamePrefix("oro_api_")
+ * REST API controller for dashboards.
  */
-class DashboardController extends FOSRestController implements ClassResourceInterface
+class DashboardController extends AbstractFOSRestController
 {
     /**
      * @param Dashboard $id
@@ -36,16 +32,14 @@ class DashboardController extends FOSRestController implements ClassResourceInte
     public function deleteAction(Dashboard $id)
     {
         $dashboard = $id;
-        $this->getEntityManager()->remove($dashboard);
-        $this->getEntityManager()->flush();
+        $em = $this->getEntityManager();
+        $em->remove($dashboard);
+        $em->flush();
 
-        return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
     }
 
-    /**
-     * @return ObjectManager
-     */
-    protected function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getDoctrine()->getManager();
     }

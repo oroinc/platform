@@ -1,0 +1,26 @@
+data:
+    type: asyncoperations
+    id: '<toString(@root_bu_user_operation->id)>'
+    attributes:
+        entityType: testapidepartments
+        status: success
+        progress: 1
+        createdAt: '@root_bu_user_operation->createdAt->format("Y-m-d\TH:i:s\Z")'
+        updatedAt: '@root_bu_user_operation->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        elapsedTime: '@root_bu_user_operation->elapsedTime'
+        summary:
+            aggregateTime: 100
+            readCount: 10
+            writeCount: 10
+            errorCount: 0
+            createCount: 10
+            updateCount: 0
+    relationships:
+        owner:
+            data:
+                type: users
+                id: '<toString(@root_bu_user_operation->owner->id)>'
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@root_bu_user_operation->organization->id)>'

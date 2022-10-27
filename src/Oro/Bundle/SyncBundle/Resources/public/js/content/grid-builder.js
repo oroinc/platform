@@ -1,7 +1,7 @@
 define(['underscore', '../content-manager'], function(_, ContentManager) {
     'use strict';
 
-    var methods = {
+    const methods = {
         initHandler: function(deferred, metadata) {
             if (metadata.options && _.isArray(metadata.options.contentTags)) {
                 ContentManager.tagContent(metadata.options.contentTags);

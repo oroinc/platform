@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\DependencyInjection;
 
@@ -10,49 +11,56 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class OroTranslationExtension extends Extension
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('form_types.yml');
         $loader->load('services.yml');
         $loader->load('importexport.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
+        $loader->load('controllers_api.yml');
+        $loader->load('mq_topics.yml');
 
-        $container
-            ->getDefinition('oro_translation.controller')
-            ->replaceArgument(3, $config['js_translation']);
+        $container->getDefinition('oro_translation.js_generator')
+            ->setArgument('$domains', $config['js_translation']['domains']);
+        $container->getDefinition('oro_translation.manager.translation')
+            ->setArgument('$jsTranslationDomains', $config['js_translation']['domains']);
+        $container->getDefinition('oro_translation.twig.translation.extension')
+            ->setArgument('$isDebugJsTranslations', $config['js_translation']['debug']);
 
-        $container->setParameter('oro_translation.js_translation.domains', $config['js_translation']['domains']);
-        $container->setParameter('oro_translation.js_translation.debug', $config['js_translation']['debug']);
+        $container->setParameter(
+            'oro_translation.translation_service.apikey',
+            $config['translation_service']['apikey']
+        );
 
+        $container->setParameter('oro_translation.package_names', array_unique($config['package_names']));
+        $container->setParameter('oro_translation.debug_translator', $config['debug_translator']);
         $container->setParameter('oro_translation.locales', $config['locales']);
         $container->setParameter('oro_translation.default_required', $config['default_required']);
-        $container->setAlias('oro_translation.manager_registry', $config['manager_registry']);
         $container->setParameter('oro_translation.templating', $config['templating']);
 
-        if (!empty($config['api'])) {
-            foreach ($config['api'] as $serviceId => $params) {
-                foreach ($params as $key => $value) {
-                    $container->setParameter(
-                        sprintf('oro_translation.api.%s.%s', $serviceId, $key),
-                        $value
-                    );
-                }
-            }
-        }
-
-        $serviceId = sprintf('oro_translation.uploader.%s_adapter', $config['default_api_adapter']);
-        if ($container->has($serviceId)) {
-            $container->setAlias('oro_translation.uploader.default_adapter', $serviceId);
-        }
-
-        $container->setParameter('oro_translation.debug_translator', $config['debug_translator']);
+        $this->configureTranslatableDictionaries($container, $config['translatable_dictionaries']);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+    }
+
+    private function configureTranslatableDictionaries(ContainerBuilder $container, array $config): void
+    {
+        $listenerDef = $container->getDefinition('oro_translation.event_listener.update_translatable_dictionaries');
+        foreach ($config as $entityClass => $fields) {
+            foreach ($fields as $translatableFieldName => $fieldConfig) {
+                $listenerDef->addMethodCall('addEntity', [
+                    $entityClass,
+                    $translatableFieldName,
+                    $fieldConfig['translation_key_prefix'],
+                    $fieldConfig['key_field_name']
+                ]);
+            }
+        }
     }
 }

@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var GridViewsCollection;
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var GridViewsModel = require('./model');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const GridViewsModel = require('./model');
 
-    GridViewsCollection = BaseCollection.extend({
+    const GridViewsCollection = BaseCollection.extend({
         /** @property */
         model: GridViewsModel,
 
@@ -15,14 +14,14 @@ define(function(require) {
         gridName: '',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function GridViewsCollection() {
-            GridViewsCollection.__super__.constructor.apply(this, arguments);
+        constructor: function GridViewsCollection(...args) {
+            GridViewsCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             _.extend(this, _.pick(options, ['gridName']));
@@ -30,7 +29,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _prepareModel: function(attrs, options) {
             if (attrs instanceof Backbone.Model) {
@@ -42,7 +41,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         clone: function() {
             return new this.constructor(this.toJSON(), {gridName: this.gridName});

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 /**
  * @Entity
  * @Table(name="cms_users")
@@ -9,7 +11,8 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS;
 class CmsUser
 {
     /**
-     * @Id @Column(type="integer")
+     * @Id
+     * @Column(type="integer")
      * @GeneratedValue
      */
     public $id;
@@ -33,6 +36,21 @@ class CmsUser
      * @OneToOne(targetEntity="CmsAddress", mappedBy="user", cascade={"persist"}, orphanRemoval=true)
      */
     public $address;
+
+    /**
+     * @OneToMany(
+     *      targetEntity="CmsAddress",
+     *      mappedBy="user",
+     *      cascade={"all"},
+     *      orphanRemoval=true
+     * )
+     */
+    public $shippingAddresses;
+
+    public function __construct()
+    {
+        $this->shippingAddresses = new ArrayCollection();
+    }
 
     public function getId()
     {

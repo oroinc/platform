@@ -2,17 +2,19 @@
 
 a,
 a:visited {
+    // stylelint-disable-next-line declaration-no-important
     text-decoration: underline !important;
 }
 
-a[href]:after {
-    content: "";
+a[href]::after {
+    content: '';
 }
 
-a[class~="icons-holder-text"],
-a[class~="icons-holder-text"]:visited,
-a[class~="accordion-toggle"],
-a[class~="accordion-toggle"]:visited {
+a[class~='icons-holder-text'],
+a[class~='icons-holder-text']:visited,
+a[class~='accordion-toggle'],
+a[class~='accordion-toggle']:visited {
+    // stylelint-disable-next-line declaration-no-important
     text-decoration: none !important;
 }
 
@@ -31,11 +33,13 @@ a[class~="accordion-toggle"]:visited {
     .filter-item {
         a,
         a:visited {
+            // stylelint-disable-next-line declaration-no-important
             text-decoration: none !important;
         }
     }
 }
 
 .scrollable-container {
+    // stylelint-disable-next-line declaration-no-important
     height: auto !important;
 }

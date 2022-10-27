@@ -17,8 +17,11 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides useful methods for dynamic fields.
+ */
 class DynamicFieldsHelper
 {
     /** @var ConfigManager */
@@ -120,11 +123,6 @@ class DynamicFieldsHelper
             );
     }
 
-    /**
-     * @param FormView        $view
-     * @param FormInterface   $form
-     * @param ConfigInterface $extendConfig
-     */
     public function addInitialElements(FormView $view, FormInterface $form, ConfigInterface $extendConfig)
     {
         $data = $form->getData();
@@ -162,7 +160,7 @@ class DynamicFieldsHelper
         }
         $selectedCollection = FieldAccessor::getValue($data, $fieldName);
 
-        if ($dataId) {
+        if (!empty($selectedCollection)) {
             $view->children[$fieldName]->vars['initial_elements'] =
                 $this->getInitialElements($selectedCollection, $defaultEntity, $extendConfig);
         }
@@ -186,7 +184,7 @@ class DynamicFieldsHelper
         foreach ($entities as $entity) {
             $extraData = [];
             foreach ($extendConfig->get('target_grid') as $fieldName) {
-                $label = $this->configManager->getProvider('entity')
+                $label = (string) $this->configManager->getProvider('entity')
                     ->getConfig($className, $fieldName)
                     ->get('label');
 

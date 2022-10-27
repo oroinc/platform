@@ -1,2 +1,2 @@
 bundles:
-    - OroLocaleBundle:Form:fields.html.twig
+    - '@OroLocale/Form/fields.html.twig'

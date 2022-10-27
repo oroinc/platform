@@ -4,53 +4,40 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
-use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OptionsHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var FormProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formProvider;
-
     /** @var OptionsHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->router = $this->createMock(Router::class);
-        $this->router->expects($this->any())->method('generate')->willReturn('generated-url');
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator->expects(self::any())
+            ->method('generate')
+            ->willReturn('generated-url');
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::any())
             ->method('trans')
-            ->willReturnCallback(function ($id) {
-                return $id === 'untranslated' ? 'untranslated' : '[trans]'.$id.'[/trans]';
+            ->willReturnCallback(function ($id, $parameters) {
+                $parameters = implode('_', $parameters);
+                return sprintf('[trans]%s[%s][/trans]', $id, $parameters);
             });
 
-        $this->formProvider = $this->createMock(FormProvider::class);
         $this->helper = new OptionsHelper(
-            $this->router,
-            $this->translator,
-            $this->formProvider
+            $urlGenerator,
+            $translator,
+            $this->createMock(FormProvider::class),
+            $this->createMock(HtmlTagHelper::class)
         );
     }
 
     /**
-     * @param ButtonInterface $button
-     * @param array $expectedData
-     *
      * @dataProvider getFrontendOptionsProvider
      */
     public function testGetFrontendOptions(ButtonInterface $button, array $expectedData)
@@ -59,11 +46,9 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getFrontendOptionsProvider()
+    public function getFrontendOptionsProvider(): array
     {
         $defaultData = [
             'options' => [
@@ -88,6 +73,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                     'showDialog' => true,
                     'frontendOptions' => [
                         'title' => 'custom title',
+                        'title_parameters' => ['param1' => 'value1'],
                         'message' => [
                             'message' => 'message1',
                             'message_parameters' => ['param1' => 'value1'],
@@ -104,7 +90,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                         'hasDialog' => true,
                         'showDialog' => true,
                         'dialogOptions' => [
-                            'title' => '[trans]custom title[/trans]',
+                            'title' => '[trans]custom title[value1][/trans]',
                             'dialogOptions' => [],
                         ],
                         'dialogUrl' => 'generated-url',
@@ -137,7 +123,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                         'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
                         'message' => [
                             'title' => 'title1',
-                            'content' => '[trans]message1[/trans]',
+                            'content' => '[trans]message1[value1][/trans]',
                             'message_parameters' => ['param1' => 'value1']
                         ],
                     ],
@@ -165,20 +151,51 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                     'data' => [],
                 ],
             ],
+            'options with frontend confirmation message' => [
+                'button' => $this->getButton('test label', [
+                    'hasForm' => false,
+                    'frontendOptions' => [
+                        'confirmation' => [
+                            'title' => 'title1',
+                            'okText' => 'okText1',
+                            'message' => 'message1',
+                            'message_parameters' => [
+                                'username' => 'username'
+                            ],
+                        ],
+                    ],
+                ]),
+                'expectedData' => [
+                    'options' => [
+                        'hasDialog' => false,
+                        'showDialog' => false,
+                        'executionUrl' => 'generated-url',
+                        'url' => 'generated-url',
+                        'jsDialogWidget' => ButtonInterface::DEFAULT_JS_DIALOG_WIDGET,
+                        'confirmation' => [
+                            'title' => 'title1',
+                            'okText' => 'okText1',
+                            'message' => 'message1',
+                            'message_parameters' => [
+                                'username' => 'username'
+                            ],
+                        ],
+                    ],
+                    'data' => [],
+                ],
+            ],
         ];
     }
 
-    /**
-     * @param string $label
-     * @param array $templateData
-     *
-     * @return ButtonInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getButton($label, array $templateData)
+    private function getButton(string $label, array $templateData): ButtonInterface
     {
         $button = $this->createMock(ButtonInterface::class);
-        $button->expects($this->any())->method('getTemplateData')->willReturn($templateData);
-        $button->expects($this->any())->method('getLabel')->willReturn($label);
+        $button->expects($this->any())
+            ->method('getTemplateData')
+            ->willReturn($templateData);
+        $button->expects($this->any())
+            ->method('getLabel')
+            ->willReturn($label);
 
         return $button;
     }

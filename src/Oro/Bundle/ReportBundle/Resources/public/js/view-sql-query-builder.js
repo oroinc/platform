@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var tools = require('oroui/js/tools');
-    var ViewSqlQueryPlugin = require('ororeport/js/app/plugins/grid/view-sql-query-plugin');
+    const tools = require('oroui/js/tools');
+    const ViewSqlQueryPlugin = require('ororeport/js/app/plugins/grid/view-sql-query-plugin');
 
-    var ViewSqlQueryBuilder = {
+    const ViewSqlQueryBuilder = {
         /**
          * Prepares and preloads all required files for inline editing plugin
          *

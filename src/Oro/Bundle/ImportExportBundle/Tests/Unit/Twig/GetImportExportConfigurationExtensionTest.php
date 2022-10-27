@@ -5,34 +5,37 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Twig;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
 use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
-use PHPUnit\Framework\TestCase;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Twig\TwigFunction;
 
-class GetImportExportConfigurationExtensionTest extends TestCase
+class GetImportExportConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ImportExportConfigurationRegistryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    use TwigExtensionTestCaseTrait;
+
+    /** @var ImportExportConfigurationRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $configurationRegistry;
 
-    /**
-     * @var GetImportExportConfigurationExtension
-     */
+    /** @var GetImportExportConfigurationExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationRegistry = $this->createMock(ImportExportConfigurationRegistryInterface::class);
 
-        $this->extension = new GetImportExportConfigurationExtension($this->configurationRegistry);
+        $container = self::getContainerBuilder()
+            ->add('oro_importexport.configuration.registry', $this->configurationRegistry)
+            ->getContainer($this);
+
+        $this->extension = new GetImportExportConfigurationExtension($container);
     }
 
     public function testGetFunctions()
     {
         $expected = [
-            new \Twig_SimpleFunction('get_import_export_configuration', [$this->extension, 'getConfiguration'])
+            new TwigFunction('get_import_export_configuration', [$this->extension, 'getConfiguration'])
         ];
 
-        static::assertEquals($expected, $this->extension->getFunctions());
+        self::assertEquals($expected, $this->extension->getFunctions());
     }
 
     public function testGetConfiguration()
@@ -41,12 +44,14 @@ class GetImportExportConfigurationExtensionTest extends TestCase
 
         $expectedResult = [$this->createMock(ImportExportConfigurationInterface::class)];
 
-        $this->configurationRegistry
-            ->expects(static::once())
+        $this->configurationRegistry->expects(self::once())
             ->method('getConfigurations')
             ->with($alias)
             ->willReturn($expectedResult);
 
-        static::assertSame($expectedResult, $this->extension->getConfiguration($alias));
+        self::assertSame(
+            $expectedResult,
+            $this->callTwigFunction($this->extension, 'get_import_export_configuration', [$alias])
+        );
     }
 }

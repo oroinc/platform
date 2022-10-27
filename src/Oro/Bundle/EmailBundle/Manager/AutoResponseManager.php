@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
-use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\AutoResponseRuleCondition;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\ConfigExpression\ConfigExpressions;
@@ -22,26 +23,24 @@ use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class AutoResponseManager
+ * Provides methods to manage auto-response rules.
  *
- * @package Oro\Bundle\EmailBundle\Manager
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class AutoResponseManager
 {
     const INDEX_PLACEHOLDER = '__index__';
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var EmailModelBuilder */
     protected $emailBuilder;
 
-    /** @var Processor */
-    protected $emailProcessor;
+    protected EmailModelSender $emailModelSender;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -63,15 +62,15 @@ class AutoResponseManager
 
     /** @var array */
     protected $filterToConditionMap = [
-        TextFilterType::TYPE_CONTAINS     => 'contains',
-        TextFilterType::TYPE_ENDS_WITH    => 'end_with',
-        TextFilterType::TYPE_EQUAL        => 'eq',
-        TextFilterType::TYPE_IN           => 'in',
+        TextFilterType::TYPE_CONTAINS => 'contains',
+        TextFilterType::TYPE_ENDS_WITH => 'end_with',
+        TextFilterType::TYPE_EQUAL => 'eq',
+        TextFilterType::TYPE_IN => 'in',
         TextFilterType::TYPE_NOT_CONTAINS => 'not_contains',
-        TextFilterType::TYPE_NOT_IN       => 'not_in',
-        TextFilterType::TYPE_STARTS_WITH  => 'start_with',
-        FilterUtility::TYPE_EMPTY         => 'empty',
-        FilterUtility::TYPE_NOT_EMPTY     => 'not_empty',
+        TextFilterType::TYPE_NOT_IN => 'not_in',
+        TextFilterType::TYPE_STARTS_WITH => 'start_with',
+        FilterUtility::TYPE_EMPTY => 'empty',
+        FilterUtility::TYPE_NOT_EMPTY => 'not_empty',
     ];
 
     /** @var array */
@@ -80,33 +79,24 @@ class AutoResponseManager
         FilterUtility::CONDITION_OR => '@or',
     ];
 
-    /**
-     * @param Registry            $registry
-     * @param EmailModelBuilder   $emailBuilder
-     * @param Processor           $emailProcessor
-     * @param EmailRenderer       $emailRender
-     * @param LoggerInterface     $logger
-     * @param TranslatorInterface $translator
-     * @param string              $defaultLocale
-     */
     public function __construct(
-        Registry $registry,
+        ManagerRegistry $registry,
         EmailModelBuilder $emailBuilder,
-        Processor $emailProcessor,
+        EmailModelSender $emailModelSender,
         EmailRenderer $emailRender,
         LoggerInterface $logger,
         TranslatorInterface $translator,
-        $defaultLocale
+        string $defaultLocale
     ) {
-        $this->registry          = $registry;
-        $this->emailBuilder      = $emailBuilder;
-        $this->emailProcessor    = $emailProcessor;
-        $this->logger            = $logger;
-        $this->translator        = $translator;
-        $this->defaultLocale     = $defaultLocale;
+        $this->registry = $registry;
+        $this->emailBuilder = $emailBuilder;
+        $this->emailModelSender = $emailModelSender;
+        $this->logger = $logger;
+        $this->translator = $translator;
+        $this->defaultLocale = $defaultLocale;
         $this->configExpressions = new ConfigExpressions();
-        $this->accessor          = PropertyAccess::createPropertyAccessor();
-        $this->emailRender       = $emailRender;
+        $this->accessor = PropertyAccess::createPropertyAccessor();
+        $this->emailRender = $emailRender;
     }
 
     /**
@@ -126,9 +116,6 @@ class AutoResponseManager
         return false;
     }
 
-    /**
-     * @param Email $email
-     */
     public function sendAutoResponses(Email $email)
     {
         $mailboxes = $this->getMailboxRepository()->findForEmail($email);
@@ -155,13 +142,7 @@ class AutoResponseManager
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $label
-     *
-     * @return array
-     */
-    protected function createField($name, $label)
+    protected function createField(string $name, string $label): array
     {
         return [
             'label' => $this->translator->trans($label),
@@ -170,34 +151,33 @@ class AutoResponseManager
         ];
     }
 
-    /**
-     * @param Mailbox $mailbox
-     * @param Email   $email
-     */
     protected function processMailbox(Mailbox $mailbox, Email $email)
     {
-        $rules       = $this->getApplicableRules($mailbox, $email);
+        $rules = $this->getApplicableRules($mailbox, $email);
         $emailModels = $this->createReplyEmailModels($email, $rules);
         foreach ($emailModels as $emailModel) {
             $this->sendEmailModel($emailModel, $mailbox->getOrigin());
         }
     }
 
-    /**
-     * @param EmailModel  $email
-     * @param EmailOrigin $origin
-     */
-    protected function sendEmailModel(EmailModel $email, EmailOrigin $origin = null)
+    protected function sendEmailModel(EmailModel $emailModel, EmailOrigin $origin = null)
     {
         try {
-            $this->emailProcessor->process($email, $origin);
-        } catch (\Exception $ex) {
-            $this->logger->error('Email sending failed.', ['exception' => $ex]);
+            $this->emailModelSender->send($emailModel, $origin);
+        } catch (\RuntimeException $exception) {
+            $this->logger->error(
+                sprintf(
+                    'Failed to send email model to %s: %s',
+                    implode(', ', $emailModel->getTo()),
+                    $exception->getMessage()
+                ),
+                ['exception' => $exception, 'emailModel' => $emailModel]
+            );
         }
     }
 
     /**
-     * @param Email                         $email
+     * @param Email $email
      * @param AutoResponseRule[]|Collection $rules
      *
      * @return EmailModel[]|Collection
@@ -216,51 +196,47 @@ class AutoResponseManager
         });
     }
 
-    /**
-     * @param EmailModel    $emailModel
-     * @param EmailTemplate $template
-     * @param Email         $email
-     */
     protected function applyTemplate(EmailModel $emailModel, EmailTemplate $template, Email $email)
     {
-        $locales        = array_merge($email->getAcceptedLocales(), [$this->defaultLocale]);
-        $flippedLocales = array_flip($locales);
-
         $translatedSubjects = [];
         $translatedContents = [];
+        /** @var EmailTemplateTranslation $translation */
         foreach ($template->getTranslations() as $translation) {
-            switch ($translation->getField()) {
-                case 'content':
-                    $translatedContents[$translation->getLocale()] = $translation->getContent();
-                    break;
-                case 'subject':
-                    $translatedSubjects[$translation->getLocale()] = $translation->getContent();
-                    break;
+            $langCode = $translation->getLocalization()->getLanguageCode();
+            if ($translation->getSubject()) {
+                $translatedSubjects[$langCode] = $translation->getSubject();
+            }
+            if ($translation->getContent()) {
+                $translatedContents[$langCode] = $translation->getContent();
             }
         }
 
-        $comparator = ArrayUtil::createOrderedComparator($flippedLocales);
+        $locales = array_flip(array_merge($email->getAcceptedLocales(), [$this->defaultLocale]));
+        $comparator = ArrayUtil::createOrderedComparator($locales);
         uksort($translatedSubjects, $comparator);
         uksort($translatedContents, $comparator);
 
-        $validContents = array_intersect_key($translatedContents, $flippedLocales);
-        $validsubjects = array_intersect_key($translatedSubjects, $flippedLocales);
+        $subjects = array_intersect_key($translatedSubjects, $locales);
+        $subject = reset($subjects);
+        if (false === $subject) {
+            $subject = $template->getSubject() ?? '';
+        }
 
-        $content = reset($validContents);
-        $subject = reset($validsubjects);
-
-        $content = $content === false ? $template->getContent() : $content;
-        $subject = $subject === false ? $template->getSubject() : $subject;
+        $contents = array_intersect_key($translatedContents, $locales);
+        $content = reset($contents);
+        if (false === $content) {
+            $content = $template->getContent() ?? '';
+        }
 
         $emailModel
-            ->setSubject($this->emailRender->renderWithDefaultFilters($subject, ['entity' => $email]))
-            ->setBody($this->emailRender->renderWithDefaultFilters($content, ['entity' => $email]))
+            ->setSubject($this->emailRender->renderTemplate($subject, ['entity' => $email]))
+            ->setBody($this->emailRender->renderTemplate($content, ['entity' => $email]))
             ->setType($template->getType());
     }
 
     /**
      * @param MailBox $mailbox
-     * @param Email   $email
+     * @param Email $email
      *
      * @return AutoResponseRule[]|Collection
      */
@@ -268,8 +244,8 @@ class AutoResponseManager
     {
         return $mailbox->getAutoResponseRules()->filter(function (AutoResponseRule $rule) use ($email) {
             return $rule->isActive()
-            && $this->isExprApplicable($email, $this->createRuleExpr($rule, $email))
-            && $rule->getCreatedAt() < $email->getSentAt();
+                && $this->isExprApplicable($email, $this->createRuleExpr($rule, $email))
+                && $rule->getCreatedAt() < $email->getSentAt();
         });
     }
 
@@ -286,7 +262,7 @@ class AutoResponseManager
 
     /**
      * @param AutoResponseRule $rule
-     * @param Email            $email
+     * @param Email $email
      *
      * @return array
      */
@@ -300,10 +276,6 @@ class AutoResponseManager
         return $this->createGroupExpr([$definition['filters']], $email);
     }
 
-    /**
-     * @param array $group
-     * @param Email $email
-     */
     protected function createGroupExpr(array $group, Email $email)
     {
         $exprs = [];
@@ -360,7 +332,7 @@ class AutoResponseManager
 
         $configs = [];
         foreach ($paths as $path) {
-            $args[0]   = $path;
+            $args[0] = $path;
             $configKey = sprintf('@%s', $this->filterToConditionMap[$condition->getFilterType()]);
             $configs[] = [
                 $configKey => $args,
@@ -379,8 +351,8 @@ class AutoResponseManager
     protected function getFieldPaths($field, $context)
     {
         $delimiter = sprintf('.%s.', static::INDEX_PLACEHOLDER);
-        if (strpos($field, $delimiter) !== false) {
-            list($leftPart) = explode($delimiter, $field);
+        if (str_contains($field, $delimiter)) {
+            [$leftPart] = explode($delimiter, $field);
             $collection = $this->accessor->getValue($context, $leftPart);
             if (!$collection) {
                 return [];
@@ -425,6 +397,6 @@ class AutoResponseManager
      */
     protected function getMailboxRepository()
     {
-        return $this->registry->getRepository('OroEmailBundle:Mailbox');
+        return $this->registry->getRepository(Mailbox::class);
     }
 }

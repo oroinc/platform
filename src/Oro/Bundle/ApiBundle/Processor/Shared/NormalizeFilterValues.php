@@ -3,11 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\SpecialHandlingFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\Constraint;
@@ -16,6 +19,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -31,10 +35,9 @@ class NormalizeFilterValues implements ProcessorInterface
     /** @var EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
-    /**
-     * @param ValueNormalizer             $valueNormalizer
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
+    /** @var Context */
+    private $context;
+
     public function __construct(
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerRegistry $entityIdTransformerRegistry
@@ -55,31 +58,42 @@ class NormalizeFilterValues implements ProcessorInterface
             return;
         }
 
-        $requestType = $context->getRequestType();
-        $metadata = $context->getMetadata();
-        $filters = $context->getFilters();
-        $filterValues = $context->getFilterValues()->getAll();
+        $this->context = $context;
+        try {
+            $this->normalizeFilterValues();
+        } finally {
+            $this->context = null;
+        }
+    }
+
+    private function normalizeFilterValues(): void
+    {
+        $requestType = $this->context->getRequestType();
+        $metadata = $this->context->getMetadata();
+        $filters = $this->context->getFilters();
+        $filterValues = $this->context->getFilterValues()->getAll();
         foreach ($filterValues as $filterKey => $filterValue) {
             if ($filters->has($filterKey)) {
                 $filter = $filters->get($filterKey);
-                if ($filter instanceof StandaloneFilter) {
+                if ($filter instanceof StandaloneFilter && !$filter instanceof SpecialHandlingFilterInterface) {
                     try {
                         $value = $this->normalizeFilterValue(
                             $requestType,
                             $filter,
+                            $filterKey,
                             $filterValue->getValue(),
                             $filterValue->getOperator(),
                             $metadata
                         );
                         $filterValue->setValue($value);
                     } catch (\Exception $e) {
-                        $context->addError(
+                        $this->context->addError(
                             $this->createFilterError($filterKey, $filterValue)->setInnerException($e)
                         );
                     }
                 }
             } else {
-                $context->addError(
+                $this->context->addError(
                     $this->createFilterError($filterKey, $filterValue)->setDetail('The filter is not supported.')
                 );
             }
@@ -89,6 +103,7 @@ class NormalizeFilterValues implements ProcessorInterface
     /**
      * @param RequestType         $requestType
      * @param StandaloneFilter    $filter
+     * @param string              $path
      * @param mixed               $value
      * @param string|null         $operator
      * @param EntityMetadata|null $metadata
@@ -98,6 +113,7 @@ class NormalizeFilterValues implements ProcessorInterface
     private function normalizeFilterValue(
         RequestType $requestType,
         StandaloneFilter $filter,
+        string $path,
         $value,
         ?string $operator,
         ?EntityMetadata $metadata
@@ -105,7 +121,7 @@ class NormalizeFilterValues implements ProcessorInterface
         $dataType = $filter->getDataType();
         $isArrayAllowed = $filter->isArrayAllowed($operator);
         $isRangeAllowed = $filter->isRangeAllowed($operator);
-        if (ComparisonFilter::EXISTS === $operator) {
+        if (FilterOperator::EXISTS === $operator) {
             $dataType = DataType::BOOLEAN;
             $isArrayAllowed = false;
             $isRangeAllowed = false;
@@ -114,6 +130,7 @@ class NormalizeFilterValues implements ProcessorInterface
             if ($fieldName) {
                 if ($metadata->hasAssociation($fieldName)) {
                     return $this->normalizeIdentifierValue(
+                        $path,
                         $value,
                         $isArrayAllowed,
                         $isRangeAllowed,
@@ -126,6 +143,7 @@ class NormalizeFilterValues implements ProcessorInterface
                     $property = $metadata->getPropertyByPropertyPath($fieldName);
                     if (null !== $property && $property->getName() === $idFieldNames[0]) {
                         return $this->normalizeIdentifierValue(
+                            $path,
                             $value,
                             $isArrayAllowed,
                             $isRangeAllowed,
@@ -147,6 +165,7 @@ class NormalizeFilterValues implements ProcessorInterface
     }
 
     /**
+     * @param string         $path
      * @param mixed          $value
      * @param bool           $isArrayAllowed
      * @param bool           $isRangeAllowed
@@ -156,6 +175,7 @@ class NormalizeFilterValues implements ProcessorInterface
      * @return mixed
      */
     private function normalizeIdentifierValue(
+        string $path,
         $value,
         bool $isArrayAllowed,
         bool $isRangeAllowed,
@@ -174,39 +194,95 @@ class NormalizeFilterValues implements ProcessorInterface
 
         if (\is_array($value)) {
             $normalizedValue = [];
+            $hasNotResolvedIdentifiers = false;
             foreach ($value as $val) {
-                $normalizedValue[] = $entityIdTransformer->reverseTransform($val, $metadata);
+                $normalizedId = $entityIdTransformer->reverseTransform($val, $metadata);
+                if (null === $normalizedId) {
+                    $hasNotResolvedIdentifiers = true;
+                    $normalizedId = $this->getNotExistingEntityIdentifier($metadata);
+                }
+                $normalizedValue[] = $normalizedId;
+            }
+            if ($hasNotResolvedIdentifiers) {
+                $this->context->addNotResolvedIdentifier(
+                    ConfigUtil::FILTERS . ConfigUtil::PATH_DELIMITER . $path,
+                    new NotResolvedIdentifier($value, $metadata->getClassName())
+                );
             }
 
             return $normalizedValue;
         }
 
         if ($value instanceof Range) {
-            $value->setFromValue($entityIdTransformer->reverseTransform($value->getFromValue(), $metadata));
-            $value->setToValue($entityIdTransformer->reverseTransform($value->getToValue(), $metadata));
+            $normalizedFromId = $entityIdTransformer->reverseTransform($value->getFromValue(), $metadata);
+            $normalizedToId = $entityIdTransformer->reverseTransform($value->getToValue(), $metadata);
+            if (null === $normalizedFromId || null === $normalizedToId) {
+                $this->context->addNotResolvedIdentifier(
+                    ConfigUtil::FILTERS . ConfigUtil::PATH_DELIMITER . $path,
+                    new NotResolvedIdentifier(
+                        new Range($value->getFromValue(), $value->getToValue()),
+                        $metadata->getClassName()
+                    )
+                );
+                $normalizedFromId = $this->getNotExistingEntityIdentifier($metadata);
+                $normalizedToId = $normalizedFromId;
+            }
+            $value->setFromValue($normalizedFromId);
+            $value->setToValue($normalizedToId);
 
             return $value;
         }
 
-        return $entityIdTransformer->reverseTransform($value, $metadata);
+        $normalizedId = $entityIdTransformer->reverseTransform($value, $metadata);
+        if (null === $normalizedId) {
+            $this->context->addNotResolvedIdentifier(
+                ConfigUtil::FILTERS . ConfigUtil::PATH_DELIMITER . $path,
+                new NotResolvedIdentifier($value, $metadata->getClassName())
+            );
+            $normalizedId = $this->getNotExistingEntityIdentifier($metadata);
+        }
+
+        return $normalizedId;
     }
 
     /**
-     * @param RequestType $requestType
+     * @param EntityMetadata $metadata
      *
-     * @return EntityIdTransformerInterface
+     * @return mixed
      */
+    private function getNotExistingEntityIdentifier(EntityMetadata $metadata)
+    {
+        $idFieldNames = $metadata->getIdentifierFieldNames();
+        if (\count($idFieldNames) === 1) {
+            return $this->getNotExistingIdentifierFieldValue($metadata, reset($idFieldNames));
+        }
+
+        $result = [];
+        foreach ($idFieldNames as $idFieldName) {
+            $result[$idFieldName] = $this->getNotExistingIdentifierFieldValue($metadata, $idFieldName);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param EntityMetadata $metadata
+     * @param string         $idFieldName
+     *
+     * @return mixed
+     */
+    private function getNotExistingIdentifierFieldValue(EntityMetadata $metadata, string $idFieldName)
+    {
+        return DataType::STRING === $metadata->getProperty($idFieldName)->getDataType()
+            ? ''
+            : 0;
+    }
+
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
-    /**
-     * @param string      $filterKey
-     * @param FilterValue $filterValue
-     *
-     * @return Error
-     */
     private function createFilterError(string $filterKey, FilterValue $filterValue): Error
     {
         return Error::createValidationError(Constraint::FILTER)

@@ -2,40 +2,32 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Cache;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
-use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EmailCacheManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dispatcher;
+    private $dispatcher;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $emailBodySynchronizer;
+    private $emailBodySynchronizer;
 
     /** @var EmailCacheManager */
-    protected $manager;
+    private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailBodySynchronizer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManager::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->emailBodySynchronizer = $this->createMock(EmailBodySynchronizer::class);
 
         $this->manager = new EmailCacheManager(
             $this->em,
@@ -59,8 +51,7 @@ class EmailCacheManagerTest extends \PHPUnit\Framework\TestCase
     {
         $email = new Email();
 
-        $this->emailBodySynchronizer
-            ->expects($this->once())
+        $this->emailBodySynchronizer->expects($this->once())
             ->method('syncOneEmailBody');
 
         $this->manager->ensureEmailBodyCached($email);

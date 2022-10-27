@@ -5,9 +5,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors as BaseCollectFormErrors;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Collects errors occurred during submit of forms for primary and included entities
+ * Collects errors occurred when submitting forms for primary and included entities
  * and adds them into the context.
  */
 class CollectFormErrors extends BaseCollectFormErrors
@@ -36,7 +37,7 @@ class CollectFormErrors extends BaseCollectFormErrors
 
                 if ($propertyPath === $associationName) {
                     $errorSource->setPropertyPath('');
-                } elseif (0 === \strpos($propertyPath, $associationName . '.')) {
+                } elseif (str_starts_with($propertyPath, $associationName . ConfigUtil::PATH_DELIMITER)) {
                     $errorSource->setPropertyPath(\substr($propertyPath, \strlen($associationName) + 1));
                 }
             }

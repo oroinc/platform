@@ -1,6 +1,8 @@
 define(function(require) {
     'use strict';
 
+    const NumberEditorView = require('./number-editor-view');
+
     /**
      * Percent cell content editor.
      *
@@ -57,36 +59,46 @@ define(function(require) {
      * @augments [NumberEditorView](./number-editor-view.md)
      * @exports PercentEditorView
      */
-    var PercentEditorView;
-    var NumberEditorView = require('./number-editor-view');
-
-    PercentEditorView = NumberEditorView.extend(/** @lends PercentEditorView.prototype */{
+    const PercentEditorView = NumberEditorView.extend(/** @lends PercentEditorView.prototype */{
         className: 'number-editor',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function PercentEditorView() {
-            PercentEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function PercentEditorView(options) {
+            PercentEditorView.__super__.constructor.call(this, options);
         },
 
         parseRawValue: function(value) {
-            return parseFloat(value) * 100;
+            return this._roundValue(parseFloat(value) * 100);
         },
 
         getModelUpdateData: function() {
-            var data = {};
-            var value = this.getValue();
-            data[this.fieldName] = isNaN(value) ? null : value / 100;
+            const data = {};
+            const value = this.getValue();
+            data[this.fieldName] = isNaN(value) ? null : this._roundValue(value / 100);
             return data;
         },
 
         formatRawValue: function(value) {
-            var raw = this.parseRawValue(value);
+            const raw = this.parseRawValue(value);
             if (isNaN(raw)) {
                 return '';
             }
             return String(raw);
+        },
+
+        /**
+         * Removes insignificant fractional part of a float value that may occurs in result of math operations.
+         * For example, the string representation of the result of 1.11 * 100 is 111.00000000000001,
+         * but we need to show 111 in this case.
+         *
+         * @param {Float} value
+         * @returns {Float}
+         * @private
+         */
+        _roundValue: function(value) {
+            return parseFloat(Math.round(value + 'e12') + 'e-12');
         }
     });
 

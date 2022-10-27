@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_2;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
@@ -33,7 +33,7 @@ class AddApplications implements Migration, DatabasePlatformAwareInterface
             new ParametrizedSqlMigrationQuery(
                 'UPDATE oro_workflow_definition SET applications = :applications WHERE applications IS NULL',
                 ['applications' => [CurrentApplicationProviderInterface::DEFAULT_APPLICATION]],
-                ['applications' => Type::SIMPLE_ARRAY]
+                ['applications' => Types::SIMPLE_ARRAY]
             )
         );
 

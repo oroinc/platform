@@ -2,128 +2,118 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AssignValue;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AssignValueTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ActionInterface
-     */
-    protected $action;
+    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextAccessor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $contextAccessor;
+    /** @var AssignValue */
+    private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\ContextAccessor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contextAccessor = $this->createMock(ContextAccessor::class);
+
         $this->action = new AssignValue($this->contextAccessor);
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute and value parameters are required.
      * @dataProvider invalidOptionsNumberDataProvider
-     * @param array $options
      */
-    public function testInitializeExceptionParametersCount($options)
+    public function testInitializeExceptionParametersCount(array $options)
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute and value parameters are required.');
+
         $this->action->initialize($options);
     }
 
-    public function invalidOptionsNumberDataProvider()
+    public function invalidOptionsNumberDataProvider(): array
     {
-        return array(
-            array(array()),
-            array(array(1)),
-            array(array(1, 2, 3)),
-            array(array('target' => 1)),
-            array(array('value' => 1)),
-        );
+        return [
+            [[]],
+            [[1]],
+            [[1, 2, 3]],
+            [['target' => 1]],
+            [['value' => 1]],
+        ];
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property definition.
      * @dataProvider invalidOptionsAttributeDataProvider
-     * @param array $options
      */
-    public function testInitializeExceptionInvalidAttribute($options)
+    public function testInitializeExceptionInvalidAttribute(array $options)
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property definition.');
+
         $this->action->initialize($options);
     }
 
-    public function invalidOptionsAttributeDataProvider()
+    public function invalidOptionsAttributeDataProvider(): array
     {
-        return array(
-            array(array('test', 'value')),
-            array(array('attribute' => 'test', 'value' => 'value'))
-        );
+        return [
+            [['test', 'value']],
+            [['attribute' => 'test', 'value' => 'value']]
+        ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be defined.
-     */
     public function testInitializeExceptionNoAttribute()
     {
-        $this->action->initialize(array('some' => 'test', 'value' => 'test'));
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be defined.');
+
+        $this->action->initialize(['some' => 'test', 'value' => 'test']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Value must be defined.
-     */
     public function testInitializeExceptionNoValue()
     {
-        $this->action->initialize(array('attribute' => 'test', 'unknown' => 'test'));
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Value must be defined.');
+
+        $this->action->initialize(['attribute' => 'test', 'unknown' => 'test']);
     }
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
      */
-    public function testInitialize($options)
+    public function testInitialize(array $options)
     {
-        $this->assertInstanceOf(
-            'Oro\Component\Action\Action\ActionInterface',
-            $this->action->initialize($options)
-        );
+        self::assertInstanceOf(AssignValue::class, $this->action->initialize($options));
 
-        if (is_array(current($options))) {
-            $expectedAssigns = array_values($options);
+        if (\is_array(\current($options))) {
+            $expectedAssigns = \array_values($options);
         } else {
             $expectedAssigns[] = $options;
         }
 
-        $this->assertAttributeEquals($expectedAssigns, 'assigns', $this->action);
+        self::assertEquals($expectedAssigns, ReflectionUtil::getPropertyValue($this->action, 'assigns'));
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
-        $assigns = array(
-            'numeric arguments' => array(
-                'options' => array($this->getPropertyPath(), 'value')
-            ),
-            'string arguments' => array(
-                'options' => array('attribute' => $this->getPropertyPath(), 'value' => 'value')
-            ),
-            'numeric null value' => array(
-                'options' => array($this->getPropertyPath(), null)
-            ),
-            'string null value' => array(
-                'options' => array('attribute' => $this->getPropertyPath(), 'value' => null)
-            ),
-        );
+        $assigns = [
+            'numeric arguments' => [
+                'options' => [$this->createMock(PropertyPath::class), 'value']
+            ],
+            'string arguments' => [
+                'options' => ['attribute' => $this->createMock(PropertyPath::class), 'value' => 'value']
+            ],
+            'numeric null value' => [
+                'options' => [$this->createMock(PropertyPath::class), null]
+            ],
+            'string null value' => [
+                'options' => ['attribute' => $this->createMock(PropertyPath::class), 'value' => null]
+            ],
+        ];
 
         // unite all single assigns to one mass assign
         $assigns['mass assign'] = $assigns;
@@ -133,37 +123,28 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
      */
-    public function testExecute($options)
+    public function testExecute(array $options)
     {
-        $context = array();
+        $context = [];
         $optionsData = array_values($options);
         if (is_array(current($optionsData))) {
-            for ($i = 0; $i < count($optionsData); $i++) {
-                $assignData = array_values($optionsData[$i]);
-                $attribute = $assignData[0];
-                $value = $assignData[1];
-                $this->contextAccessor->expects($this->at($i))
-                    ->method('setValue')
-                    ->with($context, $attribute, $value);
+            $with = [];
+            foreach ($optionsData as $item) {
+                [$attribute, $value] = array_values($item);
+                $with[] = [$context, $attribute, $value];
             }
+            $this->contextAccessor->expects(self::exactly(count($optionsData)))
+                ->method('setValue')
+                ->withConsecutive(...$with);
         } else {
-            $attribute = $optionsData[0];
-            $value = $optionsData[1];
-            $this->contextAccessor->expects($this->once())
+            [$attribute, $value] = $optionsData;
+            $this->contextAccessor->expects(self::once())
                 ->method('setValue')
                 ->with($context, $attribute, $value);
         }
 
         $this->action->initialize($options);
         $this->action->execute($context);
-    }
-
-    protected function getPropertyPath()
-    {
-        return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

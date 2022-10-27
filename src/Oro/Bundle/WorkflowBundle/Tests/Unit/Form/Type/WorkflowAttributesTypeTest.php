@@ -2,70 +2,73 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $defaultValuesListener;
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflowRegistry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $formInitListener;
+    /** @var AttributeGuesser|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeGuesser;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $requiredAttributesListener;
+    /** @var DefaultValuesListener|\PHPUnit\Framework\MockObject\MockObject */
+    private $defaultValuesListener;
 
-    /**
-     * @var WorkflowAttributesType
-     */
-    protected $type;
+    /** @var FormInitListener|\PHPUnit\Framework\MockObject\MockObject */
+    private $formInitListener;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflowRegistry;
+    /** @var RequiredAttributesListener|\PHPUnit\Framework\MockObject\MockObject */
+    private $requiredAttributesListener;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attributeGuesser;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dispatcher;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $dispatcher;
+    /** @var PropertyPathSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $propertyPathSecurityHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $propertyPathSecurityHelper;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var WorkflowAttributesType */
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowRegistry = $this->createWorkflowRegistryMock();
-        $this->attributeGuesser = $this->createAttributeGuesserMock();
-        $this->defaultValuesListener = $this->createDefaultValuesListenerMock();
-        $this->formInitListener = $this->createFormInitListenerMock();
-        $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
-        $this->dispatcher = $this->createDispatcherMock();
-        $this->propertyPathSecurityHelper = $this->createPropertyPathSecurityHelper();
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
+        $this->attributeGuesser = $this->createMock(AttributeGuesser::class);
+        $this->defaultValuesListener = $this->getMockBuilder(DefaultValuesListener::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['initialize', 'setDefaultValues'])
+            ->getMock();
+        $this->formInitListener = $this->getMockBuilder(FormInitListener::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['initialize', 'executeInitAction'])
+            ->getMock();
+        $this->requiredAttributesListener = $this->getMockBuilder(RequiredAttributesListener::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['initialize', 'onPreSetData', 'onSubmit'])
+            ->getMock();
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->propertyPathSecurityHelper = $this->createMock(PropertyPathSecurityHelper::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->type = $this->createWorkflowAttributesType(
@@ -78,12 +81,10 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $this->propertyPathSecurityHelper,
             $this->translator
         );
+
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtensions()
     {
         return [
@@ -94,13 +95,9 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 []
             ),
         ];
-        parent::setUp();
     }
 
     /**
-     * @param array $attributeField
-     * @param array $expectedOptions
-     *
      * @dataProvider buildFormProvider
      */
     public function testBuildForm(array $attributeField, array $expectedOptions)
@@ -123,15 +120,12 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
         $this->translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($id, $parameters, $domain) {
-                    return $domain === 'custom' ? $id : sprintf('%s-%s', $id, $domain);
-                }
-            );
+            ->willReturnCallback(function ($id, $parameters, $domain) {
+                return $domain === 'custom' ? $id : sprintf('%s-%s', $id, $domain);
+            });
 
-        /* @var $builder FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects($this->at(1))
+        $builder->expects($this->once())
             ->method('add')
             ->with('attr', TextType::class, $expectedOptions)
             ->willReturnSelf();
@@ -139,10 +133,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->type->buildForm($builder, $formOptions);
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormProvider()
+    public function buildFormProvider(): array
     {
         return [
             'root label' => [
@@ -232,12 +223,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     /**
      * @dataProvider submitDataProvider
-     * @param array $submitData
-     * @param WorkflowData $formData
-     * @param array $formOptions
-     * @param array $childrenOptions
-     * @param array $guessedData
-     * @param WorkflowData|null $sourceWorkflowData
      */
     public function testSubmit(
         array $submitData,
@@ -253,22 +238,21 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 ->method('initialize')
                 ->with(
                     $formOptions['workflow_item'],
-                    isset($formOptions['attribute_default_values']) ? $formOptions['attribute_default_values'] : array()
+                    $formOptions['attribute_default_values'] ?? []
                 );
         } else {
-            $this->defaultValuesListener->expects($this->never())->method($this->anything());
+            $this->defaultValuesListener->expects($this->never())
+                ->method($this->anything());
         }
 
         // Check init action listener is subscribed or not subscribed
         if (!empty($formOptions['form_init'])) {
             $this->formInitListener->expects($this->once())
                 ->method('initialize')
-                ->with(
-                    $formOptions['workflow_item'],
-                    $formOptions['form_init']
-                );
+                ->with($formOptions['workflow_item'], $formOptions['form_init']);
         } else {
-            $this->formInitListener->expects($this->never())->method($this->anything());
+            $this->formInitListener->expects($this->never())
+                ->method($this->anything());
         }
 
         // Check required attributes listener is subscribed or not subscribed
@@ -278,22 +262,30 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 ->with(array_keys($formOptions['attribute_fields']));
             $this->requiredAttributesListener->expects($this->once())
                 ->method('onPreSetData')
-                ->with($this->isInstanceOf('Symfony\Component\Form\FormEvent'));
+                ->with($this->isInstanceOf(FormEvent::class));
             $this->requiredAttributesListener->expects($this->once())
                 ->method('onSubmit')
-                ->with($this->isInstanceOf('Symfony\Component\Form\FormEvent'));
+                ->with($this->isInstanceOf(FormEvent::class));
         } else {
-            $this->requiredAttributesListener->expects($this->never())->method($this->anything());
+            $this->requiredAttributesListener->expects($this->never())
+                ->method($this->anything());
         }
 
         // Set guessed data for attributes
-        foreach ($guessedData as $number => $guess) {
-            $typeGuess = new TypeGuess($guess['form_type'], $guess['form_options'], TypeGuess::VERY_HIGH_CONFIDENCE);
-            $this->attributeGuesser->expects($this->at($number))
-                ->method('guessClassAttributeForm')
-                ->with($guess['entity'], $this->isInstanceOf('Oro\Bundle\ActionBundle\Model\Attribute'))
-                ->will($this->returnValue($typeGuess));
+        $guessClassAttributeFormExpectations = [];
+        $guessClassAttributeFormExpectationResults = [];
+        foreach ($guessedData as $guess) {
+            $guessClassAttributeFormExpectations[] = [$guess['entity'], $this->isInstanceOf(Attribute::class)];
+            $guessClassAttributeFormExpectationResults[] = new TypeGuess(
+                $guess['form_type'],
+                $guess['form_options'],
+                TypeGuess::VERY_HIGH_CONFIDENCE
+            );
         }
+        $this->attributeGuesser->expects($this->exactly(count($guessClassAttributeFormExpectations)))
+            ->method('guessClassAttributeForm')
+            ->withConsecutive(...$guessClassAttributeFormExpectations)
+            ->willReturnOnConsecutiveCalls(...$guessClassAttributeFormExpectationResults);
 
         $form = $this->factory->create(WorkflowAttributesType::class, $sourceWorkflowData, $formOptions);
 
@@ -316,261 +308,254 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
-        return array(
-            'empty_attribute_fields' => array(
-                'submitData' => array(),
+        return [
+            'empty_attribute_fields' => [
+                'submitData' => [],
                 'formData' => $this->createWorkflowData(),
-                'formOptions' => array(
+                'formOptions' => [
                     'workflow_item' => $this->createWorkflowItem($workflow = $this->createWorkflow('test_workflow')),
                     'workflow' => $workflow,
-                    'attribute_fields' => array()
-                ),
-                'childrenOptions' => array()
-            ),
-            'existing_data' => array(
-                'submitData' => array('first' => 'first_string', 'second' => 'second_string'),
+                    'attribute_fields' => []
+                ],
+                'childrenOptions' => []
+            ],
+            'existing_data' => [
+                'submitData' => ['first' => 'first_string', 'second' => 'second_string'],
                 'formData' => $this->createWorkflowData(
-                    array(
+                    [
                         'first' => 'first_string',
                         'second' => 'second_string',
-                    )
+                    ]
                 ),
-                'formOptions' => array(
+                'formOptions' => [
                     'workflow' => $workflow = $this->createWorkflow(
                         'test_workflow_with_attributes',
-                        array(
+                        [
                             'first' => $this->createAttribute('first', 'string', 'First'),
                             'second' => $this->createAttribute('second', 'string', 'Second'),
-                        )
+                        ]
                     ),
                     'workflow_item' => $this->createWorkflowItem($workflow),
-                    'attribute_fields' => array(
-                        'first'  => array(
+                    'attribute_fields' => [
+                        'first'  => [
                             'form_type' => TextType::class,
                             'label' => 'First Custom',
-                            'options' => array('required' => true)
-                        ),
-                        'second' => array(
+                            'options' => ['required' => true]
+                        ],
+                        'second' => [
                             'form_type' => TextType::class,
-                            'options' => array('required' => false, 'label' => 'Second Custom')
-                        ),
-                    ),
-                    'attribute_default_values' => array('first' => 'Test'),
-                    'form_init' => $this->createMock('Oro\Component\Action\Action\ActionInterface')
-                ),
-                'childrenOptions' => array(
-                    'first'  => array('label' => 'First Custom', 'required' => true),
-                    'second' => array('label' => 'Second Custom', 'required' => false),
-                )
-            ),
-            'partial_fields' => array(
-                'submitData' => array('first' => 'first_string_modified'),
+                            'options' => ['required' => false, 'label' => 'Second Custom']
+                        ],
+                    ],
+                    'attribute_default_values' => ['first' => 'Test'],
+                    'form_init' => $this->createMock(ActionInterface::class)
+                ],
+                'childrenOptions' => [
+                    'first'  => ['label' => 'First Custom', 'required' => true],
+                    'second' => ['label' => 'Second Custom', 'required' => false],
+                ]
+            ],
+            'partial_fields' => [
+                'submitData' => ['first' => 'first_string_modified'],
                 'formData' => $this->createWorkflowData(
-                    array(
+                    [
                         'first' => 'first_string_modified',
                         'second' => 'second_string',
-                    )
+                    ]
                 ),
-                'formOptions' => array(
+                'formOptions' => [
                     'workflow' => $workflow = $this->createWorkflow(
                         'test_workflow_with_partial_attributes',
-                        array(
+                        [
                             'first' => $this->createAttribute('first', 'string', 'First'),
                             'second' => $this->createAttribute('second', 'string', 'Second'),
-                        )
+                        ]
                     ),
                     'workflow_item' => $this->createWorkflowItem($workflow),
-                    'attribute_fields' => array(
-                        'first'  => array(
+                    'attribute_fields' => [
+                        'first'  => [
                             'form_type' => TextType::class,
                             'label' => 'First Custom',
-                            'options' => array('required' => true)
-                        ),
-                    )
-                ),
-                'childrenOptions' => array(
-                    'first'  => array('label' => 'First Custom', 'required' => true),
-                ),
-                'guessedData' => array(),
+                            'options' => ['required' => true]
+                        ],
+                    ]
+                ],
+                'childrenOptions' => [
+                    'first'  => ['label' => 'First Custom', 'required' => true],
+                ],
+                'guessedData' => [],
                 'sourceWorkflowData' => $this->createWorkflowData(
-                    array(
+                    [
                         'first' => 'first_string',
                         'second' => 'second_string',
-                    )
+                    ]
                 )
-            ),
-            'disable_fields' => array(
-                'submitData' => array('first' => 'first_string', 'second' => 'second_string'),
+            ],
+            'disable_fields' => [
+                'submitData' => ['first' => 'first_string', 'second' => 'second_string'],
                 'formData' => $this->createWorkflowData(),
-                'formOptions' => array(
+                'formOptions' => [
                     'workflow' => $workflow = $this->createWorkflow(
                         'test_workflow_with_attributes',
-                        array(
+                        [
                             'first' => $this->createAttribute('first', 'string', 'First'),
                             'second' => $this->createAttribute('second', 'string', 'Second'),
-                        )
+                        ]
                     ),
                     'workflow_item' => $this->createWorkflowItem($workflow),
-                    'attribute_fields' => array(
-                        'first'  => array('form_type' => TextType::class, 'options' => array('required' => true)),
-                        'second' => array('form_type' => TextType::class, 'options' => array('required' => false)),
-                    ),
+                    'attribute_fields' => [
+                        'first'  => ['form_type' => TextType::class, 'options' => ['required' => true]],
+                        'second' => ['form_type' => TextType::class, 'options' => ['required' => false]],
+                    ],
                     'disable_attribute_fields' => true
-                ),
-                'childrenOptions' => array(
-                    'first'  => array('label' => 'First', 'required' => true, 'disabled' => true),
-                    'second' => array('label' => 'Second', 'required' => false, 'disabled' => true),
-                )
-            ),
-            'guessed_fields' => array(
-                'submitData' => array('first' => 'first_string'),
-                'formData' => $this->createWorkflowData(array('first' => 'first_string')),
-                'formOptions' => array(
+                ],
+                'childrenOptions' => [
+                    'first'  => ['label' => 'First', 'required' => true, 'disabled' => true],
+                    'second' => ['label' => 'Second', 'required' => false, 'disabled' => true],
+                ]
+            ],
+            'guessed_fields' => [
+                'submitData' => ['first' => 'first_string'],
+                'formData' => $this->createWorkflowData(['first' => 'first_string']),
+                'formOptions' => [
                     'workflow' => $workflow = $this->createWorkflow(
                         'test_workflow_with_attributes',
-                        array('first' => $this->createAttribute('first', null, 'Attribute Label', 'entity.first')),
-                        array(),
+                        ['first' => $this->createAttribute('first', null, 'Attribute Label', 'entity.first')],
+                        [],
                         'RelatedEntity'
                     ),
                     'workflow_item' => $this->createWorkflowItem($workflow),
-                    'attribute_fields' => array(
+                    'attribute_fields' => [
                         'first' => null
-                    ),
-                ),
-                'childrenOptions' => array(
-                    'first'  => array(
+                    ],
+                ],
+                'childrenOptions' => [
+                    'first'  => [
                         'label' => 'Guessed Label',
                         'required' => false,
                         'attr' => [
                             'maxlength' => 50
                         ]
-                    ),
-                ),
-                'guessedData' => array(
-                    array(
+                    ],
+                ],
+                'guessedData' => [
+                    [
                         'entity' => 'RelatedEntity',
                         'form_type' => TextType::class,
-                        'form_options' => array(
+                        'form_options' => [
                             'label' => 'Guessed Label',
                             'attr' => [
                                 'maxlength' => 50
                             ]
-                        )
-                    )
-                ),
-            )
-        );
+                        ]
+                    ]
+                ],
+            ]
+        ];
     }
 
     /**
      * @dataProvider submitWithExceptionDataProvider
      */
     public function testSubmitWithException(
-        $expectedException,
-        $expectedMessage,
+        string $expectedException,
+        string $expectedMessage,
         array $options
     ) {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedMessage);
 
         $form = $this->factory->create(WorkflowAttributesType::class, null, $options);
-        $form->submit(array());
+        $form->submit([]);
     }
 
-    /**
-     * @return array
-     */
-    public function submitWithExceptionDataProvider()
+    public function submitWithExceptionDataProvider(): array
     {
-        return array(
-            'no_workflow_item' => array(
-                'expectedException' => 'Symfony\Component\OptionsResolver\Exception\MissingOptionsException',
+        return [
+            'no_workflow_item' => [
+                'expectedException' => MissingOptionsException::class,
                 'expectedMessage' =>
                     'The required option "workflow_item" is missing.',
-                'options' => array(),
-            ),
-            'unknown_workflow_attribute' => array(
-                'expectedException' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
+                'options' => [],
+            ],
+            'unknown_workflow_attribute' => [
+                'expectedException' => InvalidConfigurationException::class,
                 'expectedMessage' => 'Invalid reference to unknown attribute "first" of workflow "test_workflow".',
-                'options' => array(
+                'options' => [
                     'workflow' => $workflow = $this->createWorkflow('test_workflow'),
                     'workflow_item' => $this->createWorkflowItem($workflow),
-                    'attribute_fields' => array(
-                        'first'  => array('form_type' => TextType::class, 'options' => array('required' => true))
-                    ),
-                ),
-            ),
-            'form_type_is_not_defined' => array(
-                'expectedException' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
+                    'attribute_fields' => [
+                        'first'  => ['form_type' => TextType::class, 'options' => ['required' => true]]
+                    ],
+                ],
+            ],
+            'form_type_is_not_defined' => [
+                'expectedException' => InvalidConfigurationException::class,
                 'expectedMessage' =>
                     'Parameter "form_type" must be defined for attribute "test" in workflow "test_workflow".',
-                'options' => array(
+                'options' => [
                     'workflow' => $this->createWorkflow(
                         'test_workflow',
-                        array(
+                        [
                             'test' => $this->createAttribute('test', 'string', 'Test')
-                        )
+                        ]
                     ),
                     'workflow_item' => $this->createWorkflowItem($workflow),
-                    'attribute_fields' => array(
-                        'test'  => array()
-                    ),
-                )
-            ),
-            'form_type_cant_guessed' => array(
-                'expectedException' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
+                    'attribute_fields' => [
+                        'test'  => []
+                    ],
+                ]
+            ],
+            'form_type_cant_guessed' => [
+                'expectedException' => InvalidConfigurationException::class,
                 'expectedMessage' =>
                     'Parameter "form_type" must be defined for attribute "test" in workflow "test_workflow".',
-                'options' => array(
+                'options' => [
                     'workflow' => $this->createWorkflow(
                         'test_workflow',
-                        array(
+                        [
                             'test' => $this->createAttribute('test', null, null, 'entity.field')
-                        )
+                        ]
                     ),
                     'workflow_item' => $this->createWorkflowItem($workflow),
-                    'attribute_fields' => array(
-                        'test'  => array()
-                    ),
-                )
-            ),
-        );
+                    'attribute_fields' => [
+                        'test'  => []
+                    ],
+                ]
+            ],
+        ];
     }
 
     public function testNotEditableAttributes()
     {
         $entity = (object)['first' => null, 'second' => null];
-        $formData = $this->createWorkflowData(array('entity' => $entity));
+        $formData = $this->createWorkflowData(['entity' => $entity]);
         $workflow = $this->createWorkflow(
             'test_workflow_with_attributes',
-            array(
+            [
                 'first' => $this->createAttribute('first', 'string', 'First'),
                 'second' => $this->createAttribute('second', 'string', 'Second'),
-            )
+            ]
         );
         $workflow->getDefinition()->setEntityAttributeName('entity');
-        $formOptions = array(
+        $formOptions = [
             'workflow' => $workflow,
             'workflow_item' => $this->createWorkflowItem($workflow),
-            'attribute_fields' => array(
-                'first'  => array('form_type' => TextType::class),
-                'second' => array('form_type' => TextType::class)
-            )
-        );
+            'attribute_fields' => [
+                'first'  => ['form_type' => TextType::class],
+                'second' => ['form_type' => TextType::class]
+            ]
+        ];
 
-        $this->propertyPathSecurityHelper->expects($this->at(0))
+        $this->propertyPathSecurityHelper->expects($this->exactly(2))
             ->method('isGrantedByPropertyPath')
-            ->with($entity, 'first', 'EDIT')
-            ->willReturn(true);
-        $this->propertyPathSecurityHelper->expects($this->at(1))
-            ->method('isGrantedByPropertyPath')
-            ->with($entity, 'second', 'EDIT')
-            ->willReturn(false);
+            ->willReturnMap([
+                [$entity, 'first', 'EDIT', true],
+                [$entity, 'second', 'EDIT', false]
+            ]);
 
         $form = $this->factory->create(WorkflowAttributesType::class, $formData, $formOptions);
 
@@ -599,7 +584,8 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
         ];
 
-        $this->propertyPathSecurityHelper->expects($this->never())->method('isGrantedByPropertyPath');
+        $this->propertyPathSecurityHelper->expects($this->never())
+            ->method('isGrantedByPropertyPath');
 
         $form = $this->factory->create(WorkflowAttributesType::class, $formData, $formOptions);
 
@@ -610,13 +596,15 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     public function testNormalizers()
     {
         $expectedWorkflow = $this->createWorkflow('test_workflow');
-        $options = array(
+        $options = [
             'workflow_item' => $this->createWorkflowItem($expectedWorkflow),
-            'attribute_fields' => array(),
-        );
+            'attribute_fields' => [],
+        ];
 
-        $this->workflowRegistry->expects($this->once())->method('getWorkflow')
-            ->with($expectedWorkflow->getName())->will($this->returnValue($expectedWorkflow));
+        $this->workflowRegistry->expects($this->once())
+            ->method('getWorkflow')
+            ->with($expectedWorkflow->getName())
+            ->willReturn($expectedWorkflow);
 
         $this->factory->create(WorkflowAttributesType::class, null, $options);
     }

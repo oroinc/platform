@@ -6,34 +6,29 @@ use Oro\Bundle\FormBundle\Validator\HtmlPurifierTelValidator;
 
 class HtmlPurifierTelValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var HtmlPurifierTelValidator */
-    protected $validator;
-
     /** @var \HTMLPurifier_URI */
-    protected $uri;
+    private $uri;
 
-    protected function setUp()
+    /** @var HtmlPurifierTelValidator */
+    private $validator;
+
+    protected function setUp(): void
     {
-        $this->validator = new HtmlPurifierTelValidator();
         $this->uri = new \HTMLPurifier_URI('scheme', 'userinfo', 'host', 'port', 'path', 'query', 'fragment');
+
+        $this->validator = new HtmlPurifierTelValidator();
     }
 
     /**
-     * @param string $phone
-     * @param bool $expectedValue
-     *
      * @dataProvider phoneProvider
      */
-    public function testPhones($phone, $expectedValue)
+    public function testPhones(string $phone, bool $expectedValue)
     {
         $this->uri->path = $phone;
         $this->assertEquals($expectedValue, $this->validator->doValidate($this->uri, null, null));
     }
 
-    /**
-     * @return array
-     */
-    public function phoneProvider()
+    public function phoneProvider(): array
     {
         return [
             [

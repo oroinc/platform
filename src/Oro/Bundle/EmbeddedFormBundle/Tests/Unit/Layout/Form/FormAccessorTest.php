@@ -4,21 +4,23 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormInterface;
 
 class FormAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_NAME = 'test_form';
+    private const FORM_NAME = 'test_form';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $form;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $this->form = $this->createMock(FormInterface::class);
         $this->form->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue(self::FORM_NAME));
+            ->willReturn(self::FORM_NAME);
     }
 
     public function testGetForm()
@@ -54,24 +56,23 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
         $formAction = 'test_action';
         $formMethod = 'test_method';
 
-        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $formView   = new FormView();
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formView = new FormView();
 
         $formView->vars['multipart'] = false;
 
         $this->form->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $this->form->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
         $formConfig->expects($this->once())
             ->method('getAction')
-            ->will($this->returnValue($formAction));
+            ->willReturn($formAction);
         $formConfig->expects($this->once())
             ->method('getMethod')
-            ->will($this->returnValue($formMethod));
+            ->willReturn($formMethod);
 
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
@@ -86,23 +87,23 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
         $formAction = 'test_action';
         $formMethod = 'test_method';
 
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $formView   = new FormView();
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formView = new FormView();
 
         $formView->vars['multipart'] = true;
 
         $this->form->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $this->form->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
         $formConfig->expects($this->once())
             ->method('getAction')
-            ->will($this->returnValue($formAction));
+            ->willReturn($formAction);
         $formConfig->expects($this->once())
             ->method('getMethod')
-            ->will($this->returnValue($formMethod));
+            ->willReturn($formMethod);
 
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
@@ -115,15 +116,15 @@ class FormAccessorTest extends \PHPUnit\Framework\TestCase
         // form
         //   field1
         //     field2
-        $formView                       = new FormView();
-        $field1View                     = new FormView($formView);
-        $formView->children['field1']   = $field1View;
-        $field2View                     = new FormView($field1View);
+        $formView = new FormView();
+        $field1View = new FormView($formView);
+        $formView->children['field1'] = $field1View;
+        $field2View = new FormView($field1View);
         $field1View->children['field2'] = $field2View;
 
         $this->form->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
 
         $formAccessor = new FormAccessor($this->form);
         $this->assertSame($formView, $formAccessor->getView());

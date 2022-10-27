@@ -5,8 +5,6 @@ namespace Oro\Bundle\ConfigBundle\Tests\Behat\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\ActivityListBundle\Tests\Behat\Element\ActivityList;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SidebarConfigMenu;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\AllowedColorsMapping;
@@ -21,11 +19,10 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
 class FeatureContext extends OroFeatureContext implements
-    KernelAwareContext,
     FixtureLoaderAwareInterface,
     OroPageObjectAware
 {
-    use KernelDictionary, FixtureLoaderDictionary, PageObjectDictionary, AllowedColorsMapping;
+    use FixtureLoaderDictionary, PageObjectDictionary, AllowedColorsMapping;
 
     /**
      * Follow link on sidebar in configuration menu
@@ -255,5 +252,57 @@ class FeatureContext extends OroFeatureContext implements
         /** @var SidebarConfigMenu $sidebarConfigMenu */
         $sidebarConfigMenu = $this->createElement('SidebarConfigMenu');
         $sidebarConfigMenu->collapseAll();
+    }
+
+    /**
+     * Enables (set to true) certain config options
+     * Used instead of manual walking on configuration like "System/ Configuration"
+     *
+     * Example: I enable configuration options:
+     *      | oro_config.setting1 |
+     *      | oro_config.setting2 |
+     *
+     * @Given /^I enable configuration options:$/
+     */
+    public function enableConfigOptions(TableNode $table): void
+    {
+        $configManager = $this->getAppContainer()->get('oro_config.global');
+        foreach ($table->getRows() as $row) {
+            $configManager->set($row[0], true);
+        }
+
+        $configManager->flush();
+    }
+
+    /**
+     * Disables (set to false) certain config options
+     * Used instead of manual walking on configuration like "System/ Configuration"
+     *
+     * Example: I disable configuration options:
+     *      | oro_config.setting1 |
+     *      | oro_config.setting2 |
+     *
+     * @Given /^I disable configuration options:$/
+     */
+    public function disableConfigOptions(TableNode $table): void
+    {
+        $configManager = $this->getAppContainer()->get('oro_config.global');
+        foreach ($table->getRows() as $row) {
+            $configManager->set($row[0], false);
+        }
+
+        $configManager->flush();
+    }
+
+    /**
+     * @When /^(?:|I )set configuration property "(?P<key>[^"]+)" to "(?P<value>[^"]+)"$/
+     * @param string $key
+     * @param string $value
+     */
+    public function setConfigurationProperty($key, $value)
+    {
+        $configManager = $this->getAppContainer()->get('oro_config.global');
+        $configManager->set($key, $value);
+        $configManager->flush();
     }
 }

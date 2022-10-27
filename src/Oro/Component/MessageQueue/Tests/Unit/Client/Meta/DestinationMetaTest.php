@@ -1,37 +1,24 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Client\Meta;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 
 class DestinationMetaTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithExpectedArguments()
+    public function testCouldBeConstructedWithExpectedArguments(): void
     {
-        $destination = new DestinationMeta('aClientName', 'aTransportName');
-        
-        $this->assertAttributeEquals('aClientName', 'clientName', $destination);
-        $this->assertAttributeEquals('aTransportName', 'transportName', $destination);
-        $this->assertAttributeEquals([], 'subscribers', $destination);
+        $destination = new DestinationMeta('queue_name', 'transport_queue_name');
+
+        self::assertEquals('queue_name', $destination->getQueueName());
+        self::assertEquals('transport_queue_name', $destination->getTransportQueueName());
+        self::assertEquals([], $destination->getMessageProcessors());
     }
 
-    public function testShouldAllowGetClientNameSetInConstructor()
+    public function testShouldAllowGetSubscribersSetInConstructor(): void
     {
-        $destination = new DestinationMeta('theClientName', 'aTransportName');
-        
-        $this->assertSame('theClientName', $destination->getClientName());
-    }
+        $destination = new DestinationMeta('queue_name', 'transport_queue_name', ['message_processor1']);
 
-    public function testShouldAllowGetTransportNameSetInConstructor()
-    {
-        $destination = new DestinationMeta('aClientName', 'theTransportName');
-
-        $this->assertSame('theTransportName', $destination->getTransportName());
-    }
-
-    public function testShouldAllowGetSubscribersSetInConstructor()
-    {
-        $destination = new DestinationMeta('aClientName', 'aTransportName', ['aSubscriber']);
-
-        $this->assertSame(['aSubscriber'], $destination->getSubscribers());
+        self::assertSame(['message_processor1'], $destination->getMessageProcessors());
     }
 }

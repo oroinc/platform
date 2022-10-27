@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DatagridBundle\Tests\Unit\Stub;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Stub;
 
 class SomeEntity
 {

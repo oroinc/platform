@@ -4,147 +4,221 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var EnumValueProvider
-     */
-    protected $provider;
+    /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
-    /**
-     * @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $cache;
+    /** @var EnumValueProvider */
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->cache = $this->createMock(EnumTranslationCache::class);
+
         $this->provider = new EnumValueProvider($this->doctrineHelper, $this->cache);
     }
 
-    public function testGetEnumChoices()
+    public function testGetEnumChoicesWithoutCachedValue()
     {
-        $enumClass = '\stdClass';
-        $expected = ['Name' => 'id'];
-
-        $this->assertEnumChoices($enumClass);
-        $this->assertEquals($expected, $this->provider->getEnumChoices($enumClass));
-    }
-
-    public function testGetEnumChoicesWithEmptyCache()
-    {
-        $enumClass = 'FooBar';
-        $expected = ['Name' => 'id'];
-
-        $this->cache->expects($this->once())
-            ->method('contains')
-            ->with($enumClass)
-            ->willReturn(false);
-        $this->cache->expects($this->never())
-            ->method('fetch');
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with($enumClass, $expected);
-
-        $this->assertEnumChoices($enumClass);
-        $this->assertEquals($expected, $this->provider->getEnumChoices($enumClass));
-    }
-
-    public function testGetEnumChoicesFromCache()
-    {
-        $enumClass = 'FooBar';
-        $expected  = [1 => 'Test'];
-
-        $this->cache->expects($this->once())
-            ->method('contains')
-            ->with($enumClass)
-            ->willReturn(true);
-        $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with($enumClass)
-            ->willReturn($expected);
-        $this->cache->expects($this->never())
-            ->method('save');
-
-        $this->doctrineHelper->expects($this->never())
-            ->method('getEntityRepository')
-            ->with($enumClass);
-
-        $this->assertEquals($expected, $this->provider->getEnumChoices($enumClass));
-    }
-
-    public function testGetEnumChoicesByCode()
-    {
-        $code = 'test_enum';
         $enumClass = 'Extend\Entity\EV_Test_Enum';
-        $expected = ['Name' => 'id'];
+        $expected = ['Test Value' => 'test_val'];
+        $repo = $this->createMock(EnumValueRepository::class);
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with($enumClass, $repo)
+            ->willReturn(array_flip($expected));
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityRepository')
+            ->with($enumClass)
+            ->willReturn($repo);
 
-        $this->assertEnumChoices($enumClass);
-        $this->assertEquals($expected, $this->provider->getEnumChoicesByCode($code));
+        self::assertEquals($expected, $this->provider->getEnumChoices($enumClass));
     }
 
-    /**
-     * @param string $enumClass
-     */
-    protected function assertEnumChoices($enumClass)
+    public function testGetEnumChoicesWithCachedValue()
     {
-        $enum = $this->createMock(AbstractEnumValue::class);
-        $enum->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue('id'));
-        $enum->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('Name'));
-        $values = [$enum];
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $expected = ['Test' => '1'];
 
         $repo = $this->createMock(EnumValueRepository::class);
-        $repo->expects($this->once())
-            ->method('getValues')
-            ->will($this->returnValue($values));
-
-        $this->doctrineHelper->expects($this->once())
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with($enumClass, $repo)
+            ->willReturn(array_flip($expected));
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepository')
             ->with($enumClass)
-            ->will($this->returnValue($repo));
+            ->willReturn($repo);
+
+        // We use assertSame here to get a data type proof comparison.
+        self::assertSame($expected, $this->provider->getEnumChoices($enumClass));
+    }
+
+    public function testGetEnumChoicesByCodeWithoutCachedValue()
+    {
+        $enumCode = 'test_enum';
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $expected = ['Test Value' => 'test_val'];
+
+        $repo = $this->createMock(EnumValueRepository::class);
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with($enumClass, $repo)
+            ->willReturn(array_flip($expected));
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityRepository')
+            ->with($enumClass)
+            ->willReturn($repo);
+
+        self::assertEquals($expected, $this->provider->getEnumChoicesByCode($enumCode));
+    }
+
+    public function testGetEnumChoicesByCodeWithCachedValue()
+    {
+        $enumCode = 'test_enum';
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $expected = ['Test Value' => 'test_val'];
+
+        $repo = $this->createMock(EnumValueRepository::class);
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with($enumClass, $repo)
+            ->willReturn(array_flip($expected));
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityRepository')
+            ->with($enumClass)
+            ->willReturn($repo);
+
+        self::assertEquals($expected, $this->provider->getEnumChoicesByCode($enumCode));
     }
 
     public function testGetEnumValueByCode()
     {
-        $code = 'test_enum';
+        $enumCode = 'test_enum';
         $enumClass = 'Extend\Entity\EV_Test_Enum';
-        $id = 1;
-        $instance = new \stdClass();
+        $id = 'test_val';
+        $value = new TestEnumValue($id, 'Test Value');
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityReference')
             ->with($enumClass, $id)
-            ->will($this->returnValue($instance));
+            ->willReturn($value);
 
-        $this->assertEquals($instance, $this->provider->getEnumValueByCode($code, $id));
+        self::assertSame($value, $this->provider->getEnumValueByCode($enumCode, $id));
     }
 
-    public function getDefaultEnumValuesByCode()
+    public function testGetDefaultEnumValues()
     {
-        $code = 'test_enum';
         $enumClass = 'Extend\Entity\EV_Test_Enum';
-        $id = 1;
-        $instance = new \stdClass();
+        $value = new TestEnumValue('test_val', 'Test Value');
 
-        $this->doctrineHelper->expects($this->once())
+        $repo = $this->createMock(EnumValueRepository::class);
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepository')
             ->with($enumClass)
-            ->will($this->returnValue([$instance]));
+            ->willReturn($repo);
+        $repo->expects(self::once())
+            ->method('getDefaultValues')
+            ->willReturn([$value]);
 
-        $this->assertEquals([$instance], $this->provider->getEnumValueByCode($code, $id));
+        self::assertSame([$value], $this->provider->getDefaultEnumValues($enumClass));
+    }
+
+    public function testGetDefaultEnumValuesByCode()
+    {
+        $enumCode = 'test_enum';
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $value = new TestEnumValue('test_val', 'Test Value');
+
+        $repo = $this->createMock(EnumValueRepository::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityRepository')
+            ->with($enumClass)
+            ->willReturn($repo);
+        $repo->expects(self::once())
+            ->method('getDefaultValues')
+            ->willReturn([$value]);
+
+        self::assertSame([$value], $this->provider->getDefaultEnumValuesByCode($enumCode));
+    }
+
+    public function testGetDefaultEnumValue()
+    {
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $value = new TestEnumValue('test_val', 'Test Value');
+
+        $repo = $this->createMock(EnumValueRepository::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityRepository')
+            ->with($enumClass)
+            ->willReturn($repo);
+        $repo->expects(self::once())
+            ->method('getDefaultValues')
+            ->willReturn([$value]);
+
+        self::assertSame($value, $this->provider->getDefaultEnumValue($enumClass));
+    }
+
+    public function testGetDefaultEnumValueWhenNoDefaultEnumValues()
+    {
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+
+        $repo = $this->createMock(EnumValueRepository::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityRepository')
+            ->with($enumClass)
+            ->willReturn($repo);
+        $repo->expects(self::once())
+            ->method('getDefaultValues')
+            ->willReturn([]);
+
+        self::assertNull($this->provider->getDefaultEnumValue($enumClass));
+    }
+
+    public function testGetDefaultEnumValueByCode()
+    {
+        $enumCode = 'test_enum';
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $value = new TestEnumValue('test_val', 'Test Value');
+
+        $repo = $this->createMock(EnumValueRepository::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityRepository')
+            ->with($enumClass)
+            ->willReturn($repo);
+        $repo->expects(self::once())
+            ->method('getDefaultValues')
+            ->willReturn([$value]);
+
+        self::assertSame($value, $this->provider->getDefaultEnumValueByCode($enumCode));
+    }
+
+    public function testGetDefaultEnumValueByCodeWhenNoDefaultEnumValues()
+    {
+        $enumCode = 'test_enum';
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+
+        $repo = $this->createMock(EnumValueRepository::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityRepository')
+            ->with($enumClass)
+            ->willReturn($repo);
+        $repo->expects(self::once())
+            ->method('getDefaultValues')
+            ->willReturn([]);
+
+        self::assertNull($this->provider->getDefaultEnumValueByCode($enumCode));
     }
 }

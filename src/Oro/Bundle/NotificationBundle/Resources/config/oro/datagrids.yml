@@ -14,7 +14,7 @@ datagrids:
                     - e.status
                     - e.processedAt
                 from:
-                    - { table: OroNotificationBundle:MassNotification, alias: e }
+                    - { table: Oro\Bundle\NotificationBundle\Entity\MassNotification, alias: e }
 
         columns:
             sender:
@@ -85,45 +85,42 @@ datagrids:
 
     email-notification-grid:
         options:
-            entityHint: transactional emails
+            entityHint: oro.notification.emailnotification.datagrid.entity_hint
             entity_pagination: true
         acl_resource: oro_notification_emailnotification_view
-        extended_entity_name: '%oro_notification.emailnotification.entity.class%'
+        extended_entity_name: 'Oro\Bundle\NotificationBundle\Entity\EmailNotification'
         source:
             type: orm
             query:
                 select:
-                    - partial e.{id, entityName}
-                    - event.name as eventName
-                    - event.id as eventId
+                    - partial e.{id, entityName, eventName}
                     - recipientList.email as emailRecipient
                     - template.name as templateName
                 from:
-                    - { table: OroNotificationBundle:EmailNotification, alias: e }
+                    - { table: Oro\Bundle\NotificationBundle\Entity\EmailNotification, alias: e }
                 join:
                     left:
-                        - { join: e.event, alias: event }
                         - { join: e.template, alias: template }
                         - { join: e.recipientList, alias: recipientList }
                         - { join: recipientList.users, alias: recipientUsersList }
                         - { join: recipientList.groups, alias: recipientGroupsList }
-                groupBy: e.id, eventName, eventId, emailRecipient, templateName
+                groupBy: e.id, emailRecipient, templateName
 
         columns:
             entityName:
                 label: oro.notification.emailnotification.entity_name.label
                 data_name: entityName
                 type: twig
-                template: OroEntityBundle:Datagrid:Property/entity.html.twig
+                template: '@OroEntity/Datagrid/Property/entity.html.twig'
                 frontend_type: html
                 context:
                     entity_provider: '@oro_entity.entity_provider'
                 order: 10
 
             eventName:
-                label: oro.notification.emailnotification.event.label
+                label: oro.notification.emailnotification.event_name.label
                 type: translatable
-                choices: "@oro_notification.event_listener.email_notification_service->getEventNameChoices"
+                choices: "@oro_notification.grid_helper->getEventNameChoices"
                 order: 20
 
             templateName:
@@ -133,15 +130,15 @@ datagrids:
             recipientUsersList:
                 label: oro.notification.datagrid.recipient.user
                 type: twig
-                template: OroNotificationBundle:EmailNotification:Datagrid/Property/recipientUsersList.html.twig
+                template: '@OroNotification/EmailNotification/Datagrid/Property/recipientUsersList.html.twig'
                 frontend_type: html
                 order: 60
 
             recipientGroupsList:
                 label: oro.notification.datagrid.recipient.group
                 type: twig
-                template: OroNotificationBundle:EmailNotification:Datagrid/Property/recipientGroupsList.html.twig
-                choices: "@oro_notification.event_listener.email_notification_service->getRecipientGroupsChoices"
+                template: '@OroNotification/EmailNotification/Datagrid/Property/recipientGroupsList.html.twig'
+                choices: "@oro_notification.grid_helper->getRecipientGroupsChoices"
                 frontend_type: html
                 order: 70
 
@@ -149,6 +146,7 @@ datagrids:
                 label: oro.notification.datagrid.recipient.custom_email
                 frontend_type: string
                 order: 80
+                cellClassName: 'direction-ltr'
 
         properties:
             id: ~
@@ -193,11 +191,11 @@ datagrids:
                 eventName:
                     filter_by_having: true
                     type: choice
-                    data_name: eventId
+                    data_name: eventName
                     options:
                         field_options:
                             multiple: true
-                            choices: "@oro_notification.event_listener.email_notification_service->getEventNameChoices"
+                            choices: "@oro_notification.grid_helper->getEventNameChoices"
 
                 templateName:
                     type: string
@@ -209,7 +207,7 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
-                            choices: "@oro_notification.event_listener.email_notification_service->getRecipientUsersChoices"
+                            choices: "@oro_notification.grid_helper->getRecipientUsersChoices"
 
                 recipientGroupsList:
                     type: choice
@@ -217,8 +215,167 @@ datagrids:
                     options:
                         field_options:
                             multiple: true
-                            choices: "@oro_notification.event_listener.email_notification_service->getRecipientGroupsChoices"
+                            choices: "@oro_notification.grid_helper->getRecipientGroupsChoices"
 
                 emailRecipient:
                     type: string
                     data_name: emailRecipient
+
+    oro-notification-alerts-grid:
+        acl_resource: oro_notification_alert_view
+        source:
+            type: orm
+            query:
+                select:
+                    - alert.id
+                    - alert.sourceType
+                    - alert.resourceType
+                    - alert.alertType
+                    - alert.operation
+                    - alert.step as operationStep
+                    - alert.itemId
+                    - alert.externalId
+                    - alert.resolved
+                    - alert.message
+                    - CONCAT_WS(' ', user.firstName, user.lastName) as userName
+                    - alert.createdAt
+                    - alert.updatedAt
+                from:
+                    - { table: 'Oro\Bundle\NotificationBundle\Entity\NotificationAlert', alias: alert }
+                join:
+                    left:
+                        - { join: alert.user, alias: user }
+        properties:
+            id: ~
+        inline_editing:
+            enable: false
+        columns:
+            id:
+                label: oro.notification.notificationalert.id.label
+                frontend_type: string
+                order: 10
+            createdAt:
+                label: oro.ui.created_at
+                frontend_type: datetime
+                order: 20
+            updatedAt:
+                label: oro.ui.updated_at
+                frontend_type: datetime
+                order: 30
+            userName:
+                label: oro.notification.notificationalert.user.label
+                frontend_type: relation
+                order: 40
+            message:
+                label: oro.notification.notificationalert.message.label
+                frontend_type: string
+                order: 50
+            sourceType:
+                label: oro.notification.notificationalert.source_type.label
+                frontend_type: string
+                order: 60
+            resourceType:
+                label: oro.notification.notificationalert.resource_type.label
+                frontend_type: string
+                order: 70
+            alertType:
+                label: oro.notification.notificationalert.alert_type.label
+                frontend_type: string
+                order: 80
+            operation:
+                label: oro.notification.notificationalert.operation.label
+                frontend_type: string
+                order: 90
+            operationStep:
+                label: oro.notification.notificationalert.step.label
+                frontend_type: string
+                order: 100
+            itemId:
+                label: oro.notification.notificationalert.item_id.label
+                frontend_type: string
+                order: 110
+            externalId:
+                label: oro.notification.notificationalert.external_id.label
+                type: twig
+                frontend_type: html
+                template: '@OroNotification/NotificationAlert/Property/externalId.html.twig'
+                order: 120
+            resolved:
+                label: oro.notification.notificationalert.resolved.label
+                frontend_type: boolean
+                order: 130
+        sorters:
+            columns:
+                id:
+                    data_name: alert.id
+                createdAt:
+                    data_name: alert.createdAt
+                updatedAt:
+                    data_name: alert.updatedAt
+                userName:
+                    data_name: userName
+                message:
+                    data_name: alert.message
+                sourceType:
+                    data_name: alert.sourceType
+                resourceType:
+                    data_name: alert.resourceType
+                alertType:
+                    data_name: alert.alertType
+                operation:
+                    data_name: alert.operation
+                operationStep:
+                    data_name: operationStep
+                itemId:
+                    data_name: alert.itemId
+                externalId:
+                    data_name: alert.externalId
+                resolved:
+                    data_name: alert.resolved
+            default:
+                createdAt: DESC
+        filters:
+            columns:
+                id:
+                    type: string
+                    data_name: alert.id
+                createdAt:
+                    type: datetime
+                    data_name: alert.createdAt
+                updatedAt:
+                    type: datetime
+                    data_name: alert.updatedAt
+                userName:
+                    type: string
+                    data_name: userName
+                message:
+                    type: string
+                    data_name: alert.message
+                sourceType:
+                    type: string
+                    data_name: alert.sourceType
+                resourceType:
+                    type: string
+                    data_name: alert.resourceType
+                alertType:
+                    type: string
+                    data_name: alert.alertType
+                operation:
+                    type: string
+                    data_name: alert.operation
+                operationStep:
+                    type: string
+                    data_name: operationStep
+                itemId:
+                    data_name: alert.itemId
+                    type: number
+                externalId:
+                    data_name: alert.externalId
+                    type: string
+                resolved:
+                    data_name: alert.resolved
+                    type: boolean
+        options:
+            entityHint: oro.notification.notificationalert.entity_plural_label
+            export: true
+        views_list: "@oro_notification.notification_alert.datagrid_view_list"

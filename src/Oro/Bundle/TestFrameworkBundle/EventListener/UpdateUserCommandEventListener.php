@@ -15,17 +15,11 @@ class UpdateUserCommandEventListener
     /** @var UserManager */
     protected $userManager;
 
-    /**
-     * @param UserManager $userManager
-     */
     public function __construct(UserManager $userManager)
     {
         $this->userManager = $userManager;
     }
 
-    /**
-     * @param ConsoleTerminateEvent $event
-     */
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
     {
         if ($event->getCommand() instanceof UpdateUserCommand) {
@@ -40,7 +34,7 @@ class UpdateUserCommandEventListener
             }
 
             /** @var User $user */
-            $user = $this->userManager->loadUserByUsername($userName);
+            $user = $this->userManager->findUserByUsername($userName);
             $user
                 ->setUsername('admin')
                 ->setPlainPassword('admin')
@@ -49,7 +43,7 @@ class UpdateUserCommandEventListener
                 ->setEmail('admin@example.com')
                 ->setSalt('');
 
-            $this->userManager->updateUser($user, true);
+            $this->userManager->updateUser($user);
         }
     }
 }

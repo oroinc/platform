@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Model;
 
-use Doctrine\Common\EventManager;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -17,34 +15,23 @@ use Oro\Component\Testing\Doctrine\StubEventListener;
  */
 class WorkflowManagerTest extends WorkflowTestCase
 {
-    /** @var EntityManager */
-    protected $entityManger;
-
-    /** @var WorkflowManager */
-    protected $systemWorkflowManager;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
-        $this->entityManger = $this->getEntityManager(WorkflowAwareEntity::class);
-        $this->systemWorkflowManager = self::getSystemWorkflowManager();
     }
 
     /**
-     * @param int $entitiesCount
-     * @param int $postFlushCalls
-     *
      * @dataProvider massStartWorkflowDataProvider
      */
-    public function testMassStartWorkflow($entitiesCount, $postFlushCalls)
+    public function testMassStartWorkflow(int $entitiesCount, int $postFlushCalls)
     {
         $startArgumentList = $this->getStartArgumentList($entitiesCount);
 
         $listenerMock = $this->createMock(StubEventListener::class);
-        $listenerMock->expects($this->exactly($postFlushCalls))->method('postFlush');
+        $listenerMock->expects($this->exactly($postFlushCalls))
+            ->method('postFlush');
 
-        /** @var EventManager $eventManager */
-        $eventManager = $this->entityManger->getEventManager();
+        $eventManager = $this->getEntityManager(WorkflowAwareEntity::class)->getEventManager();
         $eventManager->addEventListener(Events::postFlush, $listenerMock);
 
         $this->getSystemWorkflowManager()->massStartWorkflow($startArgumentList);
@@ -53,14 +40,13 @@ class WorkflowManagerTest extends WorkflowTestCase
         $this->assertWorkflowItemsCount($entitiesCount);
     }
 
-    /**
-     * @return \Generator
-     */
-    public function massStartWorkflowDataProvider()
+    public function massStartWorkflowDataProvider(): array
     {
-        yield 'less than batch size' => [WorkflowManager::MASS_START_BATCH_SIZE - 1, 2];
-        yield 'batch size' => [WorkflowManager::MASS_START_BATCH_SIZE, 2];
-        yield 'greater than batch size' => [WorkflowManager::MASS_START_BATCH_SIZE + 1, 4];
+        return [
+            'less than batch size' => [WorkflowManager::MASS_START_BATCH_SIZE - 1, 2],
+            'batch size' => [WorkflowManager::MASS_START_BATCH_SIZE, 2],
+            'greater than batch size' => [WorkflowManager::MASS_START_BATCH_SIZE + 1, 4]
+        ];
     }
 
     public function testMassStartWorkflowWithRollback()
@@ -71,11 +57,13 @@ class WorkflowManagerTest extends WorkflowTestCase
 
         $listenerMock = $this->createMock(StubEventListener::class);
 
-        $listenerMock->expects($this->exactly(1))->method('onFlush')->willThrowException(new \Exception('Message'));
-        $listenerMock->expects($this->exactly(0))->method('postFlush');
+        $listenerMock->expects($this->once())
+            ->method('onFlush')
+            ->willThrowException(new \Exception('Message'));
+        $listenerMock->expects($this->exactly(0))
+            ->method('postFlush');
 
-        /** @var EventManager $eventManager */
-        $eventManager = $this->entityManger->getEventManager();
+        $eventManager = $this->getEntityManager(WorkflowAwareEntity::class)->getEventManager();
         $eventManager->addEventListener(Events::onFlush, $listenerMock);
         $eventManager->addEventListener(Events::postFlush, $listenerMock);
 
@@ -85,13 +73,7 @@ class WorkflowManagerTest extends WorkflowTestCase
         $this->assertWorkflowTransitionRecordCount(0 + count($transitionRecords));
     }
 
-    /**
-     * @param int $size
-     *
-     * @return array
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
-    private function getStartArgumentList($size = 10)
+    private function getStartArgumentList(int $size = 10): array
     {
         $startArgumentList = [];
 
@@ -103,11 +85,11 @@ class WorkflowManagerTest extends WorkflowTestCase
                 'start_transition'
             );
         }
-        $this->entityManger->flush();
+        $this->getEntityManager(WorkflowAwareEntity::class)->flush();
 
         $this->assertWorkflowItemsCount(0);
 
-        self::loadWorkflowFrom('/Tests/Functional/Model/DataFixtures/config/MassStart');
+        $this->loadWorkflowFrom('/Tests/Functional/Model/DataFixtures/config/MassStart');
 
         return $startArgumentList;
     }

@@ -7,21 +7,15 @@ use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
 
 class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailBodyBuilder
-     */
-    protected $emailBodyBuilder;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var EmailBodyBuilder */
+    private $emailBodyBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->emailBodyBuilder = new EmailBodyBuilder($this->configManager);
     }
@@ -35,19 +29,15 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $body->getTextBody());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetEmptyEmailBody()
     {
+        $this->expectException(\LogicException::class);
         $this->emailBodyBuilder->getEmailBody();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testAddEmailAttachmentWithoutBody()
     {
+        $this->expectException(\LogicException::class);
         $this->emailBodyBuilder->addEmailAttachment(
             'test',
             'content',
@@ -59,26 +49,32 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $expected
-     * @param [] $data
-     * @param bool $configSyncEnabled
-     * @param int $configSyncMaxSize
-     *
      * @dataProvider addAttachmentProvider
      */
-    public function testAddAttachment($expected, $data, $configSyncEnabled, $configSyncMaxSize)
-    {
+    public function testAddAttachment(
+        bool $expected,
+        array $data,
+        ?bool $configSyncEnabled,
+        int|float|null $configSyncMaxSize
+    ) {
         $this->emailBodyBuilder->setEmailBody('test', true);
 
-        $this->configManager->expects($this->at(0))
-            ->method('get')
-            ->with(EmailBodyBuilder::ORO_EMAIL_ATTACHMENT_SYNC_ENABLE)
-            ->willReturn($configSyncEnabled);
         if ($configSyncEnabled) {
-            $this->configManager->expects($this->at(1))
+            $this->configManager->expects($this->exactly(2))
                 ->method('get')
-                ->with(EmailBodyBuilder::ORO_EMAIL_ATTACHMENT_SYNC_MAX_SIZE)
-                ->willReturn($configSyncMaxSize);
+                ->withConsecutive(
+                    [EmailBodyBuilder::ORO_EMAIL_ATTACHMENT_SYNC_ENABLE],
+                    [EmailBodyBuilder::ORO_EMAIL_ATTACHMENT_SYNC_MAX_SIZE]
+                )
+                ->willReturn(
+                    $configSyncEnabled,
+                    $configSyncMaxSize
+                );
+        } else {
+            $this->configManager->expects($this->once())
+                ->method('get')
+                ->with(EmailBodyBuilder::ORO_EMAIL_ATTACHMENT_SYNC_ENABLE)
+                ->willReturn($configSyncEnabled);
         }
 
         $this->emailBodyBuilder->addEmailAttachment(
@@ -94,7 +90,7 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $body->getHasAttachments());
     }
 
-    public function addAttachmentProvider()
+    public function addAttachmentProvider(): array
     {
         return [
             'not set' => [

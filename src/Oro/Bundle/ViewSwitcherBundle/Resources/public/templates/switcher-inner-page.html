@@ -1,0 +1,36 @@
+<% if (showSwitcher) { %>
+    <header class="head-panel <%- styleMode %>">
+        <div class="head-panel__inner">
+            <div class="head-panel__col head-panel__col--side" data-role="control-action"></div>
+            <div class="head-panel__col head-panel__col--center">
+                <nav class="view-switcher">
+                    <% _.each(items, function (item) { %>
+                    <a href="#" data-view-name="<%- item.name %>" title="<%- item.title %>" tabindex="-1" aria-label="<%- item.title %>"
+                       class="<%- item.name %> view-switcher__item<% if (item.name === activeView) {%> active<% } %>">
+                    </a>
+                    <% }) %>
+                </nav>
+                <div class="head-panel__trigger-wrapper" role="button">
+                    <div class="head-panel__trigger" aria-label="show / hide switcher"></div>
+                </div>
+            </div>
+            <div class="head-panel__col head-panel__col--side">
+                <button class="head-panel__link head-panel__link--help" data-click-action="open-help-carousel">
+                    <span class="head-panel__link-icon fa fa-info-circle" aria-hidden="true"></span>
+                    <%- _.__('oro_viewswitcher.inner_page_model.needHelp') %>
+                </button>
+
+                <% if (personalDemoUrl) { %>
+                    <a href="<%- personalDemoUrl %>" class="btn btn--light-solid" target="_blank" tabindex="-1" rel="noopener">
+                        <%- _.__('oro_viewswitcher.inner_page_model.personalizedDemo') %>
+                    </a>
+                <% } %>
+            </div>
+        </div>
+    </header>
+<% } %>
+<main class="content-area">
+    <div class="content-area__wrapper" data-view-name="<%- activeView %>">
+        <iframe class="content-area__iframe" src="<%- url %>" name="<%- frameName %>" title="<%- frameTitle %>"></iframe>
+    </div>
+</main>

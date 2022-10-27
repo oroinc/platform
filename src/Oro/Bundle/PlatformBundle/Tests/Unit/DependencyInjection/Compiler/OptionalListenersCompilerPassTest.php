@@ -22,16 +22,16 @@ class OptionalListenersCompilerPassTest extends \PHPUnit\Framework\TestCase
         $nonInterfaceSubscriberDefinition->addTag('doctrine.event_subscriber');
 
         $testOrmListenerDefinition = new Definition(TestListener::class);
-        $testOrmListenerDefinition->addTag('doctrine.orm.entity_listener');
+        $testOrmListenerDefinition->addTag('doctrine.orm.entity_listener')->setPublic(false);
         $testListenerDefinition = new Definition(TestListener::class);
-        $testListenerDefinition->addTag('doctrine.event_listener');
+        $testListenerDefinition->addTag('doctrine.event_listener')->setPublic(false);
         $testSubscriberDefinition = new Definition(TestListener::class);
-        $testSubscriberDefinition->addTag('doctrine.event_subscriber');
+        $testSubscriberDefinition->addTag('doctrine.event_subscriber')->setPublic(false);
 
         $kernelListenerDefinition = new Definition(TestListener::class);
-        $kernelListenerDefinition->addTag('kernel.event_listener');
+        $kernelListenerDefinition->addTag('kernel.event_listener')->setPublic(false);
         $kernelSubscriberDefinition = new Definition(TestListener::class);
-        $kernelSubscriberDefinition->addTag('kernel.event_subscriber');
+        $kernelSubscriberDefinition->addTag('kernel.event_subscriber')->setPublic(false);
 
         $container->addDefinitions(
             [
@@ -45,6 +45,12 @@ class OptionalListenersCompilerPassTest extends \PHPUnit\Framework\TestCase
                 'kernel.subscriber'               => $kernelSubscriberDefinition,
             ]
         );
+
+        $this->assertFalse($kernelListenerDefinition->isPublic());
+        $this->assertFalse($kernelSubscriberDefinition->isPublic());
+        $this->assertFalse($testOrmListenerDefinition->isPublic());
+        $this->assertFalse($testListenerDefinition->isPublic());
+        $this->assertFalse($testSubscriberDefinition->isPublic());
 
         $managerDefinition = new Definition();
         $managerDefinition->addArgument([]);
@@ -61,5 +67,11 @@ class OptionalListenersCompilerPassTest extends \PHPUnit\Framework\TestCase
             ],
             $managerDefinition->getArgument(0)
         );
+
+        $this->assertTrue($kernelListenerDefinition->isPublic());
+        $this->assertTrue($kernelSubscriberDefinition->isPublic());
+        $this->assertTrue($testOrmListenerDefinition->isPublic());
+        $this->assertTrue($testListenerDefinition->isPublic());
+        $this->assertTrue($testSubscriberDefinition->isPublic());
     }
 }

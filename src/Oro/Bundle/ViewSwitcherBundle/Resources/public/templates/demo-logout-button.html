@@ -1,0 +1,9 @@
+<div class="head-panel__logo<% if (isLoggedIn) { %> logo-hidden<% } %>">
+    <span tabindex="-1" class="head-panel__link" role="button" data-click-action="logout">
+        <span class="head-panel__link-icon head-panel__link-icon--colored fa fa-chevron-left" aria-hidden="true"></span>
+        <% if (backToLoginIcon) { %>
+             <span class="head-panel__link-icon fa <%- backToLoginIcon %>" aria-hidden="true"></span>
+        <% } %>
+        <%- _.__('oro_viewswitcher.inner_page_model.backToLogin') %>
+    </span>
+</div>

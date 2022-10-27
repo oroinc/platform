@@ -3,29 +3,74 @@ oro_note_bundle:
     type:         annotation
     prefix:       /
 
-oro_note_bundle_api:
-    resource: "@OroNoteBundle/Controller/Api/Rest/NoteController.php"
-    type: rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-    defaults:
-        version:  latest
 
 #
-# REST actions
+# OLD REST API ROUTES
 #
+
 oro_api_get_notes:
-    path: api/rest/{version}/notes/{entityClass}/{entityId}.{_format}
-    defaults: {_controller: OroNoteBundle:Api/Rest/Note:cget, _format: json}
+    path: '/api/rest/{version}/notes/{entityClass}/{entityId}.{_format}'
     methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController::cgetAction'
+        _format: json
+    requirements:
+        entityId: \d+
+        _format: json|html
+        version: latest|v1
 
 oro_api_get_note:
-    path: api/rest/{version}/notes/{id}.{_format}
-    defaults: {_controller: OroNoteBundle:Api/Rest/Note:get, _format: json}
+    path: '/api/rest/{version}/notes/{id}.{_format}'
     methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController::getAction'
+        _format: json
+    requirements:
+        id: \d+
+        _format: json|html
+        version: latest|v1
 
 oro_api_post_note:
-    path: api/rest/{version}/notes.{_format}
-    defaults: {_controller: OroNoteBundle:Api/Rest/Note:post, _format: json}
+    path: '/api/rest/{version}/notes.{_format}'
     methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController::postAction'
+        _format: json
+    requirements:
+        _format: json|html
+        version: latest|v1
+
+oro_api_put_note:
+    path: '/api/rest/{version}/notes/{id}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController::putAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json|html
+        version: latest|v1
+
+oro_api_delete_note:
+    path: '/api/rest/{version}/notes/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json|html
+        version: latest|v1
+
+oro_api_options_notes:
+    path: '/api/rest/{version}/notes.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\NoteBundle\Controller\Api\Rest\NoteController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json|html
+        version: latest|v1

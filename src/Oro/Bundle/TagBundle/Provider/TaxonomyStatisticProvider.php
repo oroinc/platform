@@ -5,7 +5,6 @@ namespace Oro\Bundle\TagBundle\Provider;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Taxonomy;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
 
@@ -23,12 +22,6 @@ class TaxonomyStatisticProvider
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
-    /**
-     * @param EntityManager       $entityManager
-     * @param SecurityProvider    $securityProvider
-     * @param ConfigProvider      $configProvider
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(
         EntityManager $entityManager,
         SecurityProvider $securityProvider,

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -11,25 +12,32 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for number filters
+ */
 class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
 {
-    const NAME = 'oro_type_number_filter';
-    const ARRAY_SEPARATOR = ',';
+    public const NAME = 'oro_type_number_filter';
+    public const ARRAY_SEPARATOR = ',';
+    public const OPTION_KEY_FORMATTER_OPTION = 'formatter_options';
 
     /**
      * @var TranslatorInterface
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(TranslatorInterface $translator)
-    {
+    private NumberFormatter $numberFormatter;
+
+    public function __construct(
+        TranslatorInterface $translator,
+        NumberFormatter $numberFormatter
+    ) {
         $this->translator = $translator;
+        $this->numberFormatter = $numberFormatter;
     }
 
     /**
@@ -71,7 +79,8 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
                     $options = $form->get('value')->getConfig()->getOptions();
                     $form->remove('value');
                     $form->add('value', TextType::class, [
-                        'label' => $options['label'], 'required' => $options['required']
+                        'label' => $options['label'],
+                        'required' => $options['required']
                     ]);
                 }
             }
@@ -97,20 +106,22 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         ];
 
         $resolver->setDefaults(
-            array(
-                'field_type'        => NumberType::class,
-                'operator_choices'  => $operatorChoices,
-                'data_type'         => self::DATA_INTEGER,
-                'formatter_options' => array()
-            )
+            [
+                'field_type' => NumberType::class,
+                'operator_choices' => $operatorChoices,
+                'data_type' => self::DATA_INTEGER,
+                self::OPTION_KEY_FORMATTER_OPTION => []
+            ]
         );
+        $resolver->setNormalizer('field_options', function (Options $options, $fieldOptions) {
+            if ($options['data_type'] !== self::DATA_INTEGER && $options['field_type'] === NumberType::class) {
+                $fieldOptions['limit_decimals'] = false;
+            }
+
+            return $fieldOptions;
+        });
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $dataType = self::DATA_INTEGER;
@@ -118,17 +129,17 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
             $dataType = $options['data_type'];
         }
 
-        $formatterOptions = array();
-
+        $formatterOptions = [];
         switch ($dataType) {
             case self::PERCENT:
-                $formatterOptions['decimals'] = 2;
-                $formatterOptions['grouping'] = false;
+                $formatterOptions['grouping'] = true;
                 $formatterOptions['percent'] = true;
                 break;
             case self::DATA_DECIMAL:
-                $formatterOptions['decimals'] = 2;
                 $formatterOptions['grouping'] = true;
+                if (isset($options['field_options']['scale'])) {
+                    $formatterOptions['decimals'] = $options['field_options']['scale'];
+                }
                 break;
             case self::DATA_INTEGER:
             default:
@@ -136,17 +147,19 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
                 $formatterOptions['grouping'] = false;
         }
 
-        $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);
-
         $formatterOptions['orderSeparator'] = $formatterOptions['grouping']
-            ? $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL)
+            ? $this->numberFormatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, \NumberFormatter::DECIMAL)
             : '';
 
-        $formatterOptions['decimalSeparator'] = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+        $formatterOptions['decimalSeparator'] = $this->numberFormatter->getSymbol(
+            \NumberFormatter::DECIMAL_SEPARATOR_SYMBOL,
+            \NumberFormatter::DECIMAL
+        );
 
         $view->vars['formatter_options'] = array_merge($formatterOptions, $options['formatter_options']);
         $view->vars['array_separator'] = self::ARRAY_SEPARATOR;
         $view->vars['array_operators'] = self::ARRAY_TYPES;
         $view->vars['data_type'] = $dataType;
+        $view->vars['limit_decimals'] = $options['field_options']['limit_decimals'] ?? false;
     }
 }

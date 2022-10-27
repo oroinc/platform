@@ -4,16 +4,9 @@ namespace Oro\Bundle\EmailBundle\DependencyInjection;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
-use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * This is the class that validates and merges configuration from your config files
- *
- * To learn more see
- * {@link http://symfony.com/doc/current/cookbook/bundles/extension.html#cookbook-bundles-extension-config-class}
- */
 class Configuration implements ConfigurationInterface
 {
     const KEY_SMTP_SETTINGS = 'smtp_settings';
@@ -28,13 +21,19 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root('oro_email');
+        $treeBuilder = new TreeBuilder('oro_email');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
                 ->arrayNode('email_sync_exclusions')
                     ->info('Determines which email address owners should be excluded during synchronization.')
+                    ->example(['Oro\Bundle\UserBundle\Entity\User'])
+                    ->treatNullLike([])
+                    ->prototype('scalar')->end()
+                ->end()
+                ->arrayNode('public_email_owners')
+                    ->info('Determines which email address owners should be processed as public.')
                     ->example(['Oro\Bundle\UserBundle\Entity\User'])
                     ->treatNullLike([])
                     ->prototype('scalar')->end()
@@ -62,6 +61,7 @@ class Configuration implements ConfigurationInterface
                 'show_recent_emails_in_user_bar' => ['value' => true],
                 'attachment_sync_enable' => ['value' => true],
                 'attachment_sync_max_size' => ['value' => 50],
+                'attachment_max_size' => ['value' => 10],
                 'attachment_preview_limit' => ['value' => 8],
                 'sanitize_html' => ['value' => false],
                 'threads_grouping' => ['value' => true],

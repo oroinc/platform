@@ -6,8 +6,13 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
+/**
+ * The set of static methods to help working with layout blocks.
+ */
 class BlockUtils
 {
+    private const UNIQUE_BLOCK_PREFIX_PATTERN = '/[^a-z0-9\_]+/i';
+
     /**
      * Registers the plugin for the block type.
      * You can use this method to add the additional block prefix that allow you
@@ -70,10 +75,8 @@ class BlockUtils
         } elseif ($options->isExistsAndNotEmpty($routeName)) {
             $view->vars[$routeName] = $options[$routeName];
 
-            $routeParamName              = null !== $prefix ? $prefix . '_route_parameters' : 'route_parameters';
-            $view->vars[$routeParamName] = isset($options[$routeParamName])
-                ? $options[$routeParamName]
-                : [];
+            $routeParamName = null !== $prefix ? $prefix . '_route_parameters' : 'route_parameters';
+            $view->vars[$routeParamName] = $options[$routeParamName] ?? [];
         } elseif ($required) {
             throw new MissingOptionsException(
                 sprintf('Either "%s" or "%s" must be set.', $pathName, $routeName)
@@ -81,16 +84,20 @@ class BlockUtils
         }
     }
 
-    /**
-     * @param BlockView $view
-     * @param Options   $options
-     * @param array     $optionNames
-     */
-    public static function setViewVarsFromOptions(BlockView $view, Options $options, array $optionNames)
+    public static function setViewVarsFromOptions(BlockView $view, Options $options, array $optionNames): void
     {
         foreach ($optionNames as $optionName) {
             $view->vars[$optionName] = isset($options[$optionName]) ? $options->get($optionName, false) : null;
         }
+    }
+
+    public static function populateComputedViewVars(array &$vars, string $contextHash): void
+    {
+        $id = $vars['id'];
+        $type = $vars['block_type'];
+        $vars['block_type_widget_id'] = $type . '_widget';
+        $vars['unique_block_prefix']  = '_' . preg_replace(self::UNIQUE_BLOCK_PREFIX_PATTERN, '_', $id);
+        $vars['cache_key'] = sprintf('_%s_%s_%s', $id, $type, $contextHash);
     }
 
     /**

@@ -1,15 +1,14 @@
-define([
-    'underscore',
-    './header-cell/header-cell',
-    'chaplin',
-    '../app/components/column-renderer-component',
-    './util'
-], function(_, HeaderCell, Chaplin, ColumnRendererComponent, util) {
+define(function(require) {
     'use strict';
 
-    var HeaderRow;
+    const _ = require('underscore');
+    const HeaderCell = require('./header-cell/header-cell');
+    const Chaplin = require('chaplin');
+    const ColumnRendererComponent = require('../app/components/column-renderer-component');
 
-    HeaderRow = Chaplin.CollectionView.extend({
+    const HeaderRow = Chaplin.CollectionView.extend({
+        optionNames: ['ariaRowIndex'],
+
         tagName: 'tr',
 
         className: '',
@@ -25,14 +24,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function HeaderRow() {
-            HeaderRow.__super__.constructor.apply(this, arguments);
+        constructor: function HeaderRow(options) {
+            HeaderRow.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.columns = options.columns;
@@ -40,16 +39,16 @@ define([
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
-            var _this = this;
+            const headerRowView = this;
             _.extend(this, _.pick(options, ['themeOptions', 'template']));
             // let descendants override itemView
             if (!this.itemView) {
                 this.itemView = function(options) {
-                    var column = options.model;
-                    var CurrentHeaderCell = column.get('headerCell') || options.headerCell || HeaderCell;
-                    var cellOptions = {
+                    const column = options.model;
+                    const CurrentHeaderCell = column.get('headerCell') || options.headerCell || HeaderCell;
+                    const cellOptions = {
                         column: column,
-                        collection: _this.dataCollection,
+                        collection: headerRowView.dataCollection,
                         themeOptions: {
                             className: 'grid-cell grid-header-cell'
                         }
@@ -57,19 +56,19 @@ define([
                     if (column.get('name')) {
                         cellOptions.themeOptions.className += ' grid-header-cell-' + column.get('name');
                     }
-                    _this.columns.trigger('configureInitializeOptions', CurrentHeaderCell, cellOptions);
+                    headerRowView.columns.trigger('configureInitializeOptions', CurrentHeaderCell, cellOptions);
                     return new CurrentHeaderCell(cellOptions);
                 };
             }
 
             this.columnRenderer = new ColumnRendererComponent(options);
 
-            HeaderRow.__super__.initialize.apply(this, arguments);
+            HeaderRow.__super__.initialize.call(this, options);
             this.cells = this.subviews;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -86,7 +85,7 @@ define([
             if (this.template) {
                 this.renderCustomTemplate();
             } else {
-                HeaderRow.__super__.render.apply(this, arguments);
+                HeaderRow.__super__.render.call(this);
             }
             this._resolveDeferredRender();
 
@@ -94,11 +93,11 @@ define([
         },
 
         renderCustomTemplate: function() {
-            var self = this;
+            const self = this;
             this.$el.html(this.template({
                 themeOptions: this.themeOptions ? this.themeOptions : {},
                 render: function(columnName) {
-                    var columnModel = _.find(self.columns.models, function(model) {
+                    const columnModel = _.find(self.columns.models, function(model) {
                         return model.get('name') === columnName;
                     });
                     if (columnModel) {
@@ -107,8 +106,8 @@ define([
                     return '';
                 },
                 attributes: function(columnName, additionalAttributes) {
-                    var attributes = additionalAttributes || {};
-                    var columnModel = _.find(self.columns.models, function(model) {
+                    const attributes = additionalAttributes || {};
+                    const columnModel = _.find(self.columns.models, function(model) {
                         return model.get('name') === columnName;
                     });
                     if (columnModel) {
@@ -125,6 +124,12 @@ define([
             }, this);
 
             return this;
+        },
+
+        _attributes() {
+            return {
+                'aria-rowindex': this.ariaRowIndex
+            };
         }
     });
 

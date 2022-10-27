@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,29 +22,17 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var TitleExtension */
     private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->titleService = $this->getMockBuilder(TitleServiceInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->getMock();
+        $this->titleService = $this->createMock(TitleServiceInterface::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_navigation.title_service', $this->titleService)
-            ->add('request_stack', $this->requestStack)
+            ->add(RequestStack::class, $this->requestStack)
             ->getContainer($this);
 
         $this->extension = new TitleExtension($container);
-    }
-
-    public function testNameConfigured()
-    {
-        $this->assertInternalType('string', $this->extension->getName());
     }
 
     public function testRenderSerialized()
@@ -53,20 +42,18 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->setRouteName($routeName);
 
-        $this->titleService->expects($this->at(0))
+        $this->titleService->expects(self::once())
             ->method('loadByRoute')
             ->with($routeName)
-            ->will($this->returnSelf());
-
-        $this->titleService->expects($this->at(1))
+            ->willReturnSelf();
+        $this->titleService->expects(self::once())
             ->method('setData')
-            ->will($this->returnSelf());
-
-        $this->titleService->expects($this->at(2))
+            ->willReturnSelf();
+        $this->titleService->expects(self::once())
             ->method('getSerialized')
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedResult,
             self::callTwigFunction($this->extension, 'oro_title_render_serialized', [])
         );
@@ -80,22 +67,20 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->setRouteName($routeName);
 
-        $this->titleService->expects($this->at(0))
+        $this->titleService->expects(self::once())
             ->method('loadByRoute')
             ->with($routeName)
-            ->will($this->returnSelf());
-
-        $this->titleService->expects($this->at(1))
+            ->willReturnSelf();
+        $this->titleService->expects(self::once())
             ->method('setData')
             ->with([])
-            ->will($this->returnSelf());
-
-        $this->titleService->expects($this->at(2))
+            ->willReturnSelf();
+        $this->titleService->expects(self::once())
             ->method('render')
             ->with([], $title, null, null, true)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedResult,
             self::callTwigFunction($this->extension, 'oro_title_render', [$title])
         );
@@ -109,22 +94,20 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->setRouteName($routeName);
 
-        $this->titleService->expects($this->at(0))
+        $this->titleService->expects(self::once())
             ->method('loadByRoute')
             ->with($routeName)
-            ->will($this->returnSelf());
-
-        $this->titleService->expects($this->at(1))
+            ->willReturnSelf();
+        $this->titleService->expects(self::once())
             ->method('setData')
             ->with([])
-            ->will($this->returnSelf());
-
-        $this->titleService->expects($this->at(2))
+            ->willReturnSelf();
+        $this->titleService->expects(self::once())
             ->method('render')
             ->with([], $title, null, null, true, true)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedResult,
             self::callTwigFunction($this->extension, 'oro_title_render_short', [$title])
         );
@@ -132,13 +115,11 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider renderAfterSetDataProvider
-     * @param array $data
-     * @param array $expectedData
      */
     public function testRenderAfterSet(array $data, array $expectedData)
     {
         foreach ($data as $arguments) {
-            list($data, $templateScope) = array_pad($arguments, 2, null);
+            [$data, $templateScope] = array_pad($arguments, 2, null);
             $this->extension->set($data, $templateScope);
         }
 
@@ -148,31 +129,26 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->setRouteName($routeName);
 
-        $this->titleService->expects($this->at(0))
+        $this->titleService->expects(self::once())
             ->method('loadByRoute')
             ->with($routeName)
-            ->will($this->returnSelf());
-
-        $this->titleService->expects($this->at(1))
+            ->willReturnSelf();
+        $this->titleService->expects(self::once())
             ->method('setData')
-            ->with($expectedData)
-            ->will($this->returnSelf());
-
-        $this->titleService->expects($this->at(2))
+            ->with(self::identicalTo($expectedData))
+            ->willReturnSelf();
+        $this->titleService->expects(self::once())
             ->method('render')
             ->with([], $title, null, null, true)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedResult,
             self::callTwigFunction($this->extension, 'oro_title_render', [$title])
         );
     }
 
-    /**
-     * @return array
-     */
-    public function renderAfterSetDataProvider()
+    public function renderAfterSetDataProvider(): array
     {
         return [
             'override options in same template' => [
@@ -188,12 +164,20 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
                     [['k1' => 'v1'], 'child_template'],
                     [['k1' => 'v2'], 'child_template'],
                     [['k3' => 'v3'], 'child_template'],
+                    [['k5' => ['k1' => 'v2', 'k2' => 'val2']], 'child_template'],
                     [['k1' => 'v4'], 'parent_template'],
                     [['k2' => 'v5'], 'parent_template'],
                     [['k3' => 'v6'], 'parent_template'],
                     [['k4' => 'v7'], 'parent_template'],
+                    [['k5' => ['k1' => 'v1', 'k3' => 'val3']], 'parent_template'],
                 ],
-                ['k1' => 'v2', 'k2' => 'v5', 'k3' => 'v3', 'k4' => 'v7'],
+                [
+                    'k1' => 'v2',
+                    'k2' => 'v5',
+                    'k3' => 'v3',
+                    'k4' => 'v7',
+                    'k5' => ['k1' => 'v2', 'k3' => 'val3', 'k2' => 'val2']
+                ],
             ],
             'empty data' => [
                 [],
@@ -207,18 +191,15 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
         $fooData = ['k' => 'foo'];
         $barData = ['k' => 'bar'];
 
-        $this->titleService->expects($this->never())
+        $this->titleService->expects(self::never())
             ->method('setData');
 
         $this->extension->set($fooData);
         $this->extension->set($barData);
 
-        $this->assertAttributeEquals(
-            [
-                md5(__FILE__) => [$fooData, $barData]
-            ],
-            'templateFileTitleDataStack',
-            $this->extension
+        self::assertEquals(
+            [md5(__FILE__) => [$fooData, $barData]],
+            ReflectionUtil::getPropertyValue($this->extension, 'templateFileTitleDataStack')
         );
     }
 
@@ -226,22 +207,19 @@ class TitleExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->extension->getTokenParsers();
 
-        $this->assertInternalType('array', $result);
-        $this->assertCount(1, $result);
+        self::assertIsArray($result);
+        self::assertCount(1, $result);
     }
 
-    /**
-     * @param string $routeName
-     */
-    protected function setRouteName($routeName)
+    private function setRouteName(string $routeName): void
     {
-        $request = $this->getMockBuilder(Request::class)->disableOriginalConstructor()->getMock();
-        $request->expects($this->any())
+        $request = $this->createMock(Request::class);
+        $request->expects(self::any())
             ->method('get')
             ->with('_route')
             ->willReturn($routeName);
 
-        $this->requestStack->expects($this->any())
+        $this->requestStack->expects(self::any())
             ->method('getCurrentRequest')
             ->willReturn($request);
     }

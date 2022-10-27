@@ -2,45 +2,39 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Metadata;
 
-use Metadata\PropertyMetadata;
-
-class FieldMetadata extends PropertyMetadata
+/**
+ * Represents an entity field metadata for configurable entities.
+ */
+final class FieldMetadata
 {
-    /**
-     * @var string
-     */
-    public $mode;
+    public string $class;
+    public string $name;
+    public ?string $mode = null;
+    public ?array $defaultValues = null;
 
-    /**
-     * @var array
-     */
-    public $defaultValues;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __construct(string $class, string $name)
     {
-        return serialize(
-            array(
-                $this->defaultValues,
-                $this->mode,
-                parent::serialize(),
-            )
-        );
+        $this->class = $class;
+        $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($str)
+    public function __serialize(): array
     {
-        list(
-            $this->defaultValues,
+        return [
+            $this->class,
+            $this->name,
             $this->mode,
-            $parentStr
-            ) = unserialize($str);
+            $this->defaultValues
+        ];
+    }
 
-        parent::unserialize($parentStr);
+    public function __unserialize(array $serialized): void
+    {
+        [
+            $this->class,
+            $this->name,
+            $this->mode,
+            $this->defaultValues
+        ] = $serialized;
     }
 }

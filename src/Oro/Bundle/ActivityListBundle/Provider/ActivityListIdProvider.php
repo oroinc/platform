@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Provider;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\AccessRule\ActivityListAccessRule;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
@@ -11,12 +12,13 @@ use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Provides a set of methods to get identifiers of activity list items to manage
- * a pagination and groupping of activity lists.
+ * a pagination and grouping of activity lists.
  */
 class ActivityListIdProvider
 {
@@ -38,13 +40,6 @@ class ActivityListIdProvider
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param ConfigManager                    $config
-     * @param ActivityListChainProvider        $chainProvider
-     * @param ActivityListFilterHelper         $activityListFilterHelper
-     * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
-     * @param AclHelper                        $aclHelper
-     */
     public function __construct(
         ConfigManager $config,
         ActivityListChainProvider $chainProvider,
@@ -107,7 +102,7 @@ class ActivityListIdProvider
 
         $query = $this->aclHelper->apply(
             $getIdsQb,
-            'VIEW',
+            BasicPermission::VIEW,
             [
                 AclAccessRule::DISABLE_RULE => true,
                 ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
@@ -133,6 +128,7 @@ class ActivityListIdProvider
      * @param int          $pageSize
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadListDataIds(QueryBuilder $qb, $entityClass, $entityId, $filter, $pageFilter, $pageSize)
     {
@@ -153,7 +149,7 @@ class ActivityListIdProvider
         $this->activityListFilterHelper->addFiltersToQuery($getIdsQb, $filter);
         $query = $this->aclHelper->apply(
             $getIdsQb,
-            'VIEW',
+            BasicPermission::VIEW,
             [
                 AclAccessRule::DISABLE_RULE => true,
                 ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
@@ -184,7 +180,7 @@ class ActivityListIdProvider
                     $qb->andWhere($qb->expr()->lt($orderByPath, ':offsetDate'));
                 }
             }
-            $qb->setParameter('offsetDate', $offsetDate);
+            $qb->setParameter('offsetDate', $offsetDate, Types::DATETIME_MUTABLE);
             $rows = $this->loadListDataIds(
                 $qb,
                 $entityClass,
@@ -240,17 +236,20 @@ class ActivityListIdProvider
 
             $query = $this->aclHelper->apply(
                 $inheritanceQb,
-                'VIEW',
+                BasicPermission::VIEW,
                 [
                     AclAccessRule::DISABLE_RULE => true,
                     ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
                 ]
             );
 
-            $ids = array_merge($ids, $query->getArrayResult());
+            $ids[] = $query->getArrayResult();
         }
 
-        return $ids;
+        if (!$ids) {
+            return [];
+        }
+        return array_merge(...$ids);
     }
 
     /**
@@ -278,16 +277,19 @@ class ActivityListIdProvider
 
             $query = $this->aclHelper->apply(
                 $inheritanceQb,
-                'VIEW',
+                BasicPermission::VIEW,
                 [
                     AclAccessRule::DISABLE_RULE => true,
                     ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
                 ]
             );
-            $ids = array_merge($ids, $query->getArrayResult());
+            $ids[] = $query->getArrayResult();
         }
 
-        return $ids;
+        if (!$ids) {
+            return [];
+        }
+        return array_merge(...$ids);
     }
 
     /**
@@ -311,7 +313,8 @@ class ActivityListIdProvider
                 $qb->andWhere($qb->expr()->lte($orderByPath, ':dateFilter'));
             }
             $qb->setParameter(':dateFilter', $dateFilter->format('Y-m-d H:i:s'));
-            $qb->andWhere($qb->expr()->notIn('activity.id', implode(',', $pageFilter['ids'])));
+            $qb->andWhere($qb->expr()->notIn('activity.id', ':pageFilterIds'));
+            $qb->setParameter('pageFilterIds', $pageFilter['ids']);
         }
 
         $qb->orderBy($orderByPath, $orderDirection);

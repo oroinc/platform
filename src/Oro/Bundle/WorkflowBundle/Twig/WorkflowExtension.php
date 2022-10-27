@@ -5,29 +5,28 @@ namespace Oro\Bundle\WorkflowBundle\Twig;
 use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
-class WorkflowExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to determine if an entity has associated workflows:
+ *   - has_workflows
+ *   - has_workflow_items
+ *
+ * Provides Twig filter to format a workflow variable value in workflow management:
+ *   - oro_format_workflow_variable_value
+ */
+class WorkflowExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_workflow';
+    private ContainerInterface $container;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return WorkflowManager
-     */
-    protected function getWorkflowManager()
-    {
-        return $this->container->get('oro_workflow.registry.workflow_manager')->getManager();
     }
 
     /**
@@ -36,8 +35,8 @@ class WorkflowExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('has_workflows', [$this, 'hasApplicableWorkflows']),
-            new \Twig_SimpleFunction('has_workflow_items', [$this, 'hasWorkflowItemsByEntity'])
+            new TwigFunction('has_workflows', [$this, 'hasApplicableWorkflows']),
+            new TwigFunction('has_workflow_items', [$this, 'hasWorkflowItemsByEntity'])
         ];
     }
 
@@ -47,20 +46,12 @@ class WorkflowExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
+            new TwigFilter(
                 'oro_format_workflow_variable_value',
                 [$this, 'formatWorkflowVariableValue'],
                 ['is_safe' => ['html']]
             ),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**
@@ -94,10 +85,23 @@ class WorkflowExtension extends \Twig_Extension
     }
 
     /**
-     * @return WorkflowVariableFormatter
+     * {@inheritdoc}
      */
-    protected function getWorkflowVariableFormatter()
+    public static function getSubscribedServices()
     {
-        return $this->container->get('oro_workflow.formatter.workflow_variable');
+        return [
+            WorkflowVariableFormatter::class,
+            WorkflowManagerRegistry::class,
+        ];
+    }
+
+    private function getWorkflowVariableFormatter(): WorkflowVariableFormatter
+    {
+        return $this->container->get(WorkflowVariableFormatter::class);
+    }
+
+    private function getWorkflowManager(): WorkflowManager
+    {
+        return $this->container->get(WorkflowManagerRegistry::class)->getManager();
     }
 }

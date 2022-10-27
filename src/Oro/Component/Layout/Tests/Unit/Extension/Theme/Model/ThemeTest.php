@@ -12,16 +12,11 @@ use Oro\Component\Layout\Extension\Theme\Model\Theme;
 class ThemeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Theme */
-    protected $theme;
+    private $theme;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->theme = new Theme('test');
-    }
-
-    protected function tearDown()
-    {
-        unset($this->theme);
     }
 
     public function testGetNameAndConstructor()
@@ -59,6 +54,20 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('logo.png', $this->theme->getLogo());
     }
 
+    public function testImagePlaceholdersMethods()
+    {
+        $this->assertEmpty($this->theme->getImagePlaceholders());
+        $this->theme->setImagePlaceholders(['test' => '/test/url.png']);
+        $this->assertEquals(['test' => '/test/url.png'], $this->theme->getImagePlaceholders());
+    }
+
+    public function testRtlSupport(): void
+    {
+        $this->assertFalse($this->theme->isRtlSupport());
+        $this->theme->setRtlSupport(true);
+        $this->assertTrue($this->theme->isRtlSupport());
+    }
+
     public function testScreenshotMethods()
     {
         $this->assertNull($this->theme->getScreenshot());
@@ -72,6 +81,8 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
 
         $this->theme->setGroups(['test']);
         $this->assertSame(['test'], $this->theme->getGroups());
+        $this->assertTrue($this->theme->hasGroup('test'));
+        $this->assertFalse($this->theme->hasGroup('another_test'));
     }
 
     public function testParentThemeMethods()

@@ -1,61 +1,86 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\UserBundle\Command;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\InvalidArgumentException;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CreateUserCommand extends ContainerAwareCommand
+/**
+ * Creates a user.
+ */
+class CreateUserCommand extends Command
 {
-    /**
-     * @var UserManager
-     */
-    protected $userManager;
+    /** @var string */
+    protected static $defaultName = 'oro:user:create';
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
+    protected UserManager $userManager;
+    protected EntityManagerInterface $entityManager;
 
-    /**
-     * {@inheritdoc}
-     */
+    public function __construct(UserManager $userManager, EntityManagerInterface $entityManager)
+    {
+        $this->userManager = $userManager;
+        $this->entityManager = $entityManager;
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:user:create')
-            ->setDescription('Create user.')
-            ->addOption('user-role', null, InputOption::VALUE_REQUIRED, 'User role')
-            ->addOption('user-business-unit', null, InputOption::VALUE_REQUIRED, 'User business unit (required)')
-            ->addOption('user-name', null, InputOption::VALUE_REQUIRED, 'User name (required)')
-            ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'User email (required)')
-            ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'User first name')
-            ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
-            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password (required)')
+            ->addOption('user-role', null, InputOption::VALUE_REQUIRED, 'Role')
+            ->addOption('user-business-unit', null, InputOption::VALUE_REQUIRED, 'Business unit')
+            ->addOption('user-name', null, InputOption::VALUE_REQUIRED, 'Username')
+            ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'Email')
+            ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'First name')
+            ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'Last name')
+            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'Password')
             ->addOption(
                 'user-organizations',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
-                'User organizations'
+                'Organizations'
             )
+            ->setDescription('Creates a user.')
+            // @codingStandardsIgnoreStart
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command creates a user.
+
+  <info>php %command.full_name% --user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id></info>
+
+The <info>--user-name</info>, <info>--user-email</info>, <info>--user-password</info> and <info>--user-business-unit</info> options are required and should be used to specify the username, email and password for the new user and the business unit in which the user should be created:
+
+  <info>php %command.full_name% --user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id></info>
+
+The <info>--user-firstname</info>, <info>--user-lastname</info> and <info>--user-role</info> options can be used to provide additional details:
+
+  <info>php %command.full_name% --user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id> --user-firstname=<firstname> --user-lastname=<lastname> --user-role=<role></info>
+
+HELP
+            )
+            ->addUsage('--user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id>')
+            ->addUsage('--user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id> --user-firstname=<firstname> --user-lastname=<lastname> --user-role=<role>')
+            // @codingStandardsIgnoreEnd
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var User $user */
-        $user = $this->getUserManager()->createUser();
+        $user = $this->userManager->createUser();
         $user->setEnabled(true);
 
         $options = $input->getOptions();
@@ -66,17 +91,21 @@ class CreateUserCommand extends ContainerAwareCommand
                 ->updateUser($user, $options);
         } catch (InvalidArgumentException $exception) {
             $output->writeln($exception->getMessage());
+
+            return $exception->getCode() ?: 1;
         } catch (DBALException $exception) {
             $output->writeln('User exists');
+
+            return $exception->getCode() ?: 1;
         }
+
+        return 0;
     }
 
     /**
-     * @param array $options
      * @throws InvalidArgumentException
-     * @return $this
      */
-    protected function checkRequiredOptions($options)
+    protected function checkRequiredOptions(array $options): self
     {
         $requiredOptions = [
             'user-business-unit',
@@ -95,11 +124,9 @@ class CreateUserCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param User  $user
-     * @param array $options
      * @throws InvalidArgumentException
      */
-    protected function updateUser(User $user, $options)
+    protected function updateUser(User $user, array $options): void
     {
         if (!empty($options['user-name'])) {
             $user->setUsername($options['user-name']);
@@ -115,43 +142,43 @@ class CreateUserCommand extends ContainerAwareCommand
             ->setOrganizations($user, $options)
             ->setProperties($user, $options);
 
-        $this->getUserManager()->updateUser($user);
+        $this->userManager->updateUser($user);
     }
 
     /**
-     * @param User $user
-     * @param array $options
      * @throws InvalidArgumentException
-     * @return $this
      */
-    protected function setRole(User $user, $options)
+    protected function setRole(User $user, array $options): self
     {
+        $roleName = null;
         if (!empty($options['user-role'])) {
-            $role = $this->getEntityManager()
-                ->getRepository('OroUserBundle:Role')
-                ->findOneBy(['role' => $options['user-role']]);
+            $roleName = $options['user-role'];
+        } elseif (null === $user->getId()) {
+            $roleName = User::ROLE_DEFAULT;
+        }
+        if ($roleName) {
+            $role = $this->entityManager
+                ->getRepository(Role::class)
+                ->findOneBy(['role' => $roleName]);
 
             if (!$role) {
                 throw new InvalidArgumentException('Invalid Role');
             }
 
-            $user->addRole($role);
+            $user->addUserRole($role);
         }
 
         return $this;
     }
 
     /**
-     * @param User $user
-     * @param array $options
      * @throws InvalidArgumentException
-     * @return $this
      */
-    protected function setBusinessUnit(User $user, $options)
+    protected function setBusinessUnit(User $user, array $options): self
     {
         if (!empty($options['user-business-unit'])) {
-            $businessUnit = $this->getEntityManager()
-                ->getRepository('OroOrganizationBundle:BusinessUnit')
+            $businessUnit = $this->entityManager
+                ->getRepository(BusinessUnit::class)
                 ->findOneBy(['name' => $options['user-business-unit']]);
 
             if (!$businessUnit) {
@@ -161,6 +188,7 @@ class CreateUserCommand extends ContainerAwareCommand
             $user
                 ->setOwner($businessUnit)
                 ->setOrganization($businessUnit->getOrganization())
+                ->addOrganization($businessUnit->getOrganization())
                 ->addBusinessUnit($businessUnit);
         }
 
@@ -168,18 +196,15 @@ class CreateUserCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param User $user
-     * @param array $options
      * @throws InvalidArgumentException
-     * @return $this
      */
-    protected function setOrganizations(User $user, $options)
+    protected function setOrganizations(User $user, array $options): self
     {
         if (!empty($options['user-organizations'])) {
             foreach ($options['user-organizations'] as $organizationName) {
                 try {
-                    $organization = $this->getEntityManager()
-                        ->getRepository('OroOrganizationBundle:Organization')
+                    $organization = $this->entityManager
+                        ->getRepository(Organization::class)
                         ->getOrganizationByName($organizationName);
                 } catch (NoResultException $e) {
                     throw new InvalidArgumentException('Invalid organization "' . $organizationName .
@@ -193,13 +218,7 @@ class CreateUserCommand extends ContainerAwareCommand
         return $this;
     }
 
-    /**
-     * @param User $user
-     * @param array $options
-     * @throws InvalidArgumentException
-     * @return $this
-     */
-    protected function setProperties(User $user, $options)
+    protected function setProperties(User $user, array $options): self
     {
         $properties = ['email', 'firstname', 'lastname'];
         foreach ($properties as $property) {
@@ -209,29 +228,5 @@ class CreateUserCommand extends ContainerAwareCommand
         }
 
         return $this;
-    }
-
-    /**
-     * @return UserManager
-     */
-    protected function getUserManager()
-    {
-        if (!$this->userManager) {
-            $this->userManager = $this->getContainer()->get('oro_user.manager');
-        }
-
-        return $this->userManager;
-    }
-
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
-    {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        }
-
-        return $this->entityManager;
     }
 }

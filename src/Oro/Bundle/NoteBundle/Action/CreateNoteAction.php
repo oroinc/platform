@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Component\Action\Action\AbstractAction;
@@ -21,11 +21,6 @@ class CreateNoteAction extends AbstractAction
     /** @var array|null */
     protected $options;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param ActivityManager $activityManager
-     * @param ContextAccessor $contextAccessor
-     */
     public function __construct(
         ManagerRegistry $registry,
         ActivityManager $activityManager,
@@ -95,9 +90,6 @@ class CreateNoteAction extends AbstractAction
         }
     }
 
-    /**
-     * @return ObjectManager
-     */
     private function getEntityManager(): ObjectManager
     {
         return $this->registry->getManagerForClass(Note::class);

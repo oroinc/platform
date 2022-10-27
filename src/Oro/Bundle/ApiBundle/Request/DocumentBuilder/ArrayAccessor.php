@@ -4,22 +4,23 @@ namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Provides an access to properties of arrays.
+ */
 class ArrayAccessor implements ObjectAccessorInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getClassName($object)
+    public function getClassName($object): ?string
     {
-        return array_key_exists(ConfigUtil::CLASS_NAME, $object)
-            ? $object[ConfigUtil::CLASS_NAME]
-            : null;
+        return $object[ConfigUtil::CLASS_NAME] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getValue($object, $propertyName)
+    public function getValue($object, string $propertyName)
     {
         if (!$this->hasProperty($object, $propertyName)) {
             throw new \OutOfBoundsException(sprintf('The "%s" property does not exist.', $propertyName));
@@ -31,20 +32,20 @@ class ArrayAccessor implements ObjectAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function hasProperty($object, $propertyName)
+    public function hasProperty($object, string $propertyName): bool
     {
         // ignore "metadata" items
         if (ConfigUtil::CLASS_NAME === $propertyName) {
             return false;
         }
 
-        return array_key_exists($propertyName, $object);
+        return \array_key_exists($propertyName, $object);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function toArray($object)
+    public function toArray($object): array
     {
         // remove "metadata" items
         unset($object[ConfigUtil::CLASS_NAME]);

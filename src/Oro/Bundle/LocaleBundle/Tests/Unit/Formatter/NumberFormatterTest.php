@@ -2,554 +2,839 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
+use Brick\Math\BigDecimal;
 use NumberFormatter as IntlNumberFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Intl\Util\IntlTestHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 /**
+ * Please note that this test should check only our logic,
+ * DO NOT use IntlNumberFormatter directly to prevent problems with different libicu versions
+ *
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NumberFormatterTest extends TestCase
+class NumberFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $localeSettings;
+    private const UNFORMATTED_VALUE = 18908997.16908;
+    private const FORMATTED_VALUE = '18908997.16908';
+    private const LOCALE = 'en_US';
+    private const CURRENCY = 'USD';
 
-    /**
-     * @var NumberFormatter
-     */
-    protected $formatter;
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
 
-    protected function setUp()
+    /** @var IntlNumberFormatterFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $intlNumberFormatterFactory;
+
+    /** @var NumberFormatter */
+    private $formatter;
+
+    protected function setUp(): void
     {
-        IntlTestHelper::requireIntl($this);
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->intlNumberFormatterFactory = $this->createMock(IntlNumberFormatterFactory::class);
 
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->formatter = new NumberFormatter($this->localeSettings);
+        $this->formatter = new NumberFormatter($this->localeSettings, $this->intlNumberFormatterFactory);
     }
 
-    /**
-     * @dataProvider formatDataProvider
-     */
-    public function testFormat(
-        $expected,
-        $value,
-        $style,
-        $attributes,
-        $textAttributes,
-        $symbols,
-        $locale,
-        $defaultLocale = null
-    ) {
-        if ($defaultLocale) {
-            $this->localeSettings->expects($this->once())->method('getLocale')
-                ->will($this->returnValue($defaultLocale));
-        }
-        $this->assertEquals(
-            $expected,
-            $this->formatter->format($value, $style, $attributes, $textAttributes, $symbols, $locale)
+    public function testFormat(): void
+    {
+        $style = IntlNumberFormatter::DECIMAL;
+
+        $this->mockFormat($style);
+
+        self::assertEquals(
+            self::FORMATTED_VALUE,
+            $this->formatter->format(self::UNFORMATTED_VALUE, $style, [], [], [], self::LOCALE)
+        );
+
+        // check local cache
+        self::assertEquals(
+            self::FORMATTED_VALUE,
+            $this->formatter->format(self::UNFORMATTED_VALUE, $style, [], [], [], self::LOCALE)
         );
     }
 
-    public function formatDataProvider()
+    private function mockFormat(string $style): void
     {
-        return array(
-            array(
-                'expected' => '1,234.568',
-                'value' => 1234.56789,
-                'style' => \NumberFormatter::DECIMAL,
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => '1,234.568',
-                'value' => 1234.56789,
-                'style' => 'DECIMAL',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => '1,234.57',
-                'value' => 1234.56789,
-                'style' => \NumberFormatter::DECIMAL,
-                'attributes' => array(
-                    'fraction_digits' => 2
-                ),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => null,
-                'settingsLocale' => 'en_US'
-            ),
-            array(
-                'expected' => 'MINUS 10.0000,123',
-                'value' => -100000.123,
-                'style' => \NumberFormatter::DECIMAL,
-                'attributes' => array(
-                    \NumberFormatter::GROUPING_SIZE => 4,
-                ),
-                'textAttributes' => array(
-                    \NumberFormatter::NEGATIVE_PREFIX => 'MINUS ',
-                ),
-                'symbols' => array(
-                    \NumberFormatter::DECIMAL_SEPARATOR_SYMBOL => ',',
-                    \NumberFormatter::GROUPING_SEPARATOR_SYMBOL => '.',
-                ),
-                'locale' => 'en_US'
-            ),
-        );
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $this->intlNumberFormatterFactory
+            ->expects(self::once())
+            ->method('create')
+            ->with(self::LOCALE, $style, [], [], [])
+            ->willReturn($intlNumberFormatter);
+
+        $intlNumberFormatter
+            ->expects(self::atLeastOnce())
+            ->method('format')
+            ->with(self::UNFORMATTED_VALUE)
+            ->willReturn(self::FORMATTED_VALUE);
     }
 
-    public function testFormatWithoutLocale()
+    public function testFormatCurrency(): void
     {
-        $locale = 'fr_FR';
-        $this->localeSettings->expects($this->once())->method('getLocale')->will($this->returnValue($locale));
-        $this->assertEquals(
-            '123 456,4',
-            $this->formatter->format(123456.4, \NumberFormatter::DECIMAL)
-        );
-    }
+        $expectedLocale = 'en_US@currency=USD';
+        $value = '42';
+        $formattedValue = '42$';
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage NumberFormatter has no constant 'UNKNOWN_ATTRIBUTE'
-     */
-    public function testFormatFails()
-    {
-        $this->formatter->format(
-            '123',
-            \NumberFormatter::DECIMAL,
-            array('unknown_attribute' => 1),
-            array(),
-            array(),
-            'en_US'
-        );
-    }
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $this->intlNumberFormatterFactory
+            ->expects(self::once())
+            ->method('create')
+            ->with($expectedLocale, IntlNumberFormatter::CURRENCY, [], [], [])
+            ->willReturn($intlNumberFormatter);
 
-    /**
-     * @dataProvider formatDecimalDataProvider
-     */
-    public function testFormatDecimal($expected, $value, $attributes, $textAttributes, $symbols, $locale)
-    {
-        $this->assertEquals(
-            $expected,
-            $this->formatter->formatDecimal($value, $attributes, $textAttributes, $symbols, $locale)
-        );
-    }
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('formatCurrency')
+            ->with($value, self::CURRENCY)
+            ->willReturn($formattedValue);
 
-    public function formatDecimalDataProvider()
-    {
-        return array(
-            array(
-                'expected' => '1,234.568',
-                'value' => 1234.56789,
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => '+12 345,6789000000',
-                'value' => 12345.6789,
-                'attributes' => array(
-                    'fraction_digits' => 10
-                ),
-                'textAttributes' => array(
-                    'positive_prefix' => '+',
-                ),
-                'symbols' => array(
-                    \NumberFormatter::DECIMAL_SEPARATOR_SYMBOL => ',',
-                    \NumberFormatter::GROUPING_SEPARATOR_SYMBOL => ' ',
-                ),
-                'locale' => 'en_US'
-            ),
-        );
-    }
-
-    public function testDefaultFormatCurrency()
-    {
-        $locale = 'en_GB';
-        $currency = 'GBP';
-        $currencySymbol = 'Pound';
-
-        $this->localeSettings->expects($this->any())->method('getLocale')->will($this->returnValue($locale));
-        $this->localeSettings->expects($this->any())->method('getCurrency')->will($this->returnValue($currency));
-        $this->localeSettings->expects($this->any())
-            ->method('getCurrencySymbolByCurrency')
-            ->with($currency)
-            ->will($this->returnValue($currencySymbol));
-
-        $this->assertEquals('Pound1,234.57', $this->formatter->formatCurrency(1234.56789));
-    }
-
-    /**
-     * @dataProvider formatCurrencyDataProvider
-     */
-    public function testFormatCurrency($expected, $value, $currency, $attributes, $textAttributes, $symbols, $locale)
-    {
-        $currencySymbolMap = array(
-            array('USD', '$'),
-            array('RUB', 'руб.'),
-        );
-        $this->localeSettings->expects($this->any())
-            ->method('getCurrencySymbolByCurrency')
-            ->will($this->returnValueMap($currencySymbolMap));
-
-        $this->assertEquals(
-            $expected,
-            $this->formatter->formatCurrency($value, $currency, $attributes, $textAttributes, $symbols, $locale)
-        );
-    }
-
-    public function formatCurrencyDataProvider()
-    {
-        return array(
-            array(
-                'expected' => '$1,234.57',
-                'value' => 1234.56789,
-                'currency' => 'USD',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => 'руб.1,234.57',
-                'value' => 1234.56789,
-                'currency' => 'RUB',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-            array(
-                'expected' => '1 234,57 €',
-                'value' => 1234.56789,
-                'currency' => 'EUR',
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'ru_RU'
-            ),
-        );
-    }
-
-    /**
-     * @dataProvider formatPercentDataProvider
-     */
-    public function testFormatPercent($expected, $value, $attributes, $textAttributes, $symbols, $locale)
-    {
-        $this->assertEquals(
-            $expected,
-            $this->formatter->formatPercent($value, $attributes, $textAttributes, $symbols, $locale)
-        );
-    }
-
-    public function formatPercentDataProvider()
-    {
-        return array(
-            array(
-                'expected' => '123,456.789%',
-                'value' => 1234.56789,
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-        );
-    }
-
-    /**
-     * @dataProvider formatSpelloutDataProvider
-     */
-    public function testFormatSpellout($expected, $value, $attributes, $textAttributes, $symbols, $locale)
-    {
-        $this->assertEquals(
-            $expected,
-            $this->formatter->formatSpellout($value, $attributes, $textAttributes, $symbols, $locale)
-        );
-    }
-
-    public function formatSpelloutDataProvider()
-    {
-        return array(
-            array(
-                'expected' => 'twenty-one',
-                'value' => 21,
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en_US'
-            ),
-        );
-    }
-
-    /**
-     * @dataProvider formatDurationDataProvider
-     */
-    public function testFormatDuration($expected, $value, $attributes, $textAttributes, $symbols, $locale, $default)
-    {
-        $this->assertEquals(
-            $expected,
-            $this->formatter->formatDuration($value, $attributes, $textAttributes, $symbols, $locale, $default)
-        );
-    }
-
-    public function formatDurationDataProvider()
-    {
-        return array(
-            'default' => array(
-                'expected' => '1:01:01',
-                'value' => 3661,
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en',
-                'default' => false
-            ),
-            'with default format' => array(
-                'expected' => '00:00:01',
-                'value' => 1,
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => null,
-                'default' => true
-            ),
-            'without default format' => array(
-                'expected' => '1 sec.',
-                'value' => 1,
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'en',
-                'default' => false
-            ),
-            'with_words' => array(
-                'expected' => '1 hour, 1 minute, 1 second',
-                'value' => 3661,
-                'attributes' => array(),
-                'textAttributes' => array(
-                    \NumberFormatter::DEFAULT_RULESET => "%with-words"
-                ),
-                'symbols' => array(),
-                'locale' => 'en_US',
-                'default' => false
-            ),
-            'fix_for_localization_problems' => array(
-                'expected' => '01:01:01',
-                'value' => 3661,
-                'attributes' => array(),
-                'textAttributes' => array(),
-                'symbols' => array(),
-                'locale' => 'ru',
-                'default' => false
-            ),
-        );
-    }
-
-    public function testFormatOrdinal()
-    {
-        $result = $this->formatter->formatOrdinal(1, array(), array(), array(), 'en_US');
-
-        // expected result is: 1st but in som versions of ICU 1ˢᵗ is also possible
-        $this->assertStringStartsWith('1', $result);
-        $this->assertNotEquals('1', $result);
-    }
-
-    /**
-     * @dataProvider getAttributeDataProvider
-     */
-    public function testGetAttribute($attribute, $style, $locale, $expected, $attributes)
-    {
-        $this->assertSame(
-            $expected,
-            $this->formatter->getAttribute(
-                $attribute,
-                $style,
-                $locale,
-                $attributes
-            )
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function getAttributeDataProvider()
-    {
-        $intlFormatter = new IntlNumberFormatter('en_US', \NumberFormatter::DECIMAL);
-        $maxIntegerDigits = $intlFormatter->getAttribute(\NumberFormatter::MAX_INTEGER_DIGITS);
-
-        return array(
-            array('parse_int_only', 'DECIMAL', 'en_US', 0, []),
-            array('parse_int_only', null, 'en_US', 0, []),
-            array('GROUPING_USED', 'decimal', 'en_US', 1, []),
-            array(\NumberFormatter::DECIMAL_ALWAYS_SHOWN, \NumberFormatter::DECIMAL, 'en_US', 0, []),
-            array(\NumberFormatter::MAX_INTEGER_DIGITS, \NumberFormatter::DECIMAL, 'en_US', $maxIntegerDigits, []),
-            array(\NumberFormatter::MIN_INTEGER_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 1, []),
-            array(\NumberFormatter::INTEGER_DIGITS,\NumberFormatter::DECIMAL, 'en_US', 1, []),
-            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 3, []),
-            array(\NumberFormatter::MIN_FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 0, []),
-            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::CURRENCY, 'en_US', 2, []),
-            array(\NumberFormatter::MIN_FRACTION_DIGITS, \NumberFormatter::CURRENCY, 'en_US', 2, []),
-            array(\NumberFormatter::FRACTION_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 0, []),
-            array(\NumberFormatter::MULTIPLIER, \NumberFormatter::DECIMAL, 'en_US', 1, []),
-            array(\NumberFormatter::GROUPING_SIZE, \NumberFormatter::DECIMAL, 'en_US', 3, []),
-            array(\NumberFormatter::ROUNDING_MODE, \NumberFormatter::DECIMAL, 'en_US', 4, []),
-            array(\NumberFormatter::ROUNDING_INCREMENT, \NumberFormatter::DECIMAL, 'en_US', 0.0, []),
-            array(\NumberFormatter::FORMAT_WIDTH, \NumberFormatter::DECIMAL, 'en_US', 0, []),
-            array(\NumberFormatter::PADDING_POSITION, \NumberFormatter::DECIMAL, 'en_US', 0, []),
-            array(\NumberFormatter::SECONDARY_GROUPING_SIZE, \NumberFormatter::DECIMAL, 'en_US', 0, []),
-            array(\NumberFormatter::SIGNIFICANT_DIGITS_USED, \NumberFormatter::DECIMAL, 'en_US', 0, []),
-            array(\NumberFormatter::MIN_SIGNIFICANT_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 1, []),
-            array(\NumberFormatter::MAX_SIGNIFICANT_DIGITS, \NumberFormatter::DECIMAL, 'en_US', 6, []),
-            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::PERCENT, 'en_US', 0, [
-                \NumberFormatter::MAX_FRACTION_DIGITS => 4,
-            ]),
-            array(\NumberFormatter::MAX_FRACTION_DIGITS, \NumberFormatter::PERCENT, 'en_US', 4, [
-                \NumberFormatter::FRACTION_DIGITS => 4,
-                \NumberFormatter::MIN_FRACTION_DIGITS => 0,
-                \NumberFormatter::MAX_FRACTION_DIGITS => 4,
-            ]),
-        );
-    }
-
-    /**
-     * @dataProvider getTextAttributeDataProvider
-     */
-    public function testTextAttribute($attribute, $locale, $style, $expected)
-    {
-        $this->assertSame(
-            $expected,
-            $this->formatter->getTextAttribute(
-                $attribute,
-                $locale,
-                $style
-            )
-        );
-    }
-
-    public function getTextAttributeDataProvider()
-    {
-        return array(
-            array('POSITIVE_PREFIX', 'DECIMAL', 'en_US', ''),
-            array('negative_prefix', 'decimal', 'en_US', '-'),
-            array(\NumberFormatter::NEGATIVE_SUFFIX, \NumberFormatter::DECIMAL, 'en_US', ''),
-            array(\NumberFormatter::CURRENCY_CODE, \NumberFormatter::CURRENCY, 'en_US', 'USD'),
-            array(\NumberFormatter::DEFAULT_RULESET, \NumberFormatter::DECIMAL, 'en_US', false),
-            array(\NumberFormatter::PUBLIC_RULESETS, \NumberFormatter::DECIMAL, 'en_US', false)
-        );
-    }
-
-    /**
-     * @dataProvider getSymbolDataProvider
-     */
-    public function testGetNumberFormatterSymbol($symbol, $locale, $style, $expected)
-    {
-        $this->assertSame(
-            $expected,
-            $this->formatter->getSymbol(
-                $symbol,
-                $locale,
-                $style
-            )
-        );
-    }
-
-    public function getSymbolDataProvider()
-    {
-        return array(
-            array('DECIMAL_SEPARATOR_SYMBOL', 'DECIMAL', 'en_US', '.'),
-            array(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', ','),
-            array('pattern_separator_symbol', 'decimal', 'en_US', ';'),
-            array(\NumberFormatter::PERCENT_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', '%'),
-            array(\NumberFormatter::ZERO_DIGIT_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', '0'),
-            array(\NumberFormatter::DIGIT_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', '#'),
-            array(\NumberFormatter::MINUS_SIGN_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', '-'),
-            array(\NumberFormatter::PLUS_SIGN_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', '+'),
-            array(\NumberFormatter::CURRENCY_SYMBOL, \NumberFormatter::CURRENCY, 'en_US', '$'),
-            array(\NumberFormatter::INTL_CURRENCY_SYMBOL, \NumberFormatter::CURRENCY, 'en_US', 'USD'),
-            array(\NumberFormatter::MONETARY_SEPARATOR_SYMBOL, \NumberFormatter::CURRENCY, 'en_US', '.'),
-            array(\NumberFormatter::EXPONENTIAL_SYMBOL, \NumberFormatter::SCIENTIFIC, 'en_US', 'E'),
-            array(\NumberFormatter::PERMILL_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', '‰'),
-            array(\NumberFormatter::PAD_ESCAPE_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', '*'),
-            array(\NumberFormatter::INFINITY_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', '∞'),
-            array(\NumberFormatter::NAN_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', 'NaN'),
-            array(\NumberFormatter::SIGNIFICANT_DIGIT_SYMBOL, \NumberFormatter::DECIMAL, 'en_US', '@'),
-            array(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL, \NumberFormatter::CURRENCY, 'en_US', ','),
-        );
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage NumberFormatter style '19' is invalid
-     */
-    public function testFormatWithInvalidStyle()
-    {
-        $this->formatter->format(123, \NumberFormatter::LENIENT_PARSE);
-    }
-
-    /**
-     * @param bool $expected
-     * @param string $currency
-     * @param string|null $locale
-     * @param string|null $defaultLocale
-     * @dataProvider isCurrencySymbolPrependDataProvider
-     */
-    public function testIsCurrencySymbolPrepend($expected, $currency, $locale, $defaultLocale = null)
-    {
-        if ($defaultLocale) {
-            $this->localeSettings->expects($this->once())
-                ->method('getLocale')
-                ->will($this->returnValue($defaultLocale));
-        } else {
-            $this->localeSettings->expects($this->never())
-                ->method('getLocale');
-        }
-
-        $this->assertEquals($expected, $this->formatter->isCurrencySymbolPrepend($currency, $locale));
-    }
-
-    public function testIsCurrencySymbolPrependWithoutLocale()
-    {
-        $this->localeSettings
-            ->expects($this->once())
-            ->method('getLocale')
-            ->will($this->returnValue('en'));
+        $symbol = '$';
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('getSymbol')
+            ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
+            ->willReturn($symbol);
 
         $this->localeSettings
-            ->expects($this->once())
+            ->expects(self::once())
+            ->method('getCurrencySymbolByCurrency')
+            ->with(self::CURRENCY, self::LOCALE)
+            ->willReturn($symbol);
+
+        self::assertEquals(
+            $formattedValue,
+            $this->formatter->formatCurrency($value, self::CURRENCY, [], [], [], self::LOCALE)
+        );
+
+        // check local cache
+        self::assertEquals(
+            $formattedValue,
+            $this->formatter->formatCurrency($value, self::CURRENCY, [], [], [], self::LOCALE)
+        );
+    }
+
+    /**
+     * @dataProvider formatCurrencyWhenAnotherSymbolDataProvider
+     */
+    public function testFormatCurrencyWhenAnotherSymbol(string $formattedValue, string $expectedValue): void
+    {
+        $expectedLocale = 'en_US@currency=USD';
+        $value = '42';
+
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $this->intlNumberFormatterFactory
+            ->expects(self::once())
+            ->method('create')
+            ->with($expectedLocale, IntlNumberFormatter::CURRENCY, [], [], [])
+            ->willReturn($intlNumberFormatter);
+
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('formatCurrency')
+            ->with($value, self::CURRENCY)
+            ->willReturn($formattedValue);
+
+        $fromSymbol = '$';
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('getSymbol')
+            ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
+            ->willReturn($fromSymbol);
+
+        $toSymbol = 'USD';
+        $this->localeSettings
+            ->expects(self::once())
+            ->method('getCurrencySymbolByCurrency')
+            ->with(self::CURRENCY, self::LOCALE)
+            ->willReturn($toSymbol);
+
+        self::assertEquals(
+            $expectedValue,
+            $this->formatter->formatCurrency($value, self::CURRENCY, [], [], [], self::LOCALE)
+        );
+
+        // check local cache
+        self::assertEquals(
+            $expectedValue,
+            $this->formatter->formatCurrency($value, self::CURRENCY, [], [], [], self::LOCALE)
+        );
+    }
+
+    public function formatCurrencyWhenAnotherSymbolDataProvider(): array
+    {
+        return [
+            [
+                'formattedValue' => '42$',
+                'expectedValue' => '42USD',
+            ],
+            [
+                'formattedValue' => '42 $',
+                'expectedValue' => '42 USD',
+            ],
+            [
+                'formattedValue' => '42  $',
+                'expectedValue' => '42 USD',
+            ],
+            [
+                'formattedValue' => '$42',
+                'expectedValue' => 'USD 42',
+            ],
+        ];
+    }
+
+    public function testFormatCurrencyWhenNoCurrencyCode(): void
+    {
+        $expectedLocale = 'en_US@currency=USD';
+        $value = '42';
+        $formattedValue = '42$';
+
+        $this->localeSettings
+            ->expects(self::exactly(2))
             ->method('getCurrency')
-            ->will($this->returnValue('RUR'));
+            ->willReturn(self::CURRENCY);
 
-        $this->assertEquals(true, $this->formatter->isCurrencySymbolPrepend());
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $this->intlNumberFormatterFactory
+            ->expects(self::once())
+            ->method('create')
+            ->with($expectedLocale, IntlNumberFormatter::CURRENCY, [], [], [])
+            ->willReturn($intlNumberFormatter);
+
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('formatCurrency')
+            ->with($value, self::CURRENCY)
+            ->willReturn($formattedValue);
+
+        $symbol = '$';
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('getSymbol')
+            ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
+            ->willReturn($symbol);
+
+        $this->localeSettings
+            ->expects(self::once())
+            ->method('getCurrencySymbolByCurrency')
+            ->with(self::CURRENCY, self::LOCALE)
+            ->willReturn($symbol);
+
+        self::assertEquals(
+            $formattedValue,
+            $this->formatter->formatCurrency($value, null, [], [], [], self::LOCALE)
+        );
+
+        // check local cache
+        self::assertEquals(
+            $formattedValue,
+            $this->formatter->formatCurrency($value, null, [], [], [], self::LOCALE)
+        );
+    }
+
+    public function testFormatCurrencyWhenNoLocale(): void
+    {
+        $expectedLocale = 'en_US@currency=USD';
+        $value = '42';
+        $formattedValue = '42$';
+
+        $this->localeSettings
+            ->expects(self::exactly(2))
+            ->method('getLocale')
+            ->willReturn(self::LOCALE);
+
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $this->intlNumberFormatterFactory
+            ->expects(self::once())
+            ->method('create')
+            ->with($expectedLocale, IntlNumberFormatter::CURRENCY, [], [], [])
+            ->willReturn($intlNumberFormatter);
+
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('formatCurrency')
+            ->with($value, self::CURRENCY)
+            ->willReturn($formattedValue);
+
+        $symbol = '$';
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('getSymbol')
+            ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
+            ->willReturn($symbol);
+
+        $this->localeSettings
+            ->expects(self::once())
+            ->method('getCurrencySymbolByCurrency')
+            ->with(self::CURRENCY, self::LOCALE)
+            ->willReturn($symbol);
+
+        self::assertEquals(
+            $formattedValue,
+            $this->formatter->formatCurrency($value, self::CURRENCY, [], [], [], null)
+        );
+
+        // check local cache
+        self::assertEquals(
+            $formattedValue,
+            $this->formatter->formatCurrency($value, self::CURRENCY, [], [], [], null)
+        );
     }
 
     /**
-     * @return array
+     * @dataProvider dataProviderFormatCurrency
      */
-    public function isCurrencySymbolPrependDataProvider()
+    public function testFormatCurrencyWithNoneFractionDigits(
+        string $locale,
+        string $currencyCode,
+        string $currencySymbol,
+        float $value,
+        string $formattedValue,
+        array $attributes
+    ): void {
+        $this->localeSettings
+            ->expects(self::any())
+            ->method('getCurrencySymbolByCurrency')
+            ->with($currencyCode, $locale)
+            ->willReturn($currencySymbol);
+
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $intlNumberFormatter
+            ->expects($this->once())
+            ->method('formatCurrency')
+            ->with($value, $currencyCode)
+            ->willReturn($formattedValue);
+
+        $this->intlNumberFormatterFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with($locale. '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
+            ->willReturn($intlNumberFormatter);
+
+        $currency = $this->formatter->formatCurrency($value, $currencyCode, $attributes, [], [], $locale);
+        $this->assertEquals($formattedValue, $currency);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function dataProviderFormatCurrency(): array
     {
-        return array(
-            'default locale' => array(
-                'expected' => true,
-                'currency' => 'USD',
-                'locale' => null,
-                'defaultLocale' => 'en',
-            ),
-            'custom locale' => array(
-                'expected' => false,
-                'currency' => 'RUR',
-                'locale' => 'ru',
-            ),
+        return [
+            'Andorran Peseta(ADP) without decimal part' => [
+                'locale' => 'en_US',
+                'currencyCode' => 'ADP',
+                'currencySymbol' => '',
+                'value' => 1.0,
+                'formattedValue' => 'ADP 1',
+                'attributes' => [],
+            ],
+            'Andorran Peseta(ADP) with decimal part and fixed fraction digits' => [
+                'locale' => 'fr_FR',
+                'currencyCode' => 'ADP',
+                'currencySymbol' => '',
+                'value' => 9.9999,
+                'formattedValue' => '10,000 ADP',
+                'attributes' => [IntlNumberFormatter::MIN_FRACTION_DIGITS => 3],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderFormatCurrencyWithFractionDigits
+     */
+    public function testFormatCurrencyWithFractionDigits(
+        string $locale,
+        string $currencyCode,
+        string $currencySymbol,
+        float $value,
+        string $formattedValue,
+        array $attributes,
+        int $minFractionDigits = 0
+    ): void {
+        $this->localeSettings
+            ->expects($this->any())
+            ->method('getCurrencySymbolByCurrency')
+            ->with($currencyCode, $locale)
+            ->willReturn($currencySymbol);
+
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $intlNumberFormatter
+            ->expects($this->once())
+            ->method('formatCurrency')
+            ->with($value, $currencyCode)
+            ->willReturn($formattedValue);
+        $intlNumberFormatter
+            ->expects($this->once())
+            ->method('getAttribute')
+            ->with(\NumberFormatter::MIN_FRACTION_DIGITS)
+            ->willReturn($minFractionDigits);
+        $intlNumberFormatter
+            ->expects($this->exactly(2))
+            ->method('setAttribute')
+            ->withConsecutive(
+                [IntlNumberFormatter::MIN_FRACTION_DIGITS, BigDecimal::of($value)->getScale()],
+                [IntlNumberFormatter::MIN_FRACTION_DIGITS, $minFractionDigits]
+            );
+
+        $this->intlNumberFormatterFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with($locale. '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
+            ->willReturn($intlNumberFormatter);
+
+        $currency = $this->formatter->formatCurrency($value, $currencyCode, $attributes, [], [], $locale);
+        $this->assertEquals($formattedValue, $currency);
+    }
+
+    public function dataProviderFormatCurrencyWithFractionDigits(): array
+    {
+        return [
+            'Andorran Peseta(ADP) without scientific notation value' => [
+                'locale' => 'en_US',
+                'currencyCode' => 'ADP',
+                'currencySymbol' => '',
+                'value' => 2.3456e2,
+                'formattedValue' => 'ADP 234.56',
+                'attributes' => [],
+            ],
+            'Andorran Peseta(ADP) with decimal part' => [
+                'locale' => 'en_US',
+                'currencyCode' => 'ADP',
+                'currencySymbol' => '',
+                'value' => 9.9999,
+                'formattedValue' => 'ADP 9.9999',
+                'attributes' => [],
+            ],
+            'US Dollar with decimal part' => [
+                'locale' => 'en_US',
+                'currencyCode' => 'USD',
+                'currencySymbol' => '',
+                'value' => 9.9999,
+                'formattedValue' => '$9.9999',
+                'attributes' => [],
+                'minFractionDigits' => 2
+            ]
+        ];
+    }
+
+    public function testFormatDecimal(): void
+    {
+        $unformattedValue = '1234.1234567891011121314151617';
+        $formattedValue = '1,234.12';
+        $unformattedValueIntegral = '1234';
+        $formattedValueIntegral = '1,234';
+
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('format')
+            ->withConsecutive([$unformattedValue], [$unformattedValueIntegral])
+            ->willReturnOnConsecutiveCalls($formattedValue, $formattedValueIntegral);
+        $originalAttribute = 2;
+        $intlNumberFormatter
+            ->expects(self::once())
+            ->method('getAttribute')
+            ->with(IntlNumberFormatter::MIN_FRACTION_DIGITS)
+            ->willReturn($originalAttribute);
+        $intlNumberFormatter
+            ->expects(self::exactly(2))
+            ->method('setAttribute')
+            ->withConsecutive(
+                [IntlNumberFormatter::MIN_FRACTION_DIGITS, 0],
+                [IntlNumberFormatter::MIN_FRACTION_DIGITS, $originalAttribute]
+            );
+        $intlNumberFormatter
+            ->expects(self::once())
+            ->method('getSymbol')
+            ->willReturnMap(
+                [
+                    [IntlNumberFormatter::DECIMAL_SEPARATOR_SYMBOL, '.'],
+                ]
+            );
+        $this->intlNumberFormatterFactory
+            ->expects(self::once())
+            ->method('create')
+            ->with(self::LOCALE, IntlNumberFormatter::DECIMAL, [], [], [])
+            ->willReturn($intlNumberFormatter);
+
+        self::assertEquals(
+            '1,234.1234567891011121314151617',
+            $this->formatter->formatDecimal($unformattedValue, [], [], [], self::LOCALE)
         );
+    }
+
+    public function testFormatPercent(): void
+    {
+        $unformattedValue = '12.341234567891';
+        $formattedValue = '1,234.1234567891%';
+
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $intlNumberFormatter
+            ->expects(self::atLeastOnce())
+            ->method('format')
+            ->with($unformattedValue)
+            ->willReturn($formattedValue);
+
+        $this->intlNumberFormatterFactory
+            ->expects(self::once())
+            ->method('create')
+            ->with(self::LOCALE, IntlNumberFormatter::PERCENT, [IntlNumberFormatter::MAX_FRACTION_DIGITS => 10], [], [])
+            ->willReturn($intlNumberFormatter);
+
+        self::assertEquals(
+            $formattedValue,
+            $this->formatter->formatPercent($unformattedValue, [], [], [], self::LOCALE)
+        );
+    }
+
+    public function testFormatSpellout(): void
+    {
+        $this->mockFormat(IntlNumberFormatter::SPELLOUT);
+
+        self::assertEquals(
+            self::FORMATTED_VALUE,
+            $this->formatter->formatSpellout(self::UNFORMATTED_VALUE, [], [], [], self::LOCALE)
+        );
+    }
+
+    /**
+     * @dataProvider formatDurationWhenDefaultFormatDataProvider
+     *
+     * @param string|int|float|\DateTime $value
+     * @param string $formattedValue
+     */
+    public function testFormatDurationWhenDefaultFormat($value, string $formattedValue): void
+    {
+        $this->intlNumberFormatterFactory
+            ->expects(self::never())
+            ->method('create');
+
+        self::assertEquals(
+            $formattedValue,
+            $this->formatter->formatDuration($value, [], [], [], self::LOCALE, true)
+        );
+    }
+
+    public function formatDurationWhenDefaultFormatDataProvider(): array
+    {
+        return [
+            [
+                'value' => '',
+                'formattedValue' => '00:00:00',
+            ],
+            [
+                'value' => 0,
+                'formattedValue' => '00:00:00',
+            ],
+            [
+                'value' => -42,
+                'formattedValue' => '00:00:42',
+            ],
+            [
+                'value' => 42.1,
+                'formattedValue' => '00:00:42',
+            ],
+            [
+                'value' => '42',
+                'formattedValue' => '00:00:42',
+            ],
+            [
+                'value' => 42,
+                'formattedValue' => '00:00:42',
+            ],
+            [
+                'value' => 142,
+                'formattedValue' => '00:02:22',
+            ],
+            [
+                'value' => 4242,
+                'formattedValue' => '01:10:42',
+            ],
+            [
+                'value' => 424242,
+                'formattedValue' => '117:50:42',
+            ],
+            [
+                'value' => new \DateTime('11.09.2020 13:23:32', new \DateTimeZone('UTC')),
+                'formattedValue' => '444397:23:32',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider formatDurationWhenNotDefaultFormatDataProvider
+     *
+     * @param string|int|float|\DateTime $value
+     * @param string $formattedValue
+     * @param string $expectedValue
+     */
+    public function testFormatDurationWhenNotDefaultFormat($value, string $formattedValue, string $expectedValue): void
+    {
+        $intlNumberFormatterDuration = $this->createMock(IntlNumberFormatter::class);
+        $intlNumberFormatterDefault = $this->createMock(IntlNumberFormatter::class);
+        $this->intlNumberFormatterFactory
+            ->expects(self::exactly(2))
+            ->method('create')
+            ->willReturnMap(
+                [
+                    [self::LOCALE, IntlNumberFormatter::DURATION, [], [], [], $intlNumberFormatterDuration],
+                    ['', IntlNumberFormatter::DEFAULT_STYLE, [], [], [], $intlNumberFormatterDefault],
+                ]
+            );
+
+        $intlNumberFormatterDuration
+            ->expects(self::once())
+            ->method('format')
+            ->with(abs($value))
+            ->willReturn($formattedValue);
+
+        $intlNumberFormatterDefault
+            ->expects(self::exactly(2))
+            ->method('getSymbol')
+            ->willReturnMap(
+                [
+                    [IntlNumberFormatter::GROUPING_SEPARATOR_SYMBOL, ' '],
+                    [IntlNumberFormatter::DECIMAL_SEPARATOR_SYMBOL, ','],
+                ]
+            )
+            ->willReturn($formattedValue);
+
+        self::assertEquals(
+            $expectedValue,
+            $this->formatter->formatDuration($value, [], [], [], self::LOCALE, false)
+        );
+    }
+
+    public function formatDurationWhenNotDefaultFormatDataProvider(): array
+    {
+        return [
+            'value is int' => [
+                'value' => 142,
+                'formattedValue' => '2 minutes, 22 seconds',
+                'expectedValue' => '2 minutes, 22 seconds',
+            ],
+            'value is string' => [
+                'value' => '142',
+                'formattedValue' => '2 minutes, 22 seconds',
+                'expectedValue' => '2 minutes, 22 seconds',
+            ],
+            'value is negative' => [
+                'value' => -142,
+                'formattedValue' => '2 minutes, 22 seconds',
+                'expectedValue' => '2 minutes, 22 seconds',
+            ],
+            'duration is not valid' => [
+                'value' => '142',
+                'formattedValue' => '2 22',
+                'expectedValue' => '00:02:22',
+            ],
+        ];
+    }
+
+    /**
+     * @param string $style
+     * @return IntlNumberFormatter|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function mockCreate(string $style): IntlNumberFormatter
+    {
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $this->intlNumberFormatterFactory
+            ->expects(self::once())
+            ->method('create')
+            ->with(self::LOCALE, $style, [], [], [])
+            ->willReturn($intlNumberFormatter);
+
+        return $intlNumberFormatter;
+    }
+
+    public function testFormatOrdinal(): void
+    {
+        $this->mockFormat(IntlNumberFormatter::ORDINAL);
+
+        self::assertEquals(
+            self::FORMATTED_VALUE,
+            $this->formatter->formatOrdinal(self::UNFORMATTED_VALUE, [], [], [], self::LOCALE)
+        );
+    }
+
+    public function testGetAttribute(): void
+    {
+        $style = 'decimal';
+        $this->mockCreate($style);
+
+        $this->formatter->getAttribute('MAX_INTEGER_DIGITS', $style, self::LOCALE, []);
+    }
+
+    public function testGetAttributeWhenInvalid(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('NumberFormatter has no constant \'INVALID\'');
+
+        $this->formatter->getAttribute('INVALID', IntlNumberFormatter::DECIMAL, self::LOCALE, []);
+    }
+
+    public function testGetTextAttribute(): void
+    {
+        $style = 'decimal';
+        $this->mockCreate($style);
+
+        $this->formatter->getTextAttribute('MAX_INTEGER_DIGITS', $style, self::LOCALE);
+    }
+
+    public function testGetTextAttributeWhenInvalid(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('NumberFormatter has no constant \'INVALID\'');
+
+        $this->formatter->getTextAttribute('INVALID', IntlNumberFormatter::DECIMAL, self::LOCALE);
+    }
+
+    public function testGetSymbol(): void
+    {
+        $style = 'decimal';
+        $this->mockCreate($style);
+
+        $this->formatter->getSymbol('MAX_INTEGER_DIGITS', $style, self::LOCALE);
+    }
+
+    public function testGetSymbolWhenInvalid(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('NumberFormatter has no constant \'INVALID\'');
+
+        $this->formatter->getSymbol('INVALID', IntlNumberFormatter::DECIMAL, self::LOCALE);
+    }
+
+    /**
+     * @dataProvider currencySymbolPrependDataProvider
+     */
+    public function testIsCurrencySymbolPrepend(string $formattedValue, ?bool $expectedResult): void
+    {
+        $intlNumberFormatter = $this->mockCreate(IntlNumberFormatter::CURRENCY);
+
+        $intlNumberFormatter
+            ->expects(self::once())
+            ->method('formatCurrency')
+            ->with(123, self::CURRENCY)
+            ->willReturn($formattedValue);
+
+        self::assertSame($expectedResult, $this->formatter->isCurrencySymbolPrepend(self::CURRENCY, self::LOCALE));
+    }
+
+    public function currencySymbolPrependDataProvider(): array
+    {
+        return [
+            [
+                'formattedValue' => '123$',
+                'expectedResult' => false,
+            ],
+            [
+                'formattedValue' => '123 $',
+                'expectedResult' => false,
+            ],
+            [
+                'formattedValue' => '$123',
+                'expectedResult' => true,
+            ],
+            [
+                'formattedValue' => '$ 123',
+                'expectedResult' => true,
+            ],
+            [
+                'formattedValue' => '123US$',
+                'expectedResult' => false,
+            ],
+            [
+                'formattedValue' => '123 US$',
+                'expectedResult' => false,
+            ],
+            [
+                'formattedValue' => 'US$123',
+                'expectedResult' => true,
+            ],
+            [
+                'formattedValue' => 'US$ 123',
+                'expectedResult' => true,
+            ],
+            [
+                'formattedValue' => '123USD',
+                'expectedResult' => false,
+            ],
+            [
+                'formattedValue' => '123 USD',
+                'expectedResult' => false,
+            ],
+            [
+                'formattedValue' => 'USD123',
+                'expectedResult' => true,
+            ],
+            [
+                'formattedValue' => 'USD 123',
+                'expectedResult' => true,
+            ],
+            [
+                'formattedValue' => '123',
+                'expectedResult' => null,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider currencySymbolPrependDataProvider
+     */
+    public function testIsCurrencySymbolPrependWhenNoLocale(string $formattedValue, ?bool $expectedResult): void
+    {
+        $intlNumberFormatter = $this->mockCreate(IntlNumberFormatter::CURRENCY);
+
+        $this->localeSettings
+            ->expects(self::once())
+            ->method('getLocale')
+            ->willReturn(self::LOCALE);
+
+        $intlNumberFormatter
+            ->expects(self::once())
+            ->method('formatCurrency')
+            ->with(123, self::CURRENCY)
+            ->willReturn($formattedValue);
+
+        self::assertSame($expectedResult, $this->formatter->isCurrencySymbolPrepend(self::CURRENCY, null));
+    }
+
+    /**
+     * @dataProvider currencySymbolPrependDataProvider
+     */
+    public function testIsCurrencySymbolPrependWhenNoCurrency(string $formattedValue, ?bool $expectedResult): void
+    {
+        $intlNumberFormatter = $this->mockCreate(IntlNumberFormatter::CURRENCY);
+
+        $this->localeSettings
+            ->expects(self::once())
+            ->method('getCurrency')
+            ->willReturn(self::CURRENCY);
+
+        $intlNumberFormatter
+            ->expects(self::once())
+            ->method('formatCurrency')
+            ->with(123, self::CURRENCY)
+            ->willReturn($formattedValue);
+
+        self::assertEquals($expectedResult, $this->formatter->isCurrencySymbolPrepend(null, self::LOCALE));
+    }
+
+    public function testIsCurrencySymbolPrependWhenLocalCache(): void
+    {
+        $intlNumberFormatter = $this->mockCreate(IntlNumberFormatter::CURRENCY);
+        $intlNumberFormatter
+            ->expects(self::once())
+            ->method('formatCurrency')
+            ->with(123, self::CURRENCY)
+            ->willReturn('123$');
+
+        self::assertEquals(false, $this->formatter->isCurrencySymbolPrepend(self::CURRENCY, self::LOCALE));
+        self::assertEquals(false, $this->formatter->isCurrencySymbolPrepend(self::CURRENCY, self::LOCALE));
     }
 }

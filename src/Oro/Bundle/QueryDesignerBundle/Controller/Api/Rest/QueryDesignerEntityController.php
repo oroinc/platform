@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider;
@@ -15,10 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("querydesigner/entity")
- * @NamePrefix("oro_api_querydesigner_")
+ * REST API controller for the query designer.
  */
-class QueryDesignerEntityController extends FOSRestController implements ClassResourceInterface
+class QueryDesignerEntityController extends AbstractFOSRestController
 {
     /**
      * Get entities with fields
@@ -44,12 +39,12 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
         $withRelations = filter_var($request->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
-        $statusCode = Codes::HTTP_OK;
+        $statusCode = Response::HTTP_OK;
 
         try {
             $result = $provider->getFields(true, true, $withRelations);
         } catch (InvalidEntityException $ex) {
-            $statusCode = Codes::HTTP_NOT_FOUND;
+            $statusCode = Response::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];
         }
 

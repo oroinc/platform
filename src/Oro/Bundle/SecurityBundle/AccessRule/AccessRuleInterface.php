@@ -9,17 +9,14 @@ interface AccessRuleInterface
 {
     /**
      * Checks whether this rule can be applied to the given criteria.
-     *
-     * @param Criteria $criteria
-     *
-     * @return bool
+     * Note: this method is intended for complex logic that cannot be achieved
+     * via the "oro_security.access_rule" tag options.
+     * @link ../Resources/doc/access-rules.md#add-a-new-access-rule
      */
     public function isApplicable(Criteria $criteria): bool;
 
     /**
      * Adds necessary access expressions to the given criteria.
-     *
-     * @param Criteria $criteria
      */
     public function process(Criteria $criteria): void;
 }

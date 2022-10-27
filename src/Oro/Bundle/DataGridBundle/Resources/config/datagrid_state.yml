@@ -1,12 +1,11 @@
 services:
     oro_datagrid.tools.parameters_helper:
         class: 'Oro\Bundle\DataGridBundle\Tools\DatagridParametersHelper'
-        public: false
+        public: true
 
     oro_datagrid.provider.state.abtract:
         class: 'Oro\Bundle\DataGridBundle\Provider\State\AbstractStateProvider'
         abstract: true
-        public: false
         arguments:
             - '@oro_datagrid.grid_view.manager'
             - '@oro_security.token_accessor'
@@ -27,13 +26,11 @@ services:
 
     oro_datagrid.provider.selected_fields:
         class: 'Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsProvider'
-        public: false
-        lazy: true
+        arguments:
+            - !tagged_iterator oro_datagrid.selected_fields_provider
 
     oro_datagrid.provider.selected_fields.columns:
         class: 'Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsFromColumnsProvider'
-        public: false
-        lazy: true
         arguments:
             - '@oro_datagrid.provider.state.columns'
         tags:
@@ -41,8 +38,6 @@ services:
 
     oro_datagrid.provider.selected_fields.sorters:
         class: 'Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsFromSortersProvider'
-        public: false
-        lazy: true
         arguments:
             - '@oro_datagrid.provider.state.sorters'
         tags:

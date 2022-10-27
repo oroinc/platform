@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Helper\DefaultOperationRequestHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -15,8 +16,11 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Populates datagrid config with actions and context configs that attached to it
+ */
 class DatagridActionButtonProvider implements DatagridActionProviderInterface
 {
     /** @var ButtonProvider */
@@ -43,14 +47,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
     /** @var array */
     protected $groups;
 
-    /**
-     * @param ButtonProvider $buttonProvider
-     * @param ContextHelper $contextHelper
-     * @param MassActionProviderRegistry $providerRegistry
-     * @param OptionsHelper $optionsHelper
-     * @param EntityClassResolver $entityClassResolver
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         ButtonProvider $buttonProvider,
         ContextHelper $contextHelper,
@@ -67,9 +63,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         $this->translator = $translator;
     }
 
-    /**
-     * @param array $groups
-     */
     public function setGroups(array $groups)
     {
         $this->groups = $groups;
@@ -81,9 +74,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         return 0 !== count($this->getButtons($this->getButtonSearchContext($configuration), $configuration));
     }
 
-    /**
-     * @param DatagridConfiguration $configuration
-     */
     public function applyActions(DatagridConfiguration $configuration)
     {
         if (!$this->hasActions($configuration)) {
@@ -218,22 +208,18 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         return array_merge($frontendOptions['options'], $frontendOptions['data']);
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     */
     protected function applyContextConfig(DatagridConfiguration $config)
     {
         $context = $this->contextHelper->getContext();
 
         if (!empty($context['route'])) {
-            $config->offsetSetByPath('[options][urlParams][originalRoute]', $context['route']);
+            $config->offsetSetByPath(
+                '[options][urlParams]['. DefaultOperationRequestHelper::ORIGINAL_ROUTE_URL_PARAMETER_KEY .']',
+                $context['route']
+            );
         }
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param ButtonSearchContext $context
-     */
     protected function applyActionsConfig(DatagridConfiguration $config, ButtonSearchContext $context)
     {
         $actionsConfig = $config->offsetGetOr(ActionExtension::ACTION_KEY, []);
@@ -259,13 +245,18 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         $config = array_merge(
             [
                 'type' => 'button-widget',
-                'label' => $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain()),
+                'label' => $this->getTranslatedButtonLabel($button),
                 'rowAction' => false,
                 'link' => '#',
                 'icon' => $icon,
             ],
             $button->getTemplateData()['additionalData']
         );
+
+        $ariaLabel = $button->getAriaLabel();
+        if ($ariaLabel) {
+            $config['ariaLabel'] = $ariaLabel;
+        }
 
         if ($button->getOrder()) {
             $config['order'] = $button->getOrder();
@@ -274,10 +265,6 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         return $config;
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param ButtonSearchContext $context
-     */
     protected function processMassActionsConfig(DatagridConfiguration $config, ButtonSearchContext $context)
     {
         $actions = $config->offsetGetOr('mass_actions', []);
@@ -300,7 +287,7 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
             } elseif (!empty($datagridOptions['mass_action'])) {
                 $actions[$button->getName()] = array_merge(
                     [
-                        'label' => $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain()),
+                        'label' => $this->getTranslatedButtonLabel($button),
                     ],
                     $datagridOptions['mass_action']
                 );
@@ -326,5 +313,10 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         }
 
         return $context;
+    }
+
+    private function getTranslatedButtonLabel(ButtonInterface $button): string
+    {
+        return $this->translator->trans($button->getLabel(), [], $button->getTranslationDomain());
     }
 }

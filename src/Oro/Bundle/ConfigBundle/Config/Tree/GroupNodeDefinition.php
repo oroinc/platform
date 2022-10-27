@@ -4,6 +4,9 @@ namespace Oro\Bundle\ConfigBundle\Config\Tree;
 
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Responsible for parameters that can be used to build a configuration form in the system configuration.
+ */
 class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, \IteratorAggregate
 {
     /** @var array */
@@ -45,7 +48,7 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
     /**
      * {@inheritDoc}
      */
-    public function count()
+    public function count(): int
     {
         return count($this->children);
     }
@@ -53,7 +56,7 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
     /**
      * {@inheritDoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $this->resort();
 
@@ -100,9 +103,16 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
         return array(
             $this->getName() => array_intersect_key(
                 $this->definition,
-                array_flip(
-                    ['title', 'priority', 'description', 'configurator', 'handler', 'page_reload', 'tooltip']
-                )
+                array_flip([
+                    'title',
+                    'priority',
+                    'description',
+                    'description_style',
+                    'configurator',
+                    'handler',
+                    'page_reload',
+                    'tooltip'
+                ])
             )
         );
     }
@@ -117,7 +127,7 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
         return array_intersect_key(
             $this->definition,
             array_flip(
-                ['title', 'priority', 'description', 'icon', 'tooltip']
+                ['title', 'priority', 'description', 'description_style',  'icon', 'tooltip']
             )
         );
     }

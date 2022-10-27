@@ -20,63 +20,24 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 TransitionTriggerMessage::TRANSITION_TRIGGER => $triggerId,
-                TransitionTriggerMessage::MAIN_ENTITY => $mainEntityId
+                TransitionTriggerMessage::MAIN_ENTITY => $mainEntityId,
             ],
             $this->getTransitionTriggerMessage($triggerId, $mainEntityId)->toArray()
         );
     }
 
-    /**
-     * @dataProvider createFromJsonExceptionProvider
-     *
-     * @param mixed $json
-     * @param string $expectedMessage
-     */
-    public function testCreateFromJsonException($json, $expectedMessage)
-    {
-        $this->expectException('\InvalidArgumentException');
-        $this->expectExceptionMessage($expectedMessage);
-
-        TransitionTriggerMessage::createFromJson($json);
-    }
-
-    /**
-     * @return array
-     */
-    public function createFromJsonExceptionProvider()
-    {
-        return [
-            [
-                'json' => null,
-                'expectedMessage' => 'Accept only string argument but got: "NULL"'
-            ],
-            [
-                'json' => new \stdClass(),
-                'expectedMessage' => 'Accept only string argument but got: "stdClass"'
-            ],
-            [
-                'json' => 'data',
-                'expectedMessage' => 'The malformed json given'
-            ],
-            [
-                'json' => '',
-                'expectedMessage' => 'Given json should not be empty'
-            ]
-        ];
-    }
-
-    public function testCreateFromJson()
+    public function testCreateFromArray()
     {
         $triggerId = 42;
         $mainEntityId = ['id' => 105];
 
         $this->assertEquals(
             $this->getTransitionTriggerMessage($triggerId, $mainEntityId),
-            TransitionTriggerMessage::createFromJson($this->getJson($triggerId, $mainEntityId))
+            TransitionTriggerMessage::createFromArray($this->getArray($triggerId, $mainEntityId))
         );
         $this->assertEquals(
             $this->getTransitionTriggerMessage(null, null),
-            TransitionTriggerMessage::createFromJson('{"test":"data"}')
+            TransitionTriggerMessage::createFromArray([])
         );
     }
 
@@ -87,39 +48,21 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             $this->getTransitionTriggerMessage($triggerId, $mainEntityId),
-            TransitionTriggerMessage::create($this->getEventTriggerMock($triggerId), $mainEntityId)
+            TransitionTriggerMessage::create($this->getEventTrigger($triggerId), $mainEntityId)
         );
     }
 
-    public function testAccessors()
-    {
-        $this->assertPropertyAccessors(
-            $this->getTransitionTriggerMessage(null, null),
-            [
-                ['triggerId', 5, 0],
-                ['mainEntityId', ['id' => 105]]
-            ]
-        );
-    }
-
-    /**
-     * @param $id
-     * @return \PHPUnit\Framework\MockObject\MockObject|BaseTransitionTrigger
-     */
-    protected function getEventTriggerMock($id)
+    private function getEventTrigger(int $id): BaseTransitionTrigger
     {
         $mock = $this->createMock(BaseTransitionTrigger::class);
-        $mock->expects($this->any())->method('getId')->willReturn($id);
+        $mock->expects($this->any())
+            ->method('getId')
+            ->willReturn($id);
 
         return $mock;
     }
 
-    /**
-     * @param int $triggerId
-     * @param mixed $mainEntityId
-     * @return TransitionTriggerMessage
-     */
-    protected function getTransitionTriggerMessage($triggerId, $mainEntityId)
+    private function getTransitionTriggerMessage(?int $triggerId, mixed $mainEntityId): TransitionTriggerMessage
     {
         return $this->getEntity(
             TransitionTriggerMessage::class,
@@ -127,19 +70,11 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param int $triggerId
-     * @param mixed $mainEntityId
-     * @return string
-     */
-    protected function getJson($triggerId, $mainEntityId)
+    private function getArray(int $triggerId, mixed $mainEntityId): array
     {
-        return sprintf(
-            '{"%s":%d,"%s":%s}',
-            TransitionTriggerMessage::TRANSITION_TRIGGER,
-            $triggerId,
-            TransitionTriggerMessage::MAIN_ENTITY,
-            json_encode($mainEntityId)
-        );
+        return [
+            TransitionTriggerMessage::TRANSITION_TRIGGER => $triggerId,
+            TransitionTriggerMessage::MAIN_ENTITY => $mainEntityId,
+        ];
     }
 }

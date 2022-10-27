@@ -12,9 +12,6 @@ class ChoiceLoaderStub implements ChoiceLoaderInterface
      */
     private $choiceList;
 
-    /**
-     * @param array $choices
-     */
     public function __construct(array $choices)
     {
         $this->choiceList = new ArrayChoiceList($choices, function ($givenChoice) use ($choices) {

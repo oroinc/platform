@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\Tools;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
+use Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\SomeEntity;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestCustomEntity;
 use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder;
@@ -10,70 +11,72 @@ use Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestUser;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class PhoneProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendConfigProvider;
 
-    /** @var PhoneProvider */
-    protected $provider;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
+    }
 
-        $this->provider = new PhoneProvider($this->extendConfigProvider);
+    /**
+     * @param array $phoneProviders [class => [provider id => provider, ...]]
+     *
+     * @return PhoneProvider
+     */
+    private function getPhoneProvider(array $phoneProviders): PhoneProvider
+    {
+        $map = [];
+        $containerBuilder = TestContainerBuilder::create();
+        foreach ($phoneProviders as $class => $providers) {
+            foreach ($providers as $id => $provider) {
+                $map[$class][] = $id;
+                $containerBuilder->add($id, $provider);
+            }
+        }
+
+        return new PhoneProvider(
+            $map,
+            $containerBuilder->getContainer($this),
+            $this->extendConfigProvider
+        );
     }
 
     /**
      * @dataProvider getPhoneNumberProvider
      */
-    public function testGetPhoneNumber($object, $expected)
+    public function testGetPhoneNumber(object|string|null $object, ?string $expected)
     {
-        $testPhoneHolderProvider = $this->createMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
-        $testPhoneHolderProvider->expects($this->any())
+        $phoneProvider = $this->createMock(PhoneProviderInterface::class);
+        $phoneProvider->expects($this->any())
             ->method('getPhoneNumber')
-            ->will(
-                $this->returnCallback(
-                    function ($object) {
-                        /** @var TestPhoneHolder $object */
-                        return $object->getPhoneNumber();
-                    }
-                )
-            );
-        $this->provider->addPhoneProvider(
-            'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder',
-            $testPhoneHolderProvider
-        );
+            ->willReturnCallback(function (TestPhoneHolder $object) {
+                return $object->getPhoneNumber();
+            });
 
-        $this->assertEquals($expected, $this->provider->getPhoneNumber($object));
+        $provider = $this->getPhoneProvider([TestPhoneHolder::class => ['provider1' => $phoneProvider]]);
+        $this->assertEquals($expected, $provider->getPhoneNumber($object));
     }
 
     /**
      * @dataProvider getPhoneNumbersProvider
      */
-    public function testGetPhoneNumbers($object, $expected)
+    public function testGetPhoneNumbers(object|string|null $object, array $expected)
     {
-        $testPhoneHolderProvider = $this->createMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
-        $testPhoneHolderProvider->expects($this->any())
+        $phoneProvider = $this->createMock(PhoneProviderInterface::class);
+        $phoneProvider->expects($this->any())
             ->method('getPhoneNumbers')
-            ->will(
-                $this->returnCallback(
-                    function ($object) {
-                        /** @var TestPhoneHolder $object */
-                        return $object->getPhoneNumbers();
-                    }
-                )
-            );
-        $this->provider->addPhoneProvider(
-            'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder',
-            $testPhoneHolderProvider
-        );
+            ->willReturnCallback(function (TestPhoneHolder $object) {
+                return $object->getPhoneNumbers();
+            });
 
-        $this->assertSame($expected, $this->provider->getPhoneNumbers($object));
+        $provider = $this->getPhoneProvider([TestPhoneHolder::class => ['provider1' => $phoneProvider]]);
+        $this->assertSame($expected, $provider->getPhoneNumbers($object));
     }
 
     public function testGetPhoneNumberFromRelatedObjectNotConfigurableEntity()
@@ -85,11 +88,12 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->extendConfigProvider->expects($this->never())
             ->method('getConfig');
 
-        $this->assertEquals(null, $this->provider->getPhoneNumber($object));
+        $provider = $this->getPhoneProvider([]);
+        $this->assertNull($provider->getPhoneNumber($object));
     }
 
     public function testGetPhoneNumbersFromRelatedObjectNotConfigurableEntity()
@@ -101,11 +105,12 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->extendConfigProvider->expects($this->never())
             ->method('getConfig');
 
-        $this->assertSame([], $this->provider->getPhoneNumbers($object));
+        $provider = $this->getPhoneProvider([]);
+        $this->assertSame([], $provider->getPhoneNumbers($object));
     }
 
     public function testGetPhoneNumberFromRelatedObjectNoTargetEntities()
@@ -122,17 +127,17 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'user', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestUser'
+                    'target_entity' => TestUser::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'phoneHolder', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder'
+                    'target_entity' => TestPhoneHolder::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'other', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\SomeEntity'
+                    'target_entity' => SomeEntity::class
                 ],
             ]
         );
@@ -140,13 +145,14 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $this->assertEquals(null, $this->provider->getPhoneNumber($object));
+        $provider = $this->getPhoneProvider([]);
+        $this->assertEquals(null, $provider->getPhoneNumber($object));
     }
 
     public function testGetPhoneNumbersFromRelatedObjectNoTargetEntities()
@@ -163,17 +169,17 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'user', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestUser'
+                    'target_entity' => TestUser::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'phoneHolder', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder'
+                    'target_entity' => TestPhoneHolder::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'other', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\SomeEntity'
+                    'target_entity' => SomeEntity::class
                 ],
             ]
         );
@@ -181,13 +187,14 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $this->assertSame([], $this->provider->getPhoneNumbers($object));
+        $provider = $this->getPhoneProvider([]);
+        $this->assertSame([], $provider->getPhoneNumbers($object));
     }
 
     public function testGetPhoneNumberFromRelatedObject()
@@ -197,21 +204,12 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $object->setPhoneHolder(new TestPhoneHolder('123-123'));
         $object->setOther(new SomeEntity());
 
-        $testPhoneHolderProvider = $this->createMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
-        $testPhoneHolderProvider->expects($this->any())
+        $phoneProvider = $this->createMock(PhoneProviderInterface::class);
+        $phoneProvider->expects($this->any())
             ->method('getPhoneNumber')
-            ->will(
-                $this->returnCallback(
-                    function ($object) {
-                        /** @var TestPhoneHolder $object */
-                        return $object->getPhoneNumber();
-                    }
-                )
-            );
-        $this->provider->addPhoneProvider(
-            'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder',
-            $testPhoneHolderProvider
-        );
+            ->willReturnCallback(function (TestPhoneHolder $object) {
+                return $object->getPhoneNumber();
+            });
 
         $config = new Config(new EntityConfigId('extend', get_class($object)));
         $config->set(
@@ -220,17 +218,17 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'user', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestUser'
+                    'target_entity' => TestUser::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'phoneHolder', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder'
+                    'target_entity' => TestPhoneHolder::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'other', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\SomeEntity'
+                    'target_entity' => SomeEntity::class
                 ],
             ]
         );
@@ -238,16 +236,17 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $this->provider->addTargetEntity('Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestUser');
-        $this->provider->addTargetEntity('Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder', -10);
+        $provider = $this->getPhoneProvider([TestPhoneHolder::class => ['provider1' => $phoneProvider]]);
+        $provider->addTargetEntity(TestUser::class);
+        $provider->addTargetEntity(TestPhoneHolder::class, -10);
 
-        $this->assertEquals('123-123', $this->provider->getPhoneNumber($object));
+        $this->assertEquals('123-123', $provider->getPhoneNumber($object));
     }
 
     public function testGetPhoneNumbersFromRelatedObject()
@@ -259,21 +258,12 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $object->setPhoneHolder($testPhoneHolder);
         $object->setOther(new SomeEntity());
 
-        $testPhoneHolderProvider = $this->createMock('Oro\Bundle\AddressBundle\Provider\PhoneProviderInterface');
-        $testPhoneHolderProvider->expects($this->any())
+        $phoneProvider = $this->createMock(PhoneProviderInterface::class);
+        $phoneProvider->expects($this->any())
             ->method('getPhoneNumbers')
-            ->will(
-                $this->returnCallback(
-                    function ($object) {
-                        /** @var TestPhoneHolder $object */
-                        return $object->getPhoneNumbers();
-                    }
-                )
-            );
-        $this->provider->addPhoneProvider(
-            'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder',
-            $testPhoneHolderProvider
-        );
+            ->willReturnCallback(function (TestPhoneHolder $object) {
+                return $object->getPhoneNumbers();
+            });
 
         $config = new Config(new EntityConfigId('extend', get_class($object)));
         $config->set(
@@ -282,17 +272,17 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'user', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestUser'
+                    'target_entity' => TestUser::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'phoneHolder', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder'
+                    'target_entity' => TestPhoneHolder::class
                 ],
                 [
                     'owner' => true,
                     'field_id' => new FieldConfigId('extend', get_class($object), 'other', 'manyToOne'),
-                    'target_entity' => 'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\SomeEntity'
+                    'target_entity' => SomeEntity::class
                 ],
             ]
         );
@@ -300,44 +290,36 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($object))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with(get_class($object))
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $this->provider->addTargetEntity('Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestUser');
-        $this->provider->addTargetEntity('Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder', -10);
+        $provider = $this->getPhoneProvider([TestPhoneHolder::class => ['provider1' => $phoneProvider]]);
+        $provider->addTargetEntity(TestUser::class);
+        $provider->addTargetEntity(TestPhoneHolder::class, -10);
 
         $this->assertSame(
             [
                 ['123-123', $testPhoneHolder],
                 ['user phone', $testUser],
             ],
-            $this->provider->getPhoneNumbers($object)
+            $provider->getPhoneNumbers($object)
         );
     }
 
-    public function getPhoneNumberProvider()
+    public function getPhoneNumberProvider(): array
     {
-        return array(
-            'null'                                => array(null, null),
-            'not obj'                             => array(
-                'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder',
-                null
-            ),
-            'obj implements PhoneHolderInterface' => array(
-                new TestPhoneHolder('123-123'),
-                '123-123'
-            ),
-            'obj has getPhone method'             => array(
-                new TestUser('123-123'),
-                '123-123'
-            ),
-        );
+        return [
+            'null' => [null, null],
+            'not obj' => [TestPhoneHolder::class, null],
+            'obj implements PhoneHolderInterface' => [new TestPhoneHolder('123-123'), '123-123'],
+            'obj has getPhone method' => [new TestUser('123-123'), '123-123'],
+        ];
     }
 
-    public function getPhoneNumbersProvider()
+    public function getPhoneNumbersProvider(): array
     {
         $testPhoneHolder = new TestPhoneHolder('123-123');
         $testUser = new TestUser('123-123');
@@ -345,26 +327,10 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
 
         return [
             'null' => [null, []],
-            'not obj' => [
-                'Oro\Bundle\AddressBundle\Tests\Unit\Fixtures\TestPhoneHolder',
-                []
-            ],
-            'obj implements PhoneHolderInterface' => [
-                $testPhoneHolder,
-                [
-                    ['123-123', $testPhoneHolder]
-                ]
-            ],
-            'obj has getPhone method' => [
-                $testUser,
-                [
-                    ['123-123', $testUser]
-                ]
-            ],
-            'obj has getPhone method and phone not exists' => [
-                $testUserWithoutPhone,
-                []
-            ]
+            'not obj' => [TestPhoneHolder::class, []],
+            'obj implements PhoneHolderInterface' => [$testPhoneHolder, [['123-123', $testPhoneHolder]]],
+            'obj has getPhone method' => [$testUser, [['123-123', $testUser]]],
+            'obj has getPhone method and phone not exists' => [$testUserWithoutPhone, []]
         ];
     }
 }

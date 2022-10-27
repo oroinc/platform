@@ -1,9 +1,14 @@
-oro_qb_api:
-    resource:     "@OroQueryDesignerBundle/Resources/config/oro/routing_api.yml"
-    type:         rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
+#
+# OLD REST API ROUTES
+#
+
+oro_api_querydesigner_fields_entity:
+    path: '/api/rest/{version}/querydesigner/entities/fields.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\QueryDesignerBundle\Controller\Api\Rest\QueryDesignerEntityController::fieldsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1

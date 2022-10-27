@@ -9,7 +9,7 @@ class TestConnector implements ConnectorInterface
     /**
      * {@inheritdoc}
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'test connector';
     }

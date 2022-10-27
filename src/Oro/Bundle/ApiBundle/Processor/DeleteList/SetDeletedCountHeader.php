@@ -12,8 +12,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDeletedCountHeader implements ProcessorInterface
 {
-    const RESPONSE_HEADER_NAME  = 'X-Include-Deleted-Count';
-    const REQUEST_HEADER_VALUE = 'deletedCount';
+    public const RESPONSE_HEADER_NAME = 'X-Include-Deleted-Count';
+    public const REQUEST_HEADER_VALUE = 'deletedCount';
 
     /**
      * {@inheritdoc}

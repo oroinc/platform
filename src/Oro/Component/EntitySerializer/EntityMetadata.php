@@ -4,80 +4,76 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+/**
+ * A wrapper for a manageable entity metadata.
+ */
 class EntityMetadata
 {
     /** @var ClassMetadata */
-    protected $metadata;
+    private $metadata;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public function __construct(ClassMetadata $metadata)
     {
         $this->metadata = $metadata;
     }
 
     /**
-     * Returns entity field names
+     * Gets entity field names.
      *
      * @return string[]
      */
-    public function getFieldNames()
+    public function getFieldNames(): array
     {
         return $this->metadata->getFieldNames();
     }
 
     /**
-     * Returns entity association names
+     * Gets entity association names.
      *
      * @return string[]
      */
-    public function getAssociationNames()
+    public function getAssociationNames(): array
     {
         return $this->metadata->getAssociationNames();
     }
 
     /**
-     * Returns names of entity identifier fields
+     * Gets names of entity identifier fields.
      *
      * @return string[]
      */
-    public function getIdentifierFieldNames()
+    public function getIdentifierFieldNames(): array
     {
         return $this->metadata->getIdentifierFieldNames();
     }
 
     /**
-     * Returns the name of entity identifier field if an entity has a single-field identifier
-     *
-     * @return string
+     * Gets the name of entity identifier field if an entity has a single field identifier.
      */
-    public function getSingleIdentifierFieldName()
+    public function getSingleIdentifierFieldName(): string
     {
         return $this->metadata->getSingleIdentifierFieldName();
     }
 
     /**
      * Checks whether an entity is participate in an inheritance hierarchy,
-     * e.g. in the JOINED or SINGLE_TABLE inheritance mapping
-     *
-     * @return bool
+     * e.g. in the JOINED or SINGLE_TABLE inheritance mapping.
      */
-    public function hasInheritance()
+    public function hasInheritance(): bool
     {
-        return $this->metadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE;
+        return !$this->metadata->isInheritanceTypeNone();
     }
 
     /**
-     * Returns the discriminator value of the given entity class
+     * Gets the discriminator value of the given entity class.
      * This does only apply to the JOINED and SINGLE_TABLE inheritance mapping strategies
-     * where a discriminator column is used
+     * where a discriminator column is used.
      *
      * @param string $entityClass
      *
      * @return mixed
      */
-    public function getDiscriminatorValue($entityClass)
+    public function getDiscriminatorValue(string $entityClass)
     {
         $map = array_flip($this->metadata->discriminatorMap);
 
@@ -85,78 +81,63 @@ class EntityMetadata
     }
 
     /**
-     * Gets the type of a field
-     *
-     * @param string $fieldName
-     *
-     * @return string|null
+     * Gets the data type of the given field.
      */
-    public function getFieldType($fieldName)
+    public function getFieldType(string $fieldName): ?string
     {
         return $this->metadata->getTypeOfField($fieldName);
     }
 
     /**
-     * Returns the mapping of an association
-     *
-     * @param string $fieldName
-     *
-     * @return array
+     * Gets the mapping of the given association.
      */
-    public function getAssociationMapping($fieldName)
+    public function getAssociationMapping(string $fieldName): array
     {
         return $this->metadata->getAssociationMapping($fieldName);
     }
 
     /**
-     * Returns the target class name of an association
-     *
-     * @param string $fieldName
-     *
-     * @return string
+     * Gets the target class name for the given association.
      */
-    public function getAssociationTargetClass($fieldName)
+    public function getAssociationTargetClass(string $fieldName): string
     {
         return $this->metadata->getAssociationTargetClass($fieldName);
     }
 
     /**
-     * Checks if the given field is a mapped property
-     *
-     * @param string $fieldName
-     *
-     * @return bool
+     * Checks whether the given field is a mapped property.
      */
-    public function isField($fieldName)
+    public function isField(string $fieldName): bool
     {
         return $this->metadata->hasField($fieldName);
     }
 
     /**
-     * Checks if the given field is a mapped association
-     *
-     * @param string $fieldName
-     *
-     * @return bool
+     * Checks whether the given field is a mapped association.
      */
-    public function isAssociation($fieldName)
+    public function isAssociation(string $fieldName): bool
     {
         return $this->metadata->hasAssociation($fieldName);
     }
 
     /**
-     * Checks if the given field is mapped as collection-valued association
-     *
-     * @param string $fieldName
-     *
-     * @return bool
+     * Checks whether the given field is a mapped single valued association.
      */
-    public function isCollectionValuedAssociation($fieldName)
+    public function isSingleValuedAssociation(string $fieldName): bool
     {
-        if (!$this->isAssociation($fieldName)) {
-            return false;
-        }
+        return $this->isAssociation($fieldName) && !$this->isCollectionValued($fieldName);
+    }
 
+    /**
+     * Checks whether the given field is a mapped collection valued association.
+     */
+    public function isCollectionValuedAssociation(string $fieldName): bool
+    {
+        return $this->isAssociation($fieldName) && $this->isCollectionValued($fieldName);
+    }
+
+    private function isCollectionValued(string $fieldName): bool
+    {
         $mapping = $this->getAssociationMapping($fieldName);
 
         return

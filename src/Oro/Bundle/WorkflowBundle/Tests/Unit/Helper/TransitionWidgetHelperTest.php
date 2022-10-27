@@ -5,64 +5,46 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionWidgetHelper;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var TransitionWidgetHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->helper = new TransitionWidgetHelper($this->doctrineHelper);
     }
 
     /**
-     * {@inheritDoc}
-     */
-    protected function tearDown()
-    {
-        unset(
-            $this->doctrineHelper,
-            $this->formFactory,
-            $this->workflowDataSerializer,
-            $this->helper
-        );
-    }
-
-    /**
-     * @param string $entityClass
-     * @param null|mixed $entityId
-     *
      * @dataProvider getOrCreateEntityReferenceDataProvider
      */
-    public function testGetOrCreateEntityReference($entityClass, $entityId = null)
+    public function testGetOrCreateEntityReference(string $entityClass, int $entityId = null)
     {
         if ($entityId) {
-            $this->doctrineHelper->expects($this->once())->method('getEntityReference')->with($entityClass, $entityId);
+            $this->doctrineHelper->expects($this->once())
+                ->method('getEntityReference')
+                ->with($entityClass, $entityId);
         } else {
-            $this->doctrineHelper->expects($this->once())->method('createEntityInstance')->with($entityClass);
+            $this->doctrineHelper->expects($this->once())
+                ->method('createEntityInstance')
+                ->with($entityClass);
         }
 
         $this->helper->getOrCreateEntityReference($entityClass, $entityId);
     }
 
     /**
-     * @param string $entityClass
-     * @param null|mixed $entityId
-     *
      * @dataProvider getOrCreateEntityReferenceDataProvider
-     *
-     * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
-    public function testGetOrCreateEntityReferenceException($entityClass, $entityId = null)
+    public function testGetOrCreateEntityReferenceException(string $entityClass, int $entityId = null)
     {
+        $this->expectException(BadRequestHttpException::class);
         if ($entityId) {
             $this->doctrineHelper->expects($this->once())
                 ->method('getEntityReference')
@@ -78,12 +60,11 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->getOrCreateEntityReference($entityClass, $entityId);
     }
 
-    /**
-     * @return \Generator
-     */
-    public function getOrCreateEntityReferenceDataProvider()
+    public function getOrCreateEntityReferenceDataProvider(): array
     {
-        yield 'with id' => ['entityClass' => 'SomeClass', 'entityId' => 1];
-        yield 'without id' => ['entityClass' => 'SomeClass'];
+        return [
+            'with id' => ['entityClass' => 'SomeClass', 'entityId' => 1],
+            'without id' => ['entityClass' => 'SomeClass']
+        ];
     }
 }

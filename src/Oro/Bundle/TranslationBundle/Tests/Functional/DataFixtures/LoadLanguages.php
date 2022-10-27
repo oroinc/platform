@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -14,10 +14,7 @@ class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
     const LANGUAGE2 = 'fr_FR';
     const LANGUAGE3 = 'en_US';
 
-    /**
-     * @var array
-     */
-    protected $languages = [
+    public const LANGUAGES = [
         self::LANGUAGE1 => [
             'enabled' => false,
             'user' => 'admin'
@@ -45,7 +42,7 @@ class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
      */
     public function load(ObjectManager $manager)
     {
-        foreach ($this->languages as $language => $definition) {
+        foreach (static::LANGUAGES as $language => $definition) {
             $this->createLanguage($manager, $language, $definition);
         }
 
@@ -61,7 +58,7 @@ class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
      */
     protected function createLanguage(ObjectManager $manager, $code, array $options)
     {
-        /* @var $user User */
+        /* @var User $user */
         $user = $manager->getRepository(User::class)->findOneBy(['username' => $options['user']]);
 
         $language = new Language();

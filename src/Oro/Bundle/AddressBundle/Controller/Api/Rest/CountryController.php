@@ -2,19 +2,14 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("country")
- * @NamePrefix("oro_api_")
+ * REST API controller for countries.
  */
-class CountryController extends FOSRestController
+class CountryController extends RestGetController
 {
     /**
      * Get countries
@@ -27,11 +22,7 @@ class CountryController extends FOSRestController
      */
     public function cgetAction()
     {
-        $items = $this->getDoctrine()->getRepository('OroAddressBundle:Country')->findAll();
-
-        return $this->handleView(
-            $this->view($items, is_array($items) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
-        );
+        return $this->handleGetListRequest(1, PHP_INT_MAX);
     }
 
     /**
@@ -47,10 +38,14 @@ class CountryController extends FOSRestController
      */
     public function getAction($id)
     {
-        $item = $this->getDoctrine()->getRepository('OroAddressBundle:Country')->find($id);
+        return $this->handleGetRequest($id);
+    }
 
-        return $this->handleView(
-            $this->view($item, is_object($item) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
-        );
+    /**
+     * {@inheritdoc}
+     */
+    public function getManager()
+    {
+        return $this->get('oro_address.api.manager.country');
     }
 }

@@ -6,40 +6,31 @@ use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
 
 class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  SimpleTagGenerator */
-    protected $generator;
+    /** @var SimpleTagGenerator */
+    private $generator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->generator = new SimpleTagGenerator();
     }
 
-    protected function tearDown()
-    {
-        unset($this->generator);
-    }
-
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param mixed $data
-     * @param bool  $expectedResult
      */
-    public function testSupports($data, $expectedResult)
+    public function testSupports(mixed $data, bool $expectedResult)
     {
         $this->assertSame($expectedResult, $this->generator->supports($data));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
+    public function supportsDataProvider(): array
     {
         return [
             'simple array given'                          => [['name' => 'tagSimpleName'], true],
             'given array with name and params'            => [['name' => 'tagSimpleName', 'params' => ['das']], true],
-            'given array with name and params and nested' =>
-                [['name' => 'tagSimpleName', 'params' => ['das'], 'children' => ['some nested data']], true],
+            'given array with name and params and nested' =>[
+                ['name' => 'tagSimpleName', 'params' => ['das'], 'children' => ['some nested data']],
+                true
+            ],
             'given empty array w/o name'                  => [[], false],
             'given string'                                => ['testString', false],
             'given object'                                => [new \stdClass(), false]
@@ -54,16 +45,13 @@ class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
      * @param bool  $processNestedData
      * @param int   $expectedCount
      */
-    public function testGenerate($data, $includeCollectionTag, $processNestedData, $expectedCount)
+    public function testGenerate(mixed $data, bool $includeCollectionTag, bool $processNestedData, int $expectedCount)
     {
         $result = $this->generator->generate($data, $includeCollectionTag, $processNestedData);
         $this->assertCount($expectedCount, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function generateDataProvider()
+    public function generateDataProvider(): array
     {
         return [
             'should return tags by name param'                                  =>
@@ -92,7 +80,7 @@ class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
     {
         $tagWOParams = ['name' => 'testName'];
 
-        $result        = $this->generator->generate($tagWOParams);
+        $result = $this->generator->generate($tagWOParams);
         $tagWithParams = $tagWOParams + ['params' => ['activeSection']];
         $this->assertNotEquals(
             $result,

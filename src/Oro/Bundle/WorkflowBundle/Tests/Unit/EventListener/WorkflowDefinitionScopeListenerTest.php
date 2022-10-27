@@ -12,28 +12,21 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const FIELD_NAME = 'testField';
-    const ENTITY_CLASS = 'stdClass';
-    const ENTITY_ID = 42;
+    private const FIELD_NAME = 'testField';
+    private const ENTITY_CLASS = 'stdClass';
+    private const ENTITY_ID = 42;
 
     /** @var WorkflowScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowScopeManager;
+    private $workflowScopeManager;
 
     /** @var WorkflowDefinitionScopeListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowScopeManager = $this->getMockBuilder(WorkflowScopeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowScopeManager = $this->createMock(WorkflowScopeManager::class);
 
         $this->listener = new WorkflowDefinitionScopeListener($this->workflowScopeManager);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->listener, $this->workflowScopeManager);
     }
 
     public function testOnActivationWorkflowDefinition()
@@ -62,7 +55,8 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
     {
         $event = new WorkflowChangesEvent($this->createWorkflowDefinition());
 
-        $this->workflowScopeManager->expects($this->never())->method($this->anything());
+        $this->workflowScopeManager->expects($this->never())
+            ->method($this->anything());
 
         $this->listener->onCreateWorkflowDefinition($event);
     }
@@ -75,14 +69,17 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnCreateWorkflowDefinition(WorkflowDefinition $definition, $expectedReset)
     {
-        $this->workflowScopeManager->expects($this->once())->method('updateScopes')->with($definition, $expectedReset);
+        $this->workflowScopeManager->expects($this->once())
+            ->method('updateScopes')
+            ->with($definition, $expectedReset);
 
         $this->listener->onCreateWorkflowDefinition(new WorkflowChangesEvent($definition));
     }
 
     public function testOnUpdateWorkflowDefinitionWithoutScopesConfigChanges()
     {
-        $this->workflowScopeManager->expects($this->never())->method($this->anything());
+        $this->workflowScopeManager->expects($this->never())
+            ->method($this->anything());
 
         $event = new WorkflowChangesEvent(
             $this->createWorkflowDefinition(
@@ -108,17 +105,16 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnUpdateWorkflowDefinition(WorkflowDefinition $definition, $expectedReset)
     {
-        $this->workflowScopeManager->expects($this->once())->method('updateScopes')->with($definition, $expectedReset);
+        $this->workflowScopeManager->expects($this->once())
+            ->method('updateScopes')
+            ->with($definition, $expectedReset);
 
         $this->listener->onUpdateWorkflowDefinition(
             new WorkflowChangesEvent($definition, $this->createWorkflowDefinition())
         );
     }
 
-    /**
-     * @return array
-     */
-    public function onCreateOrUpdateDataProvider()
+    public function onCreateOrUpdateDataProvider(): array
     {
         return [
             [
@@ -137,7 +133,7 @@ class WorkflowDefinitionScopeListenerTest extends \PHPUnit\Framework\TestCase
      * @param bool $active
      * @return WorkflowDefinition
      */
-    protected function createWorkflowDefinition(array $scopesConfig = [], $active = false)
+    private function createWorkflowDefinition(array $scopesConfig = [], $active = false)
     {
         return $this->getEntity(
             WorkflowDefinition::class,

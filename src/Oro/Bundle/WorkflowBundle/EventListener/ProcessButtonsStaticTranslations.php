@@ -15,17 +15,11 @@ class ProcessButtonsStaticTranslations
     /** @var TransitionTranslationHelper */
     protected $translationHelper;
 
-    /**
-     * @param TransitionTranslationHelper $translationHelper
-     */
     public function __construct(TransitionTranslationHelper $translationHelper)
     {
         $this->translationHelper = $translationHelper;
     }
 
-    /**
-     * @param OnButtonsMatched $event
-     */
     public function processButtons(OnButtonsMatched $event)
     {
         foreach ($event->getButtons() as $button) {
@@ -35,9 +29,6 @@ class ProcessButtonsStaticTranslations
         }
     }
 
-    /**
-     * @param Transition $transition
-     */
     protected function processTransition(Transition $transition)
     {
         if (in_array($transition, $this->processedTransitions, true)) {

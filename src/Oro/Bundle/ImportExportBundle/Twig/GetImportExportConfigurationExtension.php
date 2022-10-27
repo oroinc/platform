@@ -4,29 +4,31 @@ namespace Oro\Bundle\ImportExportBundle\Twig;
 
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class GetImportExportConfigurationExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to render import/export buttons:
+ *   - get_import_export_configuration
+ */
+class GetImportExportConfigurationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /**
-     * @var ImportExportConfigurationRegistryInterface
-     */
-    private $configurationRegistry;
+    private ContainerInterface $container;
 
-    /**
-     * @param ImportExportConfigurationRegistryInterface $configurationRegistry
-     */
-    public function __construct(ImportExportConfigurationRegistryInterface $configurationRegistry)
+    public function __construct(ContainerInterface $container)
     {
-        $this->configurationRegistry = $configurationRegistry;
+        $this->container = $container;
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('get_import_export_configuration', [$this, 'getConfiguration'])
+            new TwigFunction('get_import_export_configuration', [$this, 'getConfiguration'])
         ];
     }
 
@@ -37,6 +39,21 @@ class GetImportExportConfigurationExtension extends \Twig_Extension
      */
     public function getConfiguration(string $alias): array
     {
-        return $this->configurationRegistry->getConfigurations($alias);
+        return $this->getImportExportConfigurationRegistry()->getConfigurations($alias);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_importexport.configuration.registry' => ImportExportConfigurationRegistryInterface::class,
+        ];
+    }
+
+    private function getImportExportConfigurationRegistry(): ImportExportConfigurationRegistryInterface
+    {
+        return $this->container->get('oro_importexport.configuration.registry');
     }
 }

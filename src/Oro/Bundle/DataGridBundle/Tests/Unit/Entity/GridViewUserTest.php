@@ -10,18 +10,16 @@ class GridViewUserTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider provider
-     * @param $property
-     * @param $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $gridView = new GridViewUser();
 
-        call_user_func_array(array($gridView, 'set' . ucfirst($property)), array($value));
-        static::assertEquals($value, call_user_func_array(array($gridView, 'get' . ucfirst($property)), array()));
+        call_user_func([$gridView, 'set' . ucfirst($property)], $value);
+        self::assertEquals($value, call_user_func_array([$gridView, 'get' . ucfirst($property)], []));
     }
 
-    public function provider()
+    public function provider(): array
     {
         $user = new User();
         $user->setUsername('username');

@@ -1,0 +1,85 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+
+Oro\Bundle\OrganizationBundle\Entity\Organization:
+    organization{1..2}:
+        name: 'Organization <current()>'
+        enabled: true
+
+Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+    business_unit{1..2}:
+        name: 'Business Unit <current()>'
+        organization: '@organization<current()>'
+
+Oro\Bundle\UserBundle\Entity\Email:
+    email2:
+        email: 'test@example.com'
+    email2_2:
+        email: 'test@example.com'
+    email3:
+        email: 'test@example.com'
+    email4:
+        email: 'jane.smith@another.com'
+    email6:
+        email: 'john.smith@example.com'
+
+Oro\Bundle\UserBundle\Entity\User:
+    user1:
+        firstName: 'John'
+        lastName: 'Smith'
+        username: 'john_smith'
+        password: 'gxP1L8r86hrdUMg9wKdfnsS/EZC4a7jOIdn6BMzegqL2S6e+KBIuHCrDVciMdiR/64osNnabmFonwK8l09vQxA=='
+        email: 'john.smith@example.com'
+        organizations: ['@organization', '@organization1']
+        organization: '@organization'
+        owner: '@business_unit'
+    user2:
+        firstName: 'Nancy'
+        lastName: 'Sallee'
+        username: 'nancy_sallee'
+        password: 'gxP1L8r86hrdUMg9wKdfnsS/EZC4a7jOIdn6BMzegqL2S6e+KBIuHCrDVciMdiR/64osNnabmFonwK8l09vQxA=='
+        email: 'nancy.sallee@example.com'
+        emails: ['@email2', '@email2_2']
+        organizations: ['@organization']
+        organization: '@organization'
+        owner: '@business_unit'
+    user3:
+        firstName: 'Marlene'
+        lastName: 'Bradley'
+        username: 'marlene_bradley'
+        password: 'gxP1L8r86hrdUMg9wKdfnsS/EZC4a7jOIdn6BMzegqL2S6e+KBIuHCrDVciMdiR/64osNnabmFonwK8l09vQxA=='
+        email: 'marlene.bradley@example.com'
+        emails: ['@email3']
+        organizations: ['@organization']
+        organization: '@organization'
+        owner: '@business_unit'
+    user4:
+        firstName: 'Jane'
+        lastName: 'Smith'
+        username: 'jane_smith'
+        password: 'gxP1L8r86hrdUMg9wKdfnsS/EZC4a7jOIdn6BMzegqL2S6e+KBIuHCrDVciMdiR/64osNnabmFonwK8l09vQxA=='
+        email: 'jane.smith@example.com'
+        emails: ['@email4']
+        organizations: ['@organization']
+        organization: '@organization'
+        owner: '@business_unit'
+    user5:
+        firstName: 'Charlie'
+        lastName: 'Smith'
+        username: 'charlie_smith'
+        password: 'gxP1L8r86hrdUMg9wKdfnsS/EZC4a7jOIdn6BMzegqL2S6e+KBIuHCrDVciMdiR/64osNnabmFonwK8l09vQxA=='
+        email: 'charlie.smith@example.com'
+        organizations: ['@organization']
+        organization: '@organization1'
+        owner: '@business_unit'
+    user6:
+        firstName: 'John'
+        lastName: 'Smith'
+        username: 'another_john_smith'
+        password: 'gxP1L8r86hrdUMg9wKdfnsS/EZC4a7jOIdn6BMzegqL2S6e+KBIuHCrDVciMdiR/64osNnabmFonwK8l09vQxA=='
+        email: 'another.john.smith@example.com'
+        emails: ['@email6']
+        organizations: ['@organization1', '@organization2']
+        organization: '@organization1'
+        owner: '@business_unit1'

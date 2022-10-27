@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Data\Demo\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -14,6 +14,9 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Abstract fixture to load workflow data
+ */
 abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implements
     ContainerAwareInterface,
     DependentFixtureInterface
@@ -21,7 +24,7 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
     use ContainerAwareTrait;
 
     /**
-     * @return array|[<workflow1Name>, <workflow2Name>...]
+     * @return string[] [<workflow1Name>, <workflow2Name>, ...]
      */
     abstract protected function getWorkflows();
 
@@ -44,7 +47,7 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
     abstract protected function getDeepLevel();
 
     /**
-     * @return array|[<workflow1Name> => [<transition1Name>, <transition2Name>...]]
+     * @return string[] [<workflow1Name> => [<transition1Name>, <transition2Name>, ...]]
      */
     protected function getIgnoredTransitions()
     {
@@ -85,10 +88,6 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
         return $this->getWorkflowManager()->getWorkflowItem($entity, $workflowName);
     }
 
-    /**
-     * @param WorkflowItem $workflowItem
-     * @param Transition $transition
-     */
     protected function transitWorkflow(WorkflowItem $workflowItem, Transition $transition)
     {
         $this->getWorkflowManager()->transit($workflowItem, $transition);
@@ -146,15 +145,12 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
         }
     }
 
-    /**
-     * @param AbstractUser $user
-     */
     private function setUserToken(AbstractUser $user)
     {
         /** @var Organization $organization */
         $organization = $user->getOrganization();
 
-        $token = new UsernamePasswordOrganizationToken($user, false, 'main', $organization, $user->getRoles());
+        $token = new UsernamePasswordOrganizationToken($user, false, 'main', $organization, $user->getUserRoles());
         $this->container->get('security.token_storage')->setToken($token);
     }
 }

@@ -1,4 +1,7 @@
-assets:
-    css:
-      'orofilter':
-          - 'bundles/orofilter/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/orofilter/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/orofilter/css/scss/main.scss'

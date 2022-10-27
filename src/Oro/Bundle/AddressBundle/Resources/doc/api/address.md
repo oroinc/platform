@@ -26,32 +26,32 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"addresses",
-      "attributes":{  
+{
+   "data": {
+      "type": "addresses",
+      "attributes": {
          "label": "Home",
-         "street":"1475 Harigun Drive",
-         "city":"Dallas",
-         "postalCode":"04759",
-         "organization":"Dallas Nugets",
-         "namePrefix":"Mr.",
-         "firstName":"Jerry",
-         "middleName":"August",
-         "lastName":"Coleman",
-         "nameSuffix":"d'"
+         "street": "1475 Harigun Drive",
+         "city": "Dallas",
+         "postalCode": "04759",
+         "organization": "Dallas Nugets",
+         "namePrefix": "Mr.",
+         "firstName": "Jerry",
+         "middleName": "August",
+         "lastName": "Coleman",
+         "nameSuffix": "d'"
       },
-      "relationships":{  
-         "country":{  
-            "data":{  
-               "type":"countries",
-               "id":"US"
+      "relationships": {
+         "country": {
+            "data": {
+               "type": "countries",
+               "id": "US"
             }
          },
-         "region":{  
-            "data":{  
-               "type":"regions",
-               "id":"US-NY"
+         "region": {
+            "data": {
+               "type": "regions",
+               "id": "US-NY"
             }
          }
       }
@@ -60,10 +60,11 @@ Example:
 ```
 {@/request}
 
-
 ### update
 
 Edit a specific address record.
+
+The updated record is returned in the response.
 
 {@inheritdoc}
 
@@ -71,33 +72,33 @@ Edit a specific address record.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"addresses",
-      "id":"51",
-      "attributes":{  
-         "label":"Home",
-         "street":"1475 Harigun Drive",
-         "city":"Dallas",
-         "postalCode":"04759",
-         "organization":"Dallas Nugets",
-         "namePrefix":"Mr.",
-         "firstName":"Jerry",
-         "middleName":"August",
-         "lastName":"Coleman",
-         "nameSuffix":"d'"
+{
+   "data": {
+      "type": "addresses",
+      "id": "51",
+      "attributes": {
+         "label": "Home",
+         "street": "1475 Harigun Drive",
+         "city": "Dallas",
+         "postalCode": "04759",
+         "organization": "Dallas Nugets",
+         "namePrefix": "Mr.",
+         "firstName": "Jerry",
+         "middleName": "August",
+         "lastName": "Coleman",
+         "nameSuffix": "d'"
       },
-      "relationships":{  
-         "country":{  
-            "data":{  
-               "type":"countries",
-               "id":"US"
+      "relationships": {
+         "country": {
+            "data": {
+               "type": "countries",
+               "id": "US"
             }
          },
-         "region":{  
-            "data":{  
-               "type":"regions",
-               "id":"US-NY"
+         "region": {
+            "data": {
+               "type": "regions",
+               "id": "US-NY"
             }
          }
       }
@@ -120,29 +121,19 @@ Delete a collection of address records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field**
-
 ### street
 
 #### create
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### city
 
@@ -150,15 +141,27 @@ Delete a collection of address records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
+**This field must not be empty, if it is passed.**
 
-*This field is **required** and must remain defined.*
+### country
+
+#### create
+
+{@inheritdoc}
+
+**The required field.**
+
+#### update
+
+{@inheritdoc}
+
+**This field must not be empty, if it is passed.**
 
 ### postalCode
 
@@ -166,15 +169,13 @@ Delete a collection of address records.
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ## SUBRESOURCES
 

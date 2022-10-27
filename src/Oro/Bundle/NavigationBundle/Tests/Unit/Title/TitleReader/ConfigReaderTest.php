@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader;
 
-use Oro\Bundle\NavigationBundle\Provider\ConfigurationProvider;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 
 class ConfigReaderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ROUTE = 'test_route';
+    private const TEST_ROUTE = 'test_route';
 
     /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configurationProvider;
@@ -15,33 +15,34 @@ class ConfigReaderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigReader */
     private $reader;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configurationProvider
-            ->expects($this->once())
-            ->method('getConfiguration')
-            ->with(ConfigurationProvider::TITLES_KEY)
-            ->willReturn([self::TEST_ROUTE => 'Test title template']);
+        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
         $this->reader = new ConfigReader($this->configurationProvider);
     }
 
     public function testGetTitle()
     {
+        $title = 'Test title template';
+
+        $this->configurationProvider->expects(self::once())
+            ->method('getTitle')
+            ->with(self::TEST_ROUTE)
+            ->willReturn($title);
+
         $title = $this->reader->getTitle(self::TEST_ROUTE);
         $this->assertEquals('Test title template', $title);
     }
 
     public function testGetTitleEmpty()
     {
-        $title = $this->reader->getTitle('custom_route');
+        $this->configurationProvider->expects(self::once())
+            ->method('getTitle')
+            ->with(self::TEST_ROUTE)
+            ->willReturn(null);
+
+        $title = $this->reader->getTitle(self::TEST_ROUTE);
         $this->assertNull($title);
     }
 }

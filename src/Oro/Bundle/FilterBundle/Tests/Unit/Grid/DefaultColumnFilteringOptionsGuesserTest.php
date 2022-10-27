@@ -9,9 +9,9 @@ use Oro\Bundle\FilterBundle\Grid\DefaultColumnFilteringOptionsGuesser;
 class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DefaultColumnFilteringOptionsGuesser */
-    protected $guesser;
+    private $guesser;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->guesser = new DefaultColumnFilteringOptionsGuesser();
     }
@@ -26,7 +26,7 @@ class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals(ColumnGuess::LOW_CONFIDENCE, $guess->getConfidence());
     }
 
-    public function guessFilterProvider()
+    public function guessFilterProvider(): array
     {
         return [
             [

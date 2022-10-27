@@ -1,50 +1,62 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Doctrine\Common\Cache\ClearableCache;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CacheBundle\Provider\DirectoryAwareFileCacheInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProxyGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application as ConsoleApplication;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-abstract class CacheCommand extends ContainerAwareCommand
+/**
+ * Base class for various extended entity cache warmup commands.
+ */
+abstract class CacheCommand extends Command
 {
-    /** @var string|null */
-    protected $cacheDir;
+    protected ?string $cacheDir;
 
-    /**
-     * @return ExtendConfigDumper
-     */
-    protected function getExtendConfigDumper()
-    {
-        return $this->getContainer()->get('oro_entity_extend.tools.dumper');
+    private EntityProxyGenerator $entityProxyGenerator;
+    private EntityAliasResolver $entityAliasResolver;
+    protected ExtendConfigDumper $extendConfigDumper;
+    private ManagerRegistry $doctrine;
+    private KernelInterface $kernel;
+
+    public function __construct(
+        EntityProxyGenerator $entityProxyGenerator,
+        EntityAliasResolver $entityAliasResolver,
+        ExtendConfigDumper $extendConfigDumper,
+        ManagerRegistry $doctrine,
+        KernelInterface $kernel
+    ) {
+        $this->entityProxyGenerator = $entityProxyGenerator;
+        $this->entityAliasResolver = $entityAliasResolver;
+        $this->extendConfigDumper = $extendConfigDumper;
+        $this->doctrine = $doctrine;
+        $this->kernel = $kernel;
+        parent::__construct();
     }
 
-    /**
-     * @return KernelInterface
-     */
-    protected function getKernel()
+    protected function getKernel(): KernelInterface
     {
         $application = $this->getApplication();
 
         return $application instanceof ConsoleApplication
             ? $application->getKernel()
-            : $this->getContainer()->get('kernel');
+            : $this->kernel;
     }
 
     /**
      * Warms up caches which may be affected by extended entities
-     *
-     * @param OutputInterface $output
      */
-    protected function warmup(OutputInterface $output)
+    protected function warmup(OutputInterface $output): void
     {
         $callable = function () use ($output) {
             $this->warmupExtendedEntityCache($output);
@@ -59,25 +71,23 @@ abstract class CacheCommand extends ContainerAwareCommand
 
     /**
      * Warms up extended entities cache
-     *
-     * @param OutputInterface $output
+     * @throws \Exception
      */
-    protected function warmupExtendedEntityCache(OutputInterface $output)
+    protected function warmupExtendedEntityCache(OutputInterface $output): void
     {
         $output->writeln('Dump the configuration of extended entities to the cache');
-        $dumper = $this->getExtendConfigDumper();
 
-        $cacheDir = $dumper->getCacheDir();
+        $cacheDir = $this->extendConfigDumper->getCacheDir();
         if (empty($this->cacheDir) || $this->cacheDir === $cacheDir) {
-            $dumper->dump();
+            $this->extendConfigDumper->dump();
             $this->setClassAliases($cacheDir);
         } else {
-            $dumper->setCacheDir($this->cacheDir);
+            $this->extendConfigDumper->setCacheDir($this->cacheDir);
             try {
-                $dumper->dump();
-                $dumper->setCacheDir($cacheDir);
+                $this->extendConfigDumper->dump();
+                $this->extendConfigDumper->setCacheDir($cacheDir);
             } catch (\Exception $e) {
-                $dumper->setCacheDir($cacheDir);
+                $this->extendConfigDumper->setCacheDir($cacheDir);
                 throw $e;
             }
             $this->setClassAliases($this->cacheDir);
@@ -86,22 +96,21 @@ abstract class CacheCommand extends ContainerAwareCommand
 
     /**
      * Warms up Doctrine metadata cache
-     *
-     * @param OutputInterface $output
+     * @throws \Exception
      */
-    protected function warmupMetadataCache(OutputInterface $output)
+    protected function warmupMetadataCache(OutputInterface $output): void
     {
         $kernel              = $this->getKernel();
-        $em                  = $kernel->getContainer()->get('doctrine')->getManager();
-        $metadataCacheDriver = $em->getConfiguration()->getMetadataCacheImpl();
+        $em                  = $this->doctrine->getManager();
+        $metadataCacheDriver = $em->getConfiguration()->getMetadataCache();
 
-        if (!$metadataCacheDriver instanceof ClearableCache) {
+        if (!$metadataCacheDriver instanceof AdapterInterface) {
             return;
         }
 
         if (empty($this->cacheDir) || $this->cacheDir === $kernel->getCacheDir()) {
             $output->writeln('Clear entity metadata cache');
-            $metadataCacheDriver->deleteAll();
+            $metadataCacheDriver->clear();
             $output->writeln('Warm up entity metadata cache');
             $em->getMetadataFactory()->getAllMetadata();
         } else {
@@ -111,14 +120,14 @@ abstract class CacheCommand extends ContainerAwareCommand
 
             $kernelCacheDir   = $kernel->getCacheDir();
             $metadataCacheDir = $metadataCacheDriver->getDirectory();
-            if (strpos($metadataCacheDir, $kernelCacheDir) !== 0) {
+            if (!str_starts_with($metadataCacheDir, $kernelCacheDir)) {
                 return;
             }
 
             $metadataCacheDriver->setDirectory($this->cacheDir . substr($metadataCacheDir, strlen($kernelCacheDir)));
             try {
                 $output->writeln('Clear entity metadata cache');
-                $metadataCacheDriver->deleteAll();
+                $metadataCacheDriver->clear();
                 $output->writeln('Warm up entity metadata cache');
                 $em->getMetadataFactory()->getAllMetadata();
                 $metadataCacheDriver->setDirectory($metadataCacheDir);
@@ -131,31 +140,27 @@ abstract class CacheCommand extends ContainerAwareCommand
 
     /**
      * Generates Doctrine proxy classes for extended entities
-     *
-     * @param OutputInterface $output
+     * @throws \Exception
      */
-    protected function warmupProxies(OutputInterface $output)
+    protected function warmupProxies(OutputInterface $output): void
     {
-        $em = $this->getKernel()->getContainer()->get('doctrine')->getManager();
+        $em = $this->doctrine->getManager();
         if ($em->getConfiguration()->getAutoGenerateProxyClasses()) {
             return;
         }
 
         $output->writeln('Generate Doctrine proxy classes for extended entities');
 
-        /** @var EntityProxyGenerator $proxyGenerator */
-        $proxyGenerator = $this->getContainer()->get('oro_entity_extend.extend.entity_proxy_generator');
-
-        $cacheDir = $proxyGenerator->getCacheDir();
+        $cacheDir = $this->entityProxyGenerator->getCacheDir();
         if (empty($this->cacheDir) || $this->cacheDir === $cacheDir) {
-            $proxyGenerator->generateProxies();
+            $this->entityProxyGenerator->generateProxies();
         } else {
-            $proxyGenerator->setCacheDir($this->cacheDir);
+            $this->entityProxyGenerator->setCacheDir($this->cacheDir);
             try {
-                $proxyGenerator->generateProxies();
-                $proxyGenerator->setCacheDir($cacheDir);
+                $this->entityProxyGenerator->generateProxies();
+                $this->entityProxyGenerator->setCacheDir($cacheDir);
             } catch (\Exception $e) {
-                $proxyGenerator->setCacheDir($cacheDir);
+                $this->entityProxyGenerator->setCacheDir($cacheDir);
                 throw $e;
             }
         }
@@ -163,24 +168,17 @@ abstract class CacheCommand extends ContainerAwareCommand
 
     /**
      * Warms up entity aliases cache
-     *
-     * @param OutputInterface $output
      */
-    protected function warmupEntityAliasesCache(OutputInterface $output)
+    protected function warmupEntityAliasesCache(OutputInterface $output): void
     {
         $output->writeln('Warm up entity aliases cache');
-
-        /** @var EntityAliasResolver $entityAliasResolver */
-        $entityAliasResolver = $this->getContainer()->get('oro_entity.entity_alias_resolver');
-        $entityAliasResolver->warmUpCache();
+        $this->entityAliasResolver->warmUpCache();
     }
 
     /**
      * Sets class aliases for extended entities.
-     *
-     * @param string $cacheDir The cache directory
      */
-    protected function setClassAliases($cacheDir)
+    protected function setClassAliases(string $cacheDir): void
     {
         ExtendClassLoadingUtils::setAliases($cacheDir);
     }

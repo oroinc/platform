@@ -1,0 +1,56 @@
+default:
+    allowed_html_elements:
+        p: ~
+        span:
+            attributes:
+                - id
+        br:
+            hasClosingTag: false
+        style:
+            attributes:
+                - media
+                - type
+        iframe:
+            attributes:
+                - allowfullscreen
+        a:
+            attributes:
+                - target
+    allowed_iframe_domains:
+        - 'youtube.com/embed/'
+        - 'player.vimeo.com/video/'
+    allowed_uri_schemes:
+        - 'http'
+        - 'https'
+        - 'ftp'
+    allowed_rel: []
+
+additional:
+    extends: default
+    allowed_html_elements:
+        a:
+            attributes:
+                - title
+        div: ~
+    allowed_iframe_domains:
+        - 'maps.google.com'
+    allowed_uri_schemes:
+        - 'tel'
+    allowed_rel:
+        - 'alternate'
+        - 'author'
+        - 'bookmark'
+
+extra:
+    extends: additional
+    allowed_html_elements:
+        img:
+            hasClosingTag: false
+    allowed_iframe_domains:
+        - 'example.com'
+    allowed_uri_schemes:
+        - 'mailto'
+    allowed_rel:
+        - 'help'
+        - 'nofollow'
+        - 'opener'

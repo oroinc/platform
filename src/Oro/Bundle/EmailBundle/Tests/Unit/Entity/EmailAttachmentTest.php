@@ -4,7 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Component\Testing\ReflectionUtil;
 
 class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
 {
@@ -31,43 +33,43 @@ class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
 
     public function testContentGetterAndSetter()
     {
-        $content = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent');
+        $content = $this->createMock(EmailAttachmentContent::class);
 
         $entity = new EmailAttachment();
         $entity->setContent($content);
 
-        $this->assertTrue($content === $entity->getContent());
+        $this->assertSame($content, $entity->getContent());
     }
 
     public function testEmailBodyGetterAndSetter()
     {
-        $emailBody = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailBody');
+        $emailBody = $this->createMock(EmailBody::class);
 
         $entity = new EmailAttachment();
         $entity->setEmailBody($emailBody);
 
-        $this->assertTrue($emailBody === $entity->getEmailBody());
+        $this->assertSame($emailBody, $entity->getEmailBody());
     }
-    
+
     public function testGetSize()
     {
-        $file = $this->createMock('Oro\Bundle\AttachmentBundle\Entity\File');
+        $file = $this->createMock(File::class);
         $file->expects($this->once())
             ->method('getFileSize')
-            ->will($this->returnValue(100));
+            ->willReturn(100);
         $entity = new EmailAttachment();
         $entity->setFile($file);
-        $this->assertTrue($entity->getSize() === 100);
+        $this->assertSame(100, $entity->getSize());
 
         $entity = new EmailAttachment();
-        $attachmentContent = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent');
+        $attachmentContent = $this->createMock(EmailAttachmentContent::class);
         $attachmentContent->expects($this->once())
             ->method('getContent')
-            ->will($this->returnValue(base64_encode('1234')));
+            ->willReturn(base64_encode('1234'));
         $attachmentContent->expects($this->once())
             ->method('getContentTransferEncoding')
-            ->will($this->returnValue('base64'));
+            ->willReturn('base64');
         $entity->setContent($attachmentContent);
-        $this->assertTrue($entity->getSize() === 4);
+        $this->assertSame(4, $entity->getSize());
     }
 }

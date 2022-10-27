@@ -9,7 +9,8 @@ use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 /**
- * Loads entities using SqlQueryBuilder object.
+ * Loads entities using SqlQueryBuilder or SqlQuery object.
+ * IMPORTANT: this processor does not apply access rules to the query.
  */
 class LoadEntitiesBySqlQuery implements ProcessorInterface
 {

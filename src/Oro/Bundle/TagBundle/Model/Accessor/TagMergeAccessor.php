@@ -15,10 +15,6 @@ class TagMergeAccessor implements AccessorInterface
     /** @var TaggableHelper */
     protected $taggableHelper;
 
-    /**
-     * @param TagManager     $tagManager
-     * @param TaggableHelper $helper
-     */
     public function __construct(TagManager $tagManager, TaggableHelper $helper)
     {
         $this->tagManager     = $tagManager;

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
+use Oro\Bundle\DataGridBundle\Datasource\BindParametersInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -47,9 +47,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
  */
 class RowSelectionListener
 {
-    const ROW_SELECTION_OPTION_PATH             = '[options][rowSelection]';
-    const REQUIREJS_MODULES_MODULES_OPTION_PATH = '[options][requireJSModules]';
-    const ROW_SELECTION_JS_MODULE               = 'orodatagrid/js/datagrid/listener/column-form-listener';
+    const ROW_SELECTION_OPTION_PATH = '[options][rowSelection]';
+    const REQUIRED_MODULES_KEY      = '[options][jsmodules]';
+    const ROW_SELECTION_JS_MODULE   = 'orodatagrid/js/datagrid/listener/column-form-listener';
 
     /**
      * Included/excluded param names populated by orodatagrid/js/datagrid/listener/column-form-listener on frontend
@@ -62,23 +62,17 @@ class RowSelectionListener
      */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
 
-        if (!$datasource instanceof ParameterBinderAwareInterface) {
+        if (!$datasource instanceof BindParametersInterface) {
             return;
         }
 
@@ -91,17 +85,17 @@ class RowSelectionListener
         }
 
         // Add frontend module to handle selection
-        $requireJsModules = $config->offsetGetByPath(self::REQUIREJS_MODULES_MODULES_OPTION_PATH, []);
+        $jsModules = $config->offsetGetByPath(self::REQUIRED_MODULES_KEY, []);
 
-        if (!$requireJsModules || !is_array($requireJsModules)) {
-            $requireJsModules = [];
+        if (!$jsModules || !is_array($jsModules)) {
+            $jsModules = [];
         }
 
-        if (!in_array(self::ROW_SELECTION_JS_MODULE, $requireJsModules)) {
-            $requireJsModules[] = self::ROW_SELECTION_JS_MODULE;
+        if (!in_array(self::ROW_SELECTION_JS_MODULE, $jsModules)) {
+            $jsModules[] = self::ROW_SELECTION_JS_MODULE;
         }
 
-        $config->offsetSetByPath(self::REQUIREJS_MODULES_MODULES_OPTION_PATH, $requireJsModules);
+        $config->offsetSetByPath(self::REQUIRED_MODULES_KEY, $jsModules);
         $defaultParameter = $this->getDefaultParameter($config);
 
         // bind parameters for selection

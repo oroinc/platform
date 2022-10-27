@@ -3,9 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
@@ -15,6 +17,8 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 {
@@ -24,21 +28,29 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     /** @var CorrectSortValue */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
-        $this->processor = new CorrectSortValue($this->doctrineHelper, $this->valueNormalizer);
+        $filterNames = $this->createMock(FilterNames::class);
+        $filterNames->expects(self::any())
+            ->method('getSortFilterName')
+            ->willReturn('sort');
+
+        $this->processor = new CorrectSortValue(
+            $this->doctrineHelper,
+            $this->valueNormalizer,
+            new FilterNamesRegistry(
+                [['filter_names', null]],
+                TestContainerBuilder::create()->add('filter_names', $filterNames)->getContainer($this),
+                new RequestExpressionMatcher()
+            )
+        );
     }
 
-    /**
-     * @param array $config
-     *
-     * @return EntityDefinitionConfig
-     */
-    private function createConfigObject(array $config)
+    private function createConfigObject(array $config): EntityDefinitionConfig
     {
         $configLoaderFactory = new ConfigLoaderFactory(new ConfigExtensionRegistry());
 
@@ -70,7 +82,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @dataProvider processProvider
      */
-    public function testProcess($className, $config, $orderBy, $expectedOrderBy)
+    public function testProcess(string $className, ?array $config, array $orderBy, array $expectedOrderBy)
     {
         $sortFilterValue = new FilterValue('sort', $orderBy);
         $filterValueAccessor = $this->createMock(FilterValueAccessorInterface::class);
@@ -90,7 +102,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function processProvider()
+    public function processProvider(): array
     {
         return [
             'sort by identifier field (ASC)'                                                       => [
@@ -208,11 +220,11 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
      * @dataProvider processDefaultValueProvider
      */
     public function testProcessDefaultValue(
-        $className,
-        $config,
-        $defaultValue,
-        $normalizedDefaultValue,
-        $expectedOrderBy
+        string $className,
+        ?array $config,
+        string $defaultValue,
+        array $normalizedDefaultValue,
+        array $expectedOrderBy
     ) {
         $sortFilterValue = null;
 
@@ -234,11 +246,9 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         $filterValueAccessor = $this->createMock(FilterValueAccessorInterface::class);
         $filterValueAccessor->expects(self::once())
             ->method('set')
-            ->willReturnCallback(
-                function ($key, $value) use (&$sortFilterValue) {
-                    $sortFilterValue = $value;
-                }
-            );
+            ->willReturnCallback(function ($key, $value) use (&$sortFilterValue) {
+                $sortFilterValue = $value;
+            });
 
         $this->context->setConfig($this->createConfigObject($config ?? []));
         $this->context->setFilterValues($filterValueAccessor);
@@ -248,7 +258,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         self::assertEquals($expectedOrderBy, $sortFilterValue->getValue());
     }
 
-    public function processDefaultValueProvider()
+    public function processDefaultValueProvider(): array
     {
         return [
             'identifier field as default value'                                                => [

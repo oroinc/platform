@@ -30,12 +30,6 @@ class EmailManager
 
     /**
      * Constructor
-     *
-     * @param EntityManager          $em
-     * @param EmailThreadManager     $emailThreadManager
-     * @param EmailThreadProvider    $emailThreadProvider
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param MailboxManager         $mailboxManager
      */
     public function __construct(
         EntityManager $em,
@@ -91,8 +85,6 @@ class EmailManager
 
     /**
      * Toggle EmailUser thread seen
-     *
-     * @param EmailUser $entity
      */
     public function toggleEmailUserSeen(EmailUser $entity)
     {
@@ -148,10 +140,6 @@ class EmailManager
         return true;
     }
 
-    /**
-     * @param Email $entity
-     * @param       $target
-     */
     public function addContextToEmailThread(Email $entity, $target)
     {
         $relatedEmails = $this->emailThreadProvider->getThreadEmails($this->em, $entity);
@@ -162,10 +150,6 @@ class EmailManager
         $this->em->flush();
     }
 
-    /**
-     * @param Email $entity
-     * @param       $target
-     */
     public function deleteContextFromEmailThread(Email $entity, $target)
     {
         $relatedEmails = $this->emailThreadProvider->getThreadEmails($this->em, $entity);

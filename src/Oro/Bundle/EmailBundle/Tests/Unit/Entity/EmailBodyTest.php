@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 
 class EmailBodyTest extends \PHPUnit\Framework\TestCase
 {
@@ -44,16 +46,16 @@ class EmailBodyTest extends \PHPUnit\Framework\TestCase
 
     public function testAttachmentGetterAndSetter()
     {
-        $attachment = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAttachment');
+        $attachment = $this->createMock(EmailAttachment::class);
 
         $entity = new EmailBody();
         $entity->addAttachment($attachment);
 
         $attachments = $entity->getAttachments();
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $attachments);
+        $this->assertInstanceOf(ArrayCollection::class, $attachments);
         $this->assertCount(1, $attachments);
-        $this->assertTrue($attachment === $attachments[0]);
+        $this->assertSame($attachment, $attachments[0]);
     }
 
     public function testBeforeSave()

@@ -1,24 +1,33 @@
 services:
-    Oro\Bundle\ActionBundle\Command\DebugActionCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\ActionBundle\Command\DebugActionCommand
+
+    Oro\Bundle\ActionBundle\Command\DebugActionCommand:
+        arguments:
+            - '@oro_action.action_locator'
+            - '@oro_action.action_factory'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ActionBundle\Command\DebugConditionCommand:
-        public: false
-        class: Oro\Bundle\ActionBundle\Command\DebugConditionCommand
+        arguments:
+            - '@oro_action.condition_locator'
+            - '@oro_action.expression.factory'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ActionBundle\Command\DebugOperationCommand:
-        public: false
-        class: Oro\Bundle\ActionBundle\Command\DebugOperationCommand
+        arguments:
+            - '@oro_action.configuration.provider.operations'
+            - '@oro_action.operation_registry'
+            - '@oro_action.configuration.provider.action_groups'
+            - '@oro_action.action_group_registry'
         tags:
             - { name: console.command }
 
     Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand:
-        public: false
-        class: Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand
+        arguments:
+            - '@oro_action.configuration.provider.operations'
+            - '@oro_action.configuration.validator.operations'
         tags:
             - { name: console.command }

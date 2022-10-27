@@ -1,4 +1,7 @@
-assets:
-    css:
-        orouser:
-            - 'bundles/orouser/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/orouser/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/orouser/css/scss/main.scss'

@@ -1,6 +1,6 @@
-{% extends "OroUIBundle:actions:view.html.twig" %}
-{% import "OroActivityBundle::macros.html.twig" as AC %}
-{% import "OroEmailBundle::actions.html.twig" as Actions %}
+{% extends "@OroUI/actions/view.html.twig" %}
+{% import "@OroActivity/macros.html.twig" as AC %}
+{% import "@OroEmail/actions.html.twig" as Actions %}
 
 {% oro_title_set({params : {"%subject%": entity.subject|oro_html_strip_tags} }) %}
 
@@ -19,6 +19,10 @@
 {% endblock pageActions %}
 
 {% block navButtons %}
+    {% import '@OroActivity/macros.html.twig' as AC %}
+    {% import "@OroEmail/actions.html.twig" as Actions %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set buttonsHtml %}
         {# Button for add context on the activity list item view page #}
         {{ AC.addContextButton(entity) }}
@@ -33,10 +37,12 @@
     {% set breadcrumbs = [
         {'label': 'oro.email.menu.user_emails'|trans }
     ] %}
-    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+    {% include '@OroNavigation/Menu/breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}
 
 {% block stats %}
+    {% import '@OroActivity/macros.html.twig' as AC %}
+
     {# Display contexts targets in the activity view page #}
     <li class="context-data activity-context-activity-block">
         {{ AC.activity_contexts(entity) }}

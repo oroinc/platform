@@ -18,27 +18,21 @@ class OwnershipMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $metadata->getOwnerColumnName());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorWithInvalidOwnerType()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new OwnershipMetadata('test');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorWithoutOwnerFieldName()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new OwnershipMetadata('ORGANIZATION');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorWithoutOwnerIdColumnName()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new OwnershipMetadata('ORGANIZATION', 'org');
     }
 
@@ -107,13 +101,11 @@ class OwnershipMetadataTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $arguments
-     * @param array $levels
      * @dataProvider getAccessLevelNamesDataProvider
      */
     public function testGetAccessLevelNames(array $arguments, array $levels)
     {
-        $reflection = new \ReflectionClass('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata');
+        $reflection = new \ReflectionClass(OwnershipMetadata::class);
         /** @var OwnershipMetadata $metadata */
         $metadata = $reflection->newInstanceArgs($arguments);
         $this->assertEquals($levels, $metadata->getAccessLevelNames());

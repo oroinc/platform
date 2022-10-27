@@ -1,35 +1,25 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityChangesetTransformer;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var string
-     */
-    protected $class;
+    /** @var EntityChangesetTransformer */
+    private $transformer;
 
-    /**
-     * @var EntityChangesetTransformer
-     */
-    protected $transformer;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->class = '\stdClass';
-        $this->transformer = new EntityChangesetTransformer($this->doctrineHelper, $this->class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
+        $this->transformer = new EntityChangesetTransformer($this->doctrineHelper, \stdClass::class);
     }
 
     public function testTransform()
@@ -40,11 +30,8 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider transformDataProvider
-     *
-     * @param mixed $expected
-     * @param mixed $value
      */
-    public function testReverseTransform($expected, $value)
+    public function testReverseTransform(mixed $expected, mixed $value)
     {
         if (!$expected) {
             $expected = new ArrayCollection();
@@ -52,21 +39,14 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($expected->isEmpty() ? $this->never() : $this->exactly($expected->count()))
             ->method('getEntityReference')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        return $this->createDataObject(func_get_arg(1));
-                    }
-                )
-            );
+            ->willReturnCallback(function () {
+                return $this->createDataObject(func_get_arg(1));
+            });
 
         $this->assertEquals($expected, $this->transformer->reverseTransform($value));
     }
 
-    /**
-     * @return array
-     */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             [null,[]],
@@ -84,20 +64,15 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "string" given
-     */
     public function testReverseTransformException()
     {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "array", "string" given');
+
         $this->transformer->reverseTransform('test');
     }
 
-    /**
-     * @param int $id
-     * @return \stdClass
-     */
-    public function createDataObject($id)
+    private function createDataObject(int $id): \stdClass
     {
         $obj = new \stdClass();
         $obj->id = $id;

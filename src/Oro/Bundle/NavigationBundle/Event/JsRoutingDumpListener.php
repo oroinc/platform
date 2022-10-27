@@ -5,26 +5,25 @@ namespace Oro\Bundle\NavigationBundle\Event;
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
+/**
+ * Renews the "routing" assets version before running the "fos:js-routing:dump" command.
+ */
 class JsRoutingDumpListener
 {
-    /** @var DynamicAssetVersionManager */
-    protected $assetVersionManager;
+    private DynamicAssetVersionManager $assetVersionManager;
 
-    /**
-     * @param DynamicAssetVersionManager $assetVersionManager
-     */
     public function __construct(DynamicAssetVersionManager $assetVersionManager)
     {
         $this->assetVersionManager = $assetVersionManager;
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
-    public function onConsoleCommand(ConsoleCommandEvent $event)
+    public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
-        if ('fos:js-routing:dump' === $event->getCommand()->getName()) {
-            $this->assetVersionManager->updateAssetVersion('routing');
+        $command = $event->getCommand();
+        if (null === $command || 'fos:js-routing:dump' !== $command->getName()) {
+            return;
         }
+
+        $this->assetVersionManager->updateAssetVersion('routing');
     }
 }

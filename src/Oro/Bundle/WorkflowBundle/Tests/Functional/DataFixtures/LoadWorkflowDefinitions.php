@@ -3,7 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -51,7 +52,7 @@ class LoadWorkflowDefinitions extends AbstractFixture implements ContainerAwareI
         $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
         foreach ($workflowDefinitions as $workflowDefinition) {
-            if ($manager->getRepository('OroWorkflowBundle:WorkflowDefinition')->find($workflowDefinition->getName())) {
+            if ($manager->getRepository(WorkflowDefinition::class)->find($workflowDefinition->getName())) {
                 continue;
             }
 

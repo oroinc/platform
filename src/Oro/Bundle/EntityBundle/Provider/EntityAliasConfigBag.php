@@ -2,24 +2,24 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
+/**
+ * A storage for configuration of entity aliases defined in "Resources/config/oro/entity.yml" files.
+ */
 class EntityAliasConfigBag
 {
-    /** @var array */
-    protected $entityAliases;
+    /** @var EntityConfigurationProvider */
+    private $configProvider;
 
     /** @var array */
-    protected $exclusions;
+    private $exclusions;
 
-    /**
-     * @param array $entityAliases
-     * @param array $exclusions
-     */
-    public function __construct(array $entityAliases, array $exclusions)
+    public function __construct(EntityConfigurationProvider $configProvider)
     {
-        $this->entityAliases = $entityAliases;
-        $this->exclusions    = array_fill_keys($exclusions, true);
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -31,7 +31,9 @@ class EntityAliasConfigBag
      */
     public function hasEntityAlias($entityClass)
     {
-        return isset($this->entityAliases[$entityClass]);
+        $entityAliases = $this->getEntityAliases();
+
+        return isset($entityAliases[$entityClass]);
     }
 
     /**
@@ -43,9 +45,11 @@ class EntityAliasConfigBag
      */
     public function getEntityAlias($entityClass)
     {
+        $entityAliases = $this->getEntityAliases();
+
         return new EntityAlias(
-            $this->entityAliases[$entityClass]['alias'],
-            $this->entityAliases[$entityClass]['plural_alias']
+            $entityAliases[$entityClass]['alias'],
+            $entityAliases[$entityClass]['plural_alias']
         );
     }
 
@@ -58,6 +62,13 @@ class EntityAliasConfigBag
      */
     public function isEntityAliasExclusionExist($entityClass)
     {
+        if (null === $this->exclusions) {
+            $this->exclusions = array_fill_keys(
+                $this->configProvider->getConfiguration(EntityConfiguration::ENTITY_ALIAS_EXCLUSIONS),
+                true
+            );
+        }
+
         return isset($this->exclusions[$entityClass]);
     }
 
@@ -68,6 +79,14 @@ class EntityAliasConfigBag
      */
     public function getClassNames()
     {
-        return array_keys($this->entityAliases);
+        return array_keys($this->getEntityAliases());
+    }
+
+    /**
+     * @return array
+     */
+    private function getEntityAliases()
+    {
+        return $this->configProvider->getConfiguration(EntityConfiguration::ENTITY_ALIASES);
     }
 }

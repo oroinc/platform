@@ -4,15 +4,14 @@ namespace Oro\Bundle\SidebarBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SidebarBundle\Entity\SidebarState;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class SidebarStateTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, string|object $value)
     {
         $obj = new SidebarState();
 
@@ -21,13 +20,12 @@ class SidebarStateTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        $user = $this->getMockForAbstractClass('Symfony\Component\Security\Core\User\UserInterface');
-        return array(
-            array('user', $user),
-            array('position', 'SIDEBAR_RIGHT'),
-            array('state', 'SIDEBAR_MINIMIZED'),
-        );
+        return [
+            ['user', $this->createMock(UserInterface::class)],
+            ['position', 'SIDEBAR_RIGHT'],
+            ['state', 'SIDEBAR_MINIMIZED'],
+        ];
     }
 }

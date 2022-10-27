@@ -8,31 +8,25 @@ class AclAncestorTest extends \PHPUnit\Framework\TestCase
 {
     public function testAncestor()
     {
-        $aclAncestor = new AclAncestor(array('value' => 'test_acl'));
+        $aclAncestor = new AclAncestor(['value' => 'test_acl']);
         $this->assertEquals('test_acl', $aclAncestor->getId());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAncestorWithEmptyId()
     {
-        $aclAncestor = new AclAncestor(array('value' => ''));
+        $this->expectException(\InvalidArgumentException::class);
+        new AclAncestor(['value' => '']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAncestorWithInvalidId()
     {
-        $aclAncestor = new AclAncestor(array('value' => 'test acl'));
+        $this->expectException(\InvalidArgumentException::class);
+        new AclAncestor(['value' => 'test acl']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testAncestorWithMissingId()
     {
-        $aclAncestor = new AclAncestor(array());
+        $this->expectException(\InvalidArgumentException::class);
+        new AclAncestor([]);
     }
 }

@@ -1,6 +1,7 @@
 You must select at least {{ limit }} role:  You must select at least {{ limit }} role.|You must select at least {{ limit }} roles.
 "The password fields must match.": "The password fields must match."
 "This value cannot be in the future.": "This value cannot be in the future."
+"The birth date cannot be in the future.": "The birth date cannot be in the future."
 
 oro:
     user:
@@ -41,9 +42,14 @@ oro:
                 lower_case_numbers_special_chars: The password must include a lower case letter, a number and a special character
                 lower_case_upper_case_numbers_special_chars: The password must include a lower case letter, an upper case letter, a number, and a special character
             user_email_exists: This email is already registered by another user. Please provide unique email address.
+            user_username_exists: This username is already registered by another user. Please provide unique username.
             system_configuration:
                 case_insensitive:
                     collation: 'Cannot disable "Case-Insensitive Email Addresses" - the "email" columns in "oro_user" database table has case insensitive collation.'
                     duplicated_emails:
                         message: 'Cannot enable "Case-Insensitive Email Addresses" - there are existing users who have identical lowercase emails. Please resolve these conflicts and try again. %click_here% to see some of the conflicting users.'
                         click_here: 'Click here'
+        user:
+            birthday:
+                type:
+                    message: 'This value is not a valid date.'

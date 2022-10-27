@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\OrganizationBundle\Autocomplete;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
+/**
+ * The autocomplete handler to search business units that can be an owner for other entities.
+ */
 class BusinessUnitOwnerSearchHandler extends SearchHandler
 {
-    /** @var  Registry */
-    protected $doctrine;
+    protected ManagerRegistry $doctrine;
 
-    public function __construct($entityName, array $properties, Registry $doctrine)
+    public function __construct($entityName, array $properties, ManagerRegistry $doctrine)
     {
         parent::__construct($entityName, $properties);
         $this->doctrine = $doctrine;
@@ -24,7 +26,7 @@ class BusinessUnitOwnerSearchHandler extends SearchHandler
     {
         $result = parent::convertItem($item);
 
-        $businessUnit = $this->doctrine->getManager()->getRepository('OroOrganizationBundle:BusinessUnit')
+        $businessUnit = $this->doctrine->getManager()->getRepository(BusinessUnit::class)
             ->find($result[$this->idFieldName]);
 
         $result['treePath'] = $this->getPath($businessUnit, []);

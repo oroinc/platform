@@ -26,8 +26,6 @@ class OroLocaleBundle implements Migration
 
     /**
      * Create oro_localization table
-     *
-     * @param Schema $schema
      */
     protected function createOroLocalizationTable(Schema $schema)
     {
@@ -45,8 +43,6 @@ class OroLocaleBundle implements Migration
 
     /**
      * Create oro_fallback_localization_val table
-     *
-     * @param Schema $schema
      */
     protected function createOroFallbackLocalizedValueTable(Schema $schema)
     {
@@ -63,8 +59,6 @@ class OroLocaleBundle implements Migration
 
     /**
      * Create oro_localization_title table
-     *
-     * @param Schema $schema
      */
     protected function createOroLocalizationTitleTable(Schema $schema)
     {
@@ -77,8 +71,6 @@ class OroLocaleBundle implements Migration
 
     /**
      * Add oro_localization foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroLocalizationForeignKeys(Schema $schema)
     {
@@ -93,8 +85,6 @@ class OroLocaleBundle implements Migration
 
     /**
      * Add oro_fallback_localization_val foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroFallbackLocalizedValueForeignKeys(Schema $schema)
     {
@@ -109,8 +99,6 @@ class OroLocaleBundle implements Migration
 
     /**
      * Add oro_localization_title foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroLocalizationTitleForeignKeys(Schema $schema)
     {

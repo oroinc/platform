@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FeatureChange extends Event
 {

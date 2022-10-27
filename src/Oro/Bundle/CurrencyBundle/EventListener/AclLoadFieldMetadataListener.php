@@ -9,7 +9,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * As currency functionality is represented by three fields (from entity side) we have to hide such fields from
@@ -28,23 +27,12 @@ class AclLoadFieldMetadataListener
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /**
-     * @param ConfigManager       $configManager
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(ConfigManager $configManager, TranslatorInterface $translator)
+    public function __construct(ConfigManager $configManager)
     {
         $this->multicurrencyConfigProvider = $configManager->getProvider('multicurrency');
         $this->entityConfigProvider = $configManager->getProvider('entity');
-        $this->translator = $translator;
     }
 
-    /**
-     * @param LoadFieldsMetadata $event
-     */
     public function onLoad(LoadFieldsMetadata $event)
     {
         $className = $event->getClassName();
@@ -85,9 +73,7 @@ class AclLoadFieldMetadataListener
             ) {
                 $fieldsToAdd[$target] = new FieldSecurityMetadata(
                     $target,
-                    $this->translator->trans(
-                        $this->entityConfigProvider->getConfig($className, $fieldName)->get('label')
-                    ),
+                    $this->entityConfigProvider->getConfig($className, $fieldName)->get('label'),
                     ['VIEW', 'CREATE', 'EDIT']
                 );
             }

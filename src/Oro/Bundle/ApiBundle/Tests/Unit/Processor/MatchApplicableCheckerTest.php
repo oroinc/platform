@@ -6,12 +6,43 @@ use Oro\Bundle\ApiBundle\Processor\MatchApplicableChecker;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
 
 class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
 {
+    private function getApplicableChecker(): ChainApplicableChecker
+    {
+        $checker = new ChainApplicableChecker();
+        $checker->addChecker(new MatchApplicableChecker(['group'], ['class']));
+
+        return $checker;
+    }
+
+    private function getProcessorRegistry(): ProcessorRegistryInterface
+    {
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects(self::any())
+            ->method('getProcessor')
+            ->willReturnCallback(function ($processorId) {
+                return new ProcessorMock($processorId);
+            });
+
+        return $processorRegistry;
+    }
+
+    private function assertProcessors(array $expectedProcessorIds, \Iterator $processors): void
+    {
+        $processorIds = [];
+        /** @var ProcessorMock $processor */
+        foreach ($processors as $processor) {
+            $processorIds[] = $processor->getProcessorId();
+        }
+
+        self::assertEquals($expectedProcessorIds, $processorIds);
+    }
+
     public function testMatchByInstanceOf()
     {
         $context = new Context();
@@ -41,7 +72,7 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             $processors,
             $context,
             $this->getApplicableChecker(),
-            $this->getProcessorFactory()
+            $this->getProcessorRegistry()
         );
 
         $this->assertProcessors(
@@ -52,48 +83,5 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             ],
             $iterator
         );
-    }
-
-    /**
-     * @return ChainApplicableChecker
-     */
-    protected function getApplicableChecker()
-    {
-        $checker = new ChainApplicableChecker();
-        $checker->addChecker(new MatchApplicableChecker(['group'], ['class']));
-
-        return $checker;
-    }
-
-    /**
-     * @return ProcessorFactoryInterface
-     */
-    protected function getProcessorFactory()
-    {
-        $factory = $this->createMock(ProcessorFactoryInterface::class);
-        $factory->expects(self::any())
-            ->method('getProcessor')
-            ->willReturnCallback(
-                function ($processorId) {
-                    return new ProcessorMock($processorId);
-                }
-            );
-
-        return $factory;
-    }
-
-    /**
-     * @param string[]  $expectedProcessorIds
-     * @param \Iterator $processors
-     */
-    protected function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
-    {
-        $processorIds = [];
-        /** @var ProcessorMock $processor */
-        foreach ($processors as $processor) {
-            $processorIds[] = $processor->getProcessorId();
-        }
-
-        self::assertEquals($expectedProcessorIds, $processorIds);
     }
 }

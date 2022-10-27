@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var WidgetContainerIconView;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    WidgetContainerIconView = BaseView.extend({
-        template: require('tpl!orosidebar/templates/sidebar-widget-container/widget-container-icon.html'),
+    const WidgetContainerIconView = BaseView.extend({
+        template: require('tpl-loader!orosidebar/templates/sidebar-widget-container/widget-container-icon.html'),
 
         listen: {
             'change model': 'render'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetContainerIconView(options) {
             WidgetContainerIconView.__super__.constructor.call(this, options);

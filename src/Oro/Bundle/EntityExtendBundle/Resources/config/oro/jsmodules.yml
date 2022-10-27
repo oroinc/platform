@@ -1,0 +1,19 @@
+aliases:
+    oro/datagrid/action/ajaxdeletefield-action$: oroentityextend/js/datagrid/action/ajaxdeletefield-action
+    oro/datagrid/action/ajaxrestorefield-action$: oroentityextend/js/datagrid/action/ajaxrestorefield-action
+    oroentityextend/js/bidirectional-only-for-extended-component$: oroentityextend/js/components/bidirectional-only-for-extended-component
+    oroentityextend/js/extend-field-form-component$: oroentityextend/js/components/extend-field-form-component
+    oroentityextend/js/schema-update-action-component$: oroentityextend/js/components/schema-update-action-component
+app-modules:
+    - oroentityextend/js/app/modules/validator-constraints-module
+dynamic-imports:
+    commons:
+        - oroentityextend/js/app/views/enum-values-view
+        - oroentityextend/js/bidirectional-only-for-extended-component
+        - oroentityextend/js/extend-field-form-component
+        - oroentityextend/js/init-entity-extend-relation
+        - oroentityextend/js/schema-update-action-component
+        - oroentityextend/js/validator/field-name-length
+    orodatagrid:
+        - oro/datagrid/action/ajaxdeletefield-action
+        - oro/datagrid/action/ajaxrestorefield-action

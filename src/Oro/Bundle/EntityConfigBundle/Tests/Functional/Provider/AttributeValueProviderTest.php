@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Provider;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Provider\AttributeValueProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeFamilyData;
@@ -13,59 +12,48 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadActivityTar
 
 class AttributeValueProviderTest extends WebTestCase
 {
-    /**
-     * @var AttributeValueProviderInterface
-     */
-    protected $provider;
+    /** @var AttributeValueProviderInterface */
+    private $provider;
 
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
         $this->loadFixtures([
             LoadAttributeFamilyData::class,
             LoadActivityTargets::class,
         ]);
-        $this->provider = $this->getContainer()->get('oro_entity_config.provider.attribute_value');
-        $this->doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
+
+        $this->provider = self::getContainer()->get('oro_entity_config.provider.attribute_value');
     }
 
     public function testRemoveAttributeValues()
     {
         $attributeFamily = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
-        
-        $testActivityTargetManager = $this->doctrineHelper->getEntityManagerForClass(TestActivityTarget::class);
-        $testActivityTarget = $this->loadTestActivityTarget($attributeFamily, $testActivityTargetManager);
+
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(TestActivityTarget::class);
+        $testActivityTarget = $this->loadTestActivityTarget($attributeFamily, $em);
         $this->assertNotEmpty($testActivityTarget->getString());
-        
+
         $this->provider->removeAttributeValues(
             $attributeFamily,
             ['string']
         );
 
-        $testActivityTargetManager->refresh($testActivityTarget);
+        $em->refresh($testActivityTarget);
         $this->assertEmpty($testActivityTarget->getString());
     }
 
-    /**
-     * @param AttributeFamily $attributeFamily
-     * @param EntityManagerInterface $manager
-     * @return TestActivityTarget
-     */
-    protected function loadTestActivityTarget(AttributeFamily $attributeFamily, EntityManagerInterface $manager)
-    {
+    private function loadTestActivityTarget(
+        AttributeFamily $attributeFamily,
+        EntityManagerInterface $manager
+    ): TestActivityTarget {
         $testActivityTarget = $this->getReference('activity_target_one');
         $testActivityTarget->setString('some string');
         $testActivityTarget->setAttributeFamily($attributeFamily);
 
         $manager->persist($testActivityTarget);
         $manager->flush();
-        
+
         return $testActivityTarget;
     }
 }

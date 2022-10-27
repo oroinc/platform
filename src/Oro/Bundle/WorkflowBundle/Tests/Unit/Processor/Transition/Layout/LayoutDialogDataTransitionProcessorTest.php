@@ -16,26 +16,26 @@ class LayoutDialogDataTransitionProcessorTest extends \PHPUnit\Framework\TestCas
     /** @var LayoutDialogDataTransitionProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new LayoutDialogDataTransitionProcessor();
     }
 
     public function testData()
     {
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
         $formView = $this->createMock(FormView::class);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('createView')->willReturn($formView);
+        $form->expects($this->once())
+            ->method('createView')
+            ->willReturn($formView);
 
         $context = new TransitionContext();
         $context->setResultType(new LayoutDialogResultType('route_name'));
@@ -62,13 +62,13 @@ class LayoutDialogDataTransitionProcessorTest extends \PHPUnit\Framework\TestCas
 
     public function testSkipUnsupportedResultTypeContext()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')
             ->willReturn($this->createMock(TransitActionResultTypeInterface::class));
 
-        $context->expects($this->never())->method('getTransition');
+        $context->expects($this->never())
+            ->method('getTransition');
 
         $this->processor->process($context);
     }

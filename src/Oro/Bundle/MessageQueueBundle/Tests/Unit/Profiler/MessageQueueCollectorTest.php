@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 class MessageQueueCollectorTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
-    
+
     public function testShouldExtendDataCollectorClass()
     {
         $this->assertClassExtends(DataCollector::class, MessageQueueCollector::class);

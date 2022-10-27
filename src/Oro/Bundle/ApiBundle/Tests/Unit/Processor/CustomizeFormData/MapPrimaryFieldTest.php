@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension;
 use Oro\Bundle\ApiBundle\Form\FormValidationHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataEventDispatcher;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\MapPrimaryField;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
@@ -20,23 +21,24 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RestrictedNameContainerTyp
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class MapPrimaryFieldTest extends TypeTestCase
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
     private $customizationProcessor;
@@ -56,20 +58,18 @@ class MapPrimaryFieldTest extends TypeTestCase
     /** @var MapPrimaryField */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->customizationProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->customizationHandler = new CustomizeFormDataHandler($this->customizationProcessor);
         $this->validator = Validation::createValidator();
+
         /* @var ClassMetadata $metadata */
         $metadata = $this->validator->getMetadataFor(Form::class);
         $metadata->addConstraint(new FormConstraint());
         $metadata->addPropertyConstraint('children', new Assert\Valid());
-
-        parent::setUp();
-
-        $this->dispatcher = new EventDispatcher();
-        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
 
         $configProvider = $this->createMock(ConfigProvider::class);
         $metadataProvider = $this->createMock(MetadataProvider::class);
@@ -88,25 +88,28 @@ class MapPrimaryFieldTest extends TypeTestCase
 
         $this->customizationProcessor->expects(self::any())
             ->method('createContext')
-            ->willReturnCallback(
-                function () {
-                    return new CustomizeFormDataContext();
-                }
-            );
+            ->willReturnCallback(function () {
+                return new CustomizeFormDataContext();
+            });
         $this->customizationProcessor->expects(self::any())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeFormDataContext $context) {
-                    if (Entity\Account::class === $context->getClassName()) {
-                        $this->processor->process($context);
-                    }
+            ->willReturnCallback(function (CustomizeFormDataContext $context) {
+                if (Entity\Account::class === $context->getClassName()) {
+                    $this->processor->process($context);
                 }
-            );
+            });
 
-        $this->formValidationHandler = new FormValidationHandler($this->validator, $this->customizationHandler);
+        $this->formValidationHandler = new FormValidationHandler(
+            $this->validator,
+            new CustomizeFormDataEventDispatcher($this->customizationHandler),
+            new PropertyAccessor()
+        );
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getFormExtensions(): array
     {
         return [
             new PreloadedExtension(
@@ -121,17 +124,12 @@ class MapPrimaryFieldTest extends TypeTestCase
         ];
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     *
-     * @return FormBuilderInterface
-     */
-    private function getFormBuilder(EntityDefinitionConfig $config)
+    private function getFormBuilder(?EntityDefinitionConfig $config): FormBuilderInterface
     {
         $this->formContext->setConfig($config);
 
-        return $this->builder->create(
-            null,
+        return $this->createFormBuilder()->create(
+            '',
             FormType::class,
             [
                 'data_class'                          => Entity\Account::class,
@@ -141,22 +139,13 @@ class MapPrimaryFieldTest extends TypeTestCase
         );
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param Entity\Account         $data
-     * @param array                  $submittedData
-     * @param array                  $itemOptions
-     * @param string                 $entryType
-     *
-     * @return FormInterface
-     */
     private function processForm(
-        EntityDefinitionConfig $config,
+        ?EntityDefinitionConfig $config,
         Entity\Account $data,
         array $submittedData,
         array $itemOptions = [],
-        $entryType = NameContainerType::class
-    ) {
+        string $entryType = NameContainerType::class
+    ): FormInterface {
         $formBuilder = $this->getFormBuilder($config);
         $formBuilder->add('enabledRole', null, array_merge(['mapped' => false], $itemOptions));
         $formBuilder->add(
@@ -174,19 +163,19 @@ class MapPrimaryFieldTest extends TypeTestCase
         $form = $formBuilder->getForm();
         $form->setData($data);
         $form->submit($submittedData, false);
-        $this->formValidationHandler->validate($form);
+        $this->validateForm($form);
 
         return $form;
     }
 
-    /**
-     * @param Entity\Account $data
-     * @param string         $name
-     * @param bool           $enabled
-     *
-     * @return Entity\Role
-     */
-    private function addRole(Entity\Account $data, $name, $enabled)
+    private function validateForm(FormInterface $form): void
+    {
+        $this->formValidationHandler->preValidate($form);
+        $this->formValidationHandler->validate($form);
+        $this->formValidationHandler->postValidate($form);
+    }
+
+    private function addRole(Entity\Account $data, string $name, bool $enabled): Entity\Role
     {
         $role = new Entity\Role();
         $role->setName($name);
@@ -196,7 +185,127 @@ class MapPrimaryFieldTest extends TypeTestCase
         return $role;
     }
 
-    public function testProcessWhenPrimaryFieldIsNotSubmitted()
+    public function testProcessWithoutConfigShouldWorkAsRegularForm()
+    {
+        $data = new Entity\Account();
+        $role1 = $this->addRole($data, 'role1', false);
+        $role2 = $this->addRole($data, 'role2', true);
+
+        $form = $this->processForm(
+            null,
+            $data,
+            [
+                'enabledRole' => 'role1',
+                'roles'       => [
+                    ['name' => 'role1'],
+                    ['name' => 'role2'],
+                    ['name' => 'role3']
+                ]
+            ]
+        );
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
+
+        self::assertFalse($role1->isEnabled());
+        self::assertTrue($role2->isEnabled());
+        self::assertCount(3, $data->getRoles());
+    }
+
+    public function testProcessWithoutAssociationConfigShouldWorkAsRegularForm()
+    {
+        $data = new Entity\Account();
+        $role1 = $this->addRole($data, 'role1', false);
+        $role2 = $this->addRole($data, 'role2', true);
+
+        $form = $this->processForm(
+            new EntityDefinitionConfig(),
+            $data,
+            [
+                'enabledRole' => 'role1',
+                'roles'       => [
+                    ['name' => 'role1'],
+                    ['name' => 'role2']
+                ]
+            ]
+        );
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
+
+        self::assertFalse($role1->isEnabled());
+        self::assertTrue($role2->isEnabled());
+    }
+
+    public function testProcessWithoutPrimaryFieldFormFieldShouldWorkAsRegularForm()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->addField('enabledRole');
+        $rolesField = $config->addField('roles');
+        $rolesField->getOrCreateTargetEntity()->addField('name');
+
+        $data = new Entity\Account();
+        $role1 = $this->addRole($data, 'role1', false);
+        $role2 = $this->addRole($data, 'role2', true);
+
+        $formBuilder = $this->getFormBuilder($config);
+        $formBuilder->add(
+            'roles',
+            CollectionType::class,
+            [
+                'by_reference'  => false,
+                'allow_add'     => true,
+                'allow_delete'  => true,
+                'entry_type'    => NameContainerType::class,
+                'entry_options' => ['data_class' => Entity\Role::class]
+            ]
+        );
+        $form = $formBuilder->getForm();
+        $form->setData($data);
+        $form->submit(
+            [
+                'roles' => [
+                    ['name' => 'role1'],
+                    ['name' => 'role2'],
+                    ['name' => 'role3']
+                ]
+            ],
+            false
+        );
+        $this->validateForm($form);
+
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
+
+        self::assertFalse($role1->isEnabled());
+        self::assertTrue($role2->isEnabled());
+        self::assertCount(3, $data->getRoles());
+    }
+
+    public function testProcessWithoutAssociationFormFieldShouldWorkAsRegularForm()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->addField('enabledRole');
+        $rolesField = $config->addField('roles');
+        $rolesField->getOrCreateTargetEntity()->addField('name');
+
+        $data = new Entity\Account();
+        $role1 = $this->addRole($data, 'role1', false);
+        $role2 = $this->addRole($data, 'role2', true);
+
+        $formBuilder = $this->getFormBuilder($config);
+        $formBuilder->add('enabledRole', null, ['mapped' => false]);
+        $form = $formBuilder->getForm();
+        $form->setData($data);
+        $form->submit(['enabledRole' => 'role1'], false);
+        $this->validateForm($form);
+
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isValid());
+
+        self::assertFalse($role1->isEnabled());
+        self::assertTrue($role2->isEnabled());
+    }
+
+    public function testProcessWhenPrimaryFieldAndAssociationAreNotSubmitted()
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -339,7 +448,7 @@ class MapPrimaryFieldTest extends TypeTestCase
         self::assertFalse($role2->isEnabled());
     }
 
-    public function testProcessWhenUnknownValueForPrimaryFieldIsSubmitted()
+    public function testProcessWhenNewValueForPrimaryFieldIsSubmitted()
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -350,15 +459,15 @@ class MapPrimaryFieldTest extends TypeTestCase
         $role1 = $this->addRole($data, 'role1', false);
         $role2 = $this->addRole($data, 'role2', true);
 
-        $form = $this->processForm($config, $data, ['enabledRole' => 'unknown']);
+        $form = $this->processForm($config, $data, ['enabledRole' => 'role3']);
         self::assertTrue($form->isSynchronized());
         self::assertTrue($form->isValid());
 
         $roles = $data->getRoles();
-        self::assertCount(3, $roles);
+        self::assertCount(2, $roles);
         self::assertFalse($role1->isEnabled());
-        self::assertFalse($role2->isEnabled());
-        self::assertTrue($roles[2]->isEnabled());
+        self::assertTrue($role2->isEnabled());
+        self::assertEquals('role3', $role2->getName());
     }
 
     public function testProcessWhenUnknownValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted()
@@ -408,7 +517,7 @@ class MapPrimaryFieldTest extends TypeTestCase
             $config,
             $data,
             ['enabledRole' => '1'],
-            ['constraints' => [new Assert\Length(['min' => 3])]],
+            ['constraints' => [new Assert\Length(['min' => 3, 'allowEmptyString' => false])]],
             RestrictedNameContainerType::class
         );
         self::assertTrue($form->isSynchronized());
@@ -419,7 +528,7 @@ class MapPrimaryFieldTest extends TypeTestCase
             'This value is too short. It should have 3 characters or more.',
             $errors[0]->getMessage()
         );
-        self::assertCount(0, $form->get('roles')->get('2')->getErrors(true));
+        self::assertCount(0, $form->get('roles')->getErrors(true));
     }
 
     public function testProcessWhenInvalidValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted()
@@ -443,7 +552,7 @@ class MapPrimaryFieldTest extends TypeTestCase
                     ['name' => 'role2']
                 ]
             ],
-            ['constraints' => [new Assert\Length(['min' => 3])]]
+            ['constraints' => [new Assert\Length(['min' => 3, 'allowEmptyString' => false])]]
         );
         self::assertTrue($form->isSynchronized());
         self::assertFalse($form->isValid());

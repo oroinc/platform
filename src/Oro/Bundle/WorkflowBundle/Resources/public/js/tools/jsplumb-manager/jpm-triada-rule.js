@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var TriadaRule;
-    var _ = require('underscore');
-    var Rule = require('./jpm-base-rule');
+    const _ = require('underscore');
+    const Rule = require('./jpm-base-rule');
 
-    TriadaRule = Rule.extend({
+    const TriadaRule = Rule.extend({
         name: 'Triada',
         match: function(cell) {
-            var children = _.filter(cell.children, function(child) {
+            const children = _.filter(cell.children, function(child) {
                 return child.y === cell.y + 1 || child.y === cell.y + 2;
             });
             children.sort(function(a, b) {
@@ -25,9 +24,9 @@ define(function(require) {
             }
         },
         apply: function() {
-            var context = this.context;
-            var average;
-            var changed = false;
+            const context = this.context;
+            let average;
+            let changed = false;
             if (this.root) {
                 average = Math.floor((this.items[0].x + this.items[1].x + this.items[2].x) / 3);
                 changed = context.move(this.root, average) || changed;

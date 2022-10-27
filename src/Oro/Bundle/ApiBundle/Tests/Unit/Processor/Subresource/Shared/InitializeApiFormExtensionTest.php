@@ -23,7 +23,7 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
     /** @var InitializeApiFormExtension */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -61,9 +61,9 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
 
         $this->processor->process($this->context);
 
-        self::assertFalse($this->context->has(InitializeApiFormExtension::PREVIOUS_INCLUDED_ENTITIES));
-        self::assertFalse($this->context->has(InitializeApiFormExtension::PREVIOUS_METADATA_ACCESSOR));
-        self::assertFalse($this->context->has(InitializeApiFormExtension::PREVIOUS_CONFIG_ACCESSOR));
+        self::assertFalse($this->context->has('previousIncludedEntities'));
+        self::assertFalse($this->context->has('previousMetadataAccessor'));
+        self::assertFalse($this->context->has('previousConfigAccessor'));
     }
 
     public function testProcessWhenApiFormExtensionIsActivated()
@@ -83,7 +83,7 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
         $this->metadataTypeGuesser->expects(self::never())
             ->method('setConfigAccessor');
 
-        $this->context->set(InitializeApiFormExtension::API_FORM_EXTENSION_ACTIVATED, true);
+        $this->context->set('apiFormExtensionActivated', true);
         $this->processor->process($this->context);
     }
 
@@ -119,17 +119,8 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
         $this->context->setIncludedEntities($currentIncludedEntities);
         $this->processor->process($this->context);
 
-        self::assertSame(
-            $includedEntities,
-            $this->context->get(InitializeApiFormExtension::PREVIOUS_INCLUDED_ENTITIES)
-        );
-        self::assertSame(
-            $metadataAccessor,
-            $this->context->get(InitializeApiFormExtension::PREVIOUS_METADATA_ACCESSOR)
-        );
-        self::assertSame(
-            $configAccessor,
-            $this->context->get(InitializeApiFormExtension::PREVIOUS_CONFIG_ACCESSOR)
-        );
+        self::assertSame($includedEntities, $this->context->get('previousIncludedEntities'));
+        self::assertSame($metadataAccessor, $this->context->get('previousMetadataAccessor'));
+        self::assertSame($configAccessor, $this->context->get('previousConfigAccessor'));
     }
 }

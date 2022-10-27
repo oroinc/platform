@@ -1,5 +1,20 @@
 oro:
     importexport:
+        importexportresult:
+            entity_label: Import/Export result
+            entity_plural_label: Import/Export results
+            entity_grid_all_view_label: All %entity_plural_label%
+            organization.label: Organization
+            id.label: ID
+            expired.label: Expired
+            filename.label: Filename
+            job_code.label: Job code
+            job_id.label: Job ID
+            owner.label: Owner
+            entity.label: Entity name
+            type.label: Type
+            options.label: Options
+
         action:
             export:  "Export entity records"
             import:  "Import entity records"
@@ -8,10 +23,12 @@ oro:
             label: Export
             processor: Processor
             popup:
-                options.label: Exported data
+                options:
+                    label: Exported data
+                button.label: Export
 
         export_template:
-            label: Export template
+            label: Download Import Template
 
         entity_config:
             block_title:    "Import & Export"
@@ -21,6 +38,7 @@ oro:
             header.label:   "Column Name"
             header.tooltip: "If blank Label will be used"
             identity.label: "Use as Identity Field"
+            identity.no: "No"
             identity.only_when_not_empty: "Only when not empty"
             identity.always: "Always"
             identity.tooltip: "If set to \"Only when not empty\", the field may be omitted in the identity when it has no value."
@@ -28,10 +46,11 @@ oro:
 
 
         import:
-            error:          "Errors occurred during file import."
+            error:          "Errors occurred during file import: %errors%"
             download_error_log: "Error log"
             errors_found:   "Errors found: %errors%"
             error %number%: "Error in row #%number%."
+            warning:        "Warning in row #%number%."
             label:          "Import file"
             validation_label: "Validate"
             success:        "File was successfully imported."
@@ -45,11 +64,11 @@ oro:
             importance:     Important
             columns_notice: The file must be comma-separated only. Files containing other separators will be rejected.
             errors:
-                not_found_entity: Not found entity "%entity_name%"
+                not_found_entity: 'Not found entity "%entity_name%". Item data: %item_data%.'
                 access_denied_entity: Access denied to entity "%entity_name%"
                 access_denied_property_entity: Access denied to property %property_name% of entity "%entity_name%"
                 wrong_owner: You have no access to set given owner
-            postponed_rows: "There were %postponedRows% rows that could not be proccessed."
+            postponed_rows: "%postponedRows% rows could not be processed."
             success.message: "Import started successfully. You will receive an email notification upon completion."
             validate:
                 success.message: "Validation started successfully. You will receive an email notification upon completion."

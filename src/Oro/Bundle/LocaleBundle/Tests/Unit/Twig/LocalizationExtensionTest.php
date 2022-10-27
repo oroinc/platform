@@ -12,32 +12,23 @@ class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /**  @var LocalizationExtension */
-    protected $extension;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageCodeFormatter */
-    protected $languageCodeFormatter;
+    private $languageCodeFormatter;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FormattingCodeFormatter */
-    protected $formattingCodeFormatter;
+    private $formattingCodeFormatter;
 
     /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationHelper;
+    private $localizationHelper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    /** @var LocalizationExtension */
+    private $extension;
+
+    protected function setUp(): void
     {
-        $this->languageCodeFormatter = $this->getMockBuilder(LanguageCodeFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->formattingCodeFormatter = $this->getMockBuilder(FormattingCodeFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->localizationHelper = $this->getMockBuilder(LocalizationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->languageCodeFormatter = $this->createMock(LanguageCodeFormatter::class);
+        $this->formattingCodeFormatter = $this->createMock(FormattingCodeFormatter::class);
+        $this->localizationHelper = $this->createMock(LocalizationHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_locale.formatter.language_code', $this->languageCodeFormatter)
@@ -46,21 +37,6 @@ class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
             ->getContainer($this);
 
         $this->extension = new LocalizationExtension($container);
-    }
-
-    public function tearDown()
-    {
-        unset(
-            $this->languageCodeFormatter,
-            $this->formattingCodeFormatter,
-            $this->localizationHelper,
-            $this->extension
-        );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(LocalizationExtension::NAME, $this->extension->getName());
     }
 
     public function testGetFormattingTitleByCode()

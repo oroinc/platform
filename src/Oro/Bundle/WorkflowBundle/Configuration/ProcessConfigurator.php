@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
@@ -55,9 +55,6 @@ class ProcessConfigurator implements LoggerAwareInterface
         $this->triggersConfigurator->setLogger($logger);
     }
 
-    /**
-     * @param array $processConfigurations
-     */
     public function configureProcesses(array $processConfigurations = [])
     {
         if (array_key_exists(ProcessConfigurationProvider::NODE_DEFINITIONS, $processConfigurations)) {
@@ -93,7 +90,7 @@ class ProcessConfigurator implements LoggerAwareInterface
                 $this->definitionsConfigurator->removeDefinition($processDefinitionName);
             }
         }
-        
+
         $this->triggersConfigurator->flush();
         $this->definitionsConfigurator->flush();
     }

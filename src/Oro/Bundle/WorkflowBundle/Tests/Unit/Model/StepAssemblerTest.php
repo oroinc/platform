@@ -2,49 +2,50 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepAssembler;
+use Oro\Component\Action\Exception\AssemblerException;
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class StepAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var StepAssembler
-     */
-    protected $assembler;
+    /** @var StepAssembler */
+    private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assembler = new StepAssembler();
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider invalidOptionsDataProvider
      * @param array $configuration
      */
     public function testAssembleRequiredOptionException($configuration)
     {
+        $this->expectException(AssemblerException::class);
         $this->assembler->assemble($configuration, null);
     }
 
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
-        return array(
-            'no options' => array(
-                array(
-                    'name' => array()
-                )
-            ),
-            'no label' => array(
-                array(
-                    'name' => array(
+        return [
+            'no options' => [
+                [
+                    'name' => []
+                ]
+            ],
+            'no label' => [
+                [
+                    'name' => [
                         'isFinal' => false
-                    )
-                )
-            )
-        );
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -52,90 +53,85 @@ class StepAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     public function testAssemble($configuration, $attributes, Step $expectedStep)
     {
-        $configurationPass = $this->getMockBuilder(
-            'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
-        )->getMockForAbstractClass();
+        $configurationPass = $this->createMock(ConfigurationPassInterface::class);
 
         $configurationPass->expects($this->any())
             ->method('passConfiguration')
             ->with($this->isType('array'))
-            ->will(
-                $this->returnCallback(
-                    function (array $data) {
-                        if (isset($data['path'])) {
-                            $data['path'] = new PropertyPath('data.' . str_replace('$', '', $data['path']));
-                        } else {
-                            foreach ($data as &$value) {
-                                $value = new PropertyPath('data.' . str_replace('$', '', $value));
-                            }
-                        }
-                        return $data;
+            ->willReturnCallback(function (array $data) {
+                if (isset($data['path'])) {
+                    $data['path'] = new PropertyPath('data.' . str_replace('$', '', $data['path']));
+                } else {
+                    foreach ($data as &$value) {
+                        $value = new PropertyPath('data.' . str_replace('$', '', $value));
                     }
-                )
-            );
+                }
+
+                return $data;
+            });
 
         $this->assembler->addConfigurationPass($configurationPass);
 
-        $expectedAttributes = array();
+        $expectedAttributes = [];
         /** @var Attribute $attribute */
-        foreach ($attributes ? $attributes : array() as $attribute) {
+        foreach ($attributes ? $attributes : [] as $attribute) {
             $expectedAttributes[$attribute->getName()] = $attribute;
         }
 
         $steps = $this->assembler->assemble($configuration, $attributes);
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $steps);
+        $this->assertInstanceOf(ArrayCollection::class, $steps);
         $this->assertCount(1, $steps);
         $this->assertTrue($steps->containsKey($expectedStep->getName()));
 
         $this->assertEquals($expectedStep, $steps->get($expectedStep->getName()));
     }
 
-    public function configurationDataProvider()
+    public function configurationDataProvider(): array
     {
-        return array(
-            'minimal' => array(
-                array(
-                    'step_one' => array(
+        return [
+            'minimal' => [
+                [
+                    'step_one' => [
                         'label' => 'label',
-                    )
-                ),
+                    ]
+                ],
                 null,
                 $this->createStep('step_one')
                     ->setLabel('label')
                     ->setOrder(0)
                     ->setFinal(false),
-            ),
-            'full' => array(
-                array(
-                    'step_two' => array(
+            ],
+            'full' => [
+                [
+                    'step_two' => [
                         'label' => 'label',
                         'order' => 10,
                         'is_final' => true,
-                        'allowed_transitions' => array('transition_one'),
-                        'entity_acl' => array(
-                            'attribute_one' => array('update' => false)
-                        )
-                    )
-                ),
-                array(
+                        'allowed_transitions' => ['transition_one'],
+                        'entity_acl' => [
+                            'attribute_one' => ['update' => false]
+                        ]
+                    ]
+                ],
+                [
                     $this->createAttribute('attribute_one')->setLabel('Attribute One'),
                     $this->createAttribute('attribute_two'),
-                ),
+                ],
                 $this->createStep('step_two')
                     ->setLabel('label')
                     ->setFinal(true)
                     ->setOrder(10)
-                    ->setAllowedTransitions(array('transition_one'))
-                    ->setEntityAcls(array('attribute_one' => array('update' => false)))
-            ),
-        );
+                    ->setAllowedTransitions(['transition_one'])
+                    ->setEntityAcls(['attribute_one' => ['update' => false]])
+            ],
+        ];
     }
 
     /**
      * @param string $name
      * @return Step
      */
-    protected function createStep($name)
+    private function createStep($name)
     {
         $step = new Step();
         $step->setName($name);
@@ -147,7 +143,7 @@ class StepAssemblerTest extends \PHPUnit\Framework\TestCase
      * @param string $name
      * @return Attribute
      */
-    protected function createAttribute($name)
+    private function createAttribute($name)
     {
         $attribute = new Attribute();
         $attribute->setName($name);

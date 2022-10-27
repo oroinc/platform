@@ -1,7 +1,7 @@
 {% block oro_type_widget_datetime_range_widget %}
     {% set valueType = (form.vars.value.type != '') ? form.vars.value.type : 1 %}
 
-    {% import 'OroDashboardBundle::macros.html.twig' as UI %}
+    {% import '@OroDashboard/macros.html.twig' as UI %}
 
     {{ UI.renderDateWidgeView(form, valueType, 'datetime', 'orodashboard/js/app/views/widget-datetime-range-view') }}
 {% endblock %}
@@ -10,13 +10,13 @@
     {% set monthType = constant('Oro\\Bundle\\FilterBundle\\Form\\Type\\Filter\\AbstractDateFilterType::TYPE_THIS_MONTH') %}
     {% set valueType = (form.vars.value.type != '') ? form.vars.value.type : (form.vars.datetime_range_metadata.valueTypes ? monthType : 1) %}
 
-    {% import 'OroDashboardBundle::macros.html.twig' as UI %}
+    {% import '@OroDashboard/macros.html.twig' as UI %}
 
     {{ UI.renderDateWidgeView(form, valueType, 'date', 'orodashboard/js/app/views/widget-date-range-view') }}
 {% endblock oro_type_widget_date_range_widget %}
 
 {% block oro_type_widget_title_widget %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div class="widget-title-container" {{ UI.renderPageComponentAttributes({
         view: 'oroform/js/app/views/default-field-value-view',
@@ -26,7 +26,7 @@
         }
     }) }}>
         <div class="widget-title-widget">
-            {{ form_widget(form.title) }}
+            {{ form_widget(form.title, {'attr': {'class': 'widget-title-input'}}) }}
         </div>
         {{ form_row(form.useDefault, { 'attr': {'data-role': 'changeUseDefault'} }) }}
     </div>
@@ -35,35 +35,31 @@
 {% endblock oro_type_widget_title_widget %}
 
 {% block oro_type_widget_items_row %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set rowId = form.vars.id ~ 'Row' %}
 
-    <div id="{{ rowId }}" class="dashboard-widget-items">
-        <div class="control-group">
-            <label class="control-label">{{ label|trans }}</label>
-            <div class="control-group controls">
-                <div class="">
-                    {{ UI.clientButton({
-                        'aCss': 'no-hash add-button',
-                        'label': 'oro.dashboard.datagrid.actions.add.label'|trans
-                    }) }}
-                    {{ UI.clientButton({
-                        'aCss': 'no-hash btn-primary add-all-button',
-                        'label': 'oro.dashboard.datagrid.actions.add_all.label'|trans
-                    }) }}
-                </div>
+    <div id="{{ rowId }}" class="control-group dashboard-widget-items">
+        <label class="control-label">{{ label|trans }}</label>
+        <div class="controls items-table-container">
+            <div class="actions-wrap">
+                {{ UI.clientButton({
+                    'aCss': 'no-hash add-button',
+                    'label': 'oro.dashboard.datagrid.actions.add.label'|trans
+                }) }}
+                {{ UI.clientButton({
+                    'aCss': 'no-hash btn-primary add-all-button',
+                    'label': 'oro.dashboard.datagrid.actions.add_all.label'|trans
+                }) }}
             </div>
-            <div class="controls">
-                <table id="{{ form.vars.id }}" class="grid table table-bordered table-condensed">
-                    <thead>
-                        <tr>
-                            <th><span>{{ form.vars.item_label|trans }}</span></th>
-                            <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
-                        </tr>
-                    </thead>
-                    <tbody class="item-container"></tbody>
-                </table>
-            </div>
+            <table id="{{ form.vars.id }}" class="grid grid-main-container table table-bordered table-condensed">
+                <thead>
+                <tr>
+                    <th><span>{{ form.vars.item_label|trans }}</span></th>
+                    <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
+                </tr>
+                </thead>
+                <tbody class="item-container"></tbody>
+            </table>
         </div>
     </div>
     {{ form_javascript(form) }}
@@ -81,7 +77,7 @@
         }) %}
     {% endif %}
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         view: 'orodashboard/js/items/view',
@@ -99,7 +95,7 @@
                 {{ form_widget(form.date) }}
             </div>
 
-            {% import 'OroUIBundle::macros.html.twig' as UI %}
+            {% import '@OroUI/macros.html.twig' as UI %}
 
             <div {{ UI.renderPageComponentAttributes({
                 view: 'orodashboard/js/app/views/widget-date-compare-view',
@@ -114,58 +110,54 @@
 {% endblock oro_type_widget_date_widget %}
 
 {% block oro_dashboard_query_filter_row %}
-    <div class="control-group">
-        <div
-        {% if collapsible %}
-            class="control-group widget-query-filter collapsible{% if collapsed %} collapsed{% endif %}"
-                data-page-component-module="oroui/js/app/components/view-component"
-                data-page-component-options="{{ {'view': 'oroform/js/app/views/collapsible-form-row-view'}|json_encode }}">
-        {% else %}
-            class="control-group">
-        {% endif %}
-            <label class="control-label widget-query-filter">{{ label|trans }}</label>
-
+    {% if isMobileVersion() %}
+        {{ form_row(form.entity) }}
+        {{ form_row(form.definition) }}
+    {% else %}
+        <div class="control-group">
+            <label class="control-label">{{ label|trans }}</label>
+            <div class="controls query-filter-row">
             {% if collapsible %}
-                {% set labelsMap = {
-                    0: 'oro.dashboard.query_filter.collapse'|trans,
-                    1: 'oro.dashboard.query_filter.expand'|trans,
-                } %}
-
-                <a class="collapse-action"
-                   data-toggle-label="{{ labelsMap[not collapsed] }}"
-                   data-name="collapse" href="#">{{ labelsMap[collapsed] }}</a>
+                {% set togglerId = 'toggler-'|uniqid %}
+                {% set collapseId = 'collapse-'|uniqid %}
+                <a id="{{ togglerId }}" role="button" class="collapse-toggler{% if collapsed %} collapsed{% endif %}"
+                   data-toggle="collapse" href="#{{ collapseId }}" title="{{ ('oro.dashboard.query_filter.'~(collapsed ? 'expand' : 'collapse'))|trans }}"
+                   aria-expanded="{{ collapsed ? 'false' : 'true' }}" aria-controls="{{ collapseId }}">
+                    <span class="expanded-text">{{ 'oro.dashboard.query_filter.collapse'|trans }}</span>
+                    <span class="collapsed-text">{{ 'oro.dashboard.query_filter.expand'|trans }}</span>
+                </a>
             {% endif %}
+                <div{% if collapsible %} id="{{ collapseId }}" data-expanded-title="{{ 'oro.dashboard.query_filter.collapse'|trans }}" data-collapsed-title="{{ 'oro.dashboard.query_filter.expand'|trans }}" class="collapse{% if not collapsed %} show{% endif %}" aria-labelledby="{{ togglerId }}"{% endif %}>
+                    {{ form_row(form.entity) }}
+                    {{ form_row(form.definition) }}
+                    {% set metadata = oro_query_filter_metadata() %}
+                    {% set column_chain_template_id = 'column-chain-template' %}
+                    {% import '@OroQueryDesigner/macros.html.twig' as QD %}
+                    {{ QD.query_designer_column_chain_template(column_chain_template_id) }}
+                    {% import '@OroSegment/macros.html.twig' as segmentQD %}
+                    {{ segmentQD.query_designer_condition_builder({
+                        'id': name ~ '-condition-builder',
+                        'disable_audit': true,
+                        'metadata': metadata,
+                        'column_chain_template_selector': '#' ~ column_chain_template_id,
+                    }) }}
 
-            <div class="controls">
-                {{ form_row(form.entity) }}
-                {{ form_row(form.definition) }}
-                {% set metadata = oro_query_filter_metadata() %}
-                {% set column_chain_template_id = 'column-chain-template' %}
-                {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
-                {{ QD.query_designer_column_chain_template(column_chain_template_id) }}
-                {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
-                {{ segmentQD.query_designer_condition_builder({
-                    'id': name ~ '-condition-builder',
-                    'disable_audit': true,
-                    'metadata': metadata,
-                    'column_chain_template_selector': '#' ~ column_chain_template_id,
-                }) }}
-
-                {% set widgetOptions = {
-                    valueSource:                '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_definition]',
-                    entityChoice:               '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_entity]',
-                    entityChangeConfirmMessage: name|replace('_', '.') ~ '.change_entity_confirmation',
-                    metadata:                   metadata,
-                    disable_audit:              true,
-                    initEntityChangeEvents:     false,
-                    select2FieldChoiceTemplate: '#' ~ column_chain_template_id,
-                } %}
-                {% set widgetOptions = update_segment_widget_options(widgetOptions, name) %}
-                <div
-                    data-page-component-module="orosegment/js/app/components/segment-component"
-                    data-page-component-options="{{ widgetOptions|json_encode }}">
+                    {% set widgetOptions = {
+                        valueSource:                '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_definition]',
+                        entityChoice:               '[data-ftid=' ~ widgetType ~ '_' ~ name ~ '_entity]',
+                        entityChangeConfirmMessage: name|replace({'_':'.'}) ~ '.change_entity_confirmation',
+                        metadata:                   metadata,
+                        disable_audit:              true,
+                        initEntityChangeEvents:     false,
+                        select2FieldChoiceTemplate: '#' ~ column_chain_template_id,
+                    } %}
+                    {% set widgetOptions = update_segment_widget_options(widgetOptions, name) %}
+                    <div
+                        data-page-component-module="orosegment/js/app/components/segment-component"
+                        data-page-component-options="{{ widgetOptions|json_encode }}">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {% endblock oro_dashboard_query_filter_row %}

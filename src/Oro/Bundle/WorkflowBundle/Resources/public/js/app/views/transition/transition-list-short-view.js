@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var TransitionsShortListView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var TransitionsShortRowView = require('./transition-row-short-view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const TransitionsShortRowView = require('./transition-row-short-view');
 
-    TransitionsShortListView = BaseView.extend({
+    const TransitionsShortListView = BaseView.extend({
         tagName: 'ul',
 
         attributes: {
@@ -19,14 +18,14 @@ define(function(require) {
             stepFrom: null
         },
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function TransitionsShortListView() {
-            TransitionsShortListView.__super__.constructor.apply(this, arguments);
+        constructor: function TransitionsShortListView(options) {
+            TransitionsShortListView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -37,7 +36,7 @@ define(function(require) {
         },
 
         addItem: function(item) {
-            var rowView = new TransitionsShortRowView({
+            const rowView = new TransitionsShortRowView({
                 model: item,
                 workflow: this.options.workflow,
                 stepFrom: this.options.stepFrom

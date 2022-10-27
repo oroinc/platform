@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ConfigValueTest extends \PHPUnit\Framework\TestCase
@@ -12,7 +13,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
     {
         $obj = new ConfigValue();
 
-        $this->setId($obj, 1);
+        ReflectionUtil::setId($obj, 1);
         $this->assertEquals(1, $obj->getId());
     }
 
@@ -21,7 +22,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         $date = new \DateTime('now');
 
         $obj = new ConfigValue();
-        $this->setCreatedAt($obj, $date);
+        ReflectionUtil::setPropertyValue($obj, 'createdAt', $date);
         $this->assertEquals($date, $obj->getCreatedAt());
     }
 
@@ -40,10 +41,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $accessor->getValue($obj, $property));
     }
 
-    /**
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
         return [
             ['name', 'testName'],
@@ -69,7 +67,7 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedType, $obj->getType());
     }
 
-    public function valuesDataProvider()
+    public function valuesDataProvider(): array
     {
         return [
             ['string', ConfigValue::FIELD_SCALAR_TYPE],
@@ -99,31 +97,5 @@ class ConfigValueTest extends \PHPUnit\Framework\TestCase
 
         $obj->doPreUpdate();
         $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
-    }
-
-    /**
-     * @param mixed $obj
-     * @param mixed $val
-     */
-    protected function setId($obj, $val)
-    {
-        $class = new \ReflectionClass($obj);
-        $prop  = $class->getProperty('id');
-        $prop->setAccessible(true);
-
-        $prop->setValue($obj, $val);
-    }
-
-    /**
-     * @param mixed $obj
-     * @param mixed $val
-     */
-    protected function setCreatedAt($obj, $val)
-    {
-        $class = new \ReflectionClass($obj);
-        $prop  = $class->getProperty('createdAt');
-        $prop->setAccessible(true);
-
-        $prop->setValue($obj, $val);
     }
 }

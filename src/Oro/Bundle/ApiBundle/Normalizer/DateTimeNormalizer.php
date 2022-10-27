@@ -2,24 +2,33 @@
 
 namespace Oro\Bundle\ApiBundle\Normalizer;
 
+use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Symfony\Component\Form\DataTransformerInterface;
+
 /**
- * This normalizer tells the ObjectNormalizer to skip a normalization of \DateTime.
+ * Normalizes an instance of \DateTimeInterface.
  */
 class DateTimeNormalizer implements ObjectNormalizerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($object)
+    /** @var DataTransformerRegistry */
+    private $dataTransformerRegistry;
+
+    public function __construct(DataTransformerRegistry $dataTransformerRegistry)
     {
-        return $object instanceof \DateTime;
+        $this->dataTransformerRegistry = $dataTransformerRegistry;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function normalize($object)
+    public function normalize($object, RequestType $requestType)
     {
-        return $object;
+        $dataTransformer = $this->dataTransformerRegistry->getDataTransformer(DataType::DATETIME, $requestType);
+
+        return $dataTransformer instanceof DataTransformerInterface
+            ? $dataTransformer->transform($object)
+            : $object;
     }
 }

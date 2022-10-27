@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
+/**
+ * The metadata factory for nested objects for non manageable entities.
+ */
 class ObjectNestedObjectMetadataFactory
 {
     /** @var NestedObjectMetadataHelper */
@@ -15,10 +18,6 @@ class ObjectNestedObjectMetadataFactory
     /** @var ObjectMetadataFactory */
     protected $objectMetadataFactory;
 
-    /**
-     * @param NestedObjectMetadataHelper $nestedObjectMetadataHelper
-     * @param ObjectMetadataFactory      $objectMetadataFactory
-     */
     public function __construct(
         NestedObjectMetadataHelper $nestedObjectMetadataHelper,
         ObjectMetadataFactory $objectMetadataFactory

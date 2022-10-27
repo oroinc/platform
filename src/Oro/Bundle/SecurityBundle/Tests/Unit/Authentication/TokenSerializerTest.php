@@ -2,27 +2,25 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializer;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Role\RoleInterface;
 
 class TokenSerializerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    private $doctrine;
 
     /** @var TokenSerializer */
-    protected $tokenSerializer;
+    private $tokenSerializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 
@@ -59,13 +57,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
     {
         $organization = new Organization();
         $organization->setId(1);
-        $user = $this->getMockBuilder(AbstractUser::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getId'])
-            ->getMockForAbstractClass();
-        $user->expects(self::once())
-            ->method('getId')
-            ->willReturn(123);
+        $user = new User();
+        $user->setId(123);
         $token = new OrganizationToken($organization);
         $token->setUser($user);
 
@@ -79,21 +72,12 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
     {
         $organization = new Organization();
         $organization->setId(1);
-        $user = $this->getMockBuilder(AbstractUser::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getId'])
-            ->getMockForAbstractClass();
-        $user->expects(self::once())
-            ->method('getId')
-            ->willReturn(123);
-        $role1 = $this->createMock(RoleInterface::class);
-        $role1->expects(self::once())
-            ->method('getRole')
-            ->willReturn('ROLE_1');
-        $role2 = $this->createMock(RoleInterface::class);
-        $role2->expects(self::once())
-            ->method('getRole')
-            ->willReturn('ROLE_2');
+        $user = new User();
+        $user->setId(123);
+        $role1 = new Role('ROLE_1');
+        $role2 = new Role('ROLE_2');
+        $user->addUserRole($role1);
+        $user->addUserRole($role2);
         $token = new OrganizationToken($organization, [$role1, $role2]);
         $token->setUser($user);
 
@@ -113,16 +97,12 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $role1 = new Role('ROLE_1');
         $role2 = new Role('ROLE_2');
         $role3 = new Role('ROLE_3');
-        $user->addRole($role1);
-        $user->addRole($role2);
-        $user->addRole($role3);
+        $user->addUserRole($role1);
+        $user->addUserRole($role2);
+        $user->addUserRole($role3);
 
-        $organizationRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $userRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $organizationRepo = $this->createMock(EntityRepository::class);
+        $userRepo = $this->createMock(EntityRepository::class);
         $this->doctrine->expects(self::exactly(2))
             ->method('getRepository')
             ->willReturnMap([
@@ -144,22 +124,23 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         );
 
         self::assertInstanceOf(ImpersonationToken::class, $token);
-        self::assertSame($organization, $token->getOrganizationContext());
+        self::assertSame($organization, $token->getOrganization());
         self::assertSame($user, $token->getUser());
-        self::assertCount(2, $token->getRoles());
-        self::assertSame($role1, $token->getRoles()[0]);
-        self::assertSame($role2, $token->getRoles()[1]);
+        self::assertCount(3, $token->getRoles());
+        self::assertEquals($role1, $token->getRoles()[0]);
+        self::assertEquals($role2, $token->getRoles()[1]);
+        self::assertEquals($role3, $token->getRoles()[2]);
     }
 
     /**
      * @dataProvider unsupportedTokenProvider
      */
-    public function testDeserializeUnsupportedToken($value)
+    public function testDeserializeUnsupportedToken(?string $value)
     {
         self::assertNull($this->tokenSerializer->deserialize($value));
     }
 
-    public function unsupportedTokenProvider()
+    public function unsupportedTokenProvider(): array
     {
         return [
             [null],
@@ -181,12 +162,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $organization = new Organization();
         $organization->setId(1);
 
-        $organizationRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $userRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $organizationRepo = $this->createMock(EntityRepository::class);
+        $userRepo = $this->createMock(EntityRepository::class);
         $this->doctrine->expects(self::exactly(2))
             ->method('getRepository')
             ->willReturnMap([
@@ -215,12 +192,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $user->setId(123);
 
-        $organizationRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $userRepo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $organizationRepo = $this->createMock(EntityRepository::class);
+        $userRepo = $this->createMock(EntityRepository::class);
         $this->doctrine->expects(self::exactly(2))
             ->method('getRepository')
             ->willReturnMap([

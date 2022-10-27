@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * The base class for providers that get parent entities/mapped superclasses for any configurable entity.
+ */
 abstract class AbstractEntityHierarchyProvider implements EntityHierarchyProviderInterface
 {
     /** @var DoctrineHelper */
@@ -13,9 +16,6 @@ abstract class AbstractEntityHierarchyProvider implements EntityHierarchyProvide
     /** @var array */
     protected $hierarchy;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -38,9 +38,7 @@ abstract class AbstractEntityHierarchyProvider implements EntityHierarchyProvide
     {
         $this->ensureHierarchyInitialized();
 
-        return isset($this->hierarchy[$className])
-            ? $this->hierarchy[$className]
-            : [];
+        return $this->hierarchy[$className] ?? [];
     }
 
     /**
@@ -77,7 +75,7 @@ abstract class AbstractEntityHierarchyProvider implements EntityHierarchyProvide
             // a parent class should be:
             // - not extended entity proxy
             // - registered in Doctrine, for example Entity or MappedSuperclass
-            if (strpos($parentClassName, ExtendHelper::ENTITY_NAMESPACE) !== 0) {
+            if (!str_starts_with($parentClassName, ExtendHelper::ENTITY_NAMESPACE)) {
                 $em = $this->doctrineHelper->getEntityManagerForClass($className, false);
                 if ($em && !$em->getMetadataFactory()->isTransient($parentClassName)) {
                     $result[] = $parentClassName;

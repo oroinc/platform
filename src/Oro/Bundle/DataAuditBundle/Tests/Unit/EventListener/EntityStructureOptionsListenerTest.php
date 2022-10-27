@@ -12,12 +12,12 @@ use Oro\Bundle\EntityBundle\Model\EntityStructure;
 class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AuditConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $auditConfigProvider;
+    private $auditConfigProvider;
 
     /** @var EntityStructureOptionsListener */
-    protected $listener;
+    private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->auditConfigProvider = $this->createMock(AuditConfigProvider::class);
         $this->listener = new EntityStructureOptionsListener($this->auditConfigProvider);
@@ -25,11 +25,8 @@ class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onOptionsRequestDataProvider
-     *
-     * @param bool $isEntityAuditable
-     * @param bool $isFieldAuditable
      */
-    public function testOnOptionsRequest($isEntityAuditable, $isFieldAuditable)
+    public function testOnOptionsRequest(bool $isEntityAuditable, bool $isFieldAuditable)
     {
         $field = $this->createMock(EntityFieldStructure::class);
         $field->expects($this->once())
@@ -37,7 +34,7 @@ class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test_field');
         $field->expects($this->exactly((int) $isFieldAuditable))
             ->method('addOption')
-            ->with(EntityStructureOptionsListener::OPTION_NAME, $isFieldAuditable);
+            ->with('auditable', $isFieldAuditable);
 
         $data = $this->createMock(EntityStructure::class);
         $data->expects($this->once())
@@ -48,20 +45,17 @@ class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$field]);
         $data->expects($this->exactly((int) $isEntityAuditable))
             ->method('addOption')
-            ->with(EntityStructureOptionsListener::OPTION_NAME, $isEntityAuditable);
+            ->with('auditable', $isEntityAuditable);
 
-        $this->auditConfigProvider
-            ->expects($this->once())
+        $this->auditConfigProvider->expects($this->once())
             ->method('isAuditableEntity')
             ->with(\stdClass::class)
             ->willReturn($isEntityAuditable);
-        $this->auditConfigProvider
-            ->expects($this->once())
+        $this->auditConfigProvider->expects($this->once())
             ->method('isAuditableField')
             ->with(\stdClass::class, 'test_field')
             ->willReturn($isFieldAuditable);
 
-        /** @var EntityStructureOptionsEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(EntityStructureOptionsEvent::class);
         $event->expects($this->once())
             ->method('getData')
@@ -72,10 +66,7 @@ class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onOptionsRequest($event);
     }
 
-    /**
-     * @return array
-     */
-    public function onOptionsRequestDataProvider()
+    public function onOptionsRequestDataProvider(): array
     {
         return [
             'both auditable' => [
@@ -106,7 +97,7 @@ class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fieldName);
         $field->expects($this->once())
             ->method('addOption')
-            ->with(EntityStructureOptionsListener::OPTION_NAME, true);
+            ->with('auditable', true);
 
         $data = $this->createMock(EntityStructure::class);
         $data->expects($this->once())
@@ -117,20 +108,17 @@ class EntityStructureOptionsListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$field]);
         $data->expects($this->once())
             ->method('addOption')
-            ->with(EntityStructureOptionsListener::OPTION_NAME, true);
+            ->with('auditable', true);
 
-        $this->auditConfigProvider
-            ->expects($this->once())
+        $this->auditConfigProvider->expects($this->once())
             ->method('isAuditableEntity')
             ->with(\stdClass::class)
             ->willReturn(true);
-        $this->auditConfigProvider
-            ->expects($this->once())
+        $this->auditConfigProvider->expects($this->once())
             ->method('isAuditableField')
             ->with('class', 'field')
             ->willReturn(true);
 
-        /** @var EntityStructureOptionsEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(EntityStructureOptionsEvent::class);
         $event->expects($this->once())
             ->method('getData')

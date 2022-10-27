@@ -7,7 +7,7 @@ use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
 
 class EmailAddressWithContextTest extends \PHPUnit\Framework\TestCase
 {
-    const EMAIL = 'some@mail.com';
+    private const EMAIL = 'some@mail.com';
 
     public function testGetters(): void
     {

@@ -3,20 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
+use Oro\Component\Testing\ReflectionUtil;
 
 class PermissionEntityTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PermissionEntity */
-    protected $object;
+    private $object;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->object = new PermissionEntity();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->object);
     }
 
     public function testGetId()
@@ -24,21 +20,14 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->object->getId());
 
         $testValue = 42;
-        $reflectionProperty = new \ReflectionProperty('Oro\Bundle\SecurityBundle\Entity\PermissionEntity', 'id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->object, $testValue);
-
+        ReflectionUtil::setId($this->object, $testValue);
         $this->assertEquals($testValue, $this->object->getId());
     }
 
     /**
      * @dataProvider setGetDataProvider
-     *
-     * @param string $propertyName
-     * @param mixed $value
-     * @param mixed $defaultValue
      */
-    public function testSetGet($propertyName, $value, $defaultValue = null)
+    public function testSetGet(string $propertyName, mixed $value, mixed $defaultValue = null)
     {
         $setter = 'set' . ucfirst($propertyName);
         $getter = 'get' . ucfirst($propertyName);
@@ -51,10 +40,7 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->object->$getter());
     }
 
-    /**
-     * @return array
-     */
-    public function setGetDataProvider()
+    public function setGetDataProvider(): array
     {
         return [
             'name' => [

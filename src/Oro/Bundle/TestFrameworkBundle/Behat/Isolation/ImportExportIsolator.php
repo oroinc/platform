@@ -2,35 +2,26 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Import and Export Behat tests isolator.
+ */
 class ImportExportIsolator implements IsolatorInterface
 {
-    /** @var Filesystem */
-    protected $fs;
+    /** @var KernelInterface */
+    private $kernel;
 
-    /** @var Finder */
-    protected $finder;
-
-    /** @var string */
-    protected $path;
-
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
-        $this->fs = new Filesystem();
-        $this->finder = new Finder();
-        $this->path = $kernel->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export';
+        $this->kernel = $kernel;
     }
 
     /** {@inheritdoc} */
@@ -41,13 +32,13 @@ class ImportExportIsolator implements IsolatorInterface
     /** {@inheritdoc} */
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
-        $this->fs->remove($this->finder->files()->in($this->path));
+        $this->clearStorage();
     }
 
     /** {@inheritdoc} */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
-        $this->fs->remove($this->finder->files()->in($this->path));
+        $this->clearStorage();
     }
 
     /** {@inheritdoc} */
@@ -58,19 +49,19 @@ class ImportExportIsolator implements IsolatorInterface
     /** {@inheritdoc} */
     public function isApplicable(ContainerInterface $container)
     {
-        return $this->fs->exists($this->path);
+        return true;
     }
 
     /** {@inheritdoc} */
     public function restoreState(RestoreStateEvent $event)
     {
-        $this->fs->remove($this->finder->files()->in($this->path));
+        $this->clearStorage();
     }
 
     /** {@inheritdoc} */
     public function isOutdatedState()
     {
-        return (bool)$this->finder->files()->in($this->path)->count();
+        return count($this->getImportExportFileManager()->getFilesByFilePattern('*')) !== 0;
     }
 
     /** {@inheritdoc} */
@@ -83,5 +74,19 @@ class ImportExportIsolator implements IsolatorInterface
     public function getTag()
     {
         return 'import_export';
+    }
+
+    private function clearStorage(): void
+    {
+        $fileManager = $this->getImportExportFileManager();
+        $files = $fileManager->getFilesByFilePattern('*');
+        foreach ($files as $file) {
+            $fileManager->deleteFile($file);
+        }
+    }
+
+    private function getImportExportFileManager(): FileManager
+    {
+        return $this->kernel->getContainer()->get('oro_importexport.file.file_manager');
     }
 }

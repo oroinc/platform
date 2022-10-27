@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Stores block views collection
+ */
 class BlockViewCollection implements \ArrayAccess
 {
     /**
@@ -9,9 +12,6 @@ class BlockViewCollection implements \ArrayAccess
      */
     protected $elements;
 
-    /**
-     * @param array $elements
-     */
     public function __construct(array $elements = [])
     {
         $this->elements = $elements;
@@ -20,7 +20,7 @@ class BlockViewCollection implements \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->elements[$offset]);
     }
@@ -28,7 +28,7 @@ class BlockViewCollection implements \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         if (isset($this->elements[$offset])) {
             return $this->elements[$offset];
@@ -40,7 +40,7 @@ class BlockViewCollection implements \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new \BadMethodCallException('Not supported');
     }
@@ -48,7 +48,7 @@ class BlockViewCollection implements \ArrayAccess
     /**
      * {@inheritDoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new \BadMethodCallException('Not supported');
     }

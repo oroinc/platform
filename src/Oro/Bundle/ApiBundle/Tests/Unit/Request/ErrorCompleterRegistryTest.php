@@ -6,24 +6,19 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $errorCompleters
-     *
-     * @return ErrorCompleterRegistry
-     */
-    private function getErrorCompleterRegistry(array $errorCompleters)
+    private function getErrorCompleterRegistry(array $errorCompleters): ErrorCompleterRegistry
     {
         return new ErrorCompleterRegistry(
             $errorCompleters,
@@ -72,12 +67,11 @@ class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot find an error completer for the request "another".
-     */
     public function testShouldThrowExceptionIfNoErrorCompleterForSpecificRequestTypeAndNoDefaultErrorCompleter()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot find an error completer for the request "another".');
+
         $registry = $this->getErrorCompleterRegistry([
             ['errorCompleter1', 'rest&json_api']
         ]);

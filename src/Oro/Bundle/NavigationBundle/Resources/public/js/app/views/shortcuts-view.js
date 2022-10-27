@@ -1,19 +1,21 @@
 define(function(require) {
     'use strict';
 
-    var ShortcutsView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var routing = require('routing');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const routing = require('routing');
     require('bootstrap');
 
-    ShortcutsView = BaseView.extend({
+    const ShortcutsView = BaseView.extend({
         autoRender: true,
 
         events: {
             'change': 'onChange',
+            'focus [data-role="shortcut-search"]': 'onFocus',
+            'hide.bs.dropdown': 'onDropdownHide',
             'click .nav-content': 'stopPropagation'
         },
 
@@ -26,33 +28,34 @@ define(function(require) {
         entityId: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ShortcutsView() {
-            ShortcutsView.__super__.constructor.apply(this, arguments);
+        constructor: function ShortcutsView(options) {
+            ShortcutsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = options || {};
 
-            var $input = this.getTypeaheadInput();
+            const $input = this.getTypeaheadInput();
             this.sourceUrl = $input.data('source-url') ? $input.data('source-url') : null;
             this.entityClass = $input.data('entity-class') ? $input.data('entity-class') : null;
             this.entityId = $input.data('entity-id') ? $input.data('entity-id') : null;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
-            var $input = this.getTypeaheadInput();
+            const $input = this.getTypeaheadInput();
 
             if (!$input.data('typeahead')) {
                 this.initTypeahead();
             }
+
             this.initLayout();
 
             return this;
@@ -63,17 +66,17 @@ define(function(require) {
         },
 
         initTypeahead: function() {
-            var self = this;
+            const self = this;
             this.getTypeaheadInput().typeahead({
-                source: _.bind(this.source, this),
+                source: this.source.bind(this),
                 matcher: function(item) {
                     return item.key.toLowerCase().indexOf(this.query.toLowerCase()) !== -1;
                 },
                 sorter: function(items) {
-                    var beginswith = [];
-                    var caseSensitive = [];
-                    var caseInsensitive = [];
-                    var item;
+                    const beginswith = [];
+                    const caseSensitive = [];
+                    const caseInsensitive = [];
+                    let item;
 
                     while ((item = items.shift()) !== undefined) {
                         if (item.key.toLowerCase().indexOf(this.query.toLowerCase()) === 0) {
@@ -88,13 +91,13 @@ define(function(require) {
                     return beginswith.concat(caseSensitive, caseInsensitive);
                 },
                 render: function(items) {
-                    var that = this;
-                    items = $(items).map(function(i, item) {
-                        var view;
+                    items = $(items).map((i, item) => {
+                        let view;
+                        const secureItem = _.escape(item.key);
 
                         if (item.item.dialog) {
-                            var config = item.item.dialog_config;
-                            var options = {
+                            const config = item.item.dialog_config;
+                            const options = {
                                 'type': config.widget.type,
                                 'multiple': config.widget.multiple,
                                 'refresh-widget-alias': config.widget.refreshWidgetAlias,
@@ -113,12 +116,12 @@ define(function(require) {
                                 },
                                 'createOnEvent': 'click'
                             };
-                            var dataUrl = routing.generate(config.dataUrl, {
+                            const dataUrl = routing.generate(config.dataUrl, {
                                 entityClass: self.entityClass,
                                 entityId: self.entityId
                             });
 
-                            view = $(that.options.item).attr('data-value', item.key).data('isDialog', item.item.dialog);
+                            view = $(this.options.item).attr('data-value', item.key).data('isDialog', item.item.dialog);
                             view.find('a')
                                 .attr('href', '#')
                                 .attr('class', config.aCss)
@@ -126,11 +129,14 @@ define(function(require) {
                                 .attr('title', __(config.label))
                                 .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
                                 .attr('data-page-component-options', JSON.stringify(options))
-                                .html('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>' +
-                                    that.highlighter(item.key));
+                                .html(this.highlighter(secureItem));
+
+                            if (config.iCss) {
+                                view.prepend('<i class="' + config.iCss + ' hide-text">' + secureItem + '</i>');
+                            }
                         } else {
-                            view = $(that.options.item).attr('data-value', item.key);
-                            view.find('a').html(that.highlighter(item.key));
+                            view = $(this.options.item).attr('data-value', item.key);
+                            view.find('a').html(this.highlighter(secureItem));
                         }
 
                         return view[0];
@@ -139,7 +145,8 @@ define(function(require) {
                     items.first().addClass('active');
                     this.$menu.html(items);
                     return this;
-                }, click: function(e) {
+                },
+                click: function(e) {
                     e.stopPropagation();
                     e.preventDefault();
                     if (!this.$menu.find('.active').data('isDialog')) {
@@ -151,7 +158,7 @@ define(function(require) {
         },
 
         source: function(query, process) {
-            var self = this;
+            const self = this;
             if (_.isArray(this.sourceUrl)) {
                 process(this.sourceUrl);
                 this.render();
@@ -159,10 +166,10 @@ define(function(require) {
                 process(this.cache[query]);
                 this.render();
             } else {
-                var url = routing.generate(this.sourceUrl, {query: query});
-                $.get(url, _.bind(function(data) {
+                const url = routing.generate(this.sourceUrl, {query: query});
+                $.get(url, data => {
                     this.data = data;
-                    var result = [];
+                    const result = [];
                     _.each(data, function(item, key) {
                         result.push({
                             key: key,
@@ -172,23 +179,32 @@ define(function(require) {
                     this.cache[query] = result;
                     process(result);
                     self.render();
-                }, this));
+                });
             }
         },
 
         onChange: function() {
-            var $input = this.getTypeaheadInput();
-            var key = $input.val();
-            var dataItem;
-            $input.val('');
-            if (!_.isUndefined(this.data[key])) {
-                dataItem = this.data[key];
+            const $input = this.getTypeaheadInput();
+            const key = $input.val();
+            const dataItem = this.data[key];
+
+            if (dataItem !== void 0) {
+                $input.val('').inputWidget('refresh');
+
                 if (!dataItem.dialog) {
-                    $input.closest('form').attr('action', dataItem.url).submit();
+                    mediator.execute('redirectTo', {url: dataItem.url}, {redirect: true});
                 } else {
                     $input.parent().find('li.active > a').click();
                 }
             }
+        },
+
+        onFocus: function() {
+            this.getTypeaheadInput().typeahead('lookup');
+        },
+
+        onDropdownHide: function() {
+            this.getTypeaheadInput().val('').inputWidget('refresh');
         },
 
         stopPropagation: function(e) {

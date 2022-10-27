@@ -1,26 +1,25 @@
 define(function(require) {
     'use strict';
 
-    var EntityFieldsCollection;
-    var _ = require('underscore');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    const _ = require('underscore');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
 
-    EntityFieldsCollection = BaseCollection.extend({
+    const EntityFieldsCollection = BaseCollection.extend({
         /**
          * @type {EntityStructureDataProvider}
          */
         dataProvider: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EntityFieldsCollection() {
-            EntityFieldsCollection.__super__.constructor.apply(this, arguments);
+        constructor: function EntityFieldsCollection(...args) {
+            EntityFieldsCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             if (!options || !(options.dataProvider instanceof EntityStructureDataProvider)) {
@@ -31,7 +30,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _prepareModel: function(attrs, options) {
             options.dataProvider = this.dataProvider;
@@ -39,7 +38,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         clone: function() {
             return new this.constructor(this.models, {dataProvider: this.dataProvider});
@@ -63,7 +62,7 @@ define(function(require) {
          * @return {EntityFieldsCollection}
          */
         removeInvalidModels: function() {
-            var models = this.filter(function(model) {
+            const models = this.filter(function(model) {
                 return !model.isValid();
             });
             this.remove(models);

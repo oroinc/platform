@@ -1,0 +1,40 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
+    test_employee{1..2}:
+        name: 'Test Employee <current()>'
+        owner: '@business_unit'
+        organization: '@organization'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestBuyer:
+    test_buyer{1..2}:
+        name: 'Test Buyer <current()>'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+    test_department:
+        name: 'Test Department'
+        staff: ['@test_employee1', '@test_buyer1']
+        owner: '@business_unit'
+        organization: '@organization'
+
+Oro\Bundle\TestFrameworkBundle\Entity\TestProduct:
+    test_product:
+        name: 'Test Product'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget:
+    test_target{1..2}:
+        name: 'Target <current()>'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner:
+    test_owner1:
+        name: 'Owner 1'
+        target: '@test_target1'
+        targets: ['@test_target1', '@test_target2']
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestActivity:
+    test_activity:
+        name: 'Test Activity'
+        test_owner_655b996: ['@test_owner1']
+        test_target_67911c5: ['@test_target1']

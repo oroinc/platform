@@ -1,0 +1,17 @@
+<% if (obj.content) {
+    var renderedAttrs = '';
+    var attributes = ['dir', 'class'];
+
+    obj.dir = obj.dir ? obj.dir : 'ltr';
+    _.each(obj, function(value, key) {
+        if (attributes.indexOf(key) !== -1) {
+            var attr = key + '="' + _.escape(value) + '" ';
+
+            renderedAttrs = renderedAttrs + attr;
+        }
+    })
+
+    renderedAttrs = renderedAttrs.trim();
+    %>
+    <span <%= renderedAttrs %>><%- obj.content %></span>
+<% } %>

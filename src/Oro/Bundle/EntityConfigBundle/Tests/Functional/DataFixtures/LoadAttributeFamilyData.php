@@ -4,12 +4,11 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -42,9 +41,6 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
         ];
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $configManager = $this->container->get('oro_entity_config.config_manager');
@@ -53,7 +49,7 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
         foreach ($this->families as $familyName => $groups) {
             $family = new AttributeFamily();
             $family->setDefaultLabel($familyName);
-            $family->setOwner($this->getAdminUser($manager));
+            $family->setOwner($this->getOrganization($manager));
             $family->setCode($familyName);
             $family->setEntityClass($entityConfigModel->getClassName());
             foreach ($groups as $group) {
@@ -70,14 +66,8 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @return User
-     */
-    private function getAdminUser(ObjectManager $manager)
+    private function getOrganization(ObjectManager $manager): Organization
     {
-        $repository = $manager->getRepository(User::class);
-
-        return $repository->findOneBy(['email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL]);
+        return $manager->getRepository(Organization::class)->getFirst();
     }
 }

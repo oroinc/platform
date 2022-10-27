@@ -5,7 +5,8 @@ namespace Oro\Bundle\EmailBundle\Async\Manager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationsTopic;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
@@ -13,6 +14,9 @@ use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * Manages {@see Email} associations.
+ */
 class AssociationManager
 {
     const EMAIL_BUFFER_SIZE = 100;
@@ -36,13 +40,6 @@ class AssociationManager
     /** @var bool */
     protected $queued = true;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EmailActivityManager $emailActivityManager
-     * @param EmailOwnersProvider $emailOwnersProvider
-     * @param EmailManager $emailManager
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EmailActivityManager $emailActivityManager,
@@ -118,7 +115,7 @@ class AssociationManager
                     $ownerIds = array_map('current', $rows);
                     if ($this->queued) {
                         $this->producer->send(
-                            Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS,
+                            UpdateEmailOwnerAssociationsTopic::getName(),
                             [
                                 'ownerClass' => $emailOwnerClassName,
                                 'ownerIds' => $ownerIds,
@@ -165,11 +162,14 @@ class AssociationManager
                         $this->clear();
 
                         if ($this->queued) {
-                            $this->producer->send(Topics::ADD_ASSOCIATION_TO_EMAILS, [
-                                'emailIds' => $emailIds,
-                                'targetClass' => $ownerClassName,
-                                'targetId' => $owner->getId(),
-                            ]);
+                            $this->producer->send(
+                                AddEmailAssociationsTopic::getName(),
+                                [
+                                    'emailIds' => $emailIds,
+                                    'targetClass' => $ownerClassName,
+                                    'targetId' => $owner->getId(),
+                                ]
+                            );
                         } else {
                             $this->processAddAssociation($emailIds, $ownerClassName, $owner->getId());
                         }

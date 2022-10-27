@@ -2,17 +2,18 @@
 
 namespace Oro\Bundle\NotificationBundle\Doctrine;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * The storage of entities that is used to manage batch persist and flush operations.
+ */
 class EntityPool
 {
-    /**
-     * @var array
-     */
-    protected $persistEntities = array();
+    /** @var array */
+    private $persistEntities = [];
 
     /**
-     * Adds entity to persist.
+     * Adds an entity to the persist list.
      *
      * @param object $entity
      */
@@ -22,12 +23,13 @@ class EntityPool
     }
 
     /**
-     * Persist entities to entity manager. If there were entities to persist returns TRUE, otherwise returns FALSE.
+     * Persists entities and clear this pool
      *
-     * @param EntityManager $entityManager
-     * @return bool
+     * @param EntityManagerInterface $entityManager
+     *
+     * @return bool TRUE if there were entities to persist; otherwise returns FALSE.
      */
-    public function persistAndClear(EntityManager $entityManager)
+    public function persistAndClear(EntityManagerInterface $entityManager)
     {
         if (!$this->persistEntities) {
             return false;
@@ -37,25 +39,26 @@ class EntityPool
             $entityManager->persist($entity);
         }
 
-        $this->persistEntities = array();
+        $this->persistEntities = [];
 
         return true;
     }
 
     /**
-     * Persist entities. If has entities to persist then call flush them and returns TRUE, otherwise returns FALSE.
+     * Persists and flush entities.
      *
-     * @param EntityManager $entityManager
-     * @return bool
+     * @param EntityManagerInterface $entityManager
+     *
+     * @return bool TRUE if there were entities to persist and they were flushed; otherwise returns FALSE.
      */
-    public function persistAndFlush(EntityManager $entityManager)
+    public function persistAndFlush(EntityManagerInterface $entityManager)
     {
+        $flushed = false;
         if ($this->persistAndClear($entityManager)) {
             $entityManager->flush();
-
-            return true;
+            $flushed = true;
         }
 
-        return false;
+        return $flushed;
     }
 }

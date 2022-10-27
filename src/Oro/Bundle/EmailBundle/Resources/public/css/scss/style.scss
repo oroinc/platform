@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable selector-max-compound-selectors, max-nesting-depth, no-descending-specificity */
+
 .auto-response-rules {
     .select-all-header-cell__dropdown-menu .all-visible {
         display: none;
@@ -7,155 +9,86 @@
 }
 
 .auto-response-rule-header {
-    height: 28px;
     line-height: 28px;
 
     h5 {
         display: inline-block;
-        margin: 0;
     }
 }
 
 .ui-dialog [data-ftid='oro_email_autoresponserule'] {
+    width: 980px;
+
     .control-group {
-        max-width: none;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+
+        .control-label {
+            width: 130px;
+        }
+
+        .controls {
+            width: 100%;
+
+            > input[type='text'] {
+                width: 100%;
+            }
+
+            @include selector-width(100%, 100%);
+        }
     }
 
-    input[type='text'] {
-        width: 807px;
-    }
-
-    .form-horizontal .control-group .controls {
-        .new-entity {
-            .control-group:nth-of-type(2) {
-                .controls > div {
-                    display: inline-block;
-                    vertical-align: top;
-                }
-            }
-
-            .emailtemplate-translatation {
-                width: 360px;
-            }
-
-            .mce-tinymce {
-                width: 345px;
-            }
-
-            .emailtemplate-variables {
-                width: 435px;
-                margin-left: 26px;
-                margin-top: -52px;
-                position: absolute;
-            }
-        }
-
-        .dropdown {
-            input[type='text'] {
-                width: calc(100% - 270px);
-                float: right;
-                margin-right: 10px;
-            }
-
-            .dropdown-menu {
-                top: initial;
-            }
-        }
-
-        .condition-builder {
-            width: 821px;
-        }
-
-        .conditions-group {
-            min-height: 100px;
-
-            .select2-container {
-                width: auto;
-                min-width: 74px;
-                display: inline-block;
-                margin: 0;
-                line-height: 30px;
-            }
-        }
-
-        select {
-            max-width: none;
-            width: 809px;
-        }
-
+    .existing-entity {
         .select2-container {
-            max-width: none;
-            width: 819px;
+            width: 100%;
+            max-width: 100%;
         }
+    }
 
-        .condition {
-            margin-left: 0;
-        }
+    .new-entity {
+        margin-left: -154px;
+        margin-top: $content-padding-medium;
+        position: relative;
+    }
 
-        .create-select-entity-choice-container {
-            margin-left: -142px;
+    .emailtemplate-translatation {
+        width: 360px;
 
-            [data-ftid='oro_email_autoresponserule_template_new_entity'] > .control-group:nth-child(2) {
-                .control-label.wrap {
-                    width: 130px;
+        .oro-tabs__content {
+            margin-left: -154px;
 
-                    label {
-                        display: block;
-                    }
-                }
+            .tab-content {
+                padding-right: 0;
+                padding-bottom: 0;
             }
 
-            [data-ftid='oro_email_autoresponserule_template_new_entity'] > .control-group:nth-child(3) > .control-label.wrap {
-                width: 130px;
-            }
-
-            [data-ftid='oro_email_autoresponserule_template_new_entity'] > .control-group:last-of-type {
-                text-align: right;
-                margin-right: 460px;
-
-                .control-label.wrap {
-                    float: none;
-                    display: inline-block;
-                    margin-right: 0;
-                }
-
-                input {
+            .control-group {
+                &:first-child {
                     margin-top: 0;
                 }
 
-                .controls {
-                    margin: 0;
-                    display: inline-block;
+                &:last-child {
+                    margin-bottom: 0;
                 }
             }
         }
+    }
 
-        .emailtemplate-translatation {
-            .control-label {
-                width: 70px;
-            }
-
-            .controls {
-                margin-left: 85px;
-            }
-
-            .tab-content {
-                margin-left: -85px;
-                border-top: 1px solid #ddd;
-                margin-top: -1px;
-            }
-        }
+    .emailtemplate-variables {
+        width: 435px;
+        position: absolute;
+        top: 0;
+        right: 0;
     }
 }
 
 .emailtemplate-translatation {
     .tab-content {
-        padding: 20px 16px 10px 0;
         overflow-x: hidden;
 
-        .mce-tinymce {
-            width: 100%;
-            max-width: 542px;
+        .tox-tinymce {
+            max-width: 516px;
         }
 
         .tab-pane {
@@ -164,7 +97,7 @@
                 box-sizing: border-box;
             }
 
-            input {
+            input:not([type='checkbox']) {
                 height: 32px;
             }
         }
@@ -176,14 +109,13 @@
     margin-right: 10px;
     width: auto;
 
-    input[type="radio"] {
+    input[type='radio'] {
         margin: -2px 6px 0 0;
     }
 }
 
 .emailtemplate-variables {
     .tab-content {
-        padding-top: 12px;
         padding-bottom: 10px;
     }
 
@@ -192,8 +124,8 @@
         padding-left: 15px;
         padding-bottom: 10px;
 
-        & > li,
-        & > li.active {
+        > li,
+        > li.active {
             text-transform: none;
             font-size: 13px;
         }
@@ -205,14 +137,15 @@
         }
 
         .group-label {
-            font-weight: bold;
+            font-weight: font-weight('bold');
         }
 
         .nav {
-            padding-left: 15px;
-            padding-right: 15px;
+            display: block;
+            padding-left: $content-padding-medium;
+            padding-right: $content-padding-medium;
 
-            & > li > a {
+            > li > a {
                 display: inline-block;
                 padding: 3px 0;
             }
@@ -226,7 +159,7 @@
         padding: 0;
         margin: 0;
 
-        & > li {
+        > li {
             display: inline-block;
         }
     }
@@ -234,7 +167,7 @@
 
 .modal-body {
     .loading-content {
-        background: #fff url(../../img/loader.gif) no-repeat center left;
+        background: #fff url('#{$global-url}/oroemail/img/loader.gif') no-repeat center left;
         padding-left: 30px;
     }
 }
@@ -247,44 +180,88 @@
             display: none;
         }
 
-        .mce-tinymce {
-            width: calc(97% + 12px);
-        }
-
         .form-horizontal {
-            .control-group {
-                max-width: none;
+            width: 756px;
+            margin: auto;
 
+            .control-group {
                 .controls {
-                    .validation-failed {
-                        margin-left: 14px;
+                    // stylelint-disable-next-line selector-type-no-unknown
+                    #{map_get($oro-form-selectors, 'inputs')},
+                    textarea,
+                    .select2-container,
+                    .validate-group {
+                        width: 100%;
+                        max-width: 100%;
                     }
+
+                    textarea {
+                        height: 200px;
+                    }
+
+                    .choice-widget-expanded__item {
+                        display: inline-block;
+                        margin-bottom: 0;
+
+                        &:not(:last-child) {
+                            margin-right: 5px;
+                        }
+                    }
+
+                    .dropup {
+                        padding-right: 4px;
+
+                        .attachment-list-popup {
+                            width: 290px;
+                            margin-left: -70px;
+                        }
+                    }
+
+                    .divider {
+                        display: inline-block;
+
+                        &::before {
+                            content: '';
+                            display: inline-block;
+                            vertical-align: middle;
+                            padding-left: 6px;
+                            height: 16px;
+                            width: 1px;
+                            line-height: 1;
+                            border-left: 1px solid $primary-700;
+                        }
+                    }
+                }
+
+                > .control-label {
+                    width: 96px;
                 }
             }
         }
 
-        input[type=radio] {
-            width: auto;
+        .control-group-collection {
+            margin-bottom: 16px;
         }
-    }
-
-    pre.email-body,
-    iframe.email-body,
-    .email-form textarea {
-        height: 200px;
     }
 }
 
-.select2-container.select2-container-multi.taggable-email {
-    ul.select2-choices {
-        padding-right: 60px;
+.taggable-field {
+    .select2-container.select2-container-multi.taggable-email {
+        ul.select2-choices {
+            padding-right: 70px;
+        }
     }
 }
 
 .cc-bcc-holder {
     position: absolute;
-    top: 5px;
-    right: 0;
+    top: 0;
+    bottom: 0;
+    right: $content-padding-small;
+    line-height: 18px;
+    height: 28px;
+    margin: 4px auto 0;
+    padding: 5px 0;
 
     .showCc,
     .showBcc {
@@ -297,13 +274,6 @@
     }
 }
 
-.icon-email-thread {
-    background: url(../../img/icon-email-thread.png);
-    width: 21px;
-    height: 18px;
-    display: inline-block;
-}
-
 .icon.grid {
     display: inline-block;
 
@@ -314,146 +284,147 @@ span.icon.grid .fa-paperclip {
     font-size: 21px;
 }
 
-.thread-view {
-    .email-load-more {
-        border-bottom: 1px solid #e5e5e5;
-
-        @include load-more-items(#e5e5e5, #f5f5f5, #888);
-
-        &.process {
-            .load-more-label {
-                @include process('../../../oroui/img/loader-16.gif');
-
-                &:after {
-                    background-color: #f5f5f5;
-                    background-position: center center;
-                    padding-left: 10px;
-                }
-            }
-        }
-    }
-}
-
 .email-thread-action-panel {
     .email-view-toggle-all {
-        color: #888;
+        color: $primary-550;
         text-decoration: underline;
 
         &:hover {
-            color: #777;
+            color: $primary-500;
         }
     }
 }
 
 .email-info {
-    border-bottom: 1px solid #e5e5e5;
+    .email-header {
+        padding: $email-header-offset;
 
-    &:last-child {
-        border-bottom: none;
+        @include clearfix();
     }
 
     .email-recipient {
         white-space: nowrap;
     }
 
-    .email-participants {
-        margin-right: 150px;
+    .email-actions {
+        float: right;
+
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+
+        color: $email-actions-color;
     }
 
-    .email-sent-date {
-        display: inline-block;
-        float: #{$end};
-        padding: 5px 18px;
-
-        text-align: #{$end};
-
-        color: $primary-550;
+    .email-contexts-targets {
+        float: left;
+        padding-right: $email-actions-offset;
     }
 
     .comment-count {
-        margin-right: 5px;
+        margin-right: $email-comment-count-offset;
+
+        @include fa-icon($email-comment-count-icon);
     }
 
     .email-has-attachment {
-        font-size: 1.3em;
-        margin-right: .5em;
+        margin-right: $email-attachmen-offset;
+
+        @include fa-icon($email-attachment-icon);
     }
 
     .email-content {
-        padding: 0 15px 10px;
-        margin: 0;
+        @include clearfix();
     }
 
     .email-view-toggle {
         cursor: pointer;
-        display: inline-block;
-        padding: 10px 15px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    &:only-child {
-        .email-view-toggle {
-            padding: 0 0 10px;
-        }
-
-        .email-content {
-            padding: 0 0 10px;
-        }
+        padding: $email-view-toggle-offset;
     }
 
     .email-recipients {
-        color: #888;
+        color: $email-recipients-color;
     }
 
     .email-short {
-        background-color: #f5f5f5;
+        padding: $email-short-padding;
 
-        .email-recipients {
-            font-style: italic;
+        background-color: $email-short-background-color;
+        border-bottom: $email-short-border;
+        color: $email-short-color;
+
+        .email-sent-date {
+            margin-bottom: $email-short-sent-date-margin;
+
+            @include clearfix();
+        }
+
+        .email-author {
+            font-weight: $email-short-author-font-weight;
+
+            color: $email-short-author-color;
+        }
+
+        .comment-date {
+            float: right;
+
+            font-size: $email-short-comment-date-font-size;
         }
 
         .email-body {
-            color: #888;
-            margin: 2px 150px 0 0;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-
-            &:after {
-                content: '\2026';
-            }
-        }
-
-        .email-sent-date {
-            padding: 11px 0;
-            color: #888;
-            font-style: normal;
+            @include text-line-truncate();
         }
     }
 
     .email-full {
         display: none;
 
-        .email-author {
-            font-weight: bold;
-        }
+        @include clearfix();
 
-        .email-view-toggle {
-            padding-bottom: 9px;
+        .email-author {
+            font-weight: font-weight('bold');
         }
 
         .email-body {
-            & > iframe {
+            > iframe {
                 border: 0;
                 width: 100%;
                 height: 0;
                 overflow: auto;
             }
         }
+
+        .email-sent-date {
+            padding-right: $email-sent-date-offset;
+        }
+    }
+
+    // first short email
+    &:first-child:not(.in) {
+        padding-top: $email-info-short-first-offset;
+    }
+
+    // next full email after short email or load-more button
+    & + &.in {
+        padding-top: $email-info-opened-first-offset;
+    }
+
+    // next full email after load-more button
+    @at-root .load-more + .email-info.in {
+        padding-top: $email-info-opened-first-offset;
     }
 
     &.in {
+        padding-bottom: $email-info-in-offset;
+
+        @at-root .list-item:last-child .email-info.in:last-child {
+            padding-bottom: 0;
+        }
+
+        &:not(:only-child):not(:last-child) {
+            border-bottom: 1px solid $email-info-in-border-color;
+        }
+
         .email-short {
             display: none;
         }
@@ -497,7 +468,8 @@ span.icon.grid .fa-paperclip {
                     margin-right: 10px;
 
                     .email-attachments-file {
-                        display: none; // hide thumbnails on mobile
+                        // hide thumbnails on mobile
+                        display: none;
                     }
                 }
 
@@ -506,13 +478,14 @@ span.icon.grid .fa-paperclip {
                     height: 80px;
                     padding: 0;
                     text-align: center;
-                    background: #eee;
+                    background: $primary-830;
                     border-radius: 6px;
                     border: none;
+                    display: block;
 
                     .fa {
                         padding-top: 20px;
-                        color: #fff;
+                        color: $primary-inverse;
                     }
                 }
 
@@ -529,7 +502,7 @@ span.icon.grid .fa-paperclip {
                         }
 
                         &:focus {
-                            font-weight: normal;
+                            font-weight: font-weight('light');
                         }
                     }
 
@@ -542,12 +515,12 @@ span.icon.grid .fa-paperclip {
 
                             span {
                                 margin-left: 7px;
-                                color: #777;
+                                color: $primary-500;
                             }
 
                             &:hover {
                                 span {
-                                    color: #777;
+                                    color: $primary-500;
                                 }
                             }
                         }
@@ -564,7 +537,7 @@ span.icon.grid .fa-paperclip {
                     }
 
                     .fa {
-                        color: #444;
+                        color: $additional-lighten;
                         font-size: 15px;
                         margin-right: 1px;
                         margin-left: 0;
@@ -597,215 +570,22 @@ span.icon.grid .fa-paperclip {
     .email-prev-body {
         margin-left: 10px;
         padding-left: 10px;
-        border-left: 1px solid #000;
-    }
-}
-
-.responsive-section {
-    .email-content {
-        .responsive-cell {
-            padding-left: 0;
-            padding-right: 15px;
-            margin-bottom: 0 !important; /* overrides activity list widget styles */
-        }
-
-        .responsive-cell:only-child,
-        .responsive-cell:last-child {
-            padding-right: 0;
-        }
-    }
-
-    &.responsive-small {
-        .responsive-cell {
-            padding-right: 0;
-        }
-    }
-
-    &.responsive-small {
-        .email-content {
-            .responsive-cell:not(:last-child) {
-                margin-bottom: 20px !important; /* overrides activity list widget styles */
-            }
-        }
-    }
-}
-
-.accordion-body .email-info {
-    &:last-child .email-content {
-        padding-bottom: 0;
-    }
-}
-
-.email-detailed-info-table {
-    display: inline-block;
-
-    .dropdown-toggle {
-        cursor: pointer;
-        font-size: 14px;
-        color: #b3b3b3;
-        padding: 0 3px;
-
-        &:hover {
-            color: #888;
-        }
-    }
-
-    .dropdown-menu {
-        padding: 8px 10px 2px 0;
-        margin-left: -16px;
-        margin-top: 3px;
-
-        &:before {
-            content: '';
-            display: inline-block;
-            border-left: 7px solid transparent;
-            border-right: 7px solid transparent;
-            border-bottom: 7px solid #ccc;
-            border-bottom-color: rgba(0, 0, 0, .2);
-            position: absolute;
-            top: -7px;
-            left: 19px;
-        }
-
-        &:after {
-            content: '';
-            display: inline-block;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-bottom: 6px solid #fff;
-            position: absolute;
-            top: -6px;
-            left: 20px;
-        }
-
-        &.fixed-width .controls {
-            white-space: normal;
-        }
-
-        ul {
-            margin: 0;
-            list-style: none;
-        }
-
-        .form-horizontal .control-group {
-            margin-bottom: 0;
-
-            label.control-label {
-                width: 70px;
-            }
-
-            .controls {
-                margin-left: 80px;
-            }
-        }
-    }
-
-    .control-group {
-        label.control-label,
-        .controls {
-            color: #777;
-            margin-bottom: 5px;
-            padding-top: .3px;
-            line-height: 1.4em;
-            white-space: nowrap;
-
-            b {
-                color: #444;
-            }
-        }
-
-        label.control-label {
-            width: 70px;
-        }
-
-        .controls {
-            margin-left: 80px;
-        }
+        border-left: 1px solid $primary;
     }
 }
 
 .forged-required label em {
-    color: #c30b25;
+    color: $danger-darken;
     font-size: 15px;
     line-height: 1px;
 }
 
-.attachment-item {
-    display: inline-block;
-    position: relative;
-    margin-right: 16px;
-
-    span.filename-label {
-        color: #006acc;
-    }
-
-    i.fa-close {
-        cursor: pointer;
-        opacity: .2;
-    }
-
-    input {
-        opacity: 0;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: 0 !important;
-        height: 0 !important;
-        border: none;
-        z-index: -1;
-    }
-}
-
 a.attachment .icon .fa-link {
-    color: #999;
+    color: $primary-600;
 }
 
 .control-group .email-body-action {
-    margin-right: 15px;
-}
-
-.dropdown.link-to-record {
-    display: inline-block;
-    padding-right: 4px;
-
-    .dropdown-menu {
-        margin-top: 5px;
-        line-height: 24px;
-        text-align: center;
-
-        a {
-            padding-right: 7px;
-        }
-    }
-
-    .dropdown-menu.one {
-        min-width: 100px;
-    }
-
-    .dropdown-menu:after {
-        border-bottom: 6px solid #fff;
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        content: "";
-        display: inline-block;
-        left: 10px;
-        position: absolute;
-        top: -6px;
-    }
-
-    .dropdown-menu:before {
-        content: '';
-        display: inline-block;
-        border-left: 7px solid transparent;
-        border-right: 7px solid transparent;
-        border-bottom: 7px solid #ccc;
-        border-bottom-color: rgba(0, 0, 0, .2);
-        position: absolute;
-        top: -7px;
-        left: 9px;
-    }
+    margin-right: $content-padding-medium;
 }
 
 .attachment-list-popup {
@@ -818,11 +598,13 @@ a.attachment .icon .fa-link {
 }
 
 .email-body-actions .attach-file {
-    font-weight: normal !important;
+    &::after {
+        display: none;
+    }
 }
 
 .attachment-list-popup .attachment-list-content {
-    padding: 10px 10px 0 10px;
+    padding: 10px 10px 0;
 }
 
 .attachment-list-popup .attachment-actions {
@@ -830,8 +612,8 @@ a.attachment .icon .fa-link {
     margin-top: 6px;
     margin-bottom: -5px;
     padding: 10px;
-    background-color: rgb(250, 250, 250);
-    border-top: 1px solid rgb(229, 229, 229);
+    background-color: $primary-inverse;
+    border-top: 1px solid $primary-800;
 }
 
 .attachment-list-popup .attachment-actions .pull-left {
@@ -865,21 +647,21 @@ a.attachment .icon .fa-link {
 .attachment-list-popup .attachment-list-row input.checkbox {
     display: inline-block;
     width: 14px;
-    margin: -1px 0 0 0;
+    margin: -1px 0 0;
 }
 
 .attachment-list-popup .attachment-list-row span {
     padding-top: 1px;
 }
 
-.email-row-is-readed {
-    background-color: #f5f5f5;
+.email-row-is-read {
+    background-color: $primary-860;
 }
 
 .email-mail-count-circle {
     display: inline;
-    background-color: #f80;
-    color: #fff;
+    background-color: $danger-light;
+    color: $primary-inverse;
     border-radius: 6px;
     padding: 1px 4px;
     vertical-align: top;
@@ -888,11 +670,11 @@ a.attachment .icon .fa-link {
 
 .oro-email-user-emails .email-count {
     margin-left: 4px;
-    color: #f80;
+    color: $danger-light;
 }
 
 .has-new-emails .fa-user-circle {
-    color: #f80;
+    color: $danger-light;
 }
 
 a.sync-btn span.dots {
@@ -909,7 +691,7 @@ a.sync-btn span.dots {
             padding-left: 5px;
 
             a {
-                color: rgb(68, 68, 68);
+                color: $additional-lighten;
                 font-size: 13px;
             }
         }
@@ -917,10 +699,6 @@ a.sync-btn span.dots {
 }
 
 .folder-tree {
-    .folder-tree-widget {
-        margin-top: 5px;
-    }
-
     .folder-label {
         margin-left: 5px;
     }
@@ -930,11 +708,13 @@ a.sync-btn span.dots {
     }
 
     .folder-tree-widget {
+        margin-top: 5px;
+
         .folder-list {
             margin-left: 20px;
         }
 
-        input[type="checkbox"] {
+        input[type='checkbox'] {
             margin: 0;
         }
     }
@@ -959,7 +739,7 @@ a.sync-btn span.dots {
     .email-body {
         display: inline;
 
-        &:before {
+        &::before {
             content: '-';
             display: inline;
             margin-right: 4px;

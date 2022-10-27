@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\BigNumber;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Provides a set of reusable utility methods for "big numbers" dashboard widgets
@@ -14,7 +15,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
  */
 class BigNumberDateHelper
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /** @var AclHelper */
@@ -23,12 +24,7 @@ class BigNumberDateHelper
     /** @var LocaleSettings */
     protected $localeSettings;
 
-    /**
-     * @param RegistryInterface $doctrine
-     * @param AclHelper         $aclHelper
-     * @param LocaleSettings    $localeSettings
-     */
-    public function __construct(RegistryInterface $doctrine, AclHelper $aclHelper, LocaleSettings $localeSettings)
+    public function __construct(ManagerRegistry $doctrine, AclHelper $aclHelper, LocaleSettings $localeSettings)
     {
         $this->doctrine       = $doctrine;
         $this->aclHelper      = $aclHelper;
@@ -49,6 +45,7 @@ class BigNumberDateHelper
         if ((isset($dateRange['type']) && $dateRange['type'] === AbstractDateFilterType::TYPE_LESS_THAN)
             || (isset($dateRange['part']) && $dateRange['part'] === DateModifierInterface::PART_ALL_TIME)
         ) {
+            QueryBuilderUtil::checkIdentifier($field);
             $qb    = $this->doctrine
                 ->getRepository($entity)
                 ->createQueryBuilder('e')

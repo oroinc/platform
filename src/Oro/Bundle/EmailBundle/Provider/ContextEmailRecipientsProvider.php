@@ -3,16 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
-use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 
+/**
+ * Provider for email recipient list based on related entity.
+ */
 class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
-    /** @var RelatedEmailsProvider */
-    protected $relatedEmailsProvider;
+    private RelatedEmailsProvider $relatedEmailsProvider;
 
-    /**
-     * @param RelatedEmailsProvider $relatedEmailsProvider
-     */
     public function __construct(RelatedEmailsProvider $relatedEmailsProvider)
     {
         $this->relatedEmailsProvider = $relatedEmailsProvider;
@@ -36,7 +34,7 @@ class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getSection()
+    public function getSection(): string
     {
         return 'oro.email.autocomplete.contexts';
     }

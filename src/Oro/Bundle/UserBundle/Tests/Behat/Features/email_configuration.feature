@@ -1,5 +1,5 @@
 @ticket-BAP-16638
-@ticket BAP-17154
+@ticket-BAP-17154
 
 Feature: Email configuration
   In order to have ability to change Email configuration

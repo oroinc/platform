@@ -1,7 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
+namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use Oro\Bundle\ImapBundle\Connector\ImapConnector;
+use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFlagManager;
 
 class ImapEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
@@ -13,24 +18,16 @@ class ImapEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
     private $connector;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $repoImapEmail;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->connector = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapConnector')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->em = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\OroEntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->repoImapEmail = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->connector = $this->createMock(ImapConnector::class);
+        $this->em = $this->createMock(OroEntityManager::class);
+        $this->repoImapEmail = $this->createMock(ImapEmailRepository::class);
 
         $this->manager = new ImapEmailFlagManager($this->connector, $this->em);
     }
@@ -43,27 +40,26 @@ class ImapEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->repoImapEmail->expects($this->once())
             ->method('getUid')
-            ->will($this->returnValue(1))
+            ->willReturn(1)
             ->with($folderId, $emailId);
 
         $this->em->expects($this->once())
-            ->method('getRepository')->willReturn($this->repoImapEmail);
+            ->method('getRepository')
+            ->willReturn($this->repoImapEmail);
 
         $this->connector->expects($this->once())
             ->method('setFlags')
             ->with(1, $flags);
 
-        $emailFolder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailFolder = $this->createMock(EmailFolder::class);
         $emailFolder->expects($this->once())
-            ->method('getId')->will($this->returnValue($folderId));
+            ->method('getId')
+            ->willReturn($folderId);
 
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $email = $this->createMock(Email::class);
         $email->expects($this->once())
-            ->method('getId')->will($this->returnValue($emailId));
+            ->method('getId')
+            ->willReturn($emailId);
 
         $this->manager->setFlags($emailFolder, $email, $flags);
     }
@@ -76,27 +72,26 @@ class ImapEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->repoImapEmail->expects($this->once())
             ->method('getUid')
-            ->will($this->returnValue(1))
+            ->willReturn(1)
             ->with($folderId, $emailId);
 
         $this->em->expects($this->once())
-            ->method('getRepository')->willReturn($this->repoImapEmail);
+            ->method('getRepository')
+            ->willReturn($this->repoImapEmail);
 
         $this->connector->expects($this->once())
             ->method('setFlags')
             ->with(1, $flags);
 
-        $emailFolder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailFolder = $this->createMock(EmailFolder::class);
         $emailFolder->expects($this->once())
-            ->method('getId')->will($this->returnValue($folderId));
+            ->method('getId')
+            ->willReturn($folderId);
 
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $email = $this->createMock(Email::class);
         $email->expects($this->once())
-            ->method('getId')->will($this->returnValue($emailId));
+            ->method('getId')
+            ->willReturn($emailId);
 
         $this->manager->setSeen($emailFolder, $email);
     }
@@ -109,27 +104,26 @@ class ImapEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->repoImapEmail->expects($this->once())
             ->method('getUid')
-            ->will($this->returnValue(1))
+            ->willReturn(1)
             ->with($folderId, $emailId);
 
         $this->em->expects($this->once())
-            ->method('getRepository')->willReturn($this->repoImapEmail);
+            ->method('getRepository')
+            ->willReturn($this->repoImapEmail);
 
         $this->connector->expects($this->once())
             ->method('setFlags')
             ->with(1, $flags);
 
-        $emailFolder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailFolder = $this->createMock(EmailFolder::class);
         $emailFolder->expects($this->once())
-            ->method('getId')->will($this->returnValue($folderId));
+            ->method('getId')
+            ->willReturn($folderId);
 
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $email = $this->createMock(Email::class);
         $email->expects($this->once())
-            ->method('getId')->will($this->returnValue($emailId));
+            ->method('getId')
+            ->willReturn($emailId);
 
         $this->manager->setUnseen($emailFolder, $email);
     }

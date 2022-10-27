@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EntityBundle\EntityProperty;
 
-use JMS\Serializer\Annotation as Serializer;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-
+/**
+ * Add update date support to entities
+ */
 trait UpdatedAtAwareTrait
 {
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
+     * @Doctrine\ORM\Mapping\Column(name="updated_at", type="datetime")
+     * @Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField(
      *      defaultValues={
      *          "entity"={
      *              "label"="oro.ui.updated_at"
@@ -23,7 +23,6 @@ trait UpdatedAtAwareTrait
 
     /**
      * @var bool
-     * @Serializer\Type("boolean")
      */
     protected $updatedAtSet;
 

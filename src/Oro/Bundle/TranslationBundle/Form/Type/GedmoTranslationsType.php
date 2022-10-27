@@ -14,7 +14,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Regroups by locales, all translations fields (gedmo)
- *
  */
 class GedmoTranslationsType extends AbstractType
 {
@@ -103,10 +102,8 @@ class GedmoTranslationsType extends AbstractType
             'fields' => [],
             'translatable_class' => null,
             // inherit_data is needed only if there is no persist of default locale
-            // and default locale is required to display
             'inherit_data' => function (Options $options) use ($translatableListener) {
-                return (!$translatableListener->getPersistDefaultLocaleTranslation()
-                    && (in_array($translatableListener->getDefaultLocale(), $options['locales'])));
+                return !$translatableListener->getPersistDefaultLocaleTranslation();
             },
         ]);
     }

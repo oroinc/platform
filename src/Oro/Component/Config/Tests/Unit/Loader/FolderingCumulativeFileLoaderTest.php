@@ -8,12 +8,11 @@ use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
-use Oro\Component\Config\Tests\Unit\Fixtures\CopyFixturesToTemp;
+use Oro\Component\Testing\TempDirExtension;
 
 class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CopyFixturesToTemp */
-    private $copier;
+    use TempDirExtension;
 
     /** @var string */
     private $bundleDir;
@@ -21,21 +20,20 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $target = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'test_data';
-        $source = realpath(__DIR__ . '/../Fixtures');
-        $this->copier = new CopyFixturesToTemp($target, $source);
-        $this->copier->copy();
-        $this->bundleDir = $target . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';
+        $tmpDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../Fixtures'));
+        $this->bundleDir = $tmpDir . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $path
+     *
+     * @return string
      */
-    protected function tearDown()
+    private function getPath($path)
     {
-        $this->copier->delete();
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
     public function testLoad()
@@ -59,15 +57,15 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
             }
         );
         self::assertEquals(
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/another non word/test.yml'),
+            $this->getPath($bundleDir . '/Resources/config/another non word/test.yml'),
             $result[0]->path
         );
         self::assertEquals(
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/bar/test.yml'),
+            $this->getPath($bundleDir . '/Resources/config/bar/test.yml'),
             $result[1]->path
         );
         self::assertEquals(
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/foo/test.yml'),
+            $this->getPath($bundleDir . '/Resources/config/foo/test.yml'),
             $result[2]->path
         );
     }
@@ -86,9 +84,9 @@ class FolderingCumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         sort($found);
         self::assertEquals(
             [
-                str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/another non word/test.yml'),
-                str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/bar/test.yml'),
-                str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/Resources/config/foo/test.yml')
+                $this->getPath($bundleDir . '/Resources/config/another non word/test.yml'),
+                $this->getPath($bundleDir . '/Resources/config/bar/test.yml'),
+                $this->getPath($bundleDir . '/Resources/config/foo/test.yml')
             ],
             $found
         );

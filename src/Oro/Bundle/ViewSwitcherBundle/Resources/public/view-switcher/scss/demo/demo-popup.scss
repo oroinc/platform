@@ -1,0 +1,145 @@
+/* @theme: view-switcher; */
+
+.demo-popup {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    min-width: $body-min-width;
+
+    transform: translateY(100%);
+    transition: transform 1s ease-out;
+
+    &.shown {
+        transform: translateY(0);
+    }
+
+    &__content {
+        display: flex;
+        flex-wrap: wrap;
+
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+
+        background-color: $demo-popup-color-dark;
+    }
+
+    &__col {
+        padding-left: 24px;
+        padding-right: 24px;
+
+        &:nth-child(2) {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+    }
+
+    &__title {
+        font-size: 24px;
+        line-height: 1.125;
+        color: $demo-popup-color-primary;
+    }
+
+    &__text {
+        display: inline-block;
+        max-width: 350px;
+
+        line-height: 1.29;
+        text-align: center;
+        color: $demo-popup-color-secondary;
+    }
+
+    &__btn {
+        display: inline-block;
+        padding: 12px 16px;
+
+        font-size: 13px;
+        text-transform: uppercase;
+        line-height: 1.15;
+        color: $demo-popup-color-dark;
+
+        background-color: $demo-popup-color-primary;
+        border-radius: 5px;
+
+        @include hover-focus() {
+            background-color: $white;
+        }
+    }
+
+    &__link {
+        display: flex;
+        flex-wrap: wrap;
+        flex-grow: 1;
+        justify-content: center;
+        align-items: center;
+        padding-top: 16px;
+        padding-bottom: 16px;
+        padding-left: 52px;
+
+        text-decoration: none;
+    }
+
+    &__link,
+    &__close {
+        @include hover() {
+            background-color: $demo-popup-color-gray-300;
+        }
+
+        @include hover-focus-active() {
+            outline: none;
+        }
+    }
+
+    &__close {
+        width: 52px;
+        padding: 0;
+
+        background-color: $demo-popup-color-dark;
+        border-width: 0;
+
+        cursor: pointer;
+
+        @include fa-icon($fa-var-times, before, true) {
+            font-size: 16px;
+
+            color: $demo-popup-color-gray-100;
+        }
+    }
+}
+
+@include media-breakpoint-down(md) {
+    .demo-popup {
+        &__col {
+            &:nth-child(2) {
+                display: none;
+            }
+        }
+    }
+}
+
+@include media-breakpoint-down(sm) {
+    .demo-popup {
+        &__col {
+            padding-right: 22px;
+            padding-left: 22px;
+
+            &:nth-child(2) {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+        }
+    }
+}
+
+@include media-breakpoint-down(xs) {
+    .demo-popup {
+        &__col {
+            padding: 6px 0;
+        }
+
+        &__link {
+            flex-direction: column;
+        }
+    }
+}

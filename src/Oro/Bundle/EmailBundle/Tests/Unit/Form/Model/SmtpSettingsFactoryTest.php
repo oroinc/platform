@@ -4,37 +4,38 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Model;
 
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testWithoutRequestValues()
+    public function testWithoutRequestValues(): void
     {
         $smtpSettings = new SmtpSettings();
 
-        $this->assertEquals($smtpSettings, SmtpSettingsFactory::createFromRequest(new Request()));
+        self::assertEquals($smtpSettings, SmtpSettingsFactory::createFromRequest(new Request()));
     }
 
     /**
      * @dataProvider validParametersDataProvider
-     *
-     * @param string $uri
-     * @param string $method
-     * @param array  $parameters
      */
-    public function testWithValidRequestValues($uri, $method, $parameters)
+    public function testWithValidRequestValues(string $uri, string $method, array $parameters): void
     {
         $request = Request::create($uri, $method, $parameters);
 
         $smtpSettings = new SmtpSettings();
         $factorySmtpSettings = SmtpSettingsFactory::createFromRequest($request);
 
-        $this->assertNotSame($smtpSettings->getHost(), $factorySmtpSettings->getHost());
-        $this->assertNotSame($smtpSettings->getPort(), $factorySmtpSettings->getPort());
-        $this->assertNotSame($smtpSettings->getEncryption(), $factorySmtpSettings->getEncryption());
-        $this->assertNotSame($smtpSettings->getUsername(), $factorySmtpSettings->getUsername());
-        $this->assertNotSame($smtpSettings->getPassword(), $factorySmtpSettings->getPassword());
-        $this->assertTrue($factorySmtpSettings->isEligible());
+        self::assertNotSame($smtpSettings->getHost(), $factorySmtpSettings->getHost());
+        self::assertNotSame($smtpSettings->getPort(), $factorySmtpSettings->getPort());
+        self::assertNotSame($smtpSettings->getEncryption(), $factorySmtpSettings->getEncryption());
+        self::assertNotSame($smtpSettings->getUsername(), $factorySmtpSettings->getUsername());
+        self::assertNotSame($smtpSettings->getPassword(), $factorySmtpSettings->getPassword());
+        self::assertTrue($factorySmtpSettings->isEligible());
     }
 
     /**
@@ -44,19 +45,19 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
      * @param string $method
      * @param array  $parameters
      */
-    public function testWithPartialValidRequestValues($uri, $method, $parameters)
+    public function testWithPartialValidRequestValues(string $uri, string $method, array $parameters): void
     {
         $request = Request::create($uri, $method, $parameters);
 
         $smtpSettings = new SmtpSettings();
         $factorySmtpSettings = SmtpSettingsFactory::createFromRequest($request);
 
-        $this->assertNotSame($smtpSettings->getHost(), $factorySmtpSettings->getHost());
-        $this->assertNotSame($smtpSettings->getPort(), $factorySmtpSettings->getPort());
-        $this->assertNotSame($smtpSettings->getEncryption(), $factorySmtpSettings->getEncryption());
-        $this->assertSame($smtpSettings->getUsername(), $factorySmtpSettings->getUsername());
-        $this->assertSame($smtpSettings->getPassword(), $factorySmtpSettings->getPassword());
-        $this->assertTrue($factorySmtpSettings->isEligible());
+        self::assertNotSame($smtpSettings->getHost(), $factorySmtpSettings->getHost());
+        self::assertNotSame($smtpSettings->getPort(), $factorySmtpSettings->getPort());
+        self::assertNotSame($smtpSettings->getEncryption(), $factorySmtpSettings->getEncryption());
+        self::assertSame($smtpSettings->getUsername(), $factorySmtpSettings->getUsername());
+        self::assertSame($smtpSettings->getPassword(), $factorySmtpSettings->getPassword());
+        self::assertTrue($factorySmtpSettings->isEligible());
     }
 
     /**
@@ -66,15 +67,15 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
      * @param string $method
      * @param array  $parameters
      */
-    public function testWithInvalidRequestValues($uri, $method, $parameters)
+    public function testWithInvalidRequestValues(string $uri, string $method, array $parameters): void
     {
         $request = Request::create($uri, $method, $parameters);
         $factorySmtpSettings = SmtpSettingsFactory::createFromRequest($request);
 
-        $this->assertFalse($factorySmtpSettings->isEligible());
+        self::assertFalse($factorySmtpSettings->isEligible());
     }
 
-    public function validParametersDataProvider()
+    public function validParametersDataProvider(): array
     {
         return [
             [
@@ -102,7 +103,7 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function partialParametersDataProvider()
+    public function partialParametersDataProvider(): array
     {
         return [
             [
@@ -126,7 +127,7 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function invalidParametersDataProvider()
+    public function invalidParametersDataProvider(): array
     {
         return [
             [
@@ -148,5 +149,65 @@ class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
+    }
+
+    public function testCreateFromUserEmailOriginWithEmptyUserEmailOrigin(): void
+    {
+        $encryptor = $this->createMock(SymmetricCrypterInterface::class);
+        $smtpSettingsFactory = new SmtpSettingsFactory($encryptor);
+        $smtpSettings = $smtpSettingsFactory->createFromUserEmailOrigin(new UserEmailOrigin());
+
+        self::assertEquals(new SmtpSettings(), $smtpSettings);
+    }
+
+    public function testCreateFromUserEmailOrigin(): void
+    {
+        $userEmailOrigin = new UserEmailOrigin();
+        $userEmailOrigin->setSmtpHost('smtp.host');
+        $userEmailOrigin->setSmtpPort(123);
+        $userEmailOrigin->setSmtpEncryption('ssl');
+        $userEmailOrigin->setUser('user');
+        $userEmailOrigin->setPassword('encrypted_password');
+
+        $encryptor = $this->createMock(SymmetricCrypterInterface::class);
+        $encryptor->expects(self::once())
+            ->method('decryptData')
+            ->with($userEmailOrigin->getPassword())
+            ->willReturn('decrypted_password');
+
+        $smtpSettingsFactory = new SmtpSettingsFactory($encryptor);
+
+        $smtpSettings = $smtpSettingsFactory->createFromUserEmailOrigin($userEmailOrigin);
+        $expectedSmtpSettings = new SmtpSettings('smtp.host', 123, 'ssl', 'user', 'decrypted_password');
+
+        self::assertEquals($expectedSmtpSettings, $smtpSettings);
+    }
+
+    public function testCreateFromEmptyArray(): void
+    {
+        $encryptor = $this->createMock(SymmetricCrypterInterface::class);
+        $smtpSettingsFactory = new SmtpSettingsFactory($encryptor);
+        $smtpSettings = $smtpSettingsFactory->createFromArray([]);
+
+        self::assertEquals(new SmtpSettings(), $smtpSettings);
+    }
+
+    public function testCreateFromArray(): void
+    {
+        $encryptor = $this->createMock(SymmetricCrypterInterface::class);
+
+        $data = [
+            'smtp.host',
+            123,
+            'ssl',
+            'user',
+            'decrypted_password'
+        ];
+
+        $smtpSettingsFactory = new SmtpSettingsFactory($encryptor);
+        $smtpSettings = $smtpSettingsFactory->createFromArray($data);
+        $expectedSmtpSettings = new SmtpSettings('smtp.host', 123, 'ssl', 'user', 'decrypted_password');
+
+        self::assertEquals($expectedSmtpSettings, $smtpSettings);
     }
 }

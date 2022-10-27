@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Event;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class EntityDataEvent extends Event
 {
@@ -12,9 +12,6 @@ class EntityDataEvent extends Event
      */
     protected $entityData;
 
-    /**
-     * @param EntityData $entityData
-     */
     public function __construct(EntityData $entityData)
     {
         $this->entityData = $entityData;

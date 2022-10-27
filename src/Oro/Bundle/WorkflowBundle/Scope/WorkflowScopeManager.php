@@ -4,15 +4,18 @@ namespace Oro\Bundle\WorkflowBundle\Scope;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowScopeConfigurationException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Manages workflow related scopes.
+ */
 class WorkflowScopeManager
 {
     const SCOPE_TYPE = 'workflow_definition';
@@ -26,11 +29,6 @@ class WorkflowScopeManager
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param ScopeManager $scopeManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(ManagerRegistry $registry, ScopeManager $scopeManager, LoggerInterface $logger)
     {
         $this->registry = $registry;
@@ -64,7 +62,7 @@ class WorkflowScopeManager
             throw $e;
         }
 
-        /** @var Scope[] $scopes */
+        /** @var ArrayCollection|Scope[] $scopes */
         $scopes = new ArrayCollection();
         foreach ($contexts as $context) {
             $scopes->add($this->scopeManager->findOrCreate(self::SCOPE_TYPE, $context));

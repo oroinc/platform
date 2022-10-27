@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
@@ -12,40 +11,26 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
 class TranslationRepositoryTest extends WebTestCase
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var TranslationRepository */
-    protected $repository;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-
         $this->loadFixtures([LoadTranslations::class, LoadLanguages::class]);
+    }
 
-        $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Translation::class);
-        $this->repository = $this->em->getRepository(Translation::class);
+    private function getRepository(): TranslationRepository
+    {
+        return $this->getContainer()->get('doctrine')->getRepository(Translation::class);
     }
 
     /**
-     * @param int $expectedCount
-     * @param string $code
-     *
      * @dataProvider getCountByLanguageProvider
      */
-    public function testGetCountByLanguage($expectedCount, $code)
+    public function testGetCountByLanguage(int $expectedCount, string $code)
     {
-        $this->assertEquals($expectedCount, $this->repository->getCountByLanguage($this->getReference($code)));
+        $this->assertEquals($expectedCount, $this->getRepository()->getCountByLanguage($this->getReference($code)));
     }
 
-    /**
-     * @return array
-     */
-    public function getCountByLanguageProvider()
+    public function getCountByLanguageProvider(): array
     {
         return [
             'language1' => [
@@ -61,31 +46,23 @@ class TranslationRepositoryTest extends WebTestCase
 
     public function testDeleteByLanguage()
     {
-        /* @var $language Language */
+        /* @var Language $language */
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
 
-        $this->repository->deleteByLanguage($language);
+        $this->getRepository()->deleteByLanguage($language);
 
-        $this->assertEquals(0, $this->repository->getCountByLanguage($language));
+        $this->assertEquals(0, $this->getRepository()->getCountByLanguage($language));
     }
 
     /**
-     * @param string $keyPrefix
-     * @param string $locale
-     * @param string $domain
-     * @param array $values
-     *
      * @dataProvider findValuesProvider
      */
-    public function testFindValues($keyPrefix, $locale, $domain, array $values)
+    public function testFindValues(string $keyPrefix, string $locale, string $domain, array $values)
     {
-        $this->assertEquals($values, $this->repository->findValues($keyPrefix, $locale, $domain));
+        $this->assertEquals($values, $this->getRepository()->findValues($keyPrefix, $locale, $domain));
     }
 
-    /**
-     * @return array
-     */
-    public function findValuesProvider()
+    public function findValuesProvider(): array
     {
         return [
             'language2' => [
@@ -109,25 +86,20 @@ class TranslationRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider findTranslationDataProvider
-     *
-     * @param string $key
-     * @param string $locale
-     * @param string $domain
-     * @param bool $hasResult
      */
-    public function testFindTranslation($key, $locale, $domain, $hasResult = false)
+    public function testFindTranslation(string $key, string $locale, string $domain, bool $hasResult = false)
     {
-        if (!$hasResult) {
-            $this->assertNull($this->repository->findTranslation($key, $locale, $domain));
+        if ($hasResult) {
+            $this->assertEquals(
+                $this->getReference($key),
+                $this->getRepository()->findTranslation($key, $locale, $domain)
+            );
         } else {
-            $this->assertEquals($this->getReference($key), $this->repository->findTranslation($key, $locale, $domain));
+            $this->assertNull($this->getRepository()->findTranslation($key, $locale, $domain));
         }
     }
 
-    /**
-     * @return array
-     */
-    public function findTranslationDataProvider()
+    public function findTranslationDataProvider(): array
     {
         return [
             'existing' => [
@@ -163,34 +135,10 @@ class TranslationRepositoryTest extends WebTestCase
         ];
     }
 
-    public function testFindAllByLanguageAndDomain()
-    {
-        $result = array_column(
-            $this->repository->findAllByLanguageAndDomain(
-                LoadLanguages::LANGUAGE2,
-                LoadTranslations::TRANSLATION_KEY_DOMAIN
-            ),
-            'key'
-        );
-
-        sort($result);
-
-        $this->assertEquals(
-            [
-                LoadTranslations::TRANSLATION_KEY_4,
-                LoadTranslations::TRANSLATION_KEY_5,
-            ],
-            $result
-        );
-    }
-
     /**
      * @dataProvider getTranslationsDataProvider
-     *
-     * @param string $languageCode
-     * @param array $expectedTranslations
      */
-    public function testGetTranslationsData($languageCode, array $expectedTranslations)
+    public function testGetTranslationsData(string $languageCode, array $expectedTranslations)
     {
         $language = $this->getReference($languageCode);
 
@@ -206,13 +154,10 @@ class TranslationRepositoryTest extends WebTestCase
             ];
         }
 
-        $this->assertEquals($result, $this->repository->getTranslationsData($language->getId()));
+        $this->assertEquals($result, $this->getRepository()->getTranslationsData($language->getId()));
     }
 
-    /**
-     * @return array
-     */
-    public function getTranslationsDataProvider()
+    public function getTranslationsDataProvider(): array
     {
         return [
             'language2' => [

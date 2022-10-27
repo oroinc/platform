@@ -9,7 +9,7 @@ placeholders:
 
     items:
         change_history_link:
-            template: OroDataAuditBundle::change_history_link.html.twig
+            template: '@@OroDataAudit/change_history_link.html.twig'
             applicable:
                 - "@oro_dataaudit.placeholder.filter->isEntityAuditable($entity$, $audit_show_change_history$)"
                 - "@oro_user.placeholder.filter->isUserApplicable()"
@@ -18,4 +18,4 @@ placeholders:
             acl: oro_dataaudit_view
             applicable:
                 - "@oro_dataaudit.segment_widget.context_checker->isApplicableInContext($params$)"
-            template: OroDataAuditBundle:Segment:data_audit_condition.html.twig
+            template: '@@OroDataAudit/Segment/data_audit_condition.html.twig'

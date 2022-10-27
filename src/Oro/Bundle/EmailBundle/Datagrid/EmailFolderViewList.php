@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\AbstractViewsList;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\EmailBundle\Model\FolderType;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailFolderViewList extends AbstractViewsList
 {
@@ -14,10 +14,6 @@ class EmailFolderViewList extends AbstractViewsList
      */
     private $mailboxChoiceList;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param MailboxChoiceList   $mailboxChoiceList
-     */
     public function __construct(TranslatorInterface $translator, MailboxChoiceList $mailboxChoiceList)
     {
         parent::__construct($translator);

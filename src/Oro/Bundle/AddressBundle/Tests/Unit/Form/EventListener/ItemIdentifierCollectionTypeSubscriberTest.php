@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\AddressBundle\Entity\Country;
@@ -12,20 +12,14 @@ use Symfony\Component\Form\Test\FormInterface;
 class ItemIdentifierCollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ItemIdentifierCollectionTypeSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->subscriber = new ItemIdentifierCollectionTypeSubscriber('iso2Code');
     }
 
-    /**
-     * @param array $existingData
-     * @param mixed $submittedData
-     *
-     * @return FormEvent
-     */
-    private function getFormEvent(array $existingData, $submittedData)
+    private function getFormEvent(array $existingData, mixed $submittedData): FormEvent
     {
         $collection = new ArrayCollection($existingData);
         $form = $this->createMock(FormInterface::class);

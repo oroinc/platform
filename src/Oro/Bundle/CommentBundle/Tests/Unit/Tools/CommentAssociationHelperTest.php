@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -11,17 +13,15 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var CommentAssociationHelper */
-    protected $commentAssociationHelper;
+    private $commentAssociationHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->commentAssociationHelper = new CommentAssociationHelper($this->configManager);
     }
@@ -71,26 +71,24 @@ class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
 
         $associationName   = ExtendHelper::buildAssociationName($entityClass);
         $associationConfig = new Config(
-            new FieldConfigId('extend', CommentAssociationHelper::COMMENT_ENTITY, $associationName)
+            new FieldConfigId('extend', Comment::class, $associationName)
         );
         $associationConfig->set('is_extend', true);
         $associationConfig->set('state', ExtendScope::STATE_ACTIVE);
 
         $this->configManager->expects($this->exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [CommentAssociationHelper::COMMENT_ENTITY, $associationName, true],
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [Comment::class, $associationName, true],
+            ]);
         $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('comment', $entityClass)
             ->willReturn($config);
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
-            ->with('extend', CommentAssociationHelper::COMMENT_ENTITY, $associationName)
+            ->with('extend', Comment::class, $associationName)
             ->willReturn($associationConfig);
 
         $this->assertTrue(
@@ -107,26 +105,24 @@ class CommentAssociationHelperTest extends \PHPUnit\Framework\TestCase
 
         $associationName   = ExtendHelper::buildAssociationName($entityClass);
         $associationConfig = new Config(
-            new FieldConfigId('extend', CommentAssociationHelper::COMMENT_ENTITY, $associationName)
+            new FieldConfigId('extend', Comment::class, $associationName)
         );
         $associationConfig->set('is_extend', true);
         $associationConfig->set('state', ExtendScope::STATE_NEW);
 
         $this->configManager->expects($this->exactly(2))
             ->method('hasConfig')
-            ->willReturnMap(
-                [
-                    [$entityClass, null, true],
-                    [CommentAssociationHelper::COMMENT_ENTITY, $associationName, true],
-                ]
-            );
+            ->willReturnMap([
+                [$entityClass, null, true],
+                [Comment::class, $associationName, true],
+            ]);
         $this->configManager->expects($this->once())
             ->method('getEntityConfig')
             ->with('comment', $entityClass)
             ->willReturn($config);
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
-            ->with('extend', CommentAssociationHelper::COMMENT_ENTITY, $associationName)
+            ->with('extend', Comment::class, $associationName)
             ->willReturn($associationConfig);
 
         $this->assertFalse(

@@ -3,66 +3,82 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Exception\EmailTemplateCompilationException;
 use Oro\Bundle\EmailBundle\Exception\EmailTemplateNotFoundException;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
-use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Twig\Error\Error;
 
 /**
  * Provides compiled email template information ready to be sent via email.
  */
-class EmailTemplateContentProvider implements LoggerAwareInterface
+class EmailTemplateContentProvider
 {
-    use LoggerAwareTrait;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /**
-     * @var DoctrineHelper
-     */
-    private $doctrineHelper;
-
-    /**
-     * @var EmailRenderer
-     */
+    /** @var EmailRenderer */
     private $emailRenderer;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EmailRenderer $emailRenderer
-     */
-    public function __construct(DoctrineHelper $doctrineHelper, EmailRenderer $emailRenderer)
-    {
-        $this->doctrineHelper = $doctrineHelper;
+    /** @var PropertyAccessor */
+    private $propertyAccessor;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(
+        ManagerRegistry $doctrine,
+        EmailRenderer $emailRenderer,
+        PropertyAccessor $propertyAccessor,
+        LoggerInterface $logger
+    ) {
+        $this->doctrine = $doctrine;
         $this->emailRenderer = $emailRenderer;
+        $this->propertyAccessor = $propertyAccessor;
+        $this->logger = $logger;
     }
 
     /**
-     * @param EmailTemplateCriteria $criteria
-     * @param string $language
-     * @param array $params
-     * @return EmailTemplateModel
-     * @throws EmailTemplateNotFoundException
-     * @throws EmailTemplateCompilationException
+     * Get localized email template
      */
     public function getTemplateContent(
         EmailTemplateCriteria $criteria,
-        string $language,
-        array $params
+        Localization $localization,
+        array $templateParams
     ): EmailTemplateModel {
-        $emailTemplate = $this->loadEmailTemplate($criteria, $language);
+        $repository = $this->doctrine->getRepository(EmailTemplate::class);
 
         try {
-            [$subject, $content] = $this->emailRenderer->compileMessage($emailTemplate, $params);
-        } catch (\Twig_Error $exception) {
-            $this->logError(
+            /** @var EmailTemplate $emailTemplate */
+            $emailTemplateEntity = $repository->findWithLocalizations($criteria);
+        } catch (NonUniqueResultException | NoResultException $exception) {
+            $this->logger->error(
+                'Could not find unique email template for the given criteria',
+                ['exception' => $exception, 'criteria' => $criteria]
+            );
+
+            throw new EmailTemplateNotFoundException($criteria);
+        }
+
+        $emailTemplateModel = $this->getLocalizedModel($emailTemplateEntity, $localization);
+
+        try {
+            [$subject, $content] = $this->emailRenderer->compileMessage($emailTemplateModel, $templateParams);
+            $emailTemplateModel
+                ->setSubject($subject)
+                ->setContent($content);
+        } catch (Error $exception) {
+            $this->logger->error(
                 sprintf(
                     'Rendering of email template "%s" failed. %s',
-                    $emailTemplate->getSubject(),
+                    $emailTemplateModel->getSubject(),
                     $exception->getMessage()
                 ),
                 ['exception' => $exception]
@@ -71,64 +87,90 @@ class EmailTemplateContentProvider implements LoggerAwareInterface
             throw new EmailTemplateCompilationException($criteria);
         }
 
-        $emailTemplateModel = new EmailTemplateModel();
-        $emailTemplateModel
-            ->setSubject($subject)
-            ->setContent($content)
-            ->setType($this->getTemplateContentType($emailTemplate));
-
         return $emailTemplateModel;
     }
 
-    /**
-     * @param EmailTemplateInterface $emailTemplate
-     * @return string
-     */
-    private function getTemplateContentType(EmailTemplateInterface $emailTemplate): string
+    public function getLocalizedModel(EmailTemplate $entity, Localization $localization): EmailTemplateModel
     {
-        return $emailTemplate->getType() === EmailTemplate::TYPE_HTML
-            ? EmailTemplateModel::CONTENT_TYPE_HTML
-            : EmailTemplateModel::CONTENT_TYPE_TEXT;
+        $model = new EmailTemplateModel();
+
+        $templateIndex = [];
+
+        foreach ($entity->getTranslations() as $templateTranslation) {
+            $templateIndex[$templateTranslation->getLocalization()->getId()] = $templateTranslation;
+        }
+
+        $this->populateAttribute($templateIndex, $localization, $model, $entity, 'subject');
+        $this->populateAttribute($templateIndex, $localization, $model, $entity, 'content');
+
+        $model->setType(
+            $entity->getType() === EmailTemplate::TYPE_HTML
+                ? EmailTemplateModel::CONTENT_TYPE_HTML
+                : EmailTemplateModel::CONTENT_TYPE_TEXT
+        );
+
+        return $model;
     }
 
     /**
-     * @param string $message
-     * @param array $params
+     * Localize model attribute
+     *
+     * Finding the right template for the localization tree based on the fallback attribute.
+     * When not exist template or specified fallback for localization without a parent
+     * used default attribute value from entity.
      */
-    private function logError(string $message, array $params = []): void
-    {
-        if (!$this->logger) {
-            return;
+    private function populateAttribute(
+        array $templateIndex,
+        Localization $localization,
+        EmailTemplateModel $model,
+        EmailTemplate $entity,
+        string $attribute
+    ): void {
+        $attributeFallback = $attribute . 'Fallback';
+
+        while ($currentTemplate = $this->findTemplate($templateIndex, $localization)) {
+            // For current attribute not enabled fallback to parent localizations
+            if (!$this->propertyAccessor->getValue($currentTemplate, $attributeFallback)) {
+                $this->propertyAccessor->setValue(
+                    $model,
+                    $attribute,
+                    $this->propertyAccessor->getValue($currentTemplate, $attribute)
+                );
+                return;
+            }
+
+            // Find next available localized template by localization tree
+            $localization = $currentTemplate->getLocalization()->getParentLocalization();
         }
 
-        $this->logger->error($message, $params);
+        // Fallback to default when template for localization not found
+        $this->propertyAccessor->setValue(
+            $model,
+            $attribute,
+            $this->propertyAccessor->getValue($entity, $attribute)
+        );
     }
 
     /**
-     * @param EmailTemplateCriteria $criteria
-     * @param string $language
-     * @return EmailTemplate
+     * @param array $templateIndex
+     * @param Localization $localization
+     * @return EmailTemplateTranslation|null
      */
-    private function loadEmailTemplate(EmailTemplateCriteria $criteria, string $language): EmailTemplate
+    private function findTemplate(array &$templateIndex, ?Localization $localization): ?EmailTemplateTranslation
     {
-        /** @var EmailTemplateRepository $emailTemplateRepository */
-        $emailTemplateRepository = $this->doctrineHelper->getEntityRepositoryForClass(EmailTemplate::class);
+        while ($localization) {
+            if (isset($templateIndex[$localization->getId()])) {
+                $template = $templateIndex[$localization->getId()];
 
-        try {
-            $emailTemplate = $emailTemplateRepository->findOneLocalized($criteria, $language);
-        } catch (NonUniqueResultException $exception) {
-            $this->logError(
-                'Could not find unique email template for the given criteria',
-                ['exception' => $exception, 'criteria' => $criteria]
-            );
-            // If we have non unique result exception it can be treated similar to not found email template
-            $emailTemplate = null;
+                // Fix possible deadlock on a looped localization tree
+                unset($templateIndex[$localization->getId()]);
+
+                return $template;
+            }
+
+            $localization = $localization->getParentLocalization();
         }
 
-        if (!$emailTemplate) {
-            throw new EmailTemplateNotFoundException($criteria);
-        }
-
-        return $emailTemplate;
+        return null;
     }
 }

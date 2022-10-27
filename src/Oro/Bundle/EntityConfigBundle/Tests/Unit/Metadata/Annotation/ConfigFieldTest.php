@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Annotation;
 
+use Oro\Bundle\EntityConfigBundle\Exception\AnnotationException;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 class ConfigFieldTest extends \PHPUnit\Framework\TestCase
@@ -10,32 +11,22 @@ class ConfigFieldTest extends \PHPUnit\Framework\TestCase
      * @dataProvider constructorDataProvider
      */
     public function testConstructor(
-        $data,
-        $expectedMode,
-        $expectedDefaultValues
+        array $data,
+        string $expectedMode,
+        array $expectedDefaultValues
     ) {
         $config = new ConfigField($data);
         $this->assertEquals($expectedMode, $config->mode);
         $this->assertEquals($expectedDefaultValues, $config->defaultValues);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\AnnotationException
-     */
     public function testIncorrectMode()
     {
+        $this->expectException(AnnotationException::class);
         new ConfigField(['mode' => 'some mode']);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\AnnotationException
-     */
-    public function testIncorrectDefaultValues()
-    {
-        new ConfigField(['defaultValues' => 'some string']);
-    }
-
-    public function constructorDataProvider()
+    public function constructorDataProvider(): array
     {
         return [
             [

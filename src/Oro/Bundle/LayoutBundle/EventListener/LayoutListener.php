@@ -4,54 +4,57 @@ namespace Oro\Bundle\LayoutBundle\EventListener;
 
 use Oro\Bundle\LayoutBundle\Annotation\Layout as LayoutAnnotation;
 use Oro\Bundle\LayoutBundle\Layout\LayoutManager;
-use Oro\Bundle\LayoutBundle\Request\LayoutHelper;
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\Exception\BlockViewNotFoundException;
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
- * The LayoutListener class handles the @Layout annotation.
+ * Checks whether a web request should be processed by the layout engine
+ * (the Request object has the @Layout annotation in the "_layout" attribute),
+ * and if so, renders the layout.
  */
-class LayoutListener
+class LayoutListener implements ServiceSubscriberInterface
 {
-    /** @var LayoutHelper */
-    private $layoutHelper;
+    private ContainerInterface $container;
 
-    /** @var ContainerInterface */
-    private $container;
-
-    /**
-     * @param LayoutHelper       $layoutHelper
-     * @param ContainerInterface $container
-     */
-    public function __construct(LayoutHelper $layoutHelper, ContainerInterface $container)
+    public function __construct(ContainerInterface $container)
     {
-        $this->layoutHelper = $layoutHelper;
         $this->container = $container;
     }
 
     /**
-     * Renders the layout and initializes the content of a new response object
-     * with the rendered layout.
-     *
-     * @param GetResponseForControllerResultEvent $event
-     *
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return [
+            LayoutManager::class,
+            LoggerInterface::class
+        ];
+    }
+
+    /**
      * @throws LogicException if @Layout annotation is used in incorrect way
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(ViewEvent $event): void
     {
         $request = $event->getRequest();
 
-        $layoutAnnotation = $this->layoutHelper->getLayoutAnnotation($request);
-        if (!$layoutAnnotation) {
+        /** @var LayoutAnnotation|null $layoutAnnotation */
+        $layoutAnnotation = $request->attributes->get('_layout');
+        if (null === $layoutAnnotation) {
             return;
         }
+
         if ($request->attributes->get('_template')) {
             throw new LogicException(
                 'The @Template() annotation cannot be used together with the @Layout() annotation.'
@@ -61,7 +64,7 @@ class LayoutListener
         $layout = null;
         $context = null;
         $parameters = $event->getControllerResult();
-        if (is_array($parameters)) {
+        if (\is_array($parameters)) {
             $context = new LayoutContext($parameters, (array) $layoutAnnotation->getVars());
         } elseif ($parameters instanceof ContextInterface) {
             $context = $parameters;
@@ -85,8 +88,7 @@ class LayoutListener
             $response = new Response($layout->render());
         } else {
             $this->configureContext($context, $layoutAnnotation);
-            /** @var LayoutManager $layoutManager */
-            $layoutManager = $this->container->get('oro_layout.layout_manager');
+            $layoutManager = $this->container->get(LayoutManager::class);
             $layoutManager->getLayoutBuilder()->setBlockTheme($layoutAnnotation->getBlockThemes());
             $response = $this->getLayoutResponse($context, $request, $layoutManager);
         }
@@ -94,16 +96,10 @@ class LayoutListener
         $event->setResponse($response);
     }
 
-    /**
-     * Configures the layout context.
-     *
-     * @param ContextInterface $context
-     * @param LayoutAnnotation $layoutAnnotation
-     */
-    protected function configureContext(ContextInterface $context, LayoutAnnotation $layoutAnnotation)
+    private function configureContext(ContextInterface $context, LayoutAnnotation $layoutAnnotation): void
     {
         $action = $layoutAnnotation->getAction();
-        if (!empty($action)) {
+        if ($action) {
             $currentAction = $context->getOr('action');
             if (empty($currentAction)) {
                 $context->set('action', $action);
@@ -111,7 +107,7 @@ class LayoutListener
         }
 
         $theme = $layoutAnnotation->getTheme();
-        if (!empty($theme)) {
+        if ($theme) {
             $currentTheme = $context->getOr('theme');
             if (empty($currentTheme)) {
                 $context->set('theme', $theme);
@@ -119,32 +115,41 @@ class LayoutListener
         }
     }
 
-    /**
-     * @param ContextInterface $context
-     * @param Request          $request
-     * @param LayoutManager    $layoutManager
-     *
-     * @return Response
-     */
-    protected function getLayoutResponse(
+    private function getLayoutResponse(
         ContextInterface $context,
         Request $request,
         LayoutManager $layoutManager
-    ) {
+    ): Response {
         $blockIds = $request->get('layout_block_ids');
-        if (is_array($blockIds) && $blockIds) {
-            $response = [];
+        if ($blockIds && \is_array($blockIds)) {
+            $data = [];
             foreach ($blockIds as $blockId) {
                 if ($blockId) {
-                    $layout = $layoutManager->getLayout($context, $blockId);
-                    $response[$blockId] = $layout->render();
+                    try {
+                        $data[$blockId] = $layoutManager->getLayout($context, $blockId)->render();
+                    } catch (BlockViewNotFoundException $e) {
+                        $this->logNotFoundViewException($blockId, $e);
+                    }
                 }
             }
-            $response = new JsonResponse($response);
-        } else {
-            $layout = $layoutManager->getLayout($context);
-            $response = new Response($layout->render());
+
+            return new JsonResponse($data);
         }
-        return $response;
+
+        return new Response($layoutManager->getLayout($context)->render());
+    }
+
+    /**
+     * @param string $blockId
+     * @param BlockViewNotFoundException $e
+     */
+    private function logNotFoundViewException($blockId, BlockViewNotFoundException $e): void
+    {
+        /** @var LoggerInterface $logger */
+        $logger = $this->container->get(LoggerInterface::class);
+        $logger->warning(
+            sprintf('Unknown block "%s" was requested via layout_block_ids', $blockId),
+            ['exception' => $e]
+        );
     }
 }

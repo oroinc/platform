@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * This extensions provides validation constraints data for js validation via html attributes.
+ * This extensions provides validation constraints data for JS validation via HTML attributes.
  */
 class JsValidationExtension extends AbstractTypeExtension
 {
@@ -19,9 +19,6 @@ class JsValidationExtension extends AbstractTypeExtension
     /** @var ConstraintsProviderInterface */
     protected $constraintsProvider;
 
-    /**
-     * @param ConstraintsProviderInterface $constraintsProvider
-     */
     public function __construct(ConstraintsProviderInterface $constraintsProvider)
     {
         $this->constraintsProvider = $constraintsProvider;
@@ -40,9 +37,6 @@ class JsValidationExtension extends AbstractTypeExtension
      * Adds "data-validation-optional-group" attributes to embedded form.
      *
      * Validation will run only if one of the children is filled in.
-     *
-     * @param FormView $view
-     * @param array $options
      */
     protected function addDataValidationOptionalGroupAttributes(FormView $view, array $options)
     {
@@ -91,8 +85,7 @@ class JsValidationExtension extends AbstractTypeExtension
     /**
      * Adds "data-validation" attribute to form view that contain data for JS validation
      *
-     * @param FormView $view
-     * @param FormInterface $form
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addDataValidationAttribute(FormView $view, FormInterface $form)
     {
@@ -102,6 +95,11 @@ class JsValidationExtension extends AbstractTypeExtension
             // Since there is no way to transform backend callback function to frontend one don't add it into
             // validation attribute
             unset($data['Callback']);
+        }
+
+        if ($data['NotBlank']['allowNull'] ?? false) {
+            // Since an empty string equals to null on the frontend side
+            unset($data['NotBlank']);
         }
 
         if ($data) {
@@ -161,15 +159,16 @@ class JsValidationExtension extends AbstractTypeExtension
      * Gets constraint name based on object
      *
      * @param Constraint $constraint
-     * @return mixed|string
+     * @return string
      */
     protected function getConstraintName(Constraint $constraint)
     {
-        $class = get_class($constraint);
+        $class = \get_class($constraint);
         $defaultClassPrefix = 'Symfony\\Component\\Validator\\Constraints\\';
-        if (0 === strpos($class, $defaultClassPrefix)) {
+        if (str_starts_with($class, $defaultClassPrefix)) {
             return str_replace($defaultClassPrefix, '', $class);
         }
+
         return $class;
     }
 

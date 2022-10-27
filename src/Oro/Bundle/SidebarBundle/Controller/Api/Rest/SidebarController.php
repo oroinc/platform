@@ -2,22 +2,19 @@
 
 namespace Oro\Bundle\SidebarBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SidebarBundle\Entity\AbstractSidebarState;
 use Oro\Bundle\SidebarBundle\Entity\Repository\SidebarStateRepository;
+use Oro\Bundle\SidebarBundle\Entity\SidebarState;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @RouteResource("sidebars")
- * @NamePrefix("oro_api_")
+ * REST API controller for the sidebar.
  */
-class SidebarController extends FOSRestController
+class SidebarController extends AbstractFOSRestController
 {
     /**
      * REST GET
@@ -34,7 +31,7 @@ class SidebarController extends FOSRestController
         $item = $this->getRepository()->getState($this->getUser(), $position);
 
         return $this->handleView(
-            $this->view($item, Codes::HTTP_OK)
+            $this->view($item, $item ? Response::HTTP_OK : Response::HTTP_NO_CONTENT)
         );
     }
 
@@ -62,7 +59,7 @@ class SidebarController extends FOSRestController
         $manager->flush();
 
         return $this->handleView(
-            $this->view(['id' => $entity->getId()], Codes::HTTP_CREATED)
+            $this->view(['id' => $entity->getId()], Response::HTTP_CREATED)
         );
     }
 
@@ -82,10 +79,10 @@ class SidebarController extends FOSRestController
     {
         $entity = $this->getManager()->find($this->getSidebarStateClass(), (int)$stateId);
         if (!$entity) {
-            return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Response::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view(null, Response::HTTP_FORBIDDEN));
         }
         $entity->setState($request->get('state', $entity->getState()));
 
@@ -93,7 +90,7 @@ class SidebarController extends FOSRestController
         $em->persist($entity);
         $em->flush();
 
-        return $this->handleView($this->view([], Codes::HTTP_OK));
+        return $this->handleView($this->view([], Response::HTTP_OK));
     }
 
     /**
@@ -110,7 +107,7 @@ class SidebarController extends FOSRestController
     /**
      * Get entity Manager
      *
-     * @return \Doctrine\Common\Persistence\ObjectManager
+     * @return \Doctrine\Persistence\ObjectManager
      */
     protected function getManager()
     {
@@ -130,6 +127,6 @@ class SidebarController extends FOSRestController
      */
     protected function getSidebarStateClass()
     {
-        return $this->getParameter('oro_sidebar.entity.sidebar_state.class');
+        return SidebarState::class;
     }
 }

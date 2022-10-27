@@ -6,7 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageManager
 {
@@ -30,12 +30,6 @@ class MessageManager
      */
     protected $storage;
 
-    /**
-     * @param Session $session
-     * @param TranslatorInterface $translator
-     * @param EntityPaginationNavigation $navigation
-     * @param EntityPaginationStorage $storage
-     */
     public function __construct(
         Session $session,
         TranslatorInterface $translator,
@@ -68,8 +62,7 @@ class MessageManager
 
         $count = $this->navigation->getTotalCount($entity, $scope);
         if ($count) {
-            $message .= ' ' .
-                $this->translator->transChoice($this->getStatsMessage($scope), $count, ['%count%' => $count]);
+            $message .= ' ' . $this->translator->trans($this->getStatsMessage($scope), ['%count%' => $count]);
         }
 
         return $message;
@@ -86,8 +79,7 @@ class MessageManager
 
         $count = $this->navigation->getTotalCount($entity, $scope);
         if ($count) {
-            $message .= ' ' .
-                $this->translator->transChoice($this->getStatsMessage($scope), $count, ['%count%' => $count]);
+            $message .= ' ' . $this->translator->trans($this->getStatsMessage($scope), ['%count%' => $count]);
         }
 
         return $message;
@@ -130,7 +122,7 @@ class MessageManager
             return null;
         }
 
-        $message .= $this->translator->transChoice($this->getStatsMessage($scope), $count, ['%count%' => $count]);
+        $message .= $this->translator->trans($this->getStatsMessage($scope), ['%count%' => $count]);
 
         $this->storage->setInfoMessageShown($entityName, $scope);
 

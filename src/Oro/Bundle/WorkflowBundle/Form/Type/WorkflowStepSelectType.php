@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -15,27 +15,16 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\MessageCatalogueInterface;
-use Symfony\Component\Translation\TranslatorBagInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type provides functionality to select a WorkflowStep.
+ */
 class WorkflowStepSelectType extends AbstractType
 {
-    const NAME = 'oro_workflow_step_select';
+    private WorkflowRegistry $workflowRegistry;
+    private TranslatorInterface $translator;
 
-    /** @var WorkflowRegistry */
-    protected $workflowRegistry;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var MessageCatalogueInterface */
-    private $translatorCatalogue;
-
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(WorkflowRegistry $workflowRegistry, TranslatorInterface $translator)
     {
         $this->workflowRegistry = $workflowRegistry;
@@ -48,12 +37,10 @@ class WorkflowStepSelectType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['workflow_entity_class', 'workflow_name']);
-        $resolver->setDefaults(
-            [
-                'class' => 'OroWorkflowBundle:WorkflowStep',
-                'choice_label' => 'label'
-            ]
-        );
+        $resolver->setDefaults([
+            'class' => WorkflowStep::class,
+            'choice_label' => 'label'
+        ]);
 
         $resolver->setNormalizer(
             'query_builder',
@@ -100,50 +87,11 @@ class WorkflowStepSelectType extends AbstractType
     }
 
     /**
-     * @param string $value
-     * @return string
-     */
-    private function getTranslation($value)
-    {
-        if ($this->hasTranslation($value, WorkflowTranslationHelper::TRANSLATION_DOMAIN)) {
-            $value = $this->translator->trans($value, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param string $value
-     * @param string $domain
-     * @return bool
-     */
-    private function hasTranslation($value, $domain)
-    {
-        if ($this->translator instanceof TranslatorBagInterface) {
-            if (!$this->translatorCatalogue) {
-                $this->translatorCatalogue = $this->translator->getCatalogue();
-            }
-
-            return $this->translatorCatalogue->has($value, $domain);
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getBlockPrefix()
     {
-        return self::NAME;
+        return 'oro_workflow_step_select';
     }
 
     /**
@@ -154,30 +102,18 @@ class WorkflowStepSelectType extends AbstractType
         return EntityType::class;
     }
 
-    /**
-     * @param EntityManager $em
-     * @param string $className
-     * @param array $definitions
-     *
-     * @return QueryBuilder
-     */
-    protected function getQueryBuilder(EntityManager $em, $className, array $definitions)
+    private function getQueryBuilder(EntityManagerInterface $em, string $className, array $definitions): QueryBuilder
     {
-        $qb = $em->getRepository($className)->createQueryBuilder('ws');
-
-        return $qb->where($qb->expr()->in('ws.definition', ':workflowDefinitions'))
+        return $em->getRepository($className)
+            ->createQueryBuilder('ws')
+            ->where('ws.definition IN (:workflowDefinitions)')
             ->setParameter('workflowDefinitions', $definitions)
             ->orderBy('ws.definition', 'ASC')
             ->orderBy('ws.stepOrder', 'ASC')
             ->orderBy('ws.label', 'ASC');
     }
 
-    /**
-     * @param array|Options $options
-     *
-     * @return array
-     */
-    protected function getWorkflows($options)
+    private function getWorkflows(Options|array $options): array
     {
         if (isset($options['workflow_name'])) {
             $workflowName = $options['workflow_name'];
@@ -190,5 +126,12 @@ class WorkflowStepSelectType extends AbstractType
         }
 
         return $workflows;
+    }
+
+    private function getTranslation(?string $value): string
+    {
+        return null !== $value
+            ? $this->translator->trans($value, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            : '';
     }
 }

@@ -2,16 +2,13 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Behat\Context;
 
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderAwareInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 
-class FeatureContext extends OroFeatureContext implements KernelAwareContext, FixtureLoaderAwareInterface
+class FeatureContext extends OroFeatureContext implements FixtureLoaderAwareInterface
 {
-    use KernelDictionary;
     use FixtureLoaderDictionary;
 
     /**
@@ -31,7 +28,7 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Fi
 
     protected function clearCalendarDateTable()
     {
-        $em = $this->getContainer()
+        $em = $this->getAppContainer()
             ->get('doctrine')
             ->getManagerForClass(CalendarDate::class);
 
@@ -44,13 +41,9 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Fi
         $em->flush();
     }
 
-    /**
-     * @param \DateTime $startDate
-     * @param \DateTime $endDate
-     */
     protected function fillDatesFrom(\DateTime $startDate, \DateTime $endDate)
     {
-        $registry = $this->getContainer()->get('doctrine');
+        $registry = $this->getAppContainer()->get('doctrine');
 
         $manager = $registry->getManagerForClass(CalendarDate::class);
         $currentDates = $manager->getRepository(CalendarDate::class)->findAll();

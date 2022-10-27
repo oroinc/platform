@@ -6,6 +6,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
+/**
+ * Collects executed actions and processors
+ */
 class ActionProcessorDataCollector extends DataCollector
 {
     /** @var TraceLogger */
@@ -14,18 +17,17 @@ class ActionProcessorDataCollector extends DataCollector
     /** @var float */
     protected $totalTime;
 
-    /**
-     * @param TraceLogger $logger
-     */
     public function __construct(TraceLogger $logger)
     {
         $this->logger = $logger;
+
+        $this->reset();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         $this->data['name'] = $this->logger->getSectionName();
         $this->data['actions'] = $this->logger->getActions();
@@ -173,5 +175,16 @@ class ActionProcessorDataCollector extends DataCollector
         return array_key_exists('name', $this->data)
             ? $this->data['name']
             : $this->logger->getSectionName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->data = [
+            'actions' => [],
+            'applicableCheckers' => [],
+        ];
     }
 }

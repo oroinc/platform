@@ -18,13 +18,17 @@ class OrganizationFormLoginFactory extends FormLoginFactory
         parent::__construct();
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return 'organization-form-login';
     }
 
-    protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
-    {
+    protected function createAuthProvider(
+        ContainerBuilder $container,
+        string $id,
+        array $config,
+        string $userProviderId
+    ): string {
         $provider = 'oro_security.authentication.provider.username_password_organization.' . $id;
         $container
             ->setDefinition(
@@ -32,6 +36,7 @@ class OrganizationFormLoginFactory extends FormLoginFactory
                 new ChildDefinition('oro_security.authentication.provider.username_password_organization')
             )
             ->replaceArgument(0, new Reference($userProviderId))
+            ->replaceArgument(1, new Reference('security.user_checker.' . $id))
             ->replaceArgument(2, $id);
 
         return $provider;

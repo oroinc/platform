@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\ImportExport\Writer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -13,37 +13,29 @@ use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 class TranslationWriterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityManager;
+    private $registry;
 
     /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationManager;
+    private $translationManager;
+
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
     /** @var TranslationWriter */
-    protected $writer;
+    private $writer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-
         $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->translationManager = $this->createMock(TranslationManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with(Translation::class)
             ->willReturn($this->entityManager);
 
-        $this->translationManager = $this->getMockBuilder(TranslationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->writer = new TranslationWriter($this->registry, $this->translationManager);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->writer, $this->entityManager, $this->registry, $this->translationManager);
     }
 
     public function testWrite()
@@ -54,37 +46,75 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
             $this->getTranslation('key3', 'value3', 'domain3', 'lang3'),
         ];
 
-        $this->entityManager->expects($this->at(0))->method('beginTransaction');
-        $this->entityManager->expects($this->at(1))->method('commit');
-        $this->entityManager->expects($this->at(2))->method('clear');
+        $calls = [];
 
-        $this->translationManager->expects($this->at(0))
+        $this->entityManager->expects($this->once())
+            ->method('beginTransaction')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'beginTransaction';
+            });
+        $this->entityManager->expects($this->once())
+            ->method('commit')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'commit';
+            });
+        $this->entityManager->expects($this->once())
+            ->method('clear')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'clear';
+            });
+
+        $this->translationManager->expects($this->exactly(3))
             ->method('saveTranslation')
-            ->with('key1', 'value1', 'lang1', 'domain1', Translation::SCOPE_UI);
-        $this->translationManager->expects($this->at(1))
-            ->method('saveTranslation')
-            ->with('key2', 'value2', 'lang2', 'domain2', Translation::SCOPE_UI);
-        $this->translationManager->expects($this->at(2))
-            ->method('saveTranslation')
-            ->with('key3', 'value3', 'lang3', 'domain3', Translation::SCOPE_UI);
-        $this->translationManager->expects($this->at(3))->method('flush')->with(true);
+            ->withConsecutive(
+                ['key1', 'value1', 'lang1', 'domain1', Translation::SCOPE_UI],
+                ['key2', 'value2', 'lang2', 'domain2', Translation::SCOPE_UI],
+                ['key3', 'value3', 'lang3', 'domain3', Translation::SCOPE_UI]
+            )
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'saveTranslation';
+            });
+        $this->translationManager->expects($this->once())
+            ->method('flush')
+            ->with(true)
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'flush';
+            });
 
         $this->writer->write($items);
+
+        self::assertEquals(
+            [
+                'beginTransaction',
+                'saveTranslation',
+                'saveTranslation',
+                'saveTranslation',
+                'flush',
+                'commit',
+                'clear'
+            ],
+            $calls
+        );
     }
 
     public function testWriteWithException()
     {
         $items = [$this->getTranslation('key1', 'value1', 'domain1', 'lang1')];
 
-        $this->entityManager->expects($this->at(0))->method('beginTransaction');
-        $this->entityManager->expects($this->at(1))->method('rollback');
+        $this->entityManager->expects($this->once())
+            ->method('beginTransaction');
+        $this->entityManager->expects($this->once())
+            ->method('rollback');
 
         $exception = new \Exception('test exception');
 
-        $this->translationManager->expects($this->once())->method('saveTranslation')->willThrowException($exception);
-        $this->translationManager->expects($this->never())->method('flush');
+        $this->translationManager->expects($this->once())
+            ->method('saveTranslation')
+            ->willThrowException($exception);
+        $this->translationManager->expects($this->never())
+            ->method('flush');
 
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('test exception');
 
         $this->writer->write($items);
@@ -94,31 +124,32 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
     {
         $items = [$this->getTranslation('key1', 'value1', 'domain1', 'lang1')];
 
-        $this->entityManager->expects($this->at(0))->method('beginTransaction');
-        $this->entityManager->expects($this->at(1))->method('rollback');
-        $this->entityManager->expects($this->at(2))->method('isOpen')->willReturn(false);
+        $this->entityManager->expects($this->once())
+            ->method('beginTransaction');
+        $this->entityManager->expects($this->once())
+            ->method('rollback');
+        $this->entityManager->expects($this->once())
+            ->method('isOpen')
+            ->willReturn(false);
 
-        $this->registry->expects($this->once())->method('resetManager');
+        $this->registry->expects($this->once())
+            ->method('resetManager');
 
         $exception = new \Exception('test exception');
 
-        $this->translationManager->expects($this->once())->method('saveTranslation')->willThrowException($exception);
-        $this->translationManager->expects($this->never())->method('flush');
+        $this->translationManager->expects($this->once())
+            ->method('saveTranslation')
+            ->willThrowException($exception);
+        $this->translationManager->expects($this->never())
+            ->method('flush');
 
-        $this->expectException('Exception');
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('test exception');
 
         $this->writer->write($items);
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     * @param string $domain
-     * @param string $languageCode
-     * @return Translation
-     */
-    protected function getTranslation($key, $value, $domain, $languageCode)
+    private function getTranslation(string $key, string $value, string $domain, string $languageCode): Translation
     {
         $translation = new Translation();
         $translation->setValue($value)
@@ -128,11 +159,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
         return $translation;
     }
 
-    /**
-     * @param string $code
-     * @return Language
-     */
-    protected function getLanguage($code)
+    private function getLanguage(string $code): Language
     {
         $language = new Language();
         $language->setCode($code);
@@ -140,12 +167,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
         return $language;
     }
 
-    /**
-     * @param string $key
-     * @param string $domain
-     * @return TranslationKey
-     */
-    protected function getTranslationKey($key, $domain)
+    private function getTranslationKey(string $key, string $domain): TranslationKey
     {
         $translationKey = new TranslationKey();
         $translationKey->setKey($key)->setDomain($domain);

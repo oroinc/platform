@@ -1,0 +1,56 @@
+/* @theme: default; */
+
+$select2-container-arrow-height: 18px !default;
+$select2-container-arrow-size: 5px !default;
+$select2-container-arrow-border-top: ($select2-container-arrow-size + 1) solid $base-ui-element-arrow-color !default;
+$select2-container-arrow-border-start: $select2-container-arrow-size solid transparent !default;
+$select2-container-arrow-border-end: $select2-container-arrow-size solid transparent !default;
+
+$select2-container-size-l: 9px 22px 8px 11px !default;
+$select2-container-size-m: 5px 22px 5px 8px !default;
+$select2-container-size-s: 5px 22px 4px 8px !default;
+$select2-container-input-inner-offset: 6px 8px !default;
+$select2-container-color: get-color('additional', 'dark');
+$select2-container-background: get-color('additional', 'ultra');
+$select2-container-border: 1px solid get-color('additional', 'light');
+
+$select2-container-disabled-choice-background-color: get-color('additional', 'base');
+
+$select2-container-border-radius: $base-ui-popup-border-radius !default;
+$select2-container-drop-above-box-shadow: 0 -3px 5px rgba(0 0 0 / 15%) !default;
+
+$select2-container-input-border: 1px solid get-color(additional, 'light') !default;
+
+$select2-container-input-focus-border: 1px solid get-color('ui', 'normal') !default;
+$select2-container-input-focus-box-shadow: inset 0 1px 1px rgba(0 0 0 / 7.5%),
+                                                 0 0 8px rgba(102 175 233 / 60%) !default;
+
+$select2-container-border-color: get-color('ui', 'error-dark');
+$select2-container-input-error-border: 1px solid get-color('ui', 'error-dark') !default;
+$select2-container-input-error-box-shadow: 0 1px 7px 0 rgba(223 96 96 / 60%) !default;
+
+$select2-container-input-warning-border: 1px solid get-color('secondary', 'dark') !default;
+$select2-container-input-warning-box-shadow: 0 1px 7px 0 rgba(126 166 164 / 35%) !default;
+
+$select2-container-input-success-border: 1px solid get-color('secondary', 'light') !default;
+
+$select2-drop-border: 1px solid get-color('additional', 'light');
+$select2-drop-background-color: get-color('additional', 'ultra');
+$select2-drop-box-shadow: 0 3px 5px rgba(0 0 0 / 15%);
+$select2-drop-border-radius: 0 0 4px 4px !default;
+$select2-drop-above-border-radius: 4px 4px 0 0 !default;
+$select2-drop-above-border-color: get-color('additional', 'light');
+
+$select2-drop-result-active-background-color: get-color('ui', 'focus') !default;
+$select2-drop-result-active-color: get-color('additional', 'ultra') !default;
+
+$select2-results-color: get-color('additional', 'dark');
+$select2-results-disabled-background: get-color('additional', 'base');
+
+$select2-search-border: 1px solid get-color('additional', 'light') !default;
+
+$select2-input-success-border: 1px solid get-color('secondary', 'light') !default;
+
+$select2-more-results-background: get-color('additional', 'base') !default;
+
+$select2-results-selected-disabled-display: none !default;

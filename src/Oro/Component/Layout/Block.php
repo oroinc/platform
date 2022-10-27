@@ -22,12 +22,6 @@ final class Block implements BlockInterface
     /** @var BlockInterface|null or false if not initialized */
     private $parent = false;
 
-    /**
-     * @param RawLayout                $rawLayout
-     * @param BlockTypeHelperInterface $typeHelper
-     * @param ContextInterface         $context
-     * @param DataAccessorInterface    $data
-     */
     public function __construct(
         RawLayout $rawLayout,
         BlockTypeHelperInterface $typeHelper,

@@ -7,12 +7,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Model\ExtendBusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * BusinessUnit
+ * Business unit entity
  *
  * @ORM\Table("oro_business_unit")
  * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository")
@@ -28,7 +27,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "dictionary"={
  *              "search_fields"={"name"},
  *              "virtual_fields"={"id"},
- *              "activity_support"="true"
+ *              "activity_support"=true
  *          },
  *          "entity"={
  *              "icon"="fa-building-o"
@@ -52,7 +51,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  * )
  */
 class BusinessUnit extends ExtendBusinessUnit implements
-    NotificationEmailInterface,
     EmailHolderInterface,
     BusinessUnitInterface
 {
@@ -426,22 +424,6 @@ class BusinessUnit extends ExtendBusinessUnit implements
         $this->owner = $owningBusinessUnit;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNotificationEmails()
-    {
-        $emails = $this->getUsers()->map(
-            function (EmailHolderInterface $user) {
-                return $user->getEmail();
-            }
-        );
-
-        $emails[] = $this->getEmail();
-
-        return $emails;
     }
 
     /**

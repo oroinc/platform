@@ -182,6 +182,10 @@ AG:
         AG-11:
             combinedCode: AG-11
             code: '11'
+AI:
+    iso2Code: AI
+    iso3Code: AIA
+    regions: {  }
 AL:
     iso2Code: AL
     iso3Code: ALB
@@ -501,6 +505,10 @@ AR:
         AR-Z:
             combinedCode: AR-Z
             code: Z
+AS:
+    iso2Code: AS
+    iso3Code: ASM
+    regions: {  }
 AT:
     iso2Code: AT
     iso3Code: AUT
@@ -560,6 +568,10 @@ AU:
         AU-WA:
             combinedCode: AU-WA
             code: WA
+AX:
+    iso2Code: AX
+    iso3Code: ALA
+    regions: {  }
 AZ:
     iso2Code: AZ
     iso3Code: AZE
@@ -1715,6 +1727,9 @@ BS:
         BS-NO:
             combinedCode: BS-NO
             code: NO
+        BS-NP:
+            combinedCode: BS-NP
+            code: NP
         BS-NS:
             combinedCode: BS-NS
             code: NS
@@ -1930,6 +1945,10 @@ CA:
         CA-YT:
             combinedCode: CA-YT
             code: YT
+CC:
+    iso2Code: CC
+    iso3Code: CCK
+    regions: {  }
 CD:
     iso2Code: CD
     iso3Code: COD
@@ -7985,6 +8004,10 @@ MA:
         MA-ZAG:
             combinedCode: MA-ZAG
             code: ZAG
+MC:
+    iso2Code: MC
+    iso3Code: MCO
+    regions: {  }
 MD:
     iso2Code: MD
     iso3Code: MDA

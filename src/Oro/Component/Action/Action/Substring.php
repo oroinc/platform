@@ -5,6 +5,10 @@ namespace Oro\Component\Action\Action;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Extracts a substring of the specified "length" length starting at "startPos" from the "string",
+ * and saves the result to "attribute".
+ */
 class Substring extends AbstractAction
 {
     const OPTION_START_POSITION = 'startPos';
@@ -16,7 +20,7 @@ class Substring extends AbstractAction
     /**
      * @var array
      */
-    private $options;
+    protected $options;
 
     /**
      * {@inheritDoc}

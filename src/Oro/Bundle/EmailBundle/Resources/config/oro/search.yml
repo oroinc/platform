@@ -2,12 +2,11 @@ search:
     Oro\Bundle\EmailBundle\Entity\EmailUser:
         alias: oro_email
         label: Emails
-        search_template: OroEmailBundle:Email:searchResult.html.twig
+        search_template: '@OroEmail/Email/searchResult.html.twig'
         route:
             name: oro_email_thread_view
             parameters:
                 id: email.id
-        title_fields: [email.subject]
         fields:
             -
                 name: email
@@ -17,3 +16,7 @@ search:
                         name: subject
                         target_type: text
                         target_fields: [subject]
+            -
+                name: isEmailPrivate
+                target_type: integer
+                target_fields: [email_user_private]

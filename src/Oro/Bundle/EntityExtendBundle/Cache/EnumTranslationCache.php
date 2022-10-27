@@ -2,100 +2,65 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Cache;
 
-use Doctrine\Common\Cache\Cache;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Cache for Enum values
  */
 class EnumTranslationCache
 {
-    /**
-     * @var Cache
-     */
-    protected $cache;
+    private CacheInterface $cache;
+    private LocalizationHelper $localizationHelper;
+    private LocaleSettings $localeSettings;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @param TranslatorInterface $translator
-     * @param Cache $cache
-     */
-    public function __construct(TranslatorInterface $translator, Cache $cache)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        CacheInterface $cache,
+        LocalizationHelper $localizationHelper,
+        LocaleSettings $localeSettings
+    ) {
         $this->cache = $cache;
+        $this->localizationHelper = $localizationHelper;
+        $this->localeSettings = $localeSettings;
     }
 
-    /**
-     * Check that cache contains values
-     *
-     * @param string $enumValueEntityClass
-     *
-     * @return bool
-     */
-    public function contains(string $enumValueEntityClass): bool
+    public function get(string $enumValueEntityClass, EnumValueRepository $repository): array
     {
-        $key = $this->getKey($enumValueEntityClass);
-
-        return $this->cache->contains($key);
-    }
-
-    /**
-     * Fetch values from a cache
-     *
-     * @param string $enumValueEntityClass
-     *
-     * @return array
-     *         key   => enum value entity class name
-     *         value => array // values are sorted by priority
-     *             key   => enum value id
-     *             value => enum value name
-     */
-    public function fetch(string $enumValueEntityClass): array
-    {
-        $key = $this->getKey($enumValueEntityClass);
-        $value = $this->cache->fetch($key);
-
-        return false !== $value ? $value : [];
-    }
-
-    /**
-     * Save values
-     *
-     * @param string $enumValueEntityClass
-     * @param array $items
-     *              key   => enum value entity class name
-     *              value => array // values are sorted by priority
-     *                  key   => enum value id
-     *                  value => enum value name
-     */
-    public function save(string $enumValueEntityClass, array $items)
-    {
-        $this->cache->save($this->getKey($enumValueEntityClass), $items);
+        return $this->cache->get($this->getKey($enumValueEntityClass), function () use ($repository) {
+            $result = [];
+            $values = $repository->getValues();
+            foreach ($values as $enum) {
+                $result[$enum->getId()] = $enum->getName();
+            }
+            return $result;
+        });
     }
 
     /**
      * Invalidate a cache by class of the enum value entity
-     *
-     * @param string $enumValueEntityClass
      */
-    public function invalidate(string $enumValueEntityClass)
+    public function invalidate(string $enumValueEntityClass): void
     {
-        $key = $this->getKey($enumValueEntityClass);
-
-        $this->cache->delete($key);
+        foreach ($this->localizationHelper->getLocalizations() as $localization) {
+            $key = $this->getKey($enumValueEntityClass, $localization->getFormattingCode());
+            $this->cache->delete($key);
+        }
     }
 
-    /**
-     * @param string $enumValueEntityClass
-     * @return string
-     */
-    private function getKey(string $enumValueEntityClass): string
+    private function getKey(string $enumValueEntityClass, string $locale = null): string
     {
-        return sprintf('%s|%s', $enumValueEntityClass, $this->translator->getLocale());
+        return UniversalCacheKeyGenerator::normalizeCacheKey(
+            sprintf('%s|%s', $enumValueEntityClass, $locale ?? $this->getLocaleKey())
+        );
+    }
+
+    private function getLocaleKey(): string
+    {
+        return $this->localizationHelper->getCurrentLocalization()
+            ? $this->localizationHelper->getCurrentLocalization()->getFormattingCode()
+            : $this->localeSettings->getLocale();
     }
 }

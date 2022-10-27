@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Model\ExtendTestActivity;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * The entity for test purposes.
  * @ORM\Table(
  *     name="test_activity",
  *     indexes={@ORM\Index(name="idx_test_activity_owner_id", columns={"owner_id"})}
@@ -22,8 +23,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"="",
- *              "field_acl_supported"="true",
- *              "field_acl_enabled"="true"
+ *              "field_acl_supported"=true,
+ *              "field_acl_enabled"=true
  *          },
  *          "ownership"={
  *              "owner_type"="USER",
@@ -31,6 +32,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "owner_column_name"="owner_id",
  *              "organization_field_name"="organization",
  *              "organization_column_name"="organization_id"
+ *          },
+ *          "tag"={
+ *              "enabled"=true
  *          }
  *      }
  * )
@@ -169,5 +173,13 @@ class TestActivity extends ExtendTestActivity implements TestFrameworkEntityInte
         $this->owner = $owner;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->description;
     }
 }

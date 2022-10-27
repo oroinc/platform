@@ -1,7 +1,6 @@
 services:
     oro_api.delete_list.processor:
         class: Oro\Bundle\ApiBundle\Processor\DeleteListProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - delete_list
@@ -40,8 +39,10 @@ services:
 
     oro_api.delete_list.set_delete_limit:
         class: Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit
+        arguments:
+            - '%oro_api.max_delete_entities%'
         tags:
-            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -65 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -70 }
 
     oro_api.delete_list.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
@@ -68,8 +69,8 @@ services:
     # data_security_check
     #
 
-    oro_api.delete.entity_objects_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectsSecurityCheck
+    oro_api.delete.validate_entity_objects_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectsAccess
         arguments:
             - '@security.authorization_checker'
             - DELETE
@@ -85,13 +86,15 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }
 
-    oro_api.delete_list.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListDataByDeleteHandler
+    oro_api.delete_list.delete_entities_by_delete_handler:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteEntitiesByDeleteHandler
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@service_container'
+            - '@oro_entity.delete_handler_registry'
+            - '@logger'
         tags:
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -20 }
+            - { name: monolog.logger, channel: api }
 
     #
     # finalize

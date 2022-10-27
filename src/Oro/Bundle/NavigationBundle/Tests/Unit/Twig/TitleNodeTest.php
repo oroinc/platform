@@ -2,80 +2,66 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
+use Oro\Bundle\NavigationBundle\Twig\TitleExtension;
 use Oro\Bundle\NavigationBundle\Twig\TitleNode;
+use Twig\Compiler;
+use Twig\Error\SyntaxError;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Node;
 
 class TitleNodeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Node|\PHPUnit\Framework\MockObject\MockObject */
     private $node;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Compiler|\PHPUnit\Framework\MockObject\MockObject */
     private $compiler;
 
-    /**
-     * @var TitleNode
-     */
+    /** @var TitleNode */
     private $titleNode;
 
-    /**
-     * Set up test environment
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->node = $this->createMock('Twig_Node');
-        $this->compiler = $this->getMockBuilder('Twig_Compiler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->node = $this->createMock(Node::class);
+        $this->compiler = $this->createMock(Compiler::class);
 
         $this->titleNode = new TitleNode($this->node);
     }
 
-    /**
-     * Tests error in twig tag call
-     *
-     * @expectedException \Twig_Error_Syntax
-     */
     public function testFailedCompile()
     {
-        $this->node->expects($this->once())->method('getIterator')->will($this->returnValue(array()));
+        $this->expectException(SyntaxError::class);
+
+        $this->node->expects($this->once())
+            ->method('getIterator')
+            ->willReturn(new \ArrayIterator([]));
 
         $this->titleNode->compile($this->compiler);
     }
 
-    /**
-     * Tests success node compiling
-     */
     public function testSuccessCompile()
     {
-        $exprMock = $this->getMockBuilder('Twig_Node_Expression_Array')->disableOriginalConstructor()->getMock();
+        $expr = $this->createMock(ArrayExpression::class);
 
         $this->node->expects($this->once())
             ->method('getIterator')
-            ->will($this->returnValue(array($exprMock)));
+            ->willReturn(new \ArrayIterator([$expr]));
 
-        $this->compiler->expects($this->at(0))
+        $this->compiler->expects($this->exactly(2))
             ->method('raw')
-            ->with("\n")
-            ->will($this->returnSelf());
-
-        $this->compiler->expects($this->at(1))
+            ->withConsecutive(
+                ["\n"],
+                [");\n"]
+            )
+            ->willReturnSelf();
+        $this->compiler->expects($this->once())
             ->method('write')
-            ->with('$this->env->getExtension("oro_title")->set(')
-            ->will($this->returnSelf());
-
-        $this->compiler->expects($this->at(2))
+            ->with('$this->env->getExtension("' . TitleExtension::class . '")->set(')
+            ->willReturnSelf();
+        $this->compiler->expects($this->once())
             ->method('subcompile')
-            ->with($exprMock)
-            ->will($this->returnSelf());
-
-        $this->compiler->expects($this->at(3))
-            ->method('raw')
-            ->with(");\n")
-            ->will($this->returnSelf());
+            ->with($expr)
+            ->willReturnSelf();
 
         $this->titleNode->compile($this->compiler);
     }

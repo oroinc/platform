@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
-class ItemValueController extends Controller
+/**
+ * Item value controller.
+ */
+class ItemValueController extends AbstractController
 {
     /**
      * @Route("/", name="oro_test_item_value_index")

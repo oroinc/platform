@@ -15,25 +15,25 @@ class FeatureCheckerWorkflowRegistryFilterTest extends \PHPUnit\Framework\TestCa
     /** @var FeatureCheckerWorkflowRegistryFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)->disableOriginalConstructor()->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->filter = new FeatureCheckerWorkflowRegistryFilter($this->featureChecker);
     }
 
     public function testFilter()
     {
-        $collection = new ArrayCollection(
-            [
-                'wd1' => $wd1 = (new WorkflowDefinition())->setName('wd1'),
-                'wd2' => $wd2 = (new WorkflowDefinition())->setName('wd2'),
-            ]
-        );
+        $wd1 = (new WorkflowDefinition())->setName('wd1');
+        $wd2 = (new WorkflowDefinition())->setName('wd2');
+        $collection = new ArrayCollection(['wd1' => $wd1, 'wd2' => $wd2]);
 
-        $this->featureChecker->expects($this->at(0))
-            ->method('isResourceEnabled')->with('wd1', 'workflows')->willReturn(false);
-        $this->featureChecker->expects($this->at(1))
-            ->method('isResourceEnabled')->with('wd2', 'workflows')->willReturn(true);
+        $this->featureChecker->expects($this->exactly(2))
+            ->method('isResourceEnabled')
+            ->willReturnMap([
+                ['wd1', 'workflows', null, false],
+                ['wd2', 'workflows', null, true]
+            ]);
 
         $result = $this->filter->filter($collection);
 
@@ -42,17 +42,16 @@ class FeatureCheckerWorkflowRegistryFilterTest extends \PHPUnit\Framework\TestCa
 
     public function testFilterCachesResult()
     {
-        $collection = new ArrayCollection(
-            [
-                'wd1' => $wd1 = (new WorkflowDefinition())->setName('wd1'),
-                'wd2' => $wd2 = (new WorkflowDefinition())->setName('wd2'),
-            ]
-        );
+        $wd1 = (new WorkflowDefinition())->setName('wd1');
+        $wd2 = (new WorkflowDefinition())->setName('wd2');
+        $collection = new ArrayCollection(['wd1' => $wd1, 'wd2' => $wd2]);
 
-        $this->featureChecker->expects($this->at(0))
-            ->method('isResourceEnabled')->with('wd1', 'workflows')->willReturn(false);
-        $this->featureChecker->expects($this->at(1))
-            ->method('isResourceEnabled')->with('wd2', 'workflows')->willReturn(true);
+        $this->featureChecker->expects($this->exactly(2))
+            ->method('isResourceEnabled')
+            ->willReturnMap([
+                ['wd1', 'workflows', null, false],
+                ['wd2', 'workflows', null, true]
+            ]);
 
         $result1 = $this->filter->filter($collection);
         $this->assertEquals(['wd2' => $wd2], $result1->toArray());

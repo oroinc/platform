@@ -6,11 +6,14 @@ use Oro\Bundle\ApiBundle\Exception\ExceptionInterface as ApiException;
 use Oro\Bundle\ApiBundle\Exception\ValidationExceptionInterface;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The default implementation of extractor that retrieves information from an exception object.
@@ -20,21 +23,35 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
     /** @var bool */
     private $debug;
 
+    /** @var TranslatorInterface */
+    private $translator;
+
     /** @var string[] */
     private $safeExceptions;
 
+    /** @var string[] */
+    private $safeExceptionExclusions;
+
     /**
-     * @param bool     $debug
-     * @param string[] $safeExceptions
+     * @param bool                $debug
+     * @param TranslatorInterface $translator
+     * @param string[]            $safeExceptions
+     * @param string[]            $safeExceptionExclusions
      */
-    public function __construct($debug, $safeExceptions)
-    {
+    public function __construct(
+        $debug,
+        TranslatorInterface $translator,
+        array $safeExceptions,
+        array $safeExceptionExclusions = []
+    ) {
         $this->debug = $debug;
+        $this->translator = $translator;
         $this->safeExceptions = $safeExceptions;
+        $this->safeExceptionExclusions = $safeExceptionExclusions;
         $this->safeExceptions[] = ApiException::class;
         $this->safeExceptions[] = HttpExceptionInterface::class;
         $this->safeExceptions[] = AccessDeniedException::class;
-        $this->safeExceptions[] = ForbiddenException::class;
+        $this->safeExceptions[] = AuthenticationException::class;
     }
 
     /**
@@ -47,7 +64,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
             return $underlyingException->getStatusCode();
         }
         if ($underlyingException instanceof AccessDeniedException
-            || $underlyingException instanceof ForbiddenException
+            || $underlyingException instanceof AuthenticationException
         ) {
             return Response::HTTP_FORBIDDEN;
         }
@@ -79,14 +96,30 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     public function getExceptionType(\Exception $exception)
     {
-        return ValueNormalizerUtil::humanizeClassName(
-            \get_class(ExceptionUtil::getProcessorUnderlyingException($exception)),
-            'Exception'
-        );
+        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
+
+        if (\get_class($underlyingException) === HttpException::class) {
+            $statusCode = $underlyingException->getStatusCode();
+            if (\array_key_exists($statusCode, Response::$statusTexts)) {
+                return strtolower(Response::$statusTexts[$statusCode]) . ' http exception';
+            }
+        }
+
+        $underlyingExceptionClass = \get_class($underlyingException);
+        if ($underlyingException instanceof AuthenticationException) {
+            $underlyingExceptionClass = AuthenticationException::class;
+        } elseif ($underlyingException instanceof AccessDeniedException
+            || $underlyingException instanceof AccessDeniedHttpException
+        ) {
+            $underlyingExceptionClass = AccessDeniedException::class;
+        }
+
+        return ValueNormalizerUtil::humanizeClassName($underlyingExceptionClass, 'Exception');
     }
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getExceptionText(\Exception $exception)
     {
@@ -104,13 +137,13 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
             $text = null;
         }
         if (null !== $text) {
-            if (\substr($text, -1) !== '.') {
+            if (!str_ends_with($text, '.')) {
                 $text .= '.';
             }
             if ($underlyingException !== $exception && $exception instanceof ExecutionFailedException) {
                 $processorPath = $exception->getProcessorId();
                 $e = $exception->getPrevious();
-                while (null !== $e && $e instanceof ExecutionFailedException) {
+                while ($e instanceof ExecutionFailedException) {
                     $processorPath .= '->' . $e->getProcessorId();
                     $e = $e->getPrevious();
                 }
@@ -121,31 +154,38 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         return $text;
     }
 
-    /**
-     * @param \Exception $exception
-     *
-     * @return bool
-     */
-    private function isSafeException(\Exception $exception)
+    private function isSafeException(\Exception $exception): bool
     {
+        $isSafe = false;
         foreach ($this->safeExceptions as $class) {
-            if (\is_a($exception, $class)) {
-                return true;
+            if (is_a($exception, $class)) {
+                $isSafe = true;
+                break;
+            }
+        }
+        if ($isSafe) {
+            foreach ($this->safeExceptionExclusions as $exclusionClass) {
+                if (is_a($exception, $exclusionClass)) {
+                    $isSafe = false;
+                    break;
+                }
             }
         }
 
-        return false;
+        return $isSafe;
     }
 
-    /**
-     * @param \Exception $exception
-     *
-     * @return string
-     */
-    private function getSafeExceptionText(\Exception $exception)
+    private function getSafeExceptionText(\Exception $exception): string
     {
-        if ($exception instanceof ForbiddenException) {
-            return $exception->getReason();
+        if ($exception instanceof AccessDeniedException) {
+            return $exception->getMessage();
+        }
+        if ($exception instanceof AuthenticationException) {
+            return $this->translator->trans(
+                $exception->getMessageKey(),
+                $exception->getMessageData(),
+                'security'
+            );
         }
 
         return $exception->getMessage();

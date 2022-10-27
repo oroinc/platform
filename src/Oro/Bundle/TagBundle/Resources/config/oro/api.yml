@@ -1,11 +1,66 @@
 api:
     entities:
-        # remove this exclusion when Tag entity will be ready to be enabled for Data API
-        Oro\Bundle\TagBundle\Entity\Tag: { exclude: true}
-        Oro\Bundle\TagBundle\Entity\Taxonomy:
-            documentation_resource: '@OroTagBundle/Resources/doc/api/taxonomic_unit.md'
+        Oro\Bundle\TagBundle\Entity\Tagging:
+            fields:
+                entity:
+                    data_type: nestedAssociation
+                    fields:
+                        __class__:
+                            property_path: entityName
+                        id:
+                            property_path: recordId
+            # set manually to make the entity known for API because this entity is hidden
+            exclude: false
+            # this entity does not have own API resource
+            actions: false
+
+        Oro\Bundle\TagBundle\Entity\Tag:
+            documentation_resource: '@OroTagBundle/Resources/doc/api/tag.md'
+            fields:
+                createdAt:
+                    property_path: created
+                updatedAt:
+                    property_path: updated
+                entities:
+                    target_class: Oro\Bundle\ApiBundle\Model\EntityIdentifier
+                    target_type: collection
+                    property_path: _
+                    depends_on: [ tagging.entity ]
+            subresources:
+                entities:
+                    target_class: Oro\Bundle\ApiBundle\Model\EntityIdentifier
+                    target_type: collection
+                    actions:
+                        get_subresource: true
+                        get_relationship: true
+                        add_relationship: true
+                        update_relationship: true
+                        delete_relationship: true
             actions:
                 delete:
                     exclude: false # set manually because this entity is marked as a dictionary
                 delete_list:
+                    exclude: false # set manually because this entity is marked as a dictionary
+                create:
+                    exclude: false # set manually because this entity is marked as a dictionary
+                update:
+                    exclude: false # set manually because this entity is marked as a dictionary
+
+        Oro\Bundle\TagBundle\Entity\Taxonomy:
+            documentation_resource: '@OroTagBundle/Resources/doc/api/taxonomy.md'
+            fields:
+                tags:
+                    exclude: true
+                createdAt:
+                    property_path: created
+                updatedAt:
+                    property_path: updated
+            actions:
+                delete:
+                    exclude: false # set manually because this entity is marked as a dictionary
+                delete_list:
+                    exclude: false # set manually because this entity is marked as a dictionary
+                create:
+                    exclude: false # set manually because this entity is marked as a dictionary
+                update:
                     exclude: false # set manually because this entity is marked as a dictionary

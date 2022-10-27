@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmail;
@@ -14,18 +17,18 @@ use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|EmailOwnerProviderStorage */
-    protected $emailOwnerProviderStorage;
+    private $emailOwnerProviderStorage;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EmailAddressManager */
-    protected $emailAddressManager;
+    private $emailAddressManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EmailOwnerManager */
-    protected $emailOwnerManager;
+    private $emailOwnerManager;
 
     /** @var array */
-    protected $fixtures;
+    private $fixtures;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->fixtures = [
             'primaryEmail' => [
@@ -42,34 +45,28 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $emailOwnerProvider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
-        $emailOwnerProvider
-            ->expects($this->any())
+        $emailOwnerProvider = $this->createMock(EmailOwnerProviderInterface::class);
+        $emailOwnerProvider->expects($this->any())
             ->method('getEmailOwnerClass')
-            ->will($this->returnValue('Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner'));
+            ->willReturn(TestEmailOwner::class);
 
-        $this->emailOwnerProviderStorage =
-            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->emailOwnerProviderStorage = $this->createMock(EmailOwnerProviderStorage::class);
         $this->emailOwnerProviderStorage->expects($this->any())
             ->method('getProviders')
-            ->will($this->returnValue([$emailOwnerProvider, $emailOwnerProvider]));
+            ->willReturn([$emailOwnerProvider, $emailOwnerProvider]);
         $this->emailOwnerProviderStorage->expects($this->any())
             ->method('getEmailOwnerFieldName')
-            ->will($this->onConsecutiveCalls('primaryEmail', 'homeEmail'));
+            ->willReturnOnConsecutiveCalls('primaryEmail', 'homeEmail');
 
-        $emailAddressRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailAddressRepository = $this->createMock(EntityRepository::class);
         $emailAddressRepository->expects($this->any())
             ->method('findOneBy')
-            ->will($this->returnCallback(function (array $criteria) {
+            ->willReturnCallback(function (array $criteria) {
                 return $this->findEmailAddressBy($criteria['email']);
-            }));
+            });
         $emailAddressRepository->expects($this->any())
             ->method('findBy')
-            ->will($this->returnCallback(function (array $criteria) {
+            ->willReturnCallback(function (array $criteria) {
                 $keys = array_keys($criteria);
                 $owner = $criteria[$keys[0]];
 
@@ -79,24 +76,20 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
                 }
 
                 return [];
-            }));
+            });
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
 
-        $this->emailAddressManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->emailAddressManager = $this->createMock(EmailAddressManager::class);
         $this->emailAddressManager->expects($this->any())
             ->method('getEmailAddressRepository')
-            ->will($this->returnValue($emailAddressRepository));
+            ->willReturn($emailAddressRepository);
         $this->emailAddressManager->expects($this->any())
             ->method('newEmailAddress')
-            ->will($this->returnValue(new EmailAddress()));
+            ->willReturn(new EmailAddress());
         $this->emailAddressManager->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->emailOwnerManager = new EmailOwnerManager(
             $this->emailOwnerProviderStorage,
@@ -112,7 +105,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->emailOwnerManager->handleChangedAddresses($emailAddressData));
     }
 
-    public function handleChangedAddressesDataProvider()
+    public function handleChangedAddressesDataProvider(): array
     {
         $created1 = new TestEmailOwner(null, 'created1');
         $deleted1 = new TestEmailOwner(2, 'deleted1');
@@ -123,7 +116,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
                     'updates' => [],
                     'deletions' => [],
                 ],
-                [[],[]],
+                [[],[], []],
             ],
             [
                 [
@@ -154,6 +147,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
                             ->setOwner($created1)
                             ->setEmail('primary@example.com'),
                     ],
+                    ['primary@example.com', 'existing@example.com', 'existing2@example.com']
                 ],
             ],
         ];
@@ -167,7 +161,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $this->emailOwnerManager->createEmailAddressData($uow));
     }
 
-    public function createEmailAddressDataProvider()
+    public function createEmailAddressDataProvider(): array
     {
         $created1 = new TestEmailOwner(null, 'created1');
         $created2 = new TestEmailOwner(null, 'created2');
@@ -226,7 +220,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function findEmailAddressBy($value, $key = 'email')
+    private function findEmailAddressBy($value, $key = 'email')
     {
         if (array_key_exists($key, $this->fixtures) && array_key_exists($value, $this->fixtures[$key])) {
             return $this->fixtures[$key][$value];

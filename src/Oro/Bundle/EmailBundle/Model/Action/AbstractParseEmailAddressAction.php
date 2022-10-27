@@ -18,10 +18,6 @@ abstract class AbstractParseEmailAddressAction extends AbstractAction
     /** @var EmailAddressHelper */
     protected $addressHelper;
 
-    /**
-     * @param ContextAccessor    $contextAccessor
-     * @param EmailAddressHelper $addressHelper
-     */
     public function __construct(ContextAccessor $contextAccessor, EmailAddressHelper $addressHelper)
     {
         parent::__construct($contextAccessor);

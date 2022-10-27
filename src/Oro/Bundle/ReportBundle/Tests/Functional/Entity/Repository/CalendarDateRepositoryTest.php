@@ -8,10 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CalendarDateRepositoryTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }
@@ -58,7 +55,7 @@ class CalendarDateRepositoryTest extends WebTestCase
     /**
      * @return CalendarDateRepository
      */
-    protected function getRepository()
+    private function getRepository()
     {
         return $this->getContainer()->get('doctrine')->getRepository(CalendarDate::class);
     }
@@ -66,7 +63,7 @@ class CalendarDateRepositoryTest extends WebTestCase
     /**
      * @return CalendarDate
      */
-    protected function getLastCalendarDate()
+    private function getLastCalendarDate()
     {
         return $this->getRepository()->findOneBy([], ['date' => 'DESC']);
     }
@@ -74,12 +71,12 @@ class CalendarDateRepositoryTest extends WebTestCase
     /**
      * @return CalendarDate
      */
-    protected function getFirstCalendarDate()
+    private function getFirstCalendarDate()
     {
         return $this->getRepository()->findOneBy([], ['date' => 'ASC']);
     }
 
-    protected function emptyTable()
+    private function emptyTable()
     {
         $records = $this->getRepository()->findAll();
         $manager = $this->getContainer()->get('doctrine')->getManager();

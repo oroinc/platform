@@ -7,17 +7,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ConfigurationControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
     }
 
-    /**
-     * @return array
-     */
-    public function testGetList()
+    public function testGetList(): array
     {
-        $this->client->request('GET', $this->getUrl('oro_api_get_configurations'));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_configurations'));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertNotEmpty($result);
@@ -27,16 +24,13 @@ class ConfigurationControllerTest extends WebTestCase
 
     /**
      * @depends testGetList
-     *
-     * @param string[] $sections
      */
     public function testGet(array $sections)
     {
         foreach ($sections as $sectionPath) {
-            $this->client->request(
+            $this->client->jsonRequest(
                 'GET',
                 $this->getUrl('oro_api_get_configuration', ['path' => $sectionPath]),
-                [],
                 [],
                 $this->generateWsseAuthHeader()
             );
@@ -46,19 +40,12 @@ class ConfigurationControllerTest extends WebTestCase
         }
     }
 
-    /**
-     * @param Response $response
-     * @param integer  $statusCode
-     * @param string   $sectionPath
-     *
-     * @return array
-     */
-    protected function getApiJsonResponseContent(Response $response, $statusCode, $sectionPath)
+    private function getApiJsonResponseContent(Response $response, int $statusCode, string $sectionPath): array
     {
         try {
             $this->assertResponseStatusCodeEquals($response, $statusCode);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            $e = new \PHPUnit\Framework\ExpectationFailedException(
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Wrong %s response for section: "%s". Error message: %s',
                     $statusCode,
@@ -67,7 +54,6 @@ class ConfigurationControllerTest extends WebTestCase
                 ),
                 $e->getComparisonFailure()
             );
-            throw $e;
         }
 
         return self::jsonToArray($response->getContent());

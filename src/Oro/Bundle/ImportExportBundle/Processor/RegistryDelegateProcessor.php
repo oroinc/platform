@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\ImportExportBundle\Processor;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
+/**
+ * Import/export batch job processor that is aware of other processors, delegates processing to the most suitable one.
+ */
 class RegistryDelegateProcessor implements ProcessorInterface, StepExecutionAwareInterface, ClosableInterface
 {
     /**
@@ -87,9 +90,6 @@ class RegistryDelegateProcessor implements ProcessorInterface, StepExecutionAwar
         return $result;
     }
 
-    /**
-     * @param StepExecution $stepExecution
-     */
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;

@@ -19,9 +19,6 @@ class SetHttpResponseStatusCode implements ProcessorInterface
     /** @var int */
     private $defaultSuccessStatusCode;
 
-    /**
-     * @param int $defaultSuccessStatusCode
-     */
     public function __construct(int $defaultSuccessStatusCode = Response::HTTP_OK)
     {
         $this->defaultSuccessStatusCode = $defaultSuccessStatusCode;
@@ -42,11 +39,6 @@ class SetHttpResponseStatusCode implements ProcessorInterface
         $context->setResponseStatusCode($this->getResponseStatusCode($context));
     }
 
-    /**
-     * @param Context $context
-     *
-     * @return int
-     */
     private function getResponseStatusCode(Context $context): int
     {
         $statusCode = $this->defaultSuccessStatusCode;

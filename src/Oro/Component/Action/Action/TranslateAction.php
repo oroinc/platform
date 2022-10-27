@@ -7,7 +7,7 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslateAction extends AbstractAction
 {
@@ -22,10 +22,6 @@ class TranslateAction extends AbstractAction
     /** @var array */
     protected $options;
 
-    /**
-     * @param ContextAccessor     $contextAccessor
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ContextAccessor $contextAccessor, TranslatorInterface $translator)
     {
         parent::__construct($contextAccessor);

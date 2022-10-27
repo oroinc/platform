@@ -14,9 +14,6 @@ class ConfigApiManager
     /** @var ConfigManager[] */
     protected $configManagers;
 
-    /**
-     * @param ProviderInterface $configProvider
-     */
     public function __construct(ProviderInterface $configProvider)
     {
         $this->configProvider = $configProvider;

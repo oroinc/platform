@@ -4,11 +4,12 @@ namespace Oro\Bundle\ApiBundle\Form;
 
 use Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataEventDispatcher;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -16,37 +17,38 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class FormValidationHandler
 {
-    /** @var ValidatorInterface */
-    protected $validator;
+    private ValidatorInterface $validator;
+    private CustomizeFormDataEventDispatcher $customizeFormDataEventDispatcher;
+    private PropertyAccessorInterface $propertyAccessor;
 
-    /** @var CustomizeFormDataHandler */
-    private $customizationHandler;
+    public function __construct(
+        ValidatorInterface $validator,
+        CustomizeFormDataEventDispatcher $customizeFormDataEventDispatcher,
+        PropertyAccessorInterface $propertyAccessor
+    ) {
+        $this->validator = $validator;
+        $this->customizeFormDataEventDispatcher = $customizeFormDataEventDispatcher;
+        $this->propertyAccessor = $propertyAccessor;
+    }
 
     /**
-     * @param ValidatorInterface       $validator
-     * @param CustomizeFormDataHandler $customizationHandler
+     * Dispatches "pre_validate" event for the given form.
+     *
+     * @throws \InvalidArgumentException if the given form is not root form or it is not submitted yet
      */
-    public function __construct(ValidatorInterface $validator, CustomizeFormDataHandler $customizationHandler)
+    public function preValidate(FormInterface $form): void
     {
-        $this->validator = $validator;
-        $this->customizationHandler = $customizationHandler;
+        $this->customizeFormDataEventDispatcher->dispatch(CustomizeFormDataContext::EVENT_PRE_VALIDATE, $form);
     }
 
     /**
      * Validates the given form.
      *
-     * @param FormInterface $form
-     *
-     * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
+     * @throws \InvalidArgumentException if the given form is not root form or it is not submitted yet
      */
     public function validate(FormInterface $form): void
     {
-        if (!$form->isRoot()) {
-            throw new \InvalidArgumentException('The root form is expected.');
-        }
-        if (!$form->isSubmitted()) {
-            throw new \InvalidArgumentException('The submitted form is expected.');
-        }
+        FormUtil::assertSubmittedRootForm($form);
 
         /**
          * Mark all children of the processing root form as submitted
@@ -55,79 +57,36 @@ class FormValidationHandler
          * is a bit better approach than
          * using Form::submit($clearMissing = true) with a "pre-submit" listener that replaces missing fields
          * in submitted data with its default values from an entity.
-         * Using the first approach we can submit all Data API forms
+         * Using the first approach we can submit all API forms
          * with $clearMissing = false and manage the validation just via "enable_full_validation" form option.
          * @link https://symfony.com/doc/current/form/direct_submit.html
-         * @see \Symfony\Component\Form\Form::submit
+         * @see  \Symfony\Component\Form\Form::submit
          * @link https://github.com/symfony/symfony/pull/10567
-         * @see \Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper::acceptsErrors
-         * @see \Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener
-         * @see \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
+         * @see  \Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper::acceptsErrors
+         * @see  \Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener
+         * @see  \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
          */
         if ($form->getConfig()->getOption(ValidationExtension::ENABLE_FULL_VALIDATION)) {
-            ReflectionUtil::markFormChildrenAsSubmitted($form);
+            ReflectionUtil::markFormChildrenAsSubmitted($form, $this->propertyAccessor);
         }
-
-        $validationListener = $this->getValidationListener();
-        $event = $this->createFormEvent($form);
-        $validationListener->validateForm($event);
-        $this->dispatchFinishSubmitEventForChildren($form);
-        if ($this->isFinishSubmitEventSupported($form)) {
-            $this->dispatchFinishSubmitEvent($event);
-        }
+        $this->getValidationListener()->validateForm(new FormEvent($form, $form->getViewData()));
     }
 
     /**
-     * @return ValidationListener
+     * Dispatches "post_validate" event for the given form.
+     *
+     * @throws \InvalidArgumentException if the given form is not root form or it is not submitted yet
      */
-    protected function getValidationListener(): ValidationListener
+    public function postValidate(FormInterface $form): void
+    {
+        $this->customizeFormDataEventDispatcher->dispatch(CustomizeFormDataContext::EVENT_POST_VALIDATE, $form);
+    }
+
+    private function getValidationListener(): ValidationListener
     {
         return new ValidationListener(
             $this->validator,
             new ViolationMapper()
         );
-    }
-
-    /**
-     * @param FormInterface $form
-     *
-     * @return FormEvent
-     */
-    private function createFormEvent(FormInterface $form): FormEvent
-    {
-        return new FormEvent($form, $form->getViewData());
-    }
-
-    /**
-     * @param FormInterface $form
-     *
-     * @return bool
-     */
-    private function isFinishSubmitEventSupported(FormInterface $form): bool
-    {
-        return $form->getConfig()->hasAttribute(CustomizeFormDataHandler::API_EVENT_CONTEXT);
-    }
-    /**
-     * @param FormEvent $event
-     */
-    private function dispatchFinishSubmitEvent(FormEvent $event): void
-    {
-        $this->customizationHandler->handleFormEvent(CustomizeFormDataContext::EVENT_FINISH_SUBMIT, $event);
-    }
-
-    /**
-     * @param FormInterface $form
-     */
-    private function dispatchFinishSubmitEventForChildren(FormInterface $form): void
-    {
-        /** @var FormInterface $child */
-        foreach ($form as $child) {
-            if ($child->count() > 0) {
-                $this->dispatchFinishSubmitEventForChildren($child);
-            }
-            if ($this->isFinishSubmitEventSupported($child)) {
-                $this->dispatchFinishSubmitEvent($this->createFormEvent($child));
-            }
-        }
     }
 }

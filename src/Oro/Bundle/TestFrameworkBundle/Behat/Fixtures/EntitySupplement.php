@@ -5,15 +5,18 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Faker\Factory;
-use Faker\ORM\Doctrine\ColumnTypeGuesser;
-use Nelmio\Alice\Instances\Collection as AliceCollection;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Bundle\TestFrameworkBundle\Faker\ColumnTypeGuesser;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * Entity supplement.
+ */
 class EntitySupplement
 {
     /**
@@ -22,7 +25,7 @@ class EntitySupplement
     protected $kernel;
 
     /**
-     * @var AliceCollection
+     * @var Collection
      */
     protected $referenceRepository;
 
@@ -46,14 +49,9 @@ class EntitySupplement
      */
     protected $metadataProvider;
 
-    /**
-     * @param KernelInterface $kernel
-     * @param AliceCollection $referenceRepository
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     */
     public function __construct(
         KernelInterface $kernel,
-        AliceCollection $referenceRepository,
+        Collection $referenceRepository,
         OwnershipMetadataProviderInterface $metadataProvider
     ) {
         $this->kernel = $kernel;

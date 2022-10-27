@@ -4,6 +4,9 @@ namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
+/**
+ * Datagrid property that calls a callable, usually a service method, with parameters
+ */
 class CallbackProperty extends AbstractProperty
 {
     const CALLABLE_KEY = 'callable';
@@ -27,12 +30,8 @@ class CallbackProperty extends AbstractProperty
     protected function getParameters(ResultRecordInterface $record)
     {
         $result = [];
-        foreach ($this->getOr(self::PARAMS_KEY, []) as $name => $dataKey) {
-            if (is_numeric($name)) {
-                $name = $dataKey;
-            }
-
-            $result[$name] = $record->getValue($dataKey);
+        foreach ($this->getOr(self::PARAMS_KEY, []) as $dataKey) {
+            $result[] = $record->getValue($dataKey);
         }
 
         return $result ?: [$record];

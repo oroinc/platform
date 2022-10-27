@@ -42,7 +42,7 @@ class DuplicatorTest extends \PHPUnit\Framework\TestCase
         $entity = $this->getEntity();
 
         $duplicator = $this->createDuplicator();
-        /* @var $entityCopy Entity1 */
+        /* @var Entity1 $entityCopy */
         $entityCopy = $duplicator->duplicate($entity, $params);
 
         $this->assertNotSame($entity, $entityCopy);
@@ -60,17 +60,17 @@ class DuplicatorTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($entityCopy->getItems(), $entity->getItems());
         $this->assertEquals($entityCopy->getItems(), $entity->getItems());
 
-        /* @var $itemCopy EntityItem1 */
+        /* @var EntityItem1 $itemCopy */
         $itemCopy = $entityCopy->getItems()->first();
-        /* @var $item EntityItem1 */
+        /* @var EntityItem1 $item */
         $item = $entity->getItems()->first();
         $this->assertNotSame($item, $itemCopy);
         $this->assertEquals($item, $itemCopy);
         $this->assertEquals($item->getComment(), $itemCopy->getComment());
 
-        /* @var $item2 EntityItem2 */
+        /* @var EntityItem2 $item2 */
         $item2 = $item->getItems()->first();
-        /* @var  $item2Copy EntityItem2 */
+        /* @var  EntityItem2 $item2Copy */
         $item2Copy = $itemCopy->getItems()->first();
 
         $this->assertEquals($item2, $item2Copy);

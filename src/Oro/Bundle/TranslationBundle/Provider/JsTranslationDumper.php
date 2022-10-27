@@ -2,104 +2,75 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Oro\Bundle\TranslationBundle\Controller\Controller;
-use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Oro\Bundle\GaufretteBundle\FileManager;
 use Symfony\Component\Filesystem\Exception\IOException;
 
-class JsTranslationDumper implements LoggerAwareInterface
+/**
+ * Dump JS translations to files.
+ */
+class JsTranslationDumper
 {
-    use LoggerAwareTrait;
+    private JsTranslationGenerator $generator;
+    private LanguageProvider $languageProvider;
+    private FileManager $fileManager;
 
-    /** @var Controller */
-    protected $translationController;
-
-    /** @var array */
-    protected $translationDomains;
-
-    /** @var string */
-    protected $kernelProjectDir;
-
-    /** @var LanguageProvider */
-    protected $languageProvider;
-
-    /**
-     * @var Router
-     */
-    protected $router;
-    /**
-     * @var string
-     */
-    protected $jsTranslationRoute;
-
-    /**
-     * @param Controller       $translationController
-     * @param Router           $router
-     * @param array            $translationDomains
-     * @param string           $kernelProjectDir
-     * @param LanguageProvider $languageProvider
-     * @param string           $jsTranslationRoute
-     */
     public function __construct(
-        Controller $translationController,
-        Router $router,
-        $translationDomains,
-        $kernelProjectDir,
+        JsTranslationGenerator $generator,
         LanguageProvider $languageProvider,
-        $jsTranslationRoute = 'oro_translation_jstranslation'
+        FileManager $fileManager
     ) {
-        $this->translationController = $translationController;
-        $this->router                = $router;
-        $this->translationDomains    = $translationDomains;
-        $this->kernelProjectDir      = $kernelProjectDir;
-        $this->languageProvider      = $languageProvider;
-        $this->jsTranslationRoute    = $jsTranslationRoute;
-
-        $this->setLogger(new NullLogger());
+        $this->generator = $generator;
+        $this->languageProvider = $languageProvider;
+        $this->fileManager = $fileManager;
     }
 
     /**
-     * @param array         $locales
-     *
-     * @return bool
-     * @throws \Symfony\Component\Filesystem\Exception\IOException
-     * @throws \RuntimeException
+     * @return string[]
      */
-    public function dumpTranslations($locales = [])
+    public function getAllLocales(): array
     {
-        if (empty($locales)) {
-            $locales = array_keys($this->languageProvider->getAvailableLanguages());
+        return $this->languageProvider->getAvailableLanguageCodes();
+    }
+
+    /**
+     * @param string[] $locales
+     */
+    public function dumpTranslations(array $locales = []): void
+    {
+        if (!$locales) {
+            $locales = $this->getAllLocales();
         }
-
-        $targetPattern = realpath($this->kernelProjectDir . '/public')
-            . $this->router->getRouteCollection()->get($this->jsTranslationRoute)->getPath();
-
         foreach ($locales as $locale) {
-            $target = strtr($targetPattern, array('{_locale}' => $locale));
+            $this->dumpTranslationFile($locale);
+        }
+    }
 
-            $this->logger->info(
-                sprintf(
-                    '<comment>%s</comment> <info>[file+]</info> %s',
-                    date('H:i:s'),
-                    basename($target)
-                )
+    public function dumpTranslationFile(string $locale): string
+    {
+        $translationFile = $this->getTranslationFilePath($locale);
+        try {
+            $content = $this->generator->generateJsTranslations($locale);
+            $this->fileManager->writeToStorage($content, $translationFile);
+        } catch (\Exception $e) {
+            $message = sprintf(
+                'An error occurred while dumping content to %s, %s',
+                $translationFile,
+                $e->getMessage()
             );
 
-            $content = $this->translationController->renderJsTranslationContent($this->translationDomains, $locale);
-
-            $dirName = dirname($target);
-            if (!is_dir($dirName) && true !== @mkdir($dirName, 0777, true)) {
-                throw new IOException(sprintf('Failed to create %s', $dirName));
-            }
-
-            if (false === @file_put_contents($target, $content)) {
-                throw new \RuntimeException('Unable to write file ' . $target);
-            }
+            throw new IOException($message, $e->getCode(), $e);
         }
 
-        return true;
+        return $translationFile;
+    }
+
+    public function isTranslationFileExist(string $locale): bool
+    {
+        return $this->fileManager->hasFile($this->getTranslationFilePath($locale));
+    }
+
+    private function getTranslationFilePath(string $locale): string
+    {
+        return sprintf('translation/%s.json', $locale);
     }
 }

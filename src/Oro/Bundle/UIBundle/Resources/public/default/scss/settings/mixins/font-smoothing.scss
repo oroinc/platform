@@ -1,0 +1,8 @@
+/* @theme: default; */
+
+// Use: @include font-smoothing();
+// This mixin enable smoothing for more better rendering of fonts
+@mixin font-smoothing() {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

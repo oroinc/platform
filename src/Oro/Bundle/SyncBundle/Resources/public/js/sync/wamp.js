@@ -1,12 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'autobahn'
-], function($, _, Backbone, ab) {
+define(function(require) {
     'use strict';
 
-    var defaultOptions = {
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const ab = require('autobahn');
+
+    const defaultOptions = {
         port: 80,
         debug: false,
         path: ''
@@ -16,7 +16,7 @@ define([
      * Wraps callback in order to make it compatible with autobahn event callback
      */
     function wrapCallback(callback) {
-        var wrapper = function(channel, attributes) {
+        const wrapper = function(channel, attributes) {
             callback(attributes);
         };
         wrapper.origCallback = callback;
@@ -32,7 +32,6 @@ define([
      * @param {string} options.host is required
      * @param {number=} options.port default is 80
      * @param {number=} options.retryDelay time before next reconnection attempt, default is 5000 (5s)
-     * @param {number=} options.maxRetries quantity of attempts before stop reconnection, default is 10
      * @param {boolean=} options.skipSubprotocolCheck, default is false
      * @param {boolean=} options.skipSubprotocolAnnounce, default is false
      * @param {boolean=} options.debug, default is false
@@ -57,19 +56,16 @@ define([
         }
         this.connect();
         // fixes premature connection close in FF on page reload
-        $(window).on('beforeunload', _.bind(function() {
+        $(window).on('beforeunload', () => {
             if (this.session) {
                 this.session.close();
             }
-        }, this));
+        });
     }
 
     Wamp.prototype = {
         // number of retry reconnects
         retryCount: 0,
-
-        // quantity of attempts before stop reconnection
-        maxRetries: 0,
 
         /**
          * Initiate connection process
@@ -79,8 +75,8 @@ define([
                 $.ajax(this.options.syncTicketUrl, {
                     method: 'POST',
                     success: (function(response) {
-                        var protocol = this.options.secure ? 'wss' : 'ws';
-                        var wsuri = [
+                        const protocol = this.options.secure ? 'wss' : 'ws';
+                        let wsuri = [
                             protocol,
                             '://',
                             this.options.host,
@@ -90,7 +86,7 @@ define([
                             this.options.path.replace(/\/+$/, '')
                         ].join('');
                         wsuri = wsuri + '?ticket=' + encodeURIComponent(response.ticket);
-                        ab.connect(wsuri, _.bind(this.onConnect, this), _.bind(this.onHangup, this), this.options);
+                        ab.connect(wsuri, this.onConnect.bind(this), this.onHangup.bind(this), this.options);
                     }).bind(this),
                     error: (function() {
                         this.onHangup(ab.CONNECTION_UNSUPPORTED);
@@ -123,7 +119,7 @@ define([
          *      if was no function corresponded then removes all callbacks for a channel
          */
         unsubscribe: function(channel, callback) {
-            var callbacks = this.channels[channel];
+            let callbacks = this.channels[channel];
             if (!callbacks) {
                 return;
             }
@@ -157,7 +153,6 @@ define([
          * @param {string} msg text message
          * @param {Object} details
          * @param {number} details.delay in ms, before next reconnect attempt
-         * @param {number} details.maxretries max number of attempts
          * @param {number} details.retries number of scheduled attempt
          */
         onHangup: function(code, msg, details) {
@@ -165,24 +160,17 @@ define([
             // change the callback retries parameter to real attempt
             details = _.extend(
                 details || {},
-                {retries: this.retryCount, maxretries: this.maxRetries, delay: this.options.retryDelay}
+                {retries: this.retryCount, delay: this.options.retryDelay}
             );
-
-            if (code === ab.CONNECTION_RETRIES_EXCEEDED) {
-                if (this.retryCount <= this.maxRetries) {
-                    var that = this;
-                    window.setTimeout(function() {
-                        that.connect();
-                    }, this.options.retryDelay);
-                } else {
-                    // set the retries to null in case if was reached maximum number of retries
-                    details.retries = null;
-                }
-            }
 
             if (code !== ab.CONNECTION_CLOSED) {
                 this.trigger('connection_lost', _.extend({code: code}, details));
+
+                window.setTimeout(() => {
+                    this.connect();
+                }, this.retryCount * this.options.retryDelay);
             }
+
             this.session = null;
         },
 
@@ -192,6 +180,7 @@ define([
          */
         onConnect: function(session) {
             this.session = session;
+            this.retryCount = 0;
             this.trigger('connection_established');
             _.each(this.channels, function(callbacks, channel) {
                 _.each(callbacks, function(callback) {

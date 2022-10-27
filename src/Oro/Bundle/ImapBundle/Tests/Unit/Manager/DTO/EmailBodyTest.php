@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
+use Laminas\Mail\Header\ContentType;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Zend\Mail\Header\ContentType;
+use PHPUnit\Framework\TestCase;
 
-class EmailBodyTest extends \PHPUnit\Framework\TestCase
+class EmailBodyTest extends TestCase
 {
     use EntityTestCaseTrait;
 
     /** @var EmailBody */
     private $emailBody;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->emailBody = new EmailBody();
     }
@@ -45,10 +46,7 @@ class EmailBodyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->emailBody->getOriginalContentType());
     }
 
-    /**
-     * @return array
-     */
-    public function originalContentTypeProvider()
+    public function originalContentTypeProvider(): array
     {
         return [
             'string' => [

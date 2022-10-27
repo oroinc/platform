@@ -5,9 +5,7 @@ namespace Oro\Bundle\MigrationBundle\Locator;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 
 /**
- * Provide information about fixture path
- *
- * @package Oro\Bundle\MigrationBundle\Locator
+ * Provides the path to "main" and "demo" data fixtures.
  */
 class FixturePathLocator implements FixturePathLocatorInterface
 {

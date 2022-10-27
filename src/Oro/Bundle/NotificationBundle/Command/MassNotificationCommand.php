@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace  Oro\Bundle\NotificationBundle\Command;
 
@@ -6,70 +7,76 @@ use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Sends maintenance mass notification to a configured group of email or to enabled users if no emails were configured.
- *
- * @package Oro\Bundle\NotificationBundle\Command
+ * Sends an email notification to the application users.
  */
-class MassNotificationCommand extends ContainerAwareCommand
+class MassNotificationCommand extends Command
 {
-    const COMMAND_NAME = 'oro:maintenance-notification';
+    /** @var string */
+    protected static $defaultName = 'oro:maintenance-notification';
 
-    /**
-     * Console command configuration
-     */
-    public function configure()
+    private MassNotificationSender $massNotificationSender;
+    private LoggerInterface $logger;
+
+    public function __construct(MassNotificationSender $massNotificationSender, LoggerInterface $logger)
     {
-        $this->setName(self::COMMAND_NAME)
-            ->setDescription(
-                'Send mass notifications to all active application users ' .
-                'or to the emails specified in the Recipients list under ' .
-                'Maintenance Notification configuration settings'
-            )
-            ->addOption(
-                'subject',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Subject of notification email. If emtpy, subject from the configured template is used'
-            )
-            ->addOption(
-                'message',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Notification message to send'
-            )
-            ->addOption(
-                'file',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Path to the text file with message.'
-            )
-            ->addOption(
-                'sender_name',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Notification sender name'
-            )
-            ->addOption(
-                'sender_email',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Notification sender email'
-            );
+        $this->massNotificationSender = $massNotificationSender;
+        $this->logger = $logger;
+        parent::__construct();
     }
 
-    /**
-     * Runs command
-     *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     * @return void
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    public function configure()
+    {
+        $this
+            ->addOption('subject', null, InputOption::VALUE_OPTIONAL, 'Override the default subject')
+            ->addOption('message', null, InputOption::VALUE_OPTIONAL, 'Notification message to send')
+            ->addOption('file', null, InputOption::VALUE_OPTIONAL, 'Path to the text file with message.')
+            ->addOption('sender_name', null, InputOption::VALUE_OPTIONAL, 'Notification sender name')
+            ->addOption('sender_email', null, InputOption::VALUE_OPTIONAL, 'Notification sender email')
+            ->setDescription('Sends an email notification to the application users.')
+            ->setHelp(
+            // @codingStandardsIgnoreStart
+            <<<'HELP'
+The <info>%command.name%</info> command sends an email notification to the recipients listed in 
+<comment>System Configuration > General Setup > Email Configuration > Maintenance Notifications > Recipients</comment>.
+If the recipient list in the system configuration is left empty, the notification will be sent
+<options=bold>to all active application users</>.
+
+  <info>php %command.full_name%</info>
+
+The text of the message can be provide either as the value of the <info>--message</info> option
+or it can be read from a text file specified in the <info>--file</info> option:
+
+  <info>php %command.full_name% --message=<message-text></info>
+  <info>php %command.full_name% --file=<path-to-text-file></info>
+
+The <info>--subject</info> option can be used to override the default subject
+provided by the configured email template:
+
+  <info>php %command.full_name% --message=<message> --subject=<subject></info>
+
+The <info>--sender_name</info> and <info>--sender_email</info> options can be used to override
+the default name and email address of the sender:
+
+  <info>php %command.full_name% --message=<message> --sender_name=<name> --sender_email=<email></info>
+
+HELP
+            )
+            // @codingStandardsIgnoreEnd
+            ->addUsage('--message=<message-text>')
+            ->addUsage('--file=<path-to-text-file>')
+            ->addUsage('--message=<message> --subject=<subject>')
+            ->addUsage('--message=<message> --sender_name=<name> --sender_email=<email>')
+        ;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $subject     = $input->getOption('subject');
@@ -87,36 +94,21 @@ class MassNotificationCommand extends ContainerAwareCommand
             $message = file_get_contents($filePath);
         }
 
-        $massNotificationSender = $this->getMassNotificationSender();
-
         $sender = $senderEmail
             ? From::emailAddress($senderEmail, $senderName)
             : null;
 
         try {
-            $count = $massNotificationSender->send($message, $subject, $sender);
+            $count = $this->massNotificationSender->send($message, $subject, $sender);
         } catch (NotificationSendException $exception) {
-            $this->getLogger()->error('An error occurred while sending mass notification', ['exception' => $exception]);
+            $this->logger->error('An error occurred while sending mass notification', ['exception' => $exception]);
             $output->writeln('An error occurred while sending mass notification');
-            return;
+
+            return 1;
         }
 
         $output->writeln(sprintf('%s notifications have been added to the queue', $count));
-    }
 
-    /**
-     * @return MassNotificationSender
-     */
-    private function getMassNotificationSender()
-    {
-        return $this->getContainer()->get('oro_notification.mass_notification_sender');
-    }
-
-    /**
-     * @return LoggerInterface
-     */
-    private function getLogger(): LoggerInterface
-    {
-        return $this->getContainer()->get('logger');
+        return 0;
     }
 }

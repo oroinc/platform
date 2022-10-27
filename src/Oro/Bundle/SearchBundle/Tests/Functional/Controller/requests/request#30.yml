@@ -1,0 +1,13 @@
+request:
+    search: "456100  "
+    offset: ~
+    max_results: ~
+response:
+    records_count: 1
+    count: 1
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                entity_label: oro.testframework.item.entity_label
+                record_url: http://localhost%oro_default_prefix%search/

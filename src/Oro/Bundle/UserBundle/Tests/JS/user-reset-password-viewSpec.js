@@ -2,8 +2,8 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var $ = require('jquery');
-    var UserResetPasswordView = require('orouser/js/app/views/user-reset-password-view');
+    const $ = require('jquery');
+    const UserResetPasswordView = require('orouser/js/app/views/user-reset-password-view');
 
     describe('User Reset Password View', function() {
         function createUserResetPasswordView() {
@@ -50,7 +50,7 @@ define(function(require) {
         });
 
         it('_generatePassword', function() {
-            var passwordLength = 15;
+            const passwordLength = 15;
 
             $('.password-field').data({
                 'suggest-length': passwordLength,

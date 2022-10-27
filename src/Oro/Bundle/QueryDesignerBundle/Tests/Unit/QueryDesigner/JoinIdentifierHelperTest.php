@@ -4,14 +4,17 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const ROOT_ENTITY = 'Acme\RootEntity';
+    private const ROOT_ENTITY = 'Acme\RootEntity';
 
     /** @var JoinIdentifierHelper */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->helper = new JoinIdentifierHelper(self::ROOT_ENTITY);
     }
@@ -40,11 +43,19 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildColumnJoinIdentifierProvider
      */
-    public function testBuildColumnJoinIdentifier($columnName, $expected)
+    public function testBuildColumnJoinIdentifier(string $expected, string $columnName, string $entityClass = null)
     {
         $this->assertEquals(
             $expected,
-            $this->helper->buildColumnJoinIdentifier($columnName)
+            $this->helper->buildColumnJoinIdentifier($columnName, $entityClass)
+        );
+    }
+
+    public function testBuildColumnJoinIdentifierWithDefaultParameters()
+    {
+        $this->assertEquals(
+            self::ROOT_ENTITY . '::column1',
+            $this->helper->buildColumnJoinIdentifier('column1')
         );
     }
 
@@ -71,11 +82,32 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Cannot get parent join identifier for root table.
+     * @dataProvider splitJoinIdentifierProvider
      */
+    public function testSplitJoinIdentifier($joinId, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->helper->splitJoinIdentifier($joinId)
+        );
+    }
+
+    /**
+     * @dataProvider splitJoinIdentifierProvider
+     */
+    public function testMergeJoinIdentifier($expected, $parts)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->helper->mergeJoinIdentifier($parts)
+        );
+    }
+
     public function testGetParentJoinIdentifierForRootJoinId()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot get parent join identifier for root table.');
+
         $this->helper->getParentJoinIdentifier('');
     }
 
@@ -200,7 +232,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function buildJoinIdentifierProvider()
+    public function buildJoinIdentifierProvider(): array
     {
         return [
             ['alias.fld', null, null, null, null, 'alias.fld'],
@@ -215,15 +247,17 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function buildColumnJoinIdentifierProvider()
+    public function buildColumnJoinIdentifierProvider(): array
     {
         return [
-            ['column1', self::ROOT_ENTITY . '::column1'],
-            ['column1+Acme\E2::column2', self::ROOT_ENTITY . '::column1+Acme\E2::column2'],
+            [self::ROOT_ENTITY . '::column1', 'column1'],
+            [self::ROOT_ENTITY . '::column1+Acme\E2::column2', 'column1+Acme\E2::column2'],
+            ['Acme\TestEntity::column1', 'column1', 'Acme\TestEntity'],
+            ['Acme\TestEntity::column1+Acme\E2::column2', 'column1+Acme\E2::column2', 'Acme\TestEntity']
         ];
     }
 
-    public function explodeColumnNameProvider()
+    public function explodeColumnNameProvider(): array
     {
         return [
             ['column1', ['']],
@@ -257,7 +291,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function explodeJoinIdentifierProvider()
+    public function explodeJoinIdentifierProvider(): array
     {
         return [
             ['', ['']],
@@ -301,7 +335,34 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getParentJoinIdentifierProvider()
+    public function splitJoinIdentifierProvider(): array
+    {
+        return [
+            ['', ['']],
+            [
+                'Acme\E1::column1',
+                ['Acme\E1::column1']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::column2',
+                ['Acme\E1::column1', 'Acme\E2::column2']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::column2+Acme\E3::column3',
+                ['Acme\E1::column1', 'Acme\E2::column2', 'Acme\E3::column3']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::Acme\E21::column2+Acme\E3::Acme\E31::column3',
+                ['Acme\E1::column1', 'Acme\E2::Acme\E21::column2', 'Acme\E3::Acme\E31::column3']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::Acme\E21::column2|left|WITH|condition+Acme\E3::column3',
+                ['Acme\E1::column1', 'Acme\E2::Acme\E21::column2|left|WITH|condition', 'Acme\E3::column3']
+            ],
+        ];
+    }
+
+    public function getParentJoinIdentifierProvider(): array
     {
         return [
             ['Acme\E1::column1', ''],
@@ -325,7 +386,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function buildSiblingJoinIdentifierProvider()
+    public function buildSiblingJoinIdentifierProvider(): array
     {
         return [
             ['', 'siblingColumn', self::ROOT_ENTITY . '::siblingColumn'],
@@ -363,7 +424,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getEntityClassNameProvider()
+    public function getEntityClassNameProvider(): array
     {
         return [
             // column names
@@ -389,7 +450,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getUnidirectionalJoinEntityNameProvider()
+    public function getUnidirectionalJoinEntityNameProvider(): array
     {
         return [
             // column names
@@ -415,7 +476,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getFieldNameProvider()
+    public function getFieldNameProvider(): array
     {
         return [
             // column names
@@ -445,7 +506,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function isUnidirectionalJoinProvider()
+    public function isUnidirectionalJoinProvider(): array
     {
         return [
             ['', false],
@@ -464,7 +525,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function isUnidirectionalJoinWithConditionProvider()
+    public function isUnidirectionalJoinWithConditionProvider(): array
     {
         return [
             ['', false],
@@ -484,7 +545,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getJoinProvider()
+    public function getJoinProvider(): array
     {
         return [
             ['', ''],
@@ -499,7 +560,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getJoinTypeProvider()
+    public function getJoinTypeProvider(): array
     {
         return [
             ['', null],
@@ -528,7 +589,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getJoinConditionTypeProvider()
+    public function getJoinConditionTypeProvider(): array
     {
         return [
             ['', null],
@@ -557,7 +618,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getJoinConditionProvider()
+    public function getJoinConditionProvider(): array
     {
         return [
             ['', null],

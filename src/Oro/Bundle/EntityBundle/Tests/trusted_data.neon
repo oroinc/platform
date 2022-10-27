@@ -1,0 +1,39 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\EntityBundle\ORM\DoctrineHelper:
+            createQueryBuilder:
+                entityClass: true
+                alias: true
+                indexBy: true
+        Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor:
+            execute:
+                columnNamesWithNonNamedParameters: true
+        Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValueRepository:
+            findEntityId:
+                entityClass: true
+                fieldName: true
+    properties:
+        Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler:
+            searchEntities:
+                currentField: true
+    safe_methods:
+        Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager:
+            getEntityIdentifierFieldName: true
+        Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper:
+            getTableName: true
+        Oro\Bundle\EntityBundle\ORM\DoctrineHelper:
+            getSingleEntityIdentifier: true
+            getEntityIdentifierFieldNames: true
+            getEntityIdentifierFieldNamesForClass: true
+            getEntityIdentifier: true
+            getSingleEntityIdentifierFieldName: true
+            getSingleEntityIdentifierFieldType: true
+        Oro\Bundle\EntityBundle\Provider\EntityNameResolver:
+            getNameDQL: true
+    check_methods_safety:
+        Oro\Bundle\EntityBundle\Provider\EntityNameResolver:
+            prepareNameDQL: [0]
+    check_methods:
+        Oro\Bundle\EntityBundle\ORM\DoctrineHelper:
+            createQueryBuilder: [1, 2]

@@ -11,12 +11,10 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class EntityTreeSelectTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var EntityTreeSelectType
-     */
-    protected $formType;
+    /** @var EntityTreeSelectType */
+    private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -72,10 +70,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'data array' => [
@@ -87,7 +82,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                 null,
                 [
                     'treeOptions' => [
-                        'view' => 'oroform/js/app/components/entity-tree-select-form-type-component',
+                        'view' => 'oroform/js/app/components/entity-tree-select-form-type-view',
                         'key' => 'test',
                         'data' => [],
                         'nodeId' => null,
@@ -106,7 +101,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
                 null,
                 [
                     'treeOptions' => [
-                        'view' => 'oroform/js/app/components/entity-tree-select-form-type-component',
+                        'view' => 'oroform/js/app/components/entity-tree-select-form-type-view',
                         'key' => 'test',
                         'data' => [],
                         'nodeId' => null,

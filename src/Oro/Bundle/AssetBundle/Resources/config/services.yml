@@ -1,0 +1,55 @@
+services:
+    _defaults:
+        public: false
+
+    oro_asset_bundle.asset_config.cache:
+        class: Oro\Bundle\AssetBundle\Cache\AssetConfigCache
+        arguments:
+            - '@kernel'
+            - '%oro_asset.webpack_dev_server_options%'
+            - '@oro_layout.theme_manager'
+
+    oro_asset_bundle.asset_config.cache_warmer:
+        class: Oro\Bundle\AssetBundle\Cache\AssetConfigCacheWarmer
+        arguments:
+            - '@oro_asset_bundle.asset_config.cache'
+        tags:
+            - { name: kernel.cache_warmer }
+
+    Oro\Bundle\AssetBundle\Command\OroAssetsBuildCommand:
+        arguments:
+            - '@oro_asset.asset_command_process_factory'
+            - '@oro_asset_bundle.asset_config.cache'
+            - '%oro_asset.npm_path%'
+            - '%oro_asset.build_timeout%'
+            - '%oro_asset.npm_install_timeout%'
+            - '%oro_asset.disable_babel%'
+        tags:
+            - { name: console.command, command: 'oro:assets:build' }
+
+    Oro\Bundle\AssetBundle\Command\OroAssetsInstallCommand:
+        arguments:
+            - '@service_container'
+        tags:
+            - { name: console.command, command: 'oro:assets:install' }
+
+    oro_asset.asset_command_process_factory:
+        class: Oro\Bundle\AssetBundle\AssetCommandProcessFactory
+        arguments:
+            - '%oro_asset.npm_path%'
+
+    oro_asset.webpack_server:
+        class: Oro\Bundle\AssetBundle\Webpack\WebpackServer
+        arguments:
+            - '%oro_asset.webpack_dev_server_options%'
+
+    oro_asset.webpack_twig_extension:
+        class: Oro\Bundle\AssetBundle\Twig\WebpackExtension
+        arguments:
+            - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: twig.extension }
+
+    Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy:
+        arguments:
+            - '%kernel.project_dir%/public/build/build_version.txt'

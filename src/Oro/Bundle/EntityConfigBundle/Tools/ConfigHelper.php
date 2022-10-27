@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
-use Doctrine\Common\Util\Inflector;
 use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
+/**
+ * Helps work with entity metadata.
+ */
 class ConfigHelper
 {
     private static $configModelClasses = [
@@ -77,9 +80,10 @@ class ConfigHelper
 
         $parts = EntityLabelBuilder::explodeClassName($className);
 
-        $propertyName = Inflector::tableize($scope) . '_' . $propertyName;
+
+        $propertyName = InflectorFactory::create()->tableize($scope) . '_' . $propertyName;
         if ($fieldName) {
-            $parts[] = Inflector::tableize($fieldName);
+            $parts[] = InflectorFactory::create()->tableize($fieldName);
             $parts[] = $propertyName;
         } else {
             $parts[] = 'entity_' . $propertyName;

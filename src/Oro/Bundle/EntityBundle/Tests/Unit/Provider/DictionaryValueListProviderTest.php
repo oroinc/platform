@@ -2,67 +2,53 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\DictionaryValueListProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $em;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    private $extendConfigProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $groupingConfigProvider;
+    private $groupingConfigProvider;
 
     /** @var DictionaryValueListProvider */
-    protected $dictionaryValueListProvider;
+    private $dictionaryValueListProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager          = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->extendConfigProvider   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configManager->expects($this->any())
-            ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $this->extendConfigProvider],
-                    ['grouping', $this->groupingConfigProvider],
-                ]
-            );
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->groupingConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->em = $this->createMock(EntityManager::class);
 
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrine->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
-        $this->dictionaryValueListProvider = new DictionaryValueListProvider(
-            $this->configManager,
-            $this->doctrine
-        );
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects($this->any())
+            ->method('getProvider')
+            ->willReturnMap([
+                ['extend', $this->extendConfigProvider],
+                ['grouping', $this->groupingConfigProvider],
+            ]);
+
+        $this->dictionaryValueListProvider = new DictionaryValueListProvider($configManager, $doctrine);
     }
 
     public function testSupports()
@@ -151,12 +137,8 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Dictionary';
 
-        $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
+        $repo = $this->createMock(EntityRepository::class);
         $this->em->expects($this->once())
             ->method('getRepository')
             ->with($className)
@@ -177,25 +159,19 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetSerializationConfig()
     {
-        $className                = 'Test\Dictionary';
+        $className = 'Test\Dictionary';
         $manyToOneTargetClassName = 'Test\ManyToOne';
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
 
-        $manyToOneTargetMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $manyToOneTargetMetadata = $this->createMock(ClassMetadata::class);
 
         $this->em->expects($this->exactly(2))
             ->method('getClassMetadata')
-            ->willReturnMap(
-                [
-                    [$className, $metadata],
-                    [$manyToOneTargetClassName, $manyToOneTargetMetadata],
-                ]
-            );
+            ->willReturnMap([
+                [$className, $metadata],
+                [$manyToOneTargetClassName, $manyToOneTargetMetadata],
+            ]);
 
         $metadata->expects($this->once())
             ->method('getFieldNames')
@@ -205,26 +181,24 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['manyToOne', 'manyToMany', 'extend_association']);
         $metadata->expects($this->exactly(2))
             ->method('getAssociationMapping')
-            ->willReturnMap(
+            ->willReturnMap([
                 [
+                    'manyToOne',
                     [
-                        'manyToOne',
-                        [
-                            'type'         => ClassMetadata::MANY_TO_ONE,
-                            'isOwningSide' => true,
-                            'targetEntity' => $manyToOneTargetClassName
-                        ]
-                    ],
+                        'type'         => ClassMetadata::MANY_TO_ONE,
+                        'isOwningSide' => true,
+                        'targetEntity' => $manyToOneTargetClassName
+                    ]
+                ],
+                [
+                    'manyToMany',
                     [
-                        'manyToMany',
-                        [
-                            'type'         => ClassMetadata::MANY_TO_MANY,
-                            'isOwningSide' => true,
-                            'targetEntity' => 'Test\ManyToMany'
-                        ]
-                    ],
-                ]
-            );
+                        'type'         => ClassMetadata::MANY_TO_MANY,
+                        'isOwningSide' => true,
+                        'targetEntity' => 'Test\ManyToMany'
+                    ]
+                ],
+            ]);
 
         $manyToOneTargetMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
@@ -232,45 +206,43 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->extendConfigProvider->expects($this->exactly(7))
             ->method('getConfig')
-            ->willReturnMap(
+            ->willReturnMap([
                 [
-                    [
-                        $className,
-                        'id',
-                        $this->getEntityFieldConfig($className, 'id', [])
-                    ],
-                    [
-                        $className,
-                        'name',
-                        $this->getEntityFieldConfig($className, 'name', [])
-                    ],
-                    [
-                        $className,
-                        'default',
-                        $this->getEntityFieldConfig($className, 'default', [])
-                    ],
-                    [
-                        $className,
-                        'extend_field',
-                        $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
-                    ],
-                    [
-                        $className,
-                        'manyToOne',
-                        $this->getEntityFieldConfig($className, 'manyToOne', [])
-                    ],
-                    [
-                        $className,
-                        'manyToMany',
-                        $this->getEntityFieldConfig($className, 'manyToMany', [])
-                    ],
-                    [
-                        $className,
-                        'extend_association',
-                        $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
-                    ]
+                    $className,
+                    'id',
+                    $this->getEntityFieldConfig($className, 'id', [])
+                ],
+                [
+                    $className,
+                    'name',
+                    $this->getEntityFieldConfig($className, 'name', [])
+                ],
+                [
+                    $className,
+                    'default',
+                    $this->getEntityFieldConfig($className, 'default', [])
+                ],
+                [
+                    $className,
+                    'extend_field',
+                    $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
+                ],
+                [
+                    $className,
+                    'manyToOne',
+                    $this->getEntityFieldConfig($className, 'manyToOne', [])
+                ],
+                [
+                    $className,
+                    'manyToMany',
+                    $this->getEntityFieldConfig($className, 'manyToMany', [])
+                ],
+                [
+                    $className,
+                    'extend_association',
+                    $this->getEntityFieldConfig($className, 'extend_field', ['is_extend' => true])
                 ]
-            );
+            ]);
 
         $this->assertEquals(
             [
@@ -322,14 +294,7 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $className
-     * @param mixed  $values
-     * @param string $scope
-     *
-     * @return Config
-     */
-    protected function getEntityConfig($className, $values, $scope = 'extend')
+    private function getEntityConfig(string $className, array $values, string $scope = 'extend'): Config
     {
         $configId = new EntityConfigId($scope, $className);
         $config   = new Config($configId);
@@ -338,16 +303,12 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param mixed  $values
-     * @param string $scope
-     *
-     * @return Config
-     */
-    protected function getEntityFieldConfig($className, $fieldName, $values, $scope = 'extend')
-    {
+    private function getEntityFieldConfig(
+        string $className,
+        string $fieldName,
+        array $values,
+        string $scope = 'extend'
+    ): Config {
         $configId = new FieldConfigId($scope, $className, $fieldName);
         $config   = new Config($configId);
         $config->setValues($values);

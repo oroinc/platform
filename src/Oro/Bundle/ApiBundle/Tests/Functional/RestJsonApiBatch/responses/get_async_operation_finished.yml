@@ -1,0 +1,26 @@
+data:
+    type: asyncoperations
+    id: '<toString(@user_operation2->id)>'
+    attributes:
+        entityType: testapidepartments
+        status: success
+        progress: 1
+        createdAt: '@user_operation2->createdAt->format("Y-m-d\TH:i:s\Z")'
+        updatedAt: '@user_operation2->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        elapsedTime: '@user_operation2->elapsedTime'
+        summary:
+            aggregateTime: 100
+            readCount: 5
+            writeCount: 5
+            errorCount: 0
+            createCount: 1
+            updateCount: 4
+    relationships:
+        owner:
+            data:
+                type: users
+                id: '<toString(@user_operation2->owner->id)>'
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@user_operation2->organization->id)>'

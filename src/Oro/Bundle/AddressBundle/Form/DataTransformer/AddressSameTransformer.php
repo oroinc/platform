@@ -17,10 +17,6 @@ class AddressSameTransformer implements DataTransformerInterface
     /** @var array */
     private $ids = [];
 
-    /**
-     * @param PropertyAccessor $propertyAccessor
-     * @param array            $fields
-     */
     public function __construct(PropertyAccessor $propertyAccessor, array $fields)
     {
         $this->propertyAccessor = $propertyAccessor;

@@ -3,60 +3,48 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestCreationEntity;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ENTITY_CLASS = 'Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestCreationEntity';
-
     /** @var EntityCreationTransformer */
-    protected $transformer;
+    private $transformer;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $meta = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $meta
-            ->expects($this->any())
+        $this->em = $this->createMock(EntityManager::class);
+
+        $meta = $this->createMock(ClassMetadata::class);
+        $meta->expects($this->any())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em
-            ->expects($this->any())
+        $this->em->expects($this->any())
             ->method('getClassMetadata')
-            ->with(self::TEST_ENTITY_CLASS)
+            ->with(TestCreationEntity::class)
             ->willReturn($meta);
 
-        $this->transformer = new EntityCreationTransformer($this->em, self::TEST_ENTITY_CLASS);
+        $this->transformer = new EntityCreationTransformer($this->em, TestCreationEntity::class);
     }
 
     /**
      * @dataProvider reverseTransformDataProvider
-     *
-     * @param            $value
-     * @param            $expected
-     * @param string     $valuePath
-     * @param bool       $allowEmptyProperty
-     * @param string     $newEntityPropertyName
-     * @param \Exception $exception
-     * @param bool       $loadEntity
      */
     public function testReverseTransform(
         $value,
-        $expected,
-        $valuePath = 'value',
-        $allowEmptyProperty = false,
-        $newEntityPropertyName = 'name',
+        ?TestCreationEntity $expected,
+        ?string $valuePath = 'value',
+        bool $allowEmptyProperty = false,
+        string $newEntityPropertyName = 'name',
         \Exception $exception = null,
-        $loadEntity = false
+        bool $loadEntity = false
     ) {
         $this->transformer->setValuePath($valuePath);
         $this->transformer->setAllowEmptyProperty($allowEmptyProperty);
@@ -66,15 +54,22 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
             $this->expectExceptionMessage($exception->getMessage());
         }
         if ($loadEntity) {
-            /** @var TestCreationEntity $expected */
-            $this->setLoadEntityExpectations($expected, $expected->getId());
+            $repo = $this->createMock(EntityRepository::class);
+            $repo->expects($this->once())
+                ->method('find')
+                ->with($expected->getId())
+                ->willReturn($expected);
+            $this->em->expects($this->once())
+                ->method('getRepository')
+                ->with(TestCreationEntity::class)
+                ->willReturn($repo);
         }
         $entity = $this->transformer->reverseTransform($value);
 
         $this->assertEquals($expected, $entity);
     }
 
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
         return [
             'no value 1' => [null, null],
@@ -88,7 +83,7 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
                 new InvalidConfigurationException('No data provided for new entity property.')
             ],
             'load entity: id from json' => [
-                json_encode(['id' => 15]),
+                json_encode(['id' => 15], JSON_THROW_ON_ERROR),
                 new TestCreationEntity(15),
                 'value',
                 false,
@@ -97,7 +92,7 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
                 true
             ],
             'load entity: id as scalar' => [
-                json_encode(['id' => 15]),
+                json_encode(['id' => 15], JSON_THROW_ON_ERROR),
                 new TestCreationEntity(15),
                 'value',
                 false,
@@ -106,7 +101,7 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
                 true
             ],
             'valuePath property is empty and allowEmptyProperty property is false' => [
-                json_encode(['id' => null, 'value' => 'test']),
+                json_encode(['id' => null, 'value' => 'test'], JSON_THROW_ON_ERROR),
                 null,
                 null,
                 false,
@@ -116,7 +111,7 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
                 )
             ],
             'invalid valuePath and allowEmptyProperty property is false' => [
-                json_encode(['id' => null, 'value' => 'test']),
+                json_encode(['id' => null, 'value' => 'test'], JSON_THROW_ON_ERROR),
                 null,
                 'invalid_path',
                 false,
@@ -126,13 +121,13 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
                 )
             ],
             'create empty entity' => [
-                json_encode(['id' => null]),
+                json_encode(['id' => null], JSON_THROW_ON_ERROR),
                 new TestCreationEntity(),
                 'value',
                 true
             ],
             'create entity with value' => [
-                json_encode(['id' => null, 'value' => 'test']),
+                json_encode(['id' => null, 'value' => 'test'], JSON_THROW_ON_ERROR),
                 new TestCreationEntity(null, 'test'),
             ],
             'create entity with value from array' => [
@@ -142,29 +137,11 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage json encoded string, array or scalar value
-     */
     public function testReverseTransformUnexpectedType()
     {
-        $this->transformer->reverseTransform(new \stdClass);
-    }
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('json encoded string, array or scalar value');
 
-    protected function setLoadEntityExpectations($entity, $id)
-    {
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo
-            ->expects($this->once())
-            ->method('find')
-            ->with($id)
-            ->willReturn($entity);
-        $this->em
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(self::TEST_ENTITY_CLASS)
-            ->willReturn($repo);
+        $this->transformer->reverseTransform(new \stdClass());
     }
 }

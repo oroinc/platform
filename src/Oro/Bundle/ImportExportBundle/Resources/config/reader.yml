@@ -1,28 +1,36 @@
 services:
+    oro_importexport.reader.file.abstract:
+        class: Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader
+        arguments:
+            - '@oro_importexport.context_registry'
+        calls:
+            - ['setImportHelper', ['@oro_importexport.strategy.import.helper']]
+
     oro_importexport.reader.csv:
         class: 'Oro\Bundle\ImportExportBundle\Reader\CsvFileReader'
-        arguments:
-            - '@oro_importexport.context_registry'
+        parent: oro_importexport.reader.file.abstract
         tags:
             - { name: oro_importexport.reader, alias: csv }
+
     oro_importexport.reader.xlsx:
         class: 'Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader'
-        arguments:
-            - '@oro_importexport.context_registry'
-            - '@phpexcel'
+        parent: oro_importexport.reader.file.abstract
         tags:
             - { name: oro_importexport.reader, alias: xlsx }
+
     oro_importexport.reader.entity:
         class: Oro\Bundle\ImportExportBundle\Reader\EntityReader
         arguments:
             - '@oro_importexport.context_registry'
             - '@doctrine'
             - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_entity_config.provider.export_query'
         calls:
             - [setDispatcher, ['@event_dispatcher']]
             - [setAclHelper, ['@oro_security.acl_helper']]
         tags:
             - { name: oro_importexport.reader, alias: entity }
+
     oro_importexport.reader.template_fixture:
         class: 'Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader'
         arguments:

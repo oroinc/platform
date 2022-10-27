@@ -11,6 +11,8 @@ use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Oro\Bundle\ReportBundle\Model\ExtendReport;
 
 /**
+ * Holds report configuration.
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReportBundle\Entity\Repository\ReportRepository")
  * @ORM\Table(name="oro_report")
  * @ORM\HasLifecycleCallbacks()
@@ -27,9 +29,6 @@ use Oro\Bundle\ReportBundle\Model\ExtendReport;
  *              "type"="ACL",
  *              "group_name"="",
  *              "category"="account_management"
- *          },
- *          "note"={
- *              "immutable"=true
  *          },
  *          "activity"={
  *              "immutable"=true
@@ -139,10 +138,17 @@ class Report extends ExtendReport implements GridQueryDesignerInterface
      */
     protected $organization;
 
+    public function __clone()
+    {
+        $this->id = null;
+        $this->createdAt = null;
+        $this->updatedAt = null;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function getGridPrefix()
+    public function getGridPrefix(): string
     {
         return self::GRID_PREFIX;
     }

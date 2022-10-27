@@ -4,15 +4,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
 class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @return MarkdownApiDocParser
-     */
-    private function loadDocument()
+    private function loadDocument(): MarkdownApiDocParser
     {
         $fixturesDir = __DIR__ . '/Fixtures';
 
@@ -35,6 +33,31 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         return $apiDocParser;
     }
 
+    /**
+     * Assert loaded data in markdown parser
+     *
+     * In the PHP >= 7.3 updated DOM component.
+     * Now DOMDocument::saveHTML return html in different formatting than PHP < 7.3.
+     * We removing new lines in actual parsed data so that check to work on all supported PHP versions.
+     *
+     * @throws \ReflectionException
+     */
+    private function assertLoadedData(array $expected, MarkdownApiDocParser $apiDocParser): void
+    {
+        $actualValue = ReflectionUtil::getPropertyValue($apiDocParser, 'loadedData');
+
+        $normalizer = static function (&$val): void {
+            if (\is_string($val)) {
+                $val = str_replace("\n", '', $val);
+            }
+        };
+
+        array_walk_recursive($expected, $normalizer);
+        array_walk_recursive($actualValue, $normalizer);
+
+        self::assertEquals($expected, $actualValue);
+    }
+
     public function testRegisterDocumentationResourceForUnsupportedFile()
     {
         $fileLocator = $this->createMock(FileLocator::class);
@@ -53,7 +76,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/apidoc.yml'));
 
-        self::assertAttributeEquals($expected, 'loadedData', $apiDocParser);
+        $this->assertLoadedData($expected, $apiDocParser);
     }
 
     public function testInheritDoc()
@@ -63,7 +86,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/inheritdoc.yml'));
 
-        self::assertAttributeEquals($expected, 'loadedData', $apiDocParser);
+        $this->assertLoadedData($expected, $apiDocParser);
     }
 
     public function testReplaceDescriptions()
@@ -73,13 +96,13 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
 
         $expected = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/replace.yml'));
 
-        self::assertAttributeEquals($expected, 'loadedData', $apiDocParser);
+        $this->assertLoadedData($expected, $apiDocParser);
     }
 
     /**
      * @dataProvider getActionDocumentationProvider
      */
-    public function testGetActionDocumentation($expected, $className, $actionName)
+    public function testGetActionDocumentation(?string $expected, string $className, string $actionName)
     {
         $apiDocParser = $this->loadDocument();
 
@@ -89,7 +112,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getActionDocumentationProvider()
+    public function getActionDocumentationProvider(): array
     {
         return [
             'known action'                     => [
@@ -123,8 +146,12 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFieldDocumentationProvider
      */
-    public function testGetFieldDocumentation($expected, $className, $fieldName, $actionName = null)
-    {
+    public function testGetFieldDocumentation(
+        ?string $expected,
+        string $className,
+        string $fieldName,
+        ?string $actionName = null
+    ) {
         $apiDocParser = $this->loadDocument();
 
         self::assertSame(
@@ -133,7 +160,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getFieldDocumentationProvider()
+    public function getFieldDocumentationProvider(): array
     {
         return [
             'only common doc exists'                                               => [
@@ -206,7 +233,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFilterDocumentationProvider
      */
-    public function testGetFilterDocumentation($expected, $className, $filterName)
+    public function testGetFilterDocumentation(?string $expected, string $className, string $filterName)
     {
         $apiDocParser = $this->loadDocument();
 
@@ -216,7 +243,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getFilterDocumentationProvider()
+    public function getFilterDocumentationProvider(): array
     {
         return [
             'known filter'                     => [
@@ -250,8 +277,12 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSubresourceDocumentationProvider
      */
-    public function testGetSubresourceDocumentation($expected, $className, $subresourceName, $actionName)
-    {
+    public function testGetSubresourceDocumentation(
+        ?string $expected,
+        string $className,
+        string $subresourceName,
+        string $actionName
+    ) {
         $apiDocParser = $this->loadDocument();
 
         self::assertSame(
@@ -260,7 +291,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getSubresourceDocumentationProvider()
+    public function getSubresourceDocumentationProvider(): array
     {
         return [
             'known sub-resource'               => [

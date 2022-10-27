@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\EmbeddedFormBundle\Form\Type;
 
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;

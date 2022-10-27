@@ -1,74 +1,35 @@
 /* @theme: admin.oro; */
 
-#entity-pagination {
-    float: right;
-
-    .pagination {
-        margin: 4px 0 0;
-        line-height: 0;
-
-        ul {
-            box-shadow: none;
-
-            > li {
-                > a {
-                    font-weight: normal;
-                    padding: 1px 10px;
-                    color: #666;
-                    background: linear-gradient(#fdfdfd, #efefef);
-
-                    &:hover,
-                    &:focus {
-                        background: linear-gradient(#fdfdfd, #f5f5f5);
-                    }
-
-                    &:active {
-                        background: linear-gradient(#e7e7e7, #f2f2f2);
-                    }
-                }
-
-                &.disabled {
-                    a,
-                    a:active,
-                    a:hover,
-                    a:focus {
-                        background: linear-gradient(#fdfdfd, #efefef);
-                        box-shadow: none;
-                        pointer-events: none;
-                        opacity: .65;
-                    }
-                }
-            }
-        }
-
-        div.pagination-current {
-            float: left;
-            height: 24px;
-            min-width: 30px;
-            padding: 6px;
-            text-align: center;
-            line-height: 10px;
-            border: 1px solid #ddd;
-            border-left: none;
-            background-color: #f7f7f7;
-
-            &:hover {
-                cursor: default;
-            }
-        }
-    }
-
-    .pagination-total {
-        line-height: 24px;
-    }
-}
-
 .entity-pagination {
     display: flex;
-    align-items: center;
+    align-items: baseline;
+    line-height: $entity-pagination-line-height;
+
+    .pagination .page-link {
+        padding: $entity-pagination-page-link-padding;
+        line-height: 1;
+
+        [class*='fa-'] {
+            padding: $entity-pagination-arrow-icon-padding;
+
+            &::before {
+                font-size: $entity-pagination-arrow-icon-font-size;
+            }
+        }
+    }
+
+    .page-current {
+        margin: 0;
+        padding: 0;
+        text-align: center;
+        line-height: 1;
+        width: $entity-pagination-page-current-width;
+        color: $entity-pagination-page-current-color;
+    }
 
     &_total {
-        font-size: 12px;
-        margin: 4px 0 0;
+        margin-left: $entity-pagination-total-margin-start;
+        color: $entity-pagination-total-color;
+        font-size: $entity-pagination-total-font-size;
     }
 }

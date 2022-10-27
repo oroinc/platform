@@ -1,28 +1,42 @@
 define(function(require) {
     'use strict';
 
-    var dateTimePickerViewMixin;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var moment = require('moment');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var localeSettings = require('orolocale/js/locale-settings');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const moment = require('moment');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const localeSettings = require('orolocale/js/locale-settings');
     require('jquery.timepicker');
 
-    var TIMEPICKER_DROPDOWN_CLASS_NAME = 'timepicker-dialog-is-below';
-    var TIMEPICKER_DROPUP_CLASS_NAME = 'timepicker-dialog-is-above';
-    var DATEPICKER_DROPDOWN_CLASS_NAME = 'ui-datepicker-dialog-is-below';
-    var DATEPICKER_DROPUP_CLASS_NAME = 'ui-datepicker-dialog-is-above';
+    const TIMEPICKER_DROPDOWN_CLASS_NAME = 'timepicker-dialog-is-below';
+    const TIMEPICKER_DROPUP_CLASS_NAME = 'timepicker-dialog-is-above';
+    const DATEPICKER_DROPDOWN_CLASS_NAME = 'ui-datepicker-dialog-is-below';
+    const DATEPICKER_DROPUP_CLASS_NAME = 'ui-datepicker-dialog-is-above';
+
+    /**
+     * Checks if parent form has validator and runs validation
+     *
+     * @param {jQuery} $field
+     */
+    function validateFieldSafely($field) {
+        const $form = $field.closest('form');
+
+        if ($form.length && $form.data('validator')) {
+            $form.validate().element($field);
+        }
+    }
 
     /**
      * Mixin with prototype of TimePickerView implementation
      * (is used to extend some DatePickerView with timepicker functionality)
      * @interface TimePickerView
      */
-    dateTimePickerViewMixin = {
+    const dateTimePickerViewMixin = {
         defaults: {
             fieldsWrapper: '<div class="fields-row"></div>',
-            timeInputAttrs: {},
+            timeInputAttrs: {
+                autocomplete: 'off'
+            },
             timePickerOptions: {}
         },
 
@@ -67,7 +81,7 @@ define(function(require) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['timezone', 'defaultTime']));
-            this._super().initialize.apply(this, arguments);
+            this._super().initialize.call(this, options);
         },
 
         /**
@@ -90,7 +104,7 @@ define(function(require) {
                 this.$frontDateField.unwrap();
                 this.$frontDateField.removeData('isWrapped');
             }
-            this._super().dispose.apply(this, arguments);
+            this._super().dispose.call(this);
         },
 
         /**
@@ -110,8 +124,8 @@ define(function(require) {
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.attr('data-fake-front-field', '');
-            this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
-            this.$frontTimeField.on('keypress keyup change focus blur', _.bind(this.checkEmpty, this));
+            this.$frontTimeField.on('keyup change', this.updateOrigin.bind(this));
+            this.$frontTimeField.on('keypress keyup change focus blur', this.checkEmpty.bind(this));
             this.checkEmpty();
             this.$frontDateField.on('blur', function(e) {
                 $(this).parent().removeClass(DATEPICKER_DROPDOWN_CLASS_NAME + ' ' + DATEPICKER_DROPUP_CLASS_NAME);
@@ -129,12 +143,11 @@ define(function(require) {
          * @param {Object} options
          */
         initPickerWidget: function(options) {
-            var widgetOptions = options.timePickerOptions;
+            const widgetOptions = options.timePickerOptions;
             this.$frontTimeField.timepicker(widgetOptions);
             this.$frontTimeField.on('showTimepicker', function() {
-                var $el = $(this);
-                var isAbove = $el.data('timepicker-list').hasClass('ui-timepicker-positioned-top');
-                $el.parent()
+                const isAbove = this.timepickerObj.list.hasClass('ui-timepicker-positioned-top');
+                $(this).parent()
                     .toggleClass(TIMEPICKER_DROPDOWN_CLASS_NAME, !isAbove)
                     .toggleClass(TIMEPICKER_DROPUP_CLASS_NAME, isAbove);
             });
@@ -152,28 +165,28 @@ define(function(require) {
             if (this.$el.attr('disabled') || this.$el.attr('readonly')) {
                 this.$frontTimeField.prop('disabled', true);
             }
-            this._super().initPickerWidget.apply(this, arguments);
+            this._super().initPickerWidget.call(this, options);
         },
 
         setDisabled: function(disabled) {
             this.$frontTimeField.prop('disabled', disabled).trigger(disabled ? 'disabled' : 'enabled');
-            this._super().setDisabled.apply(this, arguments);
+            this._super().setDisabled.call(this, disabled);
         },
 
         /**
          * Returns timepicker popup
          *
-         * @returns {JQuery}
+         * @returns {jQuery}
          */
         getTimePickerWidget: function() {
-            return this.$frontTimeField.data('timepicker-list');
+            return this.$frontTimeField[0].timepickerObj.list;
         },
 
         /**
          * Destroys picker widget
          */
         destroyTimePickerWidget: function() {
-            if (!this.$frontTimeField.data('timepicker-settings')) {
+            if (!this.$frontTimeField[0].timepickerObj) {
                 // the widget was already removed.
                 return;
             }
@@ -187,7 +200,7 @@ define(function(require) {
          * Update empty state
          */
         checkEmpty: function() {
-            this._super().checkEmpty.apply(this, arguments);
+            this._super().checkEmpty.call(this);
 
             if (this.nativeMode && this.$frontTimeField) {
                 this.$frontTimeField.toggleClass(this.emptyClassName, !this.$frontTimeField.val().length);
@@ -201,7 +214,7 @@ define(function(require) {
          */
         updateOrigin: function(e) {
             this.checkConsistency(e.target);
-            this._super().updateOrigin.apply(this, arguments);
+            this._super().updateOrigin.call(this, e);
             this.updateTimeFieldState();
         },
 
@@ -212,8 +225,12 @@ define(function(require) {
             if (this._preventFrontendUpdate) {
                 return;
             }
+
             this._super().updateFront.call(this);
+
             this.$frontTimeField.val(this.getFrontendFormattedTime());
+            this.checkEmpty();
+            validateFieldSafely(this.$frontTimeField);
             this.updateTimeFieldState();
         },
 
@@ -223,20 +240,22 @@ define(function(require) {
          * @param {HTMLElement} target
          */
         checkConsistency: function(target) {
-            var date = this.$frontDateField.val();
-            var time = this.$frontTimeField.val();
-            var isValidDate = moment(date, this.getDateFormat(), true).isValid();
-            var isValidTime = moment(time, this.getTimeFormat(), true).isValid();
+            let date = this.$frontDateField.val();
+            let time = this.$frontTimeField.val();
+            const isValidDate = moment(date, this.getDateFormat(), true).isValid();
+            const isValidTime = moment(time, this.getTimeFormat(), true).isValid();
 
             // just changed the date
             if (this.$frontDateField.is(target) && isValidDate && !time) {
                 time = this.getDefaultTime();
                 this.$frontTimeField.val(time);
+                validateFieldSafely(this.$frontTimeField);
             // just changed the time
             } else if (this.$frontTimeField.is(target) && isValidTime && !date) {
                 // default day is today
                 date = moment().format(this.getDateFormat());
                 this.$frontDateField.val(date);
+                validateFieldSafely(this.$frontDateField);
             }
         },
 
@@ -246,11 +265,11 @@ define(function(require) {
          * @returns {string}
          */
         getDefaultTime: function() {
-            var date;
-            var todayDate;
-            var currentTimeMoment;
-            var guessTimeMoment;
-            var time = _.result(this, 'defaultTime');
+            let date;
+            let todayDate;
+            let currentTimeMoment;
+            let guessTimeMoment;
+            let time = _.result(this, 'defaultTime');
             if (!time) {
                 date = this.$frontDateField.val();
                 todayDate = moment().tz(this.timezone).format(this.getDateFormat());
@@ -287,8 +306,8 @@ define(function(require) {
          * @returns {string}
          */
         getFrontendFormattedTime: function() {
-            var value = '';
-            var momentInstance = this.getOriginalMoment();
+            let value = '';
+            const momentInstance = this.getOriginalMoment();
             if (momentInstance) {
                 value = momentInstance.tz(this.timezone).format(this.getTimeFormat());
             }
@@ -301,14 +320,14 @@ define(function(require) {
          * @returns {moment}
          */
         getFrontendMoment: function() {
-            var date = this.$frontDateField.val();
-            var time = this.$frontTimeField.val();
+            const date = this.$frontDateField.val();
+            const time = this.$frontTimeField.val();
             if (_.isEmpty(_.trim(date + time))) {
                 return null;
             }
-            var value = date + this.getSeparatorFormat() + time;
-            var format = this.getDateTimeFormat();
-            var momentInstance = moment.utc(value, format, true);
+            const value = date + this.getSeparatorFormat() + time;
+            const format = this.getDateTimeFormat();
+            const momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
                 return momentInstance.tz(this.timezone, true);
             }
@@ -320,8 +339,8 @@ define(function(require) {
          * @returns {string}
          */
         getFrontendFormattedDate: function() {
-            var value = '';
-            var momentInstance = this.getOriginalMoment();
+            let value = '';
+            const momentInstance = this.getOriginalMoment();
             if (momentInstance) {
                 value = momentInstance.tz(this.timezone).format(this.getDateFormat());
             }
@@ -352,9 +371,9 @@ define(function(require) {
          * @returns {string}
          */
         getDateTimeFormat: function() {
-            var dateFormat = this.getDateFormat();
-            var timeFormat = this.getTimeFormat();
-            var separatorFormat = this.getSeparatorFormat();
+            const dateFormat = this.getDateFormat();
+            const timeFormat = this.getTimeFormat();
+            const separatorFormat = this.getSeparatorFormat();
             return dateFormat + separatorFormat + timeFormat;
         }
     };

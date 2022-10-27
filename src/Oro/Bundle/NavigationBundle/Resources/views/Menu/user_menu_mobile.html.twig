@@ -1,6 +1,8 @@
-{% extends 'OroNavigationBundle:Menu:dropdown.html.twig' %}
+{% extends '@OroNavigation/Menu/dropdown.html.twig' %}
 
 {% block children %}
-    <li class="nav-header nav-header-title">{{ app.user|oro_format_name|default('') }}</li>
+    <li class="nav-header nav-header-title ">{{ app.user|oro_format_name|default('') }}
+        <button class="btn-link btn-close fa-close hide-text" data-role="close">{{ 'Close'|trans }}</button>
+    </li>
     {{ parent() }}
 {% endblock %}

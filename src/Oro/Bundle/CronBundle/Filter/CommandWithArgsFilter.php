@@ -10,6 +10,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by CLI command.
+ */
 class CommandWithArgsFilter extends StringFilter
 {
     /** @var CommandArgsTokenizer */
@@ -18,11 +21,6 @@ class CommandWithArgsFilter extends StringFilter
     /** @var FilterDatasourceAdapterInterface */
     protected $ds;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param CommandArgsTokenizer $tokenizer
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
@@ -38,15 +36,17 @@ class CommandWithArgsFilter extends StringFilter
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $this->ds = $ds;
-        $data     = $this->parseData($data);
-        $this->ds = null;
+        try {
+            $data = $this->parseData($data);
+        } finally {
+            $this->ds = null;
+        }
 
         if (!$data) {
             return false;
         }
 
         $type = $data['type'];
-
         $values = is_array($data['value']) ? $data['value'] : [$data['value']];
         foreach ($values as $value) {
             $parameterName = $ds->generateParameterName($this->getName());
@@ -59,7 +59,7 @@ class CommandWithArgsFilter extends StringFilter
                     $parameterName
                 )
             );
-            if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
+            if ($this->isValueRequired($type)) {
                 $ds->setParameter($parameterName, $value);
             }
         }
@@ -70,15 +70,22 @@ class CommandWithArgsFilter extends StringFilter
     /**
      * {@inheritdoc}
      */
-    protected function parseValue($comparisonType, $value)
+    protected function parseValue(array $data)
     {
-        switch ($comparisonType) {
+        switch ($data['type']) {
             case TextFilterType::TYPE_CONTAINS:
             case TextFilterType::TYPE_NOT_CONTAINS:
                 // a value for CONTAINS and NOT CONTAINS may contains several parts
-                return $this->getValueParts($comparisonType, $value);
+                $normalizedValue = [];
+                $parts = $this->tokenizer->tokenize($data['value'], $this->ds->getDatabasePlatform());
+                foreach ($parts as $part) {
+                    $normalizedValue[] = sprintf('%%%s%%', $part);
+                }
+                $data['value'] = $normalizedValue;
+
+                return $data;
             default:
-                return parent::parseValue($comparisonType, $value);
+                return parent::parseValue($data);
         }
     }
 
@@ -104,21 +111,5 @@ class CommandWithArgsFilter extends StringFilter
                 // other comparisons should work only for the first column
                 return reset($dataName);
         }
-    }
-
-    /**
-     * @param int    $comparisonType
-     * @param string $value
-     *
-     * @return array
-     */
-    protected function getValueParts($comparisonType, $value)
-    {
-        return array_map(
-            function ($val) use ($comparisonType) {
-                return parent::parseValue($comparisonType, $val);
-            },
-            $this->tokenizer->tokenize($value, $this->ds->getDatabasePlatform())
-        );
     }
 }

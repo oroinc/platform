@@ -10,7 +10,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 /**
  * This class responsible for loading a different kind of data fixtures.
  *
- * This class is based on {@see Doctrine\Common\DataFixtures\Loader}
+ * This class is based on {@see \Doctrine\Common\DataFixtures\Loader}
  * created by Jonathan H. Wage <jonwage@gmail.com>.
  */
 class Loader
@@ -30,10 +30,6 @@ class Loader
     /** @var bool */
     private $orderFixturesByDependencies = false;
 
-    /**
-     * @param FixtureFactoryInterface            $factory
-     * @param FixtureIdentifierResolverInterface $identifierResolver
-     */
     public function __construct(
         FixtureFactoryInterface $factory,
         FixtureIdentifierResolverInterface $identifierResolver
@@ -163,6 +159,7 @@ class Loader
                 $fixture = $this->fixtures[$fixtureId];
                 if (0 === count($this->getUnsequencedFixtures($sequences, $fixture->getDependencies()))) {
                     $sequences[$fixtureId] = $sequence++;
+                    break;
                 }
             }
 

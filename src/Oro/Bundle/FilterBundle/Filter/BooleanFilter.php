@@ -5,12 +5,22 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The filter by a boolean value.
+ */
 class BooleanFilter extends AbstractFilter
 {
     /** @var TranslatorInterface */
     protected $translator;
+
+    public function __construct(FormFactoryInterface $factory, FilterUtility $util, TranslatorInterface $translator)
+    {
+        parent::__construct($factory, $util);
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
@@ -47,7 +57,7 @@ class BooleanFilter extends AbstractFilter
      */
     public function getMetadata()
     {
-        $formView  = $this->getForm()->createView();
+        $formView = $this->getForm()->createView();
         $fieldView = $formView->children['value'];
 
         $choices = array_map(
@@ -60,8 +70,7 @@ class BooleanFilter extends AbstractFilter
             $fieldView->vars['choices']
         );
 
-
-        $metadata            = parent::getMetadata();
+        $metadata = parent::getMetadata();
         $metadata['choices'] = $choices;
 
         if (!empty($metadata['placeholder'])) {
@@ -72,17 +81,27 @@ class BooleanFilter extends AbstractFilter
     }
 
     /**
-     * @param mixed $data
-     *
-     * @return array|bool
+     * {@inheritDoc}
      */
-    public function parseData($data)
+    public function prepareData(array $data): array
     {
-        $allowedValues = array(BooleanFilterType::TYPE_YES, BooleanFilterType::TYPE_NO);
+        if (isset($data['value']) && !\is_int($data['value'])) {
+            $data['value'] = (int)$data['value'];
+        }
+
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function parseData($data)
+    {
+        $data = parent::parseData($data);
         if (!is_array($data)
             || !array_key_exists('value', $data)
             || !$data['value']
-            || !in_array($data['value'], $allowedValues)
+            || !in_array($data['value'], [BooleanFilterType::TYPE_YES, BooleanFilterType::TYPE_NO])
         ) {
             return false;
         }
@@ -109,13 +128,5 @@ class BooleanFilter extends AbstractFilter
             default:
                 return $ds->expr()->neq($fieldName, 'true');
         }
-    }
-
-    /**
-     * @param TranslatorInterface $translator
-     */
-    public function setTranslator(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
     }
 }

@@ -1,93 +1,184 @@
 /* @theme: admin.oro; */
 
-@import "bowerassets/bootstrap/scss/dropdown";
+@import '~@oroinc/bootstrap/scss/dropdown';
 
 .dropdown-menu {
-    box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
+    box-shadow: $dropdown-menu-box-shadow;
 
-    .dropdown--with-arrow & {
-        .arrow {
-            border: 0 none;
-            background: inherit;
-            width: 11px;
-            height: 10px;
+    &[x-adjusted-height] {
+        overflow-y: auto;
+    }
+
+    &[x-out-of-boundaries] {
+        display: none;
+    }
+
+    &[x-displayed-arrow] {
+        $arrow-offset: -4px;
+        $placeholder: 6px;
+
+        &::before {
             position: absolute;
-            transform: rotate(53deg) skewX(15deg);
-            box-shadow: -1px -1px 9px 3px rgba(0, 0, 0, .05);
-            z-index: -1;
+
+            height: $placeholder;
+            width: 100%;
+
+            content: '';
         }
 
-        &:after {
-            content: '';
-            border: 0 none;
-            background: inherit;
+        &::after {
             position: absolute;
             top: 0;
-            #{$start}: 0;
-            #{$end}: 0;
+            right: 0;
             bottom: 0;
-            border-radius: inherit;
+            border: 0 none;
+            left: 0;
             z-index: -1;
+
+            background: inherit;
+            border-radius: inherit;
+
+            content: '';
         }
 
-        &--top {
-            margin-bottom: 8px;
+        .arrow {
+            position: absolute;
+            z-index: -1;
+
+            width: 11px;
+            height: 10px;
+
+            border: 0 none;
+            background: inherit;
+            box-shadow: $dropdown-menu-arrow-box-shadow;
+
+            transform: rotate(53deg) skewX(15deg);
+        }
+
+        &[x-placement^='top'] {
+            margin-bottom: $placeholder;
+
+            &::before {
+                top: 100%;
+            }
 
             .arrow {
-                bottom: -5px;
+                bottom: $arrow-offset;
             }
         }
 
-        &--bottom {
-            margin-top: 8px;
+        &[x-placement^='right'] {
+            margin-left: $placeholder;
 
-            .arrow {
-                top: -5px;
+            &::before {
+                top: 0;
+                right: 100%;
+
+                height: 100%;
+                width: $placeholder;
             }
-        }
-
-        &--left {
-            margin-right: 8px;
 
             .arrow {
-                right: -5px;
+                left: $arrow-offset;
+
                 transform: rotate(145deg) skewX(15deg);
             }
         }
 
-        &--right {
-            margin-left: 8px;
+        &[x-placement^='bottom'] {
+            margin-top: $placeholder;
+
+            &::before {
+                bottom: 100%;
+            }
 
             .arrow {
-                left: -5px;
+                top: $arrow-offset;
+            }
+        }
+
+        &[x-placement^='left'] {
+            margin-right: $placeholder;
+
+            &::before {
+                top: 0;
+                left: 100%;
+
+                width: $placeholder;
+                height: 100%;
+            }
+
+            .arrow {
+                right: $arrow-offset;
+
                 transform: rotate(145deg) skewX(15deg);
             }
         }
     }
 
+    &[x-placement] {
+        /* rtl:ignore */
+        right: auto;
+
+        /* rtl:ignore */
+    }
+
     // Support of old markup
-    > li > a {
-        @extend .dropdown-item;
+    &,
+    .dropdown-menu-items {
+        > li > a {
+            @extend .dropdown-item;
+        }
+    }
+
+    // Add offset like in "bootstrap .dropdown-item" element
+    > li > .btn-group {
+        padding: $dropdown-item-padding-y $dropdown-item-padding-x;
     }
 }
 
 .dropdown-toggle {
+    &::after {
+        vertical-align: $caret-width * .5;
+
+        margin-left: $content-padding-small;
+
+        border-top-width: 5px;
+        border-right-width: 5px;
+        border-left-width: 5px;
+    }
+
     &--no-caret {
-        &:after {
-            content: none;
+        &::after {
+            // stylelint-disable-next-line declaration-no-important
+            content: none !important;
         }
     }
 }
 
 .dropleft > .dropdown-toggle--no-caret {
-    &:before {
-        content: none;
+    &::before {
+        // stylelint-disable-next-line declaration-no-important
+        content: none !important;
     }
 }
 
 .dropdown-item {
-    [class^="fa-"],
-    [class*=" fa-"] {
-        margin: $dropdown-item-icon-fa-offset;
+    line-height: $dropdown-item-line-height;
+
+    [class^='fa-'],
+    [class*=' fa-'] {
+        position: relative;
+
+        min-width: $dropdown-item-icon-fa-size;
+        height: $dropdown-item-icon-fa-size;
+        margin-right: $dropdown-item-icon-fa-offset;
+
+        text-align: center;
+        line-height: 1;
+
+        &::before {
+            font-size: $dropdown-item-icon-fa-font-size;
+        }
     }
 }

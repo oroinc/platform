@@ -1,0 +1,53 @@
+Oro\Bundle\UserBundle\Entity\User:
+    testMax1:
+        firstName: Max
+        lastName: Lenskoy
+        username: test_max1
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        email: test_max1@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+
+    testMax2:
+        firstName: Max
+        lastName: Krushow
+        username: test_max2
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        email: test_max2@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+
+    testPhil:
+        firstName: Phil
+        lastName: Collins
+        username: test_phil
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        email: test_phil@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        birthday: <(new \DateTime('2001-02-10'))>
+
+    patrick:
+        firstName: Patrick
+        lastName: Stewart
+        username: patrick
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        email: patrick@patrick.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8

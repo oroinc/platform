@@ -5,29 +5,25 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Represents the configuration of Data API resource actions.
+ * Represents the configuration of API resource actions.
  */
 class ActionsConfig
 {
     /** @var ActionConfig[] [action name => ActionConfig, ...] */
-    protected $actions = [];
+    private array $actions = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return ConfigUtil::convertObjectsToArray($this->actions);
     }
 
     /**
      * Indicates whether there is a configuration at least one action.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->actions);
     }
@@ -45,36 +41,23 @@ class ActionsConfig
      *
      * @return ActionConfig[] [action name => ActionConfig, ...]
      */
-    public function getActions()
+    public function getActions(): array
     {
         return $this->actions;
     }
 
     /**
      * Gets the configuration of the action.
-     *
-     * @param string $actionName
-     *
-     * @return ActionConfig|null
      */
-    public function getAction($actionName)
+    public function getAction(string $actionName): ?ActionConfig
     {
-        if (!isset($this->actions[$actionName])) {
-            return null;
-        }
-
-        return $this->actions[$actionName];
+        return $this->actions[$actionName] ?? null;
     }
 
     /**
      * Adds the configuration of the action.
-     *
-     * @param string            $actionName
-     * @param ActionConfig|null $action
-     *
-     * @return ActionConfig
      */
-    public function addAction($actionName, ActionConfig $action = null)
+    public function addAction(string $actionName, ActionConfig $action = null): ActionConfig
     {
         if (null === $action) {
             $action = new ActionConfig();
@@ -87,10 +70,8 @@ class ActionsConfig
 
     /**
      * Removes the configuration of the action.
-     *
-     * @param string $actionName
      */
-    public function removeAction($actionName)
+    public function removeAction(string $actionName): void
     {
         unset($this->actions[$actionName]);
     }

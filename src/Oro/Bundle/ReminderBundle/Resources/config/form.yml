@@ -1,45 +1,37 @@
-parameters:
-    oro_reminder.form.extension.reminder.class: Oro\Bundle\ReminderBundle\Form\Extension\ReminderExtension
-
-    oro_reminder.form.type.reminder.class: Oro\Bundle\ReminderBundle\Form\Type\ReminderType
-    oro_reminder.form.type.reminder_collection.class: Oro\Bundle\ReminderBundle\Form\Type\ReminderCollectionType
-    oro_reminder.form.type.method.class: Oro\Bundle\ReminderBundle\Form\Type\MethodType
-    oro_reminder.form.type.reminder_interval.class: Oro\Bundle\ReminderBundle\Form\Type\ReminderIntervalType
-    oro_reminder.form.type.reminder_interval.unit.class: Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval\UnitType
-
 services:
     # Extensions
     oro_reminder.form.extension.reminder:
-        class: '%oro_reminder.form.extension.reminder.class%'
+        class: Oro\Bundle\ReminderBundle\Form\Extension\ReminderExtension
         arguments:
-            - '@oro_reminder.entity.manager'
+            - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: form.type_extension, alias: form, extended_type: 'Symfony\Component\Form\Extension\Core\Type\FormType' }
+            - { name: form.type_extension, alias: form, extended_type: Symfony\Component\Form\Extension\Core\Type\FormType }
+            - { name: container.service_subscriber, id: oro_reminder.entity.manager }
 
     # Form types
     oro_reminder.form.type.reminder:
-        class: '%oro_reminder.form.type.reminder.class%'
+        class: Oro\Bundle\ReminderBundle\Form\Type\ReminderType
         tags:
             - { name: form.type, alias: oro_reminder }
 
     oro_reminder.form.type.reminder_collection:
-        class: '%oro_reminder.form.type.reminder_collection.class%'
+        class: Oro\Bundle\ReminderBundle\Form\Type\ReminderCollectionType
         tags:
             - { name: form.type, alias: oro_reminder_collection }
 
     oro_reminder.form.type.method:
-        class: '%oro_reminder.form.type.method.class%'
+        class: Oro\Bundle\ReminderBundle\Form\Type\MethodType
         arguments:
             - '@oro_reminder.send_processor_registry'
         tags:
             - { name: form.type, alias: oro_reminder_method }
 
     oro_reminder.form.type.reminder_interval:
-        class: '%oro_reminder.form.type.reminder_interval.class%'
+        class: Oro\Bundle\ReminderBundle\Form\Type\ReminderIntervalType
         tags:
             - { name: form.type, alias: oro_reminder_interval }
 
     oro_reminder.form.type.reminder_interval.unit:
-        class: '%oro_reminder.form.type.reminder_interval.unit.class%'
+        class: Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval\UnitType
         tags:
             - { name: form.type, alias: oro_reminder_interval_unit }

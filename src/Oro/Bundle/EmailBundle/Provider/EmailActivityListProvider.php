@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
@@ -16,7 +15,11 @@ use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
+use Oro\Bundle\EmailBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -25,19 +28,16 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
+ * Provides a way to use Email entity in an activity list.
  * For the Email activity in the case when EmailAddress does not have owner(User|Organization),
  * we are trying to extract Organization from the current logged user.
  *
- * @todo Should be refactored in the BAP-8520
- * @see EmailActivityListProvider::isApplicable
- * @see EmailActivityListProvider::getOrganization
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EmailActivityListProvider implements
@@ -49,20 +49,14 @@ class EmailActivityListProvider implements
 {
     use FeatureCheckerHolderTrait;
 
-    const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
-    const ACL_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
-
-    /** @var ServiceLink */
-    protected $doctrineRegistryLink;
 
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var Router */
-    protected $router;
+    /** @var UrlGeneratorInterface */
+    protected $urlGenerator;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -79,8 +73,8 @@ class EmailActivityListProvider implements
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /** @var ServiceLink */
-    protected $mailboxProcessStorageLink;
+    /** @var MailboxProcessStorage */
+    protected $mailboxProcessStorage;
 
     /** @var ActivityAssociationHelper */
     protected $activityAssociationHelper;
@@ -89,45 +83,30 @@ class EmailActivityListProvider implements
     protected $commentAssociationHelper;
 
     /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param ServiceLink                   $doctrineRegistryLink
-     * @param EntityNameResolver            $entityNameResolver
-     * @param Router                        $router
-     * @param ConfigManager                 $configManager
-     * @param EmailThreadProvider           $emailThreadProvider
-     * @param HtmlTagHelper                 $htmlTagHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param ServiceLink                   $mailboxProcessStorageLink
-     * @param ActivityAssociationHelper     $activityAssociationHelper
-     * @param CommentAssociationHelper      $commentAssociationHelper
-     *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        ServiceLink $doctrineRegistryLink,
         EntityNameResolver $entityNameResolver,
-        Router $router,
+        UrlGeneratorInterface $urlGenerator,
         ConfigManager $configManager,
         EmailThreadProvider $emailThreadProvider,
         HtmlTagHelper $htmlTagHelper,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
-        ServiceLink $mailboxProcessStorageLink,
+        MailboxProcessStorage $mailboxProcessStorage,
         ActivityAssociationHelper $activityAssociationHelper,
         CommentAssociationHelper $commentAssociationHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->doctrineRegistryLink = $doctrineRegistryLink;
         $this->entityNameResolver = $entityNameResolver;
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
         $this->configManager = $configManager;
         $this->emailThreadProvider = $emailThreadProvider;
         $this->htmlTagHelper = $htmlTagHelper;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
-        $this->mailboxProcessStorageLink = $mailboxProcessStorageLink;
+        $this->mailboxProcessStorage = $mailboxProcessStorage;
         $this->activityAssociationHelper = $activityAssociationHelper;
         $this->commentAssociationHelper = $commentAssociationHelper;
     }
@@ -139,7 +118,7 @@ class EmailActivityListProvider implements
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
             $entityClass,
-            self::ACTIVITY_CLASS,
+            Email::class,
             $accessible
         );
     }
@@ -147,7 +126,7 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutes($activityEntity)
+    public function getRoutes($entity)
     {
         return [
             'itemView'  => 'oro_email_view',
@@ -157,35 +136,19 @@ class EmailActivityListProvider implements
 
     /**
      * {@inheritdoc}
-     */
-    public function getActivityClass()
-    {
-        return self::ACTIVITY_CLASS;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAclClass()
-    {
-        return self::ACL_CLASS;
-    }
-
-    /**
-     * {@inheritdoc}
+     * @param Email $entity
      */
     public function getSubject($entity)
     {
-        /** @var $entity Email */
         return $entity->getSubject();
     }
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
     public function getDescription($entity)
     {
-        /** @var $entity Email */
         if ($entity->getEmailBody()) {
             return $entity->getEmailBody()->getTextBody();
         }
@@ -203,32 +166,29 @@ class EmailActivityListProvider implements
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
     public function getCreatedAt($entity)
     {
-        /** @var $entity Email */
         return $entity->getSentAt();
     }
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
     public function getUpdatedAt($entity)
     {
-        /** @var $entity Email */
         return $entity->getSentAt();
     }
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
-    public function getOrganization($activityEntity)
+    public function getOrganization($entity)
     {
-        /**
-         * @var $activityEntity Email
-         * @var $emailAddressOwner EmailOwnerInterface
-         */
-        $emailAddressOwner = $activityEntity->getFromEmailAddress()->getOwner();
+        $emailAddressOwner = $entity->getFromEmailAddress()->getOwner();
         if ($emailAddressOwner && $emailAddressOwner->getOrganization()) {
             return $emailAddressOwner->getOrganization();
         }
@@ -238,12 +198,12 @@ class EmailActivityListProvider implements
             return $currentOrganization;
         }
 
-        $processes = $this->mailboxProcessStorageLink->getService()->getProcesses();
+        /** @var MailboxRepository $mailboxRepository */
+        $mailboxRepository = $this->doctrineHelper->getEntityRepositoryForClass(Mailbox::class);
+        $processes = $this->mailboxProcessStorage->getProcesses();
         foreach ($processes as $process) {
             $settingsClass = $process->getSettingsEntityFQCN();
-
-            $mailboxes = $this->doctrineRegistryLink->getService()->getRepository('OroEmailBundle:Mailbox')
-                ->findBySettingsClassAndEmail($settingsClass, $activityEntity);
+            $mailboxes = $mailboxRepository->findBySettingsClassAndEmail($settingsClass, $entity);
 
             foreach ($mailboxes as $mailbox) {
                 return $mailbox->getOrganization();
@@ -256,17 +216,16 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getData(ActivityList $activityListEntity)
+    public function getData(ActivityList $activityList)
     {
+        $relatedActivityClass = $activityList->getRelatedActivityClass();
+        $em = $this->doctrineHelper->getEntityManagerForClass($relatedActivityClass);
         /** @var Email $email */
-        $email = $headEmail = $this->doctrineRegistryLink->getService()
-            ->getRepository($activityListEntity->getRelatedActivityClass())
-            ->find($activityListEntity->getRelatedActivityId());
+        $email = $em->getRepository($relatedActivityClass)
+            ->find($activityList->getRelatedActivityId());
+        $headEmail = $email;
         if (null !== $email->getThread()) {
-            $headEmail = $this->emailThreadProvider->getHeadEmail(
-                $this->doctrineHelper->getEntityManager($activityListEntity->getRelatedActivityClass()),
-                $email
-            );
+            $headEmail = $this->emailThreadProvider->getHeadEmail($em, $email);
         }
 
         $data = [
@@ -295,7 +254,7 @@ class EmailActivityListProvider implements
      */
     public function getTemplate()
     {
-        return 'OroEmailBundle:Email:js/activityItemTemplate.html.twig';
+        return '@OroEmail/Email/js/activityItemTemplate.html.twig';
     }
 
     /**
@@ -303,7 +262,7 @@ class EmailActivityListProvider implements
      */
     public function getGroupedTemplate(): string
     {
-        return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.html.twig';
+        return '@OroEmail/Email/js/groupedActivityItemTemplate.html.twig';
     }
 
     /**
@@ -311,9 +270,10 @@ class EmailActivityListProvider implements
      */
     public function getActivityId($entity)
     {
-        if ($this->doctrineHelper->getEntityClass($entity) === self::ACL_CLASS) {
+        if ($this->doctrineHelper->getEntityClass($entity) === EmailUser::class) {
             $entity = $entity->getEmail();
         }
+
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
@@ -322,11 +282,21 @@ class EmailActivityListProvider implements
      */
     public function isApplicable($entity)
     {
-        return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS;
+        if (\is_object($entity)) {
+            if (!$entity instanceof Email) {
+                return false;
+            }
+
+            // the activity lists for private emails should not be created.
+            return $this->doctrineHelper->getEntityRepositoryForClass(Email::class)->isEmailPublic($entity->getId());
+        }
+
+        return $entity === Email::class;
     }
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
     public function getTargetEntities($entity)
     {
@@ -347,23 +317,33 @@ class EmailActivityListProvider implements
     public function getGroupedEntities($entity, $associatedEntityClass = null, $associatedEntityId = null): array
     {
         /** @var Email $entity */
+        if (!$entity instanceof Email) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Argument must be instance of "%s", "%s" given',
+                    Email::class,
+                    is_object($entity) ? ClassUtils::getClass($entity) : gettype($entity)
+                )
+            );
+        }
 
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->doctrineRegistryLink->getService()
-            ->getRepository(ActivityList::class)
-            ->createQueryBuilder('a')
+        if (null === $entity->getThread()) {
+            return [];
+        }
+
+        $queryBuilder = $this->doctrineHelper->getEntityRepositoryForClass(ActivityList::class)
+            ->createQueryBuilder('a');
+        $queryBuilder
             ->innerJoin(
                 'OroEmailBundle:Email',
                 'e',
                 'WITH',
                 'a.relatedActivityId = e.id and a.relatedActivityClass = :class'
             )
-            ->setParameter('class', self::ACTIVITY_CLASS);
-        if (null !== $entity->getThread()) {
-            $queryBuilder
-                ->andWhere('e.thread = :thread')
-                ->setParameter('thread', $entity->getThread());
-        }
+            ->andWhere('e.thread = :thread')
+            ->setParameter('class', Email::class)
+            ->setParameter('thread', $entity->getThread());
+
         if ($associatedEntityClass && $associatedEntityId) {
             $associationName = ExtendHelper::buildAssociationName(
                 $associatedEntityClass,
@@ -390,7 +370,7 @@ class EmailActivityListProvider implements
         }
         $emailIds = array_unique($emailIds);
         if (count($emailIds) > 1) {
-            $qb = $this->doctrineHelper->getEntityRepository(Email::class)
+            $qb = $this->doctrineHelper->getEntityRepositoryForClass(Email::class)
                 ->createQueryBuilder('e')
                 ->select('e.id, IDENTITY(e.thread) AS threadId')
                 ->where('e.id IN (:ids) AND IDENTITY(e.thread) IS NOT NULL')
@@ -456,20 +436,22 @@ class EmailActivityListProvider implements
     }
 
     /**
-     * @param ActivityList $activityList
-     * @param array $filter
-     * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function collectActivityOwners(ActivityList $activityList, array $filter)
+    private function collectActivityOwners(ActivityList $activityList, array $filter): array
     {
         $activityOwners = [];
         /** @var EmailUser[] $owners */
-        $owners = $this->doctrineRegistryLink->getService()
-            ->getRepository('OroEmailBundle:EmailUser')
+        $owners = $this->doctrineHelper->getEntityRepositoryForClass(EmailUser::class)
             ->findBy($filter);
 
         if ($owners) {
             foreach ($owners as $owner) {
+                // the activity lists for private emails should not have owner
+                // to be sure it is not shown at the activity list grid.
+                if ($owner->isEmailPrivate()) {
+                    continue;
+                }
                 if (($owner->getMailboxOwner() && $owner->getOrganization()) ||
                     (!$owner->getMailboxOwner() && $owner->getOrganization() && $owner->getOwner())) {
                     $activityOwner = new ActivityOwner();
@@ -492,12 +474,20 @@ class EmailActivityListProvider implements
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function isActivityListApplicable(ActivityList $activityList): bool
+    {
+        return $activityList->getActivityOwners()->count() > 0;
+    }
+
+    /**
      * @param $entity
      * @return Email
      */
     protected function getEmailEntity($entity)
     {
-        if (ClassUtils::getClass($entity) === self::ACL_CLASS) {
+        if ($entity instanceof EmailUser) {
             $entity = $entity->getEmail();
         }
 
@@ -533,15 +523,15 @@ class EmailActivityListProvider implements
     {
         $route = null;
         $entityMetadata = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner));
-        
+
         if (null !== $entityMetadata) {
             $route = $entityMetadata->getRoute('view');
         }
-        
+
         if (null !== $route && $this->authorizationChecker->isGranted('VIEW', $owner)) {
             $id = $this->doctrineHelper->getSingleEntityIdentifier($owner);
             try {
-                $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
+                $data['ownerLink'] = $this->urlGenerator->generate($route, ['id' => $id]);
             } catch (RouteNotFoundException $e) {
                 // Do not set owner link if route is not found.
             }

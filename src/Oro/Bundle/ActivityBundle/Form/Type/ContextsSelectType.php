@@ -17,8 +17,11 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Activity Contexts select form type.
+ */
 class ContextsSelectType extends AbstractType
 {
     const NAME = 'oro_activity_contexts_select';
@@ -41,14 +44,6 @@ class ContextsSelectType extends AbstractType
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param EntityManager            $entityManager
-     * @param ConfigManager            $configManager
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
-     * @param EntityNameResolver       $entityNameResolver
-     * @param FeatureChecker           $featureChecker
-     */
     public function __construct(
         EntityManager $entityManager,
         ConfigManager $configManager,
@@ -112,7 +107,7 @@ class ContextsSelectType extends AbstractType
             $item['title'] = $title;
             $item['targetId'] = $target->getId();
             $event = new PrepareContextTitleEvent($item, $targetClass);
-            $this->dispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
+            $this->dispatcher->dispatch($event, PrepareContextTitleEvent::EVENT_NAME);
             $item = $event->getItem();
 
             $result[] = json_encode($this->getResult($item['title'], $target));
@@ -158,7 +153,7 @@ class ContextsSelectType extends AbstractType
             return null;
         }
 
-        $label = $this->configManager->getProvider('entity')->getConfig($className)->get('label');
+        $label = (string) $this->configManager->getProvider('entity')->getConfig($className)->get('label');
 
         return $this->translator->trans($label);
     }

@@ -5,6 +5,9 @@ namespace Oro\Bundle\SearchBundle\Query;
 use Doctrine\Common\Collections\Expr\Expression;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
+/**
+ * The base class for search queries.
+ */
 abstract class AbstractSearchQuery implements SearchQueryInterface
 {
     const WHERE_AND = 'and';
@@ -148,10 +151,10 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
      */
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT)
     {
-        if (strpos($fieldName, '.') === false) {
-            $field = $type . '.' . $fieldName;
-        } else {
+        if (str_contains($fieldName, '.')) {
             $field = $fieldName;
+        } else {
+            $field = $type . '.' . $fieldName;
         }
 
         $this->query
@@ -169,6 +172,16 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         $this->query->addSelect($fieldName, $enforcedFieldType);
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFrom()
+    {
+        $from = $this->query->getFrom();
+
+        return false !== $from ? $from : null;
     }
 
     /**

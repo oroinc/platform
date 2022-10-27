@@ -3,24 +3,31 @@
 namespace Oro\Bundle\DataAuditBundle\Filter;
 
 use Doctrine\ORM\Query\Expr;
-use LogicException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Form\Type\FilterType;
 use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
+use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by a modification date of an auditable field.
+ */
 class AuditFilter extends EntityFilter
 {
     const TYPE_CHANGED = 'changed';
     const TYPE_CHANGED_TO_VALUE = 'changed_to_value';
 
-    /** @var ServiceLink */
-    protected $queryDesignerManagerLink;
+    /** @var FilterExecutionContext */
+    protected $filterExecutionContext;
+
+    /** @var QueryDesignerManager */
+    protected $queryDesignerManager;
 
     /** @var string */
     protected $auditAlias;
@@ -34,18 +41,16 @@ class AuditFilter extends EntityFilter
     /** @var string */
     protected $objectClassParam;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility $util
-     * @param ServiceLink $queryDesignerManagerLink
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        ServiceLink $queryDesignerManagerLink
+        ManagerRegistry $doctrine,
+        FilterExecutionContext $filterExecutionContext,
+        QueryDesignerManager $queryDesignerManager
     ) {
-        parent::__construct($factory, $util);
-        $this->queryDesignerManagerLink = $queryDesignerManagerLink;
+        parent::__construct($factory, $util, $doctrine);
+        $this->filterExecutionContext = $filterExecutionContext;
+        $this->queryDesignerManager = $queryDesignerManager;
     }
 
     /**
@@ -73,22 +78,19 @@ class AuditFilter extends EntityFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
+        if (!$ds instanceof OrmFilterDatasourceAdapter) {
+            throw new UnexpectedTypeException($ds, OrmFilterDatasourceAdapter::class);
+        }
+
         $this->auditAlias = $ds->generateParameterName('a');
         $this->auditFieldAlias = $ds->generateParameterName('f');
         $this->fieldParam = $ds->generateParameterName('field');
         $this->objectClassParam = $ds->generateParameterName('objectClass');
 
-        if (!$ds instanceof OrmFilterDatasourceAdapter) {
-            throw new LogicException(sprintf(
-                '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
-                get_class($ds)
-            ));
-        }
-
         $qb = $ds->getQueryBuilder();
 
         $fieldName = $this->getField($data['auditFilter']['columnName']);
-        list($objectAlias) = $qb->getRootAliases();
+        [$objectAlias] = $qb->getRootAliases();
         $objectClass = $this->getClass($data['auditFilter']['columnName'], $qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($objectClass);
 
@@ -130,14 +132,13 @@ class AuditFilter extends EntityFilter
 
         $dql = $auditQb->getQuery()->getDQL();
 
-        QueryBuilderUtil::checkParameter($dql);
         $this->applyFilterToClause($ds, $ds->expr()->exists($dql));
 
         foreach ($auditQb->getParameters() as $parameter) {
             $qb->setParameter(
                 $parameter->getName(),
                 $parameter->getValue(),
-                $parameter->getType()
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
             );
         }
     }
@@ -178,17 +179,14 @@ class AuditFilter extends EntityFilter
      */
     protected function applyFilter(FilterDatasourceAdapterInterface $ds, $name, $field, $data)
     {
-        $filter = $this->queryDesignerManagerLink->getService()->createFilter($name, [
-            FilterUtility::DATA_NAME_KEY => $field,
-        ]);
+        $filter = $this->queryDesignerManager->createFilter(
+            $name,
+            [FilterUtility::DATA_NAME_KEY => $field]
+        );
 
-        $form = $filter->getForm();
-        if (!$form->isSubmitted()) {
-            $form->submit($data);
-        }
-
-        if ($form->isValid()) {
-            $filter->apply($ds, $form->getData());
+        $normalizedData = $this->filterExecutionContext->normalizedFilterData($filter, $data);
+        if (null !== $normalizedData) {
+            $filter->apply($ds, $normalizedData);
         }
     }
 
@@ -200,7 +198,7 @@ class AuditFilter extends EntityFilter
      */
     protected function getClass($columnName, array $rootEntities)
     {
-        if (strpos($columnName, '+') === false) {
+        if (!str_contains($columnName, '+')) {
             return reset($rootEntities);
         }
 
@@ -217,8 +215,8 @@ class AuditFilter extends EntityFilter
      */
     protected function getField($columnName)
     {
-        list(, $fieldName) = explode('.', $this->get(FilterUtility::DATA_NAME_KEY));
-        if (strpos($fieldName, '\\') === false) {
+        [, $fieldName] = explode('.', $this->get(FilterUtility::DATA_NAME_KEY));
+        if (!str_contains($fieldName, '\\')) {
             return $fieldName;
         }
 

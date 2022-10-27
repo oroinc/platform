@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
@@ -15,45 +16,29 @@ use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
  */
 class SegmentSnapshotDeltaProvider
 {
-    const BATCH_SIZE = 1000;
+    private const BATCH_SIZE = 1000;
 
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /**
-     * @var DynamicSegmentQueryBuilder
-     */
-    private $dynamicSegmentQB;
+    /** @var DynamicSegmentQueryBuilder */
+    private $segmentQueryBuilder;
 
-    /**
-     * @var array|string[]
-     */
+    /** @var string[] */
     private $classIdentifiers = [];
 
-    /**
-     * @var array|string[]
-     */
+    /** @var string[] */
     private $segmentRelationIdentifiers = [];
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param DynamicSegmentQueryBuilder $dynamicSegmentQB
-     */
-    public function __construct(ManagerRegistry $registry, DynamicSegmentQueryBuilder $dynamicSegmentQB)
+    public function __construct(ManagerRegistry $doctrine, DynamicSegmentQueryBuilder $segmentQueryBuilder)
     {
-        $this->registry = $registry;
-        $this->dynamicSegmentQB = $dynamicSegmentQB;
+        $this->doctrine = $doctrine;
+        $this->segmentQueryBuilder = $segmentQueryBuilder;
     }
 
-    /**
-     * @param Segment $segment
-     * @return \Generator
-     */
-    public function getAddedEntityIds(Segment $segment)
+    public function getAddedEntityIds(Segment $segment): iterable
     {
-        $entitySegmentQueryBuilder = $this->dynamicSegmentQB->getQueryBuilder($segment);
+        $entitySegmentQueryBuilder = $this->segmentQueryBuilder->getQueryBuilder($segment);
         $rootAliases = $entitySegmentQueryBuilder->getRootAliases();
         $rootAlias = reset($rootAliases);
         $identifierField = $rootAlias . '.' . $this->getIdentifierFieldName($segment->getEntity());
@@ -71,20 +56,16 @@ class SegmentSnapshotDeltaProvider
             $entitySegmentQueryBuilder->setParameter(
                 $parameter->getName(),
                 $parameter->getValue(),
-                $parameter->getType()
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
             );
         }
 
         return $this->getResultBatches(new BufferedIdentityQueryResultIterator($entitySegmentQueryBuilder));
     }
 
-    /**
-     * @param Segment $segment
-     * @return \Generator
-     */
-    public function getRemovedEntityIds(Segment $segment)
+    public function getRemovedEntityIds(Segment $segment): iterable
     {
-        $entitySegmentQueryBuilder = $this->dynamicSegmentQB->getQueryBuilder($segment);
+        $entitySegmentQueryBuilder = $this->segmentQueryBuilder->getQueryBuilder($segment);
         $rootAliases = $entitySegmentQueryBuilder->getRootAliases();
         $rootAlias = reset($rootAliases);
         $identifierField = $rootAlias . '.' . $this->getIdentifierFieldName($segment->getEntity());
@@ -102,20 +83,16 @@ class SegmentSnapshotDeltaProvider
             $segmentSnapshotQueryBuilder->setParameter(
                 $parameter->getName(),
                 $parameter->getValue(),
-                $parameter->getType()
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
             );
         }
 
         return $this->getResultBatches(new BufferedIdentityQueryResultIterator($segmentSnapshotQueryBuilder));
     }
 
-    /**
-     * @param Segment $segment
-     * @return \Generator
-     */
-    public function getAllEntityIds(Segment $segment)
+    public function getAllEntityIds(Segment $segment): iterable
     {
-        $entitySegmentQueryBuilder = $this->dynamicSegmentQB->getQueryBuilder($segment);
+        $entitySegmentQueryBuilder = $this->segmentQueryBuilder->getQueryBuilder($segment);
         $rootAliases = $entitySegmentQueryBuilder->getRootAliases();
         $rootAlias = reset($rootAliases);
         $identifierField = $rootAlias . '.' . $this->getIdentifierFieldName($segment->getEntity());
@@ -124,27 +101,18 @@ class SegmentSnapshotDeltaProvider
         return $this->getResultBatches(new BufferedIdentityQueryResultIterator($entitySegmentQueryBuilder));
     }
 
-    /**
-     * @param Segment $segment
-     * @return QueryBuilder
-     */
-    private function getSegmentSnapshotQueryBuilder(Segment $segment)
+    private function getSegmentSnapshotQueryBuilder(Segment $segment): QueryBuilder
     {
-        $queryBuilder = $this->registry
-            ->getRepository(SegmentSnapshot::class)
-            ->createQueryBuilder('segmentSnapshot');
+        $queryBuilder = $this->getEntityManager(SegmentSnapshot::class)->createQueryBuilder();
 
         return $queryBuilder
+            ->from(SegmentSnapshot::class, 'segmentSnapshot')
             ->select('segmentSnapshot.' . $this->getSegmentIdentifierFieldName($segment->getEntity()))
             ->where($queryBuilder->expr()->eq('segmentSnapshot.segment', ':segment'))
             ->setParameter('segment', $segment);
     }
 
-    /**
-     * @param BufferedIdentityQueryResultIterator $iterator
-     * @return \Generator
-     */
-    private function getResultBatches(BufferedIdentityQueryResultIterator $iterator)
+    private function getResultBatches(BufferedIdentityQueryResultIterator $iterator): iterable
     {
         $index = 0;
         foreach ($iterator as $item) {
@@ -160,11 +128,7 @@ class SegmentSnapshotDeltaProvider
         }
     }
 
-    /**
-     * @param string $className
-     * @return string
-     */
-    private function getIdentifierFieldName($className)
+    private function getIdentifierFieldName(string $className): string
     {
         if (empty($this->classIdentifiers[$className])) {
             $this->classIdentifiers[$className] = $this->getClassMetadata($className)->getSingleIdentifierFieldName();
@@ -173,11 +137,7 @@ class SegmentSnapshotDeltaProvider
         return $this->classIdentifiers[$className];
     }
 
-    /**
-     * @param string $className
-     * @return string
-     */
-    private function getSegmentIdentifierFieldName($className)
+    private function getSegmentIdentifierFieldName(string $className): string
     {
         if (empty($this->segmentRelationIdentifiers[$className])) {
             $classMetadata = $this->getClassMetadata($className);
@@ -193,12 +153,13 @@ class SegmentSnapshotDeltaProvider
         return $this->segmentRelationIdentifiers[$className];
     }
 
-    /**
-     * @param string $className
-     * @return ClassMetadata
-     */
-    private function getClassMetadata($className)
+    private function getEntityManager(string $entityClass): EntityManagerInterface
     {
-        return $this->registry->getManagerForClass($className)->getClassMetadata($className);
+        return $this->doctrine->getManagerForClass($entityClass);
+    }
+
+    private function getClassMetadata(string $entityClass): ClassMetadata
+    {
+        return $this->getEntityManager($entityClass)->getClassMetadata($entityClass);
     }
 }

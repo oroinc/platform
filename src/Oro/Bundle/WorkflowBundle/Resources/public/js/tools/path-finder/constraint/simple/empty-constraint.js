@@ -1,8 +1,8 @@
 define(['../../extends', './abstract-simple-constraint'], function(__extends, AbstractSimpleConstraint) {
     'use strict';
     __extends(EmptyConstraint, AbstractSimpleConstraint);
-    function EmptyConstraint() {
-        AbstractSimpleConstraint.apply(this, arguments);
+    function EmptyConstraint(...args) {
+        AbstractSimpleConstraint.apply(this, args);
     }
     Object.defineProperty(EmptyConstraint.prototype, 'recommendedEnd', {
         get: function() {

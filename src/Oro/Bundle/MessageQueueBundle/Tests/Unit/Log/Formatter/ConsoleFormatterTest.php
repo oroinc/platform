@@ -70,7 +70,7 @@ class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'expectedResult' => '2018-07-06 09:16:03 <fg=white>app.INFO</>: Start consuming '
-                    . '[] ["memory_usage" => "1 MB"]'
+                    . '["memory_usage" => "1 MB"]'
                     . "\n"
             ],
             'with context and without extra' => [
@@ -86,7 +86,7 @@ class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
                     'extra'      => []
                 ],
                 'expectedResult' => '2018-07-06 09:16:04 <fg=white>app.NOTICE</>: Message processed: <comment>ACK</> '
-                    . '["status" => "ACK"] []'
+                    . '["status" => "ACK"]'
                     . "\n"
             ],
             'without context and without extra' => [
@@ -99,9 +99,7 @@ class ConsoleFormatterTest extends \PHPUnit\Framework\TestCase
                     'context'    => [],
                     'extra'      => []
                 ],
-                'expectedResult' => '2018-07-06 09:16:05 <fg=white>app.INFO</>: Idle '
-                    . '[] []'
-                    . "\n"
+                'expectedResult' => "2018-07-06 09:16:05 <fg=white>app.INFO</>: Idle\n"
             ],
         ];
     }

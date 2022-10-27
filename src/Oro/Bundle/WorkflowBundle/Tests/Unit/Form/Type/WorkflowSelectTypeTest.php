@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
@@ -12,38 +13,30 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowSelectTypeTest extends FormIntegrationTestCase
 {
-    const TEST_ENTITY_CLASS   = 'Test\Entity\Class';
-    const TEST_WORKFLOW_NAME  = 'test_workflow_name';
-    const TEST_WORKFLOW_LABEL = 'Test Workflow Label';
+    private const TEST_ENTITY_CLASS = 'Test\Entity\Class';
+    private const TEST_WORKFLOW_NAME = 'test_workflow_name';
+    private const TEST_WORKFLOW_LABEL = 'Test Workflow Label';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var WorkflowSelectType */
-    protected $type;
+    private $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
-
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->type = new WorkflowSelectType($this->registry, $this->translator);
         parent::setUp();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->registry, $this->type);
     }
 
     /**
@@ -62,8 +55,6 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $inputOptions
-     * @param array $expectedOptions
      * @dataProvider configureOptionsDataProvider
      */
     public function testConfigureOptions(array $inputOptions, array $expectedOptions)
@@ -72,18 +63,16 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
         $testWorkflowDefinition->setName(self::TEST_WORKFLOW_NAME)
             ->setLabel(self::TEST_WORKFLOW_LABEL);
 
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->any())
             ->method('findBy')
             ->with(['relatedEntity' => self::TEST_ENTITY_CLASS])
-            ->will($this->returnValue([$testWorkflowDefinition]));
+            ->willReturn([$testWorkflowDefinition]);
 
         $this->registry->expects($this->any())
             ->method('getRepository')
             ->with(WorkflowDefinition::class)
-            ->will($this->returnValue($repository));
+            ->willReturn($repository);
 
         $form = $this->factory->create(WorkflowSelectType::class, null, $inputOptions);
 
@@ -94,10 +83,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function configureOptionsDataProvider()
+    public function configureOptionsDataProvider(): array
     {
         return [
             'no additional data' => [

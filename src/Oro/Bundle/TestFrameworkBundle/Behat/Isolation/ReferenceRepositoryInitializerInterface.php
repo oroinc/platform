@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Nelmio\Alice\Instances\Collection as AliceCollection;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 
+/**
+ * Interface for the implementation of the reference initializer.
+ */
 interface ReferenceRepositoryInitializerInterface
 {
     /**
      * Adds references into `referenceRepository` for objects that already in database, usually persisted after install
-     *
-     * @param Registry $doctrine
-     * @param AliceCollection $referenceRepository
-     * @return void
      */
-    public function init(Registry $doctrine, AliceCollection $referenceRepository);
+    public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void;
 }

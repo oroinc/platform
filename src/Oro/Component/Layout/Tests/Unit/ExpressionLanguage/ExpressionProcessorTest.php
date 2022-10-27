@@ -3,6 +3,9 @@
 namespace Oro\Component\Layout\Tests\Unit\ExpressionLanguage;
 
 use Oro\Component\Layout\Action;
+use Oro\Component\Layout\DataAccessorInterface;
+use Oro\Component\Layout\Exception\CircularReferenceException;
+use Oro\Component\Layout\ExpressionLanguage\ClosureWithExtraParams;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator;
@@ -12,36 +15,51 @@ use Oro\Component\Layout\OptionValueBag;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionLanguage|\PHPUnit\Framework\MockObject\MockObject */
     protected $expressionLanguage;
 
-    /** @var JsonExpressionEncoder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $encoder;
-
     /** @var ExpressionProcessor */
     protected $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->expressionLanguage = new ExpressionLanguage();
 
-        /** @var ExpressionEncoderRegistry|\PHPUnit\Framework\MockObject\MockObject $encoderRegistry */
+        $this->processor = $this->createExpressionProcessor();
+    }
+
+    protected function createExpressionProcessor(): ExpressionProcessor
+    {
+        return new ExpressionProcessor(
+            $this->expressionLanguage,
+            $this->createEncoderRegistry()
+        );
+    }
+
+    protected function createEncoderRegistry(): ExpressionEncoderRegistry
+    {
         $encoderRegistry = $this->createMock(ExpressionEncoderRegistry::class);
-
-        $this->encoder = new JsonExpressionEncoder(new ExpressionManipulator());
-
         $encoderRegistry->expects($this->any())
             ->method('get')
             ->with('json')
-            ->will($this->returnValue($this->encoder));
+            ->willReturn(new JsonExpressionEncoder(new ExpressionManipulator()));
 
-        $this->processor = new ExpressionProcessor(
-            $this->expressionLanguage,
-            $encoderRegistry
-        );
+        return $encoderRegistry;
+    }
+
+    protected function createOptionValueBag(string $expr): OptionValueBag
+    {
+        $optionValueBag = new OptionValueBag();
+        $optionValueBag->add($expr);
+
+        return $optionValueBag;
     }
 
     /**
@@ -49,18 +67,17 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessExpressionsEvaluatesAllExpressions()
     {
-        $context = new LayoutContext();
-        $context->set('css_class', 'test_class');
-        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
-
-        $trueExpr = new ParsedExpression('true', new ConstantNode(true));
-
-        $classAttr = new OptionValueBag();
-        $classAttr->add('=context["css_class"]');
-        $expectedClassAttr = new OptionValueBag();
-        $expectedClassAttr->add('test_class');
-
-        $values['expr_object'] = $trueExpr;
+        $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
+        $values['expr_closure'] = function () {
+            return true;
+        };
+        $values['expr_closure_with_extra_params'] = new ClosureWithExtraParams(
+            function ($context, $data, $attr) {
+                return $attr['data-scalar'];
+            },
+            ['attr'],
+            'attr["data-scalar"]'
+        );
         $values['dependent_expr'] = '=true == expr_string';
         $values['expr_string'] = '=true';
         $values['not_expr_string'] = '\=true';
@@ -68,24 +85,33 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $values['attr']['enabled'] = '=true';
         $values['attr']['data-scalar'] = 'foo';
         $values['attr']['data-expr'] = '=true';
-        $values['attr']['class'] = $classAttr;
+        $values['attr']['class'] = $this->createOptionValueBag('=context["css_class"]');
         $values['label_attr']['enabled'] = '=true';
         $values['array_with_expr'] = ['item1' => 'val1', 'item2' => '=true'];
 
+        $context = new LayoutContext();
+        $context->set('css_class', 'test_class');
+        $data = $this->createMock(DataAccessorInterface::class);
         $this->processor->processExpressions($values, $context, $data, true, null);
 
-        $this->assertSame(
-            true,
+        $this->assertTrue(
             $values['expr_object'],
             'Failed asserting that an expression is evaluated'
         );
-        $this->assertSame(
-            true,
+        $this->assertTrue(
+            $values['expr_closure'],
+            'Failed asserting that a closure is evaluated'
+        );
+        $this->assertEquals(
+            'foo',
+            $values['expr_closure_with_extra_params'],
+            'Failed asserting that a closure with extra params is evaluated'
+        );
+        $this->assertTrue(
             $values['dependent_expr'],
             'Failed asserting that dependent expression is parsed and evaluated'
         );
-        $this->assertSame(
-            true,
+        $this->assertTrue(
             $values['expr_string'],
             'Failed asserting that an expression is parsed and evaluated'
         );
@@ -99,8 +125,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
             $values['scalar'],
             'Failed asserting that a scalar value is not changed'
         );
-        $this->assertSame(
-            true,
+        $this->assertTrue(
             $values['attr']['enabled'],
             'Failed asserting that an expression in "attr" is parsed and evaluated'
         );
@@ -109,18 +134,16 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
             $values['attr']['data-scalar'],
             'Failed asserting that "attr.data-scalar" exists'
         );
-        $this->assertSame(
-            true,
+        $this->assertTrue(
             $values['attr']['data-expr'],
             'Failed asserting that "attr.data-expr" is parsed and evaluated'
         );
         $this->assertEquals(
-            $expectedClassAttr,
+            $this->createOptionValueBag('test_class'),
             $values['attr']['class'],
             'Failed asserting that "attr.class" is parsed and evaluated'
         );
-        $this->assertSame(
-            true,
+        $this->assertTrue(
             $values['label_attr']['enabled'],
             'Failed asserting that an expression in "label_attr" is parsed and evaluated'
         );
@@ -131,69 +154,68 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\CircularReferenceException
-     * @expectedExceptionMessage Circular reference "first > second > third > first" on expression "true == first".
-     */
     public function testProcessExpressionsWithCircularReference()
     {
-        $context = new LayoutContext();
-        $context->set('css_class', 'test_class');
-        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
+        $this->expectException(CircularReferenceException::class);
+        $this->expectExceptionMessage(
+            'Circular reference "first > second > third > first" on expression "true == first".'
+        );
 
         $values['first'] = '=second';
         $values['second'] = '=third';
         $values['third'] = '=true == first';
 
+        $context = new LayoutContext();
+        $context->set('css_class', 'test_class');
+        $data = $this->createMock(DataAccessorInterface::class);
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
 
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "data" and "context" should not be used as value keys.
-     */
     public function testProcessExpressionsWithDataKey()
     {
-        $context = new LayoutContext();
-        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
-        $values['data'] = 'test';
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"data" should not be used as value key.');
 
+        $context = new LayoutContext();
+        $data = $this->createMock(DataAccessorInterface::class);
+        $values['data'] = 'test';
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "data" and "context" should not be used as value keys.
-     */
     public function testProcessExpressionsWithContextKey()
     {
-        $context = new LayoutContext();
-        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
-        $values['context'] = 'test';
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"context" should not be used as value key.');
 
+        $context = new LayoutContext();
+        $data = $this->createMock(DataAccessorInterface::class);
+        $values['context'] = 'test';
         $this->processor->processExpressions($values, $context, $data, true, null);
     }
 
     public function testProcessExpressionsDoNothingIfEvaluationOfExpressionsDisabledAndEncodingIsNotSet()
     {
-        $context = new LayoutContext();
-        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
-
-        $expr = $this->getMockBuilder(ParsedExpression::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $values['expr_object'] = $expr;
+        $values['expr_object'] = $this->createMock(ParsedExpression::class);
+        $values['expr_closure'] = function () {
+            return true;
+        };
+        $values['expr_closure_with_extra_params'] = new ClosureWithExtraParams(
+            function ($context, $data, $attr) {
+                return $attr['data-scalar'];
+            },
+            ['attr'],
+            'attr["data-scalar"]'
+        );
         $values['expr_string'] = '=true';
         $values['not_expr_string'] = '\=true';
         $values['scalar'] = 123;
         $values['attr']['enabled'] = '=true';
         $values['label_attr']['enabled'] = '=true';
-        
+
         $initialVars = $values;
 
+        $context = new LayoutContext();
+        $data = $this->createMock(DataAccessorInterface::class);
         $this->processor->processExpressions($values, $context, $data, false, null);
 
         $this->assertSame($initialVars, $values);
@@ -201,29 +223,43 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessExpressionsEncodesAllExpressions()
     {
-        $context = new LayoutContext();
-        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
-        $trueExpr = new ParsedExpression('true', new ConstantNode(true));
-
-        $classAttr = new OptionValueBag();
-        $classAttr->add('=context["css_class"]');
-
-        $values['expr_object'] = $trueExpr;
+        $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
+        $values['expr_closure'] = function () {
+            return true;
+        };
+        $values['expr_closure_with_extra_params'] = new ClosureWithExtraParams(
+            function ($context, $data, $scalar) {
+                return $scalar;
+            },
+            ['scalar'],
+            'scalar'
+        );
         $values['expr_string'] = '=true';
         $values['not_expr_string'] = '\=true';
         $values['scalar'] = 123;
         $values['attr']['enabled'] = '=true';
-        $values['attr']['class'] = $classAttr;
+        $values['attr']['class'] = $this->createOptionValueBag('=context["css_class"]');
         $values['label_attr']['enabled'] = '=true';
 
+        $context = new LayoutContext();
+        $data = $this->createMock(DataAccessorInterface::class);
         $this->processor->processExpressions($values, $context, $data, false, 'json');
-        
-        $trueExprJson = __DIR__.'/Fixtures/true_expression.json';
+
+        $trueExprJson = __DIR__ . '/Fixtures/true_expression.json';
 
         $this->assertJsonStringEqualsJsonFile(
             $trueExprJson,
             $values['expr_object'],
             'Failed asserting that an expression is encoded'
+        );
+        $this->assertTrue(
+            $values['expr_closure'],
+            'Failed asserting that a closure is encoded'
+        );
+        $this->assertSame(
+            123,
+            $values['expr_closure_with_extra_params'],
+            'Failed asserting that a closure with extra params is encoded'
         );
         $this->assertJsonStringEqualsJsonFile(
             $trueExprJson,
@@ -252,7 +288,7 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $actualAddAction = $actualClassActions[0];
         $this->assertInstanceOf(Action::class, $actualAddAction);
         $this->assertJsonStringEqualsJsonFile(
-            __DIR__.'/Fixtures/class_expression.json',
+            __DIR__ . '/Fixtures/class_expression.json',
             $actualAddAction->getArgument(0),
             'Failed asserting that "attr.class" is parsed and encoded'
         );
@@ -265,9 +301,17 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessExpressionsWithVisibleFalse()
     {
-        $context = new LayoutContext();
-        $data = $this->createMock('Oro\Component\Layout\DataAccessorInterface');
-
+        $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
+        $values['expr_closure'] = function () {
+            return true;
+        };
+        $values['expr_closure_with_extra_params'] = new ClosureWithExtraParams(
+            function ($context, $data, $attr) {
+                return $attr['data-scalar'];
+            },
+            ['attr'],
+            'attr["data-scalar"]'
+        );
         $values['expr_string'] = '=true';
         $values['scalar'] = 123;
         $values['attr']['enabled'] = '=true';
@@ -275,14 +319,199 @@ class ExpressionProcessorTest extends \PHPUnit\Framework\TestCase
         $values['array_with_expr'] = ['item1' => 'val1', 'item2' => '=true'];
         $values['visible'] = '=false';
 
+        $context = new LayoutContext();
+        $data = $this->createMock(DataAccessorInterface::class);
         $this->processor->processExpressions($values, $context, $data, true, null);
 
         $this->assertFalse($values['visible'], 'Failed asserting that an expression is evaluated');
 
+        $this->assertNull($values['expr_object']);
+        $this->assertNull($values['expr_closure']);
+        $this->assertNull($values['expr_closure_with_extra_params']);
         $this->assertNull($values['expr_string']);
         $this->assertSame(123, $values['scalar']);
         $this->assertNull($values['attr']['enabled']);
         $this->assertSame('foo', $values['attr']['data-scalar']);
         $this->assertSame(['item1' => 'val1', 'item2' => null], $values['array_with_expr']);
+    }
+
+    public function testEvaluateStringExpressionWhenValueUsedInThisExpressionDoesNotExist()
+    {
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage(
+            'Variable "expr_1" is not valid around position 1 for expression `expr_1`. Did you mean "expr_2"?'
+        );
+
+        $values['dependent_expr'] = '=expr_1';
+        $values['scalar'] = 123;
+        $values['expr_2'] = 'val';
+
+        $context = new LayoutContext();
+        $data = $this->createMock(DataAccessorInterface::class);
+        $this->processor->processExpressions($values, $context, $data, true, null);
+    }
+
+    public function testEvaluateClosureWithExtraParamsWhenValueUsedInThisExpressionDoesNotExist()
+    {
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage(
+            'Variable "expr_1" is not valid around position 0 for expression `expr_1`. Did you mean "expr_2"?'
+        );
+
+        $values['expr_closure_with_extra_params'] = new ClosureWithExtraParams(
+            function ($context, $data, $val) {
+                return $val;
+            },
+            ['expr_1'],
+            'expr_1'
+        );
+        $values['scalar'] = 123;
+        $values['expr_2'] = 'val';
+
+        $context = new LayoutContext();
+        $data = $this->createMock(DataAccessorInterface::class);
+        $this->processor->processExpressions($values, $context, $data, true, null);
+    }
+
+    /**
+     * @dataProvider processExpressionsEvaluatesClosureWithExtraParamsDataProvider
+     */
+    public function testEvaluateClosureWithExtraParamsWhenValuesUsedInThisExpressionAlreadyEvaluated(
+        ClosureWithExtraParams $closureWithExtraParams,
+        $expectedEvaluationResult
+    ) {
+        $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
+        $values['expr_closure'] = function () {
+            return true;
+        };
+        $values['dependent_expr'] = '=true == expr_string';
+        $values['expr_string'] = '=true';
+        $values['scalar'] = 123;
+        $values['attr']['data-scalar'] = 'foo';
+        $values['attr']['data-expr'] = '=true';
+        $values['attr']['data-from-context'] = '=context["css_class"]';
+
+        $values['expr_closure_with_extra_params'] = $closureWithExtraParams;
+
+        $context = new LayoutContext();
+        $context->set('css_class', 'test_class');
+        $data = $this->createMock(DataAccessorInterface::class);
+        $this->processor->processExpressions($values, $context, $data, true, null);
+
+        $this->assertSame($expectedEvaluationResult, $values['expr_closure_with_extra_params']);
+    }
+
+    /**
+     * @dataProvider processExpressionsEvaluatesClosureWithExtraParamsDataProvider
+     */
+    public function testEvaluateClosureWithExtraParamsWhenValuesUsedInThisExpressionIsEvaluatedYet(
+        ClosureWithExtraParams $closureWithExtraParams,
+        $expectedEvaluationResult
+    ) {
+        $values['expr_closure_with_extra_params'] = $closureWithExtraParams;
+
+        $values['expr_object'] = new ParsedExpression('true', new ConstantNode(true));
+        $values['expr_closure'] = function () {
+            return true;
+        };
+        $values['dependent_expr'] = '=true == expr_string';
+        $values['expr_string'] = '=true';
+        $values['scalar'] = 123;
+        $values['attr']['data-scalar'] = 'foo';
+        $values['attr']['data-expr'] = '=true';
+        $values['attr']['data-from-context'] = '=context["css_class"]';
+
+        $context = new LayoutContext();
+        $context->set('css_class', 'test_class');
+        $data = $this->createMock(DataAccessorInterface::class);
+        $this->processor->processExpressions($values, $context, $data, true, null);
+
+        $this->assertSame($expectedEvaluationResult, $values['expr_closure_with_extra_params']);
+    }
+
+    public function processExpressionsEvaluatesClosureWithExtraParamsDataProvider(): array
+    {
+        return [
+            [
+                new ClosureWithExtraParams(
+                    function ($context, $data, $val) {
+                        return $val;
+                    },
+                    ['expr_object'],
+                    'expr_object'
+                ),
+                true
+            ],
+            [
+                new ClosureWithExtraParams(
+                    function ($context, $data, $val) {
+                        return $val;
+                    },
+                    ['expr_closure'],
+                    'expr_closure'
+                ),
+                true
+            ],
+            [
+                new ClosureWithExtraParams(
+                    function ($context, $data, $val) {
+                        return $val;
+                    },
+                    ['dependent_expr'],
+                    'dependent_expr'
+                ),
+                true
+            ],
+            [
+                new ClosureWithExtraParams(
+                    function ($context, $data, $val) {
+                        return $val;
+                    },
+                    ['expr_string'],
+                    'expr_string'
+                ),
+                true
+            ],
+            [
+                new ClosureWithExtraParams(
+                    function ($context, $data, $val) {
+                        return $val;
+                    },
+                    ['scalar'],
+                    'scalar'
+                ),
+                123
+            ],
+            [
+                new ClosureWithExtraParams(
+                    function ($context, $data, $val) {
+                        return $val['data-scalar'];
+                    },
+                    ['attr'],
+                    'attr["data-scalar"]'
+                ),
+                'foo'
+            ],
+            [
+                new ClosureWithExtraParams(
+                    function ($context, $data, $val) {
+                        return $val['data-expr'];
+                    },
+                    ['attr'],
+                    'attr["data-expr"]'
+                ),
+                true
+            ],
+            [
+                new ClosureWithExtraParams(
+                    function ($context, $data, $val) {
+                        return $val['data-from-context'];
+                    },
+                    ['attr'],
+                    'attr["data-from-context"]'
+                ),
+                'test_class'
+            ],
+        ];
     }
 }

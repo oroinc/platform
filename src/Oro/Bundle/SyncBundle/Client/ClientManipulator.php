@@ -2,16 +2,21 @@
 
 namespace Oro\Bundle\SyncBundle\Client;
 
+use Gos\Bundle\WebSocketBundle\Client\Auth\WebsocketAuthenticationProviderInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\ClientNotFoundException;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
+use GuzzleHttp\Psr7\Uri;
+use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
 use Oro\Bundle\UserBundle\Security\UserProvider;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -38,19 +43,28 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
     private $userProvider;
 
     /**
-     * @param ClientManipulatorInterface $decoratedClientManipulator
-     * @param ClientStorageInterface $clientStorage
-     * @param UserProvider $userProvider
+     * @var TicketProviderInterface
      */
+    private $ticketProvider;
+
+    /**
+     * @var WebsocketAuthenticationProviderInterface
+     */
+    private $websocketAuthenticationProvider;
+
     public function __construct(
         ClientManipulatorInterface $decoratedClientManipulator,
         ClientStorageInterface $clientStorage,
-        UserProvider $userProvider
+        UserProvider $userProvider,
+        TicketProviderInterface $ticketProvider,
+        WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider
     ) {
         $this->decoratedClientManipulator = $decoratedClientManipulator;
         $this->clientStorage = $clientStorage;
         $this->userProvider = $userProvider;
         $this->logger = new NullLogger();
+        $this->ticketProvider = $ticketProvider;
+        $this->websocketAuthenticationProvider = $websocketAuthenticationProvider;
     }
 
     /**
@@ -61,47 +75,38 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
      * @throws ClientNotFoundException
      * @throws StorageException
      */
-    public function getClient(ConnectionInterface $connection)
+    public function getClient(ConnectionInterface $connection): TokenInterface
     {
+        $storageId = $this->clientStorage->getStorageId($connection);
         try {
-            $storageId = $this->clientStorage->getStorageId($connection);
-
-            $user = $this->clientStorage->getClient($storageId);
+            $token = $this->clientStorage->getClient($storageId);
         } catch (ClientNotFoundException $exception) {
             $this->logger->debug(
-                'Client not found by storage id {storage_id} for connection {connection_id}',
-                ['connection_id' => $connection->resourceId, 'storage_id' => $storageId, 'exception' => $exception]
+                'Client not found by storage id {storage_id}',
+                ['storage_id' => $storageId, 'exception' => $exception]
             );
 
             if (!$this->renewClientByConnection($connection)) {
                 throw $exception;
             }
 
-            $user = $this->getClient($connection);
+            $token = $this->getClient($connection);
         } catch (StorageException $exception) {
             $this->logger->error(
-                'Failed to get storage id from client storage for connection {connection_id}',
-                ['connection_id' => $connection->resourceId, 'exception' => $exception]
+                'Client storage failed when trying to get client by storage id {storage_id}',
+                ['storage_id' => $storageId, 'exception' => $exception]
             );
 
             throw $exception;
         }
 
-        return $user;
+        return $token;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function findByUsername(Topic $topic, $username)
-    {
-        return $this->decoratedClientManipulator->findByUsername($topic, $username);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAll(Topic $topic, $anonymous = false)
+    public function getAll(Topic $topic, bool $anonymous = false): array
     {
         return $this->decoratedClientManipulator->getAll($topic, $anonymous);
     }
@@ -109,62 +114,78 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
     /**
      * {@inheritDoc}
      */
-    public function findByRoles(Topic $topic, array $roles)
+    public function findByRoles(Topic $topic, array $roles): array
     {
         return $this->decoratedClientManipulator->findByRoles($topic, $roles);
     }
 
     /**
-     * @param ConnectionInterface $connection
-     *
-     * @return bool
+     * {@inheritDoc}
      */
+    public function findAllByUsername(Topic $topic, string $username): array
+    {
+        return $this->decoratedClientManipulator->findAllByUsername($topic, $username);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getUser(ConnectionInterface $connection)
+    {
+        return $this->getClient($connection)->getUser();
+    }
+
     private function renewClientByConnection(ConnectionInterface $connection): bool
     {
         if (empty($connection->WAMP->username)) {
             $this->logger->error(
-                'Username not found in connection {connection_id}',
-                ['connection_id' => $connection->resourceId]
+                'Username not found in connection {storage_id}',
+                ['storage_id' => $this->clientStorage->getStorageId($connection)]
             );
 
             return false;
         }
 
-        $username = $connection->WAMP->username;
         try {
-            $user = $this->userProvider->loadUserByUsername($username);
-        } catch (UsernameNotFoundException $exception) {
-            $user = $connection->WAMP->username;
-        }
+            $user = $this->userProvider->loadUserByUsername($connection->WAMP->username);
 
-        return $this->addUserToClientStorage($connection, $user);
+            return $this->addUserToClientStorage($connection, $user);
+        } catch (UsernameNotFoundException $exception) {
+            return $this->addUserToClientStorage($connection);
+        }
     }
 
-    /**
-     * @param ConnectionInterface $connection
-     * @param UserInterface|string $user
-     *
-     * @return bool
-     */
-    private function addUserToClientStorage(ConnectionInterface $connection, $user): bool
+    private function addUserToClientStorage(ConnectionInterface $connection, ?UserInterface $user = null): bool
     {
+        if (!isset($connection->httpRequest)) {
+            return false;
+        }
+
+        $connection->httpRequest = $this->getRequestWithNewTicket($connection->httpRequest, $user);
+        $token = $this->websocketAuthenticationProvider->authenticate($connection);
+
+        $storageId = $this->clientStorage->getStorageId($connection);
         try {
-            $storageId = $this->clientStorage->getStorageId($connection);
-            $this->clientStorage->addClient($storageId, $user);
+            $this->clientStorage->addClient($storageId, $token);
 
             return true;
         } catch (StorageException $exception) {
-            $username = $user;
-            if ($user instanceof UserInterface) {
-                $username = $user->getUsername();
-            }
+            $username = $token->getUsername();
 
             $this->logger->error(
-                'Failed to add user to client storage for {username} for connection {connection_id}',
-                ['connection_id' => $connection->resourceId, 'username' => $username, 'exception' => $exception]
+                'Failed to add user to client storage for {username} for connection {storage_id}',
+                ['storage_id' => $storageId, 'username' => $username, 'exception' => $exception]
             );
         }
 
         return false;
+    }
+
+    private function getRequestWithNewTicket(RequestInterface $request, ?UserInterface $user = null): RequestInterface
+    {
+        $ticket = base64_encode($this->ticketProvider->generateTicket($user));
+        $requestUri = Uri::withQueryValue($request->getUri(), 'ticket', $ticket);
+
+        return $request->withUri($requestUri);
     }
 }

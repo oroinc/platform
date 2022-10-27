@@ -2,27 +2,17 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type;
 
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for a value of {@see \Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter}.
+ */
 class DateTimeRangeType extends AbstractType
 {
     const NAME = 'oro_type_datetime_range';
-
-    /**
-     * @var LocaleSettings
-     */
-    protected $localeSettings;
-
-    /**
-     * @param LocaleSettings $localeSettings
-     */
-    public function __construct(LocaleSettings $localeSettings)
-    {
-        $this->localeSettings = $localeSettings;
-    }
 
     /**
      * {@inheritDoc}
@@ -53,15 +43,12 @@ class DateTimeRangeType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'field_type' => DateTimeType::class,
-                'field_options' => array(
-                    'format' => 'yyyy-MM-dd HH:mm',
-                    'view_timezone' => $this->localeSettings->getTimeZone(),
-                    'model_timezone' => $this->localeSettings->getTimeZone(),
-                ),
-            )
-        );
+        $resolver->setDefaults([
+            'field_type'    => DateTimeType::class,
+            'field_options' => [
+                'format' => DateTimeRangeFilter::DATE_FORMAT,
+                'html5'  => false,
+            ],
+        ]);
     }
 }

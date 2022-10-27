@@ -5,45 +5,28 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionMaskBuilder;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
+use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ActionMetadataProvider
-     */
-    protected $metadataProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionSecurityMetadataProvider */
+    private $metadataProvider;
 
-    /**
-     * @var ActionAclExtension
-     */
-    protected $extension;
+    /** @var ActionAclExtension */
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->metadataProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataProvider = $this->createMock(ActionSecurityMetadataProvider::class);
 
         $this->extension = new ActionAclExtension($this->metadataProvider);
     }
 
-    protected function tearDown()
-    {
-        unset($this->metadataProvider, $this->extension);
-    }
-
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param mixed $id
-     * @param string $type
-     * @param string $action
-     * @param bool $isKnownAction
-     * @param bool $expected
      */
-    public function testSupports($id, $type, $action, $isKnownAction, $expected)
+    public function testSupports(string $id, string $type, string $action, bool $isKnownAction, bool $expected)
     {
         $this->metadataProvider->expects($isKnownAction ? $this->once() : $this->never())
             ->method('isKnownAction')
@@ -53,16 +36,13 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->extension->supports($type, $id));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
+    public function supportsDataProvider(): array
     {
         return [
             [
                 'id' => 'entity',
-                'type' => '\stdClass',
-                'action' => '\stdClass',
+                'type' => \stdClass::class,
+                'action' => \stdClass::class,
                 'isKnownAction' => false,
                 'expected' => false
             ],
@@ -92,19 +72,13 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getObjectIdentityDataProvider
-     *
-     * @param mixed $val
-     * @param ObjectIdentity $expected
      */
-    public function testGetObjectIdentity($val, $expected)
+    public function testGetObjectIdentity(mixed $val, ObjectIdentity $expected)
     {
         $this->assertEquals($expected, $this->extension->getObjectIdentity($val));
     }
 
-    /**
-     * @return array
-     */
-    public function getObjectIdentityDataProvider()
+    public function getObjectIdentityDataProvider(): array
     {
         $annotation = new AclAnnotation([
             'id' => 'action_id',
@@ -141,23 +115,25 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testGetDefaultPermission()
+    {
+        self::assertEquals('EXECUTE', $this->extension->getDefaultPermission());
+    }
+
+    public function testGetPermissionGroupMask()
+    {
+        self::assertNull($this->extension->getPermissionGroupMask(1));
+    }
+
     /**
      * @dataProvider getPermissionsProvider
-     *
-     * @param int|null $mask
-     * @param bool $setOnly
-     * @param bool $byCurrentGroup
-     * @param array $expected
      */
-    public function testGetPermissions($mask, $setOnly, $byCurrentGroup, array $expected)
+    public function testGetPermissions(?int $mask, bool $setOnly, bool $byCurrentGroup, array $expected)
     {
         $this->assertEquals($expected, $this->extension->getPermissions($mask, $setOnly, $byCurrentGroup));
     }
 
-    /**
-     * @return array
-     */
-    public function getPermissionsProvider()
+    public function getPermissionsProvider(): array
     {
         return [
             'mask = 0 and setOnly' => [
@@ -196,12 +172,12 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getServiceBitsProvider
      */
-    public function testGetServiceBits($mask, $expectedMask)
+    public function testGetServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->getServiceBits($mask));
     }
 
-    public function getServiceBitsProvider()
+    public function getServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [
@@ -226,12 +202,12 @@ class ActionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider removeServiceBitsProvider
      */
-    public function testRemoveServiceBits($mask, $expectedMask)
+    public function testRemoveServiceBits(int $mask, int $expectedMask)
     {
         self::assertEquals($expectedMask, $this->extension->removeServiceBits($mask));
     }
 
-    public function removeServiceBitsProvider()
+    public function removeServiceBitsProvider(): array
     {
         return [
             'zero mask'                        => [

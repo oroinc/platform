@@ -2,26 +2,25 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeValueFormatter;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTimeValueFormatterTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $datetimeFormatter;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
     /** @var DateTimeValueFormatter */
-    protected $formatter;
+    private $formatter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $datetimeFormatter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->datetimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->getMock();
+        $this->datetimeFormatter = $this->createMock(DateTimeFormatterInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->formatter = new DateTimeValueFormatter(
             $this->datetimeFormatter,
@@ -29,35 +28,18 @@ class DateTimeValueFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFormatterName()
-    {
-        $this->assertEquals('datetime', $this->formatter->getFormatterName());
-    }
-
     public function testFormat()
     {
         $parameter = new \DateTime();
-        $this->datetimeFormatter
-            ->expects($this->once())
+        $this->datetimeFormatter->expects($this->once())
             ->method('format')
             ->with($parameter);
         $this->formatter->format($parameter);
     }
 
-    public function testGetSupportedTypes()
-    {
-        $this->assertEquals(['datetime'], $this->formatter->getSupportedTypes());
-    }
-
-    public function testIsDefaultFormatter()
-    {
-        $this->assertTrue($this->formatter->isDefaultFormatter());
-    }
-
     public function testGetDefaultValue()
     {
-        $this->translator
-            ->expects($this->once())
+        $this->translator->expects($this->once())
             ->method('trans')
             ->with('oro.locale.formatter.datetime.default');
         $this->formatter->getDefaultValue();

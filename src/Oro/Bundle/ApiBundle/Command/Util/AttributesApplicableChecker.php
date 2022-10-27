@@ -10,9 +10,6 @@ class AttributesApplicableChecker extends MatchApplicableChecker
     /** @var string[] */
     protected $attributes;
 
-    /**
-     * @param array $attributes
-     */
     public function __construct(array $attributes)
     {
         parent::__construct();

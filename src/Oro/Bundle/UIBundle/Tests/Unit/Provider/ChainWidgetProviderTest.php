@@ -3,35 +3,33 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\ChainWidgetProvider;
+use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 
 class ChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $highPriorityProvider;
+
+    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $lowPriorityProvider;
+
+    /** @var WidgetProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $unsupportedProvider;
+
     /** @var ChainWidgetProvider */
-    protected $chainProvider;
+    private $chainProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $highPriorityProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $lowPriorityProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $unsupportedProvider;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->chainProvider = new ChainWidgetProvider();
+        $this->highPriorityProvider = $this->createMock(WidgetProviderInterface::class);
+        $this->lowPriorityProvider = $this->createMock(WidgetProviderInterface::class);
+        $this->unsupportedProvider = $this->createMock(WidgetProviderInterface::class);
 
-        $this->highPriorityProvider =
-            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
-        $this->lowPriorityProvider  =
-            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
-        $this->unsupportedProvider  =
-            $this->createMock('Oro\Bundle\UIBundle\Provider\WidgetProviderInterface');
-
-        $this->chainProvider->addProvider($this->lowPriorityProvider);
-        $this->chainProvider->addProvider($this->highPriorityProvider);
-        $this->chainProvider->addProvider($this->unsupportedProvider);
+        $this->chainProvider = new ChainWidgetProvider([
+            $this->lowPriorityProvider,
+            $this->highPriorityProvider,
+            $this->unsupportedProvider
+        ]);
     }
 
     public function testSupports()
@@ -62,24 +60,24 @@ class ChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
         $this->lowPriorityProvider->expects($this->once())
             ->method('supports')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->highPriorityProvider->expects($this->once())
             ->method('supports')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->unsupportedProvider->expects($this->once())
             ->method('supports')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->lowPriorityProvider->expects($this->once())
             ->method('getWidgets')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue($lowPriorityProviderWidgets));
+            ->willReturn($lowPriorityProviderWidgets);
         $this->highPriorityProvider->expects($this->once())
             ->method('getWidgets')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue($highPriorityProviderWidgets));
+            ->willReturn($highPriorityProviderWidgets);
         $this->unsupportedProvider->expects($this->never())
             ->method('getWidgets');
 

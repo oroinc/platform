@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReportBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Form\EventListener\DateGroupingFormSubscriber;
 use Oro\Bundle\ReportBundle\Form\Type\ReportType;
@@ -12,34 +13,24 @@ use Symfony\Component\Form\FormInterface;
 
 class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DateGroupingFormSubscriber
-     */
-    protected $dateGroupingFormSubscriber;
+    /** @var DateGroupingFormSubscriber */
+    private $dateGroupingFormSubscriber;
 
-    /**
-     * @var FormEvent|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
+    /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    /**
-     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $form;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    /**
-     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $dateForm;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dateForm;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dateGroupingFormSubscriber = new DateGroupingFormSubscriber();
-        $this->event = $this->getMockBuilder(FormEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dateForm = $this->getNewForm();
-        $this->form = $this->getNewForm();
+        $this->event = $this->createMock(FormEvent::class);
+        $this->dateForm = $this->createMock(FormInterface::class);
+        $this->form = $this->createMock(FormInterface::class);
         $this->form->expects($this->any())
             ->method('get')
             ->with(ReportType::DATE_GROUPING_FORM_NAME)
@@ -62,7 +53,7 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnPostSetDataDisablesFilter()
     {
         $report = new Report();
-        $report->setDefinition(json_encode([]));
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([]));
         $this->event->expects($this->once())
             ->method('getData')
             ->willReturn($report);
@@ -80,16 +71,12 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnPostSetDataDisablesEnablesFilter()
     {
         $report = new Report();
-        $report->setDefinition(
-            json_encode(
-                [
-                    DateGroupingType::DATE_GROUPING_NAME => [
-                        DateGroupingType::FIELD_NAME_ID => 'testFieldName',
-                        DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => true,
-                    ],
-                ]
-            )
-        );
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [
+                DateGroupingType::FIELD_NAME_ID => 'testFieldName',
+                DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => true,
+            ]
+        ]));
         $this->event->expects($this->once())
             ->method('getData')
             ->willReturn($report);
@@ -109,16 +96,12 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnPostSetDataDisablesEnablesFilterWithExistingDateGroupingModel()
     {
         $report = new Report();
-        $report->setDefinition(
-            json_encode(
-                [
-                    DateGroupingType::DATE_GROUPING_NAME => [
-                        DateGroupingType::FIELD_NAME_ID => 'newValue',
-                        DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => false,
-                    ],
-                ]
-            )
-        );
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [
+                DateGroupingType::FIELD_NAME_ID => 'newValue',
+                DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => false,
+            ]
+        ]));
         $this->event->expects($this->once())
             ->method('getData')
             ->willReturn($report);
@@ -153,7 +136,9 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnSubmitRemovesFilterDefinition()
     {
         $report = new Report();
-        $report->setDefinition(json_encode([DateGroupingType::DATE_GROUPING_NAME => []]));
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => []
+        ]));
         $originalDateModel = new DateGrouping();
         $originalDateModel->setUseDateGroupFilter(false);
 
@@ -166,22 +151,21 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($report);
 
         $this->dateGroupingFormSubscriber->onSubmit($this->event);
-        $this->assertArrayNotHasKey(DateGroupingType::DATE_GROUPING_NAME, json_decode($report->getDefinition(), true));
+        $this->assertArrayNotHasKey(
+            DateGroupingType::DATE_GROUPING_NAME,
+            QueryDefinitionUtil::decodeDefinition($report->getDefinition())
+        );
     }
 
     public function testOnSubmitUpdatesDefinition()
     {
         $report = new Report();
-        $report->setDefinition(
-            json_encode(
-                [
-                    DateGroupingType::DATE_GROUPING_NAME => [
-                        DateGroupingType::FIELD_NAME_ID => 'oldValue',
-                        DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => false,
-                    ],
-                ]
-            )
-        );
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [
+                DateGroupingType::FIELD_NAME_ID => 'oldValue',
+                DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => false,
+            ]
+        ]));
         $this->event->expects($this->once())
             ->method('getData')
             ->willReturn($report);
@@ -195,7 +179,7 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalDateModel);
 
         $this->dateGroupingFormSubscriber->onSubmit($this->event);
-        $newDefinition = json_decode($report->getDefinition(), true);
+        $newDefinition = QueryDefinitionUtil::decodeDefinition($report->getDefinition());
         $this->assertArrayHasKey(DateGroupingType::DATE_GROUPING_NAME, $newDefinition);
         $this->assertTrue(
             $newDefinition[DateGroupingType::DATE_GROUPING_NAME][DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID]
@@ -207,13 +191,5 @@ class DateGroupingFormSubscriberTest extends \PHPUnit\Framework\TestCase
             'newValue',
             $newDefinition[DateGroupingType::DATE_GROUPING_NAME][DateGroupingType::FIELD_NAME_ID]
         );
-    }
-
-    /**
-     * @return FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getNewForm()
-    {
-        return $this->getMockBuilder(FormInterface::class)->getMock();
     }
 }

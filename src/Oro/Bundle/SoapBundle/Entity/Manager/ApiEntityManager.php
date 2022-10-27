@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SoapBundle\Entity\Manager;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
@@ -19,6 +19,9 @@ use Oro\Component\EntitySerializer\EntitySerializer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * Provides an entity manager to work from the old REST API
+ */
 class ApiEntityManager
 {
     /** @var string */
@@ -33,8 +36,7 @@ class ApiEntityManager
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    protected DoctrineHelper $doctrineHelper;
 
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
@@ -80,8 +82,6 @@ class ApiEntityManager
 
     /**
      * Sets a event dispatcher
-     *
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
@@ -90,8 +90,6 @@ class ApiEntityManager
 
     /**
      * Sets the doctrine helper
-     *
-     * @param DoctrineHelper $doctrineHelper
      */
     public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
     {
@@ -100,8 +98,6 @@ class ApiEntityManager
 
     /**
      * Sets the entity class name helper
-     *
-     * @param EntityClassNameHelper $entityClassNameHelper
      */
     public function setEntityClassNameHelper(EntityClassNameHelper $entityClassNameHelper)
     {
@@ -110,8 +106,6 @@ class ApiEntityManager
 
     /**
      * Sets the entity serializer
-     *
-     * @param EntitySerializer $entitySerializer
      */
     public function setEntitySerializer(EntitySerializer $entitySerializer)
     {
@@ -209,28 +203,6 @@ class ApiEntityManager
     }
 
     /**
-     * Returns array of item matching filtering criteria
-     *
-     * In case when limit and offset set to null QueryBuilder instance will be returned.
-     *
-     * @deprecated since 1.4.1 use getListQueryBuilder instead
-     * @param int        $limit
-     * @param int        $page
-     * @param array      $criteria
-     * @param array|null $orderBy
-     *
-     * @return \Traversable
-     */
-    public function getList($limit = 10, $page = 1, $criteria = [], $orderBy = null)
-    {
-        $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
-
-        return $this->getRepository()
-            ->matching($criteria)
-            ->toArray();
-    }
-
-    /**
      * Returns query builder that could be used for fetching data based on given filtering criteria
      *
      * @param int   $limit
@@ -251,6 +223,24 @@ class ApiEntityManager
         $qb->addCriteria($criteria);
 
         return $qb;
+    }
+
+    /**
+     * Returns array of item matching filtering criteria
+     *
+     * @param int $limit
+     * @param int $page
+     * @param array $criteria
+     * @param array|null $orderBy
+     * @param array $joins
+     *
+     * @return array
+     */
+    public function getList($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
+    {
+        return $this->getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins)
+            ->getQuery()
+            ->getArrayResult();
     }
 
     /**
@@ -304,6 +294,18 @@ class ApiEntityManager
     }
 
     /**
+     * Serializes the given entities.
+     */
+    public function serializeEntities(array $entities): array
+    {
+        return $this->entitySerializer->serializeEntities(
+            $entities,
+            $this->class,
+            $this->getCachedSerializationConfig()
+        );
+    }
+
+    /**
      * @param object $entity
      *
      * @throws AccessDeniedException if access to the given entity is denied
@@ -312,7 +314,7 @@ class ApiEntityManager
     {
         // dispatch oro_api.request.find.after event
         $event = new FindAfter($entity);
-        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+        $this->eventDispatcher->dispatch($event, FindAfter::NAME);
     }
 
     /**
@@ -366,7 +368,7 @@ class ApiEntityManager
 
         // dispatch oro_api.request.get_list.before event
         $event = new GetListBefore($criteria, $this->class);
-        $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
+        $this->eventDispatcher->dispatch($event, GetListBefore::NAME);
         $criteria = $event->getCriteria();
 
         $criteria

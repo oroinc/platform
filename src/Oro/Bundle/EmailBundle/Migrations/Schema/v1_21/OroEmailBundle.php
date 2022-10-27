@@ -16,9 +16,6 @@ class OroEmailBundle implements Migration
         static::addIndexes($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function addIndexes(Schema $schema)
     {
         $emailRecipientTable = $schema->getTable('oro_email_recipient');

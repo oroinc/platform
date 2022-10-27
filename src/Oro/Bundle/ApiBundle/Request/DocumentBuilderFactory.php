@@ -3,13 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The factory that creates the document builder for a specific request type.
- * The implementation of this factory assumes that all document builders
- * are declared in DIC as public non shared services.
- * @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass
  */
 class DocumentBuilderFactory
 {
@@ -40,10 +37,6 @@ class DocumentBuilderFactory
     /**
      * Creates a new instance of DocumentBuilderInterface
      * responsible to build a document for the specific request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return DocumentBuilderInterface
      *
      * @throws \LogicException if a document builder cannot be created for the given request type
      */

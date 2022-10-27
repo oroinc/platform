@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var NoneFilter;
-    var wrapperTemplate = require('tpl!orofilter/templates/filter/filter-wrapper.html');
-    var template = require('tpl!orofilter/templates/filter/none-filter.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var AbstractFilter = require('./abstract-filter');
+    const wrapperTemplate = require('tpl-loader!orofilter/templates/filter/filter-wrapper.html');
+    const template = require('tpl-loader!orofilter/templates/filter/none-filter.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const AbstractFilter = require('oro/filter/abstract-filter');
 
     /**
      * None filter: an empty filter implements 'null object' pattern
@@ -18,7 +17,7 @@ define(function(require) {
      * @class   oro.filter.NoneFilter
      * @extends oro.filter.AbstractFilter
      */
-    NoneFilter = AbstractFilter.extend({
+    const NoneFilter = AbstractFilter.extend({
         wrappable: true,
 
         wrapperTemplate: wrapperTemplate,
@@ -65,10 +64,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function NoneFilter() {
-            NoneFilter.__super__.constructor.apply(this, arguments);
+        constructor: function NoneFilter(options) {
+            NoneFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -77,11 +76,11 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'popupHint');
+            const opts = _.pick(options || {}, 'popupHint');
             _.extend(this, opts);
 
             this.label = 'None';
-            NoneFilter.__super__.initialize.apply(this, arguments);
+            NoneFilter.__super__.initialize.call(this, options);
         },
 
         /**
@@ -135,7 +134,7 @@ define(function(require) {
          * @protected
          */
         _onClickOutsideCriteria: function(e) {
-            var elem = this.$(this.criteriaSelector);
+            const elem = this.$(this.criteriaSelector);
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
                 this._hideCriteria();
@@ -148,11 +147,14 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            var $filter = $(this.template({
+            const $filter = $(this.template({
                 popupHint: this._getPopupHint(),
                 renderMode: this.renderMode
             }));
             this._wrap($filter);
+            if (this.initiallyOpened) {
+                this._showCriteria();
+            }
             return this;
         },
 
@@ -166,12 +168,12 @@ define(function(require) {
          * @protected
          */
         _showCriteria: function() {
-            this.trigger('showCriteria', this);
             this.$(this.criteriaSelector).show();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
-            setTimeout(_.bind(function() {
+            this.trigger('showCriteria', this);
+            setTimeout(() => {
                 this.popupCriteriaShowed = true;
-            }, this), 100);
+            }, 100);
         },
 
         /**
@@ -182,22 +184,23 @@ define(function(require) {
         _hideCriteria: function() {
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
-            setTimeout(_.bind(function() {
+            this.trigger('hideCriteria', this);
+            setTimeout(() => {
                 if (!this.disposed) {
                     this.popupCriteriaShowed = false;
                 }
-            }, this), 100);
+            }, 100);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(value) {
             return this;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
             return {};

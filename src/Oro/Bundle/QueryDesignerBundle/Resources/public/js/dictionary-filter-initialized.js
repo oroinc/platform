@@ -1,8 +1,8 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
     /**
      * Resolves filter options
@@ -13,7 +13,7 @@ define(function(require) {
      * @return {jQuery.Deferred} promise
      */
     return function(filterOptions, context) {
-        var className = _.last(context).field.relatedEntityName;
+        const className = _.last(context).field.relatedEntityName;
         filterOptions.filterParams = {'class': className};
         return $.when(filterOptions);
     };

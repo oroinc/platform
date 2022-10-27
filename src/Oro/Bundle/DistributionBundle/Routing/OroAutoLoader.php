@@ -8,10 +8,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class OroAutoLoader extends AbstractLoader
 {
-    /**
-     * @param KernelInterface               $kernel
-     * @param RouteOptionsResolverInterface $routeOptionsResolver
-     */
     public function __construct(
         KernelInterface $kernel,
         RouteOptionsResolverInterface $routeOptionsResolver

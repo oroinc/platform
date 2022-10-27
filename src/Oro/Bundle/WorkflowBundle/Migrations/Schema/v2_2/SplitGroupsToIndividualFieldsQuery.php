@@ -1,12 +1,15 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_2;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Splits the "groups" field into two fields: "exclusive_active_groups" and "exclusive_record_groups".
+ */
 class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
 {
     const GROUP_TYPE_EXCLUSIVE_ACTIVE = 10;
@@ -55,7 +58,7 @@ class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
             foreach ($groupDefinitions as $groupId => $groupField) {
                 $query = sprintf(
                     'UPDATE oro_workflow_definition SET %s = :%s WHERE name = :workflow_name',
-                    $groupField,
+                    $this->connection->quoteIdentifier($groupField),
                     $groupField
                 );
                 $queries[] = [
@@ -64,7 +67,7 @@ class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
                         $groupField => isset($groups[$groupId]) ? $groups[$groupId] : [],
                         'workflow_name' => $workflowName
                     ],
-                    [$groupField => Type::SIMPLE_ARRAY, 'workflow_name' => Type::STRING]
+                    [$groupField => Types::SIMPLE_ARRAY, 'workflow_name' => Types::STRING]
                 ];
             }
         }
@@ -73,7 +76,7 @@ class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
         foreach ($queries as $val) {
             $this->logQuery($logger, $val[0], $val[1], $val[2]);
             if (!$dryRun) {
-                $this->connection->executeUpdate($val[0], $val[1], $val[2]);
+                $this->connection->executeStatement($val[0], $val[1], $val[2]);
             }
         }
     }
@@ -85,10 +88,15 @@ class SplitGroupsToIndividualFieldsQuery extends ParametrizedMigrationQuery
      */
     private function getRows(LoggerInterface $logger)
     {
-        $query = 'SELECT name, groups FROM oro_workflow_definition';
+        $qb = $this->connection->createQueryBuilder()
+            ->select(
+                $this->connection->quoteIdentifier('name'),
+                $this->connection->quoteIdentifier('groups')
+            )
+            ->from('oro_workflow_definition');
 
-        $this->logQuery($logger, $query);
+        $this->logQuery($logger, $qb->getSQL());
 
-        return $this->connection->fetchAll($query);
+        return $qb->execute()->fetchAll();
     }
 }

@@ -3,13 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The registry that allows to get the error completer for a specific request type.
- * The implementation of this registry assumes that all error completers
- * are declared in DIC as public services.
- * @see \Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ErrorCompleterCompilerPass
  */
 class ErrorCompleterRegistry
 {
@@ -40,10 +37,6 @@ class ErrorCompleterRegistry
     /**
      * Creates a new instance of ErrorCompleterInterface
      * responsible to build a document for the specific request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return ErrorCompleterInterface
      *
      * @throws \LogicException if an error completer does not exist for the given request type
      */

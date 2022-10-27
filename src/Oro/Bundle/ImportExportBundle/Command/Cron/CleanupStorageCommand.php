@@ -1,108 +1,53 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ImportExportBundle\Command\Cron;
 
 use Gaufrette\File;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager;
 
-class CleanupStorageCommand extends ContainerAwareCommand implements CronCommandInterface
+/**
+ * Deletes old temporary import/export files.
+ */
+class CleanupStorageCommand extends CleanupStorageCommandAbstract
 {
-    const DEFAULT_PERIOD = 14; // days
+    /** @var string */
+    protected static $defaultName = 'oro:cron:import-clean-up-storage';
+
+    private FileManager $fileManager;
+    private ImportExportResultManager $importExportResultManager;
+
+    public function __construct(FileManager $fileManager, ImportExportResultManager $importExportResultManager)
+    {
+        $this->fileManager = $fileManager;
+        $this->importExportResultManager = $importExportResultManager;
+
+        parent::__construct();
+    }
 
     /**
-     * Set up Adapters that support old files removing. If empty then  all adapters files will be removed.
-     *
-     * @var array
+     * {@inheritDoc}
      */
-    private static $supportedAdapters = [];
-
-    /**
-     * @inheritdoc
-     */
-    public function getDefaultDefinition()
+    public function getDefaultDefinition(): string
     {
         return '0 0 */1 * *';
     }
 
     /**
-     * {@internaldoc}
+     * {@inheritdoc}
      */
-    public function isActive()
+    protected function getFilesForDeletion($from, $to): array
     {
-        $classAdapter = get_class($this->getFileManager()->getAdapter());
-        if (empty(self::$supportedAdapters)) {
-            return true;
-        }
-
-        return in_array($classAdapter, self::$supportedAdapters);
+        $this->importExportResultManager->markResultsAsExpired($from, $to);
+        return $this->fileManager->getFilesByPeriod($from, $to);
     }
 
     /**
-     * {@internaldoc}
+     * {@inheritdoc}
      */
-    protected function configure()
+    protected function deleteFile(File $file): void
     {
-        $this
-            ->setName('oro:cron:import-clean-up-storage')
-            ->setDescription('Clear old files from import storage.')
-            ->addOption(
-                'interval',
-                'i',
-                InputOption::VALUE_OPTIONAL,
-                'Time interval (days) to keep the import and export files.'.
-                ' Will be removed files older than today-interval.',
-                self::DEFAULT_PERIOD
-            );
-    }
-
-    /**
-     * {@internaldoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $period = (int)$input->getOption('interval');
-
-        list($from, $to) = $this->getDateRangeByPeriod($period);
-        $fileManager = $this->getFileManager();
-        $files = $fileManager->getFilesByPeriod($from, $to);
-
-        /** @var File $file*/
-        foreach ($files as $fileName => $file) {
-            $fileManager->deleteFile($file);
-            $output->writeln(
-                sprintf('<info> File "%s" was removed.</info>', $fileName),
-                OutputInterface::VERBOSITY_DEBUG
-            );
-        }
-
-        $output->writeln(sprintf('<info>Were removed "%s" files.</info>', count($files)));
-
-        return;
-    }
-
-    /**
-     * @param integer $period
-     * @return array
-     */
-    private function getDateRangeByPeriod($period)
-    {
-        $toDate = new \DateTime();
-        $toDate->modify(sprintf('-%d days', $period));
-        $fromDate = new \DateTime('@0');
-
-        return [$fromDate, $toDate];
-    }
-
-    /**
-     * @return FileManager
-     */
-    private function getFileManager()
-    {
-        return $this->getContainer()->get('oro_importexport.file.file_manager');
+        $this->fileManager->deleteFile($file);
     }
 }

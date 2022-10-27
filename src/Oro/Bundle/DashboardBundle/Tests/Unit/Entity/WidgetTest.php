@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 
 class WidgetTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Widget
-     */
-    protected $widget;
+    /** @var Widget */
+    private $widget;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->widget = new Widget();
     }
@@ -39,7 +38,7 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
 
     public function testDashboard()
     {
-        $dashboard = $this->createMock('Oro\\Bundle\\DashboardBundle\\Entity\\Dashboard');
+        $dashboard = $this->createMock(Dashboard::class);
         $this->assertNull($this->widget->getDashboard());
         $this->assertEquals($this->widget, $this->widget->setDashboard($dashboard));
         $this->assertEquals($dashboard, $this->widget->getDashboard());

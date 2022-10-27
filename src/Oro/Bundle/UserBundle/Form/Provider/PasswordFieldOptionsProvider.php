@@ -26,10 +26,6 @@ class PasswordFieldOptionsProvider
     /** @var PasswordTooltipProvider */
     protected $passwordTooltip;
 
-    /**
-     * @param PasswordComplexityConfigProvider $passwordConfigProvider
-     * @param PasswordTooltipProvider $passwordTooltip
-     */
     public function __construct(
         PasswordComplexityConfigProvider $passwordConfigProvider,
         PasswordTooltipProvider $passwordTooltip

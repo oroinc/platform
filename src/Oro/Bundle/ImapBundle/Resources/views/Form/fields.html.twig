@@ -40,7 +40,8 @@
         'route': "oro_imap_change_account_type",
         'formSelector': '#'~formSelector|default(form.vars.id),
         'formParentName': form.parent.vars.name,
-        'organization': data and data.organization is defined and data.organization ? data.organization.id : null
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null,
+        'id': form.vars.value and form.vars.value.userEmailOrigin.id is defined ? form.vars.value.userEmailOrigin.id : null,
     }) %}
 
     <div class="container-change-account-type"
@@ -74,9 +75,8 @@
         'routeAccessToken': "oro_imap_gmail_access_token",
         'routeGetFolders': "oro_imap_gmail_connection_check",
         'formSelector': '#'~formSelector|default(form.vars.id),
-        'googleErrorMessage': '.google-alert',
+        'vendorErrorMessage': '.google-alert',
         'formParentName' : form.parent.parent.vars.name,
-        'type': constant('Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel::ACCOUNT_TYPE_GMAIL'),
         'organization': data and data.organization is defined and data.organization ? data.organization.id : null,
         'user': form.parent.userEmailOrigin.user.vars.value,
         'accessToken': form.parent.userEmailOrigin.accessToken.vars.value,
@@ -87,7 +87,9 @@
     <div class="container-imap-gmail-container"
          data-page-component-module="oroimap/js/app/components/imap-gmail-component"
          data-page-component-options="{{ options|json_encode }}"
-         data-layout="separate"
+         {% if form.vars.is_partial %}
+            data-layout="separate"
+         {% endif %}
     >
         <div {{ block('widget_container_attributes') }}>
             {%- if form.parent is empty -%}
@@ -100,9 +102,13 @@
                         {{ 'oro.imap.configuration.reset_email.label'|trans }}
                     </div>
                     <div class="controls oro-item-collection">
-                        <div style="margin-top: 6px">
+                        <div class="controls-line-group">
                             <strong>{{ form.parent.userEmailOrigin.user.vars.value }}</strong>
-                            <button title="{{ 'oro.imap.configuration.disconnect.label'|trans }}" class="removeRow btn-action btn-link" type="button" style="vertical-align: baseline">×</button>
+                            <button data-role="remove" class="btn btn-icon btn-square-lighter delete" type="button"
+                                    title="{{ 'oro.imap.configuration.disconnect.label'|trans }}"
+                            >
+                                <span class="fa-close" aria-hidden="true"></span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -143,7 +149,7 @@
         googleWarningMessage: '.alert-warning'
     } %}
     <div data-page-component-module="oroimap/js/app/components/google-sync-checkbox-component"
-        data-page-component-options="{{ options|json_encode }}" style="margin-top: 3px">
+        data-page-component-options="{{ options|json_encode }}">
         {{ block('checkbox_widget') }}
         <div class="alert google-connection-status alert-warning" role="alert" style="display: none">
             {{ 'oro.imap.system_configuration.fields.enable_google_imap.warning.label'|trans }}
@@ -160,3 +166,85 @@
     </div>
 {% endblock %}
 
+
+
+{% block oro_imap_configuration_microsoft_widget %}
+    {% set data = form.parent.parent.vars.value %}
+
+    {% set options = form.vars.options|default({})|merge({
+        'route': 'oro_imap_change_account_type',
+        'routeAccessToken': "oro_imap_microsoft_access_token",
+        'routeGetFolders': "oro_imap_microsoft_connection_check",
+        'formSelector': '#'~formSelector|default(form.vars.id),
+        'vendorErrorMessage': '.vendor-alert',
+        'formParentName' : form.parent.parent.vars.name,
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null,
+        'user': form.parent.userEmailOrigin.user.vars.value,
+        'accessToken': form.parent.userEmailOrigin.accessToken.vars.value,
+        'accessTokenExpiresAt': form.parent.userEmailOrigin.accessTokenExpiresAt.vars.value,
+        'id': form.vars.value and form.vars.value.id is defined ? form.vars.value.id : null,
+    }) %}
+
+    <div class="container-imap-microsoft-container"
+         data-page-component-module="oroimap/js/app/components/imap-microsoft-component"
+         data-page-component-options="{{ options|json_encode }}"
+            {% if form.vars.is_partial %}
+                data-layout="separate"
+            {% endif %}
+    >
+        <div {{ block('widget_container_attributes') }}>
+            {%- if form.parent is empty -%}
+                {{ form_errors(form) }}
+            {%- endif -%}
+
+            {% if form.parent.userEmailOrigin.user.vars.value is not empty %}
+                <div class="control-group">
+                    <div class="control-label wrap">
+                        {{ 'oro.imap.configuration.reset_email.label'|trans }}
+                    </div>
+                    <div class="controls oro-item-collection">
+                        <div class="controls-line-group">
+                            <strong>{{ form.parent.userEmailOrigin.user.vars.value }}</strong>
+                            <button data-role="remove" class="btn btn-icon btn-square-lighter delete" type="button"
+                                    title="{{ 'oro.imap.configuration.disconnect.label'|trans }}"
+                            >
+                                <span class="fa-close" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if form.check is defined %}
+                <div class="control-group">
+                    <div class="controls">
+                        {{ form_widget(form.check) }}
+                        {% if form.vars.value.isSyncEnabled() == false %}
+                            <div class="controls messages">
+                                <div class="alert alert-error" role="alert">
+                                    {{ 'oro.imap.configuration.reconnect_description'|trans }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="control-group">
+                <div class="controls">
+                    <div class="vendor-alert google-connection-status alert alert-error" role="alert" style="display: none"></div>
+                </div>
+            </div>
+
+            {% if form.checkFolder is defined %}
+                <div class="control-group">
+                    <div class="controls">
+                        {{ form_widget(form.checkFolder) }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {{- form_rest(form) -}}
+        </div>
+    </div>
+{% endblock %}

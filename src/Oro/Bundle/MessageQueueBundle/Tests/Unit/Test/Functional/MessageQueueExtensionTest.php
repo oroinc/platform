@@ -2,62 +2,172 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Functional;
 
+use Monolog\Logger;
+use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\DriverMessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Component\MessageQueue\Client\Config;
+use Oro\Component\MessageQueue\Client\DriverInterface;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Test\Async\Extension\ConsumedMessagesCollectorExtension;
+use Oro\Component\MessageQueue\Transport\Queue;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
-    /** @var ContainerInterface */
-    private static $container;
+    private static ?ContainerInterface $container = null;
 
-    /** @var MessageCollector */
-    private static $messageCollector;
+    private static ?MessageCollector $messageCollector = null;
+
+    private static BufferedMessageProducer|\PHPUnit\Framework\MockObject\MockObject|null $bufferedProducer = null;
 
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
+        self::tearDownAfterClass();
         $this->initClient();
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
+        if (self::$container) {
+            /** @beforeResetClient */
+            self::tearDownMessageCollector();
+        }
+
         self::$container = null;
         self::$messageCollector = null;
+        self::$bufferedProducer = null;
     }
 
-    protected function initClient()
+    protected function initClient(): void
     {
         if (null === self::$container) {
             self::$container = new Container();
-            self::$messageCollector = new MessageCollector($this->createMock(MessageProducerInterface::class));
+            $driverMessageCollector = new DriverMessageCollector($this->createMock(DriverInterface::class));
+            $messageProducer = $this->createMock(MessageProducerInterface::class);
+            $messageProducer
+                ->expects(self::any())
+                ->method('send')
+                ->willReturnCallback(function (string $topic, array|string $messageBody) use ($driverMessageCollector) {
+                    $message = new Message($messageBody);
+                    $message->setMessageId(uniqid('oro.', true));
+                    $message->setProperty(Config::PARAMETER_TOPIC_NAME, $topic);
+                    $driverMessageCollector->send(new Queue('oro.default'), $message);
+                });
+            self::$messageCollector = new MessageCollector(
+                $messageProducer,
+                $driverMessageCollector
+            );
             self::$container->set('oro_message_queue.test.message_collector', self::$messageCollector);
+            self::$bufferedProducer = $this->createMock(BufferedMessageProducer::class);
+            self::$container->set('oro_message_queue.client.buffered_message_producer', self::$bufferedProducer);
+            self::$container->set(
+                'oro_message_queue.test.async.extension.consumed_messages_collector',
+                new ConsumedMessagesCollectorExtension(
+                    $this->createMock(MessageProcessorRegistryInterface::class),
+                    $this->createMock(Logger::class)
+                )
+            );
         }
+
+        /** @afterInitClient */
+        $this->setUpMessageCollector();
     }
 
-    /**
-     * @return ContainerInterface
-     */
-    protected static function getContainer()
+    protected static function getContainer(): ContainerInterface
     {
         return self::$container;
     }
 
-    public function testShouldAllowGetMessageCollector()
+    public function testShouldAllowEnableMessageBuffering(): void
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(false);
+        self::$bufferedProducer->expects(self::once())
+            ->method('enableBuffering');
+
+        self::enableMessageBuffering();
+    }
+
+    public function testShouldNotEnableMessageBufferingWhenItIsAlreadyEnabled(): void
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(true);
+        self::$bufferedProducer->expects(self::never())
+            ->method('enableBuffering');
+
+        self::enableMessageBuffering();
+    }
+
+    public function testShouldAllowDisableMessageBuffering(): void
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(true);
+        self::$bufferedProducer->expects(self::once())
+            ->method('disableBuffering');
+
+        self::disableMessageBuffering();
+    }
+
+    public function testShouldNotDisableMessageBufferingWhenItIsAlreadyDisabled(): void
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(false);
+        self::$bufferedProducer->expects(self::never())
+            ->method('disableBuffering');
+
+        self::disableMessageBuffering();
+    }
+
+    public function testShouldAllowFlushMessagesBuffer(): void
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(true);
+        self::$bufferedProducer->expects(self::once())
+            ->method('flushBuffer');
+
+        self::flushMessagesBuffer();
+    }
+
+    public function testShouldNotFlushMessagesBufferWhenBufferingIsNotEnabled(): void
+    {
+        self::$bufferedProducer->expects(self::once())
+            ->method('isBufferingEnabled')
+            ->willReturn(false);
+        self::$bufferedProducer->expects(self::never())
+            ->method('flushBuffer');
+
+        self::flushMessagesBuffer();
+    }
+
+    public function testShouldAllowGetMessageCollector(): void
     {
         self::assertSame(self::$messageCollector, self::getMessageCollector());
     }
 
-    public function testShouldAllowGetSentMessages()
+    public function testShouldAllowGetSentMessages(): void
     {
         $topic = 'test topic';
         $message = 'test message';
@@ -66,13 +176,13 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                ['topic' => $topic, 'message' => $message]
+                ['topic' => $topic, 'message' => $message],
             ],
             self::getSentMessages()
         );
     }
 
-    public function testShouldAllowSendMessageViaMessageProducerAlias()
+    public function testShouldAllowSendMessageViaMessageProducerAlias(): void
     {
         $topic = 'test topic';
         $message = 'test message';
@@ -81,28 +191,28 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                ['topic' => $topic, 'message' => $message]
+                ['topic' => $topic, 'message' => $message],
             ],
             self::getSentMessages()
         );
     }
 
-    public function testAssertMessageSentShouldThrowValidExceptionIfAssertionIsFalse()
+    public function testAssertMessageSentShouldThrowValidExceptionIfAssertionIsFalse(): void
     {
         $exception = false;
         try {
             self::assertMessageSent('test topic', 'test message');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains('Failed asserting that the message', $exception->getMessage());
-            self::assertContains('All sent messages', $exception->getMessage());
+            static::assertStringContainsString('Failed asserting that the message', $exception->getMessage());
+            static::assertStringContainsString('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
             self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
-    public function testAssertMessageSentShouldNotThrowExceptionIfAssertionIsTrue()
+    public function testAssertMessageSentShouldNotThrowExceptionIfAssertionIsTrue(): void
     {
         $topic = 'test topic';
         $message = 'test message';
@@ -112,22 +222,22 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertMessageSent($topic, $message);
     }
 
-    public function testAssertMessageSentWithoutMessageBodyShouldThrowValidExceptionIfAssertionIsFalse()
+    public function testAssertMessageSentWithoutMessageBodyShouldThrowValidExceptionIfAssertionIsFalse(): void
     {
         $exception = false;
         try {
             self::assertMessageSent('test topic');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains('Failed asserting that the message', $exception->getMessage());
-            self::assertContains('All sent messages', $exception->getMessage());
+            static::assertStringContainsString('Failed asserting that the message', $exception->getMessage());
+            static::assertStringContainsString('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
             self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
-    public function testAssertMessageSentWithoutMessageBodyShouldNotThrowExceptionIfAssertionIsTrue()
+    public function testAssertMessageSentWithoutMessageBodyShouldNotThrowExceptionIfAssertionIsTrue(): void
     {
         $topic = 'test topic';
 
@@ -136,7 +246,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertMessageSent($topic);
     }
 
-    public function testAssertMessagesSentShouldThrowValidExceptionIfOneOfMessageAssertionIsFalse()
+    public function testAssertMessagesSentShouldThrowValidExceptionIfOneOfMessageAssertionIsFalse(): void
     {
         $topic = 'test topic';
         $message1 = 'test message 1';
@@ -150,15 +260,15 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessagesSent($topic, [$message1, 'another message']);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains('Failed asserting that the message', $exception->getMessage());
-            self::assertContains('All sent messages', $exception->getMessage());
+            static::assertStringContainsString('Failed asserting that the message', $exception->getMessage());
+            static::assertStringContainsString('All sent messages', $exception->getMessage());
         }
         if (!$exception) {
             self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
-    public function testAssertMessagesSentShouldThrowValidExceptionIfCountAssertionIsFalse()
+    public function testAssertMessagesSentShouldThrowValidExceptionIfCountAssertionIsFalse(): void
     {
         $topic = 'test topic';
         $message1 = 'test message 1';
@@ -172,11 +282,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessagesSent($topic, [$message2]);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 2 matches expected size 1',
                 $exception->getMessage()
             );
@@ -186,7 +296,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testAssertMessagesSentShouldNotThrowExceptionIfAssertionIsTrue()
+    public function testAssertMessagesSentShouldNotThrowExceptionIfAssertionIsTrue(): void
     {
         $topic = 'test topic';
         $message1 = 'test message 1';
@@ -206,7 +316,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertMessagesSent($anotherTopic, [$anotherMessage]);
     }
 
-    public function testAssertMessagesCountShouldThrowValidExceptionIfCountAssertionIsFalse()
+    public function testAssertMessagesCountShouldThrowValidExceptionIfCountAssertionIsFalse(): void
     {
         $topic = 'test topic';
 
@@ -218,11 +328,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessagesCount($topic, 1);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that the given number of messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 2 matches expected size 1',
                 $exception->getMessage()
             );
@@ -232,7 +342,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testAssertMessagesCountShouldNotThrowExceptionIfAssertionIsTrue()
+    public function testAssertMessagesCountShouldNotThrowExceptionIfAssertionIsTrue(): void
     {
         $topic = 'test topic';
         $anotherTopic = 'another topic';
@@ -246,12 +356,12 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertMessagesCount($anotherTopic, 1);
     }
 
-    public function testAssertMessagesCountShouldNotThrowExceptionIfZeroAssertionIsTrue()
+    public function testAssertMessagesCountShouldNotThrowExceptionIfZeroAssertionIsTrue(): void
     {
         self::assertMessagesCount('test topic', 0);
     }
 
-    public function testAssertCountMessagesShouldThrowValidExceptionIfCountAssertionIsFalse()
+    public function testAssertCountMessagesShouldThrowValidExceptionIfCountAssertionIsFalse(): void
     {
         $topic = 'test topic';
 
@@ -263,11 +373,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertCountMessages($topic, 1);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that the given number of messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 2 matches expected size 1',
                 $exception->getMessage()
             );
@@ -277,7 +387,7 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testAssertCountMessagesShouldNotThrowExceptionIfAssertionIsTrue()
+    public function testAssertCountMessagesShouldNotThrowExceptionIfAssertionIsTrue(): void
     {
         $topic = 'test topic';
         $anotherTopic = 'another topic';
@@ -291,12 +401,12 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertCountMessages($anotherTopic, 1);
     }
 
-    public function testAssertCountMessagesShouldNotThrowExceptionIfZeroAssertionIsTrue()
+    public function testAssertCountMessagesShouldNotThrowExceptionIfZeroAssertionIsTrue(): void
     {
         self::assertCountMessages('test topic', 0);
     }
 
-    public function testAssertMessagesEmptyShouldThrowValidExceptionIfAssertionIsFalse()
+    public function testAssertMessagesEmptyShouldThrowValidExceptionIfAssertionIsFalse(): void
     {
         $topic = 'test topic';
 
@@ -307,11 +417,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertMessagesEmpty($topic);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 1 matches expected size 0',
                 $exception->getMessage()
             );
@@ -321,12 +431,12 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testAssertMessagesEmptyShouldNotThrowExceptionIfAssertionIsTrue()
+    public function testAssertMessagesEmptyShouldNotThrowExceptionIfAssertionIsTrue(): void
     {
         self::assertMessagesEmpty('test topic');
     }
 
-    public function testAssertEmptyMessagesShouldThrowValidExceptionIfAssertionIsFalse()
+    public function testAssertEmptyMessagesShouldThrowValidExceptionIfAssertionIsFalse(): void
     {
         $topic = 'test topic';
 
@@ -337,11 +447,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertEmptyMessages($topic);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains(
+            static::assertStringContainsString(
                 'Failed asserting that exactly given messages were sent to "test topic" topic',
                 $exception->getMessage()
             );
-            self::assertContains(
+            static::assertStringContainsString(
                 'actual size 1 matches expected size 0',
                 $exception->getMessage()
             );
@@ -351,26 +461,29 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testAssertEmptyMessagesShouldNotThrowExceptionIfAssertionIsTrue()
+    public function testAssertEmptyMessagesShouldNotThrowExceptionIfAssertionIsTrue(): void
     {
         self::assertEmptyMessages('test topic');
     }
 
-    public function testAssertAllMessagesSentShouldThrowValidExceptionIfAssertionIsFalse()
+    public function testAssertAllMessagesSentShouldThrowValidExceptionIfAssertionIsFalse(): void
     {
         $exception = false;
         try {
             self::assertAllMessagesSent([['topic' => 'test topic', 'message' => 'test message']]);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $exception = $e;
-            self::assertContains('Failed asserting that exactly all messages were sent', $exception->getMessage());
+            static::assertStringContainsString(
+                'Failed asserting that exactly all messages were sent',
+                $exception->getMessage()
+            );
         }
         if (!$exception) {
             self::fail('\PHPUnit\Framework\ExpectationFailedException expected');
         }
     }
 
-    public function testAssertAllMessagesSentShouldNotThrowExceptionIfAssertionIsTrue()
+    public function testAssertAllMessagesSentShouldNotThrowExceptionIfAssertionIsTrue(): void
     {
         $topic = 'test topic';
         $message = 'test message';

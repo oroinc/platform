@@ -9,23 +9,50 @@ use Oro\Component\MessageQueue\Consumption\Context;
 
 class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSetLocaleOnBeforeReceive()
-    {
-        $localeSettings = $this->createMock(LocaleSettings::class);
-        $translatableListener = new TranslatableListener();
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
 
-        $localeSettings->expects($this->once())
+    /** @var TranslatableListener */
+    private $translatableListener;
+
+    /** @var LocaleExtension */
+    private $localeExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp(): void
+    {
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->translatableListener = new TranslatableListener();
+        $this->localeExtension = new LocaleExtension($this->localeSettings, $this->translatableListener);
+    }
+
+    public function testOnStart(): void
+    {
+        $this->localeSettings
+            ->expects($this->once())
             ->method('getLocale')
             ->willReturn('fr');
 
-        $localeSettings->expects($this->once())
+        /** @var Context $context */
+        $context = $this->createMock(Context::class);
+        $this->localeExtension->onStart($context);
+
+        $this->assertEquals('fr', \Locale::getDefault());
+    }
+
+    public function testOnPreReceived(): void
+    {
+        $this->localeSettings
+            ->expects($this->once())
             ->method('getLanguage')
             ->willReturn('FR_fr');
 
-        $extension = new LocaleExtension($localeSettings, $translatableListener);
-        $extension->onBeforeReceive($this->createMock(Context::class));
+        /** @var Context $context */
+        $context = $this->createMock(Context::class);
+        $this->localeExtension->onPreReceived($context);
 
-        $this->assertEquals('fr', \Locale::getDefault());
-        $this->assertEquals('FR_fr', $translatableListener->getListenerLocale());
+        $this->assertEquals('FR_fr', $this->translatableListener->getListenerLocale());
     }
 }

@@ -2,145 +2,48 @@
 
 namespace Oro\Bundle\UserBundle\Model;
 
+/**
+ * Represents an ACL category.
+ */
 class PrivilegeCategory
 {
-    /**
-     * @var string
-     */
-    protected $id;
-    
-    /**
-     * @var string
-     */
-    protected $label;
+    /** @var string */
+    private $id;
 
-    /**
-     * @var bool
-     */
-    protected $tab;
+    /** @var string */
+    private $label;
 
-    /**
-     * @var bool
-     */
-    protected $visible;
+    /** @var bool */
+    private $tab;
 
-    /**
-     * @var int
-     */
-    protected $priority;
+    /** @var int */
+    private $priority;
 
-    /**
-     * @param string $id
-     * @param string $label
-     * @param bool $tab
-     * @param int $priority
-     */
-    public function __construct($id, $label, $tab, $priority)
+    public function __construct(string $id, string $label, bool $tab, int $priority)
     {
         $this->id = $id;
         $this->label = $label;
         $this->tab = $tab;
         $this->priority = $priority;
-        $this->visible = true;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @param string $id
-     *
-     * @return PrivilegeCategory
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
 
-    /**
-     * @param string $label
-     *
-     * @return PrivilegeCategory
-     */
-    public function setLabel($label)
-    {
-        $this->label = $label;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTab()
+    public function isTab(): bool
     {
         return $this->tab;
     }
 
-    /**
-     * @param bool $tab
-     *
-     * @return PrivilegeCategory
-     */
-    public function setTab($tab)
-    {
-        $this->tab = $tab;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isVisible()
-    {
-        return $this->visible;
-    }
-
-    /**
-     * @param bool $visible
-     *
-     * @return PrivilegeCategory
-     */
-    public function setVisible($visible)
-    {
-        $this->visible = $visible;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPriority()
+    public function getPriority(): int
     {
         return $this->priority;
-    }
-
-    /**
-     * @param int $priority
-     *
-     * @return PrivilegeCategory
-     */
-    public function setPriority($priority)
-    {
-        $this->priority = $priority;
-
-        return $this;
     }
 }

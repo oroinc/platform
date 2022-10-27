@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Fixtures\FirstTestBundle;
 
-class FirstTestBundle
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class FirstTestBundle extends Bundle
 {
 }

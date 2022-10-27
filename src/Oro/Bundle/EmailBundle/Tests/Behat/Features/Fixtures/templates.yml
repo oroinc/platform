@@ -1,19 +1,19 @@
 Oro\Bundle\EmailBundle\Entity\EmailTemplate:
   contact:
-    organization: 1
+    organization: '@organization'
     is_system: 0
     name: 'test_template'
-    entity_name: 'Oro\Bundle\ContactBundle\Entity\Contact'
+    entity_name: 'Oro\\Bundle\\ContactBundle\\Entity\\Contact'
     type: 'html'
     subject: 'Test Subject'
-    content: '<h1>Test Content</h1>'
+    content: '\<h1\>Test Content\</h1\>'
 
   not_system_emails{1..3}:
     organization: '@organization'
     owner: '@admin'
     is_system: 0
     name: 'not_system_email_<current()>'
-    entity_name: 'Oro\Bundle\UserBundle\Entity\User'
+    entity_name: 'Oro\\Bundle\\UserBundle\\Entity\\User'
     type: 'txt'
     subject: 'Not System Email Template #<current()>'
     content: 'Not System Email Template Content #<current()>'
@@ -23,7 +23,17 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
     owner: '@admin'
     is_system: 1
     name: 'system_email'
-    entity_name: 'Oro\Bundle\UserBundle\Entity\User'
+    entity_name: 'Oro\\Bundle\\UserBundle\\Entity\\User'
     type: 'txt'
     subject: 'System Email Template'
     content: 'System Email Template Content'
+
+  non_entity_related_template:
+    organization: '@organization'
+    owner: '@admin'
+    is_system: 1
+    name: 'non_entity_related'
+    entity_name: ~
+    type: 'txt'
+    subject: 'Non-entity Related Template'
+    content: 'Non-entity Related Template Content'

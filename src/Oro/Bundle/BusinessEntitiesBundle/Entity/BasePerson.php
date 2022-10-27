@@ -11,9 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 
 /**
- * Class BasePerson
- *
- * @package Oro\Bundle\BusinessEntitiesBundle\Entity
+ * Basic business entity
  *
  * @ORM\MappedSuperclass
  */
@@ -271,21 +269,18 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     }
 
     /**
-     * @param \DateTime $birthday
+     * @param \DateTime|null $birthday
      *
      * @return $this
      */
-    public function setBirthday($birthday)
+    public function setBirthday(\DateTime $birthday = null)
     {
         $this->birthday = $birthday;
 
         return $this;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getBirthday()
+    public function getBirthday(): ?\DateTime
     {
         return $this->birthday;
     }
@@ -341,7 +336,7 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     }
 
     /**
-     * @param \DateTime updatedAt
+     * @param \DateTime $updatedAt
      *
      * @return $this
      */

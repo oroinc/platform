@@ -7,12 +7,16 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Tests\Functional\DataFixtures\LoadRolesData;
 use Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityPerson;
 
+/**
+ * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UserOwnedEntityQueryTest extends AclTestCase
 {
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

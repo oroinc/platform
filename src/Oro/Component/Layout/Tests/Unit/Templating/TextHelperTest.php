@@ -3,44 +3,37 @@
 namespace Oro\Component\Layout\Tests\Unit\Templating;
 
 use Oro\Component\Layout\Templating\TextHelper;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TextHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
     /** @var TextHelper */
-    protected $helper;
+    private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
             ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($id, $parameters, $domain) {
-                        return strtr('trans!' . $domain . '!' . $id, $parameters);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($id, $parameters, $domain) {
+                return strtr('trans!' . $domain . '!' . $id, $parameters);
+            });
 
-        $this->helper = new TextHelper($this->translator);
+        $this->helper = new TextHelper($translator);
     }
 
     /**
      * @dataProvider processTextDataProvider
      */
-    public function testProcessText($value, $expected, $domain = null)
+    public function testProcessText(array|string|null $value, array|string|null $expected, string $domain = null)
     {
-        $result = $this->helper->processText($value, $domain);
-        $this->assertSame($expected, $result);
+        $this->assertSame($expected, $this->helper->processText($value, $domain));
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function processTextDataProvider()
+    public function processTextDataProvider(): array
     {
         return [
             [null, null],

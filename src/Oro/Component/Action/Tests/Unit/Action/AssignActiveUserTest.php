@@ -3,66 +3,59 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\AssignActiveUser;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser as User;
 
 class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
 {
-    const ATTRIBUTE_NAME = 'some_attribute';
+    private const ATTRIBUTE_NAME = 'some_attribute';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenStorage;
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
 
     /** @var AssignActiveUser */
-    protected $action;
+    private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
         $this->action = new AssignActiveUser(new ContextAccessor(), $this->tokenStorage);
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->tokenStorage);
-        unset($this->action);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
-     * @param array $inputOptions
-     * @param array $expectedOptions
      * @dataProvider optionsDataProvider
      */
     public function testInitialize(array $inputOptions, array $expectedOptions)
     {
         $this->action->initialize($inputOptions);
-        $this->assertAttributeEquals($expectedOptions, 'options', $this->action);
+        self::assertEquals($expectedOptions, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
-        return array(
-            'numeric attribute' => array(
-                'inputOptions'    => array(new PropertyPath(self::ATTRIBUTE_NAME)),
-                'expectedOptions' => array(
+        return [
+            'numeric attribute' => [
+                'inputOptions'    => [new PropertyPath(self::ATTRIBUTE_NAME)],
+                'expectedOptions' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
                     'exceptionOnNotFound' => true
-                ),
-            ),
-            'string attribute' => array(
-                'inputOptions'    => array('attribute' => new PropertyPath(self::ATTRIBUTE_NAME)),
-                'expectedOptions' => array(
+                ],
+            ],
+            'string attribute' => [
+                'inputOptions'    => ['attribute' => new PropertyPath(self::ATTRIBUTE_NAME)],
+                'expectedOptions' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
-                    'exceptionOnNotFound' => true),
-            ),
+                    'exceptionOnNotFound' => true],
+            ],
             'exceptionOnNotFound false' => [
                 'inputOptions' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
@@ -73,77 +66,67 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
                     'exceptionOnNotFound' => false,
                 ],
             ],
-        );
+        ];
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
-        return array(
-            'no options' => array(
-                'options' => array(),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+        return [
+            'no options' => [
+                'options' => [],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Only one or two attribute parameters must be defined',
-            ),
-            'too many options' => array(
-                'options' => array(
+            ],
+            'too many options' => [
+                'options' => [
                     'attribute' => new PropertyPath(self::ATTRIBUTE_NAME),
                     'exceptionOnNotFound' => false,
                     'additional' => 'value'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Only one or two attribute parameters must be defined',
-            ),
-            'no attribute' => array(
-                'options' => array(
+            ],
+            'no attribute' => [
+                'options' => [
                     'additional' => 'value'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Attribute must be defined',
-            ),
-            'not a property path' => array(
-                'options' => array(
+            ],
+            'not a property path' => [
+                'options' => [
                     'attribute' => self::ATTRIBUTE_NAME,
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Attribute must be valid property definition',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
-     * @param array $inputOptions
      * @dataProvider optionsDataProvider
      */
     public function testExecute(array $inputOptions)
     {
         $user = new User('testUser', 'qwerty');
 
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $token->expects($this->once())
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects(self::once())
             ->method('getUser')
-            ->will($this->returnValue($user));
-
-        $this->tokenStorage->expects($this->once())
+            ->willReturn($user);
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
-            ->will($this->returnValue($token));
+            ->willReturn($token);
 
         $context = new ItemStub();
 
@@ -151,6 +134,6 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
 
         $attributeName = self::ATTRIBUTE_NAME;
-        $this->assertEquals($user, $context->$attributeName);
+        self::assertEquals($user, $context->{$attributeName});
     }
 }

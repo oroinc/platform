@@ -5,7 +5,6 @@ namespace Oro\Bundle\LocaleBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -14,6 +13,8 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 
 /**
+ * Localization entity class.
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
  * @ORM\Table(name="oro_localization")
  * @Config(
@@ -90,8 +91,6 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\TranslationBundle\Entity\Language")
      * @ORM\JoinColumn(name="language_id", referencedColumnName="id", nullable=false, onDelete="RESTRICT")
-     *
-     * @Serializer\MaxDepth(1)
      */
     protected $language;
 
@@ -103,12 +102,17 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     protected $formattingCode;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="rtl_mode", type="boolean", options={"default"=false})
+     */
+    protected $rtlMode = false;
+
+    /**
      * @var Localization
      *
      * @ORM\ManyToOne(targetEntity="Localization", inversedBy="childLocalizations")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true, onDelete="SET NULL")
-     *
-     * @Serializer\MaxDepth(3)
      */
     protected $parentLocalization;
 
@@ -116,8 +120,6 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      * @var Collection|Localization[]
      *
      * @ORM\OneToMany(targetEntity="Localization", mappedBy="parentLocalization")
-     *
-     * @Serializer\MaxDepth(3)
      */
     protected $childLocalizations;
 
@@ -194,6 +196,22 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     public function getFormattingCode()
     {
         return $this->formattingCode;
+    }
+
+    public function isRtlMode(): bool
+    {
+        return $this->rtlMode;
+    }
+
+    /**
+     * @param bool $rtlMode
+     * @return $this
+     */
+    public function setRtlMode(bool $rtlMode): self
+    {
+        $this->rtlMode = $rtlMode;
+
+        return $this;
     }
 
     /**

@@ -1,6 +1,7 @@
-{% extends 'OroNavigationBundle:Menu:history.html.twig' %}
+{% extends '@OroNavigation/Menu/history.html.twig' %}
 
 {% block linkElement %}
+    {% import '@OroNavigation/Menu/menu.html.twig' as oro_menu %}
     {%- if matcher.isCurrent(item) %}
         <a class="menu-close" href="#"{{ oro_menu.attributes(linkAttributes) }}>{{ block('label') }}</a>
     {%- else %}

@@ -2,15 +2,20 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\ContextDataCollection;
 use Oro\Component\Layout\ContextItemInterface;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\LayoutContext;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutContextTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutContext */
-    protected $context;
+    private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new LayoutContext();
     }
@@ -18,7 +23,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valueDataProvider
      */
-    public function testGetSetHasRemove($value)
+    public function testGetSetHasRemove(mixed $value)
     {
         $this->assertFalse(
             $this->context->has('test'),
@@ -72,7 +77,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function valueDataProvider()
+    public function valueDataProvider(): array
     {
         return [
             [null],
@@ -84,14 +89,15 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables. Reason: The option "test" has invalid type. Expected "Oro\Component\Layout\ContextItemInterface", but "stdClass" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testResolveShouldThrowExceptionIfInvalidObjectTypeAdded()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Failed to resolve the context variables.'
+            . ' Reason: The option "test" has invalid type. Expected "%s", but "stdClass" given.',
+            ContextItemInterface::class
+        ));
+
         $this->context->getResolver()->setDefined(['test']);
         $this->context->set('test', new \stdClass());
         $this->context->resolve();
@@ -102,12 +108,11 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->context->has('test'));
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage Undefined index: test.
-     */
     public function testGetUnknownItem()
     {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('Undefined index: test.');
+
         $this->context->get('test');
     }
 
@@ -137,22 +142,20 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val_normalized', $this->context['test']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Failed to resolve the context variables.
-     */
     public function testResolveThrowsExceptionWhenInvalidData()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Failed to resolve the context variables.');
+
         $this->context->set('test', 'val');
         $this->context->resolve();
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The context variables are already resolved.
-     */
     public function testResolveThrowsExceptionWhenDataAlreadyResolved()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The context variables are already resolved.');
+
         $this->context->resolve();
         $this->context->resolve();
     }
@@ -174,12 +177,13 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('Updated', $this->context['test']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The item "test" cannot be added because the context variables are already resolved.
-     */
     public function testAddNewValueThrowsExceptionWhenDataAlreadyResolved()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'The item "test" cannot be added because the context variables are already resolved.'
+        );
+
         $this->context->resolve();
         $this->context->set('test', 'Updated');
     }
@@ -192,12 +196,13 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->remove('unknown');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The item "test" cannot be removed because the context variables are already resolved.
-     */
     public function testRemoveExistingValueThrowsExceptionWhenDataAlreadyResolved()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'The item "test" cannot be removed because the context variables are already resolved.'
+        );
+
         $this->context->getResolver()->setDefined(['test']);
         $this->context->set('test', 'val');
         $this->context->resolve();
@@ -207,10 +212,7 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetData()
     {
-        $this->assertInstanceOf(
-            'Oro\Component\Layout\ContextDataCollection',
-            $this->context->data()
-        );
+        $this->assertInstanceOf(ContextDataCollection::class, $this->context->data());
     }
 
     public function testGetHash()
@@ -218,27 +220,28 @@ class LayoutContextTest extends \PHPUnit\Framework\TestCase
         $this->context->resolve();
         $hash = $this->context->getHash();
 
-        $this->assertEquals(md5(serialize([])), $hash);
+        $this->assertEquals(md5(serialize([]) . serialize([])), $hash);
     }
 
     public function testGetHashWithContextItemInterfaceDescendantItems()
     {
         $item = $this->createMock(ContextItemInterface::class);
-        $item->expects($this->once())->method('getHash')->willReturn('value');
+        $item->expects($this->once())
+            ->method('getHash')
+            ->willReturn('value');
 
         $this->context->getResolver()->setDefined(['item']);
         $this->context->set('item', $item);
         $this->context->resolve();
 
-        $this->assertEquals(md5(serialize(['item' => 'value'])), $this->context->getHash());
+        $this->assertEquals(md5(serialize(['item' => 'value']) . serialize([])), $this->context->getHash());
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The context is not resolved.
-     */
     public function testGetHashThrowAnException()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The context is not resolved.');
+
         $this->context->getHash();
     }
 }

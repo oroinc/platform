@@ -39,8 +39,6 @@ class MigrationExtensionManager
 
     /**
      * Sets a database connection
-     *
-     * @param Connection $connection
      */
     public function setConnection(Connection $connection)
     {
@@ -55,8 +53,6 @@ class MigrationExtensionManager
 
     /**
      * Sets a database platform
-     *
-     * @param AbstractPlatform $platform
      */
     public function setDatabasePlatform(AbstractPlatform $platform)
     {
@@ -71,8 +67,6 @@ class MigrationExtensionManager
 
     /**
      * Sets a database identifier name generator
-     *
-     * @param DbIdentifierNameGenerator $nameGenerator
      */
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
     {
@@ -115,8 +109,6 @@ class MigrationExtensionManager
 
     /**
      * Sets extensions to the given migration
-     *
-     * @param Migration $migration
      */
     public function applyExtensions(Migration $migration)
     {

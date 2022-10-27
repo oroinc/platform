@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -15,7 +15,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Adds grid views functionality to datagrids.
@@ -55,15 +55,6 @@ class GridViewsExtension extends AbstractExtension
     /** @var array|AbstractGridView[] */
     protected $defaultGridView = [];
 
-    /**
-     * @param EventDispatcherInterface      $eventDispatcher
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param TranslatorInterface           $translator
-     * @param ManagerRegistry               $registry
-     * @param AclHelper                     $aclHelper
-     * @param ServiceLink                   $managerLink
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -120,18 +111,12 @@ class GridViewsExtension extends AbstractExtension
         $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
         $data->offsetAddToArray('state', ['gridView' => $this->getCurrentViewId($gridName)]);
 
-        $systemGridView = new View(self::DEFAULT_VIEW_ID);
-        $systemGridView->setDefault($this->getDefaultViewId($gridName) === null);
-        if ($config->offsetGetByPath('[options][gridViews][allLabel]')) {
-            $systemGridView->setLabel($this->translator->trans($config['options']['gridViews']['allLabel']));
-        }
-
         $currentUser = $this->tokenAccessor->getUser();
         $gridViews = $this->managerLink->getService()->getAllGridViews($currentUser, $gridName);
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
-            $event = new GridViewsLoadEvent($gridName, $gridViews);
-            $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
+            $event = new GridViewsLoadEvent($gridName, $config, $gridViews);
+            $this->eventDispatcher->dispatch($event, GridViewsLoadEvent::EVENT_NAME);
             $gridViews = $event->getGridViews();
         }
 
@@ -140,7 +125,7 @@ class GridViewsExtension extends AbstractExtension
             [
                 'views'       => $gridViews,
                 'gridName'    => $gridName,
-                'permissions' => $this->getPermissions()
+                'permissions' => $this->getPermissions(),
             ]
         );
     }
@@ -165,7 +150,7 @@ class GridViewsExtension extends AbstractExtension
         } else {
             $defaultViewId = $this->getDefaultViewId($gridName);
 
-            return $defaultViewId ? $defaultViewId : self::DEFAULT_VIEW_ID;
+            return $defaultViewId ?: self::DEFAULT_VIEW_ID;
         }
     }
 
@@ -203,7 +188,7 @@ class GridViewsExtension extends AbstractExtension
     {
         if (!array_key_exists($gridName, $this->defaultGridView)) {
             $currentUser = $this->tokenAccessor->getUser();
-            if (null === $currentUser) {
+            if (null === $currentUser || !$currentUser->getId()) {
                 return null;
             }
             $this->defaultGridView[$gridName] = $this->managerLink->getService()
@@ -232,7 +217,7 @@ class GridViewsExtension extends AbstractExtension
                 $this->getParameters()->mergeKey('_sort_by', $defaultGridView->getSortersData());
                 $this->getParameters()->mergeKey(AppearanceExtension::APPEARANCE_ROOT_PARAM, [
                     AppearanceExtension::APPEARANCE_TYPE_PARAM => $defaultGridView->getAppearanceTypeName(),
-                    AppearanceExtension::APPEARANCE_DATA_PARAM => $defaultGridView->getAppearanceData()
+                    AppearanceExtension::APPEARANCE_DATA_PARAM => $defaultGridView->getAppearanceData(),
                 ]);
             }
         }
@@ -253,9 +238,6 @@ class GridViewsExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param ParameterBag $parameters
-     */
     public function setParameters(ParameterBag $parameters)
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {

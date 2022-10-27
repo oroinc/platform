@@ -17,9 +17,6 @@ class VariableManager
         return $this->variableAssembler;
     }
 
-    /**
-     * @param VariableAssembler $variableAssembler
-     */
     public function setVariableAssembler(VariableAssembler $variableAssembler)
     {
         $this->variableAssembler = $variableAssembler;

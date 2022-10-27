@@ -4,16 +4,20 @@ namespace Oro\Bundle\ActionBundle\Configuration;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Routing\RouterInterface;
+use Twig\Loader\LoaderInterface;
 
+/**
+ * Validates configuration of operations.
+ */
 class OperationConfigurationValidator implements ConfigurationValidatorInterface
 {
-    /** @var RouterInterface */
-    protected $router;
+    /** @var ControllerClassProvider */
+    protected $controllerClassProvider;
 
-    /** @var \Twig_ExistsLoaderInterface */
+    /** @var LoaderInterface */
     protected $twigLoader;
 
     /** @var DoctrineHelper */
@@ -29,20 +33,20 @@ class OperationConfigurationValidator implements ConfigurationValidatorInterface
     protected $errors;
 
     /**
-     * @param RouterInterface $router
-     * @param \Twig_Loader_Filesystem $twigLoader
-     * @param DoctrineHelper $doctrineHelper
-     * @param LoggerInterface $logger
-     * @param bool $debug
+     * @param ControllerClassProvider $controllerClassProvider
+     * @param LoaderInterface         $twigLoader
+     * @param DoctrineHelper          $doctrineHelper
+     * @param LoggerInterface         $logger
+     * @param bool                    $debug
      */
     public function __construct(
-        RouterInterface $router,
-        \Twig_Loader_Filesystem $twigLoader,
+        ControllerClassProvider $controllerClassProvider,
+        LoaderInterface $twigLoader,
         DoctrineHelper $doctrineHelper,
         LoggerInterface $logger,
         $debug
     ) {
-        $this->router = $router;
+        $this->controllerClassProvider = $controllerClassProvider;
         $this->twigLoader = $twigLoader;
         $this->doctrineHelper = $doctrineHelper;
         $this->logger = $logger;
@@ -150,10 +154,9 @@ class OperationConfigurationValidator implements ConfigurationValidatorInterface
             return;
         }
 
-        $routeCollection = $this->router->getRouteCollection();
-
+        $controllers = $this->controllerClassProvider->getControllers();
         foreach ($items as $key => $item) {
-            if (!$routeCollection->get($item)) {
+            if (!isset($controllers[$item])) {
                 $this->handleError($this->getPath($path, $key), 'Route "%s" not found.', $item);
             }
         }

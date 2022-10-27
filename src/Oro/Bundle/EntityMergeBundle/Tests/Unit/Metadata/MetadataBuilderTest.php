@@ -2,72 +2,47 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder;
-use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
+use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'Namespace\EntityName';
+    private const CLASS_NAME = 'Namespace\EntityName';
 
-    /**
-     * @var MetadataBuilder
-     */
-    protected $metadataBuilder;
+    /** @var MetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $metadataFactory;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $classMetadata;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $metadataFactory;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityExtendConfigProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $eventDispatcher;
+    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $classMetadata;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityExtendConfigProvider;
+    /** @var MetadataBuilder */
+    private $metadataBuilder;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $additionalMetadataProvider;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock('Symfony\\Component\\EventDispatcher\\EventDispatcherInterface');
-
-        $this->metadataFactory = $this
-            ->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\MetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->classMetadata = $this->createClassMetadata();
-
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Doctrine\\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityExtendConfigProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataFactory = $this->createMock(MetadataFactory::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->entityExtendConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->classMetadata = $this->createMock(ClassMetadata::class);
 
         $this->metadataBuilder = new MetadataBuilder(
             $this->metadataFactory,
@@ -85,27 +60,24 @@ class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects($this->once())
             ->method('getMetadataFor')
             ->with(self::CLASS_NAME)
-            ->will($this->returnValue($this->classMetadata));
+            ->willReturn($this->classMetadata);
 
         $this->entityExtendConfigProvider->expects($this->any())
-                ->method('getConfigs')
-                ->with(static::CLASS_NAME)
-                ->will($this->returnValue([]));
+            ->method('getConfigs')
+            ->with(self::CLASS_NAME)
+            ->willReturn([]);
 
-        $this->classMetadata->name = static::CLASS_NAME;
+        $this->classMetadata->name = self::CLASS_NAME;
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(['id']));
+            ->willReturn(['id']);
 
         // Test creation of entity metadata
-        $entityMetadataCallIndex = 0;
-        $entityMetadata = $this->createEntityMetadata();
-
-        $metadataFactoryCallIndex = 0;
-        $this->metadataFactory->expects($this->at($metadataFactoryCallIndex++))
+        $entityMetadata = $this->createMock(EntityMetadata::class);
+        $this->metadataFactory->expects($this->once())
             ->method('createEntityMetadata')
             ->with([], $this->isType('array'))
-            ->will($this->returnValue($entityMetadata));
+            ->willReturn($entityMetadata);
 
         // Test adding doctrine fields
         $doctrineFieldNames = ['id', 'foo_field', 'bar_field'];
@@ -114,32 +86,15 @@ class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
         $idFieldNames = ['id'];
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue($idFieldNames));
-
+            ->willReturn($idFieldNames);
         $this->classMetadata->expects($this->any())
             ->method('getFieldNames')
-            ->will($this->returnValue($doctrineFieldNames));
-
+            ->willReturn($doctrineFieldNames);
         $this->classMetadata->expects($this->any())
             ->method('getFieldMapping')
-            ->will($this->returnCallback(function ($fieldName) {
+            ->willReturnCallback(function ($fieldName) {
                 return ['fieldName' => $fieldName];
-            }));
-
-        foreach ($doctrineFieldNamesWithoutId as $fieldName) {
-            $fieldMapping = ['fieldName' => $fieldName];
-
-            $fieldMetadata = $this->createFieldMetadata();
-
-            $this->metadataFactory->expects($this->at($metadataFactoryCallIndex++))
-                ->method('createFieldMetadata')
-                ->with(['field_name' => $fieldName], $fieldMapping)
-                ->will($this->returnValue($fieldMetadata));
-
-            $entityMetadata->expects($this->at($entityMetadataCallIndex++))
-                ->method('addFieldMetadata')
-                ->with($fieldMetadata);
-        }
+            });
 
         // Test adding doctrine associations
         $associationMappings = [
@@ -149,26 +104,13 @@ class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->classMetadata->expects($this->any())
             ->method('getAssociationNames')
-            ->will($this->returnValue(array_keys($associationMappings)));
+            ->willReturn(array_keys($associationMappings));
 
         $this->classMetadata->expects($this->any())
             ->method('getAssociationMapping')
-            ->will($this->returnCallback(function ($association) use ($associationMappings) {
+            ->willReturnCallback(function ($association) use ($associationMappings) {
                 return $associationMappings[$association];
-            }));
-
-        foreach ($associationMappings as $fieldName => $associationMapping) {
-            $fieldMetadata = $this->createFieldMetadata();
-
-            $this->metadataFactory->expects($this->at($metadataFactoryCallIndex++))
-                ->method('createFieldMetadata')
-                ->with(['field_name' => $fieldName], $associationMapping)
-                ->will($this->returnValue($fieldMetadata));
-
-            $entityMetadata->expects($this->at($entityMetadataCallIndex++))
-                ->method('addFieldMetadata')
-                ->with($fieldMetadata);
-        }
+            });
 
         $inversedUnidirectionalAssociationMappings = [
             [
@@ -200,51 +142,43 @@ class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getInversedUnidirectionalAssociationMappings')
             ->willReturn($inversedUnidirectionalAssociationMappings);
 
-        foreach ($inversedUnidirectionalAssociationMappings as $associationMapping) {
-            $fieldMetadata = $this->createFieldMetadata();
-
-            $this->metadataFactory->expects($this->at($metadataFactoryCallIndex++))
-                ->method('createFieldMetadata')
-                ->will($this->returnValue($fieldMetadata));
-
-            $entityMetadata->expects($this->at($entityMetadataCallIndex++))
-                ->method('addFieldMetadata')
-                ->with($fieldMetadata);
+        $createFieldMetadataExpectations = [];
+        $createFieldMetadataResults = [];
+        $addFieldMetadataExpectations = [];
+        foreach ($doctrineFieldNamesWithoutId as $fieldName) {
+            $fieldMetadata = $this->createMock(FieldMetadata::class);
+            $createFieldMetadataExpectations[] = [['field_name' => $fieldName], ['fieldName' => $fieldName]];
+            $createFieldMetadataResults[] = $fieldMetadata;
+            $addFieldMetadataExpectations[] = [$this->identicalTo($fieldMetadata)];
         }
+        foreach ($associationMappings as $fieldName => $associationMapping) {
+            $fieldMetadata = $this->createMock(FieldMetadata::class);
+            $createFieldMetadataExpectations[] = [['field_name' => $fieldName], $associationMapping];
+            $createFieldMetadataResults[] = $fieldMetadata;
+            $addFieldMetadataExpectations[] = [$this->identicalTo($fieldMetadata)];
+        }
+        foreach ($inversedUnidirectionalAssociationMappings as $associationMapping) {
+            $fieldMetadata = $this->createMock(FieldMetadata::class);
+            $createFieldMetadataExpectations[] = [$this->isType('array'), $associationMapping];
+            $createFieldMetadataResults[] = $fieldMetadata;
+            $addFieldMetadataExpectations[] = [$this->identicalTo($fieldMetadata)];
+        }
+        $this->metadataFactory->expects($this->exactly(count($createFieldMetadataExpectations)))
+            ->method('createFieldMetadata')
+            ->withConsecutive(...$createFieldMetadataExpectations)
+            ->willReturnOnConsecutiveCalls(...$createFieldMetadataResults);
+        $entityMetadata->expects($this->exactly(count($createFieldMetadataExpectations)))
+            ->method('addFieldMetadata')
+            ->withConsecutive(...$addFieldMetadataExpectations);
 
         // Test event dispatcher
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(MergeEvents::BUILD_METADATA, new EntityMetadataEvent($entityMetadata));
+            ->with(new EntityMetadataEvent($entityMetadata), MergeEvents::BUILD_METADATA);
 
-        $this->assertEquals($entityMetadata, $this->metadataBuilder->createEntityMetadataByClass(self::CLASS_NAME));
-    }
-
-    protected function createClassMetadata()
-    {
-        return $this->getMockBuilder('Doctrine\\ORM\\Mapping\\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createEntityMetadata()
-    {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createFieldMetadata()
-    {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createDoctrineMetadata()
-    {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->assertEquals(
+            $entityMetadata,
+            $this->metadataBuilder->createEntityMetadataByClass(self::CLASS_NAME)
+        );
     }
 }

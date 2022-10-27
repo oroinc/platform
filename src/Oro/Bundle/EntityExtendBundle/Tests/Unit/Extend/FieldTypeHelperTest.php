@@ -2,18 +2,22 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Extend;
 
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 class FieldTypeHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FieldTypeHelper
-     */
+    /** @var FieldTypeHelper */
     private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->helper = new FieldTypeHelper(['enum' => 'manyToOne']);
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn(['enum' => 'manyToOne']);
+
+        $this->helper = new FieldTypeHelper($entityExtendConfigurationProvider);
     }
 
     /**

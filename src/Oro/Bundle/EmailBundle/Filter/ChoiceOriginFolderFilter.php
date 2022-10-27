@@ -5,9 +5,10 @@ namespace Oro\Bundle\EmailBundle\Filter;
 use Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType;
 use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 
+/**
+ * The filter by a folder for email messages.
+ */
 class ChoiceOriginFolderFilter extends ChoiceFilter
 {
     /**
@@ -23,12 +24,12 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
      */
     public function getMetadata()
     {
-        $formView  = $this->getForm()->createView();
+        $formView = $this->getForm()->createView();
         $fieldView = $formView->children['value'];
         $choices = $fieldView->vars['choices'];
 
         $metadata = $this->getDefaultMetadata();
-        $metadata['choices']         = $choices;
+        $metadata['choices'] = $choices;
         $metadata['populateDefault'] = $formView->vars['populate_default'];
         if (!empty($formView->vars['default_value'])) {
             $metadata['placeholder'] = $formView->vars['default_value'];
@@ -36,7 +37,6 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
         if (!empty($formView->vars['null_value'])) {
             $metadata['nullValue'] = $formView->vars['null_value'];
         }
-
         if ($fieldView->vars['multiple']) {
             $metadata[FilterUtility::TYPE_KEY] = 'multiselect-originfolder';
         }
@@ -53,10 +53,10 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
         $typeView = $formView->children['type'];
 
         $defaultMetadata = [
-            'name'                     => $this->getName(),
+            'name'    => $this->getName(),
             // use filter name if label not set
-            'label'                    => ucfirst($this->name),
-            'choices'                  => $typeView->vars['choices']
+            'label'   => ucfirst($this->name),
+            'choices' => $typeView->vars['choices']
         ];
 
         $metadata = array_diff_key(
@@ -67,19 +67,5 @@ class ChoiceOriginFolderFilter extends ChoiceFilter
         $metadata = array_merge($defaultMetadata, $metadata);
 
         return $metadata;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function finishView(FormView $view, FormInterface $form, array $options)
-    {
-        if (isset($options['populate_default'])) {
-            $view->vars['populate_default'] = $options['populate_default'];
-            $view->vars['default_value']    = $options['default_value'];
-        }
-        if (!empty($options['null_value'])) {
-            $view->vars['null_value'] = $options['null_value'];
-        }
     }
 }

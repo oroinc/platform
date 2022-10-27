@@ -3,32 +3,44 @@
 namespace Oro\Bundle\DataGridBundle\Twig;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Tools\DatagridRouteHelper;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class DataGridExtension extends \Twig_Extension
+/**
+ * Provides Twig functions for datagrid rendering:
+ *   - oro_datagrid_build
+ *   - oro_datagrid_data
+ *   - oro_datagrid_metadata
+ *   - oro_datagrid_generate_element_id
+ *   - oro_datagrid_build_fullname
+ *   - oro_datagrid_build_inputname
+ *   - oro_datagrid_link
+ *   - oro_datagrid_column_attributes
+ *   - oro_datagrid_get_page_url
+ */
+class DataGridExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const ROUTE = 'oro_datagrid_index';
+    private const ROUTE = 'oro_datagrid_index';
 
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
     /**
-     * @return Manager
+     * @return ManagerInterface
      */
     protected function getManager()
     {
@@ -48,7 +60,7 @@ class DataGridExtension extends \Twig_Extension
      */
     protected function getRouter()
     {
-        return $this->container->get('router');
+        return $this->container->get(RouterInterface::class);
     }
 
     /**
@@ -56,7 +68,7 @@ class DataGridExtension extends \Twig_Extension
      */
     protected function getAuthorizationChecker()
     {
-        return $this->container->get('security.authorization_checker');
+        return $this->container->get(AuthorizationCheckerInterface::class);
     }
 
     /**
@@ -72,7 +84,7 @@ class DataGridExtension extends \Twig_Extension
      */
     protected function getRequestStack()
     {
-        return $this->container->get('request_stack');
+        return $this->container->get(RequestStack::class);
     }
 
     /**
@@ -80,15 +92,7 @@ class DataGridExtension extends \Twig_Extension
      */
     protected function getLogger()
     {
-        return $this->container->get('logger');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
-    {
-        return 'oro_datagrid';
+        return $this->container->get(LoggerInterface::class);
     }
 
     /**
@@ -97,15 +101,15 @@ class DataGridExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_datagrid_build', [$this, 'getGrid']),
-            new \Twig_SimpleFunction('oro_datagrid_data', [$this, 'getGridData']),
-            new \Twig_SimpleFunction('oro_datagrid_metadata', [$this, 'getGridMetadata']),
-            new \Twig_SimpleFunction('oro_datagrid_generate_element_id', [$this, 'generateGridElementId']),
-            new \Twig_SimpleFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
-            new \Twig_SimpleFunction('oro_datagrid_build_inputname', [$this, 'buildGridInputName']),
-            new \Twig_SimpleFunction('oro_datagrid_link', [$this, 'generateGridUrl']),
-            new \Twig_SimpleFunction('oro_datagrid_column_attributes', [$this, 'getColumnAttributes']),
-            new \Twig_SimpleFunction('oro_datagrid_get_page_url', [$this, 'getPageUrl']),
+            new TwigFunction('oro_datagrid_build', [$this, 'getGrid']),
+            new TwigFunction('oro_datagrid_data', [$this, 'getGridData']),
+            new TwigFunction('oro_datagrid_metadata', [$this, 'getGridMetadata']),
+            new TwigFunction('oro_datagrid_generate_element_id', [$this, 'generateGridElementId']),
+            new TwigFunction('oro_datagrid_build_fullname', [$this, 'buildGridFullName']),
+            new TwigFunction('oro_datagrid_build_inputname', [$this, 'buildGridInputName']),
+            new TwigFunction('oro_datagrid_link', [$this, 'generateGridUrl']),
+            new TwigFunction('oro_datagrid_column_attributes', [$this, 'getColumnAttributes']),
+            new TwigFunction('oro_datagrid_get_page_url', [$this, 'getPageUrl']),
         ];
     }
 
@@ -140,7 +144,7 @@ class DataGridExtension extends \Twig_Extension
             $params
         );
 
-        $route = $metaData->offsetGetByPath('[options][route]');
+        $route = (string) $metaData->offsetGetByPath('[options][route]', '');
         $metaData->offsetAddToArray(
             'options',
             [
@@ -273,11 +277,11 @@ class DataGridExtension extends \Twig_Extension
      * @return string
      */
     public function generateGridUrl(
-        $routeName,
-        $gridName,
+        string $routeName,
+        string $gridName,
         array $params = [],
-        $referenceType = RouterInterface::ABSOLUTE_PATH
-    ) {
+        int $referenceType = RouterInterface::ABSOLUTE_PATH
+    ): string {
         return $this->getRouteHelper()->generate($routeName, $gridName, $params, $referenceType);
     }
 
@@ -288,7 +292,7 @@ class DataGridExtension extends \Twig_Extension
      *
      * @return string
      */
-    protected function generateUrl(DatagridInterface $grid, $route, $params)
+    protected function generateUrl(DatagridInterface $grid, string $route, array $params): string
     {
         $nameStrategy = $this->getNameStrategy();
         $gridFullName = $nameStrategy->buildGridFullName($grid->getName(), $grid->getScope());
@@ -319,5 +323,21 @@ class DataGridExtension extends \Twig_Extension
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_datagrid.datagrid.manager' => ManagerInterface::class,
+            'oro_datagrid.datagrid.name_strategy' => NameStrategyInterface::class,
+            'oro_datagrid.helper.route' => DatagridRouteHelper::class,
+            RouterInterface::class,
+            AuthorizationCheckerInterface::class,
+            RequestStack::class,
+            LoggerInterface::class,
+        ];
     }
 }

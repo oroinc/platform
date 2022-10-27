@@ -19,11 +19,6 @@ class LayoutButtonProvider
     /** @var ButtonSearchContextProvider */
     protected $contextProvider;
 
-    /**
-     * @param ButtonProvider $buttonProvider
-     * @param DoctrineHelper $doctrineHelper
-     * @param ButtonSearchContextProvider $contextProvider
-     */
     public function __construct(
         ButtonProvider $buttonProvider,
         DoctrineHelper $doctrineHelper,

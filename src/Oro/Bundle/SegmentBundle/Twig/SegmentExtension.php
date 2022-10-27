@@ -4,21 +4,24 @@ namespace Oro\Bundle\SegmentBundle\Twig;
 
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class SegmentExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to retrieve segment query builder configuration:
+ *   - update_segment_widget_options
+ *   - update_segment_condition_builder_options
+ */
+class SegmentExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_segment';
+    private ContainerInterface $container;
 
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(ContainerInterface $container)
     {
-        $this->dispatcher = $dispatcher;
+        $this->container = $container;
     }
 
     /**
@@ -27,8 +30,8 @@ class SegmentExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('update_segment_widget_options', [$this, 'updateSegmentWidgetOptions']),
-            new \Twig_SimpleFunction(
+            new TwigFunction('update_segment_widget_options', [$this, 'updateSegmentWidgetOptions']),
+            new TwigFunction(
                 'update_segment_condition_builder_options',
                 [$this, 'updateSegmentConditionBuilderOptions']
             ),
@@ -43,12 +46,14 @@ class SegmentExtension extends \Twig_Extension
      */
     public function updateSegmentWidgetOptions(array $widgetOptions, $type = null)
     {
-        if (!$this->dispatcher->hasListeners(WidgetOptionsLoadEvent::EVENT_NAME)) {
+        $eventDispatcher = $this->getEventDispatcher();
+
+        if (!$eventDispatcher->hasListeners(WidgetOptionsLoadEvent::EVENT_NAME)) {
             return $widgetOptions;
         }
 
         $event = new WidgetOptionsLoadEvent($widgetOptions, $type);
-        $this->dispatcher->dispatch(WidgetOptionsLoadEvent::EVENT_NAME, $event);
+        $eventDispatcher->dispatch($event, WidgetOptionsLoadEvent::EVENT_NAME);
 
         return $event->getWidgetOptions();
     }
@@ -60,12 +65,14 @@ class SegmentExtension extends \Twig_Extension
      */
     public function updateSegmentConditionBuilderOptions(array $options)
     {
-        if (!$this->dispatcher->hasListeners(ConditionBuilderOptionsLoadEvent::EVENT_NAME)) {
+        $eventDispatcher = $this->getEventDispatcher();
+
+        if (!$eventDispatcher->hasListeners(ConditionBuilderOptionsLoadEvent::EVENT_NAME)) {
             return $options;
         }
 
         $event = new ConditionBuilderOptionsLoadEvent($options);
-        $this->dispatcher->dispatch(ConditionBuilderOptionsLoadEvent::EVENT_NAME, $event);
+        $eventDispatcher->dispatch($event, ConditionBuilderOptionsLoadEvent::EVENT_NAME);
 
         return $event->getOptions();
     }
@@ -73,8 +80,15 @@ class SegmentExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return static::NAME;
+        return [
+            EventDispatcherInterface::class,
+        ];
+    }
+
+    private function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->container->get(EventDispatcherInterface::class);
     }
 }

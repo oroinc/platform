@@ -2,37 +2,29 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    const FIELD_NAME = 'fieldName';
+    /** @var DoctrineMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineMetadata;
 
-    /**
-     * @var array
-     */
-    protected $options;
+    /** @var EntityMetadata */
+    private $metadata;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineMetadata;
-
-    /**
-     * @var EntityMetadata
-     */
-    protected $metadata;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->options = array('foo' => 'bar');
-        $this->doctrineMetadata = $this->createDoctrineMetadata();
-        $this->metadata = new EntityMetadata($this->options, $this->doctrineMetadata);
+        $this->doctrineMetadata = $this->createMock(DoctrineMetadata::class);
+
+        $this->metadata = new EntityMetadata(['foo' => 'bar'], $this->doctrineMetadata);
     }
 
     public function testAddFieldMetadata()
     {
-        $this->assertEquals(array(), $this->metadata->getFieldsMetadata());
+        $this->assertEquals([], $this->metadata->getFieldsMetadata());
     }
 
     public function testGetDoctrineMetadata()
@@ -40,12 +32,11 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->doctrineMetadata, $this->metadata->getDoctrineMetadata());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Doctrine metadata is not configured.
-     */
     public function testGetDoctrineMetadataFails()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Doctrine metadata is not configured.');
+
         $metadata = new EntityMetadata();
         $metadata->getDoctrineMetadata();
     }
@@ -53,11 +44,14 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
     public function testFieldsMetadata()
     {
         $fieldName = 'test';
-        $fieldMetadata = $this->createFieldMetadata($fieldName);
+        $fieldMetadata = $this->createMock(FieldMetadata::class);
+        $fieldMetadata->expects($this->any())
+            ->method('getFieldName')
+            ->willReturn($fieldName);
 
         $this->metadata->addFieldMetadata($fieldMetadata);
 
-        $this->assertEquals(array($fieldName => $fieldMetadata), $this->metadata->getFieldsMetadata());
+        $this->assertEquals([$fieldName => $fieldMetadata], $this->metadata->getFieldsMetadata());
     }
 
     public function testGetClassName()
@@ -67,47 +61,26 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $this->doctrineMetadata->expects($this->once())
             ->method('has')
             ->with('name')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->doctrineMetadata->expects($this->once())
             ->method('get')
             ->with('name')
-            ->will($this->returnValue($className));
+            ->willReturn($className);
 
         $this->assertEquals($className, $this->metadata->getClassName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Cannot get class name from merge entity metadata.
-     */
     public function testGetClassNameFails()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot get class name from merge entity metadata.');
+
         $this->doctrineMetadata->expects($this->once())
             ->method('has')
             ->with('name')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->metadata->getClassName();
-    }
-
-    protected function createDoctrineMetadata()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata')
-            ->disableOriginalConstructor()->getMock();
-    }
-
-    protected function createFieldMetadata($fieldName)
-    {
-        $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fieldMetadata
-            ->expects($this->any())
-            ->method('getFieldName')
-            ->will($this->returnValue($fieldName));
-
-        return $fieldMetadata;
     }
 }

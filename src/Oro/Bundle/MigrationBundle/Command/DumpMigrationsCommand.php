@@ -1,120 +1,215 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\MigrationBundle\Tools\SchemaDumper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\Debug\FileLinkFormatter;
 
-class DumpMigrationsCommand extends ContainerAwareCommand
+/**
+ * Displays database schema as code.
+ */
+class DumpMigrationsCommand extends Command
 {
-    /**
-     * @var array
-     */
-    protected $allowedTables = [];
+    private const GLOBAL_INSTALLATION_CLASSNAME = 'GlobalInstallation';
 
-    /**
-     * @var array
-     */
-    protected $extendedFieldOptions = [];
+    private const SUCCESS_ACTION_CREATED = 'created';
+    private const SUCCESS_ACTION_UPDATED = 'updated';
 
-    /**
-     * @var string
-     */
-    protected $namespace;
+    /** @var string */
+    protected static $defaultName = 'oro:migration:dump';
 
-    /**
-     * @var string
-     */
-    protected $className;
+    private InputInterface $input;
+    private OutputInterface $output;
+    private SymfonyStyle $io;
+    private FileLinkFormatter $fileLinkFormatter;
 
-    /**
-     * @var string
-     */
-    protected $version;
+    private ManagerRegistry $registry;
+    private SchemaDumper $schemaDumper;
+    private ConfigManager $configManager;
 
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
+    private array $bundles;
+    protected array $allowedTables = [];
+    protected array $extendedFieldOptions = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
-    {
-        $this->setName('oro:migration:dump')
-            ->addOption('plain-sql', null, InputOption::VALUE_NONE, 'Out schema as plain sql queries')
-            ->addOption(
-                'bundle',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Bundle name for which migration wll be generated'
-            )
-            ->addOption(
-                'migration-version',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Migration version',
-                'v1_0'
-            )
-            ->setDescription('Dump existing database structure.');
+    protected ?string $namespace = null;
+    protected ?string $className = null;
+    protected string $version;
+
+    public function __construct(
+        ManagerRegistry $registry,
+        SchemaDumper $schemaDumper,
+        ConfigManager $configManager,
+        array $bundles,
+        ?string $fileLinkFormat = null
+    ) {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->schemaDumper = $schemaDumper;
+        $this->configManager = $configManager;
+        $this->bundles = $bundles;
+        $this->fileLinkFormatter = new FileLinkFormatter($fileLinkFormat);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    protected function configure()
+    {
+        $this
+            ->addOption('plain-sql', null, InputOption::VALUE_NONE, 'Output schema as plain SQL queries')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Generate migration for all bundles')
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Bundle to generate migration for')
+            ->addOption('migration-version', null, InputOption::VALUE_OPTIONAL, 'Migration version', 'v1_0')
+            ->setDescription('Displays database schema as code.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays the database schema as PHP code
+that can be used to create a migration script.
+
+  <info>php %command.full_name%</info>
+
+The <info>--plain-sql</info> option can be used to output schema as plain SQL queries:
+
+  <info>php %command.full_name% --plain-sql</info>
+  
+The <info>--all</info> option can be used to create migration script for all bundles:
+
+  <info>php %command.full_name% --all</info>
+
+The <info>--bundle</info> option can be used to show only the portion of the schema
+that is associated with the entities in a specific bundle:
+
+  <info>php %command.full_name% --bundle=<bundle-name></info>
+
+Use the <info>--migration-version</info> option to specify the migration version
+for the generated PHP code:
+
+  <info>php %command.full_name% --migration-version=<version-string></info>
+
+HELP
+            )
+            ->addUsage('--plain-sql')
+            ->addUsage('--all')
+            ->addUsage('--bundle=<bundle-name>')
+            ->addUsage('--migration-version=<version-string>')
+        ;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->setup($input, $output);
+
+        $bundle = $this->getBundleOption();
         $this->version = $input->getOption('migration-version');
-        $this->initializeBundleRestrictions($input->getOption('bundle'));
+        $this->initializeBundleRestrictions($bundle);
         $this->initializeMetadataInformation();
-        $doctrine = $this->getContainer()->get('doctrine');
+
+        if (!$this->initializeBundleMetadataRestrictions($bundle)) {
+            return self::FAILURE;
+        }
+
+        $connection = $this->registry->getConnection();
+
         /** @var Schema $schema */
-        $schema = $doctrine->getConnection()->getSchemaManager()->createSchema();
+        $schema = $connection->getSchemaManager()->createSchema();
 
         if ($input->getOption('plain-sql')) {
-            /** @var Connection $connection */
-            $connection = $this->getContainer()->get('doctrine')->getConnection();
             $sqls = $schema->toSql($connection->getDatabasePlatform());
             foreach ($sqls as $sql) {
                 $output->writeln($sql . ';');
             }
         } else {
-            $this->dumpPhpSchema($schema, $output);
+            $this->writePhpSchema($schema, $bundle);
         }
+
+        return self::SUCCESS;
     }
 
-    /**
-     * @param string $bundle
-     */
-    protected function initializeBundleRestrictions($bundle)
+    protected function setup(InputInterface $input, OutputInterface $output): void
+    {
+        $this->input = $input;
+        $this->output = $output;
+
+        $this->io = new SymfonyStyle($input, $output);
+    }
+
+    protected function getBundleOption(): ?string
+    {
+        $bundle = $this->input->getOption('bundle');
+        $all = $this->input->getOption('all');
+
+        if ($bundle) {
+            return $bundle;
+        }
+
+        if (!$all) {
+            return $this->askForBundleOption();
+        }
+
+        return null;
+    }
+
+    protected function askForBundleOption()
+    {
+        $helper = $this->getHelper('question');
+
+        $bundles = array_keys($this->bundles);
+        $question = new Question("\n<fg=green>Please enter the name of bundle:</> \n> ");
+        $question->setAutocompleterValues($bundles);
+
+        return $helper->ask($this->input, $this->output, $question);
+    }
+
+    protected function initializeBundleRestrictions(?string $bundle): void
     {
         if ($bundle) {
-            $bundles = $this->getContainer()->getParameter('kernel.bundles');
-            if (!array_key_exists($bundle, $bundles)) {
+            if (!array_key_exists($bundle, $this->bundles)) {
                 throw new \InvalidArgumentException(
                     sprintf('Bundle "%s" is not a known bundle', $bundle)
                 );
             }
-            $this->namespace = str_replace($bundle, 'Entity', $bundles[$bundle]);
+
+            /**
+             * In the case where bundle class name and bundle folder have the same name
+             * we need to replace only the bundle class name with 'Entity'
+             *
+             * Bundle\AcmeBundle\AcmeBundle -> Bundle\AcmeBundle\Entity
+             */
+            $this->namespace = rtrim($this->bundles[$bundle], $bundle) . 'Entity';
             $this->className = $bundle . 'Installer';
+        } else {
+            $this->className = self::GLOBAL_INSTALLATION_CLASSNAME;
         }
     }
 
-    /**
-     * Process metadata information.
-     */
-    protected function initializeMetadataInformation()
+    protected function initializeBundleMetadataRestrictions(?string $bundle): bool
     {
-        $doctrine = $this->getContainer()->get('doctrine');
+        if ($bundle && !$this->allowedTables) {
+            $this->io->error('No related entities were found to '.$bundle);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function initializeMetadataInformation(): void
+    {
         /** @var ClassMetadata[] $allMetadata */
-        $allMetadata = $doctrine->getManager()->getMetadataFactory()->getAllMetadata();
+        $allMetadata = $this->registry->getManager()->getMetadataFactory()->getAllMetadata();
         array_walk(
             $allMetadata,
             function (ClassMetadata $entityMetadata) {
@@ -138,16 +233,13 @@ class DumpMigrationsCommand extends ContainerAwareCommand
 
     /**
      * Initialize extended field options by field.
-     *
-     * @param ClassMetadata $classMetadata
      */
-    protected function initializeExtendedFieldsOptions(ClassMetadata $classMetadata)
+    protected function initializeExtendedFieldsOptions(ClassMetadata $classMetadata): void
     {
-        $configManager = $this->getConfigManager();
         $className = $classMetadata->getName();
         $tableName = $classMetadata->getTableName();
         foreach ($classMetadata->getFieldNames() as $fieldName) {
-            if ($configManager->hasConfig($className, $fieldName)) {
+            if ($this->configManager->hasConfig($className, $fieldName)) {
                 $columnName = $classMetadata->getColumnName($fieldName);
                 $options = $this->getExtendedFieldOptions($className, $fieldName);
                 if (!empty($options['extend']['is_extend'])) {
@@ -157,20 +249,12 @@ class DumpMigrationsCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * Get extended field options.
-     *
-     * @param string $className
-     * @param string $fieldName
-     * @return array
-     */
-    protected function getExtendedFieldOptions($className, $fieldName)
+    protected function getExtendedFieldOptions(string $className, string $fieldName): array
     {
-        $configManager = $this->getConfigManager();
-        $config = array();
-        foreach ($configManager->getProviders() as $provider) {
+        $config = [];
+        foreach ($this->configManager->getProviders() as $provider) {
             $fieldId = $provider->getId($className, $fieldName);
-            $extendedConfig = $configManager->getConfig($fieldId)->all();
+            $extendedConfig = $this->configManager->getConfig($fieldId)->all();
             if (!empty($extendedConfig)) {
                 $config[$provider->getScope()] = $extendedConfig;
             }
@@ -179,35 +263,84 @@ class DumpMigrationsCommand extends ContainerAwareCommand
         return $config;
     }
 
-    /**
-     * @param Schema          $schema
-     * @param OutputInterface $output
-     */
-    protected function dumpPhpSchema(Schema $schema, OutputInterface $output)
+    protected function dumpPhpSchema(Schema $schema): string
     {
-        $visitor = $this->getContainer()->get('oro_migration.tools.schema_dumper');
-        $schema->visit($visitor);
+        $schema->visit($this->schemaDumper);
 
-        $output->writeln(
-            $visitor->dump(
-                $this->allowedTables,
-                $this->namespace,
-                $this->className,
-                $this->version,
-                $this->extendedFieldOptions
-            )
+        return $this->schemaDumper->dump(
+            $this->allowedTables,
+            $this->namespace,
+            $this->className,
+            $this->version,
+            $this->extendedFieldOptions
         );
     }
 
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
+    protected function writePhpSchema(Schema $schema, ?string $bundle): void
     {
-        if (!$this->configManager) {
-            $this->configManager = $this->getContainer()->get('oro_entity_config.config_manager');
+        $dump = $this->dumpPhpSchema($schema);
+
+        if ($bundle) {
+            $bundleClass = $this->bundles[$bundle];
+            $bundleFile  = (new \ReflectionClass($bundleClass))->getFileName();
+
+            $migrationFolder = dirname($bundleFile).'/Migrations/Schema';
+        } else {
+            $migrationFolder = $this->getApplication()->getKernel()->getProjectDir();
         }
 
-        return $this->configManager;
+        $filesystem = new Filesystem();
+
+        $migrationFile = $migrationFolder.'/'.$this->className.'.php';
+        if ($migrationExists = $filesystem->exists($migrationFile)) {
+            if ($this->isOverwriteMigration($migrationFile)) {
+                $filesystem->remove($migrationFile);
+            } else {
+                $this->writeCancelMessage();
+                return ;
+            }
+        }
+
+        $filesystem->appendToFile($migrationFile, $dump);
+
+        $successAction = $migrationExists ? self::SUCCESS_ACTION_UPDATED : self::SUCCESS_ACTION_CREATED;
+        $this->writeSuccessMessage($successAction, $migrationFile);
+    }
+
+    protected function writeCancelMessage()
+    {
+        $this->io->newLine();
+        $this->io->writeln(' <bg=yellow;fg=white>           </>');
+        $this->io->writeln(' <bg=yellow;fg=white> Cancelled </>');
+        $this->io->writeln(' <bg=yellow;fg=white>           </>');
+    }
+
+    protected function writeSuccessMessage(string $action, string $migrationPath)
+    {
+        $this->io->newLine();
+        $this->io->writeln(sprintf('<fg=blue>%s</>: %s', $action, $this->generateFileLink($migrationPath)));
+
+        $this->io->newLine();
+        $this->io->writeln(' <bg=green;fg=white>          </>');
+        $this->io->writeln(' <bg=green;fg=white> Success! </>');
+        $this->io->writeln(' <bg=green;fg=white>          </>');
+        $this->io->newLine();
+    }
+
+    protected function isOverwriteMigration(string $migrationFile): bool
+    {
+        $helper = $this->getHelper('question');
+        $question = new ConfirmationQuestion(
+            sprintf("\nDo you want to overwrite %s? [Y/n] ", $this->generateFileLink($migrationFile))
+        );
+
+        return $helper->ask($this->input, $this->output, $question);
+    }
+
+    protected function generateFileLink(string $file): string
+    {
+        $link = $this->fileLinkFormatter->format($file, 1);
+
+        return $link ? sprintf('<href=%s>%s</>', $link, $file) : $file;
     }
 }

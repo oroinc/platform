@@ -1,9 +1,10 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set options = {
-    useDropdown: false,
+    useDropdown: true,
     verticalTabs: false,
-    subtitle: false
+    subtitle: false,
+    subTabs: false
 }|merge(options|default({})) %}
 
 {% set containerAlias = 'tab' %}
@@ -16,17 +17,31 @@
 {% endfor %}
 
 <div class="oro-tabs{{ options.verticalTabs ? ' oro-tabs__vertical' }}"
-     data-page-component-module="oroui/js/app/components/tabs-component"
-     data-page-component-options="{{ options|json_encode }}">
-
+     data-page-component-responsive-tabs="{{ options|json_encode }}"
+>
     <div class="oro-tabs__head">
         {% if (options.subtitle) %}
             <div class="tabs-subtitle">{{ options.subtitle }}</div>
         {% endif %}
-        <ul class="nav nav-tabs{{ options.verticalTabs ? ' flex-column' }}{{ options.useDropdown ? ' nav-tabs-dropdown' }}" role="tablist">
+
+        {% set extraClasses = '' %}
+
+        {% if (options.verticalTabs) %}
+            {% set extraClasses =  extraClasses ~ ' flex-column' %}
+        {% endif %}
+
+        {% if (options.useDropdown) %}
+            {% set extraClasses =  extraClasses ~ ' nav-tabs-dropdown' %}
+        {% endif %}
+
+        {% if (options.subTabs) %}
+            {% set extraClasses = extraClasses ~ ' sub-tabs' %}
+        {% endif %}
+
+        <ul class="nav nav-tabs {{ extraClasses }}" role="tablist">
             {% for tab in tabs %}
                 {% set isActiveTab = activeTabAlias ? activeTabAlias == tab.alias : loop.index == 1 %}
-                <li class="nav-item tab">
+                <li class="nav-item">
                     {% set widgetOptions = {
                         'type': tab.widgetType|default('block'),
                         'event': 'shown.bs.tab',
@@ -66,19 +81,9 @@
                         'ariaSelected': ariaSelectted,
                         'ariaControls': tab.alias
                     }) %}
-
                     {{ UI.clientLink(tabOptions) }}
                 </li>
             {% endfor %}
-            {% if options.useDropdown %}
-                <li class="nav-item dropdown" style="display: none">
-                    <a href="#" role=button id="{{ containerAlias }}-dropdown" class="nav-link dropdown-toggle" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                        <span>{{ 'View more...'|trans }}</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="{{ containerAlias }}-dropdown"></ul>
-                </li>
-            {% endif %}
         </ul>
     </div>
     <div class="oro-tabs__content">

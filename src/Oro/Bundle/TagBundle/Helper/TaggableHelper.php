@@ -5,12 +5,14 @@ namespace Oro\Bundle\TagBundle\Helper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 
+/**
+ * Provides a set of reusable methods to check taggable entity settings.
+ */
 class TaggableHelper
 {
     /** @var ConfigProvider */
-    protected $tagConfigProvider;
+    private $tagConfigProvider;
 
-    /** @param ConfigProvider $tagConfigProvider */
     public function __construct(ConfigProvider $tagConfigProvider)
     {
         $this->tagConfigProvider = $tagConfigProvider;
@@ -27,12 +29,27 @@ class TaggableHelper
     public function isTaggable($entity)
     {
         return
-            self::isImplementsTaggable($entity) ||
-            (
-                $entity &&
-                $this->tagConfigProvider->hasConfig($entity) &&
-                $this->tagConfigProvider->getConfig($entity)->is('enabled')
-            );
+            self::isImplementsTaggable($entity)
+            || ($entity && $this->isEntityOptionEnabled($entity, 'enabled'));
+    }
+
+    /**
+     * Gets a list of taggable entities.
+     *
+     * @return string[]
+     */
+    public function getTaggableEntities(): array
+    {
+        $taggableEntities = [];
+        $configs = $this->tagConfigProvider->getConfigs();
+        foreach ($configs as $config) {
+            $entityClass = $config->getId()->getClassName();
+            if (self::isImplementsTaggable($entityClass) || $config->is('enabled')) {
+                $taggableEntities[] = $entityClass;
+            }
+        }
+
+        return $taggableEntities;
     }
 
     /**
@@ -44,9 +61,9 @@ class TaggableHelper
      */
     public function shouldRenderDefault($entity)
     {
-        return $this->isTaggable($entity) &&
-               $this->tagConfigProvider->hasConfig($entity) &&
-               $this->tagConfigProvider->getConfig($entity)->is('enableDefaultRendering');
+        return
+            $this->isTaggable($entity)
+            && $this->isEntityOptionEnabled($entity, 'enableDefaultRendering');
     }
 
     /**
@@ -59,11 +76,8 @@ class TaggableHelper
     public function isEnableGridColumn($entity)
     {
         return
-            self::isImplementsTaggable($entity) ||
-            (
-                $this->tagConfigProvider->hasConfig($entity) &&
-                $this->tagConfigProvider->getConfig($entity)->is('enableGridColumn')
-            );
+            self::isImplementsTaggable($entity)
+            || $this->isEntityOptionEnabled($entity, 'enableGridColumn');
     }
 
     /**
@@ -76,11 +90,8 @@ class TaggableHelper
     public function isEnableGridFilter($entity)
     {
         return
-            self::isImplementsTaggable($entity) ||
-            (
-                $this->tagConfigProvider->hasConfig($entity) &&
-                $this->tagConfigProvider->getConfig($entity)->is('enableGridFilter')
-            );
+            self::isImplementsTaggable($entity)
+            || $this->isEntityOptionEnabled($entity, 'enableGridFilter');
     }
 
     /**
@@ -92,7 +103,7 @@ class TaggableHelper
      */
     public static function isImplementsTaggable($entity)
     {
-        return is_a($entity, 'Oro\Bundle\TagBundle\Entity\Taggable', true);
+        return is_a($entity, Taggable::class, true);
     }
 
     /**
@@ -104,6 +115,25 @@ class TaggableHelper
      */
     public static function getEntityId($entity)
     {
-        return $entity instanceof Taggable ? $entity->getTaggableId() : $entity->getId();
+        return $entity instanceof Taggable
+            ? $entity->getTaggableId()
+            : $entity->getId();
+    }
+
+    /**
+     * @param object|string $entity
+     * @param string        $optionName
+     *
+     * @return bool
+     */
+    private function isEntityOptionEnabled($entity, $optionName)
+    {
+        if (\is_object($entity)) {
+            $entity = \get_class($entity);
+        }
+
+        return
+            $this->tagConfigProvider->hasConfig($entity)
+            && $this->tagConfigProvider->getConfig($entity)->is($optionName);
     }
 }

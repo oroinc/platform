@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-class ShortClassMetadata implements \Serializable
+/**
+ * Represents a brief information about a manageable entity.
+ */
+class ShortClassMetadata
 {
     /**
      * READ-ONLY: The name of the entity class.
@@ -14,34 +17,42 @@ class ShortClassMetadata implements \Serializable
     /**
      * READ-ONLY: Whether this class describes the mapping of a mapped superclass.
      *
-     * @var boolean
+     * @var bool
      */
     public $isMappedSuperclass;
 
     /**
-     * @param string $name
-     * @param bool   $isMappedSuperclass
+     * READ-ONLY: Whether this class has at least one association.
+     *
+     * @var bool
      */
-    public function __construct($name, $isMappedSuperclass = false)
+    public $hasAssociations;
+
+    public function __construct(string $name, bool $isMappedSuperclass = false, bool $hasAssociations = false)
     {
         $this->name = $name;
         $this->isMappedSuperclass = $isMappedSuperclass;
+        $this->hasAssociations = $hasAssociations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->name, $this->isMappedSuperclass]);
+        $flag = 0;
+        if ($this->isMappedSuperclass) {
+            $flag |= 1;
+        }
+        if ($this->hasAssociations) {
+            $flag |= 2;
+        }
+
+        return [$this->name, $flag];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list($this->name, $this->isMappedSuperclass) = unserialize($serialized);
+        [$this->name, $flag] = $serialized;
+        $this->isMappedSuperclass = ($flag & 1) !== 0;
+        $this->hasAssociations = ($flag & 2) !== 0;
     }
 
     /**
@@ -52,7 +63,11 @@ class ShortClassMetadata implements \Serializable
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        return new ShortClassMetadata($data['name'], $data['isMappedSuperclass']);
+        return new ShortClassMetadata(
+            $data['name'],
+            $data['isMappedSuperclass'],
+            $data['hasAssociations']
+        );
     }
     // @codingStandardsIgnoreEnd
 }

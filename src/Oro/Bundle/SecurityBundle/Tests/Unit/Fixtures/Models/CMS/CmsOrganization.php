@@ -2,17 +2,25 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS;
 
+use Doctrine\ORM\Mapping as ORM;
+
 /**
- * @Entity
- * @Table(name="cms_organization")
+ * @ORM\Entity()
+ * @ORM\Table(name="cms_organization")
  */
 class CmsOrganization
 {
     /**
-     * @Id @Column(type="integer")
-     * @GeneratedValue
+     *  @ORM\Id
+     *  @ORM\Column(type="integer")
+     *  @ORM\GeneratedValue
      */
     public $id;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    public $text;
 
     public function getId()
     {

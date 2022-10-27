@@ -8,21 +8,13 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class ConfigCheckboxTest extends FormIntegrationTestCase
 {
-    /**
-     * @var ConfigCheckbox
-     */
-    protected $formType;
+    /** @var ConfigCheckbox */
+    private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->formType = new ConfigCheckbox();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-        unset($this->formType);
     }
 
     public function testGetName()
@@ -36,43 +28,38 @@ class ConfigCheckboxTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param mixed $source
-     * @param mixed $expected
      * @dataProvider buildFormDataProvider
      */
-    public function testBuildForm($source, $expected)
+    public function testBuildForm(string|bool $source, bool $expected)
     {
         $form = $this->factory->create(ConfigCheckbox::class);
         $form->setData($source);
-        $this->assertEquals($expected, $form->getData());
+        $this->assertSame($expected, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormDataProvider()
+    public function buildFormDataProvider(): array
     {
-        return array(
-            'valid true' => array(
+        return [
+            'valid true' => [
                 'source' => true,
                 'expected' => true,
-            ),
-            'valid false' => array(
+            ],
+            'valid false' => [
                 'source' => false,
                 'expected' => false,
-            ),
-            'empty string' => array(
+            ],
+            'empty string' => [
                 'source' => '',
                 'expected' => false,
-            ),
-            'string 0' => array(
+            ],
+            'string 0' => [
                 'source' => '0',
                 'expected' => false,
-            ),
-            'string 1' => array(
+            ],
+            'string 1' => [
                 'source' => '1',
                 'expected' => true,
-            ),
-        );
+            ],
+        ];
     }
 }

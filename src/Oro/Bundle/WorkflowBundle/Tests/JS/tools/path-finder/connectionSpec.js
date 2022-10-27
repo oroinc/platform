@@ -2,11 +2,11 @@ define(function(require) {
     'use strict';
 
     require('jasmine-jquery');
-    var Point2d = require('oroworkflow/js/tools/path-finder/point2d');
-    var NodePoint = require('oroworkflow/js/tools/path-finder/node-point');
-    var Interval2d = require('oroworkflow/js/tools/path-finder/interval2d');
-    var Connection = require('oroworkflow/js/tools/path-finder/connection');
-    var settings = require('oroworkflow/js/tools/path-finder/settings');
+    const Point2d = require('oroworkflow/js/tools/path-finder/point2d');
+    const NodePoint = require('oroworkflow/js/tools/path-finder/node-point');
+    const Interval2d = require('oroworkflow/js/tools/path-finder/interval2d');
+    const Connection = require('oroworkflow/js/tools/path-finder/connection');
+    const settings = require('oroworkflow/js/tools/path-finder/settings');
 
     describe('oroworkflow/js/tools/path-finder/connection', function() {
         beforeEach(function() {
@@ -16,7 +16,7 @@ define(function(require) {
             this.graph.isConnectionUnderRect.and.returnValue(false);
             this.direction = new Point2d(1, 0);
 
-            var axis = {
+            const axis = {
                 costMultiplier: 0.5,
                 graph: this.graph
             };
@@ -42,13 +42,13 @@ define(function(require) {
 
         it('check cross step connection creation', function() {
             this.graph.isConnectionUnderRect.and.returnValue(true);
-            var connection = new Connection(this.a, this.b, this.direction);
+            const connection = new Connection(this.a, this.b, this.direction);
             expect(connection.costMultiplier).toBe(settings.overBlockLineCostMultiplier);
         });
 
         it('check connection creation with no defined direction', function() {
-            var connection = new Connection(this.a, this.b);
-            var vector = this.b.sub(this.a).unitVector;
+            const connection = new Connection(this.a, this.b);
+            const vector = this.b.sub(this.a).unitVector;
             expect(connection.vector.id).toBe(vector.id);
         });
 
@@ -64,14 +64,14 @@ define(function(require) {
 
             it('cross block cost', function() {
                 this.graph.isConnectionUnderRect.and.returnValue(true);
-                var connection = new Connection(this.a, this.b, this.direction);
+                const connection = new Connection(this.a, this.b, this.direction);
                 expect(connection.cost).toBe(15 * settings.overBlockLineCostMultiplier);
             });
 
             it('cross block and cross path cost', function() {
                 this.a.used = true;
                 this.graph.isConnectionUnderRect.and.returnValue(true);
-                var connection = new Connection(this.a, this.b, this.direction);
+                const connection = new Connection(this.a, this.b, this.direction);
                 expect(connection.cost).toBe(15 * settings.overBlockLineCostMultiplier + settings.crossPathCost);
             });
         });
@@ -83,8 +83,8 @@ define(function(require) {
         });
 
         it('check connection remove method', function() {
-            var aConnections = {};
-            var bConnections = {};
+            const aConnections = {};
+            const bConnections = {};
             aConnections[this.direction.id] = null;
             bConnections[this.direction.rot180().id] = null;
 

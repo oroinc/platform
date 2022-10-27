@@ -1,4 +1,7 @@
-assets:
-    css:
-        'oroemail':
-          - 'bundles/oroemail/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oroemail/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroemail/css/scss/main.scss'

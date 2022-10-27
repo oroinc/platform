@@ -1,35 +1,26 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Event;
 
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
 class ProcessHandleEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $processTrigger;
+    /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject */
+    private $processTrigger;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $processData;
+    /** @var ProcessData|\PHPUnit\Framework\MockObject\MockObject */
+    private $processData;
 
-    /**
-     * @var ProcessHandleEvent
-     */
-    protected $event;
+    /** @var ProcessHandleEvent */
+    private $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->processTrigger = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->processData = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->processTrigger = $this->createMock(ProcessTrigger::class);
+        $this->processData = $this->createMock(ProcessData::class);
 
         $this->event = new ProcessHandleEvent($this->processTrigger, $this->processData);
     }

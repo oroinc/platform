@@ -5,49 +5,31 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Type\SystemEmailTemplateSelectType;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SystemEmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SystemEmailTemplateSelectType
-     */
-    protected $type;
+    /** @var SystemEmailTemplateSelectType */
+    private $type;
 
-    /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $em;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    /**
-     * @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityRepository;
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityRepository;
 
-    /**
-     * @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $queryBuilder;
+    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $queryBuilder;
 
-    /**
-     * Setup test env
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-                ->disableOriginalConstructor()
-                ->setMethods(['getSystemTemplatesQueryBuilder'])
-                ->getMock();
-
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['getRepository'])
-            ->getMock();
+        $this->queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->entityRepository = $this->createMock(EmailTemplateRepository::class);
+        $this->em = $this->createMock(EntityManager::class);
 
         $this->type = new SystemEmailTemplateSelectType($this->em);
     }
@@ -56,13 +38,13 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityRepository->expects($this->any())
             ->method('getSystemTemplatesQueryBuilder')
-            ->will($this->returnValue($this->queryBuilder));
+            ->willReturn($this->queryBuilder);
 
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($this->entityRepository));
+            ->willReturn($this->entityRepository);
 
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
@@ -73,14 +55,10 @@ class SystemEmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
             ]);
         $this->type->configureOptions($resolver);
     }
-    
+
     public function testBuildForm()
     {
-        $formBuilder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['addModelTransformer'])
-            ->getMock();
-
+        $formBuilder = $this->createMock(FormBuilder::class);
         $formBuilder->expects($this->once())
             ->method('addModelTransformer');
 

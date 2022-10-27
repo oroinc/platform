@@ -11,16 +11,14 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 
 /**
- * Loads entity using ORM QueryBuilder object.
+ * Loads entity using ORM QueryBuilder or ORM Query object.
+ * IMPORTANT: this processor does not apply access rules to the query.
  */
 class LoadEntityByOrmQuery implements ProcessorInterface
 {
     /** @var QueryHintResolverInterface */
-    protected $queryHintResolver;
+    private $queryHintResolver;
 
-    /**
-     * @param QueryHintResolverInterface $queryHintResolver
-     */
     public function __construct(QueryHintResolverInterface $queryHintResolver)
     {
         $this->queryHintResolver = $queryHintResolver;
@@ -49,11 +47,6 @@ class LoadEntityByOrmQuery implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return array
-     */
     private function getHints(?EntityDefinitionConfig $config): array
     {
         if (null === $config) {

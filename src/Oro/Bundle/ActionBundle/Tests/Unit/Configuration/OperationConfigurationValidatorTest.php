@@ -4,50 +4,44 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Twig\Loader\LoaderInterface;
 
 class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $controllerClassProvider;
 
-    /** @var \Twig_Loader_Filesystem|\PHPUnit\Framework\MockObject\MockObject */
-    protected $twigLoader;
+    /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $twigLoader;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var OperationConfigurationValidator */
-    protected $validator;
+    private $validator;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->router = $this->createMock('Symfony\Component\Routing\RouterInterface');
-
-        $this->twigLoader = $this->createMock('Twig_Loader_Filesystem');
-
+        $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);
+        $this->twigLoader = $this->createMock(LoaderInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->createValidator();
     }
 
-    /**
-     * @param bool $debug
-     */
-    protected function createValidator($debug = false)
+    private function createValidator(bool $debug = false): void
     {
         $this->validator = new OperationConfigurationValidator(
-            $this->router,
+            $this->controllerClassProvider,
             $this->twigLoader,
             $this->doctrineHelper,
             $this->logger,
@@ -56,17 +50,11 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider validateProvider
      */
     public function testValidate(array $inputData, array $expectedData)
     {
         $this->createValidator($inputData['debug']);
-
-        /* @var $collection RouteCollection|\PHPUnit\Framework\MockObject\MockObject */
-        $collection = $this->createMock('Symfony\Component\Routing\RouteCollection');
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
@@ -78,17 +66,13 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('isManageableEntity')
             ->willReturn(true);
 
-        $this->router->expects($this->any())
-            ->method('getRouteCollection')
-            ->willReturn($collection);
-
-        $collection->expects($this->any())
-            ->method('get')
-            ->will($this->returnValueMap($inputData['routes']));
+        $this->controllerClassProvider->expects($this->any())
+            ->method('getControllers')
+            ->willReturn($inputData['routes']);
 
         $this->twigLoader->expects($this->any())
             ->method('exists')
-            ->will($this->returnValueMap($inputData['templates']));
+            ->willReturnMap($inputData['templates']);
 
         $this->logger->expects($expectedData['expectsLog'])
             ->method('warning')
@@ -102,13 +86,9 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $config
-     * @param string $exceptionName
-     * @param string $exceptionMessage
-     *
      * @dataProvider validateWithExceptionProvider
      */
-    public function testValidateWithException(array $config, $exceptionName, $exceptionMessage)
+    public function testValidateWithException(array $config, string $exceptionName, string $exceptionMessage)
     {
         $this->twigLoader->expects($this->any())
             ->method('exists')
@@ -120,10 +100,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($config);
     }
 
-    /**
-     * @return array
-     */
-    public function validateWithExceptionProvider()
+    public function validateWithExceptionProvider(): array
     {
         return [
             'unknown button template' => [
@@ -136,7 +113,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exceptionName' => InvalidConfigurationException::class,
                 'exceptionMessage' => 'action1.button_options.template: Unable to find template "unknown_template"',
             ],
             'unknown frontend template' => [
@@ -149,7 +126,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exceptionName' => InvalidConfigurationException::class,
                 'exceptionMessage' => 'action1.frontend_options.template: Unable to find template "unknown_template"',
             ],
             'unknown attribute in attribute_fields' => [
@@ -169,7 +146,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exceptionName' => InvalidConfigurationException::class,
                 'exceptionMessage' => 'action2.form_options.attribute_fields: Unknown attribute "attribute2".',
             ],
             'unknown attribute in attribute_default_values' => [
@@ -191,21 +168,19 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exceptionName' => InvalidConfigurationException::class,
                 'exceptionMessage' => 'action2.form_options.attribute_default_values: Unknown attribute "attribute3".',
             ],
         ];
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function validateProvider()
+    public function validateProvider(): array
     {
         $routes = [
-            ['route1', new \stdClass()],
+            'route1' => [\stdClass::class, null]
         ];
 
         $templates = [
@@ -311,7 +286,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
                     'templates' => $templates,
                     'config' => [
                         'valid_config_action' => array_merge($config, [
-                            'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                            'entities' => [TestEntity1::class],
                             'routes' => ['route1'],
                             'button_options' => [
                                 'template' => 'Template1'

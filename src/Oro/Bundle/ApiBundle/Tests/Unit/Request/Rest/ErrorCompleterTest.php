@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Request\ErrorTitleOverrideProvider;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter;
@@ -14,22 +15,37 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ExceptionTextExtractorInterface */
     private $exceptionTextExtractor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
-    private $metadata;
-
     /** @var RequestType */
     private $requestType;
 
     /** @var ErrorCompleter */
     private $errorCompleter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->exceptionTextExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
-        $this->metadata = $this->createMock(EntityMetadata::class);
         $this->requestType = new RequestType([RequestType::REST]);
 
-        $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor);
+        $this->errorCompleter = new ErrorCompleter(
+            new ErrorTitleOverrideProvider(['test title alias' => 'test title']),
+            $this->exceptionTextExtractor
+        );
+    }
+
+    public function testCompleteErrorWhenErrorTitleHasSubstitution()
+    {
+        $error = new Error();
+        $error->setStatusCode(400);
+        $error->setTitle('test title alias');
+        $error->setDetail('test detail');
+
+        $expectedError = new Error();
+        $expectedError->setStatusCode(400);
+        $expectedError->setTitle('test title');
+        $expectedError->setDetail('test detail');
+
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithoutInnerException()
@@ -119,7 +135,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
         $expectedError = new Error();
         $expectedError->setStatusCode(400);
-        $expectedError->setTitle(Response::$statusTexts[400]);
+        $expectedError->setTitle(strtolower(Response::$statusTexts[400]));
 
         $this->errorCompleter->complete($error, $this->requestType);
         self::assertEquals($expectedError, $error);
@@ -134,6 +150,18 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         $expectedError->setStatusCode(1000);
 
         $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function testFixIncludedEntityPath()
+    {
+        $error = new Error();
+        $error->setSource(ErrorSource::createByPropertyPath('association1.field1'));
+
+        $expectedError = clone $error;
+        $expectedError->setSource(clone $error->getSource());
+
+        $this->errorCompleter->fixIncludedEntityPath('/included/0', $error, $this->requestType);
         self::assertEquals($expectedError, $error);
     }
 }

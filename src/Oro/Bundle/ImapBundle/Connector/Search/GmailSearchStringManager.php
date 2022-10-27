@@ -93,7 +93,6 @@ class GmailSearchStringManager extends AbstractSearchStringManager
             $result = '';
         }
 
-
         $expr = $this->processExpr($value);
         $result .= $value->isComplex()
             ? sprintf('(%s)', $expr)

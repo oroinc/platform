@@ -1,0 +1,13 @@
+/* @theme: admin.oro; */
+
+$scroll-hint-size: 18px !default;
+$scroll-hint-top-bg: linear-gradient(
+    to bottom,
+    rgba($primary-inverse, .9) 25%,
+    rgba($primary-inverse, 0) 100%
+) !default;
+$scroll-bottom-top-bg: linear-gradient(
+    360deg,
+    rgba($primary-inverse, .9) 25%,
+    rgba($primary-inverse, 0) 100%
+) !default;

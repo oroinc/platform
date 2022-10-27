@@ -17,19 +17,15 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AttributeFamilyExtensionTest extends TypeTestCase
 {
-    const DATA_CLASS = TestActivityTarget::class;
+    private const DATA_CLASS = TestActivityTarget::class;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attributeConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeConfigProvider;
 
-    /**
-     * @var AttributeFamilyExtension
-     */
-    protected $extension;
+    /** @var AttributeFamilyExtension */
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,10 +34,7 @@ class AttributeFamilyExtensionTest extends TypeTestCase
         $this->extension = new AttributeFamilyExtension($this->attributeConfigProvider);
     }
 
-    /**
-     * @return array
-     */
-    public function notApplicableDataProvider()
+    public function notApplicableDataProvider(): array
     {
         return [
             'no data_class option' => [
@@ -58,8 +51,6 @@ class AttributeFamilyExtensionTest extends TypeTestCase
 
     /**
      * @dataProvider notApplicableDataProvider
-     *
-     * @param array $options
      */
     public function testBuildFormWhenNotApplicable(array $options)
     {
@@ -97,8 +88,7 @@ class AttributeFamilyExtensionTest extends TypeTestCase
             ->with(self::DATA_CLASS)
             ->willReturn(true);
 
-        $attributeConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $attributeConfig = $this->createMock(ConfigInterface::class);
         $attributeConfig->expects($this->once())
             ->method('is')
             ->with('has_attributes')
@@ -123,8 +113,7 @@ class AttributeFamilyExtensionTest extends TypeTestCase
             ->with(self::DATA_CLASS)
             ->willReturn(true);
 
-        $attributeConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $attributeConfig = $this->createMock(ConfigInterface::class);
         $attributeConfig->expects($this->once())
             ->method('is')
             ->with('has_attributes')
@@ -143,10 +132,7 @@ class AttributeFamilyExtensionTest extends TypeTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function preSetDataProvider()
+    public function preSetDataProvider(): array
     {
         return [
             'null entity' => [
@@ -164,14 +150,12 @@ class AttributeFamilyExtensionTest extends TypeTestCase
      */
     public function testOnPreSetData($entity)
     {
-        $formConfig = $this->getMockBuilder(FormConfigInterface::class)
-            ->getMock();
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getOptions')
             ->willReturn(['data_class' => self::DATA_CLASS]);
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
-        $form = $this->getMockBuilder(FormInterface::class)
-            ->getMock();
+
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('getConfig')
             ->willReturn($formConfig);

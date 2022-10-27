@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Attribute;
 
 /**
- * Oro\Bundle\DataBundle\Entity\Product
- *
  * @ORM\Table()
  * @ORM\Entity()
  */
 class Product
 {
     /**
-     * @var integer $id
+     * @var int|null
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -23,55 +23,62 @@ class Product
     private $id;
 
     /**
-     * @var string $name
+     * @var string|null
      *
      * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
 
     /**
-     * @var float $price
+     * @var float|null
      *
      * @ORM\Column(name="price", type="decimal")
      */
     private $price;
 
     /**
-     * @var integer $count
+     * @var int|null
      *
      * @ORM\Column(name="count", type="integer")
      */
     private $count;
 
     /**
-     * @var /DateTime $createDate
+     * @var \DateTime
      *
      * @ORM\Column(name="create_date", type="datetime")
      */
     private $createDate;
 
     /**
-     * @var string $description
+     * @var string|null
      *
      * @ORM\Column(name="description", type="text")
      */
     private $description;
 
     /**
+     * @var Manufacturer|null
+     *
      * @ORM\ManyToOne(targetEntity="Manufacturer", inversedBy="products")
      * @ORM\JoinColumn(name="manufacturer_id", referencedColumnName="id")
      */
     private $manufacturer;
 
     /**
+     * @var Collection|Category[]
+     *
      * @ORM\MayToMany(targetEntity="Category", inversedBy="products")
      */
     private $categories;
 
+    public function __construct()
+    {
+        $this->categories = new ArrayCollection();
+    }
+
     /**
-     * Get id
-     *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -79,9 +86,8 @@ class Product
     }
 
     /**
-     * Set name
+     * @param string|null $name
      *
-     * @param  string  $name
      * @return Product
      */
     public function setName($name)
@@ -92,18 +98,16 @@ class Product
     }
 
     /**
-     * Get name
-     *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
         return $this->name;
     }
+
     /**
-     * Set description
+     * @param string|null $description
      *
-     * @param  string  $description
      * @return Product
      */
     public function setDescription($description)
@@ -114,9 +118,7 @@ class Product
     }
 
     /**
-     * Get description
-     *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -124,17 +126,8 @@ class Product
     }
 
     /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->categories = new \Doctrine\Common\Collections\ArrayCollection();
-    }
-
-    /**
-     * Set manufacturer
+     * @param Manufacturer|null $manufacturer
      *
-     * @param  Manufacturer $manufacturer
      * @return Product
      */
     public function setManufacturer(Manufacturer $manufacturer = null)
@@ -145,9 +138,7 @@ class Product
     }
 
     /**
-     * Get manufacturer
-     *
-     * @return Manufacturer
+     * @return Manufacturer|null
      */
     public function getManufacturer()
     {
@@ -155,9 +146,8 @@ class Product
     }
 
     /**
-     * Set price
+     * @param float|null $price
      *
-     * @param  float   $price
      * @return Product
      */
     public function setPrice($price)
@@ -168,9 +158,7 @@ class Product
     }
 
     /**
-     * Get price
-     *
-     * @return float
+     * @return float|null
      */
     public function getPrice()
     {
@@ -178,9 +166,8 @@ class Product
     }
 
     /**
-     * Set count
+     * @param int|null $count
      *
-     * @param  integer $count
      * @return Product
      */
     public function setCount($count)
@@ -191,9 +178,7 @@ class Product
     }
 
     /**
-     * Get count
-     *
-     * @return integer
+     * @return int|null
      */
     public function getCount()
     {
@@ -201,9 +186,8 @@ class Product
     }
 
     /**
-     * Set createDate
+     * @param \DateTime $createDate
      *
-     * @param  \DateTime $createDate
      * @return Product
      */
     public function setCreateDate($createDate)
@@ -214,8 +198,6 @@ class Product
     }
 
     /**
-     * Get createDate
-     *
      * @return \DateTime
      */
     public function getCreateDate()
@@ -225,7 +207,7 @@ class Product
 
     public function __toString()
     {
-        return (string) $this->name;
+        return (string)$this->name;
     }
 
     public function getValue($code)
@@ -236,6 +218,8 @@ class Product
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     public function setRecordId($id)
@@ -244,8 +228,6 @@ class Product
     }
 
     /**
-     * Add category
-     *
      * @param Category $category
      *
      * @return Product
@@ -257,20 +239,13 @@ class Product
         return $this;
     }
 
-    /**
-     * Remove category
-     *
-     * @param Category $category
-     */
     public function removeCategory(Category $category)
     {
         $this->categories->removeElement($category);
     }
 
     /**
-     * Get categories
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection|Category[]
      */
     public function getCategories()
     {

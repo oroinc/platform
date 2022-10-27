@@ -3,36 +3,36 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
 use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $managerRegistry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityConfigProvider;
 
     /** @var PropertyPathSecurityHelper */
-    protected $helper;
+    private $helper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->authorizationChecker = $this
-            ->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
+
         $this->helper = new PropertyPathSecurityHelper(
             $this->authorizationChecker,
             $this->managerRegistry,
@@ -62,44 +62,33 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
 
         $propertyPath = 'user.address.city';
 
-        $em = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(ObjectManager::class);
         $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($em);
         $em->expects($this->any())
             ->method('getClassMetadata')
-            ->willReturnMap(
-                [
-                    [get_class($address), $addressMetadata],
-                    [get_class($user), $userMetadata],
-                    [get_class($article), $articleMetadata]
-                ]
-            );
+            ->willReturnMap([
+                [get_class($address), $addressMetadata],
+                [get_class($user), $userMetadata],
+                [get_class($article), $articleMetadata]
+            ]);
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
             ->willReturnCallback(function ($permission, $object) {
-                if ($object instanceof FieldVote) {
-                    if ($object->getField() === 'city') {
-                        return false;
-                    }
-                }
-
-                return true;
+                return !(($object instanceof FieldVote) && $object->getField() === 'city');
             });
 
         $isGranted = $this->helper->isGrantedByPropertyPath($article, $propertyPath, 'EDIT');
         $this->assertFalse($isGranted);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Can't get entity manager for class stdClass
-     */
     public function testIisGrantedByPropertyPathOnWrongClass()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Can't get entity manager for class stdClass");
+
         $this->helper->isGrantedByPropertyPath(new \stdClass(), 'somePath', 'EDIT');
     }
 }

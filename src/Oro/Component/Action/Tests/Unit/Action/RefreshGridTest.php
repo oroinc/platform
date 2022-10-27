@@ -2,58 +2,43 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\RefreshGrid;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RefreshGridTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    protected $eventDispatcher;
-
     /** @var RefreshGrid */
-    protected $action;
+    private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-
         $this->action = new RefreshGrid(new ContextAccessor());
-        $this->action->setDispatcher($this->eventDispatcher);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->action, $this->eventDispatcher);
+        $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     public function testInitialize()
     {
-        $gridname = 'test_grid';
+        $gridName = 'test_grid';
 
-        $this->assertInstanceOf(
-            'Oro\Component\Action\Action\ActionInterface',
-            $this->action->initialize([$gridname])
-        );
-
-        $this->assertAttributeEquals([$gridname], 'gridNames', $this->action);
+        self::assertInstanceOf(ActionInterface::class, $this->action->initialize([$gridName]));
+        self::assertEquals([$gridName], ReflectionUtil::getPropertyValue($this->action, 'gridNames'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Gridname parameter must be specified
-     */
     public function testInitializeException()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Gridname parameter must be specified');
+
         $this->action->initialize([]);
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider executeMethodProvider
      */
     public function testExecuteMethod(array $inputData, array $expectedData)
@@ -63,13 +48,10 @@ class RefreshGridTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($inputData['options']);
         $this->action->execute($context);
 
-        $this->assertEquals($expectedData, $context->getValues());
+        self::assertEquals($expectedData, $context->getValues());
     }
 
-    /**
-     * @return array
-     */
-    public function executeMethodProvider()
+    public function executeMethodProvider(): array
     {
         return [
             'add grid' => [

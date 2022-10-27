@@ -7,27 +7,28 @@ use Oro\Bundle\SecurityBundle\EventListener\ControllerListener;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ControllerListenerTest extends \PHPUnit\Framework\TestCase
 {
-    protected $className = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject';
-    protected $methodName = 'getId';
+    private const CLASS_NAME = TestDomainObject::class;
+    private const METHOD_NAME = 'getId';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $classAuthorizationChecker;
+    /** @var ClassAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $classAuthorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     /** @var Request */
-    protected $request;
+    private $request;
 
     /** @var ControllerListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->classAuthorizationChecker = $this->createMock(ClassAuthorizationChecker::class);
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -41,79 +42,75 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAccessGranted()
+    public function testAccessGranted(): void
     {
-        $event = new FilterControllerEvent(
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
-            [new TestDomainObject(), $this->methodName],
+            [new TestDomainObject(), self::METHOD_NAME],
             $this->request,
             HttpKernelInterface::MASTER_REQUEST
         );
 
         $this->logger->expects(self::once())
             ->method('debug')
-            ->with(sprintf('Invoked controller "%s::%s". (MASTER_REQUEST)', $this->className, $this->methodName));
+            ->with(sprintf('Invoked controller "%s::%s". (MASTER_REQUEST)', self::CLASS_NAME, self::METHOD_NAME));
 
         $this->classAuthorizationChecker->expects(self::once())
             ->method('isClassMethodGranted')
-            ->with($this->className, $this->methodName)
+            ->with(self::CLASS_NAME, self::METHOD_NAME)
             ->willReturn(true);
 
         $this->listener->onKernelController($event);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
-    public function testAccessDenied()
+    public function testAccessDenied(): void
     {
-        $event = new FilterControllerEvent(
+        $this->expectException(AccessDeniedException::class);
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
-            [new TestDomainObject(), $this->methodName],
+            [new TestDomainObject(), self::METHOD_NAME],
             $this->request,
             HttpKernelInterface::MASTER_REQUEST
         );
 
         $this->logger->expects(self::once())
             ->method('debug')
-            ->with(sprintf('Invoked controller "%s::%s". (MASTER_REQUEST)', $this->className, $this->methodName));
+            ->with(sprintf('Invoked controller "%s::%s". (MASTER_REQUEST)', self::CLASS_NAME, self::METHOD_NAME));
 
         $this->classAuthorizationChecker->expects(self::once())
             ->method('isClassMethodGranted')
-            ->with($this->className, $this->methodName)
+            ->with(self::CLASS_NAME, self::METHOD_NAME)
             ->willReturn(false);
 
         $this->listener->onKernelController($event);
     }
 
-    public function testAccessDeniedForSubRequest()
+    public function testAccessDeniedForSubRequest(): void
     {
-        $event = new FilterControllerEvent(
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
-            [new TestDomainObject(), $this->methodName],
+            [new TestDomainObject(), self::METHOD_NAME],
             $this->request,
             HttpKernelInterface::SUB_REQUEST
         );
 
         $this->logger->expects(self::once())
             ->method('debug')
-            ->with(sprintf('Invoked controller "%s::%s". (SUB_REQUEST)', $this->className, $this->methodName));
+            ->with(sprintf('Invoked controller "%s::%s". (SUB_REQUEST)', self::CLASS_NAME, self::METHOD_NAME));
 
         $this->classAuthorizationChecker->expects(self::once())
             ->method('isClassMethodGranted')
-            ->with($this->className, $this->methodName)
+            ->with(self::CLASS_NAME, self::METHOD_NAME)
             ->willReturn(false);
 
         $this->listener->onKernelController($event);
     }
 
-    public function testUnsupportedControllerType()
+    public function testUnsupportedControllerType(): void
     {
-        $event = new FilterControllerEvent(
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
-            function () {
-                // some controller
-            },
+            static fn () => null,
             $this->request,
             HttpKernelInterface::MASTER_REQUEST
         );
@@ -127,12 +124,12 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    public function testAccessAlreadyChecked()
+    public function testAccessAlreadyChecked(): void
     {
         $this->request->attributes->set('_oro_access_checked', true);
-        $event = new FilterControllerEvent(
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
-            [new TestDomainObject(), $this->methodName],
+            [new TestDomainObject(), self::METHOD_NAME],
             $this->request,
             HttpKernelInterface::MASTER_REQUEST
         );

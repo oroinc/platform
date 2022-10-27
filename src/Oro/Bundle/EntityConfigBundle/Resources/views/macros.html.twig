@@ -1,12 +1,13 @@
-{% macro renderDynamicFields(entity, entity_class) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+{% macro renderDynamicFields(entity, entity_class = null, ignoredFields = {}) %}
+    {% import _self as entityConfigMacros %}
+    {% import '@OroUI/macros.html.twig' as ui %}
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for fieldName, item in dynamicFields %}
-            {% if feature_resource_enabled(fieldName, 'field_configs') %}
+            {% if fieldName not in ignoredFields %}
                 {{ ui.renderHtmlProperty(
                     item.label|trans,
-                    _self.formatDynamicFieldValue(
+                    entityConfigMacros.formatDynamicFieldValue(
                         entity,
                         entity_class,
                         fieldName,
@@ -19,12 +20,14 @@
 {% endmacro %}
 
 {% macro renderDynamicField(entity, field) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
+    {% import _self as entityConfigMacros %}
+
     {% set dynamicField = oro_get_dynamic_field(entity, field) %}
     {% if dynamicField %}
         {{ ui.renderHtmlProperty(
             dynamicField.label|trans,
-            _self.formatDynamicFieldValue(
+            entityConfigMacros.formatDynamicFieldValue(
                 entity,
                 field.entity.className,
                 field.fieldName,
@@ -35,12 +38,14 @@
 {% endmacro %}
 
 {% macro formatDynamicFieldValue(entity, entity_class, field_name, item) %}
+    {% import _self as entityConfigMacros %}
+
     {% set hasLink = false %}
     {% set fieldValue = item.value %}
     {% if fieldValue is iterable %}
         {% if fieldValue.values is defined %}
             {%- for value in fieldValue.values -%}
-                {{- _self.renderField(value) -}}
+                {{- entityConfigMacros.renderField(value) -}}
                 {%- if not loop.last -%}
                     ,&nbsp;
                 {%- endif -%}
@@ -48,14 +53,15 @@
                 {{- 'N/A'|trans -}}
             {%- endfor -%}
         {% else %}
-            {{ _self.renderField(fieldValue) }}
+            {{ entityConfigMacros.renderField(fieldValue) }}
         {% endif %}
     {% else %}
-        {{ _self.renderFormatted(entity, entity_class, field_name, item) }}
+        {{ entityConfigMacros.renderFormatted(entity, entity_class, field_name, item) }}
     {% endif %}
 {% endmacro %}
 
 {% macro renderFormatted(entity, entity_class, field_name, item) %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set value = item.value %}
     {% set type  = item.type %}
 
@@ -64,39 +70,34 @@
             {{ value|nl2br }}
         {% endset %}
     {% elseif type == 'html' %}
-        {{ value|oro_html_sanitize|default('N/A'|trans)|raw }}
+        {{ UI.renderCollapsibleHtml(
+            value|oro_html_sanitize|default('N/A'|trans)|raw,
+            entity,
+            item.label
+        ) }}
     {% elseif type == 'boolean' and value is not null %}
         {% set value = value ? 'Yes'|trans : 'No'|trans %}
     {% elseif type == 'money' %}
         {% set value = value ? value | oro_format_currency : null %}
+    {% elseif type == 'decimal' or type == 'float' %}
+        {% set value = value ? value | oro_format_decimal : null %}
     {% elseif type == 'percent' %}
         {% set value = value ? value | oro_format_percent : null %}
     {% elseif type == 'date' %}
         {% set value = value ? value | oro_format_date : null %}
     {% elseif type == 'datetime' %}
         {% set value = value ? value | oro_format_datetime : null %}
-    {% elseif type == 'file' %}
-        {% set value %}
-            {{ oro_file_view(entity, field_name, value) }}
-        {% endset %}
-    {% elseif type == 'image' %}
-        {% if entity_class is null %}
-            {% set entityInfo = entity %}
-        {% else %}
-            {% set entityInfo = entity_class %}
-        {% endif %}
-        {% set value %}
-            {{ oro_image_view(entity, value, entityInfo, field_name) }}
-        {% endset %}
     {% endif %}
 
-    {% if type != 'html' %}
+    {% if type == 'wysiwyg' %}
+        {{ UI.renderCollapsibleWysiwygContentPreview(value) }}
+    {% elseif type != 'html' %}
         {{ value|default('N/A'|trans) }}
     {% endif %}
 {% endmacro %}
 
 {% macro renderField(value) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
 
     {% if value.template is defined %}
         {{ include(value.template, { data: value}) }}
@@ -110,7 +111,7 @@
 {% endmacro %}
 
 {% macro displayLayoutActions(actions) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% for button in actions %}
         {% set componentData = {} %}
         {% if  button.page_component_module is defined %}
@@ -125,7 +126,7 @@
 
         {% endif %}
         {{ UI.button({
-            'path'   : button.void is defined ? 'javascript:void(0);' : path(button.route, button.args|default({})),
+            'path'   : button.void is defined ? '#' : path(button.route, button.args|default({})),
             'data'   : {
                 'url' : button.void is defined ? path(button.route, button.args|default({})) : null,
             }|merge(componentData),

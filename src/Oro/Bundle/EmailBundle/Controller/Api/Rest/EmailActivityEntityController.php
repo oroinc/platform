@@ -3,18 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\Proxy\Proxy;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("email_activity_relation")
- * @NamePrefix("oro_api_")
+ * REST API controller to get entities associated with an email activity.
  */
 class EmailActivityEntityController extends RestGetController
 {
@@ -22,8 +18,6 @@ class EmailActivityEntityController extends RestGetController
      * Get entities associated with the email activity.
      *
      * @param int $id The id of the email entity.
-     *
-     * @Get("/activities/emails/{id}/relations")
      *
      * @QueryParam(
      *      name="page",

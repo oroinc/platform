@@ -5,28 +5,33 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
+class CollectionNormalizer implements
+    SerializerAwareInterface,
+    ContextAwareNormalizerInterface,
+    ContextAwareDenormalizerInterface
 {
     /**
-     * @var SerializerInterface|NormalizerInterface|DenormalizerInterface
+     * @var SerializerInterface|ContextAwareNormalizerInterface|ContextAwareDenormalizerInterface
      */
     protected $serializer;
 
     /**
-     * @param SerializerInterface $serializer
      * @throws InvalidArgumentException
      */
     public function setSerializer(SerializerInterface $serializer)
     {
-        if (!$serializer instanceof NormalizerInterface || !$serializer instanceof DenormalizerInterface) {
+        if (!$serializer instanceof ContextAwareNormalizerInterface
+            || !$serializer instanceof ContextAwareDenormalizerInterface) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Serializer must implement "%s" and "%s"',
-                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface',
-                    'Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface'
+                    ContextAwareNormalizerInterface::class,
+                    ContextAwareDenormalizerInterface::class
                 )
             );
         }
@@ -39,11 +44,12 @@ class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface
      * @param Collection $object object to normalize
      * @param mixed $format
      * @param array $context
+     *
      * @return array
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
-        $result = array();
+        $result = [];
 
         foreach ($object as $item) {
             $serializedItem = $this->serializer->normalize($item, $format, $context);
@@ -57,17 +63,18 @@ class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface
      * Returns collection of denormalized data
      *
      * @param mixed $data
-     * @param string $class
+     * @param string $type
      * @param mixed $format
      * @param array $context
+     *
      * @return ArrayCollection
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (!is_array($data)) {
             return new ArrayCollection();
         }
-        $itemType = $this->getItemType($class);
+        $itemType = $this->getItemType($type);
         if (!$itemType) {
             return new ArrayCollection($data);
         }
@@ -75,11 +82,13 @@ class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface
         foreach ($data as $item) {
             $result->add($this->serializer->denormalize($item, $itemType, $format, $context));
         }
+
         return $result;
     }
 
     /**
      * @param string $class
+     *
      * @return string|null
      */
     protected function getItemType($class)
@@ -89,13 +98,14 @@ class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface
         if (preg_match($collectionRegexp, $class, $matches)) {
             return $matches[3];
         }
+
         return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = array())
+    public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         return $data instanceof Collection;
     }
@@ -103,7 +113,7 @@ class CollectionNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = array())
+    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return (bool)preg_match(
             '/^(Doctrine\\\Common\\\Collections\\\ArrayCollection|ArrayCollection)(<[\w_<>\\\]+>)?$/',

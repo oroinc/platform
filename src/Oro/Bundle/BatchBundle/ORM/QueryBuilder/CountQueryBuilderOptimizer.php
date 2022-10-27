@@ -28,9 +28,6 @@ class CountQueryBuilderOptimizer
     /** @var QueryOptimizationContext */
     protected $context;
 
-    /**
-     * @param QueryBuilderTools|null $qbTools
-     */
     public function __construct(QueryBuilderTools $qbTools = null)
     {
         if (!$qbTools) {
@@ -41,17 +38,12 @@ class CountQueryBuilderOptimizer
 
     /**
      * Sets an event dispatcher
-     *
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @param RelationHelper $relationHelper
-     */
     public function setRelationHelper(RelationHelper $relationHelper)
     {
         $this->relationHelper = $relationHelper;
@@ -294,7 +286,7 @@ class CountQueryBuilderOptimizer
     {
         if (null !== $this->eventDispatcher) {
             $event = new CountQueryOptimizationEvent($this->context, $joinAliases);
-            $this->eventDispatcher->dispatch(CountQueryOptimizationEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, CountQueryOptimizationEvent::EVENT_NAME);
             $toRemoveAliases = $event->getRemovedOptimizedQueryJoinAliases();
             if (!empty($toRemoveAliases)) {
                 $toRemoveAliases = array_diff($toRemoveAliases, $requiredJoinAliases);
@@ -330,7 +322,7 @@ class CountQueryBuilderOptimizer
     protected function getSelectFieldFromGroupByPart($groupByPart)
     {
         $expressions = [];
-        if (strpos($groupByPart, ',') !== false) {
+        if (str_contains($groupByPart, ',')) {
             $groupByParts = explode(',', $groupByPart);
             foreach ($groupByParts as $part) {
                 $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
@@ -353,6 +345,7 @@ class CountQueryBuilderOptimizer
      * @param string      $groupByAliases the aliases that was used in GROUP BY statement
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getNonSymmetricJoinAliases($fromStatements, $joins, $groupByAliases)
     {
@@ -509,7 +502,7 @@ class CountQueryBuilderOptimizer
             $alias = $from->getAlias();
             foreach ($this->context->getClassMetadata($from->getFrom())->getIdentifierFieldNames() as $item) {
                 $fieldName = $alias . '.' . $item;
-                if (stripos($distinctField, $fieldName) === false) {
+                if ($distinctField === null || stripos($distinctField, $fieldName) === false) {
                     $fieldsToSelect[] = $fieldName;
                 }
             }

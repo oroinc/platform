@@ -12,10 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetResponseContentType implements ProcessorInterface
 {
-    /**
-     * Content-Type of REST API response conforms JSON API specification
-     */
-    const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
+    private const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
 
     /**
      * {@inheritdoc}
@@ -26,7 +23,7 @@ class SetResponseContentType implements ProcessorInterface
 
         $responseHeaders = $context->getResponseHeaders();
         if (!$responseHeaders->has('Content-Type')) {
-            $context->getResponseHeaders()->set('Content-Type', self::JSON_API_CONTENT_TYPE);
+            $context->getResponseHeaders()->set('Content-Type', self::JSON_API_MEDIA_TYPE);
         }
     }
 }

@@ -6,39 +6,33 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Adds all email owner providers to an email owner storage.
+ */
 class EmailOwnerConfigurationPass implements CompilerPassInterface
 {
-    const SERVICE_KEY = 'oro_email.email.owner.provider.storage';
-    const TAG = 'oro_email.owner.provider';
+    private const SERVICE_KEY = 'oro_email.email.owner.provider.storage';
+    private const TAG         = 'oro_email.owner.provider';
 
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::SERVICE_KEY)) {
-            return;
-        }
         $storageDefinition = $container->getDefinition(self::SERVICE_KEY);
-
         $providers = $this->loadProviders($container);
         foreach ($providers as $providerServiceId) {
-            $storageDefinition->addMethodCall('addProvider', array(new Reference($providerServiceId)));
+            $storageDefinition->addMethodCall('addProvider', [new Reference($providerServiceId)]);
         }
-
-        $this->setEmailAddressEntityResolver($container);
     }
 
     /**
-     * Load services implements an email owner providers
-     *
-     * @param ContainerBuilder $container
-     * @return array
+     * Loads services that implement an email owner providers.
      */
-    protected function loadProviders(ContainerBuilder $container)
+    private function loadProviders(ContainerBuilder $container): array
     {
         $taggedServices = $container->findTaggedServiceIds(self::TAG);
-        $providers = array();
+        $providers = [];
         foreach ($taggedServices as $id => $tagAttributes) {
             $order = PHP_INT_MAX;
             foreach ($tagAttributes as $attributes) {
@@ -59,25 +53,5 @@ class EmailOwnerConfigurationPass implements CompilerPassInterface
         }
 
         return $providersPlain;
-    }
-
-    /**
-     * Register a proxy of EmailAddress entity in doctrine ORM
-     *
-     * @param ContainerBuilder $container
-     */
-    protected function setEmailAddressEntityResolver(ContainerBuilder $container)
-    {
-        if ($container->hasDefinition('doctrine.orm.listeners.resolve_target_entity')) {
-            $targetEntityResolver = $container->getDefinition('doctrine.orm.listeners.resolve_target_entity');
-            $targetEntityResolver->addMethodCall(
-                'addResolveTargetEntity',
-                array(
-                    'Oro\Bundle\EmailBundle\Entity\EmailAddress',
-                    sprintf('%s\EmailAddressProxy', $container->getParameter('oro_email.entity.cache_namespace')),
-                    array()
-                )
-            );
-        }
     }
 }

@@ -1,0 +1,13 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\ApiBundle\Controller\RestApiController:
+        arguments:
+            - '@oro_api.rest.request_handler'
+
+    Oro\Bundle\ApiBundle\Controller\RestApiDocController:
+        arguments:
+            - '@nelmio_api_doc.extractor.api_doc_extractor'
+            - '@nelmio_api_doc.formatter.html_formatter'
+            - '@session'

@@ -3,7 +3,7 @@ datagrids:
         acl_resource: ~
         options:
             base_datagrid_class: Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid
-            entityHint: entities
+            entityHint: oro.entity.plural_label
             export: true
             entity_pagination: true
         source:
@@ -57,7 +57,7 @@ datagrids:
     entity-relation-grid:
         acl_resource: ~
         options:
-            entityHint: entities
+            entityHint: oro.entity.plural_label
             routerEnabled: false
             rowSelection:
                 dataField: id
@@ -79,7 +79,7 @@ datagrids:
                 assigned:
                     data_name: assigned
             default:
-                assigned: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                assigned: DESC
         filters:
             columns:
                 assigned:

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Util;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -23,11 +23,6 @@ class PropertyPathSecurityHelper
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ManagerRegistry               $managerRegistry
-     * @param ConfigProvider                $entityConfigProvider
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ManagerRegistry $managerRegistry,

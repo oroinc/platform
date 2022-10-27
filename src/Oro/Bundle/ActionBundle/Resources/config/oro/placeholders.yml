@@ -18,10 +18,10 @@ placeholders:
 
     items:
         actions_buttons:
-            template: OroActionBundle:Widget:buttons.html.twig
+            template: '@@OroAction/Widget/buttons.html.twig'
 
         view_navButtons:
-            template: OroActionBundle:Widget:viewNavButtons.html.twig
+            template: '@@OroAction/Widget/viewNavButtons.html.twig'
 
         update_navButtons:
-            template: OroActionBundle:Widget:updateNavButtons.html.twig
+            template: '@@OroAction/Widget/updateNavButtons.html.twig'

@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EntitiesControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadExtendedRelationsData::class]);
@@ -24,10 +24,10 @@ class EntitiesControllerTest extends WebTestCase
             ->getManagerForClass(TestEntity1::class)
             ->getRepository(TestEntity1::class)
             ->findAll();
-        
+
         /** @var TestEntity1 $testEntity */
         $testEntity = reset($testEntities);
-        
+
         $this->client->request(
             'GET',
             $this->getUrl('oro_entity_relation', [

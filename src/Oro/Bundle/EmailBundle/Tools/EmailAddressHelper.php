@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
-use Oro\Bundle\EmailBundle\Entity\EmailInterface;
-
+/**
+ * Provides a set of helper methods to work with email addresses.
+ */
 class EmailAddressHelper
 {
     protected $nameSeparators = [
@@ -22,11 +23,14 @@ class EmailAddressHelper
      *    email address: <john@example.com> (Contact); 'pure' email address john@example.com
      *    email address: john@example.com; 'pure' email address john@example.com
      *
-     * @param string $fullEmailAddress
+     * @param string|null $fullEmailAddress
      * @return string
      */
     public function extractPureEmailAddress($fullEmailAddress)
     {
+        if ($fullEmailAddress === null) {
+            return '';
+        }
         $atPos = strrpos($fullEmailAddress, '@');
         if ($atPos === false) {
             return $fullEmailAddress;
@@ -168,41 +172,6 @@ class EmailAddressHelper
     }
 
     /**
-     * Extract email addresses from the given argument.
-     * Always return an array, even if no any email is given.
-     *
-     * @param $emails
-     * @return string[]
-     * @throws \InvalidArgumentException
-     */
-    public function extractEmailAddresses($emails)
-    {
-        if (is_string($emails)) {
-            return empty($emails)
-                ? array()
-                : array($emails);
-        }
-        if (!is_array($emails) && !($emails instanceof \Traversable)) {
-            throw new \InvalidArgumentException('The emails argument must be a string, array or collection.');
-        }
-
-        $result = array();
-        foreach ($emails as $email) {
-            if (is_string($email)) {
-                $result[] = $email;
-            } elseif ($email instanceof EmailInterface) {
-                $result[] = $email->getEmail();
-            } else {
-                throw new \InvalidArgumentException(
-                    'Each item of the emails collection must be a string or an object of EmailInterface.'
-                );
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Build a full email address from the given 'pure' email address and email address owner name
      *
      * Examples of full email addresses:
@@ -240,7 +209,7 @@ class EmailAddressHelper
             return false;
         }
 
-        return (strpos($emailAddress, '<') !== false);
+        return str_contains($emailAddress, '<');
     }
 
     /**

@@ -22,9 +22,6 @@ class PatchSubscriber implements EventSubscriberInterface
         return [FormEvents::PRE_SUBMIT => 'preSubmit'];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();

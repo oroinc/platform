@@ -15,6 +15,6 @@ class ChannelDisableEventFactoryTest extends \PHPUnit\Framework\TestCase
 
         $factory = new ChannelDisableEventFactory();
 
-        static::assertEquals($event, $factory->create($channel));
+        self::assertEquals($event, $factory->create($channel));
     }
 }

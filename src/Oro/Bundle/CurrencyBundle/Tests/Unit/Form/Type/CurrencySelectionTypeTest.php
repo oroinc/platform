@@ -5,66 +5,35 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\CurrencyBundle\Form\Type\CurrencySelectionType;
 use Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Utils\CurrencyNameHelperStub;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Currencies;
 
 class CurrencySelectionTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var CurrencySelectionType
-     */
-    protected $formType;
+    /** @var CurrencySelectionType */
+    private $formType;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CurrencyProviderInterface
-     */
-    protected $currencyProvider;
+    /** @var CurrencyProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $currencyProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\LocaleBundle\Model\LocaleSettings
-     */
-    protected $localeSettings;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper
-     */
-    protected $currencyNameHelper;
-
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->currencyProvider = $this->getMockBuilder(CurrencyProviderInterface::class)
-            ->setMethods([
-                'getCurrencyList',
-                'getDefaultCurrency',
-                'getViewType'
-            ])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->currencyProvider = $this->createMock(CurrencyProviderInterface::class);
 
-        $this->localeSettings = $this
-            ->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->setMethods(['getCurrency', 'getLocale'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->localeSettings->expects($this->any())
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $localeSettings->expects($this->any())
             ->method('getLocale')
             ->willReturn(\Locale::getDefault());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|\Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper */
-        $this->currencyNameHelper = new CurrencyNameHelperStub();
-
         $this->formType = new CurrencySelectionType(
             $this->currencyProvider,
-            $this->localeSettings,
-            $this->currencyNameHelper
+            $localeSettings,
+            new CurrencyNameHelperStub()
         );
 
         parent::setUp();
@@ -87,41 +56,47 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     *
      * @dataProvider submitDataProvider
-     *
-     * @param array $allowedCurrencies
-     * @param array $inputOptions
-     * @param array $expectedOptions
-     * @param string $submittedData
      */
     public function testSubmit(
         array $allowedCurrencies,
         array $inputOptions,
         array $expectedOptions,
-        $submittedData
+        string $submittedData
     ) {
         $this->currencyProvider->expects($this->any())
             ->method('getCurrencyList')
             ->willReturn($allowedCurrencies);
 
-        $this->doTestForm($inputOptions, $expectedOptions, $submittedData);
+        $form = $this->factory->create(CurrencySelectionType::class, null, $inputOptions);
+        $formConfig = $form->getConfig();
+
+        foreach ($expectedOptions as $key => $value) {
+            $this->assertTrue($formConfig->hasOption($key));
+        }
+
+        if (!isset($inputOptions['full_currency_list']) || !$inputOptions['full_currency_list']) {
+            $this->assertEquals($expectedOptions['choices'], $form->createView()->vars['choices']);
+        }
+
+        $form->submit($submittedData);
+        $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
+        $this->assertEquals($submittedData, $form->getData());
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
-        $currencyBundle = Intl::getCurrencyBundle();
-        $usdSymbol = $currencyBundle->getCurrencySymbol('USD');
-        $gbpSymbol = $currencyBundle->getCurrencySymbol('GBP');
-        $rubSymbol = $currencyBundle->getCurrencySymbol('RUB');
-        $uahSymbol = $currencyBundle->getCurrencySymbol('UAH');
+        $usdSymbol = Currencies::getSymbol('USD');
+        $gbpSymbol = Currencies::getSymbol('GBP');
+        $rubSymbol = Currencies::getSymbol('RUB');
+        $uahSymbol = Currencies::getSymbol('UAH');
 
-        $usdName = $currencyBundle->getCurrencyName('USD');
-        $uahName = $currencyBundle->getCurrencyName('UAH');
+        $usdName = Currencies::getName('USD');
+        $uahName = Currencies::getName('UAH');
 
         return [
             'currency symbol and data from system config' => [
@@ -189,7 +164,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
                 'inputOptions' => ['full_currency_list' => true],
                 'expectedOptions' => [
                     'full_currency_list' => true,
-                    'choices' => $this->getChoiceViews($currencyBundle->getCurrencyNames('en'))
+                    'choices' => $this->getChoiceViews(Currencies::getNames('en'))
                 ],
                 'submittedData' => 'GBP'
             ],
@@ -221,12 +196,7 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @param array $legacyChoices
-     *
-     * @return array
-     */
-    protected function getChoiceViews(array $legacyChoices)
+    private function getChoiceViews(array $legacyChoices): array
     {
         $choices = [];
         foreach ($legacyChoices as $key => $value) {
@@ -235,30 +205,27 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
         return $choices;
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage The option "currencies_list" must be null or not empty array.
-     */
     public function testInvalidTypeOfCurrenciesListOption()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The option "currencies_list" must be null or not empty array.');
+
         $this->factory->create(CurrencySelectionType::class, null, ['currencies_list' => 'string']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage Found unknown currencies: CUR, TST.
-     */
     public function testUnknownCurrency()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Found unknown currencies: CUR, TST.');
+
         $this->factory->create(CurrencySelectionType::class, null, ['currencies_list' => ['CUR', 'TST']]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\LogicException
-     * @expectedExceptionMessage The option "additional_currencies" must be null or array.
-     */
     public function testInvalidTypeOfAdditionalCurrenciesOption()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The option "additional_currencies" must be null or array.');
+
         $this->factory->create(CurrencySelectionType::class, null, ['additional_currencies' => 'string']);
     }
 
@@ -270,31 +237,5 @@ class CurrencySelectionTypeTest extends FormIntegrationTestCase
     public function testGetParent()
     {
         $this->assertEquals(ChoiceType::class, $this->formType->getParent());
-    }
-
-    /**
-     * @param array $inputOptions
-     * @param array $expectedOptions
-     * @param $submittedData
-     * @return FormInterface
-     */
-    protected function doTestForm(array $inputOptions, array $expectedOptions, $submittedData)
-    {
-        $form = $this->factory->create(CurrencySelectionType::class, null, $inputOptions);
-        $formConfig = $form->getConfig();
-
-        foreach ($expectedOptions as $key => $value) {
-            $this->assertTrue($formConfig->hasOption($key));
-        }
-
-        if (!isset($inputOptions['full_currency_list']) || !$inputOptions['full_currency_list']) {
-            $this->assertEquals($expectedOptions['choices'], $form->createView()->vars['choices']);
-        }
-
-        $form->submit($submittedData);
-        $this->assertTrue($form->isValid());
-        $this->assertEquals($submittedData, $form->getData());
-
-        return $form;
     }
 }

@@ -2,37 +2,32 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\EventSubscriber;
 
+use Oro\Bundle\TagBundle\Entity\Taggable;
+use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
+use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Entity;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Test\FormInterface;
 
 class TagSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_TAG_NAME = 'testName';
+    /** @var TagManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
+
+    /** @var TaggableHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $taggableHelper;
 
     /** @var TagSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
-
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
-    protected $taggableHelper;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->taggableHelper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
-            ->disableOriginalConstructor()->getMock();
-        $this->manager = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
-            ->disableOriginalConstructor()->getMock();
+        $this->manager = $this->createMock(TagManager::class);
+        $this->taggableHelper = $this->createMock(TaggableHelper::class);
 
         $this->subscriber = new TagSubscriber($this->manager, $this->taggableHelper);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->subscriber);
-        unset($this->taggableHelper);
-        unset($this->manager);
     }
 
     public function testSubscribedEvents()
@@ -47,48 +42,50 @@ class TagSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityProvider
      */
-    public function testPreSet($entity, $shouldSetData)
+    public function testPreSet(object $entity, bool $shouldSetData)
     {
-        $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()->getMock();
+        $eventMock = $this->createMock(FormEvent::class);
 
-        $parentFormMock = $this->getMockForAbstractClass('Symfony\Component\Form\Test\FormInterface');
-        $parentFormMock->expects($this->once())->method('getData')
-            ->will($this->returnValue($entity));
+        $parentFormMock = $this->createMock(FormInterface::class);
+        $parentFormMock->expects($this->once())
+            ->method('getData')
+            ->willReturn($entity);
 
-        $formMock = $this->getMockForAbstractClass('Symfony\Component\Form\Test\FormInterface');
-        $formMock->expects($this->once())->method('getParent')
-            ->will($this->returnValue($parentFormMock));
+        $formMock = $this->createMock(FormInterface::class);
+        $formMock->expects($this->once())
+            ->method('getParent')
+            ->willReturn($parentFormMock);
 
-        $eventMock->expects($this->once())->method('getForm')
-            ->will($this->returnValue($formMock));
+        $eventMock->expects($this->once())
+            ->method('getForm')
+            ->willReturn($formMock);
 
         if ($shouldSetData) {
-            $this->taggableHelper->expects($this->once())->method('isTaggable')->willReturn(true);
-            $this->manager->expects($this->once())->method('getPreparedArray')
-                ->with($entity)->will(
-                    $this->returnValue(
-                        array(array('owner' => false), array('owner' => true))
-                    )
-                );
+            $this->taggableHelper->expects($this->once())
+                ->method('isTaggable')
+                ->willReturn(true);
+            $this->manager->expects($this->once())
+                ->method('getPreparedArray')
+                ->with($entity)
+                ->willReturn([['owner' => false], ['owner' => true]]);
 
-            $eventMock->expects($this->exactly($shouldSetData))->method('setData');
+            $eventMock->expects($this->exactly($shouldSetData))
+                ->method('setData');
         } else {
-            $this->manager->expects($this->never())->method('getPreparedArray');
-            $eventMock->expects($this->never())->method('setData');
+            $this->manager->expects($this->never())
+                ->method('getPreparedArray');
+            $eventMock->expects($this->never())
+                ->method('setData');
         }
 
         $this->subscriber->preSet($eventMock);
     }
 
-    /**
-     * @return array
-     */
-    public function entityProvider()
+    public function entityProvider(): array
     {
-        return array(
-            'instance of taggable' => array($this->createMock('Oro\Bundle\TagBundle\Entity\Taggable'), 1),
-            'another entity' => array($this->createMock('Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Entity'), false),
-        );
+        return [
+            'instance of taggable' => [$this->createMock(Taggable::class), true],
+            'another entity' => [$this->createMock(Entity::class), false],
+        ];
     }
 }

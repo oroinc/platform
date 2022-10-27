@@ -10,9 +10,12 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 
+/**
+ * Process custom entities and fields. If entity or field marked as searchable - config of this custom
+ * entity or field will be added to the main search map.
+ */
 class BeforeMapObjectSearchListener
 {
-    const TITLE_FIELDS_PATH = 'title_fields';
     const FIELDS_PATH = 'fields';
 
     /** @var array */
@@ -31,7 +34,6 @@ class BeforeMapObjectSearchListener
         'float'                    => 'decimal',
         'decimal'                  => 'decimal',
         'boolean'                  => 'integer',
-        'html_escaped'             => 'text',
         RelationType::ONE_TO_MANY  => Indexer::RELATION_ONE_TO_MANY,
         RelationType::MANY_TO_ONE  => Indexer::RELATION_MANY_TO_ONE,
         RelationType::MANY_TO_MANY => Indexer::RELATION_MANY_TO_MANY,
@@ -40,9 +42,6 @@ class BeforeMapObjectSearchListener
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -52,7 +51,7 @@ class BeforeMapObjectSearchListener
      * Process custom entities and fields. If entity or field marked as searchable - config of this custom
      *  entity or field will bw added to the main search map.
      *
-     * @param SearchMappingCollectEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function prepareEntityMapEvent(SearchMappingCollectEvent $event)
     {
@@ -83,7 +82,6 @@ class BeforeMapObjectSearchListener
                             continue;
                         }
 
-                        $this->processTitles($mapConfig, $searchConfig, $className, $fieldId->getFieldName());
                         $this->processFields($mapConfig, $searchConfig, $fieldId, $className);
                     }
                 }
@@ -128,7 +126,6 @@ class BeforeMapObjectSearchListener
                 $config       = $extendConfigProvider->getConfig($className, $fieldName);
                 $targetEntity = $config->get('target_entity');
 
-
                 $targetFields = array_unique(
                     array_merge(
                         $config->get('target_grid'),
@@ -165,24 +162,6 @@ class BeforeMapObjectSearchListener
     }
 
     /**
-     * Check if field marked as title_field, add this field to titles
-     *
-     * @param array           $mapConfig
-     * @param ConfigInterface $searchConfig
-     * @param string          $className
-     * @param string          $fieldName
-     */
-    protected function processTitles(&$mapConfig, ConfigInterface $searchConfig, $className, $fieldName)
-    {
-        if ($searchConfig->is('title_field')) {
-            $mapConfig[$className][self::TITLE_FIELDS_PATH] = array_merge(
-                $mapConfig[$className][self::TITLE_FIELDS_PATH],
-                [$fieldName]
-            );
-        }
-    }
-
-    /**
      * Add custom entity mapping skeleton
      *
      * @param array           $mapConfig
@@ -196,7 +175,6 @@ class BeforeMapObjectSearchListener
         $mapConfig[$className] = [
             'alias'                 => $config->get('schema')['doctrine'][$className]['table'],
             'label'                 => $label,
-            self::TITLE_FIELDS_PATH => [],
             'route'                 => [
                 'name'       => 'oro_entity_view',
                 'parameters' => [
@@ -204,7 +182,7 @@ class BeforeMapObjectSearchListener
                     'entityName' => '@' . str_replace('\\', '_', $className) . '@'
                 ]
             ],
-            'search_template'       => 'OroEntityExtendBundle:Search:result.html.twig',
+            'search_template'       => '@OroEntityExtend/Search/result.html.twig',
             self::FIELDS_PATH       => [],
             'mode'                  => 'normal'
         ];

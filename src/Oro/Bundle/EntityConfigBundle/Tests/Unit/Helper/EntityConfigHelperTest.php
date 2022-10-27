@@ -2,110 +2,57 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Helper;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity3;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 
 class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    protected $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigInterface */
-    protected $config;
+    private $configProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface */
-    protected $groupProvider;
+    private $groupProvider;
 
     /** @var EntityConfigHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigInterface */
+    private $config;
+
+    protected function setUp(): void
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->groupProvider = $this->createMock(AclGroupProviderInterface::class);
+        $this->config = $this->createMock(ConfigInterface::class);
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-
-        $this->groupProvider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
-
-        $this->helper = new EntityConfigHelper($this->configProvider, $this->groupProvider);
-    }
-
-    public function testGetAvailableRoutes()
-    {
-        $this->configProvider->expects($this->once())
-            ->method('getClassName')
-            ->with('TestClass')
-            ->willReturn('TestClass');
-
-        $this->configProvider->expects($this->once())
-            ->method('getConfigManager')
-            ->willReturn($this->configManager);
-
-        $metadata = $this->createMock(EntityMetadata::class);
-
-        $this->configManager->expects($this->once())
-            ->method('getEntityMetadata')
-            ->with('TestClass')
-            ->willReturn($metadata);
-
-        $metadata->expects($this->once())
-            ->method('getRoutes')
-            ->willReturn(['route1' => 'value1']);
-
-        $this->assertEquals(
-            [
-                'route1' => 'value1',
-            ],
-            $this->helper->getAvailableRoutes('TestClass')
+        $this->helper = new EntityConfigHelper(
+            $this->configProvider,
+            $this->groupProvider,
+            (new InflectorFactory())->build()
         );
     }
 
-    public function testGetAvailableRoutesWithoutMetadata()
-    {
-        $this->configProvider->expects($this->once())->method('getClassName')->willReturnArgument(0);
-        $this->configProvider->expects($this->once())->method('getConfigManager')->willReturn($this->configManager);
-
-        $this->configManager->expects($this->once())->method('getEntityMetadata')->with('TestClass')->willReturn(null);
-
-        $this->assertEquals([], $this->helper->getAvailableRoutes('TestClass'));
-    }
-
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider getRoutesProvider
      */
     public function testGetRoutes(array $inputData, array $expectedData)
     {
-        $this->configProvider->expects($this->once())
-            ->method('getClassName')
-            ->with($inputData['class'])
-            ->willReturn($inputData['class']);
+        $configManager = $this->createMock(ConfigManager::class);
 
         $this->configProvider->expects($this->once())
             ->method('getConfigManager')
-            ->willReturn($this->configManager);
+            ->willReturn($configManager);
 
-        $this->configManager->expects($this->once())
+        $configManager->expects($this->once())
             ->method('getEntityMetadata')
-            ->with($inputData['class'])
+            ->with($inputData['className'] ?? $inputData['class'])
             ->willReturn($inputData['metadata']);
 
         $this->groupProvider->expects($inputData['group'] ? $this->never() : $this->any())
@@ -128,7 +75,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->configProvider->expects($this->once())
             ->method('getConfig')
-            ->with($inputData['class'])
+            ->with($inputData['className'] ?? $inputData['class'])
             ->willReturn($this->config);
 
         $this->config->expects($this->once())
@@ -152,89 +99,95 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new \RuntimeException('test exception'));
 
         if ($strict) {
-            $this->expectException('RuntimeException', 'test exception');
+            $this->expectException(\RuntimeException::class);
         }
 
         $this->assertNull($this->helper->getConfigValue('stdClass', 'param', $strict));
     }
 
-    /**
-     * @return array
-     */
-    public function getRoutesProvider()
+    public function getRoutesProvider(): array
     {
         $config = [
             'route1' => 'route_name1',
             'route2' => 'route_name2',
             'group1Route1' => 'route_group1_name1',
-            'group1Route2' => 'route_group1_name2',
+            'group1Route2' => 'route_group1_name2'
         ];
 
         return [
             'custom routes with default group' => [
                 'input' => [
-                    'class' => 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2',
+                    'class' => TestEntity2::class,
                     'routes' => ['route1', 'route2', 'unknown'],
                     'group' => null,
-                    'metadata' => $this->getEntityMetadata(
-                        'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2',
-                        $config
-                    ),
+                    'metadata' => $this->getEntityMetadata(TestEntity2::class, $config)
                 ],
                 'expected' => [
                     'route1' => 'route_name1',
                     'route2' => 'route_name2',
-                    'unknown' => null,
-                ],
+                    'unknown' => null
+                ]
             ],
             'custom routes with group "group1"' => [
                 'input' => [
-                    'class' => 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity3',
+                    'class' => TestEntity3::class,
                     'routes' => ['route1', 'route2', 'unknown'],
                     'group' => 'group1',
-                    'metadata' => $this->getEntityMetadata(
-                        'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity3',
-                        $config
-                    ),
+                    'metadata' => $this->getEntityMetadata(TestEntity3::class, $config)
                 ],
                 'expected' => [
                     'route1' => 'route_group1_name1',
                     'route2' => 'route_group1_name2',
-                    'unknown' => null,
-                ],
+                    'unknown' => null
+                ]
             ],
+            'by entity object' => [
+                'input' => [
+                    'class' => new TestEntity2(),
+                    'className' => TestEntity2::class,
+                    'routes' => ['route1'],
+                    'group' => null,
+                    'metadata' => $this->getEntityMetadata(TestEntity2::class, $config)
+                ],
+                'expected' => [
+                    'route1' => 'route_name1'
+                ]
+            ]
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getConfigValueProvider()
+    public function getConfigValueProvider(): array
     {
         return [
             'null result' => [
                 'input' => [
-                    'class' => 'TestEntity',
+                    'class' => TestEntity2::class,
                     'name' => 'name1',
-                    'result' => null,
+                    'result' => null
                 ],
-                'expected' => null,
+                'expected' => null
             ],
             'value1' => [
                 'input' => [
-                    'class' => 'TestEntity',
+                    'class' => TestEntity2::class,
                     'name' => 'name2',
-                    'result' => 'value1',
+                    'result' => 'value1'
                 ],
-                'expected' => 'value1',
+                'expected' => 'value1'
             ],
+            'by entity object' => [
+                'input' => [
+                    'class' => new TestEntity2(),
+                    'className' => TestEntity2::class,
+                    'name' => 'name2',
+                    'result' => 'value1'
+                ],
+                'expected' => 'value1'
+            ]
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function strictParamProvider()
+    public function strictParamProvider(): array
     {
         return [
             [true],
@@ -247,7 +200,7 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
      * @param array $routes
      * @return EntityMetadata
      */
-    protected function getEntityMetadata($class, array $routes)
+    private function getEntityMetadata($class, array $routes)
     {
         $meta = new EntityMetadata($class);
 

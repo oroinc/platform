@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 
@@ -9,10 +10,8 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetIdentifier()
     {
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $accessor       = new EntityIdAccessor($doctrineHelper);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $accessor = new EntityIdAccessor($doctrineHelper);
 
         $entity   = new TestEntity();
         $entityId = 123;
@@ -20,7 +19,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue($entityId));
+            ->willReturn($entityId);
 
         $this->assertEquals($entityId, $accessor->getIdentifier($entity));
     }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\EventListener\Datagrid;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
@@ -19,19 +20,12 @@ class ContextGridListener
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;
 
-    /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param EntityClassNameHelper $entityClassNameHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper, EntityClassNameHelper $entityClassNameHelper)
     {
         $this->doctrineHelper        = $doctrineHelper;
         $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         /** @var OrmDatasource $dataSource */
@@ -45,6 +39,7 @@ class ContextGridListener
 
         $parameters   = $datagrid->getParameters();
         $dataSource   = $datagrid->getDatasource();
+        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $dataSource->getQueryBuilder();
         $alias        = current($queryBuilder->getDQLPart('from'))->getAlias();
 
@@ -67,7 +62,10 @@ class ContextGridListener
                 }
 
                 if ($targetIds) {
-                    $queryBuilder->andWhere($queryBuilder->expr()->notIn(sprintf('%s.id', $alias), $targetIds));
+                    $queryBuilder->andWhere(
+                        $queryBuilder->expr()->notIn(sprintf('%s.id', $alias), ':targetIds')
+                    );
+                    $queryBuilder->setParameter('targetIds', $targetIds);
                 }
             }
         }

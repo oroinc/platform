@@ -1,36 +1,12 @@
 parameters:
-    oro_distribution.routing_loader.class:                    Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
-    oro_distribution.expose_routing_loader.class:             Oro\Bundle\DistributionBundle\Routing\OroExposeLoader
-    oro_distribution.package_manager.class:                   Oro\Bundle\DistributionBundle\Manager\PackageManager
-    oro_distribution.script_runner.class:                     Oro\Bundle\DistributionBundle\Script\Runner
-    oro_distribution.composer.class:                          Composer\Composer
-    oro_distribution.composer.io.class:                       Composer\IO\BufferIO
-    oro_distribution.composer.installer.class:                Composer\Installer
-    oro_distribution.composer.installation_manager.class:     Composer\Installer\InstallationManager
-    oro_distribution.composer.json_file.class:                Composer\Json\JsonFile
-    oro_distribution.composer_json:                           '%kernel.project_dir%/composer.json'
+    oro_distribution.composer_json: '%kernel.project_dir%/composer.json'
 
-    #
-    # BAP-10865: Hide "Package Manager" from menu
-    #
-    #oro_distribution.listener.navigation_listener.class:      Oro\Bundle\DistributionBundle\EventListener\NavigationListener
-    #oro_distribution.entry_point:                             ~
-
-    oro_distribution.security.access_denied_listener.class:   Oro\Bundle\DistributionBundle\Security\AccessDeniedListener
-
-    oro_distribution.form.type.composer_config.class:         Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType
-    oro_distribution.form.type.composer_repository.class:     Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType
-
-    oro_distribution.package_manager.system_paths:
-        - vendor
-        - public/bundles
-        - public/js
-        - public/css
-        - composer.json
+    # Makes the service container compile into a single file instead of multiple small files. Improves memory usage.
+    container.dumper.inline_factories: true
 
 services:
     oro_distribution.routing_loader:
-        class: '%oro_distribution.routing_loader.class%'
+        class: Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
         arguments:
             - '@kernel'
             - '@oro_distribution.routing_options_resolver'
@@ -42,7 +18,7 @@ services:
             - { name: routing.loader }
 
     oro_distribution.expose_routing_loader:
-        class: '%oro_distribution.expose_routing_loader.class%'
+        class: Oro\Bundle\DistributionBundle\Routing\OroExposeLoader
         arguments:
             - '@kernel'
             - '@oro_distribution.routing_options_resolver'
@@ -60,99 +36,53 @@ services:
     oro_distribution.routing_options_resolver:
         class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
         public: false
-
-    oro_distribution.package_manager:
-        class: '%oro_distribution.package_manager.class%'
         arguments:
-          - '@oro_distribution.composer'
-          - '@oro_distribution.composer.installer'
-          - '@oro_distribution.composer.io'
-          - '@oro_distribution.script_runner'
-          - '@oro_platform.maintenance'
-          - '@logger'
-          - '%oro_distribution.composer_json%'
-        tags:
-            - { name: monolog.logger, channel: oro_distribution }
-        lazy: true
-
-    oro_distribution.script_runner:
-        class: '%oro_distribution.script_runner.class%'
-        public: false
-        arguments:
-            - '@oro_distribution.composer.installation_manager'
-            - '@logger'
-            - '%kernel.project_dir%'
-            - '%kernel.environment%'
-        tags:
-            - { name: monolog.logger, channel: oro_distribution }
+            - !tagged_iterator routing.options_resolver
 
     oro_distribution.composer.io:
-        class: '%oro_distribution.composer.io.class%'
+        class: Composer\IO\BufferIO
         public: false
-        lazy: true
-
-    oro_distribution.composer.installer:
-        class: '%oro_distribution.composer.installer.class%'
-        public: false
-        factory: ['Composer\Installer', create]
-        arguments: ['@oro_distribution.composer.io', '@oro_distribution.composer']
         lazy: true
 
     oro_distribution.composer:
-        class: '%oro_distribution.composer.class%'
+        class: Composer\Composer
         factory: ['Composer\Factory', create]
         arguments: ['@oro_distribution.composer.io', '%oro_distribution.composer_json%']
         lazy: true
 
     oro_distribution.composer.installation_manager:
-        class: '%oro_distribution.composer.installation_manager.class%'
-        public: false
+        class: Composer\Installer\InstallationManager
+        public: true
         factory: ['@oro_distribution.composer', getInstallationManager]
         lazy: true
 
     oro_distribution.composer.json_file:
-        class: '%oro_distribution.composer.json_file.class%'
+        class: Composer\Json\JsonFile
+        public: true
         arguments:
           - '%oro_distribution.composer_json%'
-    #
-    # BAP-10865: Hide "Package Manager" from menu
-    #
-    ### Menu
-    #oro_distribution.listener.navigation_listener:
-    #    class: '%oro_distribution.listener.navigation_listener.class%'
-    #    arguments:
-    #        - '@security.authorization_checker'
-    #        - '@security.token_storage'
-    #        - '%oro_distribution.entry_point%'
-    #    tags:
-    #        - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
-    #    calls:
-    #        - [setRequest, ["@?request="]]
 
-    ### Form
-    oro_distribution.form.type.composer_config:
-        class: '%oro_distribution.form.type.composer_config.class%'
-        tags:
-            - { name: form.type, alias: oro_composer_config }
-
-    oro_distribution.form.type.composer_repository:
-        class: '%oro_distribution.form.type.composer_repository.class%'
-        tags:
-            - { name: form.type, alias: oro_composer_repository }
-
-    # Translations
-    # event listeners
-    oro_distribution.locale_listener:
-        class: 'Oro\Bundle\DistributionBundle\EventListener\LocaleListener'
+    oro_distribution.event_listener.install_command_deployment_type:
+        class: Oro\Bundle\DistributionBundle\EventListener\InstallCommandDeploymentTypeListener
         arguments:
-            - '@service_container'
+            - '%kernel.project_dir%'
+            - '%deployment_type%'
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: installer.database_preparation.before, method: afterDatabasePreparation }
 
-    # DBAL Loader
-    oro_distribution.database_translation.loader:
-        class: 'Oro\Bundle\DistributionBundle\Translation\DbalTranslationLoader'
+    oro_distribution.handler.application_status:
+        public: true
+        class: Oro\Bundle\DistributionBundle\Handler\ApplicationState
         arguments:
-            - '@doctrine'
+            - '@doctrine.dbal.config_connection'
+
+    Oro\Bundle\DistributionBundle\Handler\ApplicationState:
+        public: true
+        alias: oro_distribution.handler.application_status
+
+    oro_shipping.cache_warmer.set_is_installed:
+        class: 'Oro\Bundle\DistributionBundle\CacheWarmer\SetIsInstalledCacheWarmer'
+        arguments:
+            - '@oro_distribution.handler.application_status'
         tags:
-            - { name: translation.loader, alias: oro_dbal_translation }
+            - { name: oro_entity_extend.warmer, priority: 300 }

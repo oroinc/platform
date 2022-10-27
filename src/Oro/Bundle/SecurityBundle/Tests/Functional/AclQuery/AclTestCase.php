@@ -18,18 +18,13 @@ class AclTestCase extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
         parent::setUp();
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityRepository
-     */
     protected function getEntityRepository(string $entityClass): EntityRepository
     {
         return $this->getContainer()->get('doctrine')
@@ -38,10 +33,6 @@ class AclTestCase extends WebTestCase
 
     /**
      * Applies ACL to the given query, execute the query and asserts that the result equals to the expected result.
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param array $expectedResult
-     * @param array $options
      */
     protected function assertQuery(
         QueryBuilder $queryBuilder,
@@ -56,9 +47,6 @@ class AclTestCase extends WebTestCase
 
     /**
      * Authenticates user.
-     *
-     * @param string $user
-     * @param string $organization
      */
     protected function authenticateUser(string $user, string $organization = 'organization'): void
     {
@@ -70,7 +58,7 @@ class AclTestCase extends WebTestCase
             false,
             'main',
             $organization,
-            $user->getRoles()
+            $user->getUserRoles()
         );
         $container->get('security.token_storage')->setToken($token);
     }

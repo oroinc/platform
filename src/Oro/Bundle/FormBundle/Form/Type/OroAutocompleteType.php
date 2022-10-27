@@ -19,9 +19,6 @@ class OroAutocompleteType extends AbstractType
      */
     protected $searchRegistry;
 
-    /**
-     * @param SearchRegistry $registry
-     */
     public function __construct(SearchRegistry $registry)
     {
         $this->searchRegistry = $registry;
@@ -73,10 +70,6 @@ class OroAutocompleteType extends AbstractType
         $this->setConfigsNormalizer($resolver, $defaultConfigs);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     * @param array $defaultConfigs
-     */
     protected function setConfigsNormalizer(OptionsResolver $resolver, array $defaultConfigs)
     {
         $resolver->setNormalizer(

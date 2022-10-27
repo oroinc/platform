@@ -65,9 +65,8 @@ class ProtectQueryByAcl implements ProcessorInterface
             return;
         }
 
-        $config = $context->getConfig();
-
         $permission = null;
+        $config = $context->getConfig();
         if (null !== $config && $config->hasAclResource()) {
             $aclResource = $config->getAclResource();
             if ($aclResource) {
@@ -76,8 +75,9 @@ class ProtectQueryByAcl implements ProcessorInterface
         } else {
             $permission = $this->permission;
         }
-
-        $context->setQuery($this->aclHelper->apply($query, $permission));
+        if ($permission) {
+            $context->setQuery($this->aclHelper->apply($query, $permission));
+        }
     }
 
     /**

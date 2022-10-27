@@ -4,24 +4,21 @@ namespace Oro\Bundle\WorkflowBundle\Translation\Helper;
 
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Prepares transition buttons
+ */
 class TransitionTranslationHelper
 {
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param Transition $transition
-     */
     public function processTransitionTranslations(Transition $transition)
     {
         $buttonLabel = $this->trans($transition->getButtonLabel());
@@ -35,7 +32,7 @@ class TransitionTranslationHelper
         if (null !== $buttonTitle) {
             $transition->setButtonTitle($buttonTitle);
         } else {
-            $transition->setButtonTitle($transition->getButtonLabel());
+            $transition->setButtonTitle(null);
         }
 
         $frontendOptions = $transition->getFrontendOptions();

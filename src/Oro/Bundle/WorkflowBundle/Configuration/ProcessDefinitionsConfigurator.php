@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -51,9 +51,6 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
         $this->setLogger(new NullLogger());
     }
 
-    /**
-     * @param array $definitionsConfiguration
-     */
     public function configureDefinitions(array $definitionsConfiguration)
     {
         $definitionRepository = $this->getRepository();
@@ -87,10 +84,6 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
         $this->notify($definition, 'deleted');
     }
 
-    /**
-     * @param ProcessDefinition $existingDefinition
-     * @param ProcessDefinition $newDefinition
-     */
     protected function update(ProcessDefinition $existingDefinition, ProcessDefinition $newDefinition)
     {
         $existingDefinition->import($newDefinition);
@@ -98,9 +91,6 @@ class ProcessDefinitionsConfigurator implements LoggerAwareInterface
         $this->notify($existingDefinition, 'updated');
     }
 
-    /**
-     * @param ProcessDefinition $newDefinition
-     */
     protected function create(ProcessDefinition $newDefinition)
     {
         $this->toPersist[] = $newDefinition;

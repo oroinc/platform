@@ -1,11 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var EmailItemView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    EmailItemView = BaseView.extend({
+    const EmailItemView = BaseView.extend({
         events: {
             'click .email-view-toggle': 'onEmailHeadClick'
         },
@@ -21,26 +19,26 @@ define(function(require) {
         commentCount: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailItemView() {
-            EmailItemView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailItemView(options) {
+            EmailItemView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             this._deferredRender();
-            this.initLayout().done(_.bind(function() {
-                var commentsComponent = this.pageComponent('comments');
+            this.initLayout().done(() => {
+                const commentsComponent = this.pageComponent('comments');
                 if (commentsComponent) {
                     this.commentCount = this.fetchCommentsQuantity();
                     this.listenTo(commentsComponent.collection, 'stateChange', this.onCommentsStateChange);
                     this.updateCommentsQuantity();
                 }
                 this._resolveDeferredRender();
-            }, this));
+            });
             return this;
         },
 
@@ -48,7 +46,7 @@ define(function(require) {
          * Refreshes email-body if there's email-body component
          */
         refresh: function() {
-            var emailBodyComponent = this.pageComponent('email-body');
+            const emailBodyComponent = this.pageComponent('email-body');
             if (emailBodyComponent) {
                 emailBodyComponent.view.reattachBody();
             }
@@ -58,7 +56,7 @@ define(function(require) {
          * Handles comments state change
          */
         onCommentsStateChange: function() {
-            var diff = this.fetchCommentsQuantity() - this.commentCount;
+            const diff = this.fetchCommentsQuantity() - this.commentCount;
             if (diff === 0) {
                 return;
             }
@@ -73,8 +71,8 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onEmailHeadClick: function(e) {
-            var exclude = 'a, .dropdown';
-            var $target = this.$(e.target);
+            const exclude = 'a, .dropdown';
+            const $target = this.$(e.target);
             // if the target is an action element, skip toggling the email
             if ($target.is(exclude) || $target.parents(exclude).length) {
                 return;
@@ -104,7 +102,7 @@ define(function(require) {
          * Updates visual element of comments counter
          */
         updateCommentsQuantity: function() {
-            var quantity = this.fetchCommentsQuantity();
+            const quantity = this.fetchCommentsQuantity();
             this.$('.comment-count').toggle(Boolean(quantity));
             this.$('.comment-count .count').text(quantity);
         },
@@ -114,8 +112,8 @@ define(function(require) {
          * @returns {number}
          */
         fetchCommentsQuantity: function() {
-            var quantity = null;
-            var commentsComponent = this.pageComponent('comments');
+            let quantity = null;
+            const commentsComponent = this.pageComponent('comments');
             if (commentsComponent) {
                 quantity = commentsComponent.collection.getState().totalItemsQuantity;
             }

@@ -1,2 +1,2 @@
 bundles:
-    - OroCronBundle:Form:fields.html.twig
+    - '@OroCron/Form/fields.html.twig'

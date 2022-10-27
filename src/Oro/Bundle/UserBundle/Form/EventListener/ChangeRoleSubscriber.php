@@ -21,9 +21,6 @@ class ChangeRoleSubscriber implements EventSubscriberInterface
         return [FormEvents::SUBMIT => ['onSubmit', 10]];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onSubmit(FormEvent $event)
     {
         /** @var AbstractRole $role */
@@ -37,12 +34,12 @@ class ChangeRoleSubscriber implements EventSubscriberInterface
 
         /** @var AbstractUser $user */
         foreach ($form->get('appendUsers')->getData() as $user) {
-            $user->addRole($role);
+            $user->addUserRole($role);
         }
 
         /** @var AbstractUser $user */
         foreach ($form->get('removeUsers')->getData() as $user) {
-            $user->removeRole($role);
+            $user->removeUserRole($role);
         }
     }
 }

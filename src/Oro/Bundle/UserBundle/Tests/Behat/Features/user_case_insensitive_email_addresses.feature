@@ -1,5 +1,7 @@
 @ticket-BB-14685
 @fixture-OroUserBundle:user.yml
+#Run on PostgreSQL only because of different implementation of Case Sensitive search on MySQL
+@postgresql
 
 Feature: User Case Insensitive Email Addresses
   In order to avoid possible user mistakes
@@ -96,7 +98,7 @@ Feature: User Case Insensitive Email Addresses
     Then I should see "there are existing users who have identical lowercase emails"
     When I click "Click here"
     Then I should be on User Index page
-    And records in current page grid should be 2
+    And records in grid should be 2
     And I should see following records in grid:
       | Charlie    |
       | John       |

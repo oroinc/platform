@@ -1,0 +1,7 @@
+{% block _copyright_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' copyright'
+    }) %}
+
+    <p {{ block('block_attributes') }}>{{ 'oro.copyright'|trans({ '{{year}}': 'now'|date('Y') }) }}</p>
+{% endblock %}

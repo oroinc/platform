@@ -5,6 +5,9 @@ namespace Oro\Bundle\IntegrationBundle\Test;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
+/**
+ * The response object used by the fake REST client
+ */
 class FakeRestResponse implements RestResponseInterface
 {
     /** @var int */
@@ -13,12 +16,10 @@ class FakeRestResponse implements RestResponseInterface
     /** @var array */
     protected $headers;
 
-    /** @var string  */
+    /** @var string */
     protected $body;
 
     /**
-     * FakeRestResponse constructor.
-     *
      * @param int $statusCode HTTP status code
      * @param array $headers list of response headers
      * @param string $body raw response body
@@ -28,14 +29,6 @@ class FakeRestResponse implements RestResponseInterface
         $this->code = $statusCode;
         $this->headers = $headers;
         $this->body = $body;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __toString()
-    {
-        return (string)$this->getMessage();
     }
 
     /**
@@ -60,14 +53,6 @@ class FakeRestResponse implements RestResponseInterface
     public function getStatusCode()
     {
         return $this->code;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMessage()
-    {
-        return $this->body;
     }
 
     /**
@@ -157,7 +142,7 @@ class FakeRestResponse implements RestResponseInterface
             );
         }
 
-        return $data === null ? array() : $data;
+        return $data === null ? [] : $data;
     }
 
     /**

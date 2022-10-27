@@ -6,7 +6,7 @@ use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareJobExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -18,22 +18,22 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|TokenSerializerInterface */
     private $tokenSerializer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
-    private $jobStorage;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobManagerInterface */
+    private $jobManager;
 
     /** @var SecurityAwareJobExtension */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->tokenSerializer = $this->createMock(TokenSerializerInterface::class);
-        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
 
         $this->extension = new SecurityAwareJobExtension(
             $this->tokenStorage,
             $this->tokenSerializer,
-            $this->jobStorage
+            $this->jobManager
         );
     }
 
@@ -47,7 +47,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn(null);
 
-        $this->jobStorage->expects(self::never())
+        $this->jobManager->expects(self::never())
             ->method('saveJob');
 
         $this->extension->onPreRunUnique($job);
@@ -68,7 +68,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn($this->createMock(TokenInterface::class));
 
-        $this->jobStorage->expects(self::never())
+        $this->jobManager->expects(self::never())
             ->method('saveJob');
 
         $this->extension->onPreRunUnique($job);
@@ -93,7 +93,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($token))
             ->willReturn($serializedToken);
 
-        $this->jobStorage->expects(self::once())
+        $this->jobManager->expects(self::once())
             ->method('saveJob')
             ->with(self::identicalTo($rootJob));
 
@@ -121,7 +121,7 @@ class SecurityAwareJobExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($token))
             ->willReturn(null);
 
-        $this->jobStorage->expects(self::never())
+        $this->jobManager->expects(self::never())
             ->method('saveJob');
 
         $this->extension->onPreRunUnique($job);

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -24,7 +23,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "field_acl_supported" = "true"
+ *              "field_acl_supported"=true
  *          }
  *      }
  * )
@@ -89,33 +88,21 @@ class TestSecurityDepartment implements TestFrameworkEntityInterface
         $this->staff = new ArrayCollection();
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
     public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name): void
     {
         $this->name = $name;
@@ -137,49 +124,31 @@ class TestSecurityDepartment implements TestFrameworkEntityInterface
         $this->staff = $staff;
     }
 
-    /**
-     * @return TestSecurityCompany
-     */
     public function getCompany(): TestSecurityCompany
     {
         return $this->company;
     }
 
-    /**
-     * @param TestSecurityCompany $company
-     */
     public function setCompany(TestSecurityCompany $company): void
     {
         $this->company = $company;
     }
 
-    /**
-     * @return BusinessUnit
-     */
     public function getOwner(): BusinessUnit
     {
         return $this->owner;
     }
 
-    /**
-     * @param BusinessUnit $owner
-     */
     public function setOwner(BusinessUnit $owner): void
     {
         $this->owner = $owner;
     }
 
-    /**
-     * @return Organization
-     */
     public function getOrganization(): Organization
     {
         return $this->organization;
     }
 
-    /**
-     * @param Organization $organization
-     */
     public function setOrganization(Organization $organization): void
     {
         $this->organization = $organization;

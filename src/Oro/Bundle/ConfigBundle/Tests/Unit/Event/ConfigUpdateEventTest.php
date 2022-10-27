@@ -7,11 +7,9 @@ use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
 class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigUpdateEvent */
-    protected $event;
+    private ConfigUpdateEvent $event;
 
-    /** @var array */
-    protected $changeSet = [
+    private array $changeSet = [
         'oro_user.greeting' => [
             'old' => 'old value',
             'new' => 'default value'
@@ -22,8 +20,7 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->event = new ConfigUpdateEvent($this->changeSet);
     }
@@ -31,13 +28,13 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider changeSetProvider
      */
-    public function testChangeSet($changeSet)
+    public function testChangeSet(mixed $changeSet)
     {
         $event = new ConfigUpdateEvent($changeSet);
         $this->assertEquals($this->changeSet, $event->getChangeSet());
     }
 
-    public function changeSetProvider()
+    public function changeSetProvider(): array
     {
         return [
             'object' => [new ConfigChangeSet($this->changeSet)],
@@ -47,19 +44,13 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isChangedDataProvider
-     *
-     * @param string $key
-     * @param bool   $result
      */
-    public function testIsChanged($key, $result)
+    public function testIsChanged(string $key, bool $result)
     {
         $this->assertEquals($result, $this->event->isChanged($key));
     }
 
-    /**
-     * @return array
-     */
-    public function isChangedDataProvider()
+    public function isChangedDataProvider(): array
     {
         return [
             'oro_user.greeting changed'                => ['oro_user.greeting', true],
@@ -70,15 +61,10 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider valueRetrievingDataProvider
-     *
-     * @param string $key
-     * @param array  $expectedValues
-     * @param bool   $exception
-     *
      */
-    public function testValueRetrieving($key, array $expectedValues, $exception = false)
+    public function testValueRetrieving(string $key, array $expectedValues, string $exception = null)
     {
-        if (false !== $exception) {
+        if ($exception) {
             $this->expectException($exception);
         }
 
@@ -89,10 +75,7 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValues['new'], $new);
     }
 
-    /**
-     * @return array
-     */
-    public function valueRetrievingDataProvider()
+    public function valueRetrievingDataProvider(): array
     {
         return [
             'changed value'     => [
@@ -105,17 +88,15 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
             'not changed value' => [
                 'oro_user.someValue',
                 [],
-                '\LogicException'
+                \LogicException::class
             ],
         ];
     }
 
     /**
      * @dataProvider dataProviderForScopes
-     * @param string|null $scope
-     * @param int|null    $scopeId
      */
-    public function testScopes($scope, $scopeId)
+    public function testScopes(?string $scope, ?int $scopeId)
     {
         $event = new ConfigUpdateEvent([], $scope, $scopeId);
 
@@ -123,10 +104,7 @@ class ConfigUpdateEventTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($scopeId, $event->getScopeId());
     }
 
-    /**
-     * @return array
-     */
-    public function dataProviderForScopes()
+    public function dataProviderForScopes(): array
     {
         return [
             ['website', null],

@@ -5,14 +5,14 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 
 /**
- * This class is used only in functional test and by default disabled the buffering of messages at all,
- * because functional tests are be wraped with external DBAL transaction
- * due to dbIsolation and dbIsolationPerTest anotations.
+ * This class is used only in functional tests and allows to:
+ * * disable/enable the buffering of messages
+ * * stop/restore sending of messages
  */
 class TestBufferedMessageProducer extends BufferedMessageProducer
 {
     /** @var bool */
-    private $enabled = false;
+    private $enabled = true;
 
     /** @var bool */
     private $stopped = false;
@@ -20,7 +20,7 @@ class TestBufferedMessageProducer extends BufferedMessageProducer
     /**
      * Allows to enable the buffering of messages.
      */
-    public function enable()
+    public function enable(): void
     {
         $this->enabled = true;
     }
@@ -28,7 +28,7 @@ class TestBufferedMessageProducer extends BufferedMessageProducer
     /**
      * Disallows to enable the buffering of messages.
      */
-    public function disable()
+    public function disable(): void
     {
         $this->enabled = false;
     }
@@ -36,7 +36,7 @@ class TestBufferedMessageProducer extends BufferedMessageProducer
     /**
      * Indicates whether the sending of messages is stopped or not.
      */
-    public function isSendingOfMessagesStopped()
+    public function isSendingOfMessagesStopped(): bool
     {
         return $this->stopped;
     }
@@ -44,7 +44,7 @@ class TestBufferedMessageProducer extends BufferedMessageProducer
     /**
      * Restores sending of messages.
      */
-    public function restoreSendingOfMessages()
+    public function restoreSendingOfMessages(): void
     {
         $this->stopped = false;
     }
@@ -52,7 +52,7 @@ class TestBufferedMessageProducer extends BufferedMessageProducer
     /**
      * Stops sending of messages.
      */
-    public function stopSendingOfMessages()
+    public function stopSendingOfMessages(): void
     {
         $this->stopped = true;
     }
@@ -66,11 +66,18 @@ class TestBufferedMessageProducer extends BufferedMessageProducer
             return;
         }
         if (!$this->enabled && $this->isBufferingEnabled()) {
-            $this->disableBuffering();
+            $nestingLevel = 0;
+            while ($this->isBufferingEnabled()) {
+                $this->disableBuffering();
+                $nestingLevel++;
+            }
             try {
                 parent::send($topic, $message);
             } finally {
-                $this->enableBuffering();
+                while ($nestingLevel > 0) {
+                    $this->enableBuffering();
+                    $nestingLevel--;
+                }
             }
         } else {
             parent::send($topic, $message);

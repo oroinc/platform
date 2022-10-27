@@ -6,133 +6,120 @@ use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\EventListener\MergeListener;
 use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MergeListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MergeListener */
-    protected $listener;
-
     /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityMetadata;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $entityMetadata;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $activityManager;
+    private $activityManager;
 
-    protected function setUp()
+    /** @var MergeListener */
+    private $listener;
+
+    protected function setUp(): void
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->activityManager = $this->createMock(ActivityManager::class);
 
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
             ->method('trans')
-            ->willReturn('Items');
+            ->willReturnCallback(function (string $id, array $parameters) {
+                $result = $id . '_translated';
+                if ($parameters) {
+                    $result .= ' (';
+                    foreach ($parameters as $k => $v) {
+                        $result .= sprintf('%s = %s', $k, $v);
+                    }
+                    $result .= ')';
+                }
+
+                return $result;
+            });
+
+        $this->entityMetadata = $this->createMock(EntityMetadata::class);
+        $this->entityMetadata->expects($this->any())
+            ->method('getClassName')
+            ->willReturn(EntityStub::class);
 
         $this->listener = new MergeListener(
-            $this->translator,
+            $translator,
             $this->configProvider,
             $this->activityManager
         );
-
-        $this->entityMetadata = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
-            ->setMethods(['getClassName', 'addFieldMetadata'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityMetadata
-            ->expects($this->any())
-            ->method('getClassName')
-            ->will($this->returnValue(get_class($this->createEntity())));
     }
 
     public function testOnBuildMetadataNoActivities()
     {
-        $this->entityMetadata
-            ->expects($this->never())
+        $this->entityMetadata->expects($this->never())
             ->method('addFieldMetadata');
 
-        $this->activityManager
-            ->expects($this->once())
+        $this->activityManager->expects($this->once())
             ->method('getActivities')
             ->willReturn([]);
 
-        $event = new EntityMetadataEvent($this->entityMetadata);
-
-        $this->listener->onBuildMetadata($event);
+        $this->listener->onBuildMetadata(new EntityMetadataEvent($this->entityMetadata));
     }
 
     /**
      * @dataProvider getDataProvider
      */
-    public function testOnBuildMetadata($keys, $calls)
+    public function testOnBuildMetadata(array $keys)
     {
-        $config = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config = $this->createMock(ConfigInterface::class);
         $this->configProvider->expects($this->any())
             ->method('getConfig')
             ->willReturn($config);
 
-        $config->expects($this->exactly($calls))
+        $config->expects($this->exactly(count($keys)))
             ->method('get')
             ->willReturn('label');
 
-        $i = 0;
-        $k = array_keys($keys);
-        foreach ($k as $key) {
-            $i++;
-            $fieldMetadataOptions = [
-                'display' => true,
-                'activity' => true,
-                'type' => $key,
-                'field_name' => $key,
-                'is_collection' => true,
-                'template' => 'OroActivityListBundle:Merge:value.html.twig',
-                'label' => 'Items',
-                'merge_modes' => [MergeModes::ACTIVITY_UNITE, MergeModes::ACTIVITY_REPLACE]
+        $fieldMetadataItems = [];
+        foreach (array_keys($keys) as $key) {
+            $fieldMetadataItems[] = [
+                new FieldMetadata([
+                    'display'       => true,
+                    'activity'      => true,
+                    'type'          => $key,
+                    'field_name'    => $key,
+                    'is_collection' => true,
+                    'template'      => '@OroActivityList/Merge/value.html.twig',
+                    'label'         => 'oro.activity.merge.label_translated (%activity% = label_translated)',
+                    'merge_modes'   => [MergeModes::ACTIVITY_UNITE, MergeModes::ACTIVITY_REPLACE]
+                ])
             ];
-            $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
-
-            $this->entityMetadata
-                ->expects($this->at($i))
-                ->method('addFieldMetadata')
-                ->with($this->equalTo($fieldMetadata));
         }
+        $this->entityMetadata->expects($this->exactly(count($fieldMetadataItems)))
+            ->method('addFieldMetadata')
+            ->withConsecutive(...$fieldMetadataItems);
 
-        $this->activityManager
-            ->expects($this->once())
+        $this->activityManager->expects($this->once())
             ->method('getActivities')
             ->willReturn($keys);
 
-        $event = new EntityMetadataEvent($this->entityMetadata);
-
-        $this->listener->onBuildMetadata($event);
+        $this->listener->onBuildMetadata(new EntityMetadataEvent($this->entityMetadata));
     }
 
-    public function getDataProvider()
+    public function getDataProvider(): array
     {
         return [
-            'one' => [
-                'keys' => ['key1' => 'value'],
-                'calls' => 1
+            'one'  => [
+                'keys' => ['key1' => 'value']
             ],
-            'two' => [
-                'keys' => ['key1' => 'value', 'key2' => 'value'],
-                'calls' => 2
+            'two'  => [
+                'keys' => ['key1' => 'value', 'key2' => 'value']
             ],
             'five' => [
                 'keys' => [
@@ -141,20 +128,8 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
                     'key3' => 'value',
                     'key4' => 'value',
                     'key5' => 'value'
-                ],
-                'calls' => 5
-            ],
+                ]
+            ]
         ];
-    }
-
-
-    /**
-     * @param mixed $id
-     *
-     * @return EntityStub
-     */
-    protected function createEntity($id = null)
-    {
-        return new EntityStub($id);
     }
 }

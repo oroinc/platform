@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
+ * Base class for pinbar tabs.
+ *
  * @ORM\MappedSuperclass
  */
 class AbstractPinbarTab implements NavigationItemInterface
@@ -30,6 +32,20 @@ class AbstractPinbarTab implements NavigationItemInterface
      * @ORM\Column(name="maximized", type="datetime", nullable=true)
      */
     protected $maximized;
+
+    /**
+     * @var string $title
+     *
+     * @ORM\Column(name="title", type="string", length=255)
+     */
+    protected $title;
+
+    /**
+     * @var string $title
+     *
+     * @ORM\Column(name="title_short", type="string", length=255)
+     */
+    protected $titleShort;
 
     /**
      * Get id
@@ -112,9 +128,47 @@ class AbstractPinbarTab implements NavigationItemInterface
     }
 
     /**
-     * Set entity properties
+     * @return string
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
      *
-     * @param array $values
+     * @return PinbarTab
+     */
+    public function setTitle(string $title): AbstractPinbarTab
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    /**
+     * @param string $titleShort
+     *
+     * @return PinbarTab
+     */
+    public function setTitleShort(string $titleShort): AbstractPinbarTab
+    {
+        $this->titleShort = $titleShort;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitleShort(): ?string
+    {
+        return $this->titleShort;
+    }
+
+    /**
+     * Set entity properties
      */
     public function setValues(array $values)
     {

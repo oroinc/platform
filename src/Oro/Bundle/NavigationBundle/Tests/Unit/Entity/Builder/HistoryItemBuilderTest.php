@@ -2,69 +2,64 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Builder;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\NavigationBundle\Entity\Builder\HistoryItemBuilder;
+use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class HistoryItemBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    /**
-     * @var HistoryItemBuilder
-     */
-    protected $builder;
+    /** @var ItemFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $factory;
 
-    /**
-     * @var \Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
-     */
-    protected $factory;
+    /** @var HistoryItemBuilder */
+    private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->factory = $this->createMock('Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory');
+        $this->em = $this->createMock(EntityManager::class);
+        $this->factory = $this->createMock(ItemFactory::class);
+
         $this->builder = new HistoryItemBuilder($this->em, $this->factory);
     }
 
     public function testBuildItem()
     {
         $itemBuilder = $this->builder;
-        $itemBuilder->setClassName('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
+        $itemBuilder->setClassName(NavigationHistoryItem::class);
 
-        $user = $this->createMock('\Oro\Bundle\UserBundle\Entity\User');
-        $params = array(
+        $user = $this->createMock(User::class);
+        $params = [
             'title' => 'kldfjs;jasf',
             'url' => 'some url',
             'user' => $user,
-        );
+        ];
 
         $item = $itemBuilder->buildItem($params);
 
-        $this->assertInstanceOf('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem', $item);
+        $this->assertInstanceOf(NavigationHistoryItem::class, $item);
         $this->assertEquals($params['title'], $item->getTitle());
         $this->assertEquals($params['url'], $item->getUrl());
         $this->assertEquals($user, $item->getUser());
-        $this->assertInstanceOf('\Oro\Bundle\UserBundle\Entity\User', $item->getUser());
+        $this->assertInstanceOf(User::class, $item->getUser());
     }
 
     public function testFindItem()
     {
         $itemBuilder = $this->builder;
-        $itemBuilder->setClassName('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
+        $itemBuilder->setClassName(NavigationHistoryItem::class);
 
         $itemId = 1;
-        $this->em
-            ->expects($this->once())
+        $this->em->expects($this->once())
             ->method('find')
-            ->with($this->equalTo('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'), $this->equalTo($itemId))
-            ->will($this->returnValue(new NavigationHistoryItem()));
+            ->with(NavigationHistoryItem::class, $itemId)
+            ->willReturn(new NavigationHistoryItem());
 
         $item = $itemBuilder->findItem($itemId);
-        $this->assertInstanceOf('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem', $item);
+        $this->assertInstanceOf(NavigationHistoryItem::class, $item);
     }
 }

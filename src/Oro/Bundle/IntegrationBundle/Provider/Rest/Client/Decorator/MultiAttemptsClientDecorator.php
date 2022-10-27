@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator;
 
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class MultiAttemptsClientDecorator implements RestClientInterface
 {
@@ -43,9 +43,6 @@ class MultiAttemptsClientDecorator implements RestClientInterface
         $this->sleepBetweenAttempt = $sleepBetweenAttempt;
     }
 
-    /**
-     * @param array $sleepBetweenAttempt
-     */
     public function setSleepBetweenAttempt(array $sleepBetweenAttempt)
     {
         $this->sleepBetweenAttempt = $sleepBetweenAttempt;
@@ -224,9 +221,9 @@ class MultiAttemptsClientDecorator implements RestClientInterface
     protected function getHttpStatusesForAttempt()
     {
         return [
-            Codes::HTTP_BAD_GATEWAY,
-            Codes::HTTP_SERVICE_UNAVAILABLE,
-            Codes::HTTP_GATEWAY_TIMEOUT,
+            Response::HTTP_BAD_GATEWAY,
+            Response::HTTP_SERVICE_UNAVAILABLE,
+            Response::HTTP_GATEWAY_TIMEOUT,
         ];
     }
 }

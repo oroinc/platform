@@ -59,9 +59,6 @@ class TestOverrideClassTarget implements TestFrameworkEntityInterface
         return $this->owners;
     }
 
-    /**
-     * @param TestOverrideClassOwner $owner
-     */
     public function addOwner(TestOverrideClassOwner $owner)
     {
         if (!$this->owners->contains($owner)) {
@@ -70,9 +67,6 @@ class TestOverrideClassTarget implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestOverrideClassOwner $owner
-     */
     public function removeOwner(TestOverrideClassOwner $owner)
     {
         if ($this->owners->contains($owner)) {

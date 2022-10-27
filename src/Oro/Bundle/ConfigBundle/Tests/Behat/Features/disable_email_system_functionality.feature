@@ -10,7 +10,8 @@ Feature: Disable Email system functionality
     When I go to Dashboards/Dashboard
     Then should see "Recent Emails"
     And I should see an "Recent Emails" element
-    When I go to System/Scheduled Tasks
+    And I go to System/Scheduled Tasks
+    When I select 50 records per page
     Then I should see following records in grid:
       | oro:cron:email-body-sync |
       | oro:cron:imap-sync       |

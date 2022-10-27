@@ -1,8 +1,12 @@
 <?php
 
-
 namespace Oro\Bundle\ImportExportBundle\Context;
 
+/**
+ * Provides the ability to save and manage parameters
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class Context implements ContextInterface, BatchContextInterface
 {
     const OPTION_FILE_PATH = 'filePath';
@@ -40,8 +44,6 @@ class Context implements ContextInterface, BatchContextInterface
 
     /**
      * Constructor
-     *
-     * @param array $configuration
      */
     public function __construct(array $configuration)
     {
@@ -119,7 +121,6 @@ class Context implements ContextInterface, BatchContextInterface
 
     /**
      * Add a failure exception
-     * @param \Exception $e
      */
     public function addFailureException(\Exception $e)
     {
@@ -136,7 +137,10 @@ class Context implements ContextInterface, BatchContextInterface
      */
     public function incrementReadCount($incrementBy = 1)
     {
-        $this->setValue('read_count', (int)$this->getValue('read_count') + $incrementBy);
+        $incrementedRead = $this->getOption('incremented_read', true);
+        if ($incrementedRead) {
+            $this->setValue('read_count', (int)$this->getValue('read_count') + $incrementBy);
+        }
     }
 
     /**

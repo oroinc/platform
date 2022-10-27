@@ -3,43 +3,51 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class TemplateEntityRepositoryCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TemplateEntityRepositoryCompilerPass */
+    private $compiler;
+
+    protected function setUp(): void
+    {
+        $this->compiler = new TemplateEntityRepositoryCompilerPass();
+    }
+
+    public function testProcessNoTemplateManager()
+    {
+        $container = new ContainerBuilder();
+
+        $this->compiler->process($container);
+    }
+
     public function testProcess()
     {
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = new ContainerBuilder();
+        $templateManagerDef = $container->register('oro_importexport.template_fixture.manager');
 
-        $taggedServices = array(
-            'oro_test.foo_import_fixture' => array(
-                array(
-                    'name' => TemplateEntityRepositoryCompilerPass::TEMPLATE_FIXTURE_TAG
-                )
-            )
+        $container->register('fixture_1')
+            ->addTag('oro_importexport.template_fixture');
+
+        $this->compiler->process($container);
+
+        self::assertEquals(
+            [
+                ['addEntityRepository', [new Reference('fixture_1')]]
+            ],
+            $templateManagerDef->getMethodCalls()
         );
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with(TemplateEntityRepositoryCompilerPass::TEMPLATE_MANAGER_KEY)
-            ->will($this->returnValue(true));
-        $containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with(TemplateEntityRepositoryCompilerPass::TEMPLATE_MANAGER_KEY)
-            ->will($this->returnValue($definition));
-        $containerBuilder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with(TemplateEntityRepositoryCompilerPass::TEMPLATE_FIXTURE_TAG)
-            ->will($this->returnValue($taggedServices));
-        $definition->expects($this->once())
-            ->method('addMethodCall')
-            ->with('addEntityRepository', array(new Reference('oro_test.foo_import_fixture')));
+    }
 
-        $pass = new TemplateEntityRepositoryCompilerPass();
-        $pass->process($containerBuilder);
+    public function testProcessWhenNoFixtures()
+    {
+        $container = new ContainerBuilder();
+        $templateManagerDef = $container->register('oro_importexport.template_fixture.manager');
+
+        $this->compiler->process($container);
+
+        self::assertSame([], $templateManagerDef->getMethodCalls());
     }
 }

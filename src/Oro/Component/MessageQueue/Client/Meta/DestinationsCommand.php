@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client\Meta;
 
@@ -7,25 +8,43 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class DestinationsCommand extends Command implements ContainerAwareInterface
+/**
+ * Lists available message queue destinations.
+ */
+class DestinationsCommand extends Command
 {
-    use ContainerAwareTrait;
+    /** @var string */
+    protected static $defaultName = 'oro:message-queue:destinations';
 
-    /**
-     * {@inheritdoc}
-     */
+    private DestinationMetaRegistry $destinationMetaRegistry;
+
+    public function __construct(DestinationMetaRegistry $destinationMetaRegistry)
+    {
+        $this->destinationMetaRegistry = $destinationMetaRegistry;
+
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:message-queue:destinations')
-            ->setDescription('A command shows all available destinations and some information about them.');
+            ->setDescription('Lists available message queue destinations.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command lists available message queue destinations.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -34,17 +53,15 @@ class DestinationsCommand extends Command implements ContainerAwareInterface
 
         $count = 0;
         $firstRow = true;
-        /** @var DestinationMetaRegistry $destinationMetaRegistry */
-        $destinationMetaRegistry = $this->container->get('oro_message_queue.client.meta.destination_meta_registry');
-        foreach ($destinationMetaRegistry->getDestinationsMeta() as $destination) {
+        foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $destination) {
             if (!$firstRow) {
                 $table->addRow(new TableSeparator());
             }
 
             $table->addRow([
-                $destination->getClientName(),
-                $destination->getTransportName(),
-                implode(PHP_EOL, $destination->getSubscribers())
+                $destination->getQueueName(),
+                $destination->getTransportQueueName(),
+                implode(PHP_EOL, $destination->getMessageProcessors())
             ]);
 
             $count++;
@@ -54,5 +71,7 @@ class DestinationsCommand extends Command implements ContainerAwareInterface
         $output->writeln(sprintf('Found %s destinations', $count));
         $output->writeln('');
         $table->render();
+
+        return 0;
     }
 }

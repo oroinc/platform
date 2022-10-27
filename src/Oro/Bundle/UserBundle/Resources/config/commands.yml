@@ -1,30 +1,32 @@
 services:
-    Oro\Bundle\UserBundle\Command\CreateUserCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\UserBundle\Command\CreateUserCommand
-        tags:
-            - { name: console.command }
 
-    Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand:
-        public: false
-        class: Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand
+    Oro\Bundle\UserBundle\Command\CreateUserCommand:
+        arguments:
+            - '@oro_user.manager'
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: console.command }
 
     Oro\Bundle\UserBundle\Command\ImpersonateUserCommand:
-        public: false
-        class: Oro\Bundle\UserBundle\Command\ImpersonateUserCommand
+        arguments:
+            - '@doctrine'
+            - '@router'
+            - '@oro_config.manager'
+            - '@oro_user.manager'
+            - '@oro_locale.formatter.date_time'
         tags:
             - { name: console.command }
 
     Oro\Bundle\UserBundle\Command\ListUserCommand:
-        public: false
-        class: Oro\Bundle\UserBundle\Command\ListUserCommand
+        arguments:
+            - '@doctrine'
         tags:
             - { name: console.command }
 
     Oro\Bundle\UserBundle\Command\UpdateUserCommand:
+        parent: Oro\Bundle\UserBundle\Command\CreateUserCommand
         public: false
-        class: Oro\Bundle\UserBundle\Command\UpdateUserCommand
         tags:
             - { name: console.command }

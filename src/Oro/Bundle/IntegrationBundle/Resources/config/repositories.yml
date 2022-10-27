@@ -1,6 +1,12 @@
 services:
     oro_integration.repository.channel:
-        class: 'Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository'
+        alias: Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository
+
+    Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository:
         parent: oro_entity.abstract_repository
         arguments:
             - 'Oro\Bundle\IntegrationBundle\Entity\Channel'
+        calls:
+            - [setAclHelper, ['@oro_security.acl_helper']]
+        tags:
+            - { name: doctrine.repository_service }

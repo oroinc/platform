@@ -1,19 +1,16 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/mediator',
-    'oroui/js/tools',
-    './../base/page-region-view'
-], function($, _, mediator, tools, PageRegionView) {
+define(function(require) {
     'use strict';
 
-    var PageContentView;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const PageRegionView = require('./../base/page-region-view');
 
     /**
      * Finds first container that has active scrollbar and sets focus on it for ability of scrolling it by keyboard
      */
     function focusScrollElement() {
-        var scrollable = [
+        const scrollable = [
             '.scrollable-container',
             '.other-scroll',
             '.layout-content .scrollable-container',
@@ -21,9 +18,9 @@ define([
             '.scrollspy'
         ];
 
-        var target = _.find(scrollable, function(item) {
-            var $el = $(item).first();
-            var overflow = $el.css('overflow-y');
+        const target = _.find(scrollable, function(item) {
+            const $el = $(item).first();
+            const overflow = $el.css('overflow-y');
             return $el.length && /auto|scroll/.test(overflow) && $el[0].scrollHeight > $el[0].clientHeight;
         });
 
@@ -37,12 +34,12 @@ define([
         }
     }
 
-    PageContentView = PageRegionView.extend({
+    const PageContentView = PageRegionView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function PageContentView() {
-            PageContentView.__super__.constructor.apply(this, arguments);
+        constructor: function PageContentView(options) {
+            PageContentView.__super__.constructor.call(this, options);
         },
 
         template: function(data) {
@@ -57,8 +54,8 @@ define([
         render: function() {
             PageContentView.__super__.render.call(this);
 
-            // @TODO discuss if scripts section is still in use
-            var data = this.getTemplateData();
+            const data = this.getTemplateData();
+
             if (data && data.scripts) {
                 this.$el.append(data.scripts);
             }
@@ -76,7 +73,7 @@ define([
         onPageAfterChange: function() {
             // should not be applied before layouting (see init-layout.js)
             // that will give issues on extra small screens
-            _.defer(_.bind(this.initFocus, this));
+            _.defer(this.initFocus.bind(this));
 
             // force to redraw page header to avoid wrong width
             this.$('.page-title:first').hide().show(0);
@@ -87,15 +84,18 @@ define([
          * is not active on purpose (autofocus attribute)
          */
         initFocus: function() {
-            var activeElement = document.activeElement;
-            if (tools.isTouchDevice() || $(activeElement).is('[autofocus]')) {
+            const activeElement = document.activeElement;
+
+            if (!$(activeElement).is('body') || tools.isTouchDevice() || $(activeElement).is('[autofocus]')) {
                 return;
             }
 
-            var delay = 200;
-            this.$('form:first').focusFirstInput();
-            if (!tools.isMobile() && activeElement === document.activeElement) {
-                _.delay(focusScrollElement, delay);
+            const $form = this.$('form:first');
+
+            if ($form.length) {
+                $form.focusFirstInput();
+            } else {
+                _.delay(focusScrollElement, 200);
             }
         }
     });

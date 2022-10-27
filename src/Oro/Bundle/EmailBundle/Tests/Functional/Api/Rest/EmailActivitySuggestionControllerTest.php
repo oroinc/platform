@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailActivitySuggestionControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->markTestSkipped('Due to BAP-8365');
 
@@ -25,7 +25,7 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
             'oro_api_get_activity_email_suggestions',
             ['id' => $this->getReference('email_1')->getId()]
         );
-        $this->client->request('GET', $url);
+        $this->client->jsonRequest('GET', $url);
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         //2 not assigned users
@@ -38,10 +38,9 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
             'oro_api_get_activity_email_suggestions',
             ['id' => $this->getReference('email_1')->getId()]
         );
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $url . '?page=2&limit=1',
-            [],
             [],
             ['HTTP_X-Include' => 'totalCount']
         );

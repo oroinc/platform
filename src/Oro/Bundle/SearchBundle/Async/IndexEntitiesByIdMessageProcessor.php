@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Async;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByIdTopic;
 use Oro\Bundle\SearchBundle\Engine\AbstractIndexer;
 use Oro\Bundle\SearchBundle\Transformer\MessageTransformerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -10,10 +11,12 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+/**
+ * Message queue processor that indexes entities by id.
+ */
 class IndexEntitiesByIdMessageProcessor implements
     MessageProcessorInterface,
     TopicSubscriberInterface,
@@ -30,11 +33,6 @@ class IndexEntitiesByIdMessageProcessor implements
     /** @var AbstractIndexer */
     private $indexer;
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param DoctrineHelper $doctrineHelper
-     * @param AbstractIndexer $indexer
-     */
     public function __construct(
         JobRunner $jobRunner,
         DoctrineHelper $doctrineHelper,
@@ -50,29 +48,7 @@ class IndexEntitiesByIdMessageProcessor implements
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $messageBody = JSON::decode($message->getBody());
-
-        if (false === is_array($messageBody)) {
-            $this->logger->error(sprintf(
-                'Expected array but got: "%s"',
-                is_object($messageBody) ? get_class($messageBody) : gettype($messageBody)
-            ));
-
-            return self::REJECT;
-        }
-
-        if (!$this->hasEnoughDataToBuildJobName($messageBody)) {
-            $this->logger->error(sprintf(
-                'Expected array with keys "class" and "context" but given: "%s"',
-                implode('","', array_keys($messageBody))
-            ));
-
-            return self::REJECT;
-        }
-
-        $ownerId = $message->getMessageId();
-
-        return $this->runUnique($messageBody, $ownerId) ? self::ACK : self::REJECT;
+        return $this->runUnique($message->getBody(), $message->getMessageId()) ? self::ACK : self::REJECT;
     }
 
     /**
@@ -80,7 +56,7 @@ class IndexEntitiesByIdMessageProcessor implements
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::INDEX_ENTITIES];
+        return [IndexEntitiesByIdTopic::getName()];
     }
 
     /**
@@ -134,16 +110,5 @@ class IndexEntitiesByIdMessageProcessor implements
         $ids = $messageBody[MessageTransformerInterface::MESSAGE_FIELD_ENTITY_IDS];
         sort($ids);
         return 'search_reindex|' . md5(serialize($entityClass) . serialize($ids));
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return bool
-     */
-    private function hasEnoughDataToBuildJobName(array $data)
-    {
-        return !empty($data[MessageTransformerInterface::MESSAGE_FIELD_ENTITY_CLASS]) &&
-            !empty($data[MessageTransformerInterface::MESSAGE_FIELD_ENTITY_IDS]);
     }
 }

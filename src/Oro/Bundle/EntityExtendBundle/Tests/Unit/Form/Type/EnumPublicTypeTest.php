@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumPublicType;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -12,19 +13,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnumPublicTypeTest extends TypeTestCase
 {
+    /** @var EnumTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $typeHelper;
+
     /** @var EnumPublicType */
-    protected $type;
+    private $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $typeHelper;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->typeHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper')
+        $this->typeHelper = $this->getMockBuilder(EnumTypeHelper::class)
             ->disableOriginalConstructor()
-            ->setMethods(['isSystem', 'getEnumCode', 'isImmutable', 'hasOtherReferences'])
+            ->onlyMethods(['isSystem', 'getEnumCode', 'isImmutable', 'hasOtherReferences'])
             ->getMock();
 
         $this->type = new EnumPublicType($this->typeHelper);
@@ -35,13 +36,13 @@ class EnumPublicTypeTest extends TypeTestCase
      */
     public function testConfigureOptions(
         ConfigIdInterface $configId,
-        $isNewConfig,
-        $enumCode,
-        $isSystem,
-        $isImmutablePublic,
-        $hasOtherReferences,
-        $options,
-        $expectedOptions
+        bool $isNewConfig,
+        ?string $enumCode,
+        bool $isSystem,
+        bool $isImmutablePublic,
+        bool $hasOtherReferences,
+        array $options,
+        array $expectedOptions
     ) {
         $fieldName          = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
         $enumValueClassName = $enumCode ? ExtendHelper::buildEnumValueClassName($enumCode) : null;
@@ -49,19 +50,19 @@ class EnumPublicTypeTest extends TypeTestCase
         $this->typeHelper->expects($this->any())
             ->method('getEnumCode')
             ->with($configId->getClassName(), $fieldName)
-            ->will($this->returnValue($enumCode));
+            ->willReturn($enumCode);
         $this->typeHelper->expects($this->any())
             ->method('isSystem')
             ->with($configId->getClassName(), $fieldName)
-            ->will($this->returnValue($isSystem));
+            ->willReturn($isSystem);
         $this->typeHelper->expects($this->any())
             ->method('isImmutable')
             ->with('enum', $enumValueClassName, null, 'public')
-            ->will($this->returnValue($isImmutablePublic));
+            ->willReturn($isImmutablePublic);
         $this->typeHelper->expects($this->any())
             ->method('hasOtherReferences')
             ->with($enumCode, $configId->getClassName(), $fieldName)
-            ->will($this->returnValue($hasOtherReferences));
+            ->willReturn($hasOtherReferences);
 
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
@@ -79,10 +80,7 @@ class EnumPublicTypeTest extends TypeTestCase
         $this->assertEquals($expectedOptions, $resolvedOptions);
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
+    private function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults(
@@ -97,7 +95,7 @@ class EnumPublicTypeTest extends TypeTestCase
         return $resolver;
     }
 
-    public function configureOptionsProvider()
+    public function configureOptionsProvider(): array
     {
         return [
             [
@@ -198,9 +196,6 @@ class EnumPublicTypeTest extends TypeTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals(
-            ChoiceType::class,
-            $this->type->getParent()
-        );
+        $this->assertEquals(ChoiceType::class, $this->type->getParent());
     }
 }

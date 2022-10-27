@@ -31,12 +31,6 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
      */
     private $errorHandler;
 
-    /**
-     * @param EventDispatcherInterface           $dispatcher
-     * @param ChannelActionEventFactoryInterface $eventFactory
-     * @param ChannelActionHandlerInterface      $actionHandler
-     * @param ChannelActionErrorHandlerInterface $errorHandler
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
         ChannelActionEventFactoryInterface $eventFactory,
@@ -56,7 +50,7 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
     {
         $event = $this->eventFactory->create($channel);
 
-        $this->dispatcher->dispatch($event->getName(), $event);
+        $this->dispatcher->dispatch($event, $event->getName());
 
         if (!$this->handleEventErrors($event)) {
             return false;

@@ -12,7 +12,7 @@ class ChannelDisableEventTest extends \PHPUnit\Framework\TestCase
     {
         $event = new ChannelDisableEvent(new Channel());
 
-        static::assertSame('oro_integration.channel_disable', $event->getName());
+        self::assertSame('oro_integration.channel_disable', $event->getName());
     }
 
     public function testSettersGetters()
@@ -22,7 +22,7 @@ class ChannelDisableEventTest extends \PHPUnit\Framework\TestCase
 
         $event->addError('error1');
 
-        static::assertSame($channel, $event->getChannel());
-        static::assertEquals(new ArrayCollection(['error1']), $event->getErrors());
+        self::assertSame($channel, $event->getChannel());
+        self::assertEquals(new ArrayCollection(['error1']), $event->getErrors());
     }
 }

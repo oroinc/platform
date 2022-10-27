@@ -2,288 +2,562 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Api\Processor;
 
-use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
-use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Form\Type\ArrayType;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData\CustomizeFormDataProcessorTestCase;
 use Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
+use Oro\Bundle\EntityBundle\Tests\Unit\Fallback\Stub\FallbackContainingEntity;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class ValidateEntityFallbackTest extends \PHPUnit\Framework\TestCase
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
 {
-    /**
-     * @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fallbackResolver;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityFallbackResolver */
+    private $fallbackResolver;
 
-    /**
-     * @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $valueNormalizer;
+    /** @var ValidateEntityFallback */
+    private $processor;
 
-    /**
-     * @var ValidateEntityFallback
-     */
-    protected $processor;
-
-    /**
-     * @var CreateContext|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->fallbackResolver = $this->getMockBuilder(EntityFallbackResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->valueNormalizer = $this->getMockBuilder(ValueNormalizer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->valueNormalizer->expects($this->once())
-            ->method('normalizeValue')
-            ->willReturn('entityfieldfallbackvalues');
+        parent::setUp();
+
+        $this->fallbackResolver = $this->createMock(EntityFallbackResolver::class);
+
         $this->processor = new ValidateEntityFallback(
             $this->fallbackResolver,
-            $this->valueNormalizer
+            PropertyAccess::createPropertyAccessor()
         );
-        $this->context = $this->getMockBuilder(CreateContext::class)->disableOriginalConstructor()->getMock();
     }
 
     /**
-     * @param string $mainClass
-     * @param array $requestData
-     * @dataProvider getIgnoreTestProvider
+     * @param EntityFieldFallbackValue $fallbackValue
+     *
+     * @return FormInterface
      */
-    public function testProcessShouldBeIgnored($mainClass, $requestData)
+    private function getEntityFieldFallbackValueForm(EntityFieldFallbackValue $fallbackValue)
     {
-        $this->valueNormalizer->expects($this->never())
-            ->method('normalizeValue');
-        $this->context->expects($this->once())
-            ->method('get')
-            ->willReturn($mainClass);
-        $this->context->expects($this->once())
-            ->method('getRequestData')
-            ->willReturn($requestData);
+        $formBuilder = $this->createFormBuilder()->create(
+            '',
+            FormType::class,
+            ['data_class' => EntityFieldFallbackValue::class]
+        );
+        $formBuilder
+            ->add('fallback', TextType::class)
+            ->add('scalarValue', TextType::class)
+            ->add('arrayValue', ArrayType::class);
 
-        $this->processor->process($this->context);
-    }
+        $formBuilder->setData($fallbackValue);
 
-    public function getIgnoreTestProvider()
-    {
-        return [
-            [null, []],
-            [
-                'nonExistentClass',
-                [
-                    JsonApiDoc::INCLUDED => [],
-                    JsonApiDoc::DATA => [JsonApiDoc::RELATIONSHIPS => []],
-                ],
-            ],
-            [
-                'nonExistentClass',
-                [
-                    JsonApiDoc::INCLUDED => [],
-                    JsonApiDoc::DATA => [JsonApiDoc::RELATIONSHIPS => []],
-                ],
-            ],
-        ];
+        return $formBuilder->getForm();
     }
 
     /**
-     * @dataProvider getErrorOnInvalidIncludedItemProvider
+     * @param object                   $primaryEntity
+     * @param EntityMetadata           $primaryEntityMetadata
+     * @param EntityFieldFallbackValue $fallbackValue
+     *
+     * @return IncludedEntityCollection
      */
-    public function testProcessShouldSetErrorOnInvalidIncludedItem($includedData)
-    {
-        $initialIncluded = [
-            JsonApiDoc::TYPE => 'entityfieldfallbackvalues',
-        ];
-        $requestData = [
-            JsonApiDoc::DATA => [JsonApiDoc::RELATIONSHIPS => []],
-            JsonApiDoc::INCLUDED => [array_merge($initialIncluded, $includedData)],
-        ];
-
-        $this->context->expects($this->once())
-            ->method('get')
-            ->willReturn(\stdClass::class);
-        $this->context->expects($this->once())
-            ->method('getRequestData')
-            ->willReturn($requestData);
-
-        $this->context->expects($this->once())
-            ->method('addError')
-            ->willReturnCallback(
-                function ($error) {
-                    $this->assertEquals(
-                        'Invalid entity fallback value provided for the included value with id \'0\'.'
-                        . ' Please provide a correct id, and an attribute section with'
-                        . ' either a \'fallback\' identifier, an \'arrayValue\' or \'scalarValue\'',
-                        $error->getDetail()
-                    );
-                }
-            );
-
-        $this->processor->process($this->context);
-    }
-
-    public function getErrorOnInvalidIncludedItemProvider()
-    {
-        return [
-            [
-                [
-                    JsonApiDoc::ID => '1',
-                    JsonApiDoc::ATTRIBUTES => null,
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider getValidationErrorTestProvider
-     */
-    public function testProcessShouldSetErrorOnValidationError(
-        $fallbackAttributes,
-        $requiredValueField = null,
-        $isValid = false
+    private function getIncludedEntityCollection(
+        $primaryEntity,
+        EntityMetadata $primaryEntityMetadata,
+        EntityFieldFallbackValue $fallbackValue
     ) {
-        $requestData = [
-            JsonApiDoc::DATA => [
-                JsonApiDoc::RELATIONSHIPS => [
-                    "field1" => [
-                        JsonApiDoc::DATA => [
-                            JsonApiDoc::TYPE => 'entityfieldfallbackvalues',
-                            JsonApiDoc::ID => '1',
-                        ],
-                    ],
-                ],
-            ],
-            JsonApiDoc::INCLUDED => [
-                [
-                    JsonApiDoc::TYPE => 'entityfieldfallbackvalues',
-                    JsonApiDoc::ID => '1',
-                    JsonApiDoc::ATTRIBUTES => $fallbackAttributes,
-                ],
-            ],
-        ];
-        $fallbackConfig = [
-            'systemConfig' => [],
-            'testField' => [],
-        ];
-        $this->fallbackResolver->expects($this->any())
-            ->method('getFallbackConfig')
-            ->willReturn($fallbackConfig);
-        $this->fallbackResolver->expects($this->any())
-            ->method('getRequiredFallbackFieldByType')
-            ->willReturn($requiredValueField);
-        $this->context->expects($this->once())
-            ->method('get')
-            ->willReturn(\stdClass::class);
-        $this->context->expects($this->once())
-            ->method('getRequestData')
-            ->willReturn($requestData);
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->setPrimaryEntityId(get_class($primaryEntity), null);
+        $includedEntities->setPrimaryEntity($primaryEntity, $primaryEntityMetadata);
+        $includedEntities->add(
+            $fallbackValue,
+            get_class($fallbackValue),
+            'fallback_value',
+            new IncludedEntityData('/included/0', 0)
+        );
 
-        if (false === $isValid) {
-            $this->context->expects($this->once())
-                ->method('addError')
-                ->willReturnCallback(
-                    function ($error) {
-                        $this->assertEquals(
-                            'Invalid entity fallback value provided for the included value with id \'1\'.'
-                            . ' Please provide a correct id, and an attribute section with'
-                            . ' either a \'fallback\' identifier, an \'arrayValue\' or \'scalarValue\'',
-                            $error->getDetail()
-                        );
-                    }
-                );
-        } else {
-            $this->context->expects($this->never())->method('addError');
-        }
-
-        $this->processor->process($this->context);
+        return $includedEntities;
     }
 
-    public function getValidationErrorTestProvider()
+    private static function assertFormSubmittedAndValid(FormInterface $form)
+    {
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isValid());
+    }
+
+    /**
+     * @param object $entity
+     * @param string $associationName
+     * @param string $valueType
+     * @param string $requiredFieldType
+     */
+    private function expectRequiredFallbackFieldByType($entity, $associationName, $valueType, $requiredFieldType)
+    {
+        $this->fallbackResolver->expects(self::once())
+            ->method('getType')
+            ->with(self::identicalTo($entity), $associationName)
+            ->willReturn($valueType);
+        $this->fallbackResolver->expects(self::once())
+            ->method('getRequiredFallbackFieldByType')
+            ->with($valueType)
+            ->willReturn($requiredFieldType);
+    }
+
+    public function testProcessWhenFormAlreadyContainsValidationErrors()
+    {
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit([]);
+
+        FormUtil::addFormError($form, 'some error');
+
+        // guard
+        self::assertTrue($form->isSynchronized());
+        self::assertTrue($form->isSubmitted());
+        self::assertFalse($form->isValid());
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->processor->process($this->context);
+
+        self::assertCount(1, $form->getErrors(true));
+    }
+
+    /**
+     * @dataProvider invalidNumberOfAttributesDataProvider
+     */
+    public function testProcessWhenFallbackValueHasInvalidNumberOfAttributes(array $submittedData)
+    {
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->processor->process($this->context);
+
+        $errors = $form->getErrors(true);
+        self::assertCount(1, $errors);
+        self::assertEquals(
+            'Either "fallback", "scalarValue" or "arrayValue" property should be specified.',
+            $errors[0]->getMessage()
+        );
+        self::assertEquals('', $errors[0]->getCause()->getPropertyPath());
+    }
+
+    public function invalidNumberOfAttributesDataProvider(): array
     {
         return [
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => null,
-                ],
+            'empty'                    => [
+                'submittedData' => []
             ],
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => [],
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => null,
-                ],
+            'all attributes empty'     => [
+                'submittedData' => [
+                    'fallback'    => null,
+                    'scalarValue' => null,
+                    'arrayValue'  => []
+                ]
             ],
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => 'string',
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => null,
-                ],
+            'fallback + scalarValue'   => [
+                'submittedData' => [
+                    'fallback'    => 'fallbackValue',
+                    'scalarValue' => 'scalarValue'
+                ]
             ],
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => [],
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => 'systemConfig',
-                ],
+            'fallback + arrayValue'    => [
+                'submittedData' => [
+                    'fallback'   => 'fallbackValue',
+                    'arrayValue' => ['key' => 'value']
+                ]
             ],
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => 'nonExistentFallbackConfig',
-                ],
+            'scalarValue + arrayValue' => [
+                'submittedData' => [
+                    'scalarValue' => 'scalarValue',
+                    'arrayValue'  => ['key' => 'value']
+                ]
             ],
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => [],
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => null,
-                ],
-                EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD,
-                false,
-            ],
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => '123',
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => null,
-                ],
-                EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD,
-                false,
-            ],
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => [],
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => null,
-                ],
-                EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD,
-                true,
-            ],
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => '123',
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => null,
-                ],
-                EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD,
-                true,
-            ],
-            [
-                [
-                    EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD => null,
-                    EntityFieldFallbackValue::FALLBACK_PARENT_FIELD => 'systemConfig',
-                ],
-                null,
-                true,
-            ],
+            'all attributes'           => [
+                'submittedData' => [
+                    'fallback'    => 'fallbackValue',
+                    'scalarValue' => 'scalarValue',
+                    'arrayValue'  => ['key' => 'value']
+                ]
+            ]
         ];
+    }
+
+    public function testProcessWhenFallbackValueHasOnlyFallback()
+    {
+        $submittedData = [
+            'fallback' => 'fallbackValue'
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $form->getErrors(true));
+        self::assertEquals($submittedData['fallback'], $fallbackValue->getFallback());
+    }
+
+    public function testProcessWhenFallbackValueHasOnlyScalarValue()
+    {
+        $submittedData = [
+            'scalarValue' => 'scalarValue'
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $form->getErrors(true));
+        self::assertEquals($submittedData['scalarValue'], $fallbackValue->getScalarValue());
+    }
+
+    public function testProcessWhenFallbackValueHasOnlyArrayValue()
+    {
+        $submittedData = [
+            'arrayValue' => ['key' => 'value']
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $form->getErrors(true));
+        self::assertEquals($submittedData['arrayValue'], $fallbackValue->getArrayValue());
+    }
+
+    public function testProcessWhenFallbackValueHasNotAcceptableFallback()
+    {
+        $submittedData = [
+            'fallback' => 'fallback3'
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $primaryEntity = new FallbackContainingEntity($fallbackValue);
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
+        $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
+            ->setTargetClassName(EntityFieldFallbackValue::class);
+
+        $includedEntities = $this->getIncludedEntityCollection($primaryEntity, $primaryEntityMetadata, $fallbackValue);
+
+        $this->fallbackResolver->expects(self::once())
+            ->method('getFallbackConfig')
+            ->with(self::identicalTo($primaryEntity), 'testProperty', EntityFieldFallbackValue::FALLBACK_LIST)
+            ->willReturn([
+                'fallback1' => [],
+                'fallback2' => []
+            ]);
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        $errors = $form->getErrors(true);
+        self::assertCount(1, $errors);
+        self::assertEquals(
+            'The value is not valid. Acceptable values: fallback1,fallback2.',
+            $errors[0]->getMessage()
+        );
+        self::assertEquals('children[fallback]', $errors[0]->getCause()->getPropertyPath());
+    }
+
+    public function testProcessWhenFallbackValueHasAcceptableFallback()
+    {
+        $submittedData = [
+            'fallback' => 'fallback1'
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $primaryEntity = new FallbackContainingEntity($fallbackValue);
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
+        $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
+            ->setTargetClassName(EntityFieldFallbackValue::class);
+
+        $includedEntities = $this->getIncludedEntityCollection($primaryEntity, $primaryEntityMetadata, $fallbackValue);
+
+        $this->fallbackResolver->expects(self::once())
+            ->method('getFallbackConfig')
+            ->with(self::identicalTo($primaryEntity), 'testProperty', EntityFieldFallbackValue::FALLBACK_LIST)
+            ->willReturn([
+                'fallback1' => [],
+                'fallback2' => []
+            ]);
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $form->getErrors(true));
+        self::assertEquals($submittedData['fallback'], $fallbackValue->getFallback());
+    }
+
+    public function testProcessWhenFallbackValueHasScalarValueButShouldBeArrayValue()
+    {
+        $submittedData = [
+            'scalarValue' => 'test'
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $primaryEntity = new FallbackContainingEntity($fallbackValue);
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
+        $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
+            ->setTargetClassName(EntityFieldFallbackValue::class);
+
+        $includedEntities = $this->getIncludedEntityCollection($primaryEntity, $primaryEntityMetadata, $fallbackValue);
+
+        $this->expectRequiredFallbackFieldByType(
+            $primaryEntity,
+            'testProperty',
+            EntityFallbackResolver::TYPE_ARRAY,
+            EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD
+        );
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        $errors = $form->getErrors(true);
+        self::assertCount(1, $errors);
+        self::assertEquals('The value should not be blank.', $errors[0]->getMessage());
+        self::assertEquals('children[arrayValue]', $errors[0]->getCause()->getPropertyPath());
+    }
+
+    public function testProcessWhenFallbackValueHasArrayValueButShouldBeScalarValue()
+    {
+        $submittedData = [
+            'arrayValue' => ['key' => 'value']
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $primaryEntity = new FallbackContainingEntity($fallbackValue);
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
+        $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
+            ->setTargetClassName(EntityFieldFallbackValue::class);
+
+        $includedEntities = $this->getIncludedEntityCollection($primaryEntity, $primaryEntityMetadata, $fallbackValue);
+
+        $this->expectRequiredFallbackFieldByType(
+            $primaryEntity,
+            'testProperty',
+            EntityFallbackResolver::TYPE_STRING,
+            EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD
+        );
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        $errors = $form->getErrors(true);
+        self::assertCount(1, $errors);
+        self::assertEquals('The value should not be null.', $errors[0]->getMessage());
+        self::assertEquals('children[scalarValue]', $errors[0]->getCause()->getPropertyPath());
+    }
+
+    public function testProcessWhenFallbackValueHasScalarValueAndScalarValueExpected()
+    {
+        $submittedData = [
+            'scalarValue' => 'test'
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $primaryEntity = new FallbackContainingEntity($fallbackValue);
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
+        $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
+            ->setTargetClassName(EntityFieldFallbackValue::class);
+
+        $includedEntities = $this->getIncludedEntityCollection($primaryEntity, $primaryEntityMetadata, $fallbackValue);
+
+        $this->expectRequiredFallbackFieldByType(
+            $primaryEntity,
+            'testProperty',
+            EntityFallbackResolver::TYPE_STRING,
+            EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD
+        );
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $form->getErrors(true));
+        self::assertEquals($submittedData['scalarValue'], $fallbackValue->getScalarValue());
+    }
+
+    public function testProcessWhenFallbackValueHasArrayValueAndArrayValueExpected()
+    {
+        $submittedData = [
+            'arrayValue' => ['key' => 'value']
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $primaryEntity = new FallbackContainingEntity($fallbackValue);
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
+        $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
+            ->setTargetClassName(EntityFieldFallbackValue::class);
+
+        $includedEntities = $this->getIncludedEntityCollection($primaryEntity, $primaryEntityMetadata, $fallbackValue);
+
+        $this->expectRequiredFallbackFieldByType(
+            $primaryEntity,
+            'testProperty',
+            EntityFallbackResolver::TYPE_ARRAY,
+            EntityFieldFallbackValue::FALLBACK_ARRAY_FIELD
+        );
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $form->getErrors(true));
+        self::assertEquals($submittedData['arrayValue'], $fallbackValue->getArrayValue());
+    }
+
+    public function testProcessWhenAssociationNotFound()
+    {
+        $submittedData = [
+            'scalarValue' => 'test'
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $primaryEntity = new FallbackContainingEntity($fallbackValue);
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
+        $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
+            ->setTargetClassName(\stdClass::class);
+
+        $includedEntities = $this->getIncludedEntityCollection($primaryEntity, $primaryEntityMetadata, $fallbackValue);
+
+        $this->fallbackResolver->expects(self::never())
+            ->method('getType');
+        $this->fallbackResolver->expects(self::never())
+            ->method('getRequiredFallbackFieldByType');
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $form->getErrors(true));
+        self::assertEquals($submittedData['scalarValue'], $fallbackValue->getScalarValue());
+    }
+
+    public function testProcessWhenAnotherIncludedEntityAssociatedWithFallbackValue()
+    {
+        $submittedData = [
+            'scalarValue' => 'test'
+        ];
+        $fallbackValue = new EntityFieldFallbackValue();
+        $form = $this->getEntityFieldFallbackValueForm($fallbackValue);
+        $form->submit($submittedData);
+
+        // guard
+        self::assertFormSubmittedAndValid($form);
+
+        $primaryEntity = new FallbackContainingEntity();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
+        $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
+            ->setTargetClassName(EntityFieldFallbackValue::class);
+
+        $includedEntities = $this->getIncludedEntityCollection($primaryEntity, $primaryEntityMetadata, $fallbackValue);
+
+        $anotherIncludedEntity = new FallbackContainingEntity($fallbackValue);
+        $anotherIncludedEntityMetadata = new EntityMetadata('Test\Entity');
+        $anotherIncludedEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
+            ->setTargetClassName(EntityFieldFallbackValue::class);
+        $anotherIncludedEntityData = new IncludedEntityData('/included/1', 1);
+        $anotherIncludedEntityData->setMetadata($anotherIncludedEntityMetadata);
+        $includedEntities->add(
+            $anotherIncludedEntity,
+            get_class($anotherIncludedEntity),
+            'another',
+            $anotherIncludedEntityData
+        );
+
+        $this->expectRequiredFallbackFieldByType(
+            $anotherIncludedEntity,
+            'testProperty',
+            EntityFallbackResolver::TYPE_STRING,
+            EntityFieldFallbackValue::FALLBACK_SCALAR_FIELD
+        );
+
+        $this->context->setForm($form);
+        $this->context->setData($fallbackValue);
+        $this->context->setIncludedEntities($includedEntities);
+        $this->processor->process($this->context);
+
+        self::assertCount(0, $form->getErrors(true));
+        self::assertEquals($submittedData['scalarValue'], $fallbackValue->getScalarValue());
     }
 }

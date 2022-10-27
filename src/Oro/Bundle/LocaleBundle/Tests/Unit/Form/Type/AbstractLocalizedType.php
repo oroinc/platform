@@ -2,65 +2,56 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 abstract class AbstractLocalizedType extends FormIntegrationTestCase
 {
-    const LOCALIZATION_CLASS = 'Oro\Bundle\LocaleBundle\Entity\Localization';
+    protected const LOCALIZATION_CLASS = Localization::class;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /**
-     * @return ManagerRegistry
-     */
-    protected function setRegistryExpectations()
+    protected function setRegistryExpectations(): void
     {
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())
             ->method('getResult')
             ->willReturn($this->getLocalizations());
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with('l.parentLocalization', 'parent')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('addOrderBy')
             ->with('l.id', 'ASC')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('createQueryBuilder')
             ->with('l')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
         $this->registry->expects($this->once())
             ->method('getRepository')
             ->with(self::LOCALIZATION_CLASS)
-            ->will($this->returnValue($repository));
+            ->willReturn($repository);
     }
 
     /**
      * @return Localization[]
      */
-    protected function getLocalizations()
+    protected function getLocalizations(): array
     {
         $en   = $this->createLocalization(1, 'en', 'en');
         $enUs = $this->createLocalization(2, 'en', 'en_US', $en);
@@ -69,30 +60,25 @@ abstract class AbstractLocalizedType extends FormIntegrationTestCase
         return [$en, $enUs, $enCa];
     }
 
-    /**
-     * @param int $id
-     * @param string $languageCode
-     * @param string $formattingCode
-     * @param Localization|null $parentLocalization
-     * @return Localization
-     */
-    protected function createLocalization($id, $languageCode, $formattingCode, $parentLocalization = null)
-    {
-        $website = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Entity\Localization')
-            ->disableOriginalConstructor()
-            ->getMock();
+    protected function createLocalization(
+        int $id,
+        string $languageCode,
+        string $formattingCode,
+        Localization $parentLocalization = null
+    ): Localization {
+        $website = $this->createMock(Localization::class);
         $website->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue($id));
+            ->willReturn($id);
         $website->expects($this->any())
             ->method('getLanguageCode')
-            ->will($this->returnValue($languageCode));
+            ->willReturn($languageCode);
         $website->expects($this->any())
             ->method('getFormattingCode')
-            ->will($this->returnValue($formattingCode));
+            ->willReturn($formattingCode);
         $website->expects($this->any())
             ->method('getParentLocalization')
-            ->will($this->returnValue($parentLocalization));
+            ->willReturn($parentLocalization);
 
         return $website;
     }

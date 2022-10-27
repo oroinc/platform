@@ -2,55 +2,48 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Twig;
 
+use JMS\Serializer\SerializerInterface;
 use Oro\Bundle\PlatformBundle\Twig\SerializerExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SerializerExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
+    /** @var SerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
+
     /** @var SerializerExtension */
-    protected $extension;
+    private $extension;
 
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $serializer;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->serializer = $this->createMock(\JMS\Serializer\Twig\SerializerExtension::class);
-        $this->container  = self::getContainerBuilder()
+        if (!interface_exists('JMS\Serializer\SerializerInterface')) {
+            self::markTestSkipped('"jms/serializer" is not installed');
+        }
+
+        $this->serializer = $this->createMock(SerializerInterface::class);
+
+        $container = self::getContainerBuilder()
             ->add('jms_serializer', $this->serializer)
             ->getContainer($this);
 
-        $this->extension = new SerializerExtension($this->container);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'jms_serializer',
-            $this->extension->getName()
-        );
+        $this->extension = new SerializerExtension($container);
     }
 
     public function testSerialize()
     {
         $obj = new \stdClass();
+        $serializedData = 'serialized';
 
-        $this->container
-            ->expects($this->once())
-            ->method('get')
-            ->with('jms_serializer');
-
-        $this->serializer
-            ->expects($this->once())
+        $this->serializer->expects(self::once())
             ->method('serialize')
-            ->with($this->equalTo($obj), $this->equalTo('json'));
+            ->with(self::identicalTo($obj), 'json')
+            ->willReturn($serializedData);
 
-        $this->extension->serialize($obj);
+        self::assertEquals(
+            $serializedData,
+            self::callTwigFilter($this->extension, 'serialize', [$obj])
+        );
     }
 }

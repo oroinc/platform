@@ -14,53 +14,42 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $navigation;
+    /** @var EntityPaginationNavigation|\PHPUnit\Framework\MockObject\MockObject */
+    private $navigation;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dataCollector;
+    /** @var StorageDataCollector|\PHPUnit\Framework\MockObject\MockObject */
+    private $dataCollector;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $messageManager;
+    /** @var MessageManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $messageManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
     /** @var EntityPaginationExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->navigation =$this->getMockBuilder(EntityPaginationNavigation::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dataCollector = $this->getMockBuilder(StorageDataCollector::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->messageManager = $this->getMockBuilder(MessageManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->navigation =$this->createMock(EntityPaginationNavigation::class);
+        $this->dataCollector = $this->createMock(StorageDataCollector::class);
+        $this->messageManager = $this->createMock(MessageManager::class);
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_entity_pagination.navigation', $this->navigation)
             ->add('oro_entity_pagination.storage.data_collector', $this->dataCollector)
             ->add('oro_entity_pagination.message_manager', $this->messageManager)
-            ->add('request_stack', $this->requestStack)
+            ->add(RequestStack::class, $this->requestStack)
             ->getContainer($this);
 
         $this->extension = new EntityPaginationExtension($container);
     }
 
     /**
-     * @param mixed $expected
-     * @param int|null $totalCount
-     * @param int|null $currentNumber
      * @dataProvider getPagerDataProvider
      */
-    public function testGetPager($expected, $totalCount = null, $currentNumber = null)
+    public function testGetPager(?array $expected, int $totalCount = null, int $currentNumber = null)
     {
         $entity = new \stdClass();
         $scope = 'test';
@@ -68,11 +57,11 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->navigation->expects($this->any())
             ->method('getTotalCount')
             ->with($entity, $scope)
-            ->will($this->returnValue($totalCount));
+            ->willReturn($totalCount);
         $this->navigation->expects($this->any())
             ->method('getCurrentNumber')
             ->with($entity, $scope)
-            ->will($this->returnValue($currentNumber));
+            ->willReturn($currentNumber);
 
         $this->assertSame(
             $expected,
@@ -92,7 +81,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dataCollector->expects($this->once())
             ->method('collect')
             ->with($request, $scope)
-            ->will($this->returnValue($result));
+            ->willReturn($result);
 
         $this->assertSame(
             $result,
@@ -100,10 +89,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getPagerDataProvider()
+    public function getPagerDataProvider(): array
     {
         return [
             'no total' => [
@@ -122,10 +108,9 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param bool $hasMessage
      * @dataProvider showInfoMessageDataProvider
      */
-    public function testShowInfoMessage($hasMessage)
+    public function testShowInfoMessage(bool $hasMessage)
     {
         $entity = new \stdClass();
         $scope = 'test';
@@ -134,7 +119,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->messageManager->expects($this->once())
             ->method('getInfoMessage')
             ->with($entity, $scope)
-            ->will($this->returnValue($message));
+            ->willReturn($message);
 
         if ($hasMessage) {
             $this->messageManager->expects($this->once())
@@ -148,16 +133,11 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
         self::callTwigFunction($this->extension, 'oro_entity_pagination_show_info_message', [$entity, $scope]);
     }
 
-    public function showInfoMessageDataProvider()
+    public function showInfoMessageDataProvider(): array
     {
         return [
             'has message' => [true],
             'no message'  => [false],
         ];
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(EntityPaginationExtension::NAME, $this->extension->getName());
     }
 }

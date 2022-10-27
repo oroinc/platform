@@ -19,9 +19,6 @@ class OriginFolderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function setOriginToFolders(FormEvent $event)
     {
         $data = $event->getData();

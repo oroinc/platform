@@ -2,33 +2,31 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
-use Oro\Bundle\NavigationBundle\Provider\TitleService;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class TitleExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to render page (navigation) titles:
+ *   - oro_title_render
+ *   - oro_title_render_short
+ *   - oro_title_render_serialized
+ *
+ * Provides a Twig tag to work with page (navigation) titles:
+ *   - oro_title_set
+ */
+class TitleExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXT_NAME = 'oro_title';
+    private ContainerInterface $container;
+    private array $templateFileTitleDataStack = [];
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var array */
-    protected $templateFileTitleDataStack = [];
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return TitleService
-     */
-    protected function getTitleService()
-    {
-        return $this->container->get('oro_navigation.title_service');
     }
 
     /**
@@ -37,9 +35,9 @@ class TitleExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_title_render', [$this, 'render']),
-            new \Twig_SimpleFunction('oro_title_render_short', [$this, 'renderShort']),
-            new \Twig_SimpleFunction('oro_title_render_serialized', [$this, 'renderSerialized']),
+            new TwigFunction('oro_title_render', [$this, 'render']),
+            new TwigFunction('oro_title_render_short', [$this, 'renderShort']),
+            new TwigFunction('oro_title_render_serialized', [$this, 'renderSerialized']),
         ];
     }
 
@@ -128,7 +126,7 @@ class TitleExtension extends \Twig_Extension
      * @param array $options
      * @param string|null $templateScope
      */
-    protected function addTitleData(array $options = [], $templateScope = null)
+    private function addTitleData(array $options = [], $templateScope = null)
     {
         if (!$templateScope) {
             $backtrace = debug_backtrace(false);
@@ -139,47 +137,52 @@ class TitleExtension extends \Twig_Extension
             }
         }
 
-        if (!isset($this->templateFileTitleDataStack[$templateScope])) {
-            $this->templateFileTitleDataStack[$templateScope] = [];
-        }
         $this->templateFileTitleDataStack[$templateScope][] = $options;
     }
 
-    /**
-     * @return array
-     */
-    protected function getTitleData()
+    private function getTitleData(): array
     {
         $result = [];
         if ($this->templateFileTitleDataStack) {
-            $result = [];
-            foreach (array_reverse($this->templateFileTitleDataStack) as $templateOptions) {
+            $reversedTemplateFileTitleDataStack = array_reverse($this->templateFileTitleDataStack);
+            foreach ($reversedTemplateFileTitleDataStack as $templateOptions) {
                 foreach ($templateOptions as $options) {
-                    $result = array_replace_recursive($result, $options);
+                    $result[] = $options;
                 }
             }
+            if ($result) {
+                $result = array_replace_recursive(...$result);
+            }
         }
+
         return $result;
     }
 
-    /**
-     * @return string
-     */
-    private function getCurrenRoute()
+    private function getCurrenRoute(): ?string
     {
-        return $this->container
-            ->get('request_stack')
-            ->getCurrentRequest()
-            ->get('_route');
+        $request = $this->getRequest();
+
+        return null !== $request ? $request->get('_route') : null;
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::EXT_NAME;
+        return [
+            'oro_navigation.title_service' => TitleServiceInterface::class,
+            RequestStack::class,
+        ];
+    }
+
+    private function getTitleService(): TitleServiceInterface
+    {
+        return $this->container->get('oro_navigation.title_service');
+    }
+
+    protected function getRequest(): ?Request
+    {
+        return $this->container->get(RequestStack::class)->getCurrentRequest();
     }
 }

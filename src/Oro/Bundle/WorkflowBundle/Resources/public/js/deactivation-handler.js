@@ -9,8 +9,8 @@ define(['jquery', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/me
      * @class   oroworkflow.WorkflowDeactivationHandler
      */
     return function(url, label, hideNotifications) {
-        var el = this;
-        var confirmDeactivation = new Modal({
+        const el = this;
+        const confirmDeactivation = new Modal({
             title: __('oro.workflow.workflowdefinition.deactivate', {label: label}),
             content: __('oro.workflow.workflowdefinition.reset_workflow_data_message'),
             okText: __('oro.workflow.workflowdefinition.deactivate_button_text')
@@ -20,7 +20,7 @@ define(['jquery', 'orotranslation/js/translator', 'oroui/js/modal', 'oroui/js/me
             el.trigger('deactivation_start');
             $.ajax({
                 url: url,
-                type: 'GET',
+                type: 'POST',
                 success: function(response) {
                     if (response.message && !hideNotifications) {
                         Messenger.notificationFlashMessage('success', response.message);

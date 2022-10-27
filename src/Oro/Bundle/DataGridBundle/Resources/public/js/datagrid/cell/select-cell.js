@@ -1,12 +1,10 @@
-define([
-    'underscore',
-    'backgrid',
-    'orodatagrid/js/datagrid/editor/select-cell-radio-editor',
-    'oroui/js/tools/text-util'
-], function(_, Backgrid, SelectCellRadioEditor, textUtil) {
+define(function(require) {
     'use strict';
 
-    var SelectCell;
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const SelectCellRadioEditor = require('orodatagrid/js/datagrid/editor/select-cell-radio-editor');
+    const textUtil = require('oroui/js/tools/text-util');
 
     /**
      * Select column cell. Added missing behaviour.
@@ -15,27 +13,29 @@ define([
      * @class   oro.datagrid.cell.SelectCell
      * @extends Backgrid.SelectCell
      */
-    SelectCell = Backgrid.SelectCell.extend({
+    const SelectCell = Backgrid.SelectCell.extend({
         events: {},
 
         optionValues: [],
 
+        notMarkAsBlank: true,
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SelectCell() {
-            SelectCell.__super__.constructor.apply(this, arguments);
+        constructor: function SelectCell(options) {
+            SelectCell.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (this.expanded && !this.multiple) {
                 this.editor = SelectCellRadioEditor;
             }
 
-            var choices = options.column.get('metadata').choices;
+            const choices = options.column.get('metadata').choices;
             if (choices) {
                 this.optionValues = [];
                 _.each(choices, function(value, label) {
@@ -44,7 +44,7 @@ define([
             } else {
                 throw new Error('Column metadata must have choices specified');
             }
-            SelectCell.__super__.initialize.apply(this, arguments);
+            SelectCell.__super__.initialize.call(this, options);
 
             this.listenTo(this.model, 'change:' + this.column.get('name'), function() {
                 this.enterEditMode();
@@ -54,14 +54,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             if (_.isEmpty(this.optionValues)) {
                 return;
             }
 
-            var render = SelectCell.__super__.render.apply(this, arguments);
+            const render = SelectCell.__super__.render.call(this);
 
             this.enterEditMode();
 
@@ -69,16 +69,16 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enterEditMode: function() {
             if (this.isEditableColumn()) {
-                SelectCell.__super__.enterEditMode.apply(this, arguments);
+                SelectCell.__super__.enterEditMode.call(this);
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         exitEditMode: function() {
             this.$el.removeClass('error');

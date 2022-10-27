@@ -7,11 +7,15 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\ScopeBundle\Model\ExtendScope;
 
 /**
- * Class Scope
+ * Represents a set of application parameters that can be used to find application data suitable for these parameters.
+ * @ORM\Table(
+ *     name="oro_scope",
+ *     uniqueConstraints={
+ *         @ORM\UniqueConstraint(name="oro_scope_row_hash_uidx", columns={"row_hash"})
+ *     }
+ * )
+ * @ORM\Entity()
  * @Config()
- *
- * @ORM\Table("oro_scope")
- * @ORM\Entity(repositoryClass="Oro\Bundle\ScopeBundle\Entity\Repository\ScopeRepository")
  */
 class Scope extends ExtendScope
 {
@@ -25,10 +29,35 @@ class Scope extends ExtendScope
     private $id;
 
     /**
+     * @var string
+     * @ORM\Column(name="row_hash", type="string", nullable=true, length=32)
+     */
+    private $rowHash;
+
+    /**
      * @return int
      */
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRowHash()
+    {
+        return $this->rowHash;
+    }
+
+    /**
+     * @param string $rowHash
+     * @return Scope
+     */
+    public function setRowHash($rowHash)
+    {
+        $this->rowHash = $rowHash;
+
+        return $this;
     }
 }

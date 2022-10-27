@@ -9,21 +9,15 @@ class CaseInsensitiveParameterBagTest extends \PHPUnit\Framework\TestCase
     /** @var CaseInsensitiveParameterBag */
     private $caseInsensitiveParameterBag;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->caseInsensitiveParameterBag = new CaseInsensitiveParameterBag();
     }
 
     /**
-     * @dataProvider caseDataProvider
-     *
-     * @param string $key
-     * @param string $value
+     * @dataProvider actionsDataProvider
      */
-    public function testActions($key, $value)
+    public function testActions(string $key, string $value)
     {
         $this->caseInsensitiveParameterBag->set($key, $value);
         $this->caseInsensitiveParameterBag->set(strtoupper($key), $value);
@@ -47,25 +41,13 @@ class CaseInsensitiveParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertCount(0, $this->caseInsensitiveParameterBag->toArray());
     }
 
-    public function caseDataProvider()
+    public function actionsDataProvider(): array
     {
         return [
-            [
-                'key'         => 'key1',
-                'value'       => 'value1'
-            ],
-            [
-                'key'         => 'KeY2',
-                'value'       => 'value2'
-            ],
-            [
-                'key'         => 'three words key',
-                'value'       => 'value3'
-            ],
-            [
-                'key'         => 'SoMe KeY',
-                'value'       => 'value4'
-            ]
+            ['key' => 'key1', 'value' => 'value1'],
+            ['key' => 'KeY2', 'value' => 'value2'],
+            ['key' => 'three words key', 'value' => 'value3'],
+            ['key' => 'SoMe KeY', 'value' => 'value4']
         ];
     }
 }

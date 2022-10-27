@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 
 class LoadAddressTypeData extends AbstractFixture
@@ -23,8 +23,6 @@ class LoadAddressTypeData extends AbstractFixture
 
     /**
      * Load address types
-     *
-     * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

@@ -155,7 +155,6 @@ class OutputLogger extends AbstractLogger
         return $message;
     }
 
-
     /**
      * @param string $level
      *

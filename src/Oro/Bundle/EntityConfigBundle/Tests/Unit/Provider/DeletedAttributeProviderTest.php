@@ -12,26 +12,18 @@ use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProvider;
 
 class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configModelManager;
+    /** @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configModelManager;
 
-    /**
-     * @var AttributeValueProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attributeValueProvider;
+    /** @var AttributeValueProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeValueProvider;
 
-    /**
-     * @var DeletedAttributeProvider
-     */
-    protected $provider;
+    /** @var DeletedAttributeProvider */
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configModelManager = $this->getMockBuilder(ConfigModelManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configModelManager = $this->createMock(ConfigModelManager::class);
         $this->attributeValueProvider = $this->createMock(AttributeValueProviderInterface::class);
 
         $this->provider = new DeletedAttributeProvider($this->configModelManager, $this->attributeValueProvider);
@@ -55,9 +47,7 @@ class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
         $this->configModelManager->expects($this->once())
             ->method('checkDatabase')
             ->willReturn(true);
-        $repository = $this->getMockBuilder(FieldConfigModelRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(FieldConfigModelRepository::class);
         $repository->expects($this->once())
             ->method('getAttributesByIds')
             ->with($ids)
@@ -86,7 +76,7 @@ class DeletedAttributeProviderTest extends \PHPUnit\Framework\TestCase
             []
         );
     }
-    
+
     public function testRemoveAttributeValues()
     {
         $attributeFamily = new AttributeFamily();

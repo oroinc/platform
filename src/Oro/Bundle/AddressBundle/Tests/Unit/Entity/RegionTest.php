@@ -1,7 +1,8 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 
 class RegionTest extends \PHPUnit\Framework\TestCase
@@ -19,14 +20,9 @@ class RegionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($combinedCode, $obj->getCombinedCode());
     }
 
-    /**
-     * Test country setter
-     */
     public function testCountrySetter()
     {
-        $countryMock = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $countryMock = $this->createMock(Country::class);
 
         $obj = new Region('combinedCode');
         $obj->setCountry($countryMock);
@@ -35,30 +31,24 @@ class RegionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider provider
-     * @param string $property
+     * @dataProvider settersAndGettersDataProvider
      */
-    public function testSettersAndGetters($property)
+    public function testSettersAndGetters(string $property)
     {
         $obj = new Region('combinedCode');
         $value = 'testValue';
 
-        call_user_func_array(array($obj, 'set' . ucfirst($property)), array($value));
-        $this->assertEquals($value, call_user_func_array(array($obj, 'get' . ucfirst($property)), array()));
+        call_user_func_array([$obj, 'set' . ucfirst($property)], [$value]);
+        $this->assertEquals($value, call_user_func_array([$obj, 'get' . ucfirst($property)], []));
     }
 
-    /**
-     * Data provider
-     *
-     * @return array
-     */
-    public function provider()
+    public function settersAndGettersDataProvider(): array
     {
-        return array(
-            array('name'),
-            array('code'),
-            array('locale'),
-        );
+        return [
+            ['name'],
+            ['code'],
+            ['locale'],
+        ];
     }
 
     public function testToString()

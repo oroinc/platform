@@ -5,46 +5,43 @@ namespace Oro\Bundle\NavigationBundle\Menu\Matcher\Voter;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\Voter\VoterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Voter based on route patterns and route parameters
+ */
 class RoutePatternVoter implements VoterInterface
 {
-    /**
-     * @var Request
-     */
-    protected $request;
+    private RequestStack $requestStack;
 
-    /**
-     * @param Request $request
-     */
-    public function setRequest(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
     }
 
-    /**
-     * @param ItemInterface $item
-     * @return bool|null
-     */
-    public function matchItem(ItemInterface $item)
+    public function matchItem(ItemInterface $item): ?bool
     {
-        if (null === $this->request) {
+        // Using master request, as sub-requests routes must not be taken into account when matching the menu items
+        $request = $this->requestStack->getMainRequest();
+
+        if (null === $request) {
             return null;
         }
 
-        $route = $this->request->attributes->get('_route');
+        $route = $request->attributes->get('_route');
         if (null === $route) {
             return null;
         }
 
-        $routes = (array) $item->getExtra('routes', array());
-        $parameters = (array) $item->getExtra('routesParameters', array());
+        $routes = (array) $item->getExtra('routes', []);
+        $parameters = (array) $item->getExtra('routesParameters', []);
 
         foreach ($routes as $testedRoute) {
             if (!$this->routeMatch($testedRoute, $route)) {
                 continue;
             }
 
-            if (isset($parameters[$testedRoute]) && !$this->parametersMatch($parameters[$testedRoute])) {
+            if (isset($parameters[$testedRoute]) && !$this->parametersMatch($parameters[$testedRoute], $request)) {
                 return null;
             }
 
@@ -70,9 +67,9 @@ class RoutePatternVoter implements VoterInterface
     {
         if ($pattern == $actualRoute) {
             return true;
-        } elseif (0 === strpos($pattern, '/') && strlen($pattern) - 1 === strrpos($pattern, '/')) {
+        } elseif (str_starts_with($pattern, '/') && strlen($pattern) - 1 === strrpos($pattern, '/')) {
             return preg_match($pattern, $actualRoute);
-        } elseif (false !== strpos($pattern, '*')) {
+        } elseif (str_contains($pattern, '*')) {
             $pattern = sprintf('/^%s$/', str_replace('*', '\w+', $pattern));
             return preg_match($pattern, $actualRoute);
         } else {
@@ -82,14 +79,11 @@ class RoutePatternVoter implements VoterInterface
 
     /**
      * Returns TRUE if request matches parameters
-     *
-     * @param array $parameters
-     * @return bool
      */
-    protected function parametersMatch(array $parameters)
+    protected function parametersMatch(array $parameters, Request $request): bool
     {
         foreach ($parameters as $name => $value) {
-            if ($this->request->attributes->get($name) != $value) {
+            if ($request->attributes->get($name) != $value) {
                 return false;
             }
         }

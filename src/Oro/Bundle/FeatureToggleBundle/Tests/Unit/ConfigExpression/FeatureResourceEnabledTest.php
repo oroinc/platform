@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\ConfigExpression;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureEnabled;
 use Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureResourceEnabled;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
@@ -11,21 +10,16 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
-    /**
-     * @var FeatureResourceEnabled
-     */
-    protected $condition;
+    /** @var FeatureResourceEnabled */
+    private $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->condition = new FeatureResourceEnabled($this->featureChecker);
         $this->condition->setContextAccessor(new ContextAccessor());
     }
@@ -37,7 +31,6 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider wrongOptionsDataProvider
-     * @param array $options
      */
     public function testInitializeWrongOptions(array $options)
     {
@@ -45,10 +38,7 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function wrongOptionsDataProvider()
+    public function wrongOptionsDataProvider(): array
     {
         return [
             [
@@ -71,17 +61,13 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
      */
     public function testInitialize(array $options)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             [
@@ -101,8 +87,6 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider toArrayDataProvider
-     * @param array $options
-     * @param array $expected
      */
     public function testToArray(array $options, array $expected)
     {
@@ -111,10 +95,7 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -166,10 +147,7 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [
@@ -190,7 +168,7 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
         $context = [
             'resource' => 'test',
             'type' => 'resType',
-            'identifier' => 'id'
+            'identifier' => 1
         ];
 
         $options = [
@@ -202,7 +180,7 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
-            ->with('test', 'resType', 'id')
+            ->with('test', 'resType', 1)
             ->willReturn(true);
 
         $this->assertTrue($this->condition->evaluate($context));

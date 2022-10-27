@@ -1,7 +1,4 @@
-define([
-    'jquery',
-    'oroui/js/error'
-], function($, error) {
-    'use strict';
-    $(document).ajaxError($.proxy(error.handle, error));
-});
+import $ from 'jquery';
+import error from 'oroui/js/error';
+
+$(document).ajaxError(error.handle.bind(error));

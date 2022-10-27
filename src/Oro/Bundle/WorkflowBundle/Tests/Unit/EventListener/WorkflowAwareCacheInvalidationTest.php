@@ -2,49 +2,52 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Cache\ArrayCache;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ArrayCache */
-    protected $cache;
+    private const ACTIVE_WORKFLOW_RELATED_CLASSES_KEY = 'active_workflow_related';
+    private const WORKFLOW_RELATED_CLASSES_KEY = 'all_workflow_related';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
     /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $definitionRepository;
-
-    /** @var WorkflowAwareCache */
-    protected $workflowAwareCache;
+    private $definitionRepository;
 
     /** @var \stdClass */
     private $entity;
 
-    protected function setUp()
+    /** @var WorkflowAwareCache */
+    private $workflowAwareCache;
+
+    protected function setUp(): void
     {
-        $this->cache = new ArrayCache();
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->entity = new \stdClass();
         $this->definitionRepository = $this->createMock(WorkflowDefinitionRepository::class);
 
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctrineHelper->expects($this->any())->method('getEntityClass')->willReturn(get_class($this->entity));
-        $this->doctrineHelper->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(get_class($this->entity));
+        $doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with(WorkflowDefinition::class)
             ->willReturn($this->definitionRepository);
 
-        $this->workflowAwareCache = new WorkflowAwareCache($this->cache, $this->doctrineHelper);
+        $this->workflowAwareCache = new WorkflowAwareCache($this->cache, $doctrineHelper);
     }
 
     public function testInvalidationOfActiveWorkflowRelatedEntityClassesList()
     {
-        $this->definitionRepository->expects($this->exactly(3))
+        $this->definitionRepository->expects($this->once())
             ->method('getAllRelatedEntityClasses')
             ->withConsecutive([true], [true], [true])
             ->willReturnOnConsecutiveCalls(
@@ -52,67 +55,29 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
                 [\stdClass::class],
                 [\DateTime::class]
             );
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with(self::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->assertTrue(
             $this->workflowAwareCache->hasRelatedActiveWorkflows($this->entity),
             'Must be matched by fetched from db'
         );
 
-        $this->assertTrue(
-            $this->cache->contains(WorkflowAwareCache::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY),
-            'Data must be retrieved and cached.'
-        );
+        $this->cache->expects($this->once())
+            ->method('delete')
+            ->with(self::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY);
 
-        $this->assertTrue(
-            $this->workflowAwareCache->hasRelatedActiveWorkflows($this->entity),
-            'Result must be the same. Matched by fetched from cache.'
-        );
-
-        //first invalidation. \DateTime::class were removed from repository result
         $this->workflowAwareCache->invalidateActiveRelated();
-
-        $this->assertFalse(
-            $this->cache->contains(WorkflowAwareCache::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY),
-            'Cache must be destroyed and do not contains a data under the key'
-        );
-
-        $this->assertTrue(
-            $this->workflowAwareCache->hasRelatedActiveWorkflows($this->entity),
-            'Must be matched by fetched from db'
-        );
-
-        $this->assertTrue(
-            $this->workflowAwareCache->hasRelatedActiveWorkflows($this->entity),
-            'Result must be the same. Matched by fetched from cache.'
-        );
-
-        //second invalidation. \stdClass were removed from repository result \DateTime added
-        $this->workflowAwareCache->invalidateActiveRelated();
-
-        $this->assertFalse(
-            $this->cache->contains(WorkflowAwareCache::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY),
-            'Cache must be destroyed and do not contains a data under the key'
-        );
-
-        $this->assertFalse(
-            $this->workflowAwareCache->hasRelatedActiveWorkflows($this->entity),
-            'Must be matched by fetched from db as class not in set'
-        );
-
-        $this->assertTrue(
-            $this->cache->contains(WorkflowAwareCache::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY),
-            'Data must be cached.'
-        );
-
-        $this->assertFalse(
-            $this->workflowAwareCache->hasRelatedActiveWorkflows($this->entity),
-            'Result must be the same. Not matched by fetched from cache.'
-        );
     }
 
     public function testInvalidationOfWorkflowRelatedEntityClassesList()
     {
-        $this->definitionRepository->expects($this->exactly(3))
+        $this->definitionRepository->expects($this->once())
             ->method('getAllRelatedEntityClasses')
             ->withConsecutive([false], [false], [false])
             ->willReturnOnConsecutiveCalls(
@@ -121,66 +86,23 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
                 [\DateTime::class]
             );
 
-        $this->assertTrue(
-            $this->workflowAwareCache->hasRelatedWorkflows($this->entity),
-            'Must be matched by fetched from db'
-        );
-
-        $this->assertTrue(
-            $this->cache->contains(WorkflowAwareCache::WORKFLOW_RELATED_CLASSES_KEY),
-            'Data must be retrieved and cached.'
-        );
-
-        $this->assertTrue(
-            $this->workflowAwareCache->hasRelatedWorkflows($this->entity),
-            'Result must be the same. Matched by fetched from cache.'
-        );
-
-        //first invalidation. \DateTime::class were removed from repository result
-        $this->workflowAwareCache->invalidateRelated();
-
-        $this->assertFalse(
-            $this->cache->contains(WorkflowAwareCache::WORKFLOW_RELATED_CLASSES_KEY),
-            'Cache must be destroyed and do not contains a data under the key'
-        );
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with(self::WORKFLOW_RELATED_CLASSES_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->assertTrue(
             $this->workflowAwareCache->hasRelatedWorkflows($this->entity),
             'Must be matched by fetched from db'
         );
 
-        $this->assertTrue(
-            $this->cache->contains(WorkflowAwareCache::WORKFLOW_RELATED_CLASSES_KEY),
-            'Cache must be destroyed and do not contains a data under the key'
-        );
-
-        $this->assertTrue(
-            $this->workflowAwareCache->hasRelatedWorkflows($this->entity),
-            'Result must be the same. Matched by fetched from cache.'
-        );
-
-        //second invalidation. \stdClass were removed from repository result \DateTime added
+        $this->cache->expects($this->once())
+            ->method('delete')
+            ->with(self::WORKFLOW_RELATED_CLASSES_KEY);
         $this->workflowAwareCache->invalidateRelated();
-
-        $this->assertFalse(
-            $this->cache->contains(WorkflowAwareCache::WORKFLOW_RELATED_CLASSES_KEY),
-            'Cache must be destroyed and do not contains a data under the key'
-        );
-
-        $this->assertFalse(
-            $this->workflowAwareCache->hasRelatedWorkflows($this->entity),
-            'Must be matched by fetched from db as class not in set'
-        );
-
-        $this->assertTrue(
-            $this->cache->contains(WorkflowAwareCache::WORKFLOW_RELATED_CLASSES_KEY),
-            'Data must be cached.'
-        );
-
-        $this->assertFalse(
-            $this->workflowAwareCache->hasRelatedWorkflows($this->entity),
-            'Result must be the same. Not matched by fetched from cache.'
-        );
     }
 
     public function testGetSubscribedEvents()

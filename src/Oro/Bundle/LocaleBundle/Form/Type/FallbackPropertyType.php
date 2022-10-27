@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Choose fallback type between default and parent values.
@@ -23,9 +23,6 @@ class FallbackPropertyType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -71,6 +68,7 @@ class FallbackPropertyType extends AbstractType
                 ],
                 'localization' => null,
                 'parent_localization' => null,
+                'use_tabs' => false,
             ]
         );
 
@@ -95,8 +93,12 @@ class FallbackPropertyType extends AbstractType
                     $choices[FallbackType::PARENT_LOCALIZATION] = sprintf(
                         '%s [%s]',
                         $options['parent_localization'],
-                        $this->translator->trans($choices[FallbackType::PARENT_LOCALIZATION])
+                        $this->translator->trans((string) $choices[FallbackType::PARENT_LOCALIZATION])
                     );
+                }
+
+                if ($options['use_tabs']) {
+                    $choices[FallbackType::NONE] = $this->translator->trans('oro.locale.fallback.type.custom');
                 }
 
                 return array_flip($choices);

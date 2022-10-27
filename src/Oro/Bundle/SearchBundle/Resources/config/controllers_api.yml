@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        public: true
+
+    OroSearchBundleRestApiController:
+        namespace: Oro\Bundle\SearchBundle\Controller\Api\
+        resource: '../../Controller/Api/*Controller.php'
+        calls:
+            - [setContainer, ['@service_container']]

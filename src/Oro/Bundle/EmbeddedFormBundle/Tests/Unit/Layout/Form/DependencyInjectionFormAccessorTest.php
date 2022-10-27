@@ -5,29 +5,33 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Form;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormInterface;
 
 class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_SERVICE_ID = 'test_service_id';
+    private const FORM_SERVICE_ID = 'test_service_id';
 
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
     }
 
     public function testGetForm()
     {
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $form->expects($this->once())->method('getName')->willReturn('form_name');
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('getName')
+            ->willReturn('form_name');
 
         $this->container->expects($this->once())
             ->method('get')
             ->with(self::FORM_SERVICE_ID)
-            ->will($this->returnValue($form));
+            ->willReturn($form);
 
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
         $this->assertSame($form, $formAccessor->getForm());
@@ -62,28 +66,28 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         $formAction = 'test_action';
         $formMethod = 'test_method';
 
-        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $formView   = new FormView();
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formView = new FormView();
 
         $formView->vars['multipart'] = false;
 
         $this->container->expects($this->once())
             ->method('get')
             ->with(self::FORM_SERVICE_ID)
-            ->will($this->returnValue($form));
+            ->willReturn($form);
         $form->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $form->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
         $formConfig->expects($this->once())
             ->method('getAction')
-            ->will($this->returnValue($formAction));
+            ->willReturn($formAction);
         $formConfig->expects($this->once())
             ->method('getMethod')
-            ->will($this->returnValue($formMethod));
+            ->willReturn($formMethod);
 
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
@@ -98,28 +102,28 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         $formAction = 'test_action';
         $formMethod = 'test_method';
 
-        $form       = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $formView   = new FormView();
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formView = new FormView();
 
         $formView->vars['multipart'] = true;
 
         $this->container->expects($this->once())
             ->method('get')
             ->with(self::FORM_SERVICE_ID)
-            ->will($this->returnValue($form));
+            ->willReturn($form);
         $form->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
         $form->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
         $formConfig->expects($this->once())
             ->method('getAction')
-            ->will($this->returnValue($formAction));
+            ->willReturn($formAction);
         $formConfig->expects($this->once())
             ->method('getMethod')
-            ->will($this->returnValue($formMethod));
+            ->willReturn($formMethod);
 
         $this->assertEquals($formAction, $formAccessor->getAction()->getPath());
         $this->assertEquals(strtoupper($formMethod), $formAccessor->getMethod());
@@ -132,21 +136,21 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
         // form
         //   field1
         //     field2
-        $formView                       = new FormView();
-        $formView->vars['id']           = self::FORM_SERVICE_ID;
-        $field1View                     = new FormView($formView);
-        $formView->children['field1']   = $field1View;
-        $field2View                     = new FormView($field1View);
+        $formView = new FormView();
+        $formView->vars['id'] = self::FORM_SERVICE_ID;
+        $field1View = new FormView($formView);
+        $formView->children['field1'] = $field1View;
+        $field2View = new FormView($field1View);
         $field1View->children['field2'] = $field2View;
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $this->container->expects($this->once())
             ->method('get')
             ->with(self::FORM_SERVICE_ID)
-            ->will($this->returnValue($form));
+            ->willReturn($form);
         $form->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
 
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
         $this->assertSame($formView, $formAccessor->getView());
@@ -170,14 +174,18 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
     {
         $data = ['test'];
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $form->expects($this->once())->method('setData')->with($data);
-        $form->expects($this->once())->method('getData')->willReturn($data);
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('setData')
+            ->with($data);
+        $form->expects($this->once())
+            ->method('getData')
+            ->willReturn($data);
 
         $this->container->expects($this->once())
             ->method('get')
             ->with(self::FORM_SERVICE_ID)
-            ->will($this->returnValue($form));
+            ->willReturn($form);
 
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
 
@@ -187,22 +195,22 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetters()
     {
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $formView = new FormView();
         $formView->vars['multipart'] = true;
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
         $form->expects($this->once())
             ->method('createView')
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
 
         $this->container->expects($this->once())
             ->method('get')
             ->with(self::FORM_SERVICE_ID)
-            ->will($this->returnValue($form));
+            ->willReturn($form);
 
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
 

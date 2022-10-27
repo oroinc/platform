@@ -3,12 +3,13 @@
 namespace Oro\Component\TestUtils\ORM\Mocks;
 
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * This class is a clone of namespace Doctrine\Tests\Mocks\DatabasePlatformMock that is excluded from doctrine
  * package since v2.4.
  */
-class DatabasePlatformMock extends \Doctrine\DBAL\Platforms\AbstractPlatform
+class DatabasePlatformMock extends AbstractPlatform
 {
     private $sequenceNextValSql = "";
     private $prefersIdentityColumns = true;
@@ -112,11 +113,22 @@ class DatabasePlatformMock extends \Doctrine\DBAL\Platforms\AbstractPlatform
     protected function initializeDoctrineTypeMappings()
     {
     }
+
     /**
      * Gets the SQL Snippet used to declare a BLOB column type.
      */
     public function getBlobTypeDeclarationSQL(array $field)
     {
         throw DBALException::notSupported(__METHOD__);
+    }
+
+    public function supportsSequences(): bool
+    {
+        return true;
+    }
+
+    public function supportsIdentityColumns(): bool
+    {
+        return $this->prefersIdentityColumns;
     }
 }

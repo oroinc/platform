@@ -3,16 +3,19 @@
 namespace Oro\Bundle\SecurityBundle\Http\Firewall;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
+/**
+ * Implements Basic HTTP authentication for organization aware authentication tokens.
+ */
 class OrganizationBasicAuthenticationListener
 {
     /** @var TokenStorageInterface */
@@ -36,9 +39,7 @@ class OrganizationBasicAuthenticationListener
     /** @var OrganizationManager */
     protected $manager;
 
-    /**
-     * @var UsernamePasswordOrganizationTokenFactoryInterface
-     */
+    /** @var UsernamePasswordOrganizationTokenFactoryInterface */
     protected $tokenFactory;
 
     /**
@@ -70,9 +71,6 @@ class OrganizationBasicAuthenticationListener
         $this->ignoreFailure = false;
     }
 
-    /**
-     * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
-     */
     public function setTokenFactory(UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory)
     {
         $this->tokenFactory = $tokenFactory;
@@ -81,18 +79,19 @@ class OrganizationBasicAuthenticationListener
     /**
      * Handles basic authentication.
      *
-     * @param GetResponseEvent $event A GetResponseEvent instance
+     * @param RequestEvent $event A RequestEvent instance
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event): void
     {
         $request = $event->getRequest();
 
-        if (false === $username = $request->headers->get('PHP_AUTH_USER', false)) {
+        if (null === $username = $request->headers->get('PHP_AUTH_USER')) {
             return;
         }
 
         if (null !== $token = $this->tokenStorage->getToken()) {
-            if ($token instanceof OrganizationContextTokenInterface
+            if ($token instanceof OrganizationAwareTokenInterface
                 && $token->isAuthenticated()
                 && $token->getUsername() === $username
             ) {

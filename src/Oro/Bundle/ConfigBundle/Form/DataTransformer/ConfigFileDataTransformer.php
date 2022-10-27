@@ -8,6 +8,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\HttpFoundation\File\File as HttpFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * Transforms a value between File entity id and File entity
+ */
 class ConfigFileDataTransformer implements DataTransformerInterface
 {
     /**
@@ -25,19 +28,12 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      */
     private $validator;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ValidatorInterface $validator
-     */
     public function __construct(DoctrineHelper $doctrineHelper, ValidatorInterface $validator)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->validator = $validator;
     }
 
-    /**
-     * @param array $fileConstraints
-     */
     public function setFileConstraints(array $fileConstraints)
     {
         $this->fileConstraints = $fileConstraints;
@@ -53,9 +49,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
             return null;
         }
 
-        $file = $this->doctrineHelper->getEntityRepositoryForClass(File::class)->find($value);
-
-        return $file ? clone $file : null;
+        return $this->doctrineHelper->getEntityRepositoryForClass(File::class)->find($value);
     }
 
     /**
@@ -81,7 +75,8 @@ class ConfigFileDataTransformer implements DataTransformerInterface
             $em->flush($file);
         }
 
-        return $this->restoreFile($file)->getId();
+        $persistedFile = $this->restoreFile($file);
+        return $persistedFile ? $persistedFile->getId() : null;
     }
 
     /**
@@ -95,7 +90,7 @@ class ConfigFileDataTransformer implements DataTransformerInterface
 
     /**
      * @param File $file
-     * @return File
+     * @return File|null
      */
     protected function restoreFile(File $file)
     {

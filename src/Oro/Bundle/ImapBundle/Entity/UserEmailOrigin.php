@@ -87,14 +87,14 @@ class UserEmailOrigin extends EmailOrigin
     /**
      * @var string
      *
-     * @ORM\Column(name="access_token", type="string", length=255, nullable=true)
+     * @ORM\Column(name="access_token", type="text", length=8192, nullable=true)
      */
     protected $accessToken;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="refresh_token", type="string", length=255, nullable=true)
+     * @ORM\Column(name="refresh_token", type="text", length=8192, nullable=true)
      */
     protected $refreshToken;
 
@@ -107,8 +107,20 @@ class UserEmailOrigin extends EmailOrigin
 
     /**
      * @var string
+     *
+     * @ORM\Column(name="account_type", type="string", length=255, nullable=true, options={"default" = "other"})
+     */
+    protected $accountType = 'other';
+
+    /**
+     * @var string
      */
     protected $clientId;
+
+    /**
+     * @var string
+     */
+    protected $tenant;
 
     /**
      * Gets the host name of IMAP server
@@ -299,6 +311,23 @@ class UserEmailOrigin extends EmailOrigin
     }
 
     /**
+     * Returns type.
+     */
+    public function getAccountType(): ?string
+    {
+        return $this->accountType;
+    }
+
+    /**
+     * Sets type
+     */
+    public function setAccountType(string $accountType): UserEmailOrigin
+    {
+        $this->accountType = $accountType;
+        return $this;
+    }
+
+    /**
      * Check is configured smtp.
      *
      * @return bool
@@ -312,6 +341,26 @@ class UserEmailOrigin extends EmailOrigin
         $token = $this->getAccessToken();
 
         if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && (!empty($password) || !empty($token))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check is configured imap.
+     *
+     * @return bool
+     */
+    public function isImapConfigured()
+    {
+        $imapHost = $this->getImapHost();
+        $imapPort = $this->getImapPort();
+        $user = $this->getUser();
+        $password = $this->getPassword();
+        $token = $this->getAccessToken();
+
+        if (!empty($imapHost) && $imapPort > 0 && !empty($user) && (!empty($password) || !empty($token))) {
             return true;
         }
 
@@ -346,7 +395,7 @@ class UserEmailOrigin extends EmailOrigin
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAccessToken()
     {
@@ -419,5 +468,26 @@ class UserEmailOrigin extends EmailOrigin
     public function getClientId()
     {
         return $this->clientId;
+    }
+
+    /**
+     * Sets tenant
+     *
+     * @param string $tenant
+     */
+    public function setTenant($tenant)
+    {
+        $this->tenant = $tenant;
+        return $this;
+    }
+
+    /**
+     * Returns tenant
+     *
+     * @return string
+     */
+    public function getTenant()
+    {
+        return $this->tenant;
     }
 }

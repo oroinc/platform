@@ -3,33 +3,24 @@
 namespace Oro\Bundle\EmailBundle\Acl\Voter;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AbstractEntityVoter;
-use Symfony\Component\Security\Acl\Permission\BasicPermissionMap;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * Security voter that prevents removal of the "system" email template
+ * Prevents removal of the "system" email templates.
  */
 class EmailTemplateVoter extends AbstractEntityVoter
 {
     const EMAIL_TEMPLATE_DELETE_ALIAS = 'oro_email_emailtemplate_delete';
 
-    /** @var EmailTemplate */
-    private $object;
+    /** {@inheritDoc} */
+    protected $supportedAttributes = [
+        BasicPermission::DELETE,
+        self::EMAIL_TEMPLATE_DELETE_ALIAS
+    ];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        parent::__construct($doctrineHelper);
-
-        $this->supportedAttributes = [
-            BasicPermissionMap::PERMISSION_DELETE,
-            self::EMAIL_TEMPLATE_DELETE_ALIAS
-        ];
-    }
+    private mixed $object;
 
     /**
      * {@inheritDoc}
@@ -37,30 +28,27 @@ class EmailTemplateVoter extends AbstractEntityVoter
     public function vote(TokenInterface $token, $object, array $attributes)
     {
         $this->object = $object;
-
-        return parent::vote($token, $object, $attributes);
+        try {
+            return parent::vote($token, $object, $attributes);
+        } finally {
+            $this->object = null;
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
-        if ($this->isDeleteDenied($attribute)) {
-            return self::ACCESS_DENIED;
-        }
-
-        return self::ACCESS_ABSTAIN;
+        return $this->isDeleteDenied($attribute)
+            ? self::ACCESS_DENIED
+            : self::ACCESS_ABSTAIN;
     }
 
-    /**
-     * @param string $attribute
-     *
-     * @return bool
-     */
-    private function isDeleteDenied($attribute)
+    private function isDeleteDenied(string $attribute): bool
     {
-        return in_array($attribute, [BasicPermissionMap::PERMISSION_DELETE, self::EMAIL_TEMPLATE_DELETE_ALIAS], true)
+        return
+            \in_array($attribute, $this->supportedAttributes, true)
             && $this->object instanceof EmailTemplate
             && $this->object->getIsSystem();
     }

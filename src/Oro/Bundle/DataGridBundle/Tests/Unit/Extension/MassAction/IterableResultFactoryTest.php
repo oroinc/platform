@@ -13,17 +13,13 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AclHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $aclHelper;
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
 
-    /**
-     * @var IterableResultFactory
-     */
-    protected $iterableResultFactory;
+    /** @var IterableResultFactory */
+    private $iterableResultFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->iterableResultFactory = new IterableResultFactory($this->aclHelper);
@@ -36,7 +32,6 @@ class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testIsApplicable()
     {
-        /** @var OrmDatasource $dataSource */
         $dataSource = $this->createMock(OrmDatasource::class);
 
         $this->assertTrue($this->iterableResultFactory->isApplicable($dataSource));
@@ -44,7 +39,6 @@ class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateIterableResultWithNotSupportedDatasource()
     {
-        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $gridConfiguration **/
         $gridConfiguration = $this->createMock(DatagridConfiguration::class);
         $selectedItems = SelectedItems::createFromParameters([]);
 

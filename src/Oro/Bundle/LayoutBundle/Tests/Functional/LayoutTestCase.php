@@ -8,23 +8,16 @@ class LayoutTestCase extends WebTestCase
 {
     /**
      * Asserts that two variables contains HTML are equal
-     *
-     * @param string $expected
-     * @param string $actual
      */
-    protected function assertHtmlEquals($expected, $actual)
+    protected function assertHtmlEquals(string $expected, string $actual): void
     {
         $this->assertEquals($this->normalizeHtml($expected), $this->normalizeHtml($actual));
     }
 
     /**
      * Normalizes HTML string
-     *
-     * @param string $html
-     *
-     * @return string
      */
-    protected function normalizeHtml($html)
+    protected function normalizeHtml(string $html): string
     {
         // add line break after tag and its content
         $html = preg_replace('/\>\s*(\w)/', ">\n\${1}", $html);
@@ -47,7 +40,7 @@ class LayoutTestCase extends WebTestCase
         $html = preg_replace('/^\s+/m', '', $html);
 
         // replace uid from id attributes, see AdditionalAttrExtension
-        $html = preg_replace('/="(\w+)-uid-[a-z0-9]+"/', '="${1}"', $html);
+        $html = preg_replace('/="(\w+)\-uid\-[a-z0-9]+"/', '="${1}"', $html);
 
         $html = rtrim($html);
 

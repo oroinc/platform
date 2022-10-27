@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors, max-nesting-depth */
+
 /* Header */
 .app-header {
     margin-bottom: 0;
@@ -23,14 +25,14 @@
 
     .dropdown-menu {
         > li {
-            line-height: $header-dropdown-menu-li-line-height;
+            line-height: $line-height-base;
 
             > a {
-                line-height: $header-dropdown-menu-link-line-height;
+                line-height: $line-height-base;
             }
         }
 
-        &:before {
+        &::before {
             border: 0 none;
 
             content: '';
@@ -39,20 +41,20 @@
             height: 10px;
             position: absolute;
             top: -5px;
-            #{$start}: 9px;
+            left: 9px;
             transform: rotate(53deg) skewX(15deg);
-            box-shadow: -1px -1px 9px 3px rgba(0, 0, 0, .05);
+            box-shadow: $header-dropdown-menu-box-shadow;
             z-index: -1;
         }
 
-        &:after {
+        &::after {
             border: 0 none;
             background: inherit;
             content: '';
             position: absolute;
             top: 0;
-            #{$start}: 0;
-            #{$end}: 0;
+            left: 0;
+            right: 0;
             bottom: 0;
             border-radius: inherit;
             z-index: -1;
@@ -63,11 +65,22 @@
         margin: 0;
 
         list-style: none;
+
+        .nav-header {
+            font-weight: $header-dropdown-menu-header-font-weight;
+            margin-bottom: $header-dropdown-menu-header-margin-bottom;
+        }
     }
 
-    &__search-and-shortcuts { // Includes Shortcuts and Search
+    // Includes Shortcuts and Search
+    &__search-and-shortcuts {
         .dropdown {
-            float: #{$start};
+            float: left;
+
+            .nav-header {
+                font-weight: $header-dropdown-menu-header-font-weight;
+                margin-bottom: $header-dropdown-menu-header-margin-bottom;
+            }
 
             /* Header search dropdown */
             &.header-dropdown-search {
@@ -75,10 +88,6 @@
                     min-width: $header-search-dropdown-min-width;
 
                     background-color: $header-search-dropdown-menu-background;
-                }
-
-                > .dropdown-menu {
-                    padding-bottom: 0;
                 }
 
                 .search-form {
@@ -97,14 +106,13 @@
                         flex-wrap: nowrap;
                         align-items: stretch;
 
-
                         .search-field-container {
                             position: relative;
                             display: flex;
                             flex-grow: 1;
 
                             width: auto;
-                            margin-#{$end}: $header-search-field-container-margin-end;
+                            margin-right: $header-search-field-container-margin-end;
 
                             vertical-align: top;
 
@@ -117,14 +125,14 @@
                         }
 
                         .btn-search {
-                            margin-#{$start}: -1px;
+                            margin-left: -1px;
 
                             flex-shrink: 0;
                         }
 
                         .search-suggestion-list {
                             position: absolute;
-                            #{$start}: 0;
+                            left: 0;
                             width: 100%;
                             max-height: $header-search-suggestion-list-max-height;
                             margin: 0;
@@ -137,17 +145,20 @@
                             box-shadow: $header-search-suggestion-list-shadow;
 
                             li {
-                                border-top: $header-search-suggestion-list-separator-width solid $header-search-suggestion-list-separator-color;
+                                border-top:
+                                    $header-search-suggestion-list-separator-width
+                                    solid
+                                    $header-search-suggestion-list-separator-color;
                                 padding: $header-search-suggestion-item-v-margin 0;
                                 margin: 0 $header-search-suggestion-item-h-margin;
                             }
 
                             li:first-child {
-                                margin-top: $header-search-suggestion-item-v-margin / 2;
+                                margin-top: $header-search-suggestion-item-v-margin * .5;
                             }
 
                             li:last-child {
-                                margin-bottom: $header-search-suggestion-item-v-margin / 2;
+                                margin-bottom: $header-search-suggestion-item-v-margin * .5;
                             }
 
                             li:first-child,
@@ -159,6 +170,8 @@
                             .description {
                                 color: $header-search-suggestion-item-description-color;
                                 line-height: $header-search-suggestion-item-description-line-height;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
                             }
 
                             .entity-label {
@@ -166,13 +179,14 @@
                             }
 
                             li.selected {
-                                margin-#{$start}: $header-search-suggestion-item-h-margin / 2;
-                                margin-#{$end}: $header-search-suggestion-item-h-margin / 2;
-                                padding-#{$start}: $header-search-suggestion-item-h-margin / 2;
-                                padding-#{$end}: $header-search-suggestion-item-h-margin / 2;
+                                margin-left: $header-search-suggestion-item-h-margin * .5;
+                                margin-right: $header-search-suggestion-item-h-margin * .5;
+                                padding-left: $header-search-suggestion-item-h-margin * .5;
+                                padding-right: $header-search-suggestion-item-h-margin * .5;
                                 background-color: $header-search-selected-suggestion-item-bg;
 
-                                .description, .entity-label {
+                                .description,
+                                .entity-label {
                                     color: $header-search-selected-suggestion-item-color;
                                 }
                             }
@@ -190,11 +204,12 @@
                             }
                         }
 
-                        .no-result-message {
+                        .no-data {
                             position: absolute;
-                            #{$start}: 0;
+                            left: 0;
                             width: 100%;
-                            padding: $header-search-no-result-padding;
+                            padding: $header-search-no-data-padding;
+                            margin: 0;
 
                             background-color: $header-search-dropdown-menu-background;
                             box-shadow: $header-search-suggestion-list-shadow;
@@ -204,48 +219,68 @@
                             display: none;
                         }
 
-                        input.search:not(:focus) + .search-suggestion-list + .no-result-message {
+                        // Don't hide suggestion list immediately after search input loses focus as it prevents clicking on links in Firefox
+                        input.search:not(:focus) + .search-suggestion-list:hover {
+                            display: block;
+                        }
+
+                        input.search:not(:focus) + .search-suggestion-list + .no-data {
+                            // stylelint-disable-next-line declaration-no-important
                             display: none !important;
                         }
 
                         .avatar {
-                            float: $end;
+                            float: right;
                         }
 
-                        &:after {
-                            content: "";
+                        &::after {
+                            content: '';
                             display: block;
                             clear: both;
                         }
-                    } // Ends .header-search
-                } // Ends .search-form
-            } // Ends &:.header-dropdown-search
+                    } /* Ends .header-search */
+                } /* Ends .search-form */
+            } /* Ends &:.header-dropdown-search */
 
             &.header-dropdown-shortcut {
-                .header-dropdown-shortcut {
-                    &__search {
-                        width: 100%;
-                    }
+                .header-dropdown-shortcut__search {
+                    width: 100%;
+
+                    margin-bottom: $header-shortcut-dropdown-search-margin-bottom;
                 }
+
                 .dropdown-menu {
                     width: $header-shortcut-dropdown-width;
 
                     .typeahead {
-                        width: $field-width;
-                        margin-top: -$input-border-width;
+                        width: auto;
+                        min-width: 100%;
+                        max-width: 500px;
+                        padding: $header-shortcut-typeahead-padding;
+                        border-top-left-radius: 0;
+                        border-top-right-radius: 0;
 
-                        &:before,
-                        &:after {
-                            border: none;
+                        &::before,
+                        &::after {
+                            display: none;
                         }
                     }
                 }
+
+                .nav-content .shortcut-container {
+                    padding: $header-dropdown-item-form-padding;
+                }
+
+                .dropdown-item {
+                    > a {
+                        padding: 0;
+                    }
+                }
             }
-        } // Ends .dropdown
+        } /* Ends .dropdown */
 
         .select2-container {
             box-sizing: border-box;
         }
-
-    } // Ends .top-search
+    } /* Ends .top-search */
 }

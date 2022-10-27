@@ -11,9 +11,6 @@ trait ConfigurationPassesAwareTrait
      */
     private $configurationPasses = [];
 
-    /**
-     * @param ConfigurationPassInterface $configurationPass
-     */
     public function addConfigurationPass(ConfigurationPassInterface $configurationPass)
     {
         $this->configurationPasses[] = $configurationPass;

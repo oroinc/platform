@@ -11,12 +11,7 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
      */
     protected function getAttributeType()
     {
-        return new DecimalAttributeType('decimal');
-    }
-
-    public function testGetType()
-    {
-        $this->assertEquals('decimal', $this->getAttributeType()->getType());
+        return new DecimalAttributeType();
     }
 
     /**
@@ -31,12 +26,11 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetSearchableValue()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->getAttributeType()->getSearchableValue($this->attribute, 42.42, $this->localization);
     }
 
@@ -48,11 +42,25 @@ class DecimalAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
+    public function testGetFilterableNull()
+    {
+        $this->assertNull(
+            $this->getAttributeType()->getFilterableValue($this->attribute, null, $this->localization)
+        );
+    }
+
     public function testGetSortableValue()
     {
         $this->assertSame(
             42.42,
-            $this->getAttributeType()->getFilterableValue($this->attribute, '42.42 test', $this->localization)
+            $this->getAttributeType()->getSortableValue($this->attribute, '42.42 test', $this->localization)
+        );
+    }
+
+    public function testGetSortableValueNull()
+    {
+        $this->assertNull(
+            $this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization)
         );
     }
 }

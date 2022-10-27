@@ -33,9 +33,6 @@ class FeatureResourceEnabled extends AbstractCondition implements ContextAccesso
      */
     protected $scopeIdentifier;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;

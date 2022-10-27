@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeConfigExtension;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -20,18 +21,18 @@ use Symfony\Component\Form\Test\TypeTestCase;
 class AttributeConfigExtensionTest extends TypeTestCase
 {
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $attributeConfigProvider;
+    private $attributeConfigProvider;
 
     /** @var SerializedFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $serializedFieldProvider;
+    private $serializedFieldProvider;
 
     /** @var AttributeTypeRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $attributeTypeRegistry;
+    private $attributeTypeRegistry;
 
     /** @var AttributeConfigExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,10 +54,13 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->assertConfigProviderCalled($fieldConfigModel);
         $this->assertAttributeTypeRegistryCalled($fieldConfigModel, false, false, false);
 
-        $this->dispatcher->expects($this->exactly(2))->method('addListener');
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('addListener');
 
         $attributeTypeBuilder = $this->createMock(FormBuilderInterface::class);
-        $attributeTypeBuilder->expects($this->any())->method('getName')->willReturn('attribute');
+        $attributeTypeBuilder->expects($this->any())
+            ->method('getName')
+            ->willReturn('attribute');
         $attributeTypeBuilder->expects($this->exactly(4))
             ->method('remove')
             ->withConsecutive(
@@ -78,11 +82,15 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->assertConfigProviderCalled($fieldConfigModel);
         $this->assertAttributeTypeRegistryCalled($fieldConfigModel, true, true, true);
 
-        $this->dispatcher->expects($this->exactly(2))->method('addListener');
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('addListener');
 
         $attributeTypeBuilder = $this->createMock(FormBuilderInterface::class);
-        $attributeTypeBuilder->expects($this->any())->method('getName')->willReturn('attribute');
-        $attributeTypeBuilder->expects($this->never())->method('remove');
+        $attributeTypeBuilder->expects($this->any())
+            ->method('getName')
+            ->willReturn('attribute');
+        $attributeTypeBuilder->expects($this->never())
+            ->method('remove');
 
         $this->builder->add($attributeTypeBuilder);
 
@@ -95,61 +103,60 @@ class AttributeConfigExtensionTest extends TypeTestCase
 
         $this->assertConfigProviderCalled($fieldConfigModel);
 
-        $this->dispatcher->expects($this->exactly(2))->method('addListener');
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('addListener');
 
         $attributeTypeBuilder = $this->createMock(FormBuilderInterface::class);
-        $attributeTypeBuilder->expects($this->any())->method('getName')->willReturn('attribute');
-        $attributeTypeBuilder->expects($this->exactly(4))
-            ->method('remove')
-            ->withConsecutive(
-                ['searchable'],
-                ['filterable'],
-                ['filter_by'],
-                ['sortable']
-            );
+        $attributeTypeBuilder->expects($this->any())
+            ->method('getName')
+            ->willReturn('attribute');
 
         $this->builder->add($attributeTypeBuilder);
+        $this->assertTrue($this->builder->has('attribute'));
 
         $this->extension->buildForm($this->builder, ['config_model' => $fieldConfigModel]);
+
+        $this->assertFalse($this->builder->has('attribute'));
     }
 
-    /**
-     * @param FieldConfigModel $fieldConfigModel
-     */
-    protected function assertConfigProviderCalled(FieldConfigModel $fieldConfigModel)
+    private function assertConfigProviderCalled(FieldConfigModel $fieldConfigModel)
     {
         $classConfig = $this->createMock(ConfigInterface::class);
-        $classConfig->expects($this->once())->method('is')->with('has_attributes')->willReturn(true);
+        $classConfig->expects($this->once())
+            ->method('is')
+            ->with('has_attributes')
+            ->willReturn(true);
 
         $fieldConfig = $this->createMock(ConfigInterface::class);
-        $fieldConfig->expects($this->once())->method('is')->with('is_attribute')->willReturn(true);
+        $fieldConfig->expects($this->once())
+            ->method('is')
+            ->with('is_attribute')
+            ->willReturn(true);
 
         $this->attributeConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    [$fieldConfigModel->getEntity()->getClassName(), null, $classConfig],
-                    [$fieldConfigModel->getEntity()->getClassName(), $fieldConfigModel->getFieldName(), $fieldConfig]
-                ]
-            );
+            ->willReturnMap([
+                [$fieldConfigModel->getEntity()->getClassName(), null, $classConfig],
+                [$fieldConfigModel->getEntity()->getClassName(), $fieldConfigModel->getFieldName(), $fieldConfig]
+            ]);
     }
 
-    /**
-     * @param FieldConfigModel $attribute
-     * @param bool $isSearchable
-     * @param bool $isFilterable
-     * @param bool $isSortable
-     */
-    protected function assertAttributeTypeRegistryCalled(
+    private function assertAttributeTypeRegistryCalled(
         FieldConfigModel $attribute,
-        $isSearchable,
-        $isFilterable,
-        $isSortable
+        bool $isSearchable,
+        bool $isFilterable,
+        bool $isSortable
     ) {
         $attributeType = $this->createMock(AttributeTypeInterface::class);
-        $attributeType->expects($this->once())->method('isSearchable')->willReturn($isSearchable);
-        $attributeType->expects($this->once())->method('isFilterable')->willReturn($isFilterable);
-        $attributeType->expects($this->once())->method('isSortable')->willReturn($isSortable);
+        $attributeType->expects($this->once())
+            ->method('isSearchable')
+            ->willReturn($isSearchable);
+        $attributeType->expects($this->once())
+            ->method('isFilterable')
+            ->willReturn($isFilterable);
+        $attributeType->expects($this->once())
+            ->method('isSortable')
+            ->willReturn($isSortable);
 
         $this->attributeTypeRegistry->expects($this->once())
             ->method('getAttributeType')
@@ -161,14 +168,12 @@ class AttributeConfigExtensionTest extends TypeTestCase
     {
         $fieldConfigModel = $this->getFieldConfigModel();
 
-        $classConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $classConfig = $this->createMock(ConfigInterface::class);
         $classConfig->expects($this->once())
             ->method('is')
             ->with('has_attributes')
             ->willReturn(false);
-        $fieldConfig = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $fieldConfig = $this->createMock(ConfigInterface::class);
         $fieldConfig->expects($this->once())
             ->method('is')
             ->with('is_attribute')
@@ -189,16 +194,14 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->assertFalse($this->builder->has('attribute'));
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes()
     {
-        $this->assertEquals(ConfigType::class, $this->extension->getExtendedType());
+        $this->assertEquals([ConfigType::class], AttributeConfigExtension::getExtendedTypes());
     }
 
     public function testOnPostSetData()
     {
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
-        $form = $this->getMockBuilder(FormInterface::class)
-            ->getMock();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('remove')
             ->with('is_serialized');
@@ -207,10 +210,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->extension->onPostSetData($event);
     }
 
-    /**
-     * @return array
-     */
-    public function isSerializedDataProvider()
+    public function isSerializedDataProvider(): array
     {
         return [
             'serialized field' => [
@@ -224,13 +224,10 @@ class AttributeConfigExtensionTest extends TypeTestCase
 
     /**
      * @dataProvider isSerializedDataProvider
-     *
-     * @param bool $isSerialized
      */
-    public function testOnPostSubmit($isSerialized)
+    public function testOnPostSubmit(bool $isSerialized)
     {
-        $form = $this->getMockBuilder(FormInterface::class)
-            ->getMock();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
@@ -252,8 +249,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
             ->method('isSerializedByData')
             ->with($fieldConfigModel, $data)
             ->willReturn($isSerialized);
-        $config = $this->getMockBuilder(ConfigInterface::class)
-            ->getMock();
+        $config = $this->createMock(ConfigInterface::class);
         $config->expects($this->any())
             ->method('is')
             ->willReturn(true);
@@ -277,8 +273,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
 
     public function testOnPostSubmitNotValid()
     {
-        $form = $this->getMockBuilder(FormInterface::class)
-            ->getMock();
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
@@ -289,13 +284,39 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->extension->onPostSubmit($event);
     }
 
-    /**
-     * @return FieldConfigModel
-     */
-    protected function getFieldConfigModel()
+    public function testOnPostIsValidAndFieldConfigModelExists(): void
+    {
+        $fieldConfigModel = $this->getFieldConfigModel(1);
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formConfig->expects($this->once())
+            ->method('getOption')
+            ->with('config_model')
+            ->willReturn($fieldConfigModel);
+
+        $form->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+
+        $this->serializedFieldProvider->expects($this->never())
+            ->method('isSerializedByData');
+
+        $event = new FormEvent($form, []);
+        $this->extension->buildForm($this->builder, ['config_model' => $fieldConfigModel]);
+        $this->extension->onPostSubmit($event);
+
+        $this->assertEmpty($event->getData());
+    }
+
+    private function getFieldConfigModel(int $id = null): FieldConfigModel
     {
         $entityConfigModel = new EntityConfigModel('class');
         $fieldConfigModel = new FieldConfigModel('test', 'string');
+        ReflectionUtil::setId($fieldConfigModel, $id);
         $fieldConfigModel->setEntity($entityConfigModel);
 
         return $fieldConfigModel;

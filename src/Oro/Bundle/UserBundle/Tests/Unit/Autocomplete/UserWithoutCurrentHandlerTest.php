@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Autocomplete;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
@@ -17,70 +21,73 @@ use Oro\Bundle\UserBundle\Autocomplete\UserWithoutCurrentHandler;
 
 class UserWithoutCurrentHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const NAME = 'OroUserBundle:User';
+    private const NAME = 'OroUserBundle:User';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $indexer;
+    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
+    private $indexer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclHelper;
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
 
     /** @var UserWithoutCurrentHandler */
-    protected $handler;
+    private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $attachmentManager = $this->createMock(AttachmentManager::class);
         $this->indexer = $this->createMock(Indexer::class);
-
         $this->repository = $this->createMock(EntityRepository::class);
+        $this->aclHelper = $this->createMock(AclHelper::class);
+
+        $pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
 
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue('id'));
+            ->willReturn('id');
 
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->any())
             ->method('getMetadataFor')
             ->with(self::NAME)
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
-        $this->manager = $this->createMock(ObjectManager::class);
-        $this->manager->expects($this->any())
+        $manager = $this->createMock(ObjectManager::class);
+        $manager->expects($this->any())
             ->method('getRepository')
             ->with(self::NAME)
-            ->will($this->returnValue($this->repository));
-        $this->manager->expects($this->any())
+            ->willReturn($this->repository);
+        $manager->expects($this->any())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
+            ->willReturn($metadataFactory);
 
-        $this->aclHelper = $this->createMock(AclHelper::class);
+        $searchMappingProvider = $this->createMock(SearchMappingProvider::class);
+        $searchMappingProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with(self::NAME)
+            ->willReturn('user');
 
-        $this->handler = new UserWithoutCurrentHandler($this->tokenAccessor, $attachmentManager, self::NAME, []);
-        $this->handler->initSearchIndexer($this->indexer, [self::NAME => ['alias' => 'user']]);
-        $this->handler->initDoctrinePropertiesByEntityManager($this->manager);
+        $this->handler = new UserWithoutCurrentHandler(
+            $this->tokenAccessor,
+            $pictureSourcesProvider,
+            self::NAME,
+            []
+        );
+        $this->handler->initSearchIndexer($this->indexer, $searchMappingProvider);
+        $this->handler->initDoctrinePropertiesByEntityManager($manager);
         $this->handler->setAclHelper($this->aclHelper);
     }
 
     /**
-     * @param int $pageSize
-     * @param int $currentUserId
-     * @param array $foundUsers
-     * @param array $expectedUsers
      * @dataProvider searchIdsDataProvider
      */
-    public function testSearchIds($pageSize, $currentUserId, array $foundUsers, array $expectedUsers)
+    public function testSearchIds(int $pageSize, int $currentUserId, array $foundUsers, array $expectedUsers)
     {
         $string = 'qwerty';
         $page = 0;
@@ -92,50 +99,49 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->any())
             ->method('getUserId')
-            ->will($this->returnValue($currentUserId));
+            ->willReturn($currentUserId);
 
-        $expr = $this->createMock('Doctrine\ORM\Query\Expr');
+        $expr = $this->createMock(Expr::class);
         $expr->expects($this->once())
             ->method('in')
-            ->with($this->isType('string'), $expectedUsers);
+            ->with($this->isType('string'), ':entityIds');
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects($this->once())
             ->method('expr')
-            ->will($this->returnValue($expr));
+            ->willReturn($expr);
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('entityIds', $expectedUsers);
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $queryBuilder->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
+        $this->aclHelper->expects($this->once())
+            ->method('apply')
+            ->with($query)
+            ->willReturn($query);
 
         $this->repository->expects($this->once())
             ->method('createQueryBuilder')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
         $result = new Result(new Query(), $foundSearchRecords);
 
         $this->indexer->expects($this->once())
             ->method('simpleSearch')
             ->with($string, $page, $pageSize + 2)
-            ->will($this->returnValue($result));
+            ->willReturn($result);
 
         $this->handler->search($string, $page, $pageSize);
     }
 
-    /**
-     * @return array
-     */
-    public function searchIdsDataProvider()
+    public function searchIdsDataProvider(): array
     {
         return [
             'with current user' => [

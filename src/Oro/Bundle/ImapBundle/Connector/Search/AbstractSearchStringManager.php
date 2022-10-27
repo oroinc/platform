@@ -18,7 +18,7 @@ abstract class AbstractSearchStringManager implements SearchStringManagerInterfa
      * Gets a keyword of SEARCH command which corresponds the given item name
      *
      * @param string $itemName The item name
-     * @return string|bool a string if the the keyword exists; otherwise, false.
+     * @return string|bool a string if the keyword exists; otherwise, false.
      */
     abstract protected function getKeyword($itemName);
 

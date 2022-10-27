@@ -1,56 +1,51 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client\Meta;
 
+/**
+ * Holds meta information about destination: name on client and transport sides and subscribers (message processors).
+ */
 class DestinationMeta
 {
     /**
-     * @var string
+     * @var string Destination (queue) name on client side.
      */
-    private $clientName;
+    private string $queueName;
 
     /**
-     * @var string
+     * @var string Destination (queue) name on transport side.
      */
-    private $transportName;
+    private string $transportQueueName;
 
     /**
-     * @var string[]
+     * @var string[] Message processors names.
      */
-    private $subscribers;
+    private array $messageProcessors;
 
     /**
-     * @param string $clientName
-     * @param string $transportName
-     * @param string[] $subscribers
+     * @param string $queueName Destination (queue) name on client side.
+     * @param string $transportQueueName Destination (queue) name on transport side.
+     * @param string[] $messageProcessors Message processors names.
      */
-    public function __construct($clientName, $transportName, array $subscribers = [])
+    public function __construct(string $queueName, string $transportQueueName, array $messageProcessors = [])
     {
-        $this->clientName = $clientName;
-        $this->transportName = $transportName;
-        $this->subscribers = $subscribers;
+        $this->queueName = $queueName;
+        $this->transportQueueName = $transportQueueName;
+        $this->messageProcessors = $messageProcessors;
     }
 
-    /**
-     * @return string
-     */
-    public function getClientName()
+    public function getQueueName(): string
     {
-        return $this->clientName;
+        return $this->queueName;
     }
 
-    /**
-     * @return string
-     */
-    public function getTransportName()
+    public function getTransportQueueName(): string
     {
-        return $this->transportName;
+        return $this->transportQueueName;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getSubscribers()
+    public function getMessageProcessors(): array
     {
-        return $this->subscribers;
+        return $this->messageProcessors;
     }
 }

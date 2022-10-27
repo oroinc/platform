@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var util = require('./util');
-    var Point2d = require('./point2d');
-    var Line2d = require('./line2d');
-    var Interval2d = require('./interval2d');
+    const util = require('./util');
+    const Point2d = require('./point2d');
+    const Line2d = require('./line2d');
+    const Interval2d = require('./interval2d');
 
     /**
      * Constructs vector. Vector is specified by start point and direction
@@ -36,7 +36,7 @@ define(function(require) {
      */
     Object.defineProperty(Vector2d.prototype, 'line', {
         get: function() {
-            var slope = this.direction.y / this.direction.x;
+            const slope = this.direction.y / this.direction.x;
             if (slope === Infinity || slope === -Infinity) {
                 return new Line2d(Infinity, this.start.x);
             }
@@ -53,7 +53,7 @@ define(function(require) {
      * @returns {Point2d}
      */
     Vector2d.prototype.getCrossPointWithRect = function(rect) {
-        var crossPoint = null;
+        let crossPoint = null;
         switch (this.direction.y) {
             case -1:
                 crossPoint = this.getCrossPointWithInterval(rect.bottomSide);
@@ -80,9 +80,9 @@ define(function(require) {
      * @returns {Point2d}
      */
     Vector2d.prototype.getCrossPointWithInterval = function(interval) {
-        var intersectionPoint = this.line.intersection(interval.line);
+        const intersectionPoint = this.line.intersection(interval.line);
         if (!isNaN(intersectionPoint.x) && Math.abs(intersectionPoint.x) !== Infinity) {
-            var relativePoint = intersectionPoint.sub(this.start);
+            const relativePoint = intersectionPoint.sub(this.start);
             if ((Math.sign(relativePoint.x) === Math.sign(this.direction.x)) &&
                 (Math.sign(relativePoint.y) === Math.sign(this.direction.y))) {
                 if (interval.a.x !== interval.b.x) {
@@ -109,7 +109,7 @@ define(function(require) {
             color = 'rgba(0,0,0,0.7)';
         }
         this.start.draw(color, 3);
-        var interval = new Interval2d(this.start, this.start.add(this.direction.unitVector.mul(100000)));
+        const interval = new Interval2d(this.start, this.start.add(this.direction.unitVector.mul(100000)));
         interval.draw(color);
     };
 

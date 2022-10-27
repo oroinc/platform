@@ -5,14 +5,14 @@ namespace Oro\Bundle\FilterBundle\Expression\Date;
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
+/**
+ * Date expression parser.
+ */
 class Parser
 {
     /** @var LocaleSettings */
     protected $localeSettings;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(LocaleSettings $localeSettings)
     {
         $this->localeSettings = $localeSettings;
@@ -21,6 +21,8 @@ class Parser
     /**
      * @param array $tokens
      * @param bool $returnRawToken
+     * @param string|null $timeZone
+     *
      * @return mixed
      */
     public function parse($tokens, $returnRawToken = false)
@@ -64,6 +66,7 @@ class Parser
      *
      * @return Token[]
      * @throws \LogicException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function convertExprToRPN($tokens)
     {
@@ -112,8 +115,6 @@ class Parser
 
     /**
      * Validates token stream
-     *
-     * @param array $tokens
      *
      * @throws SyntaxException
      */

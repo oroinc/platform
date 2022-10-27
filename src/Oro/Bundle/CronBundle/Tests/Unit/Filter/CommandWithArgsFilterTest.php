@@ -2,33 +2,34 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Filter;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\CronBundle\Filter\CommandWithArgsFilter;
 use Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer;
 use Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer;
 use Oro\Bundle\CronBundle\ORM\Pgsql92CommandArgsNormalizer;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class CommandWithArgsFilterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CommandWithArgsFilter */
-    protected $filter;
+    private $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $tokenizer = new CommandArgsTokenizer();
         $tokenizer->addNormalizer(new CommandArgsNormalizer());
         $tokenizer->addNormalizer(new Pgsql92CommandArgsNormalizer());
 
         $this->filter = new CommandWithArgsFilter(
-            $this->createMock('Symfony\Component\Form\FormFactoryInterface'),
+            $this->createMock(FormFactoryInterface::class),
             new FilterUtility(),
             $tokenizer
         );
@@ -38,24 +39,26 @@ class CommandWithArgsFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider applyDataProvider
      */
-    public function testApply($platform, $value, $comparisonType, $expectedDql, $expectedParams)
-    {
+    public function testApply(
+        AbstractPlatform $platform,
+        string $value,
+        int $comparisonType,
+        string $expectedDql,
+        array $expectedParams
+    ) {
         $paramCounter = 0;
 
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock(EntityManagerInterface::class);
         $qb = new QueryBuilder($em);
-        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
-            ->setMethods(['generateParameterName', 'getDatabasePlatform'])
+        $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
+            ->onlyMethods(['generateParameterName', 'getDatabasePlatform'])
             ->setConstructorArgs([$qb])
             ->getMock();
-
         $ds->expects($this->any())
             ->method('generateParameterName')
-            ->willReturnCallback(
-                function () use (&$paramCounter) {
-                    return sprintf('param%s', ++$paramCounter);
-                }
-            );
+            ->willReturnCallback(function () use (&$paramCounter) {
+                return sprintf('param%s', ++$paramCounter);
+            });
         $ds->expects($this->any())
             ->method('getDatabasePlatform')
             ->willReturn($platform);
@@ -74,14 +77,11 @@ class CommandWithArgsFilterTest extends \PHPUnit\Framework\TestCase
         /** @var Query\Parameter $param */
         foreach ($qb->getParameters() as $param) {
             $params[$param->getName()] = $param->getValue();
-        };
+        }
         $this->assertEquals($expectedParams, $params);
     }
 
-    /**
-     * @return array
-     */
-    public function applyDataProvider()
+    public function applyDataProvider(): array
     {
         return [
             [

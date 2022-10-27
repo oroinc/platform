@@ -3,7 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface;
 
 /**
@@ -11,17 +12,19 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface;
  */
 class LoadBusinessUnit extends AbstractFixture implements InitialFixtureInterface
 {
+    public const BUSINESS_UNIT = 'business_unit';
+
     /**
      * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
     {
-        $organization = $manager->getRepository('OroOrganizationBundle:BusinessUnit')
+        $businessUnit = $manager->getRepository(BusinessUnit::class)
             ->createQueryBuilder('t')
             ->orderBy('t.id')
             ->getQuery()
             ->setMaxResults(1)
             ->getSingleResult();
-        $this->addReference('business_unit', $organization);
+        $this->addReference(self::BUSINESS_UNIT, $businessUnit);
     }
 }

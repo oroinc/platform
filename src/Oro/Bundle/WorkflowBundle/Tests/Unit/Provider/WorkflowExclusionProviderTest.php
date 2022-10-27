@@ -9,19 +9,14 @@ use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
 class WorkflowExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    protected $metadata;
+    private $metadata;
 
     /** @var WorkflowExclusionProvider */
-    protected $provider;
+    private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadata = $this->createMock(ClassMetadata::class);
 
         $this->provider = new WorkflowExclusionProvider();
     }

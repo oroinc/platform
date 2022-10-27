@@ -1,89 +1,118 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Renew Symfony routing cache.
+ * Clears router cache.
  */
-class RouterCacheClearCommand extends ContainerAwareCommand
+class RouterCacheClearCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
-    {
-        if (!$this->getContainer()->has('router')) {
-            return false;
-        }
-        $router = $this->getContainer()->get('router');
-        if (!$router instanceof WarmableInterface) {
-            return false;
-        }
+    protected static $defaultName = 'router:cache:clear';
 
-        return parent::isEnabled();
+    private KernelInterface $kernel;
+    private RouterInterface $router;
+    private Filesystem $filesystem;
+
+    public function __construct(
+        KernelInterface $kernel,
+        RouterInterface $router,
+        Filesystem $filesystem
+    ) {
+        $this->kernel = $kernel;
+        $this->router = $router;
+        $this->filesystem = $filesystem;
+
+        parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function isEnabled()
+    {
+        return
+            $this->router instanceof WarmableInterface
+            && parent::isEnabled();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('router:cache:clear')
-            ->setDescription('Clears the routing cache for an application')
+            ->setDescription('Clears router cache.')
             ->setHelp(
-                <<<EOF
-The <info>%command.name%</info> clears the routing cache for a given environment:
+                <<<'HELP'
+The <info>%command.name%</info> command clears router cache.
 
-  <info>php %command.full_name% --env=prod</info>
-EOF
-            );
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \InvalidArgumentException When route does not exist
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $realCacheDir = $this->getContainer()->getParameter('kernel.cache_dir');
-        $tmpCacheDir  = $realCacheDir . '_tmp';
-        $filesystem   = $this->getContainer()->get('filesystem');
+        $io = new SymfonyStyle($input, $output);
 
-        if (!is_writable($realCacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $realCacheDir));
+        $cacheDir = $this->kernel->getCacheDir();
+        $tmpDir = $cacheDir . '_tmp';
+
+        try {
+            if (!is_writable($cacheDir)) {
+                throw new \RuntimeException(sprintf('Unable to write in the "%s" directory.', $cacheDir));
+            }
+
+            $io->text(sprintf(
+                'Clearing the routing cache for the <info>%s</info> environment...',
+                $this->kernel->getEnvironment()
+            ));
+
+            $this->ensureDirNotExists($tmpDir);
+            $this->filesystem->mkdir($tmpDir);
+            $this->router->warmUp($tmpDir);
+            $this->moveToCacheDir($cacheDir, $tmpDir);
+        } catch (\Throwable $e) {
+            $io->error($e->getMessage());
+
+            return $e->getCode() ?: 1;
+        } finally {
+            $this->ensureDirNotExists($tmpDir);
         }
 
-        if ($filesystem->exists($tmpCacheDir)) {
-            $filesystem->remove($tmpCacheDir);
+        $io->success('The cache was successfully cleared.');
+
+        return 0;
+    }
+
+    private function ensureDirNotExists(string $dir): void
+    {
+        if ($this->filesystem->exists($dir)) {
+            $this->filesystem->remove($dir);
         }
+    }
 
-        $kernel = $this->getContainer()->get('kernel');
-        $output->writeln(
-            sprintf(
-                'Clearing the routing cache for the <info>%s</info> environment',
-                $kernel->getEnvironment()
-            )
-        );
-
-        $this->getContainer()->get('router')->warmUp($tmpCacheDir);
-
-        /** @var SplFileInfo $file */
-        foreach (Finder::create()->files()->in($tmpCacheDir) as $file) {
-            $filesystem->copy(
+    private function moveToCacheDir(string $cacheDir, string $tmpDir): void
+    {
+        /** @var SplFileInfo[] $files */
+        $files = Finder::create()->files()->in($tmpDir);
+        foreach ($files as $file) {
+            $this->filesystem->copy(
                 $file->getPathname(),
-                $realCacheDir . DIRECTORY_SEPARATOR . $file->getFilename()
+                $cacheDir . DIRECTORY_SEPARATOR . $file->getFilename()
             );
         }
 
-        $filesystem->remove($tmpCacheDir);
+        $this->filesystem->remove($tmpDir);
     }
 }

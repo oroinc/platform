@@ -11,7 +11,7 @@ class LessThanTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\LessThan */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\LessThan();
         $this->condition->setContextAccessor(new ContextAccessor());

@@ -1,0 +1,5 @@
+dynamic-imports:
+    commons:
+        - orosearch/js/app/views/search-suggestion-view
+    orodatagrid:
+        - orosearch/js/filter/search-boolean-filter

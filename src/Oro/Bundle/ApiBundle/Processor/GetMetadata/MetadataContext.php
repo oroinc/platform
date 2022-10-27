@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 /**
@@ -14,22 +14,22 @@ use Oro\Bundle\ApiBundle\Processor\ApiContext;
 class MetadataContext extends ApiContext
 {
     /** FQCN of an entity */
-    const CLASS_NAME = 'class';
+    private const CLASS_NAME = 'class';
 
     /** the name of the action for which the metadata is built */
-    const TARGET_ACTION = 'targetAction';
+    private const TARGET_ACTION = 'targetAction';
 
     /** a list of requests for additional metadata information that should be retrieved */
-    const EXTRA = 'extra';
+    private const EXTRA = 'extra';
 
     /** whether excluded fields and associations should not be removed */
-    const WITH_EXCLUDED_PROPERTIES = 'withExcludedProperties';
+    private const WITH_EXCLUDED_PROPERTIES = 'withExcludedProperties';
 
     /** @var MetadataExtraInterface[] */
-    protected $extras = [];
+    private $extras = [];
 
     /** @var EntityDefinitionConfig */
-    protected $config;
+    private $config;
 
     /**
      * {@inheritdoc}
@@ -96,8 +96,6 @@ class MetadataContext extends ApiContext
 
     /**
      * Sets the configuration of an entity.
-     *
-     * @param EntityDefinitionConfig $definition
      */
     public function setConfig(EntityDefinitionConfig $definition)
     {
@@ -113,9 +111,28 @@ class MetadataContext extends ApiContext
      */
     public function hasExtra($extraName)
     {
-        return in_array($extraName, $this->get(self::EXTRA), true);
+        return \in_array($extraName, $this->get(self::EXTRA), true);
     }
 
+    /**
+     * Gets additional metadata if it was requested.
+     *
+     * @param string $extraName
+     *
+     * @return MetadataExtraInterface|null
+     */
+    public function getExtra($extraName)
+    {
+        $result = null;
+        foreach ($this->extras as $extra) {
+            if ($extra->getName() === $extraName) {
+                $result = $extra;
+                break;
+            }
+        }
+
+        return $result;
+    }
     /**
      * Gets a list of requested additional metadata.
      *
@@ -138,9 +155,10 @@ class MetadataContext extends ApiContext
         $names = [];
         foreach ($extras as $extra) {
             if (!$extra instanceof MetadataExtraInterface) {
-                throw new \InvalidArgumentException(
-                    'Expected an array of "Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface".'
-                );
+                throw new \InvalidArgumentException(sprintf(
+                    'Expected an array of "%s".',
+                    MetadataExtraInterface::class
+                ));
             }
             $names[] = $extra->getName();
             $extra->configureContext($this);

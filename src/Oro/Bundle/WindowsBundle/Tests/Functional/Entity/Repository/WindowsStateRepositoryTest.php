@@ -4,21 +4,17 @@ namespace Oro\Bundle\WindowsBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository;
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
+use Oro\Bundle\WindowsBundle\Tests\Functional\DataFixtures\LoadWindowsStateData;
 
 class WindowsStateRepositoryTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-
-        $this->loadFixtures(
-            [
-                'Oro\Bundle\WindowsBundle\Tests\Functional\DataFixtures\LoadWindowsStateData',
-                'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData',
-            ]
-        );
+        $this->loadFixtures([LoadWindowsStateData::class, LoadUserData::class,]);
     }
 
     public function testUpdate()
@@ -29,7 +25,7 @@ class WindowsStateRepositoryTest extends WebTestCase
         $registry = $this->getContainer()->get('doctrine');
 
         /** @var WindowsStateRepository $repo */
-        $repo = $registry->getRepository('OroWindowsBundle:WindowsState');
+        $repo = $registry->getRepository(WindowsState::class);
 
         $this->assertEquals(1, $repo->update($state->getUser(), $state->getId(), ['cleanUrl' => '/path?a=1']));
 
@@ -50,7 +46,7 @@ class WindowsStateRepositoryTest extends WebTestCase
         $registry = $this->getContainer()->get('doctrine');
 
         /** @var WindowsStateRepository $repo */
-        $repo = $registry->getRepository('OroWindowsBundle:WindowsState');
+        $repo = $registry->getRepository(WindowsState::class);
 
         $this->assertEquals(0, $repo->update($user, $state->getId(), ['cleanUrl' => '/path?a=1']));
     }
@@ -63,7 +59,7 @@ class WindowsStateRepositoryTest extends WebTestCase
         $registry = $this->getContainer()->get('doctrine');
 
         /** @var WindowsStateRepository $repo */
-        $repo = $registry->getRepository('OroWindowsBundle:WindowsState');
+        $repo = $registry->getRepository(WindowsState::class);
 
         $this->assertEquals(1, $repo->delete($state->getUser(), $state->getId()));
 
@@ -81,7 +77,7 @@ class WindowsStateRepositoryTest extends WebTestCase
         $registry = $this->getContainer()->get('doctrine');
 
         /** @var WindowsStateRepository $repo */
-        $repo = $registry->getRepository('OroWindowsBundle:WindowsState');
+        $repo = $registry->getRepository(WindowsState::class);
 
         $this->assertEquals(0, $repo->delete($user, $state->getId()));
     }

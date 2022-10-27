@@ -1,0 +1,24 @@
+/* @theme: admin.oro; */
+
+.scroll-hint-top,
+.scroll-hint-bottom {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: $scrollspy-nav-z-index;
+
+    height: $scroll-hint-size;
+
+    pointer-events: none;
+}
+
+.scroll-hint-top {
+    background: $scroll-hint-top-bg;
+}
+
+.scroll-hint-bottom {
+    margin-top: -$scroll-hint-size;
+
+    background: $scroll-bottom-top-bg;
+}

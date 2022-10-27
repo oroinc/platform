@@ -6,39 +6,30 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
-use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
 
+/**
+ * Provides a set of utility methods to filter data by an activity list.
+ */
 class ActivityListFilterHelper
 {
-    /** @var  DateTimeRangeFilter */
-    protected $dateTimeRangeFilter;
-
-    /** @var ChoiceFilter */
-    protected $choiceFilter;
+    /** @var FilterBagInterface */
+    private $filterBag;
 
     /** @var EntityRoutingHelper */
-    protected $routingHelper;
+    private $routingHelper;
 
     /** @var ActivityListChainProvider */
-    protected $chainProvider;
+    private $chainProvider;
 
-    /**
-     * @param DateTimeRangeFilter       $dateTimeRangeFilter
-     * @param ChoiceFilter              $choiceFilter
-     * @param EntityRoutingHelper       $routingHelper
-     * @param ActivityListChainProvider $chainProvider
-     */
     public function __construct(
-        DateTimeRangeFilter $dateTimeRangeFilter,
-        ChoiceFilter $choiceFilter,
+        FilterBagInterface $filterBag,
         EntityRoutingHelper $routingHelper,
         ActivityListChainProvider $chainProvider
     ) {
-        $this->dateTimeRangeFilter = $dateTimeRangeFilter;
-        $this->choiceFilter        = $choiceFilter;
-        $this->routingHelper       = $routingHelper;
-        $this->chainProvider       = $chainProvider;
+        $this->filterBag = $filterBag;
+        $this->routingHelper = $routingHelper;
+        $this->chainProvider = $chainProvider;
     }
 
     /**
@@ -55,15 +46,16 @@ class ActivityListFilterHelper
     ) {
         $dataSourceAdapter = new OrmFilterDatasourceAdapter($qb);
         if (isset($filterData['dateRange'])) {
-            $this->dateTimeRangeFilter->init(
+            $dateTimeRangeFilter = $this->filterBag->getFilter('datetime');
+            $dateTimeRangeFilter->init(
                 $rangeField,
                 ['data_name' => sprintf('%s.%s', $activityListAlias, $rangeField)]
             );
-            $datetimeForm = $this->dateTimeRangeFilter->getForm();
+            $datetimeForm = $dateTimeRangeFilter->getForm();
             if (!$datetimeForm->isSubmitted()) {
                 $datetimeForm->submit($filterData['dateRange']);
             }
-            $this->dateTimeRangeFilter->apply($dataSourceAdapter, $datetimeForm->getData());
+            $dateTimeRangeFilter->apply($dataSourceAdapter, $datetimeForm->getData());
         }
         if (isset($filterData['activityType'])) {
             $routingHelper = $this->routingHelper;
@@ -75,7 +67,8 @@ class ActivityListFilterHelper
                 $filterData['activityType']['value']
             );
 
-            $this->choiceFilter->init(
+            $choiceFilter = $this->filterBag->getFilter('choice');
+            $choiceFilter->init(
                 'relatedActivityClass',
                 [
                     'data_name' => sprintf('%s.relatedActivityClass', $activityListAlias),
@@ -87,11 +80,11 @@ class ActivityListFilterHelper
                     ]
                 ]
             );
-            $typeForm = $this->choiceFilter->getForm();
+            $typeForm = $choiceFilter->getForm();
             if (!$typeForm->isSubmitted()) {
                 $typeForm->submit($filterData['activityType']);
             }
-            $this->choiceFilter->apply($dataSourceAdapter, $typeForm->getData());
+            $choiceFilter->apply($dataSourceAdapter, $typeForm->getData());
         }
     }
 }

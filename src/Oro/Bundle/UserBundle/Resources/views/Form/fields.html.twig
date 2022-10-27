@@ -1,6 +1,6 @@
 {% block oro_entity_create_or_select_inline_js_acl_user_autocomplete %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% if form.vars.configs.async_dialogs|default(false) is sameas(true) %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    {% if form.vars.configs.async_dialogs|default(false) is same as(true) %}
         {% set asyncNameSegment = 'async-' %}
     {% endif %}
     {% set gridParameters = form.vars.grid_parameters|merge({
@@ -20,7 +20,7 @@
         }
     } %}
 
-    {% if form.vars.create_enabled|default(false) is sameas(true) %}
+    {% if form.vars.create_enabled|default(false) is same as(true) %}
     {% set urlParts = urlParts|merge({
         create: {
             route:      form.vars.create_form_route,
@@ -51,22 +51,30 @@
     {{ form_start(form) }}
     {{ form_errors(form) }}
     {{ form_row(form.apiKey, {'apiKeyElementId': apiKeyElementId}) }}
-    <button class="btn btn-mini no-hash" id="btn-apigen" title="{{ 'Generate key'|trans }}" type="submit">{{ 'Generate key'|trans }}</button>
+    <button class="btn btn-sm no-hash" id="btn-apigen" title="{{ 'Generate key'|trans }}" type="submit">{{ 'Generate key'|trans }}</button>
     {{ form_end(form) }}
 {% endblock %}
 
 {% block oro_user_apikey_gen_key_row %}
-    <span class="api-key" id="{{ apiKeyElementId }}">{{ value|escape|default('N/A') }}</span>
+    <span class="api-key" id="{{ apiKeyElementId }}">{{ value|escape|default('N/A'|trans) }}</span>
 {% endblock %}
 
 {% block _user_settings_oro_user___case_insensitive_email_addresses_enabled_value_errors %}
-    {%- spaceless -%}
+    {%- apply spaceless -%}
         {% if errors|length > 0 %}
             {% set combinedError = '' %}
             {% for error in errors %}
                 {% set combinedError = (combinedError != '') ? combinedError ~ '; ' ~ error.message : error.message %}
             {% endfor %}
-            <span class="validation-failed"><span><span>{{ combinedError|raw }}</span></span></span>
+            <div><span class="validation-failed"><span><span>{{ combinedError|raw }}</span></span></span></div>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
+{% endblock %}
+
+{% block oro_user_emailsettings_widget %}
+    <div {{ block('widget_container_attributes') }}>
+        {% for child in form %}
+            {{ form_widget(child) }}
+        {% endfor %}
+    </div>
 {% endblock %}

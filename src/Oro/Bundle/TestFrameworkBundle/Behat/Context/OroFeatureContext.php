@@ -2,40 +2,42 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 
+use Behat\Mink\Session;
 use Behat\MinkExtension\Context\RawMinkContext;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
+use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
-class OroFeatureContext extends RawMinkContext
+/**
+ * Basic feature context which may be used as parent class for other contexts.
+ * Provides assert and spin functions.
+ */
+class OroFeatureContext extends RawMinkContext implements AppKernelAwareInterface
 {
     use AssertTrait;
-
-    /**
-     * @param \Closure $lambda
-     * @param int $timeLimit in seconds
-     * @return null|mixed Return null if closure throw error or return not true value.
-     *                     Return value that return closure
-     */
-    public function spin(\Closure $lambda, $timeLimit = 60)
-    {
-        $time = $timeLimit;
-
-        while ($time > 0) {
-            try {
-                if ($result = $lambda($this)) {
-                    return $result;
-                }
-            } catch (\Exception $e) {
-                // do nothing
-            }
-            usleep(250000);
-            $time -= 0.25;
-        }
-        return null;
-    }
+    use SpinTrait;
+    use AppKernelAwareTrait;
 
     public function waitForAjax()
     {
         $this->getDriver()->waitForAjax();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSession($name = null)
+    {
+        $session = parent::getSession($name);
+
+        // start session if needed
+        if (!$session->isStarted()) {
+            $session->start();
+        }
+
+        return $session;
     }
 
     /**
@@ -47,7 +49,7 @@ class OroFeatureContext extends RawMinkContext
     }
 
     /**
-     * Returns fixed step argument (with \\" replaced back to ")
+     * Returns fixed step argument (\\" replaced back to ", \\# replaced back to #)
      *
      * @param string $argument
      *
@@ -55,7 +57,7 @@ class OroFeatureContext extends RawMinkContext
      */
     protected function fixStepArgument($argument)
     {
-        return str_replace('\\"', '"', $argument);
+        return str_replace(['\\"', '\\#'], ['"', '#'], $argument);
     }
 
     /**
@@ -73,6 +75,73 @@ class OroFeatureContext extends RawMinkContext
                 return 2;
             default:
                 return (int) $count;
+        }
+    }
+
+    /**
+     * @param Session $session
+     *
+     * @return CookieJar
+     */
+    protected function getCookieJar(Session $session)
+    {
+        $sessionCookies = $session->getDriver()->getWebDriverSession()->getCookie();
+        $cookies = [];
+        foreach ($sessionCookies as $sessionCookie) {
+            $cookie = [];
+            foreach ($sessionCookie as $key => $value) {
+                $cookie[ucwords($key, '-')] = $value;
+            }
+            $cookies[] = $cookie;
+        }
+
+        return new CookieJar(false, $cookies);
+    }
+
+    protected function loadImage(string $imageUrl, bool|array $allowRedirects = false): ResponseInterface
+    {
+        $imageUrl = $this->locatePath($imageUrl);
+        $imageUrl = filter_var($imageUrl, FILTER_VALIDATE_URL);
+
+        self::assertIsString($imageUrl, sprintf('Image src "%s" is not valid', $imageUrl));
+
+        $cookieJar = $this->getCookieJar($this->getSession());
+        $client = new Client([
+            'allow_redirects' => $allowRedirects,
+            'cookies' => $cookieJar,
+        ]);
+
+        return $client->get($imageUrl);
+    }
+
+    protected function copyFiles(string $sourcePath, string $destinationPath): void
+    {
+        $fs = new Filesystem();
+        try {
+            $isDir = str_ends_with($destinationPath, '/');
+            $destinationPath = rtrim($destinationPath, '/');
+            if ($isDir && !$fs->exists($destinationPath)) {
+                $fs->mkdir($destinationPath);
+            }
+
+            if (is_dir($sourcePath)) {
+                $fs->mirror($sourcePath, $destinationPath);
+            } else {
+                if ($isDir) {
+                    $filename = basename($sourcePath);
+                    $destinationPath = sprintf('%s/%s', $destinationPath, $filename);
+                }
+                $fs->copy($sourcePath, $destinationPath);
+            }
+        } catch (\Throwable $e) {
+            $this->fail(
+                sprintf(
+                    'Failed to copy fixture files from %s to %s: %s',
+                    $sourcePath,
+                    $destinationPath,
+                    $e->getMessage()
+                )
+            );
         }
     }
 }

@@ -4,55 +4,60 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\SystemVariablesProviderInterface;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * This class prepares email variables from current logged user
- *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * Provides the following system variables related to the current logged in user for email templates:
+ * * organizationName
+ * * userName
+ * * userFirstName
+ * * userLastName
+ * * userFullName
+ * * userSignature
  */
 class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
 {
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var EntityNameResolver */
-    protected $entityNameResolver;
+    private $entityNameResolver;
 
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
-    /**
-     * @param TranslatorInterface    $translator
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param EntityNameResolver     $entityNameResolver
-     * @param ConfigManager          $configManager
-     */
+    /** @var HtmlTagHelper */
+    private $htmlTagHelper;
+
     public function __construct(
         TranslatorInterface $translator,
         TokenAccessorInterface $tokenAccessor,
         EntityNameResolver $entityNameResolver,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        HtmlTagHelper $htmlTagHelper
     ) {
         $this->translator = $translator;
         $this->tokenAccessor = $tokenAccessor;
         $this->entityNameResolver = $entityNameResolver;
         $this->configManager = $configManager;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getVariableDefinitions()
+    public function getVariableDefinitions(): array
     {
         return $this->getVariables(false);
     }
@@ -60,7 +65,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getVariableValues()
+    public function getVariableValues(): array
     {
         return $this->getVariables(true);
     }
@@ -70,7 +75,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      *
      * @return array
      */
-    protected function getVariables($addValue)
+    private function getVariables(bool $addValue): array
     {
         $result = [];
 
@@ -92,7 +97,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      * @param object $organization
      * @param bool   $addValue
      */
-    protected function addOrganizationName(array &$result, $organization, $addValue)
+    private function addOrganizationName(array &$result, $organization, bool $addValue): void
     {
         if ($organization instanceof Organization) {
             if ($addValue) {
@@ -114,7 +119,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      * @param object $user
      * @param bool   $addValue
      */
-    protected function addUserName(array &$result, $user, $addValue)
+    private function addUserName(array &$result, $user, bool $addValue): void
     {
         if ($user instanceof UserInterface) {
             if ($addValue) {
@@ -136,7 +141,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      * @param object $user
      * @param bool   $addValue
      */
-    protected function addUserFirstName(array &$result, $user, $addValue)
+    private function addUserFirstName(array &$result, $user, bool $addValue): void
     {
         if ($user instanceof FirstNameInterface) {
             if ($addValue) {
@@ -158,7 +163,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      * @param object $user
      * @param bool   $addValue
      */
-    protected function addUserLastName(array &$result, $user, $addValue)
+    private function addUserLastName(array &$result, $user, bool $addValue): void
     {
         if ($user instanceof LastNameInterface) {
             if ($addValue) {
@@ -180,7 +185,7 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      * @param object $user
      * @param bool   $addValue
      */
-    protected function addUserFullName(array &$result, $user, $addValue)
+    private function addUserFullName(array &$result, $user, bool $addValue): void
     {
         if ($user instanceof FullNameInterface) {
             if ($addValue) {
@@ -202,11 +207,11 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
      * @param object $user
      * @param bool   $addValue
      */
-    protected function addUserSignature(array &$result, $user, $addValue)
+    private function addUserSignature(array &$result, $user, bool $addValue): void
     {
         if (is_object($user)) {
             if ($addValue) {
-                $val = $this->configManager->get('oro_email.signature');
+                $val = $this->htmlTagHelper->sanitize($this->configManager->get('oro_email.signature'));
             } else {
                 $val = [
                     'type'  => 'string',

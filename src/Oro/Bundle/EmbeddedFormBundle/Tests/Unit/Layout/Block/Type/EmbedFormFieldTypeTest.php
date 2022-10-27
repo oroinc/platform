@@ -3,11 +3,15 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Block\Type;
 
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormFieldType;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigurableTypeExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Exception\ItemNotFoundException;
+use Oro\Component\Layout\Exception\UnexpectedTypeException;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class EmbedFormFieldTypeTest extends BlockTypeTestCase
 {
@@ -36,12 +40,11 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertEquals('form', $options['form_name']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "field_path" is missing.
-     */
     public function testResolveOptionsWithoutFieldName()
     {
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "field_path" is missing.');
+
         $this->resolveOptions(EmbedFormFieldType::NAME, []);
     }
 
@@ -51,11 +54,11 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $formPath = 'firstName';
         $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with($formPath)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
 
         $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
@@ -68,26 +71,25 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
-    /**
-     * @expectedException \OutOfBoundsException
-     * @expectedExceptionMessage Undefined index: test_form.
-     */
     public function testGetBlockViewWithoutForm()
     {
+        $this->expectException(\OutOfBoundsException::class);
+        $this->expectExceptionMessage('Undefined index: test_form.');
+
         $this->getBlockView(
             EmbedFormFieldType::NAME,
             ['form_name' => 'test_form', 'field_path' => 'firstName']
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "context[test_form]" argument type. Expected "Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testBuildViewWithInvalidForm()
     {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Invalid "context[test_form]" argument type. Expected "%s", "integer" given.',
+            FormAccessorInterface::class
+        ));
+
         $formName = 'test_form';
 
         $this->context->getResolver()->setDefined([$formName]);
@@ -104,11 +106,11 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $formPath = 'firstName';
         $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with($formPath)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
 
         $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);
@@ -121,11 +123,10 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $this->assertFalse($formView->isRendered());
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
-     */
     public function testGetBlockViewForInvisibleField()
     {
+        $this->expectException(ItemNotFoundException::class);
+
         $formName = 'test_form';
         $formPath = 'firstName';
 
@@ -142,11 +143,11 @@ class EmbedFormFieldTypeTest extends BlockTypeTestCase
         $formPath = 'firstName';
         $formView = new FormView();
 
-        $formAccessor = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with($formPath)
-            ->will($this->returnValue($formView));
+            ->willReturn($formView);
 
         $this->context->getResolver()->setDefined([$formName]);
         $this->context->set($formName, $formAccessor);

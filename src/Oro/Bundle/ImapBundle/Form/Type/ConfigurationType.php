@@ -7,12 +7,13 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
-use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -21,8 +22,8 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Used in System Configuration to set IMAP parameters in Email Configuration
@@ -43,11 +44,6 @@ class ConfigurationType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param SymmetricCrypterInterface $encryptor
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param TranslatorInterface    $translator
-     */
     public function __construct(
         SymmetricCrypterInterface $encryptor,
         TokenAccessorInterface $tokenAccessor,
@@ -100,6 +96,13 @@ class ConfigurationType extends AbstractType
                 'placeholder' => '',
                 'required'    => false
             ])
+            ->add('accountType', HiddenType::class, [
+                'required'  => true,
+                'data'      => AccountTypeModel::ACCOUNT_TYPE_OTHER,
+                'attr' => [
+                    'class' => 'check-connection',
+                ]
+            ])
             ->add('useSmtp', CheckboxType::class, [
                 'label'    => 'oro.imap.configuration.use_smtp.label',
                 'attr'     => ['class' => 'smtp-config check-connection'],
@@ -137,7 +140,7 @@ class ConfigurationType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'class' => 'check-connection',
-                    'autocomplete' => 'new-password'
+                    'autocomplete' => 'off'
                 ]
             ]);
         if ($options['add_check_button']) {
@@ -152,9 +155,6 @@ class ConfigurationType extends AbstractType
             ]);
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function addPrepopulatePasswordEventListener(FormBuilderInterface $builder)
     {
         $encryptor = $this->encryptor;
@@ -188,7 +188,6 @@ class ConfigurationType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addNewOriginCreateEventListener(FormBuilderInterface $builder)
@@ -197,6 +196,7 @@ class ConfigurationType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
                 $data = (array) $event->getData();
+                $data['accountType'] = AccountTypeModel::ACCOUNT_TYPE_OTHER;
                 /** @var UserEmailOrigin|null $entity */
                 $entity = $event->getForm()->getData();
                 $filtered = array_filter(
@@ -236,9 +236,6 @@ class ConfigurationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function addOwnerOrganizationEventListener(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
@@ -263,9 +260,6 @@ class ConfigurationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function modifySettingsFields(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
@@ -297,9 +291,6 @@ class ConfigurationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function finalDataCleaner(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
@@ -323,9 +314,6 @@ class ConfigurationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     public function addEnableSMTPImapListener(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
@@ -352,7 +340,7 @@ class ConfigurationType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
+            'data_class'        => UserEmailOrigin::class,
             'required'          => false,
             'constraints'       => new Valid(),
             'add_check_button'  => true,
@@ -362,14 +350,14 @@ class ConfigurationType extends AbstractType
 
                 $isSubmitted = $form->isSubmitted() === true;
                 if (($form->has('useImap') && $form->get('useImap')->getData() === true) || !$isSubmitted) {
-                    $groups[] = 'Imap';
+                    array_push($groups, 'Imap', 'ImapConnection');
 
                     if (!$form->getConfig()->getOption('skip_folders_validation')) {
                         $groups[] = 'CheckFolderSelection';
                     }
                 }
                 if (($form->has('useSmtp') && $form->get('useSmtp')->getData() === true) || !$isSubmitted) {
-                    $groups[] = 'Smtp';
+                    array_push($groups, 'Smtp', 'SmtpConnection');
                 }
 
                 return $groups;

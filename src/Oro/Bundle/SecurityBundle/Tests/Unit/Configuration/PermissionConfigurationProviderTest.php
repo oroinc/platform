@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
+use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
-use Oro\Bundle\SecurityBundle\Configuration\PermissionListConfiguration;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle1\TestBundle1;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle2\TestBundle2;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Testing\TempDirExtension;
 
 class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const PERMISSION1 = 'PERMISSION1';
-    const PERMISSION2 = 'PERMISSION2';
-    const PERMISSION3 = 'PERMISSION3';
+    use TempDirExtension;
+
+    private const PERMISSION1 = 'PERMISSION1';
+    private const PERMISSION2 = 'PERMISSION2';
+    private const PERMISSION3 = 'PERMISSION3';
 
     /** @var array */
     private $permissions = [
@@ -22,10 +25,11 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             'apply_to_all' => true,
             'apply_to_entities' => [],
             'exclude_entities' => [],
+            'apply_to_interfaces' => [],
         ],
         self::PERMISSION2 => [
             'label' => 'Label for Permission 2',
-            'group_names' => [PermissionListConfiguration::DEFAULT_GROUP_NAME, 'frontend', 'new_group'],
+            'group_names' => [PermissionConfiguration::DEFAULT_GROUP_NAME, 'frontend', 'new_group'],
             'apply_to_all' => false,
             'apply_to_entities' => [
                 'OroTestFrameworkBundle:TestActivity',
@@ -38,6 +42,10 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'OroTestFrameworkBundle:WorkflowAwareEntity',
             ],
             'description' => 'Permission 2 description',
+            'apply_to_interfaces' => [
+                'OroTestFrameworkBundle:TestActivityInterface',
+                'OroTestFrameworkBundle:TestActivityTargetInterface',
+            ],
         ],
         self::PERMISSION3 => [
             'label' => 'Label for Permission 3',
@@ -45,28 +53,33 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             'apply_to_all' => true,
             'apply_to_entities' => ['NotManageableEntity'],
             'exclude_entities' => [],
+            'apply_to_interfaces' => [],
         ],
     ];
 
-    /**
-     * @var PermissionConfigurationProvider
-     */
-    protected $provider;
+    /** @var string */
+    private $cacheFile;
 
-    protected function setUp()
+    /** @var PermissionConfigurationProvider */
+    private $provider;
+
+    protected function setUp(): void
     {
         $bundle1 = new TestBundle1();
         $bundle2 = new TestBundle2();
-        $bundles = [$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)];
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles([
+                $bundle1->getName() => get_class($bundle1),
+                $bundle2->getName() => get_class($bundle2)
+            ]);
 
-        CumulativeResourceManager::getInstance()->clear()->setBundles($bundles);
+        $this->cacheFile = $this->getTempFile('PermissionConfigurationProvider');
 
-        $this->provider = $this->getMockBuilder(PermissionConfigurationProvider::class)
-            ->setConstructorArgs([new PermissionListConfiguration(), $bundles])
-            ->setMethods(['getConfigPath'])
-            ->getMock();
-        $this->provider->expects($this->any())
-            ->method('getConfigPath')->willReturn('permissions.yml');
+        $this->provider = new PermissionConfigurationProvider(
+            $this->cacheFile,
+            false,
+        );
     }
 
     public function testCorrectConfiguration()

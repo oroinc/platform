@@ -1,0 +1,9 @@
+services:
+    oro_entity_config.tests.migration_listener:
+        class: Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
+
+    oro_entity_config.tests.provider.export_query_tuple_length:
+        parent: oro_entity_config.provider.export_query_tuple_length
+        public: true

@@ -3,31 +3,26 @@ oro_behat_extension:
     OroEntityExtendBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroDataGridBundle::GridContext
-        - OroEmailBundle::EmailContext
-        - OroEntityExtendBundle::EntityExtendContext
-        - OroEntityExtendBundle::FeatureContext
-        - OroFormBundle::FormContext
-        - OroSecurityBundle::ACLContext
-        - OroConfigBundle::FeatureContext
-        - OroLocaleBundle::LocalizationContext
-        - OroImportExportBundle::ImportExportContext:
-            - '@oro_entity.entity_alias_resolver'
-            - '@oro_importexport.processor.registry'
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\EntityExtendBundle\Tests\Behat\Context\EntityExtendContext
+        - Oro\Bundle\EntityExtendBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\LocaleBundle\Tests\Behat\Context\LocalizationContext
+        - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
       paths:
         - '@OroEntityExtendBundle/Tests/Behat/Features'
   elements:
     Create Entity:
       selector: '.btn-primary[title="Create entity"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Create Field:
       selector: '.btn[title="Create field"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Update Schema:
       selector: '.btn-danger[title="Update schema"]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Target Entity:
       selector: 'select[data-name="field__target-entity"]'
@@ -43,3 +38,17 @@ oro_behat_extension:
       options:
         mapping:
           Option First: 'oro_entity_config_type[enum][enum_options][0][label]'
+
+    CustomEntityForm:
+      selector: "form[name='custom_entity_type']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          CustomDateTimeField: 'custom_entity_type[CustomDateTimeField]'
+          CustomWYSIWYGField:
+            type: 'css'
+            locator: '[name="custom_entity_type[CustomWYSIWYGField]"]'
+            class: Oro\Bundle\CMSBundle\Tests\Behat\Element\WysiwygField
+
+    Column Name Field:
+      selector: 'input[data-name="field__header"]'

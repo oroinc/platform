@@ -59,9 +59,6 @@ class ContainerTagsDocumentationInformationProvider
         $this->installDir = realpath($installDir);
     }
 
-    /**
-     * @param array $tags
-     */
     public function setTags(array $tags)
     {
         $this->tags = $tags;
@@ -75,11 +72,6 @@ class ContainerTagsDocumentationInformationProvider
         return $this->installDir;
     }
 
-    /**
-     * @param array $includedTags
-     * @param array $excludedTags
-     * @return array
-     */
     public function getOroTags(array $includedTags, array $excludedTags): array
     {
         $includedTags = array_merge(self::$included, $includedTags);
@@ -131,9 +123,6 @@ class ContainerTagsDocumentationInformationProvider
         return $docsInfo;
     }
 
-    /**
-     * @return array
-     */
     protected function getDocs(): array
     {
         $finder = new Finder();
@@ -153,9 +142,6 @@ class ContainerTagsDocumentationInformationProvider
         return $docs;
     }
 
-    /**
-     * @return string
-     */
     protected function getOroSourceCodeDir(): string
     {
         return realpath($this->installDir . '/vendor/oro');

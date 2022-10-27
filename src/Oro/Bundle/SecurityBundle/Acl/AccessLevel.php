@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Acl;
 
 /**
- * This class defines all available access levels in the BAP security system.
+ * This class defines all available access levels for ACL.
  */
 final class AccessLevel
 {
@@ -14,60 +14,51 @@ final class AccessLevel
      */
     public static $allAccessLevelNames = ['BASIC', 'LOCAL', 'DEEP', 'GLOBAL', 'SYSTEM'];
 
-    const NONE_LEVEL_NAME = 'NONE';
+    /**
+     * The name of NONE access level.
+     */
+    public const NONE_LEVEL_NAME = 'NONE';
 
     /**
      * Unknown access level.
      */
-    const UNKNOWN = -1;
+    public const UNKNOWN = -1;
 
     /**
      * Deny access.
      */
-    const NONE_LEVEL = 0;
+    public const NONE_LEVEL = 0;
 
     /**
      * This access level gives a user access to own records and objects that are shared with the user.
      */
-    const BASIC_LEVEL = 1;
+    public const BASIC_LEVEL = 1;
 
     /**
      * This access level gives a user access to records in all business units are assigned to the user.
      */
-    const LOCAL_LEVEL = 2;
+    public const LOCAL_LEVEL = 2;
 
     /**
      * This access level gives a user access to records in all business units are assigned to the user
      * and all business units subordinate to business units are assigned to the user.
      */
-    const DEEP_LEVEL = 3;
+    public const DEEP_LEVEL = 3;
 
     /**
      * This access level gives a user access to all records within the organization,
      * regardless of the business unit hierarchical level to which the domain object belongs
      * or the user is assigned to.
      */
-    const GLOBAL_LEVEL = 4;
+    public const GLOBAL_LEVEL = 4;
 
     /**
      * This access level gives a user access to all records within the system.
      */
-    const SYSTEM_LEVEL = 5;
+    public const SYSTEM_LEVEL = 5;
 
     /**
-     * Gets constant value by its name
-     *
-     * @param string $name
-     *
-     * @return int
-     */
-    public static function getConst($name)
-    {
-        return constant('self::' . $name);
-    }
-
-    /**
-     * Gets the name of an access level by the given value of the constant
+     * Gets the name of an access level by the given value of the constant.
      *
      * @param int $value
      *
@@ -83,7 +74,7 @@ final class AccessLevel
     }
 
     /**
-     * Get array with access levels from $minLevel to the System level + None level
+     * Get array with access levels from $minLevel to the System level + None level.
      *
      * @param int   $minLevel      The min level to find names from. The default value is BASIC_LEVEL
      * @param int   $maxLevel      The max level to find names to. The default value is SYSTEM_LEVEL
@@ -96,9 +87,9 @@ final class AccessLevel
         $maxLevel = self::SYSTEM_LEVEL,
         array $excludeLevels = []
     ) {
-        $names = [self::NONE_LEVEL_NAME];
+        $names = [self::NONE_LEVEL => self::NONE_LEVEL_NAME];
         for ($level = $minLevel; $level <= $maxLevel; $level++) {
-            if (!in_array($level, $excludeLevels, true)) {
+            if (!\in_array($level, $excludeLevels, true)) {
                 $names[$level] = self::getAccessLevelName($level);
             }
         }

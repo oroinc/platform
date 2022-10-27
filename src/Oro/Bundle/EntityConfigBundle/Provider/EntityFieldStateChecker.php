@@ -22,10 +22,6 @@ class EntityFieldStateChecker
      */
     private $formFactory;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param FormFactoryInterface $formFactory
-     */
     public function __construct(ConfigManager $configManager, FormFactoryInterface $formFactory)
     {
         $this->configManager = $configManager;
@@ -50,11 +46,6 @@ class EntityFieldStateChecker
         return false;
     }
 
-    /**
-     * @param ConfigProvider $provider
-     * @param FieldConfigModel $fieldConfigModel
-     * @return bool
-     */
     private function isUpdateRequiredForProvider(ConfigProvider $provider, FieldConfigModel $fieldConfigModel): bool
     {
         $configId = $this->configManager->getConfigIdByModel($fieldConfigModel, $provider->getScope());

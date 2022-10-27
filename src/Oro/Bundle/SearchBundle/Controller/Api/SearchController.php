@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Controller\Api;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -13,10 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("search")
- * @NamePrefix("oro_api_")
+ * REST API controller for simple search.
  */
-class SearchController extends FOSRestController
+class SearchController extends AbstractFOSRestController
 {
     /**
      * @ApiDoc(
@@ -45,13 +41,13 @@ class SearchController extends FOSRestController
 
         $dispatcher = $this->get('event_dispatcher');
         foreach ($searchResults->getElements() as $item) {
-            $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+            $dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
         }
 
         return $this->handleView(
             $this->view(
                 $searchResults->toSearchResultData(),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }

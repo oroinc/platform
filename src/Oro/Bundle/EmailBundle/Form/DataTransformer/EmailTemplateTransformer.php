@@ -4,6 +4,9 @@ namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Transformers email template variables
+ */
 class EmailTemplateTransformer implements DataTransformerInterface
 {
     /**
@@ -11,7 +14,7 @@ class EmailTemplateTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        $value = $this->decodeTemplateVariables($value);
+        $value = $this->decodeTemplateVariables((string)$value);
 
         return $this->decodeHtmlSpecialCharsFromTwigTags($value);
     }
@@ -21,7 +24,7 @@ class EmailTemplateTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        $value = $this->decodeTemplateVariables($value);
+        $value = $this->decodeTemplateVariables((string)$value);
 
         return $this->decodeHtmlSpecialCharsFromTwigTags($value);
     }
@@ -33,7 +36,7 @@ class EmailTemplateTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    protected function decodeTemplateVariables($value)
+    protected function decodeTemplateVariables(string $value)
     {
         return preg_replace_callback(
             '/%7B%7B.*%7D%7D/',

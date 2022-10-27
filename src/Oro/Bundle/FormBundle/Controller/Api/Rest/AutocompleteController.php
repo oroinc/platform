@@ -2,20 +2,21 @@
 
 namespace Oro\Bundle\FormBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\ConstraintViolation;
 
-class AutocompleteController extends FOSRestController
+/**
+ * REST API controller for autocomplete functionality.
+ */
+class AutocompleteController extends AbstractFOSRestController
 {
     /**
-     * @param Request $request
-     * AclAncestor("oro_search")
      * @ApiDoc(
      *  description="Get autocomplete search result",
      *  resource=true,
@@ -65,7 +66,7 @@ class AutocompleteController extends FOSRestController
                     $autocompleteRequest->getPerPage(),
                     $autocompleteRequest->isSearchById()
                 ),
-                Codes::HTTP_OK
+                Response::HTTP_OK
             )
         );
     }

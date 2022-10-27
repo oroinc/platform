@@ -15,9 +15,6 @@ class CryptedStringType extends StringType
     /** @var SymmetricCrypterInterface */
     private static $crypter;
 
-    /**
-     * @param SymmetricCrypterInterface $crypter
-     */
     public static function setCrypter(SymmetricCrypterInterface $crypter)
     {
         static::$crypter = $crypter;
@@ -40,7 +37,7 @@ class CryptedStringType extends StringType
     {
         return static::$crypter->decryptData($value);
     }
-    
+
     /** {@inheritdoc} */
     public function requiresSQLCommentHint(AbstractPlatform $platform)
     {

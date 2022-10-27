@@ -12,7 +12,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
     /** @var Func\Iif */
     protected $function;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->function = new Func\Iif();
         $this->function->setContextAccessor(new ContextAccessor());
@@ -53,21 +53,19 @@ class IifTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 2 or 3 elements, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 2 or 3 elements, but 0 given.');
+
         $this->function->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 2 or 3 elements, but 4 given.
-     */
     public function testInitializeFailsWhenTooManyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 2 or 3 elements, but 4 given.');
+
         $this->function->initialize([1, 2, 3, 4]);
     }
 

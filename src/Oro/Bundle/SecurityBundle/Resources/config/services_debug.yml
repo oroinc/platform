@@ -1,0 +1,9 @@
+services:
+    oro_security.event_listener.debug.vote:
+        class: Oro\Bundle\SecurityBundle\EventListener\DebugVoteListener
+        decorates: debug.security.voter.vote_listener
+        arguments:
+            - '@oro_config.manager'
+            - '@.inner'
+        tags:
+            - { name: kernel.event_subscriber }

@@ -3,25 +3,19 @@
 .oro-translation-languages {
     .translation-completeness {
         min-width: 200px;
-
-        b {
-            display: block;
-            margin-top: -36px;
-            text-align: center;
-        }
     }
 
     .translation-status {
         .status-up-to-date {
-            color: #5eb95e;
+            color: $success-darken;
         }
 
-        .status-available-update {
-            color: #f89406;
+        .status-install_available {
+            color: $warning-darken;
         }
 
-        .status-available-install {
-            color: #5eb95e;
+        .status-update_available {
+            color: $success-darken;
         }
     }
 }
@@ -30,29 +24,4 @@
     .grid-header-cell {
         min-width: 100px;
     }
-}
-
-.app-page__main {
-    .oro-translation-translations {
-        label {
-            text-transform: none;
-        }
-    }
-}
-
-.no-english-translation {
-    font-size: 11px;
-    line-height: 99%;
-    font-weight: bold;
-    text-align: center;
-    text-decoration: none;
-    text-transform: uppercase;
-    display: inline-block;
-    border-radius: 3px;
-    color: #333;
-    border-color: #ccc;
-    background-color: #ccc;
-    min-width: 87px;
-    margin: 0;
-    padding: 3px 5px 2px;
 }

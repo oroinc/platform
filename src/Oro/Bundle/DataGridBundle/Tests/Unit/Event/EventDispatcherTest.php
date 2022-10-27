@@ -3,58 +3,56 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Event;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\EventDispatcher;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridConfigEvent;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_EVENT_NAME = 'test.event';
+    private const TEST_EVENT_NAME = 'test.event';
 
-    /** @var  EventDispatcherInterface */
-    protected $dispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $realDispatcher;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $realDispatcherMock;
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->realDispatcherMock = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->dispatcher         = new EventDispatcher($this->realDispatcherMock);
-    }
+        $this->realDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-    protected function tearDown()
-    {
-        unset($this->realDispatcherMock, $this->dispatcher);
+        $this->dispatcher = new EventDispatcher($this->realDispatcher);
     }
 
     /**
      * @dataProvider eventDataProvider
-     *
-     * @param array $config
-     * @param array $expectedEvents
      */
     public function testDispatchGridEvent(array $config, array $expectedEvents)
     {
-        $config   = DatagridConfiguration::create($config);
-        $gridMock = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $gridMock->expects($this->any())->method('getConfig')->will($this->returnValue($config));
+        $config = DatagridConfiguration::create($config);
+        $grid = $this->createMock(DatagridInterface::class);
+        $grid->expects($this->any())
+            ->method('getConfig')
+            ->willReturn($config);
 
-        foreach ($expectedEvents as $k => $event) {
-            $this->realDispatcherMock->expects($this->at($k))->method('dispatch')
-                ->with($event);
+        $event = new GridEvent($grid);
+
+        $events = [];
+        foreach ($expectedEvents as $eventName) {
+            $events[] = [$event, $eventName];
         }
+        $this->realDispatcher->expects($this->exactly(count($events)))
+            ->method('dispatch')
+            ->withConsecutive(...$events);
 
-        $event = new GridEvent($gridMock);
-        $this->dispatcher->dispatch(self::TEST_EVENT_NAME, $event);
+        $this->dispatcher->dispatch($event, self::TEST_EVENT_NAME);
     }
 
-    /**
-     * @return array
-     */
-    public function eventDataProvider()
+    public function eventDataProvider(): array
     {
         return [
             'should raise at least 2 events'          => [
@@ -74,30 +72,31 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider eventDataProvider
-     *
-     * @param array $config
-     * @param array $expectedEvents
      */
     public function testDispatchGridConfigEvent(array $config, array $expectedEvents)
     {
-        $config   = DatagridConfiguration::create($config);
-
-        foreach ($expectedEvents as $k => $event) {
-            $this->realDispatcherMock->expects($this->at($k))->method('dispatch')
-                ->with($event);
-        }
+        $config = DatagridConfiguration::create($config);
 
         $event = new GridConfigEvent($config);
-        $this->dispatcher->dispatch(self::TEST_EVENT_NAME, $event);
+
+        $events = [];
+        foreach ($expectedEvents as $eventName) {
+            $events[] = [$event, $eventName];
+        }
+        $this->realDispatcher->expects($this->exactly(count($events)))
+            ->method('dispatch')
+            ->withConsecutive(...$events);
+
+        $this->dispatcher->dispatch($event, self::TEST_EVENT_NAME);
     }
+
     public function testDispatchException()
     {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Unexpected event type. Expected instance of GridEventInterface or GridConfigurationEventInterface'
         );
-        $event = $this->getMockBuilder('Symfony\Component\EventDispatcher\Event')
-            ->disableOriginalConstructor();
+        $event = $this->createMock(Event::class);
         $this->dispatcher->dispatch($event);
     }
 }

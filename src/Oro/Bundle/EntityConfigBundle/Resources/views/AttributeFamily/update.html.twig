@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% form_theme form with '@OroForm/Form/fields.html.twig' %}
 
 {% if entity.id %}
     {% oro_title_set({params : {'%familyName%': entity.defaultLabel.string }}) %}
@@ -10,6 +10,8 @@
 {% endif %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if entity.id and is_granted('oro_attribute_family_delete', entity) and is_granted('delete', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_attribute_family_delete', {'id': entity.id}),
@@ -55,7 +57,7 @@
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.entity_config.attribute_family.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 
 {% endblock pageHeader %}

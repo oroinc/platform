@@ -27,11 +27,6 @@ abstract class AbstractUserHandler
      */
     protected $manager;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param UserManager   $manager
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,
@@ -68,8 +63,6 @@ abstract class AbstractUserHandler
 
     /**
      * "Success" form handler
-     *
-     * @param User $user
      */
     abstract protected function onSuccess(User $user);
 }

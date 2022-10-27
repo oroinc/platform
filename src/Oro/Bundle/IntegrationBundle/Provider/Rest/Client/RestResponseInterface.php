@@ -4,13 +4,11 @@ namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
+/**
+ * An interface for the extended response class for the Guzzle REST Client
+ */
 interface RestResponseInterface
 {
-    /**
-     * @return string
-     */
-    public function __toString();
-
     /**
      * Get the request url as string
      *
@@ -31,13 +29,6 @@ interface RestResponseInterface
      * @return integer
      */
     public function getStatusCode();
-
-    /**
-     * Get the entire response as a string
-     *
-     * @return string
-     */
-    public function getMessage();
 
     /**
      * Get the HTTP header
@@ -63,10 +54,9 @@ interface RestResponseInterface
     public function hasHeader($header);
 
     /**
-     * Get the response reason phrase- a human readable version of the numeric
-     * status code
+     * Gets the response reason phrase associated with the status code.
      *
-     * @return string
+     * @return string Reason phrase; must return an empty string if none present.
      */
     public function getReasonPhrase();
 

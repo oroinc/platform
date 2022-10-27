@@ -8,25 +8,17 @@ use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException
 class CronExpressionVerifierTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CronExpressionVerifier */
-    protected $verifier;
+    private $verifier;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->verifier = new CronExpressionVerifier();
     }
 
-    public function tearDown()
-    {
-        unset($this->verifier);
-    }
-
     /**
-     * @param string $expression
-     * @param \Exception|null $exception
-     *
      * @dataProvider validateExpressionDataProvider
      */
-    public function testExpression($expression, \Exception $exception = null)
+    public function testExpression(string $expression, \Exception $exception = null)
     {
         if ($exception) {
             $this->expectException(get_class($exception));
@@ -36,10 +28,7 @@ class CronExpressionVerifierTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->verifier->verify($expression));
     }
 
-    /**
-     * @return array
-     */
-    public function validateExpressionDataProvider()
+    public function validateExpressionDataProvider(): array
     {
         return [
             ['expression' => '@yearly', 'exception' => null],

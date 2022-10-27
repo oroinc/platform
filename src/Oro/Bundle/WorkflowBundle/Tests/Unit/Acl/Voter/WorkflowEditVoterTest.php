@@ -5,19 +5,17 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Voter;
 use Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEditVoter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $token;
+    private $token;
 
     /** @var WorkflowEditVoter */
-    protected $voter;
+    private $voter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->token = $this->createMock(TokenInterface::class);
 
@@ -27,7 +25,7 @@ class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
     public function testVoteWithUnsupportedAttribute()
     {
         $this->assertEquals(
-            WorkflowEditVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->token, null, ['ATTR'])
         );
     }
@@ -35,7 +33,7 @@ class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
     public function testVoteWithUnsupportedSubject()
     {
         $this->assertEquals(
-            WorkflowEditVoter::ACCESS_ABSTAIN,
+            VoterInterface::ACCESS_ABSTAIN,
             $this->voter->vote($this->token, null, ['EDIT'])
         );
     }
@@ -46,7 +44,7 @@ class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
         $definition->setActive(true);
 
         $this->assertEquals(
-            WorkflowEditVoter::ACCESS_DENIED,
+            VoterInterface::ACCESS_DENIED,
             $this->voter->vote($this->token, $definition, ['EDIT'])
         );
     }
@@ -57,7 +55,7 @@ class WorkflowEditVoterTest extends \PHPUnit\Framework\TestCase
         $definition->setActive(false);
 
         $this->assertEquals(
-            WorkflowEditVoter::ACCESS_GRANTED,
+            VoterInterface::ACCESS_GRANTED,
             $this->voter->vote($this->token, $definition, ['EDIT'])
         );
     }

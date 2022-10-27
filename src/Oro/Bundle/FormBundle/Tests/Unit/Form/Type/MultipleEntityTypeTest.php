@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Form\Type\MultipleEntityType;
@@ -14,49 +14,41 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class MultipleEntityTypeTest extends FormIntegrationTestCase
 {
-    const PERMISSION_ALLOW    = 'test_permission_allow';
-    const PERMISSION_DISALLOW = 'test_permission_disallow';
+    private const PERMISSION_ALLOW = 'test_permission_allow';
+    private const PERMISSION_DISALLOW = 'test_permission_disallow';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $metadata = new ClassMetadataInfo('\stdClass');
+        $metadata = new ClassMetadataInfo(\stdClass::class);
         $metadata->identifier[] = 'id';
 
-        $this->em = $this->createMock(EntityManager::class);
-        $this->em->expects($this->any())->method('getClassMetadata')
-            ->willReturnMap([['\stdClass', $metadata]]);
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturnMap([[\stdClass::class, $metadata]]);
 
         $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->registry->expects($this->any())->method('getManagerForClass')
-            ->willReturnMap([['\stdClass', $this->em]]);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturnMap([[\stdClass::class, $em]]);
 
         parent::setUp();
     }
 
-    protected function tearDown()
-    {
-        unset($this->authorizationChecker, $this->registry);
-
-        parent::tearDown();
-    }
-
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {
@@ -72,7 +64,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        $form = $this->factory->create(MultipleEntityType::class, null, ['class' => '\stdClass']);
+        $form = $this->factory->create(MultipleEntityType::class, null, ['class' => \stdClass::class]);
 
         $this->assertTrue($form->has('added'));
         $this->assertTrue($form->has('removed'));
@@ -80,13 +72,12 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
 
     public function testHasKnownOptions()
     {
-        $form = $this->factory->create(MultipleEntityType::class, null, ['class' => '\stdClass']);
+        $form = $this->factory->create(MultipleEntityType::class, null, ['class' => \stdClass::class]);
 
         $knownOptions = [
             'add_acl_resource',
             'class',
             'default_element',
-            'grid_url',
             'initial_elements',
             'selector_window_title',
             'extra_config',
@@ -102,24 +93,20 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider optionsDataProvider
-     *
-     * @param array  $options
-     * @param string $expectedKey
-     * @param mixed  $expectedValue
      */
-    public function testViewHasVars($options, $expectedKey, $expectedValue)
+    public function testViewHasVars(array $options, string $expectedKey, mixed $expectedValue)
     {
         $form = $this->factory->create(
             MultipleEntityType::class,
             null,
-            array_merge($options, ['class' => '\stdClass'])
+            array_merge($options, ['class' => \stdClass::class])
         );
 
         if (isset($options['add_acl_resource'])) {
             $this->authorizationChecker->expects($this->once())
                 ->method('isGranted')
                 ->with($options['add_acl_resource'])
-                ->will($this->returnValue($expectedValue));
+                ->willReturn($expectedValue);
         } else {
             $this->authorizationChecker->expects($this->never())
                 ->method('isGranted');
@@ -130,10 +117,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedValue, $view->vars[$expectedKey]);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             [
@@ -150,16 +134,6 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
                 ['add_acl_resource' => self::PERMISSION_DISALLOW],
                 'allow_action',
                 false
-            ],
-            [
-                ['grid_url' => '/test'],
-                'grid_url',
-                '/test'
-            ],
-            [
-                [],
-                'grid_url',
-                null
             ],
             [
                 ['initial_elements' => []],
@@ -192,24 +166,19 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
                 null
             ],
             [
-                '$formOptions'   => ['grid_url' => 'testUrl'],
-                '$expectedKey'   => 'grid_url',
-                '$expectedValue' => 'testUrl',
+                ['selection_url' => 'testUrlSelection'],
+                'selection_url',
+                'testUrlSelection',
             ],
             [
-                '$formOptions'   => ['selection_url' => 'testUrlSelection'],
-                '$expectedKey'   => 'selection_url',
-                '$expectedValue' => 'testUrlSelection',
+                ['selection_route' => 'testRoute'],
+                'selection_route',
+                'testRoute',
             ],
             [
-                '$formOptions'   => ['selection_route' => 'testRoute'],
-                '$expectedKey'   => 'selection_route',
-                '$expectedValue' => 'testRoute',
-            ],
-            [
-                '$formOptions'   => ['selection_route_parameters' => ['testParam1']],
-                '$expectedKey'   => 'selection_route_parameters',
-                '$expectedValue' => ['testParam1'],
+                ['selection_route_parameters' => ['testParam1']],
+                'selection_route_parameters',
+                ['testParam1'],
             ]
         ];
     }

@@ -23,9 +23,6 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
      */
     protected $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
@@ -44,8 +41,6 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
 
     /**
      * Adds a template field based on the entity set
-     *
-     * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {
@@ -60,8 +55,6 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
 
     /**
      * Adds a template field based on the entity set on submitted form
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {
@@ -84,8 +77,8 @@ class BuildTemplateFormSubscriber implements EventSubscriberInterface
     protected function initChoicesByEntityName($entityName, $fieldName, FormInterface $form)
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token        = $this->tokenStorage->getToken();
-        $organization = $token->getOrganizationContext();
+        $token = $this->tokenStorage->getToken();
+        $organization = $token->getOrganization();
 
         $options = [
             'query_builder'  =>

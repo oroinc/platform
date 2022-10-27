@@ -4,6 +4,8 @@
     display: flex;
     flex-shrink: 0;
     align-items: center;
+    
+    color: $sorting-select-color;
 
     .select2-container {
         height: $sorting-select-container-height;
@@ -25,13 +27,13 @@
 
     .select2-arrow {
         top: $sorting-select-arrow-top;
-        #{$end}: $sorting-select-arrow-end;
+        right: $sorting-select-arrow-end;
 
-        color: $sorting-select-color;
+        color: $sorting-select-toggle-color;
     }
 
     .order-toggle {
-        color: $sorting-select-color;
+        color: $sorting-select-toggle-color;
     }
 
     .sorting-divider {

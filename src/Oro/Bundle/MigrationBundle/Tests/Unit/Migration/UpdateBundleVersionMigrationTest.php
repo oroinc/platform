@@ -4,6 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
@@ -33,13 +34,13 @@ class UpdateBundleVersionMigrationTest extends \PHPUnit\Framework\TestCase
         $postSqls = $queryBag->getPostQueries();
         foreach ($assertQueries as $index => $query) {
             $this->assertTrue(
-                strpos($postSqls[$index], $query) === 0,
+                str_starts_with($postSqls[$index], $query),
                 sprintf('Query index: %d. Query: %s', $index, $query)
             );
         }
     }
 
-    public function upProvider()
+    public function upProvider(): array
     {
         return [
             'all success'           => [
@@ -89,17 +90,10 @@ class UpdateBundleVersionMigrationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string    $bundleName
-     * @param string    $version
-     * @param bool|null $state
-     *
-     * @return MigrationState
-     */
-    protected function getMigration($bundleName, $version, $state = true)
+    private function getMigration(string $bundleName, string $version, ?bool $state = true): MigrationState
     {
         $migration = new MigrationState(
-            $this->createMock('Oro\Bundle\MigrationBundle\Migration\Migration'),
+            $this->createMock(Migration::class),
             $bundleName,
             $version
         );

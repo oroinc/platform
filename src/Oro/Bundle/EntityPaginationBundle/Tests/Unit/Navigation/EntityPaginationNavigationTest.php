@@ -11,50 +11,41 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_NAME = 'stdClass';
-    const FIELD_NAME  = 'id';
+    private const FIELD_NAME = 'id';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $storage;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $paginationManager;
-
-    /** @var EntityPaginationNavigation */
-    protected $navigation;
+    /** @var EntityPaginationStorage|\PHPUnit\Framework\MockObject\MockObject */
+    private $storage;
 
     /** @var \stdClass */
-    protected $entity;
+    private $entity;
 
-    protected function setUp()
+    /** @var EntityPaginationNavigation */
+    private $navigation;
+
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->storage = $this->createMock(EntityPaginationStorage::class);
+        $this->entity = new \stdClass();
 
         $this->navigation = new EntityPaginationNavigation(
             $this->doctrineHelper,
             $this->authorizationChecker,
             $this->storage
         );
-        $this->entity = new \stdClass();
     }
 
     /**
-     * @param bool $isValid
-     * @param bool $inStorage
-     * @param array $entityIds
-     * @param mixed $expected
-     *
      * @dataProvider getTotalCountDataProvider
      */
-    public function testGetTotalCount($isValid, $inStorage, array $entityIds, $expected)
+    public function testGetTotalCount(bool $isValid, bool $inStorage, array $entityIds, ?int $expected)
     {
         $this->assertPrepareNavigation($isValid, $inStorage, $entityIds);
         $result = $this->navigation->getTotalCount($this->entity);
@@ -62,30 +53,22 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @param boolean $isValid
-     * @param boolean $inStorage
-     * @param array $entityIds
-     */
-    protected function assertPrepareNavigation($isValid, $inStorage, array $entityIds)
+    private function assertPrepareNavigation(bool $isValid, bool $inStorage, array $entityIds): void
     {
         $this->storage->expects($this->once())
             ->method('isEnvironmentValid')
-            ->will($this->returnValue($isValid));
+            ->willReturn($isValid);
 
         $this->storage->expects($this->any())
             ->method('isEntityInStorage')
-            ->will($this->returnValue($inStorage));
+            ->willReturn($inStorage);
 
         $this->storage->expects($this->any())
             ->method('getEntityIds')
-            ->will($this->returnValue($entityIds));
+            ->willReturn($entityIds);
     }
 
-    /**
-     * @return array
-     */
-    public function getTotalCountDataProvider()
+    public function getTotalCountDataProvider(): array
     {
         return [
             'not valid environment' => [
@@ -110,32 +93,28 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param boolean $isValid
-     * @param boolean $inStorage
-     * @param int $position
-     * @param array $entityIds
-     * @param array $expected
-     *
      * @dataProvider getCurrentNumberDataProvider
      */
-    public function testGetCurrentNumber($isValid, $inStorage, $position, array $entityIds, $expected)
-    {
+    public function testGetCurrentNumber(
+        bool $isValid,
+        bool $inStorage,
+        int $position,
+        array $entityIds,
+        ?int $expected
+    ) {
         $this->assertPrepareNavigation($isValid, $inStorage, $entityIds);
 
         $this->storage->expects($this->any())
             ->method('getCurrentPosition')
             ->with($this->entity)
-            ->will($this->returnValue($position));
+            ->willReturn($position);
 
         $result = $this->navigation->getCurrentNumber($this->entity);
 
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function getCurrentNumberDataProvider()
+    public function getCurrentNumberDataProvider(): array
     {
         return [
             'not valid environment' => [
@@ -163,9 +142,6 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider getFirstIdentifierDataProvider
      */
     public function testGetFirstIdentifier(array $source, array $expected)
@@ -185,10 +161,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult->isAccessible(), $result->isAccessible());
     }
 
-    /**
-     * @return array
-     */
-    public function getFirstIdentifierDataProvider()
+    public function getFirstIdentifierDataProvider(): array
     {
         return [
             'valid case' => [
@@ -234,9 +207,6 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider getLastIdentifierDataProvider
      */
     public function testGetLastIdentifier(array $source, array $expected)
@@ -255,10 +225,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult->isAccessible(), $result->isAccessible());
     }
 
-    /**
-     * @return array
-     */
-    public function getLastIdentifierDataProvider()
+    public function getLastIdentifierDataProvider(): array
     {
         return [
             'valid case' => [
@@ -304,12 +271,9 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider getPreviousIdentifierDataProvider
      */
-    public function testGetPreviousIdentifier($source, $expected)
+    public function testGetPreviousIdentifier(array $source, array $expected)
     {
         $this->assertPrepareResult(
             $source['isValid'],
@@ -321,7 +285,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         $this->storage->expects($this->any())
             ->method('getCurrentPosition')
             ->with($this->entity)
-            ->will($this->returnValue($source['currentPosition']));
+            ->willReturn($source['currentPosition']);
 
         $result = $this->navigation->getPreviousIdentifier($this->entity, $source['scope']);
         $expectedResult = $this->prepareExpectedResult($expected);
@@ -330,10 +294,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult->isAccessible(), $result->isAccessible());
     }
 
-    /**
-     * @return array
-     */
-    public function getPreviousIdentifierDataProvider()
+    public function getPreviousIdentifierDataProvider(): array
     {
         return [
             'valid case view scope' => [
@@ -399,12 +360,9 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         ];
     }
     /**
-     * @param array $source
-     * @param array $expected
-     *
      * @dataProvider getNextIdentifierDataProvider
      */
-    public function testGetNextIdentifier($source, $expected)
+    public function testGetNextIdentifier(array $source, array $expected)
     {
         $this->assertPrepareResult(
             $source['isValid'],
@@ -416,7 +374,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         $this->storage->expects($this->any())
             ->method('getCurrentPosition')
             ->with($this->entity)
-            ->will($this->returnValue($source['currentPosition']));
+            ->willReturn($source['currentPosition']);
 
         $result = $this->navigation->getNextIdentifier($this->entity);
         $expectedResult = $this->prepareExpectedResult($expected);
@@ -425,10 +383,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedResult->isAccessible(), $result->isAccessible());
     }
 
-    /**
-     * @return array
-     */
-    public function getNextIdentifierDataProvider()
+    public function getNextIdentifierDataProvider(): array
     {
         return [
             'valid case' => [
@@ -476,52 +431,46 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param boolean $isValid
-     * @param boolean $inStorage
-     * @param boolean $isGranted
-     * @param array $entityIds
-     * @param int|null $noEntityId
-     */
-    protected function assertPrepareResult($isValid, $inStorage, $isGranted, array $entityIds, $noEntityId = null)
-    {
+    private function assertPrepareResult(
+        bool $isValid,
+        bool $inStorage,
+        bool $isGranted,
+        array $entityIds,
+        int $noEntityId = null
+    ): void {
         $this->storage->expects($this->any())
             ->method('isEnvironmentValid')
-            ->will($this->returnValue($isValid));
+            ->willReturn($isValid);
 
         $this->storage->expects($this->any())
             ->method('isEntityInStorage')
-            ->will($this->returnValue($inStorage));
+            ->willReturn($inStorage);
 
         if ($noEntityId) {
             $this->doctrineHelper->expects($this->any())
                 ->method('getEntity')
-                ->will($this->returnValue(null));
+                ->willReturn(null);
         } else {
             $this->doctrineHelper->expects($this->any())
                 ->method('getEntity')
-                ->will($this->returnValue($this->entity));
+                ->willReturn($this->entity);
         }
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->will($this->returnValue($isGranted));
+            ->willReturn($isGranted);
 
         $this->storage->expects($this->any())
             ->method('getEntityIds')
-            ->will($this->returnValue($entityIds));
+            ->willReturn($entityIds);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifierFieldName')
             ->with($this->entity)
-            ->will($this->returnValue(self::FIELD_NAME));
+            ->willReturn(self::FIELD_NAME);
     }
 
-    /**
-     * @param array $expected
-     * @return NavigationResult
-     */
-    protected function prepareExpectedResult(array $expected)
+    private function prepareExpectedResult(array $expected): NavigationResult
     {
         $expectedResult = new NavigationResult();
         $expectedResult->setId($expected['id']);

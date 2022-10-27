@@ -2,43 +2,35 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\UIBundle\ContentProvider\FlashMessagesContentProvider;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class FlashMessagesContentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $session;
+    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
+    private $session;
 
-    /**
-     * @var FlashMessagesContentProvider
-     */
-    protected $provider;
+    /** @var FlashMessagesContentProvider */
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->session = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Session')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->session = $this->createMock(Session::class);
+
         $this->provider = new FlashMessagesContentProvider($this->session);
     }
 
     public function testGetContent()
     {
-        $messages = array('test');
-        $flashBag = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface')
-            ->getMock();
+        $messages = ['test'];
+        $flashBag = $this->createMock(FlashBagInterface::class);
         $flashBag->expects($this->once())
             ->method('all')
-            ->will($this->returnValue($messages));
+            ->willReturn($messages);
         $this->session->expects($this->once())
             ->method('getFlashBag')
-            ->will($this->returnValue($flashBag));
-        $this->assertEquals($messages, $this->provider->getContent());
-    }
+            ->willReturn($flashBag);
 
-    public function testGetName()
-    {
-        $this->assertEquals('flashMessages', $this->provider->getName());
+        $this->assertEquals($messages, $this->provider->getContent());
     }
 }

@@ -7,6 +7,9 @@ use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Improves performance of loading of routing collection.
+ */
 abstract class AbstractLoader extends CumulativeRoutingFileLoader
 {
     /** @var EventDispatcherInterface */
@@ -47,7 +50,7 @@ abstract class AbstractLoader extends CumulativeRoutingFileLoader
         }
 
         $event = new RouteCollectionEvent($routes);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        $this->eventDispatcher->dispatch($event, $eventName);
 
         return $event->getCollection();
     }
@@ -65,11 +68,13 @@ abstract class AbstractLoader extends CumulativeRoutingFileLoader
                 if (is_string($resource)) {
                     $resourceRoutes = $this->cache->getRoutes($resource);
                     if (null === $resourceRoutes) {
-                        $resourceRoutes = $this->resolve($resource)->load($resource);
+                        $resourceRoutes = $this->import($resource);
+                        $this->updateRoutesPriority($resourceRoutes);
                         $this->cache->setRoutes($resource, $resourceRoutes);
                     }
                 } else {
-                    $resourceRoutes = $this->resolve($resource)->load($resource);
+                    $resourceRoutes = $this->import($resource);
+                    $this->updateRoutesPriority($resourceRoutes);
                 }
                 $routes->addCollection($resourceRoutes);
             }

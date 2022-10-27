@@ -2,85 +2,75 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\Step\MergeFieldsStep;
+use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MergerFieldsStepTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MergeFieldsStep
-     */
-    protected $step;
+    /** @var StrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $strategy;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $eventDispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $strategy;
+    /** @var MergeFieldsStep */
+    private $step;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->strategy = $this->createMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');
+        $this->strategy = $this->createMock(StrategyInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
         $this->step = new MergeFieldsStep($this->strategy, $this->eventDispatcher);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
-        $data = $this->createEntityData();
+        $foo = $this->createMock(FieldData::class);
+        $bar = $this->createMock(FieldData::class);
 
-        $fooField = $this->createFieldData();
-        $barField = $this->createFieldData();
-
+        $data = $this->createMock(EntityData::class);
         $data->expects($this->once())
             ->method('getFields')
-            ->will($this->returnValue(array($fooField, $barField)));
+            ->willReturn([$foo, $bar]);
 
-        $this->strategy->expects($this->exactly(2))->method('merge');
-
-        $this->strategy->expects($this->at(0))
+        $this->strategy->expects($this->exactly(2))
             ->method('merge')
-            ->with($fooField);
+            ->withConsecutive(
+                [$this->identicalTo($foo)],
+                [$this->identicalTo($bar)]
+            );
 
-        $this->strategy->expects($this->at(1))
-            ->method('merge')
-            ->with($barField);
-
-        $this->eventDispatcher->expects($this->at(0))
+        $calls = [];
+        $this->eventDispatcher->expects($this->exactly(4))
             ->method('dispatch')
-            ->with(MergeEvents::BEFORE_MERGE_FIELD, new FieldDataEvent($fooField));
+            ->willReturnCallback(function (FieldDataEvent $event, string $eventName) use (&$calls, $foo, $bar) {
+                $field = 'UNKNOWN';
+                if ($event->getFieldData() === $foo) {
+                    $field = 'foo';
+                } elseif ($event->getFieldData() === $bar) {
+                    $field = 'bar';
+                }
+                $calls[] = $eventName . ' - ' . $field;
 
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(MergeEvents::AFTER_MERGE_FIELD, new FieldDataEvent($fooField));
-
-        $this->eventDispatcher->expects($this->at(2))
-            ->method('dispatch')
-            ->with(MergeEvents::BEFORE_MERGE_FIELD, new FieldDataEvent($barField));
-
-        $this->eventDispatcher->expects($this->at(3))
-            ->method('dispatch')
-            ->with(MergeEvents::AFTER_MERGE_FIELD, new FieldDataEvent($barField));
+                return $event;
+            });
 
         $this->step->run($data);
-    }
 
-    protected function createEntityData()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createFieldData()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\FieldData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->assertEquals(
+            [
+                MergeEvents::BEFORE_MERGE_FIELD . ' - foo',
+                MergeEvents::AFTER_MERGE_FIELD . ' - foo',
+                MergeEvents::BEFORE_MERGE_FIELD . ' - bar',
+                MergeEvents::AFTER_MERGE_FIELD . ' - bar'
+            ],
+            $calls
+        );
     }
 }

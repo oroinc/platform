@@ -8,35 +8,25 @@ use Symfony\Component\Config\Definition\Processor;
 class ProcessorDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorDecorator */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new ProcessorDecorator(new Processor(), []);
     }
 
-    protected function tearDown()
-    {
-        unset($this->processor);
-    }
-
     /**
      * @dataProvider mergeDataProvider
-     *
-     * @param array $startData
-     * @param array $newData
-     * @param array $expectedResult
      */
-    public function testMerge($startData, $newData, $expectedResult)
+    public function testMerge(array $startData, array $newData, array $expectedResult)
     {
         $this->assertEquals($expectedResult, $this->processor->merge($startData, $newData));
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function mergeDataProvider()
+    public function mergeDataProvider(): array
     {
         return [
             'merge tree test'           => [

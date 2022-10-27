@@ -5,11 +5,12 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional\Provider;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonProviderExtensionStub;
 use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonStub;
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -17,31 +18,33 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ButtonProviderTest extends WebTestCase
 {
-    const ROOT_NODE_NAME = 'operations';
-
-    const ROUTE_NAME = 'test_route_name';
+    private const ROUTE_NAME = 'test_route_name';
 
     /** @var ButtonProvider */
     private $buttonProvider;
 
-    /** @var FilesystemCache */
-    private $cacheProvider;
+    /** @var ConfigurationProvider */
+    private $configProvider;
+
+    /** @var PhpArrayConfigCacheModifier */
+    private $configModifier;
 
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->buttonProvider = $this->getContainer()->get('oro_action.provider.button');
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
+        $this->configProvider = $this->getContainer()->get('oro_action.tests.configuration.provider');
+        $this->configModifier = new PhpArrayConfigCacheModifier($this->configProvider);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
-        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
-
-        parent::tearDown();
+        $this->getContainer()->get('oro_action.tests.provider.button.extension')
+            ->setDecoratedExtension(null);
+        $this->configModifier->resetCache();
     }
 
     /**
@@ -55,9 +58,10 @@ class ButtonProviderTest extends WebTestCase
     public function testFindButtons(callable $findButton, callable $isAvailable, $countAll, $countAvailable)
     {
         $config = $this->getConfig('oro_action_test_operation', [self::ROUTE_NAME]);
-        $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
+        $this->setOperationsConfig($config);
 
-        $this->buttonProvider->addExtension(new ButtonProviderExtensionStub($findButton, $isAvailable));
+        $this->getContainer()->get('oro_action.tests.provider.button.extension')
+            ->setDecoratedExtension(new ButtonProviderExtensionStub($findButton, $isAvailable));
 
         $buttons = $this->buttonProvider->findAll(
             (new ButtonSearchContext())->setRouteName(self::ROUTE_NAME)
@@ -128,8 +132,7 @@ class ButtonProviderTest extends WebTestCase
                 ]
             ]
         );
-
-        $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
+        $this->setOperationsConfig($config);
 
         $buttons = $this->buttonProvider->findAvailable(
             (new ButtonSearchContext())->setRouteName('test_2')
@@ -171,5 +174,12 @@ class ButtonProviderTest extends WebTestCase
         ];
 
         return $config;
+    }
+
+    private function setOperationsConfig(array $operations)
+    {
+        $config = $this->configProvider->getConfiguration();
+        $config['operations'] = $operations;
+        $this->configModifier->updateCache($config);
     }
 }

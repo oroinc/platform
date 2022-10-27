@@ -8,21 +8,17 @@ use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
 class ActionConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ActionConfiguration
-     */
+    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $typesRegistry;
+
+    /** @var ActionConfiguration */
     private $actionConfiguration;
 
-    /**
-     * @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $typesRegistryMock;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->typesRegistryMock = $this->createMock(TypesRegistry::class);
+        $this->typesRegistry = $this->createMock(TypesRegistry::class);
 
-        $this->actionConfiguration = new ActionConfiguration($this->typesRegistryMock);
+        $this->actionConfiguration = new ActionConfiguration($this->typesRegistry);
     }
 
     public function testShouldReturnConfigForEnabledChannel()
@@ -81,8 +77,7 @@ class ActionConfigurationTest extends \PHPUnit\Framework\TestCase
             'editMode' => Channel::EDIT_MODE_DISALLOW
         ]);
 
-        $this->typesRegistryMock
-            ->expects($this->once())
+        $this->typesRegistry->expects($this->once())
             ->method('supportsSync')
             ->willReturn(false);
 

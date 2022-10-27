@@ -24,12 +24,6 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
     /** @var array */
     protected $groups;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityClassResolver $entityClassResolver
-     * @param OperationRegistry $operationRegistry
-     * @param ContextHelper $contextHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityClassResolver $entityClassResolver,
@@ -67,9 +61,6 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
         );
     }
 
-    /**
-     * @param array $groups
-     */
     public function setGroups(array $groups)
     {
         $this->groups = $groups;

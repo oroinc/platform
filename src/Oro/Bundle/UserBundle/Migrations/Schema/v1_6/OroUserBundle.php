@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension;
 use Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -29,9 +29,9 @@ class OroUserBundle implements Migration, ChangeTypeExtensionAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $this->changeTypeExtension->changePrimaryKeyType($schema, $queries, 'oro_access_group', 'id', Type::INTEGER);
-        $this->changeTypeExtension->changePrimaryKeyType($schema, $queries, 'oro_access_role', 'id', Type::INTEGER);
-        $this->changeTypeExtension->changePrimaryKeyType($schema, $queries, 'oro_user_email', 'id', Type::INTEGER);
-        $this->changeTypeExtension->changePrimaryKeyType($schema, $queries, 'oro_user_status', 'id', Type::INTEGER);
+        $this->changeTypeExtension->changePrimaryKeyType($schema, $queries, 'oro_access_group', 'id', Types::INTEGER);
+        $this->changeTypeExtension->changePrimaryKeyType($schema, $queries, 'oro_access_role', 'id', Types::INTEGER);
+        $this->changeTypeExtension->changePrimaryKeyType($schema, $queries, 'oro_user_email', 'id', Types::INTEGER);
+        $this->changeTypeExtension->changePrimaryKeyType($schema, $queries, 'oro_user_status', 'id', Types::INTEGER);
     }
 }

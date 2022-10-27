@@ -1,4 +1,6 @@
+@container-incompatible
 @ticket-BAP-16439
+@ticket-BAP-17649
 
 Feature: Email configuration settings
   In order to setup email synchronization settings
@@ -11,10 +13,10 @@ Feature: Email configuration settings
     And I follow "System Configuration/General Setup/Email Configuration" on configuration sidebar
     When I fill "Email Synchronization Settings System Config Form" with:
       | Enable SMTP | true             |
-      | SMTP Host   | smtp.gmail.com   |
-      | SMTP Port   | 465              |
+      | SMTP Host   | smtp.example.org |
+      | SMTP Port   | 2525             |
       | Encryption  | SSL              |
-      | User        | user@example.org |
+      | User        | test_user        |
       | Password    | test_password    |
     And I save form
     Then I should see "Configuration saved" flash message

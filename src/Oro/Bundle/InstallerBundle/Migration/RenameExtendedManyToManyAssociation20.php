@@ -25,11 +25,6 @@ class RenameExtendedManyToManyAssociation20
     /** @var RenameExtension */
     private $renameExtension;
 
-    /**
-     * @param Connection                      $connection
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param RenameExtension                 $renameExtension
-     */
     public function __construct(
         Connection $connection,
         ExtendDbIdentifierNameGenerator $nameGenerator,
@@ -56,7 +51,7 @@ class RenameExtendedManyToManyAssociation20
     ) {
         $targetClassNames = $this->loadTargetClassNames($entityClass, $isSupportedTarget);
         foreach ($targetClassNames as $targetClassName) {
-            if (0 !== strpos($targetClassName, 'Oro\\')) {
+            if (!str_starts_with($targetClassName, 'Oro\\')) {
                 continue;
             }
 

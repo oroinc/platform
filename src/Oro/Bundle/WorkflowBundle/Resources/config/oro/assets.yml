@@ -1,4 +1,7 @@
-assets:
-    css:
-      'oroworkflow':
-          - 'bundles/oroworkflow/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oroworkflow/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroworkflow/css/scss/main.scss'

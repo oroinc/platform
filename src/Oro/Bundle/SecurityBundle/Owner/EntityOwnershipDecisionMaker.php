@@ -12,13 +12,6 @@ class EntityOwnershipDecisionMaker extends AbstractEntityOwnershipDecisionMaker
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param OwnerTreeProviderInterface         $treeProvider
-     * @param ObjectIdAccessor                   $objectIdAccessor
-     * @param EntityOwnerAccessor                $entityOwnerAccessor
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param TokenAccessorInterface             $tokenAccessor
-     */
     public function __construct(
         OwnerTreeProviderInterface $treeProvider,
         ObjectIdAccessor $objectIdAccessor,

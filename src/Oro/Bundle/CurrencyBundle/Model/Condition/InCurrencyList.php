@@ -28,9 +28,6 @@ class InCurrencyList extends AbstractCondition implements ContextAccessorAwareIn
         return static::NAME;
     }
 
-    /**
-     * @param CurrencyListProviderInterface $currencyProvider
-     */
     public function __construct(CurrencyListProviderInterface $currencyProvider)
     {
         $this->currencyProvider = $currencyProvider;

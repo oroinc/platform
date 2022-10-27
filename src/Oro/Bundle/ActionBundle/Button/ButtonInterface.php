@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Button;
 
+/**
+ * Interface for the button implementation.
+ */
 interface ButtonInterface
 {
     const DEFAULT_GROUP = '';
@@ -15,7 +18,9 @@ interface ButtonInterface
     /**
      * @return string
      */
-    public function getLabel();
+    public function getLabel(): string;
+
+    public function getAriaLabel(): ?string;
 
     /**
      * @return string

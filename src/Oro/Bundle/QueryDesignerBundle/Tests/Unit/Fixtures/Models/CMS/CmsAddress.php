@@ -10,7 +10,8 @@ class CmsAddress
 {
     /**
      * @Column(type="integer")
-     * @Id @GeneratedValue
+     * @Id
+     * @GeneratedValue
      */
     public $id;
 
@@ -39,6 +40,16 @@ class CmsAddress
      * @JoinColumn(referencedColumnName="id")
      */
     public $user;
+
+    /**
+     * @ManyToOne(
+     *      targetEntity="CmsUser",
+     *      inversedBy="shippingAddresses",
+     *      cascade={"persist"}
+     * )
+     * @JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    protected $ownerUser;
 
     public function getId()
     {

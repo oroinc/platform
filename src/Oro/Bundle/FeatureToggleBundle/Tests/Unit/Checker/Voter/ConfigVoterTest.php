@@ -9,38 +9,27 @@ use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
 class ConfigVoterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureConfigManager;
+    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureConfigManager;
 
-    /**
-     * @var ConfigVoter
-     */
-    protected $configVoter;
+    /** @var ConfigVoter */
+    private $configVoter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->featureConfigManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->featureConfigManager = $this->createMock(ConfigurationManager::class);
+
         $this->configVoter = new ConfigVoter($this->configManager, $this->featureConfigManager);
     }
 
     /**
      * @dataProvider voteDataProvider
-     * @param bool $enabled
-     * @param int $expectedVote
      */
-    public function testVote($enabled, $expectedVote)
+    public function testVote(bool $enabled, int $expectedVote)
     {
         $feature = 'test';
         $scopeIdentifier = new \stdClass();
@@ -48,7 +37,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
 
         $this->featureConfigManager->expects($this->once())
             ->method('get')
-            ->with($feature, ConfigVoter::TOGGLE_KEY)
+            ->with($feature, 'toggle')
             ->willReturn($toggle);
 
         $this->configManager->expects($this->once())
@@ -59,10 +48,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedVote, $this->configVoter->vote($feature, $scopeIdentifier));
     }
 
-    /**
-     * @return array
-     */
-    public function voteDataProvider()
+    public function voteDataProvider(): array
     {
         return [
             [true, VoterInterface::FEATURE_ENABLED],
@@ -78,7 +64,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
 
         $this->featureConfigManager->expects($this->once())
             ->method('get')
-            ->with($feature, ConfigVoter::TOGGLE_KEY)
+            ->with($feature, 'toggle')
             ->willReturn($toggle);
 
         $this->configManager->expects($this->never())

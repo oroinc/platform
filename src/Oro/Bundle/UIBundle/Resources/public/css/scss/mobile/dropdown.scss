@@ -1,0 +1,21 @@
+/* @theme: admin.oro; */
+
+.dropdown-menu {
+
+    // Support of old markup
+    > li > a {
+        @extend .dropdown-item;
+    }
+}
+
+.dropdown-item {
+    font-size: $dropdown-item-font-size;
+    line-height: $dropdown-item-line-height;
+    padding-top: $dropdown-item-inner-offset-top;
+    padding-bottom: $dropdown-item-inner-offset-bottom;
+
+    [class^='fa-'],
+    [class*=' fa-'] {
+        margin-right: $dropdown-item-icon-fa-offset;
+    }
+}

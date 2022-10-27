@@ -55,9 +55,6 @@ class SearchIterableResult implements IterableResultInterface
      */
     private $rows;
 
-    /**
-     * @param SearchQueryInterface $query
-     */
     public function __construct(SearchQueryInterface $query)
     {
         $this->query = $query;
@@ -80,13 +77,13 @@ class SearchIterableResult implements IterableResultInterface
             throw new \InvalidArgumentException('$bufferSize must be greater than 0');
         }
 
-        $this->bufferSize = (int)$size;
+        $this->pageSize = (int)$size;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->offset = -1;
         $this->page = -1;
@@ -99,7 +96,7 @@ class SearchIterableResult implements IterableResultInterface
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->current;
     }
@@ -107,7 +104,7 @@ class SearchIterableResult implements IterableResultInterface
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -115,7 +112,7 @@ class SearchIterableResult implements IterableResultInterface
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->offset++;
 
@@ -148,7 +145,7 @@ class SearchIterableResult implements IterableResultInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return null !== $this->current;
     }
@@ -156,7 +153,7 @@ class SearchIterableResult implements IterableResultInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         if (null === $this->totalCount) {
             $query = clone $this->query;

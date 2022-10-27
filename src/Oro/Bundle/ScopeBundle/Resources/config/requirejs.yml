@@ -1,3 +1,0 @@
-config:
-    paths:
-        'oroscope/js/app/views/scope-toggle-view': 'bundles/oroscope/js/app/views/scope-toggle-view.js'

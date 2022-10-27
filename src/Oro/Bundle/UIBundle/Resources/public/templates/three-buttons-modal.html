@@ -4,7 +4,7 @@
             <% if (title) { %>
                 <h3 id="<%- modalId %>" class="modal-title"><%- title %></h3>
             <% } %>
-            <button type="button" class="close <%= closeButtonClass %>"
+            <button type="button" class="close <%- closeButtonClass %>"
                 data-dismiss="modal"
                 aria-label="<%- _.__('Close') %>">
                 <% if (closeText) { %>
@@ -17,11 +17,11 @@
         <div class="modal-body"><%= content %></div>
         <div class="modal-footer">
             <% if (allowCancel) { %>
-                <a href="#" role="button" class="cancel <%= cancelButtonClass %>" data-dismiss="modal"><%- cancelText %></a>
+                <a href="#" role="button" class="cancel <%- cancelButtonClass %>" data-dismiss="modal"><%- cancelText %></a>
             <% } %>
-                <a href="#" role="button" class="btn" data-button-id="secondary"><%- secondaryText %></a>
+                <a href="#" role="button" class="<%- secondaryButtonClass %>" data-button-id="secondary"><%- secondaryText %></a>
             <% if (allowOk) { %>
-                <a href="#" role="button" class="ok <%= okButtonClass %>"><%- okText %></a>
+                <a href="#" role="button" class="ok <%- okButtonClass %>"><%- okText %></a>
             <% } %>
         </div>
     </div>

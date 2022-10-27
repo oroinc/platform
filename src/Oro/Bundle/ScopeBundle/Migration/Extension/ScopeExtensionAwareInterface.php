@@ -7,8 +7,5 @@ namespace Oro\Bundle\ScopeBundle\Migration\Extension;
  */
 interface ScopeExtensionAwareInterface
 {
-    /**
-     * @param ScopeExtension $scopeExtension
-     */
     public function setScopeExtension(ScopeExtension $scopeExtension);
 }

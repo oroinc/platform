@@ -1,45 +1,84 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client\Meta;
 
+use Oro\Component\MessageQueue\Client\Config;
+use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class TopicsCommand extends Command implements ContainerAwareInterface
+/**
+ * Lists available message queue topics.
+ */
+class TopicsCommand extends Command
 {
-    use ContainerAwareTrait;
+    /** @var string */
+    protected static $defaultName = 'oro:message-queue:topics';
 
-    /**
-     * {@inheritdoc}
-     */
+    private TopicRegistry $topicRegistry;
+
+    private TopicMetaRegistry $topicMetaRegistry;
+
+    private TopicDescriptionProvider $topicDescriptionProvider;
+
+    public function __construct(
+        TopicRegistry $topicRegistry,
+        TopicMetaRegistry $topicMetaRegistry,
+        TopicDescriptionProvider $topicDescriptionProvider
+    ) {
+        parent::__construct();
+
+        $this->topicRegistry = $topicRegistry;
+        $this->topicMetaRegistry = $topicMetaRegistry;
+        $this->topicDescriptionProvider = $topicDescriptionProvider;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:message-queue:topics')
-            ->setDescription('A command shows all available topics and some information about them.');
+            ->setDescription('Lists available message queue topics.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command lists available message queue topics.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $table = new Table($output);
-        $table->setHeaders(['Topic', 'Description', 'Subscribers']);
+        $table->setHeaders(['Topic', 'Description', 'Default Priority', 'Subscribers']);
 
         $count = 0;
         $firstRow = true;
-        foreach ($this->getTopics() as $topic) {
+        foreach ($this->topicMetaRegistry->getTopicsMeta() as $topic) {
             if (!$firstRow) {
                 $table->addRow(new TableSeparator());
             }
 
-            $table->addRow([$topic->getName(), $topic->getDescription(), implode(PHP_EOL, $topic->getSubscribers())]);
+            $topicName = $topic->getName();
+            $table->addRow(
+                [
+                    $topicName,
+                    $this->topicDescriptionProvider->getTopicDescription($topicName),
+                    $this->getDefaultPriority($topicName),
+                    implode(PHP_EOL, $topic->getAllMessageProcessors()),
+                ]
+            );
 
             $count++;
             $firstRow = false;
@@ -48,16 +87,14 @@ class TopicsCommand extends Command implements ContainerAwareInterface
         $output->writeln(sprintf('Found %s topics', $count));
         $output->writeln('');
         $table->render();
+
+        return self::SUCCESS;
     }
 
-    /**
-     * @return TopicMeta[]
-     */
-    private function getTopics()
+    private function getDefaultPriority(string $topicName): string
     {
-        /** @var TopicMetaRegistry $topicRegistry */
-        $topicRegistry = $this->container->get('oro_message_queue.client.meta.topic_meta_registry');
+        $priority = $this->topicRegistry->get($topicName)->getDefaultPriority(Config::DEFAULT_QUEUE_NAME);
 
-        return $topicRegistry->getTopicsMeta();
+        return MessagePriority::getMessagePriorityName($priority);
     }
 }

@@ -2,72 +2,54 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
+use Symfony\Component\Mime\Address as SymfonyAddress;
+
 /**
- * Model for populating from part to \Swift_Message.
+ * Model that stores "From" email address and name.
  */
 class From
 {
-    /**
-     * @var array
-     */
-    private $params;
+    private string $address;
 
-    /**
-     * @param array $params
-     */
-    private function __construct(array $params)
+    private string $name;
+
+    private function __construct(string $address, string $name = '')
     {
-        $this->params = $params;
+        $this->address = $address;
+        $this->name = $name;
     }
 
-    /**
-     * @param \Swift_Message $message
-     */
-    public function populate(\Swift_Message $message): void
+    public static function emailAddress(From|string $emailAddress, string $name = ''): self
     {
-        $message->setFrom(...$this->params);
+        if ($emailAddress instanceof self) {
+            return self::emailAddress($emailAddress->toString(), $name);
+        }
+
+        $symfonyAddress = SymfonyAddress::create($emailAddress);
+
+        return new self($symfonyAddress->getAddress(), $name ?: $symfonyAddress->getName());
     }
 
-    /**
-     * Returns array representation.
-     * @return array
-     */
+    public function getAddress(): string
+    {
+        return trim($this->address);
+    }
+
+    public function getName(): string
+    {
+        return trim(str_replace(["\n", "\r"], '', $this->name));
+    }
+
     public function toArray(): array
     {
-        return $this->params;
+        return [$this->getAddress(), $this->getName()];
     }
 
-    /**
-     * Used when single email address should be defined in From header.
-     *
-     * @param string $emailAddress
-     * @param string|null $name
-     * @return From
-     */
-    public static function emailAddress(string $emailAddress, string $name = null): self
+    public function toString(): string
     {
-        return new self([$emailAddress, $name]);
-    }
+        $name = $this->getName();
+        $address = $this->getAddress();
 
-    /**
-     * Used when multiple email addresses are defined in From header which is possible according to RFC2822.
-     *
-     * @param array $emailAddresses a list of email addresses or [email address1 => name1, email address2 => name2, ...]
-     *
-     * @return From
-     */
-    public static function emailAddresses(array $emailAddresses): self
-    {
-        return new self([$emailAddresses]);
-    }
-
-    /**
-     * Creates object based on array returned by toArray method.
-     * @param array $data
-     * @return From
-     */
-    public static function fromArray(array $data): self
-    {
-        return new self($data);
+        return $name ? sprintf('"%s" <%s>', $name, $address) : $address;
     }
 }

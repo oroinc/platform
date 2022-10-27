@@ -11,6 +11,13 @@ use Oro\Component\Layout\Block\Type\Options;
 interface LayoutRegistryInterface
 {
     /**
+     * Returns names of all block types.
+     *
+     * @return string[]
+     */
+    public function getTypeNames(): array;
+
+    /**
      * Returns a block type by name.
      *
      * @param string $name The block type name

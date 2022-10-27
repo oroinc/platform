@@ -15,11 +15,16 @@ class NormalizeEntityClassTest extends \PHPUnit\Framework\TestCase
     /** @var NormalizeEntityClass */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityAliasResolverRegistry = $this->createMock(EntityAliasResolverRegistry::class);
 
         $this->processor = new NormalizeEntityClass($this->entityAliasResolverRegistry);
+    }
+
+    private function getArrayRequirement(string $requirement): string
+    {
+        return sprintf('%1$s(,%1$s)*', $requirement);
     }
 
     public function testProcess()
@@ -39,7 +44,7 @@ class NormalizeEntityClassTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        self::assertEquals(NormalizeEntityClass::REQUIREMENT, $context->getRequirement());
+        self::assertEquals('[a-zA-Z]\w+', $context->getRequirement());
         self::assertEquals('Test\Class', $context->getResult());
     }
 
@@ -57,17 +62,15 @@ class NormalizeEntityClassTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityAliasResolver);
         $entityAliasResolver->expects(self::exactly(2))
             ->method('getClassByPluralAlias')
-            ->willReturnMap(
-                [
-                    ['alias1', 'Test\Class1'],
-                    ['alias2', 'Test\Class2']
-                ]
-            );
+            ->willReturnMap([
+                ['alias1', 'Test\Class1'],
+                ['alias2', 'Test\Class2']
+            ]);
 
         $this->processor->process($context);
 
         self::assertEquals(
-            $this->getArrayRequirement(NormalizeEntityClass::REQUIREMENT),
+            $this->getArrayRequirement('[a-zA-Z]\w+'),
             $context->getRequirement()
         );
         self::assertEquals(['Test\Class1', 'Test\Class2'], $context->getResult());
@@ -108,10 +111,5 @@ class NormalizeEntityClassTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
 
         self::assertEquals('test', $context->getRequirement());
-    }
-
-    protected function getArrayRequirement($requirement)
-    {
-        return sprintf('%1$s(,%1$s)*', $requirement);
     }
 }

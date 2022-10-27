@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Request\NullEntityIdTransformer;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,7 +29,7 @@ class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdTransformerRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer1 = $this->createMock(EntityIdTransformerInterface::class);
         $this->transformer2 = $this->createMock(EntityIdTransformerInterface::class);

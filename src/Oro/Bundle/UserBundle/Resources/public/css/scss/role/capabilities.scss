@@ -1,12 +1,12 @@
 /* @theme: admin.oro; */
 
 .role-capability {
-    padding-bottom: 10px;
+    padding: $role-capability-offset;
 
     border-bottom: 1px solid $role-capability-color;
 
     &:last-child {
-        margin-bottom: 10px;
+        padding-bottom: $role-capability-bottom-offset;
 
         border-bottom: none;
     }
@@ -22,21 +22,15 @@
 
     &__item {
         display: inline-block;
-        width: 30%;
-        padding: side-values(0 60px 16px 0);
+        width: $role-capability-item-width;
+        padding: $role-capability-item-offset;
     }
 
     &__item-label {
-        margin: 0;
-    }
+        display: inline-flex;
+        gap: 8px;
 
-    &__item-label {
-        position: relative;
-
-        display: inline-block;
-        padding-#{$start}: $role-capability-label-offset;
-
-        line-height: 1.5;
+        line-height: $role-capability-label-line-height;
     }
 
     &__item-label--no-access {
@@ -48,7 +42,7 @@
     }
 
     &__select-all {
-        float: #{$end};
+        float: right;
 
         &.disabled {
             color: $role-capability-item-disabled;
@@ -66,9 +60,10 @@
     }
 
     &__group-title {
-        margin: 28px 0 14px;
+        margin: $role-capability-group-title-offset;
 
-        font-size: 18px;
+        font-size: $role-capability-group-title-font-size;
+        font-weight: $role-capability-group-title-weight;
     }
 
     &__group-own-title {

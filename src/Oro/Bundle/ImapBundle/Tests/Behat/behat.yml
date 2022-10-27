@@ -3,8 +3,9 @@ oro_behat_extension:
     OroImapBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroConfigBundle::FeatureContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
       paths:
         - '@OroImapBundle/Tests/Behat/Features'
 
@@ -14,7 +15,6 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
-          Use Default Language: 'language_settings[oro_locale___language][use_parent_scope_value]'
           Enable SMTP: 'user_email_configuration[oro_email___user_mailbox][value][imapConfiguration][useSmtp]'
           SMTP Host: 'user_email_configuration[oro_email___user_mailbox][value][imapConfiguration][smtpHost]'
           SMTP Port: 'user_email_configuration[oro_email___user_mailbox][value][imapConfiguration][smtpPort]'

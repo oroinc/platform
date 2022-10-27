@@ -7,46 +7,35 @@ use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeFileLoader;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\TestBundle1;
-use Oro\Component\Config\Tests\Unit\Fixtures\CopyFixturesToTemp;
+use Oro\Component\Testing\TempDirExtension;
 
 class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CopyFixturesToTemp */
-    private $copier;
+    use TempDirExtension;
 
-    /** @var string */
-    private $bundleDir;
+    private string $bundleDir;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $target = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . 'test_data';
-        $source = realpath(__DIR__ . '/../Fixtures');
-        $this->copier = new CopyFixturesToTemp($target, $source);
-        $this->copier->copy();
-        $this->bundleDir = $target . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';
+        $tmpDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../Fixtures'));
+        $this->bundleDir = $tmpDir . DIRECTORY_SEPARATOR . 'Bundle' . DIRECTORY_SEPARATOR . 'TestBundle1';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
+    private function getPath(string $path): string
     {
-        $this->copier->delete();
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
     public function testLoader()
     {
         $relativeFilePath = 'Resources/config/test.yml';
 
-        $loader = $this->createLoader($relativeFilePath);
+        $loader = $this->getMockForAbstractClass(CumulativeFileLoader::class, [$relativeFilePath]);
 
-        $data             = ['test' => 123];
-        $bundleDir        = $this->bundleDir;
+        $data = ['test' => 123];
+        $bundleDir = $this->bundleDir;
         $expectedFilePath = $bundleDir . '/' . $relativeFilePath;
-        $expectedFilePath = str_replace('/', DIRECTORY_SEPARATOR, $expectedFilePath);
+        $expectedFilePath = $this->getPath($expectedFilePath);
 
         $expectedResource = new CumulativeResourceInfo(
             TestBundle1::class,
@@ -58,7 +47,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $loader->expects($this->once())
             ->method('loadFile')
             ->with($expectedFilePath)
-            ->will($this->returnValue($data));
+            ->willReturn($data);
 
         $this->assertEquals($relativeFilePath, $loader->getResource());
 
@@ -69,9 +58,12 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filePathProvider
      */
-    public function testFilePath($relativeFilePath, $expectedRelativeFilePath, $expectedResource)
-    {
-        $loader = $this->createLoader($relativeFilePath);
+    public function testFilePath(
+        string $relativeFilePath,
+        string $expectedRelativeFilePath,
+        string $expectedResource
+    ) {
+        $loader = $this->getMockForAbstractClass(CumulativeFileLoader::class, [$relativeFilePath]);
 
         $this->assertEquals($expectedRelativeFilePath, $loader->getRelativeFilePath());
         $this->assertEquals($expectedResource, $loader->getResource());
@@ -82,9 +74,9 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $relativeFilePath = 'Resources/config/test.yml';
 
         $bundleClass = TestBundle1::class;
-        $bundleDir   = $this->bundleDir;
+        $bundleDir = $this->bundleDir;
 
-        $loader = $this->createLoader($relativeFilePath);
+        $loader = $this->getMockForAbstractClass(CumulativeFileLoader::class, [$relativeFilePath]);
 
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, '', $resource);
@@ -92,7 +84,7 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $expectedResource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $expectedResource->addFound(
             $bundleClass,
-            str_replace('/', DIRECTORY_SEPARATOR, $bundleDir . '/' . $relativeFilePath)
+            $this->getPath($bundleDir . '/' . $relativeFilePath)
         );
         $this->assertEquals($expectedResource, $resource);
     }
@@ -102,9 +94,9 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $relativeFilePath = 'Resources/config/test.yml';
 
         $bundleClass = TestBundle1::class;
-        $bundleDir   = $this->bundleDir;
+        $bundleDir = $this->bundleDir;
 
-        $loader = $this->createLoader($relativeFilePath);
+        $loader = $this->getMockForAbstractClass(CumulativeFileLoader::class, [$relativeFilePath]);
 
         $loadTime = filemtime($bundleDir . '/' . $relativeFilePath) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
@@ -118,9 +110,9 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $relativeFilePath = 'Resources/config/none.tmp';
 
         $bundleClass = TestBundle1::class;
-        $bundleDir   = $this->bundleDir;
+        $bundleDir = $this->bundleDir;
 
-        $loader = $this->createLoader($relativeFilePath);
+        $loader = $this->getMockForAbstractClass(CumulativeFileLoader::class, [$relativeFilePath]);
 
         $loadTime = filemtime($bundleDir) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
@@ -134,9 +126,9 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $relativeFilePath = 'Resources/config/test.yml';
 
         $bundleClass = TestBundle1::class;
-        $bundleDir   = $this->bundleDir;
+        $bundleDir = $this->bundleDir;
 
-        $loader = $this->createLoader($relativeFilePath);
+        $loader = $this->getMockForAbstractClass(CumulativeFileLoader::class, [$relativeFilePath]);
 
         $loadTime = filemtime($bundleDir . '/' . $relativeFilePath) - 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
@@ -150,9 +142,9 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $relativeFilePath = 'Resources/config/test.tmp';
 
         $bundleClass = TestBundle1::class;
-        $bundleDir   = $this->bundleDir;
+        $bundleDir = $this->bundleDir;
 
-        $loader = $this->createLoader($relativeFilePath);
+        $loader = $this->getMockForAbstractClass(CumulativeFileLoader::class, [$relativeFilePath]);
 
         $loadTime = filemtime($bundleDir) + 1;
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
@@ -170,9 +162,9 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $relativeFilePath = 'Resources/config/test.tmp';
 
         $bundleClass = TestBundle1::class;
-        $bundleDir   = $this->bundleDir;
+        $bundleDir = $this->bundleDir;
 
-        $loader = $this->createLoader($relativeFilePath);
+        $loader = $this->getMockForAbstractClass(CumulativeFileLoader::class, [$relativeFilePath]);
 
         $filePath = $bundleDir . '/' . $relativeFilePath;
         file_put_contents($filePath, 'test');
@@ -184,56 +176,44 @@ class CumulativeFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($loader->isResourceFresh($bundleClass, $bundleDir, '', $resource, $loadTime));
     }
 
-    public function filePathProvider()
+    public function filePathProvider(): array
     {
         return [
             [
                 'Resources/config/test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/Resources/config/test.yml'),
+                $this->getPath('/Resources/config/test.yml'),
                 'Resources/config/test.yml'
             ],
             [
                 '/Resources/config/test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/Resources/config/test.yml'),
+                $this->getPath('/Resources/config/test.yml'),
                 'Resources/config/test.yml'
             ],
             [
                 'Resources\config\test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/Resources/config/test.yml'),
+                $this->getPath('/Resources/config/test.yml'),
                 'Resources/config/test.yml'
             ],
             [
                 '\Resources\config\test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/Resources/config/test.yml'),
+                $this->getPath('/Resources/config/test.yml'),
                 'Resources/config/test.yml'
             ],
             [
                 'test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/test.yml'),
+                $this->getPath('/test.yml'),
                 'test.yml'
             ],
             [
                 '/test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/test.yml'),
+                $this->getPath('/test.yml'),
                 'test.yml'
             ],
             [
                 '\test.yml',
-                str_replace('/', DIRECTORY_SEPARATOR, '/test.yml'),
+                $this->getPath('/test.yml'),
                 'test.yml'
             ],
         ];
-    }
-
-    /**
-     * @param string $relativeFilePath
-     * @return CumulativeFileLoader|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createLoader($relativeFilePath)
-    {
-        return $this->getMockForAbstractClass(
-            'Oro\Component\Config\Loader\CumulativeFileLoader',
-            [$relativeFilePath]
-        );
     }
 }

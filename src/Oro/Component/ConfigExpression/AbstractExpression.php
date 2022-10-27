@@ -4,6 +4,9 @@ namespace Oro\Component\ConfigExpression;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Base implementation of an expression.
+ */
 abstract class AbstractExpression implements ExpressionInterface
 {
     /** @var string */
@@ -118,6 +121,7 @@ abstract class AbstractExpression implements ExpressionInterface
      * @param string $factoryAccessor
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function convertToPhpCode($params, $factoryAccessor)
     {
@@ -149,7 +153,6 @@ abstract class AbstractExpression implements ExpressionInterface
                 }
             }
         }
-
 
         $compiled =
             $factoryAccessor

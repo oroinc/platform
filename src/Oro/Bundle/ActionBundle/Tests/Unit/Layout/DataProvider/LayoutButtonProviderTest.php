@@ -11,64 +11,41 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 class LayoutButtonProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ButtonProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $buttonProvider;
-
-    /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject */
-    protected $buttonSearchContext;
+    private $buttonProvider;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
-
-    /** @var ButtonSearchContextProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextProvider;
+    private $doctrineHelper;
 
     /** @var LayoutButtonProvider */
-    protected $layoutButtonProvider;
+    private $layoutButtonProvider;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->buttonSearchContext = $this->getMockBuilder(ButtonSearchContext::class)
-            ->setMethods(null)
-            ->getMock();
-
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->buttonProvider = $this->createMock(ButtonProvider::class);
 
-        $this->contextProvider = $this->getMockBuilder(ButtonSearchContextProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->contextProvider->expects($this->once())
+        $contextProvider = $this->createMock(ButtonSearchContextProvider::class);
+        $contextProvider->expects($this->once())
             ->method('getButtonSearchContext')
-            ->willReturn($this->buttonSearchContext);
+            ->willReturn(new ButtonSearchContext());
 
         $this->layoutButtonProvider = new LayoutButtonProvider(
             $this->buttonProvider,
             $this->doctrineHelper,
-            $this->contextProvider
+            $contextProvider
         );
     }
 
     /**
      * @dataProvider getAllDataProvider
-     *
-     * @param object|null $entity
-     * @param bool $isNew
-     * @param string $expectSetEntityClass
-     * @param string $expectSetEntityId
      */
-    public function testGetAll($entity, $isNew, $expectSetEntityClass, $expectSetEntityId)
+    public function testGetAll(?object $entity, bool $isNew, string $expectSetEntityClass, string $expectSetEntityId)
     {
         $this->doctrineHelper->expects($this->any())
             ->method('isNewEntity')
             ->willReturn($isNew);
 
-        if (!is_null($entity)) {
+        if (null !== $entity) {
             $this->doctrineHelper->expects($this->atLeastOnce())
                 ->method('getEntityClass')
                 ->with($entity)
@@ -80,7 +57,9 @@ class LayoutButtonProviderTest extends \PHPUnit\Framework\TestCase
                     ->willReturn('entity_id');
             }
         }
-        $this->doctrineHelper->expects($this->any())->method('isNewEntity')->willReturn($isNew);
+        $this->doctrineHelper->expects($this->any())
+            ->method('isNewEntity')
+            ->willReturn($isNew);
         $this->doctrineHelper->expects($this->$expectSetEntityClass())
             ->method('getEntityClass')
             ->with($entity)
@@ -112,11 +91,8 @@ class LayoutButtonProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataGroupsProvider
-     *
-     * @param string|null $datagrid
-     * @param string|null $group
      */
-    public function testGetByGroup($datagrid, $group)
+    public function testGetByGroup(?string $datagrid, ?string $group)
     {
         $this->buttonProvider->expects($this->once())
             ->method('findAvailable')
@@ -130,10 +106,7 @@ class LayoutButtonProviderTest extends \PHPUnit\Framework\TestCase
         $this->layoutButtonProvider->getByGroup(null, $datagrid, $group);
     }
 
-    /**
-     * @return array
-     */
-    public function getAllDataProvider()
+    public function getAllDataProvider(): array
     {
         return [
             'testWhenEntityIsNew' => [
@@ -157,10 +130,7 @@ class LayoutButtonProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function dataGroupsProvider()
+    public function dataGroupsProvider(): array
     {
         return [
             ['datagrid', 'groups1'],

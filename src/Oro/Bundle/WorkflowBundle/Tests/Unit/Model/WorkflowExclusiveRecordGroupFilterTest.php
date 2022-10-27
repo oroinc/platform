@@ -14,42 +14,40 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 
 class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var WorkflowExclusiveRecordGroupFilter
-     */
-    protected $exclusiveRecordGroupFilter;
+    /** @var WorkflowExclusiveRecordGroupFilter */
+    private $exclusiveRecordGroupFilter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
         $this->exclusiveRecordGroupFilter = new WorkflowExclusiveRecordGroupFilter($this->doctrineHelper);
     }
 
     /**
-     * @param $expected
-     * @param array $workflowItems
-     * @param ArrayCollection $workflows
      * @dataProvider filterDataProvider
      */
-    public function testFilter($expected, array $workflowItems, ArrayCollection $workflows)
+    public function testFilter(ArrayCollection $expected, array $workflowItems, ArrayCollection $workflows)
     {
         $entity = new EntityStub(42);
 
         $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')->with($entity)->willReturn(EntityStub::class);
+            ->method('getEntityClass')
+            ->with($entity)
+            ->willReturn(EntityStub::class);
         $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')->willReturn(['id' => 42]);
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(['id' => 42]);
 
-        $workflowItemRepository = $this->getMockBuilder(WorkflowItemRepository::class)
-            ->disableOriginalConstructor()->getMock();
+        $workflowItemRepository = $this->createMock(WorkflowItemRepository::class);
 
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')
-            ->with(WorkflowItem::class)->willReturn($workflowItemRepository);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->with(WorkflowItem::class)
+            ->willReturn($workflowItemRepository);
 
         $workflowItemRepository->expects($this->once())
             ->method('findAllByEntityMetadata')
@@ -62,10 +60,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function filterDataProvider()
+    public function filterDataProvider(): array
     {
         return [
             'foreign group' => $this->foreignGroupCase(),
@@ -77,10 +72,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function sameGroupCase()
+    private function sameGroupCase(): array
     {
         $workflow1 = $this->getWorkflow('workflow1', ['group1']);
         $workflow2 = $this->getWorkflow('workflow2', ['group1']);
@@ -94,10 +86,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function foreignGroupCase()
+    private function foreignGroupCase(): array
     {
         $workflow1 = $this->getWorkflow('workflow1', ['group1']);
         $workflow2 = $this->getWorkflow('workflow2', ['group2']);
@@ -111,10 +100,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function noGroupCase()
+    private function noGroupCase(): array
     {
         $workflow1 = $this->getWorkflow('workflow1', []);
         $workflow2 = $this->getWorkflow('workflow2', []);
@@ -129,10 +115,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function mixedCase()
+    private function mixedCase(): array
     {
         $workflow1 = $this->getWorkflow('w1', ['g1']);
         $workflow2 = $this->getWorkflow('w2', ['g2']);
@@ -151,10 +134,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function unorderedRecordsCase()
+    private function unorderedRecordsCase(): array
     {
         $workflow1 = $this->getWorkflow('w1', ['g1']);
         $workflow2 = $this->getWorkflow('w2', ['g1']);
@@ -168,10 +148,7 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function itemsWithSameGroupsCase()
+    private function itemsWithSameGroupsCase(): array
     {
         $workflow1 = $this->getWorkflow('w1', ['g1', 'g2']);
         $workflow2 = $this->getWorkflow('w2', ['g1', 'g3']);
@@ -186,39 +163,33 @@ class WorkflowExclusiveRecordGroupFilterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $workflowName
-     * @param array $exclusiveRecordGroups
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getWorkflow($workflowName, array $exclusiveRecordGroups)
+    private function getWorkflow(string $workflowName, array $exclusiveRecordGroups): Workflow
     {
         $definition = new WorkflowDefinition();
         $definition->setName($workflowName);
         $definition->setExclusiveRecordGroups($exclusiveRecordGroups);
 
-        $workflowMock = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->any())
+            ->method('getName')
+            ->willReturn($workflowName);
+        $workflow->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($definition);
 
-        $workflowMock->expects($this->any())->method('getName')->willReturn($workflowName);
-        $workflowMock->expects($this->any())->method('getDefinition')->willReturn($definition);
-
-        return $workflowMock;
+        return $workflow;
     }
 
-    /**
-     * @param string $workflowName
-     * @param array $exclusiveRecordGroups
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getWorkflowItem($workflowName, array $exclusiveRecordGroups)
+    private function getWorkflowItem(string $workflowName, array $exclusiveRecordGroups): WorkflowItem
     {
         $definition = new WorkflowDefinition();
         $definition->setExclusiveRecordGroups($exclusiveRecordGroups);
 
-        $workflowItemMock = $this->getMockBuilder(WorkflowItem::class)->disableOriginalConstructor()->getMock();
+        $workflowItem = $this->createMock(WorkflowItem::class);
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn($workflowName);
 
-        $workflowItemMock->expects($this->any())->method('getWorkflowName')->willReturn($workflowName);
-
-        return $workflowItemMock;
+        return $workflowItem;
     }
 }

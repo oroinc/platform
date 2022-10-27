@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_5;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -36,7 +36,7 @@ EOF;
                 $dropFieldsQuery->addSql(
                     $dropFieldsSql,
                     ['field_name' => $fieldName, 'class_name' => $entityClass],
-                    ['field_name' => Type::STRING, 'class_name' => Type::STRING]
+                    ['field_name' => Types::STRING, 'class_name' => Types::STRING]
                 );
                 $queries->addPostQuery($dropFieldsQuery);
             }

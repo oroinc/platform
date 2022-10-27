@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var EmailAttachmentView;
-    var EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    EmailAttachmentView = BaseView.extend({
+    const EmailAttachmentView = BaseView.extend({
         model: EmailAttachmentModel,
 
         inputName: '',
 
         events: {
-            'click i.fa-close': 'removeClick'
+            'click [data-role="remove"]': 'removeClick'
         },
 
         listen: {
@@ -21,67 +20,84 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailAttachmentView() {
-            EmailAttachmentView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailAttachmentView(options) {
+            EmailAttachmentView.__super__.constructor.call(this, options);
         },
 
-        getTemplateFunction: function() {
+        /**
+         * @inheritdoc
+         */
+        initialize(options) {
+            this.guessFileIcon();
+        },
+
+        getTemplateFunction() {
             if (!this.template) {
-                this.template = require('tpl!oroemail/templates/email-attachment/email-attachment-item.html');
+                this.template = require('tpl-loader!oroemail/templates/email-attachment/email-attachment-item.html');
             }
 
             return EmailAttachmentView.__super__.getTemplateFunction.call(this);
         },
 
-        getTemplateData: function() {
-            var data = EmailAttachmentView.__super__.getTemplateData.call(this);
+        getTemplateData() {
+            const data = EmailAttachmentView.__super__.getTemplateData.call(this);
             data.cid = this.model.cid;
             data.inputName = this.inputName;
 
             return data;
         },
 
-        removeClick: function() {
+        removeClick() {
             this.model.trigger('destroy', this.model);
         },
 
-        fileSelect: function() {
-            var self = this;
-            var $fileInput = this.$('input[type="file"]');
+        fileSelect() {
+            const $fileInput = this.$('input[type="file"]');
             this.$el.hide();
 
-            $fileInput.on('change', function() {
-                var value = $fileInput.val().replace(/^.*[\\\/]/, '');
+            $fileInput.on('change', () => {
+                const value = $fileInput.val().replace(/^.*[\\\/]/, '');
 
                 if (value) {
-                    self.model.set('fileName', value);
-                    self.model.set('type', 3);
-                    var extension = value.substr(value.lastIndexOf('.') + 1);
-                    var icon = self.fileIcons['default'];
-                    if (extension && self.fileIcons[extension]) {
-                        icon = self.fileIcons[extension];
-                    }
-                    self.model.set('icon', icon);
-                    self.$el.show();
+                    this.model.set('fileName', value);
+                    this.model.set('type', 3);
+                    this.guessFileIcon();
+                    this.$el.show();
 
-                    self.collectionView.show();
+                    this.collectionView.show();
+
+                    this.$el.trigger('content:changed');
                 }
             });
             $fileInput.click();
         },
 
-        fileNameChange: function() {
-            this.$('span.filename-label').html(this.model.get('fileName'));
+        guessFileIcon() {
+            const value = this.model.get('fileName');
+            if (value) {
+                const extension = value.substr(value.lastIndexOf('.') + 1);
+                let icon = this.fileIcons['default'];
+                if (extension && this.fileIcons[extension]) {
+                    icon = this.fileIcons[extension];
+                }
+                this.model.set('icon', icon);
+            }
         },
 
-        typeChange: function() {
+        fileNameChange() {
+            this.$('.attachment-item__filename')
+                .html(this.model.get('fileName'))
+                .attr('title', this.model.get('fileName'));
+        },
+
+        typeChange() {
             this.$('input.attachment-type').val(this.model.get('type'));
         },
 
-        iconChange: function() {
-            this.$('.filename .fa').addClass(this.model.get('icon'));
+        iconChange() {
+            this.$('.attachment-item .fa').addClass(this.model.get('icon'));
         }
     });
 

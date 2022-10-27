@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Provider\Event;
 
 use Oro\Bundle\ActionBundle\Button\ButtonsCollection;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class OnButtonsMatched extends Event
 {
@@ -12,9 +12,6 @@ class OnButtonsMatched extends Event
     /** @var ButtonsCollection */
     protected $buttons;
 
-    /**
-     * @param ButtonsCollection $buttons
-     */
     public function __construct(ButtonsCollection $buttons)
     {
         $this->buttons = $buttons;

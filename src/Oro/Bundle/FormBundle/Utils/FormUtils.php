@@ -7,8 +7,45 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Provides a set of static methods that may be helpful in form processing.
+ */
 class FormUtils
 {
+    /**
+     * Finds a form field by its property path and checks whether it is submitted.
+     */
+    public static function isFormFieldSubmitted(FormInterface $form, string $propertyPath): bool
+    {
+        $field = self::findFormField($form, $propertyPath);
+
+        return null !== $field && $field->isSubmitted();
+    }
+
+    /**
+     * Finds a form field by its property path.
+     */
+    public static function findFormField(FormInterface $form, string $propertyPath): ?FormInterface
+    {
+        if ($form->has($propertyPath)) {
+            $field = $form->get($propertyPath);
+            $fieldPropertyPath = $field->getPropertyPath();
+            if (null === $fieldPropertyPath || (string)$fieldPropertyPath === $propertyPath) {
+                return $field;
+            }
+        }
+
+        /** @var FormInterface $field */
+        foreach ($form as $field) {
+            $fieldPropertyPath = $field->getPropertyPath();
+            if (null !== $fieldPropertyPath && (string)$fieldPropertyPath === $propertyPath) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Replace form field by the same field with different options
      * Example of usage:
@@ -33,20 +70,11 @@ class FormUtils
             $options['auto_initialize'] = false;
         }
 
-        //@TODO: Should be removed in scope #BAP-17037
-        if (array_key_exists('choices_as_values', $options)) {
-            $options['choices_as_values'] = null;
-        }
         $options = array_merge($options, $modifyOptions);
         $options = array_diff_key($options, array_flip($unsetOptions));
         $form->add($fieldName, get_class($config->getType()->getInnerType()), $options);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param string $fieldName
-     * @param array $mergeOptions
-     */
     public static function replaceFieldOptionsRecursive(
         FormInterface $form,
         string $fieldName,
@@ -61,9 +89,6 @@ class FormUtils
 
     /**
      * Appends CSS class(es) to given form view
-     *
-     * @param FormView $view
-     * @param string|[]   $cssClass
      */
     public static function appendClass(FormView $view, $cssClasses)
     {

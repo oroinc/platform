@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * NavigationItem Repository
+ * Doctrine repository for HistoryItem entity.
  */
 class HistoryItemRepository extends EntityRepository implements NavigationRepositoryInterface
 {
@@ -61,7 +62,7 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
         $qb = $this->createQueryBuilder('navigation_history')
             ->delete()
             ->where('navigation_history.visitedAt < :dateTime')
-            ->setParameter('dateTime', $dateTime);
+            ->setParameter('dateTime', $dateTime, Types::DATETIME_MUTABLE);
 
         return $qb->getQuery()
             ->execute();

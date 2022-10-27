@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
@@ -11,7 +12,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
  */
 class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageInterface
 {
-    /** @var CacheProvider */
+    /** @var AdapterInterface */
     protected $tokenCache;
 
     /** @var int */
@@ -21,12 +22,12 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
     protected $sessionIdProvider;
 
     /**
-     * @param CacheProvider              $tokenCache
-     * @param int                        $tokenLifetime
+     * @param AdapterInterface $tokenCache
+     * @param int $tokenLifetime
      * @param SessionIdProviderInterface $sessionIdProvider
      */
     public function __construct(
-        CacheProvider $tokenCache,
+        AdapterInterface $tokenCache,
         $tokenLifetime,
         SessionIdProviderInterface $sessionIdProvider
     ) {
@@ -40,7 +41,7 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
      */
     public function hasToken($tokenId)
     {
-        return false !== $this->tokenCache->fetch($this->getCacheKey($tokenId));
+        return $this->tokenCache->hasItem($this->getCacheKey($tokenId));
     }
 
     /**
@@ -48,7 +49,8 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
      */
     public function getToken($tokenId)
     {
-        $token = $this->tokenCache->fetch($this->getCacheKey($tokenId));
+        $cacheItem = $this->tokenCache->getItem($this->getCacheKey($tokenId));
+        $token = $cacheItem->get();
         if (false === $token) {
             $token = null;
         }
@@ -61,7 +63,16 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
      */
     public function setToken($tokenId, $token)
     {
-        $this->tokenCache->save($this->getCacheKey($tokenId), $token, $this->tokenLifetime);
+        $cacheItem = $this->tokenCache->getItem($this->getCacheKey($tokenId));
+        $cacheItem
+            ->set($token)
+            ->expiresAfter($this->tokenLifetime);
+
+        $this->tokenCache->save($cacheItem);
+
+        if ($this->tokenCache instanceof PruneableInterface) {
+            $this->tokenCache->prune();
+        }
     }
 
     /**
@@ -77,7 +88,7 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
      */
     public function clear()
     {
-        $this->tokenCache->deleteAll();
+        $this->tokenCache->clear();
     }
 
     /**

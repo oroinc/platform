@@ -21,9 +21,6 @@ class ReminderManager
      */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -32,7 +29,7 @@ class ReminderManager
     /**
      * Save reminders
      *
-     * @param RemindableInterface $entity
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function saveReminders(RemindableInterface $entity)
     {
@@ -95,8 +92,6 @@ class ReminderManager
 
     /**
      * Loads reminders into entity
-     *
-     * @param RemindableInterface $entity
      */
     public function loadReminders(RemindableInterface $entity)
     {

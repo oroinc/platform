@@ -19,18 +19,11 @@ class ImportType extends AbstractType
      */
     protected $processorRegistry;
 
-    /**
-     * @param ProcessorRegistry $processorRegistry
-     */
     public function __construct(ProcessorRegistry $processorRegistry)
     {
         $this->processorRegistry = $processorRegistry;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('file', FileType::class);
@@ -72,19 +65,11 @@ class ImportType extends AbstractType
         return $result;
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return string
-     */
     protected function generateProcessorLabel(string $alias): string
     {
         return sprintf('oro.importexport.import.%s', $alias);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

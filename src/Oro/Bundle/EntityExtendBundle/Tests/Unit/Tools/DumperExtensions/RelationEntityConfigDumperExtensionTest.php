@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDumperExtension;
@@ -21,44 +22,46 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RelationEntityConfigDumperExtension */
-    protected $extension;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $extension;
 
     /** @var array */
-    protected $configs = [];
+    private $configs = [];
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->createMock(ConfigManager::class);
+        $configManager = $this->createMock(ConfigManager::class);
+
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
 
         $this->extension = new RelationEntityConfigDumperExtension(
-            $this->configManager,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany'])
+            $configManager,
+            new FieldTypeHelper($entityExtendConfigurationProvider)
         );
 
         // will be filled by addEntityConfig and addConfigNewField
         $this->configs = [];
 
-        $this->configManager->expects($this->any())
+        $configManager->expects($this->any())
             ->method('getConfigs')
             ->with('extend')
             ->willReturnCallback(function ($scope, $className) {
                 return $this->configs[$className] ?? [];
             });
-        $this->configManager->expects($this->any())
+        $configManager->expects($this->any())
             ->method('hasConfig')
             ->willReturnCallback(function ($className, $fieldName) {
                 return $this->hasConfig($className, $fieldName);
             });
-        $this->configManager->expects($this->any())
+        $configManager->expects($this->any())
             ->method('getEntityConfig')
             ->with('extend')
             ->willReturnCallback(function ($scope, $className) {
                 return $this->getEntityConfig($className);
             });
-        $this->configManager->expects($this->any())
+        $configManager->expects($this->any())
             ->method('getFieldConfig')
             ->with('extend')
             ->willReturnCallback(function ($scope, $className, $fieldName) {
@@ -82,9 +85,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testReverseRelationAlreadyCreatedForManyToOne($reverseElements)
+    public function testReverseRelationAlreadyCreatedForManyToOne(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto';
         $selfRelations = [
@@ -151,9 +153,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testReverseRelationAlreadyCreatedForManyToMany($reverseElements)
+    public function testReverseRelationAlreadyCreatedForManyToMany(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm';
         $selfRelations = [
@@ -220,9 +221,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testReverseRelationAlreadyCreatedForOneToMany($reverseElements)
+    public function testReverseRelationAlreadyCreatedForOneToMany(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm';
         $selfRelations = [
@@ -289,9 +289,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testNoReverseRelationForManyToOne($reverseElements)
+    public function testNoReverseRelationForManyToOne(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto';
         $selfRelations = [
@@ -391,9 +390,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testNoReverseRelationForManyToMany($reverseElements)
+    public function testNoReverseRelationForManyToMany(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm';
         $selfRelations = [
@@ -493,9 +491,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testNoReverseRelationForOneToMany($reverseElements)
+    public function testNoReverseRelationForOneToMany(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm';
         $selfRelations = [
@@ -595,9 +592,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationShouldBeCreatedForManyToOne($reverseElements)
+    public function testSelfRelationShouldBeCreatedForManyToOne(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto';
         $expectedSelfRelations = [
@@ -664,9 +660,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationWithOptionsShouldBeCreatedForManyToOne($reverseElements)
+    public function testSelfRelationWithOptionsShouldBeCreatedForManyToOne(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto';
         $expectedSelfRelations = [
@@ -741,9 +736,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationShouldBeCreatedForManyToOneAndSameOwningAndTarget($reverseElements)
+    public function testSelfRelationShouldBeCreatedForManyToOneAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto';
         $selfRelations = [
@@ -808,9 +802,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationWithOptionsShouldBeCreatedForManyToOneAndSameOwningAndTarget($reverseElements)
+    public function testSelfRelationWithOptionsShouldBeCreatedForManyToOneAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto';
         $selfRelations = [
@@ -883,9 +876,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationShouldBeCreatedForManyToMany($reverseElements)
+    public function testSelfRelationShouldBeCreatedForManyToMany(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm';
         $expectedSelfRelations = [
@@ -952,9 +944,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationWithOptionsShouldBeCreatedForManyToMany($reverseElements)
+    public function testSelfRelationWithOptionsShouldBeCreatedForManyToMany(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm';
         $expectedSelfRelations = [
@@ -1029,9 +1020,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationShouldBeCreatedForManyToManyAndSameOwningAndTarget($reverseElements)
+    public function testSelfRelationShouldBeCreatedForManyToManyAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm';
         $expectedSelfRelations = [
@@ -1096,9 +1086,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationWithOptionsShouldBeCreatedForManyToManyAndSameOwningAndTarget($reverseElements)
+    public function testSelfRelationWithOptionsShouldBeCreatedForManyToManyAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm';
         $expectedSelfRelations = [
@@ -1171,9 +1160,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationShouldBeCreatedForOneToMany($reverseElements)
+    public function testSelfRelationShouldBeCreatedForOneToMany(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm';
         $expectedSelfRelations = [
@@ -1240,9 +1228,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationWithOptionsShouldBeCreatedForOneToMany($reverseElements)
+    public function testSelfRelationWithOptionsShouldBeCreatedForOneToMany(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm';
         $expectedSelfRelations = [
@@ -1317,9 +1304,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationShouldBeCreatedForOneToManyAndSameOwningAndTarget($reverseElements)
+    public function testSelfRelationShouldBeCreatedForOneToManyAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm';
         $expectedSelfRelations = [
@@ -1384,9 +1370,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testSelfRelationWithOptionsShouldBeCreatedForOneToManyAndSameOwningAndTarget($reverseElements)
+    public function testSelfRelationWithOptionsShouldBeCreatedForOneToManyAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm';
         $expectedSelfRelations = [
@@ -1617,9 +1602,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationForManyToOne($reverseElements)
+    public function testCompleteRelationForManyToOne(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto';
         $expectedSelfRelations = [
@@ -1691,9 +1675,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationWithOptionsForManyToOne($reverseElements)
+    public function testCompleteRelationWithOptionsForManyToOne(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|rel_mto';
         $expectedSelfRelations = [
@@ -1789,9 +1772,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationForManyToOneAndSameOwningAndTarget($reverseElements)
+    public function testCompleteRelationForManyToOneAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto';
         $expectedSelfRelations = [
@@ -1858,9 +1840,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationWithOptionsForManyToOneAndSameOwningAndTarget($reverseElements)
+    public function testCompleteRelationWithOptionsForManyToOneAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'manyToOne|Test\SourceEntity|Test\SourceEntity|rel_mto';
         $expectedSelfRelations = [
@@ -1943,9 +1924,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationForManyToMany($reverseElements)
+    public function testCompleteRelationForManyToMany(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm';
         $expectedSelfRelations = [
@@ -2017,9 +1997,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationWithOptionsForManyToMany($reverseElements)
+    public function testCompleteRelationWithOptionsForManyToMany(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\TargetEntity|rel_mtm';
         $expectedSelfRelations = [
@@ -2115,9 +2094,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationForManyToManyAndSameOwningAndTarget($reverseElements)
+    public function testCompleteRelationForManyToManyAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm';
         $expectedSelfRelations = [
@@ -2184,9 +2162,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationWithOptionsForManyToManyAndSameOwningAndTarget($reverseElements)
+    public function testCompleteRelationWithOptionsForManyToManyAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'manyToMany|Test\SourceEntity|Test\SourceEntity|rel_mtm';
         $expectedSelfRelations = [
@@ -2269,9 +2246,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationForOneToMany($reverseElements)
+    public function testCompleteRelationForOneToMany(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm';
         $expectedSelfRelations = [
@@ -2343,9 +2319,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationWithOptionsForOneToMany($reverseElements)
+    public function testCompleteRelationWithOptionsForOneToMany(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\TargetEntity|rel_otm';
         $expectedSelfRelations = [
@@ -2441,9 +2416,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationForOneToManyAndSameOwningAndTarget($reverseElements)
+    public function testCompleteRelationForOneToManyAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm';
         $expectedSelfRelations = [
@@ -2510,9 +2484,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
 
     /**
      * @dataProvider elementsOrderProvider
-     * @param bool $reverseElements
      */
-    public function testCompleteRelationWithOptionsForOneToManyAndSameOwningAndTarget($reverseElements)
+    public function testCompleteRelationWithOptionsForOneToManyAndSameOwningAndTarget(bool $reverseElements)
     {
         $relationKey = 'oneToMany|Test\SourceEntity|Test\SourceEntity|rel_otm';
         $expectedSelfRelations = [
@@ -2593,20 +2566,8 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
         $this->assertEquals($expectedSelfRelations, $selfConfig->get('relation'));
     }
 
-    /**
-     * @param array  $values
-     * @param string $type
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return Config
-     */
-    protected function addConfigNewField(
-        array $values = [],
-        $type = 'string',
-        $className = 'Test\SourceEntity',
-        $fieldName = 'testField'
-    ) {
+    private function addConfigNewField(array $values, string $type, string $className, string $fieldName): void
+    {
         $resultValues = [
             'owner'      => ExtendScope::OWNER_CUSTOM,
             'state'      => ExtendScope::STATE_NEW,
@@ -2621,17 +2582,9 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
         $config->setValues($resultValues);
 
         $this->configs[$className][] = $config;
-
-        return $config;
     }
 
-    /**
-     * @param array  $values
-     * @param string $className
-     *
-     * @return Config
-     */
-    protected function addEntityConfig(array $values = [], $className = 'Test\SourceEntity')
+    private function addEntityConfig(array $values, string $className): Config
     {
         $resultValues = [
             'owner'       => ExtendScope::OWNER_CUSTOM,
@@ -2656,13 +2609,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
         return $config;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    protected function hasConfig($className, $fieldName)
+    private function hasConfig(string $className, string $fieldName): bool
     {
         if (!isset($this->configs[$className])) {
             return false;
@@ -2682,12 +2629,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
         return false;
     }
 
-    /**
-     * @param string $className
-     *
-     * @return Config
-     */
-    protected function getEntityConfig($className)
+    private function getEntityConfig(string $className): Config
     {
         $result = null;
         if (isset($this->configs[null])) {
@@ -2702,13 +2644,7 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
         return $result;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return Config
-     */
-    protected function getFieldConfig($className, $fieldName)
+    private function getFieldConfig(string $className, string $fieldName): Config
     {
         if (!isset($this->configs[$className])) {
             throw new RuntimeException(sprintf('Entity "%s" is not configurable', $className));
@@ -2724,22 +2660,12 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCas
         throw new RuntimeException(sprintf('Field "%s::%s" is not configurable', $className, $fieldName));
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     *
-     * @return FieldConfigId
-     */
-    protected function getFieldId($className, $fieldName, $fieldType)
+    private function getFieldId(string $className, string $fieldName, string $fieldType): FieldConfigId
     {
         return new FieldConfigId('extend', $className, $fieldName, $fieldType);
     }
 
-    /**
-     * @return array
-     */
-    public function elementsOrderProvider()
+    public function elementsOrderProvider(): array
     {
         return [
             ['reverseElements' => false],

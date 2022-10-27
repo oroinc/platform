@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\EntityExtendBundle\Controller\ApplyController:
+        arguments:
+            - '@oro_entity_extend.extend.update_handler'
+
+    Oro\Bundle\EntityExtendBundle\Controller\ConfigEntityGridController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\EntityExtendBundle\Controller\ConfigFieldGridController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

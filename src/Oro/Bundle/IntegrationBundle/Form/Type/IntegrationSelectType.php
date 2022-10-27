@@ -17,6 +17,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for Integration select.
+ */
 class IntegrationSelectType extends AbstractType
 {
     const NAME = 'oro_integration_select';
@@ -33,12 +36,6 @@ class IntegrationSelectType extends AbstractType
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param EntityManager $em
-     * @param TypesRegistry $typesRegistry
-     * @param AssetHelper   $assetHelper
-     * @param AclHelper     $aclHelper
-     */
     public function __construct(
         EntityManager $em,
         TypesRegistry $typesRegistry,
@@ -59,8 +56,8 @@ class IntegrationSelectType extends AbstractType
         $em             = $this->em;
         $defaultConfigs = [
             'placeholder'             => 'oro.form.choose_value',
-            'result_template_twig'    => 'OroIntegrationBundle:Autocomplete:integration/result.html.twig',
-            'selection_template_twig' => 'OroIntegrationBundle:Autocomplete:integration/selection.html.twig',
+            'result_template_twig'    => '@OroIntegration/Autocomplete/integration/result.html.twig',
+            'selection_template_twig' => '@OroIntegration/Autocomplete/integration/selection.html.twig',
         ];
         // this normalizer allows to add/override config options outside.
         $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs) {
@@ -71,7 +68,7 @@ class IntegrationSelectType extends AbstractType
 
             return new DoctrineChoiceLoader(
                 $em,
-                'OroIntegrationBundle:Channel',
+                Integration::class,
                 null,
                 new Loader($this->aclHelper, $em, $types)
             );
@@ -119,7 +116,7 @@ class IntegrationSelectType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

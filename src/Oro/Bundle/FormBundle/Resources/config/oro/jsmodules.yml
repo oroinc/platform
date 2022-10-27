@@ -1,0 +1,81 @@
+aliases:
+    jquery.validate$: jquery-validation/dist/jquery.validate
+    jquery.validate-additional-methods$: jquery-validation/dist/additional-methods
+    oro/autocomplete-component$: oroform/js/app/components/autocomplete-component
+    oro/select2-autocomplete-component$: oroform/js/app/components/select2-autocomplete-component
+    oro/select2-autocomplete-entity-parent-component$: oroform/js/app/components/select2-autocomplete-entity-parent-component
+    oro/select2-component$: oroform/js/app/components/select2-component
+    oro/select2-grid-component$: oroform/js/app/components/select2-grid-component
+    oro/select2-relation-component$: oroform/js/app/components/select2-relation-component
+    oro/select2-tree-autocomplete-component$: oroform/js/app/components/select2-tree-autocomplete-component
+    tinymce/tinymce$: oroform/js/extend/tinymce
+    xregexp$: xregexp/xregexp-all
+app-modules:
+    - oroform/js/app/modules/validator-constraints-module
+configs:
+    oroform/js/extend/tinymce: {}
+    oroform/js/extend/validate: {}
+dynamic-imports:
+    commons:
+        - oro/autocomplete-component
+        - oro/select2-autocomplete-component
+        - oro/select2-autocomplete-entity-parent-component
+        - oro/select2-component
+        - oro/select2-grid-component
+        - oro/select2-relation-component
+        - oro/select2-tree-autocomplete-component
+        - oroform/js/app/components/inline-editable-view-component
+        - oroform/js/app/components/select-create-inline-type-async-component
+        - oroform/js/app/components/select-create-inline-type-component
+        - oroform/js/app/views/checkbox-view
+        - oroform/js/app/views/color-table-view
+        - oroform/js/app/views/editor/date-editor-view
+        - oroform/js/app/views/editor/datetime-editor-view
+        - oroform/js/app/views/editor/multi-checkbox-editor-view
+        - oroform/js/app/views/editor/number-editor-view
+        - oroform/js/app/views/editor/percent-editor-view
+        - oroform/js/app/views/editor/related-id-relation-editor-view
+        - oroform/js/app/views/editor/related-id-select-editor-view
+        - oroform/js/app/views/editor/select-editor-view
+        - oroform/js/app/views/editor/text-editor-view
+        - oroform/js/app/views/expression-editor-view
+        - oroform/js/app/views/fields-groups-collection-view
+        - oroform/js/app/views/form-loading-view
+        - oroform/js/app/views/form-validate-view
+        - oroform/js/app/views/lazy-validation-collection-view
+        - oroform/js/app/views/simple-color-choice-view
+        - oroform/js/app/views/simple-color-picker-view
+        - oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view
+        - oroform/js/create-select-type-handler
+        - oroform/js/multiple-entity
+        - oroform/js/multiple-entity/collection
+        - oroform/js/multiple-entity/component
+        - oroform/js/multiple-entity/model
+        - oroform/js/validator/callback
+        - oroform/js/validator/count
+        - oroform/js/validator/date
+        - oroform/js/validator/datetime
+        - oroform/js/validator/email
+        - oroform/js/validator/length
+        - oroform/js/validator/notblank
+        - oroform/js/validator/notnull
+        - oroform/js/validator/number
+        - oroform/js/validator/numeric-range
+        - oroform/js/validator/open-range
+        - oroform/js/validator/range
+        - oroform/js/validator/regex
+        - oroform/js/validator/repeated
+        - oroform/js/validator/time
+        - oroform/js/validator/type
+        - oroform/js/validator/url
+    jstree:
+        - oroform/js/app/components/entity-tree-select-form-type-view
+    tinymce.min:
+        - oroform/js/app/components/create-or-select-choice-component
+        - oroform/js/app/views/default-field-value-view
+        - oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view
+map:
+    '*':
+        jquery.validate: oroform/js/extend/validate
+    oroform/js/extend/validate:
+        jquery.validate: jquery.validate

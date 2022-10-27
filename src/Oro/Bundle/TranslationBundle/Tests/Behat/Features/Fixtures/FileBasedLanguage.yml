@@ -1,0 +1,7 @@
+Oro\Bundle\TranslationBundle\Entity\Language:
+  fr_file-based_lang:
+    code: 'fr_FR_file_based'
+    enabled: false
+    organization: '@organization'
+    owner: '@admin'
+    local_files_language: true

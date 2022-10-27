@@ -9,9 +9,9 @@ use Oro\Bundle\ConfigBundle\Api\Processor\AddScopeFilter;
 class AddScopeFilterTest extends GetListProcessorTestCase
 {
     /** @var AddScopeFilter */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

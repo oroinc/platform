@@ -3,126 +3,105 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;
+use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 use Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimary;
 use Oro\Bundle\FormBundle\Validator\Constraints\ContainsPrimaryValidator;
-use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class ContainsPrimaryValidatorTest extends \PHPUnit\Framework\TestCase
+class ContainsPrimaryValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @expectedException \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array or Traversable and ArrayAccess", "boolean" given
-     */
-    public function testValidateException()
+    protected function createValidator()
     {
-        $constraint = $this->createMock('Symfony\Component\Validator\Constraint');
-        $validator = new ContainsPrimaryValidator();
-        $validator->validate(false, $constraint);
+        return new ContainsPrimaryValidator();
     }
 
-    public function testShouldKeepLazyCollectionUninitialized()
+    public function testValidateException(): void
     {
-        /** @var AbstractLazyCollection $collection */
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "array or Traversable and ArrayAccess", "bool" given'
+        );
+
+        $constraint = $this->createMock(Constraint::class);
+        $this->validator->validate(false, $constraint);
+    }
+
+    public function testShouldKeepLazyCollectionUninitialized(): void
+    {
         $collection = $this->getMockForAbstractClass(AbstractLazyCollection::class);
-        $validator = new ContainsPrimaryValidator();
-        $validator->validate($collection, $this->createMock('Symfony\Component\Validator\Constraint'));
+        $this->validator->validate($collection, $this->createMock(Constraint::class));
 
         $this->assertFalse($collection->isInitialized());
     }
 
     /**
      * @dataProvider validItemsDataProvider
-     * @param array $items
      */
-    public function testValidateValid(array $items)
+    public function testValidateValid(array $items): void
     {
-        $context = $this->createMock(ExecutionContext::class);
-        $context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new ContainsPrimary();
+        $this->validator->validate($items, $constraint);
 
-        $constraint = $this->createMock(ContainsPrimary::class);
-        $validator = new ContainsPrimaryValidator();
-        $validator->initialize($context);
-
-        $validator->validate($items, $constraint);
+        $this->assertNoViolation();
     }
 
-    /**
-     * @return array
-     */
-    public function validItemsDataProvider()
+    public function validItemsDataProvider(): array
     {
-        return array(
-            'no items' => array(
-                array()
-            ),
-            'one item primary' => array(
-                array($this->getPrimaryItemMock(true))
-            ),
-            'more than one item with primary' => array(
-                array($this->getPrimaryItemMock(false), $this->getPrimaryItemMock(true))
-            ),
-            'empty item and primary' => array(
-                array(
-                    $this->getPrimaryItemMock(false, true),
-                    $this->getPrimaryItemMock(true),
-                    $this->getPrimaryItemMock(false, true)
-                )
-            )
-        );
+        return [
+            'no items' => [
+                []
+            ],
+            'one item primary' => [
+                [$this->getPrimaryItem(true)]
+            ],
+            'more than one item with primary' => [
+                [$this->getPrimaryItem(false), $this->getPrimaryItem(true)]
+            ],
+            'empty item and primary' => [
+                [
+                    $this->getPrimaryItem(false),
+                    $this->getPrimaryItem(true),
+                    $this->getPrimaryItem(false)
+                ]
+            ]
+        ];
     }
 
     /**
      * @dataProvider invalidItemsDataProvider
-     * @param array $items
      */
-    public function testValidateInvalid($items)
+    public function testValidateInvalid(array $items): void
     {
-        $context = $this->createMock(ExecutionContext::class);
-        $context->expects($this->once())
-            ->method('addViolation')
-            ->with('One of the items must be set as primary.');
+        $constraint = new ContainsPrimary();
+        $this->validator->validate($items, $constraint);
 
-        $constraint = $this->createMock(ContainsPrimary::class);
-        $validator = new ContainsPrimaryValidator();
-        $validator->initialize($context);
-
-        $validator->validate($items, $constraint);
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
-    /**
-     * @return array
-     */
-    public function invalidItemsDataProvider()
+    public function invalidItemsDataProvider(): array
     {
-        return array(
-            'one item' => array(
-                array($this->getPrimaryItemMock(false))
-            ),
-            'more than one item no primary' => array(
-                array($this->getPrimaryItemMock(false), $this->getPrimaryItemMock(false))
-            ),
-            'more than one item more than one primary' => array(
-                array($this->getPrimaryItemMock(true), $this->getPrimaryItemMock(true))
-            ),
-        );
+        return [
+            'one item' => [
+                [$this->getPrimaryItem(false)]
+            ],
+            'more than one item no primary' => [
+                [$this->getPrimaryItem(false), $this->getPrimaryItem(false)]
+            ],
+            'more than one item more than one primary' => [
+                [$this->getPrimaryItem(true), $this->getPrimaryItem(true)]
+            ],
+        ];
     }
 
-    /**
-     * Get primary item mock.
-     *
-     * @param bool $isPrimary
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getPrimaryItemMock($isPrimary)
+    private function getPrimaryItem(bool $isPrimary): PrimaryItem
     {
-        $item = $this->getMockBuilder('Oro\Bundle\FormBundle\Entity\PrimaryItem')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $item = $this->createMock(PrimaryItem::class);
         $item->expects($this->any())
             ->method('isPrimary')
-            ->will($this->returnValue($isPrimary));
+            ->willReturn($isPrimary);
 
         return $item;
     }

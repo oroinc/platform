@@ -26,8 +26,6 @@ class OroMigrationBundleInstaller implements Installation
 
     /**
      * Create oro_migrations_data table
-     *
-     * @param Schema $schema
      */
     protected function createOroMigrationsDataTable(Schema $schema)
     {

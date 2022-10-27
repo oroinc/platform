@@ -114,8 +114,6 @@ class TraceLogger
 
     /**
      * Marks an action as stopped
-     *
-     * @param \Exception|null $exception
      */
     public function stopAction(\Exception $exception = null)
     {
@@ -146,8 +144,6 @@ class TraceLogger
 
     /**
      * Marks a processor as stopped
-     *
-     * @param \Exception|null $exception
      */
     public function stopProcessor(\Exception $exception = null)
     {

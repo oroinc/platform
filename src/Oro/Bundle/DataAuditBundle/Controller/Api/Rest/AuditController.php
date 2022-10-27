@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\DataAuditBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -20,9 +17,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @NamePrefix("oro_api_")
+ * REST API controller for data audit.
  */
-class AuditController extends RestGetController implements ClassResourceInterface
+class AuditController extends RestGetController
 {
     /**
      * Get list of audit logs
@@ -135,13 +132,13 @@ class AuditController extends RestGetController implements ClassResourceInterfac
         /* @var $provider EntityWithFieldsProvider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
         $withRelations = filter_var($request->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
-        $statusCode = Codes::HTTP_OK;
+        $statusCode = Response::HTTP_OK;
 
         try {
             $entities = $provider->getFields(true, true, $withRelations, false);
             $result = $this->filterAuditableEntities($entities);
         } catch (InvalidEntityException $ex) {
-            $statusCode = Codes::HTTP_NOT_FOUND;
+            $statusCode = Response::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];
         }
 
@@ -169,14 +166,8 @@ class AuditController extends RestGetController implements ClassResourceInterfac
         // process relations
         $result['user'] = $entity->getUser() ? $entity->getUser()->getId() : null;
 
-        // prevent BC breaks
-        // @deprecated since 1.4.1
-        $result['object_class'] = $result['objectClass'];
-        $result['object_name']  = $result['objectName'];
-        $result['username']     = $entity->getUser() ? $entity->getUser()->getUsername() : null;
-
         unset($result['fields']);
-        $result['data'] = $entity->getData();
+        $result['data'] = $this->get('oro_dataaudit.model.fields_transformer')->getCollectionData($entity->getFields());
 
         return $result;
     }
@@ -205,7 +196,7 @@ class AuditController extends RestGetController implements ClassResourceInterfac
 
                 $fieldChunks = explode('::', $fieldData['name']);
                 if (count($fieldChunks) === 2) {
-                    list($class, $field) = $fieldChunks;
+                    [$class, $field] = $fieldChunks;
                     if (!$auditConfigProvider->getConfig($class)->is('auditable')) {
                         continue;
                     }

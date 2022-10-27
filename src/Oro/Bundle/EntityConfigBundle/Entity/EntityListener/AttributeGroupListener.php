@@ -13,18 +13,11 @@ class AttributeGroupListener
     /** @var SlugGenerator */
     private $slugGenerator;
 
-    /**
-     * @param SlugGenerator $slugGenerator
-     */
     public function __construct(SlugGenerator $slugGenerator)
     {
         $this->slugGenerator = $slugGenerator;
     }
 
-    /**
-     * @param AttributeGroup     $group
-     * @param LifecycleEventArgs $args
-     */
     public function prePersist(AttributeGroup $group, LifecycleEventArgs $args)
     {
         if ($group->getCode()) {

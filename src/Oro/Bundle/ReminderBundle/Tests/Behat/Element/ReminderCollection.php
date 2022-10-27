@@ -4,8 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Behat\Element;
 
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
-use Behat\Mink\Selector\Xpath\Manipulator;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
 
@@ -28,6 +27,8 @@ class ReminderCollection extends CollectionField
 
         $rows = $this->findAll('css', '.oro-multiselect-holder');
 
+        $inflector = (new InflectorFactory())->build();
+
         foreach ($table as $values) {
             /** @var NodeElement $row */
             $row = array_shift($rows);
@@ -40,7 +41,7 @@ class ReminderCollection extends CollectionField
             $row->find('xpath', $method)->setValue($values['Method']);
             $row->find('xpath', $intervalNumber)->setValue($values['Interval number']);
             $row->find('xpath', $intervalUnit)->setValue(
-                $this->unitChoices[Inflector::pluralize($values['Interval unit'])]
+                $this->unitChoices[$inflector->pluralize($values['Interval unit'])]
             );
         }
     }

@@ -3,48 +3,36 @@
 namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\EventListener\EntityPaginationListener;
+use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 
 class EntityPaginationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_NAME = 'test_entity';
+    private const ENTITY_NAME = 'test_entity';
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $storage;
+    /** @var EntityPaginationStorage|\PHPUnit\Framework\MockObject\MockObject */
+    private $storage;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $paginationManager;
+    /** @var EntityPaginationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $paginationManager;
 
-    /**
-     * @var EntityPaginationListener
-     */
-    protected $listener;
+    /** @var EntityPaginationListener */
+    private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->storage = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->paginationManager =
-            $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->storage = $this->createMock(EntityPaginationStorage::class);
+        $this->paginationManager =$this->createMock(EntityPaginationManager::class);
 
         $this->listener = new EntityPaginationListener($this->doctrineHelper, $this->storage, $this->paginationManager);
     }
@@ -53,70 +41,63 @@ class EntityPaginationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->paginationManager->expects($this->never())
             ->method('isDatagridApplicable');
 
-        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock()));
+        $this->listener->onResultAfter(new OrmResultAfter($this->createGrid()));
     }
 
     public function testOnResultAfterGridNotApplicable()
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->paginationManager->expects($this->once())
             ->method('isDatagridApplicable')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->storage->expects($this->never())
             ->method('clearData');
 
-        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock()));
+        $this->listener->onResultAfter(new OrmResultAfter($this->createGrid()));
     }
 
     public function testOnResultClearData()
     {
         $this->paginationManager->expects($this->once())
             ->method('isEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->paginationManager->expects($this->once())
             ->method('isDatagridApplicable')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->storage->expects($this->once())
             ->method('clearData')
             ->with(self::ENTITY_NAME);
 
-        $this->listener->onResultAfter(new OrmResultAfter($this->createGridMock()));
+        $this->listener->onResultAfter(new OrmResultAfter($this->createGrid()));
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createGridMock()
+    private function createGrid(): DatagridInterface
     {
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects($this->any())
             ->method('getRootEntities')
-            ->will($this->returnValue([self::ENTITY_NAME]));
+            ->willReturn([self::ENTITY_NAME]);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityMetadata')
             ->with(self::ENTITY_NAME)
-            ->will($this->returnValue(new ClassMetadata(self::ENTITY_NAME)));
+            ->willReturn(new ClassMetadata(self::ENTITY_NAME));
 
-        $dataSource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dataSource = $this->createMock(OrmDatasource::class);
         $dataSource->expects($this->any())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
-        $dataGrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $dataGrid = $this->createMock(DatagridInterface::class);
         $dataGrid->expects($this->any())
             ->method('getDatasource')
-            ->will($this->returnValue($dataSource));
+            ->willReturn($dataSource);
 
         return $dataGrid;
     }

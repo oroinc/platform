@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Migrations\Schema\v1_5;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
@@ -65,12 +65,9 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
         }
     }
 
-    /**
-     * @param array $row
-     */
     private function processRow(array $row)
     {
-        $definition = $this->connection->convertToPHPValue($row['definition'], Type::JSON_ARRAY);
+        $definition = $this->connection->convertToPHPValue($row['definition'], Types::JSON_ARRAY);
         if (empty($definition['filters'])) {
             return;
         }
@@ -85,7 +82,7 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
             $this->segmentTable,
             ['definition' => $definition],
             ['id' => $row['id']],
-            [Type::JSON_ARRAY]
+            [Types::JSON_ARRAY]
         );
     }
 
@@ -148,7 +145,7 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
     /**
      * Replaces old month variables ({{17}} - {{28}}) by month numbers (1 - 12)
      *
-     * @param string $value
+     * @param array  $value
      * @param string $offset
      *
      * @return string|false Replaced value or false if nothing was replaced

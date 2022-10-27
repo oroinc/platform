@@ -18,8 +18,6 @@ class AddOwnerDescriptionColumn implements Migration
 
     /**
      * Adds owner_description column
-     *
-     * @param Schema $schema
      */
     public static function addOwnerDecriptionColumn(Schema $schema)
     {

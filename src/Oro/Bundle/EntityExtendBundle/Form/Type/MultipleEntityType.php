@@ -10,20 +10,16 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * The form type to select several entities from a list.
+ */
 class MultipleEntityType extends AbstractType
 {
-    const TYPE = 'oro_entity_extend_multiple_entity';
+    private UrlGeneratorInterface $router;
 
-    /** @var RouterInterface */
-    protected $router;
-
-    /**
-     * @param RouterInterface $router
-     */
-    public function __construct(RouterInterface $router)
+    public function __construct(UrlGeneratorInterface $router)
     {
         $this->router = $router;
     }
@@ -39,17 +35,13 @@ class MultipleEntityType extends AbstractType
                 function (FormEvent $event) use ($options) {
                     // add field to parent in order to be mapped correctly automatically
                     // because current field is filled by collection
-                    $parentForm   = $event->getForm()->getParent();
+                    $parentForm = $event->getForm()->getParent();
                     $propertyName = $options['default_element'];
-
                     if (!$parentForm->has($propertyName)) {
-                        $event->getForm()->getParent()->add(
+                        $parentForm->add(
                             $propertyName,
                             EntityIdentifierType::class,
-                            [
-                                'class'    => $options['class'],
-                                'multiple' => false
-                            ]
+                            ['class' => $options['class'], 'multiple' => false]
                         );
                     }
                 }
@@ -63,28 +55,16 @@ class MultipleEntityType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $data = $view->parent->vars['value'];
-        if (is_object($data)) {
+        if (\is_object($data)) {
             $view->vars['grid_url'] = $this->router->generate(
                 'oro_entity_relation',
                 [
-                    'id'         => $data->getId() ? $data->getId() : 0,
-                    'entityName' => str_replace(
-                        '\\',
-                        '_',
-                        get_class($data)
-                    ),
+                    'id'         => $data->getId() ?? 0,
+                    'entityName' => str_replace('\\', '_', \get_class($data)),
                     'fieldName'  => $form->getName()
                 ]
             );
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefaults(['extend' => false /* deprecated since 1.5, not used anymore */]);
     }
 
     /**
@@ -100,7 +80,7 @@ class MultipleEntityType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return self::TYPE;
+        return 'oro_entity_extend_multiple_entity';
     }
 
     /**

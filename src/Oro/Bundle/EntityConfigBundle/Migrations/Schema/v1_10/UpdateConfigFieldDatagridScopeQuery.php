@@ -57,7 +57,7 @@ class UpdateConfigFieldDatagridScopeQuery extends ParametrizedMigrationQuery
                 $params                         = ['data' => $data, 'id' => $field['id']];
                 $this->logQuery($logger, $query, $params, $types);
                 if (!$dryRun) {
-                    $this->connection->executeUpdate($query, $params, $types);
+                    $this->connection->executeStatement($query, $params, $types);
                 }
             }
         }

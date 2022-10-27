@@ -6,13 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * Organization
+ * Organization represents a real enterprise, business, firm, company or another organization, to which the users belong
  *
  * @ORM\Table(name="oro_organization")
  * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository")
@@ -36,13 +35,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      }
  * )
  */
-class Organization extends ExtendOrganization implements
-    OrganizationInterface,
-    NotificationEmailInterface,
-    \Serializable
+class Organization extends ExtendOrganization implements OrganizationInterface
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -82,7 +78,7 @@ class Organization extends ExtendOrganization implements
     protected $description;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|BusinessUnit[]
      *
      * @ORM\OneToMany(
      *     targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
@@ -94,7 +90,7 @@ class Organization extends ExtendOrganization implements
     protected $businessUnits;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|User[]
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="organizations")
      * @ORM\JoinTable(name="oro_user_organization")
@@ -102,7 +98,7 @@ class Organization extends ExtendOrganization implements
     protected $users;
 
     /**
-     * @var \Datetime $created
+     * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=true)
      * @ConfigField(
@@ -116,7 +112,7 @@ class Organization extends ExtendOrganization implements
     protected $createdAt;
 
     /**
-     * @var \Datetime $updated
+     * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      * @ConfigField(
@@ -130,7 +126,7 @@ class Organization extends ExtendOrganization implements
     protected $updatedAt;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="enabled", type="boolean", options={"default"="1"})
      * @ConfigField(
@@ -141,7 +137,7 @@ class Organization extends ExtendOrganization implements
      *      }
      * )
      */
-    protected $enabled;
+    protected $enabled = true;
 
     public function __construct()
     {
@@ -151,11 +147,10 @@ class Organization extends ExtendOrganization implements
         $this->users         = new ArrayCollection();
     }
 
-
     /**
      * Get id
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -219,7 +214,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @param \Datetime $createdAt
+     * @param \DateTime $createdAt
      *
      * @return $this
      */
@@ -231,7 +226,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @return \Datetime
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -239,7 +234,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @param \Datetime $updatedAt
+     * @param \DateTime $updatedAt
      *
      * @return $this
      */
@@ -251,7 +246,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @return \Datetime
+     * @return \DateTime
      */
     public function getUpdatedAt()
     {
@@ -279,7 +274,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|BusinessUnit[]
      */
     public function getBusinessUnits()
     {
@@ -315,33 +310,19 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getNotificationEmails()
-    {
-        $emails = [];
-        $this->businessUnits->forAll(
-            function (BusinessUnit $bu) use (&$emails) {
-                $emails = array_merge($emails, $bu->getNotificationEmails());
-            }
-        );
-
-        return new ArrayCollection($emails);
-    }
-
-    /**
-     * @param  bool $enabled User state
+     * @param bool $enabled
+     *
      * @return $this
      */
     public function setEnabled($enabled)
     {
-        $this->enabled = (boolean)$enabled;
+        $this->enabled = (bool)$enabled;
 
         return $this;
     }
 
     /**
-     * @return Boolean true if organization is enabled, false otherwise
+     * @return bool
      */
     public function isEnabled()
     {
@@ -369,50 +350,29 @@ class Organization extends ExtendOrganization implements
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * Serializes organization
-     *
-     * @return string
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        $result = serialize(
-            array(
-                $this->name,
-                $this->enabled,
-                $this->id,
-            )
-        );
-        return $result;
-    }
-
-    /**
-     * Unserializes organization
-     *
-     * @param string $serialized
-     */
-    public function unserialize($serialized)
-    {
-        list(
+        return [
             $this->name,
             $this->enabled,
             $this->id,
-            ) = unserialize($serialized);
+        ];
     }
 
-    /**
-     * @param ArrayCollection $users
-     * @deprecated since 1.6
-     */
-    public function setUsers(ArrayCollection $users)
+    public function __unserialize(array $serialized): void
     {
-        $this->users = $users;
+        [
+            $this->name,
+            $this->enabled,
+            $this->id,
+        ] = $serialized;
     }
 
     /**
      * Add User to Organization
      *
      * @param User $user
+     * @return $this
      */
     public function addUser(User $user)
     {
@@ -420,12 +380,15 @@ class Organization extends ExtendOrganization implements
             $this->getUsers()->add($user);
             $user->addOrganization($this);
         }
+
+        return $this;
     }
 
     /**
      * Delete User from Organization
      *
      * @param User $user
+     * @return $this
      */
     public function removeUser(User $user)
     {
@@ -433,6 +396,8 @@ class Organization extends ExtendOrganization implements
             $this->getUsers()->removeElement($user);
             $user->removeOrganization($this);
         }
+
+        return $this;
     }
 
     /**
@@ -447,7 +412,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|User[]
      */
     public function getUsers()
     {

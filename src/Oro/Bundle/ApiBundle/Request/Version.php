@@ -3,28 +3,24 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Data API version related utilities.
+ * A set of utility methods to work with API version.
  */
 final class Version
 {
-    /** a string that can be used to reference the latest API version */
+    /** A string that can be used to reference the latest API version */
     public const LATEST = 'latest';
 
     /**
-     * Normalizes a given API version.
-     * If the given version is NULL, the "latest" version will be returned.
+     * Normalizes the given API version.
+     * If the given version is NULL, the "latest" string is returned as an API version.
      * If the given version number contains meaningless prefix, e.g. "v", it will be removed.
-     *
-     * @param string|null $version
-     *
-     * @return string
      */
     public static function normalizeVersion(?string $version): string
     {
         if (null === $version) {
             $version = self::LATEST;
-        } elseif (0 === \strpos($version, 'v')) {
-            $version = \substr($version, 1);
+        } elseif (0 === strncmp($version, 'v', 1)) {
+            $version = substr($version, 1);
         }
 
         return $version;

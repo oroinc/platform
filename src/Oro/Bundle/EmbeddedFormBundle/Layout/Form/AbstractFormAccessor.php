@@ -50,9 +50,6 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
         return $this->action;
     }
 
-    /**
-     * @param FormAction $action
-     */
     public function setAction(FormAction $action)
     {
         $this->action = $action;

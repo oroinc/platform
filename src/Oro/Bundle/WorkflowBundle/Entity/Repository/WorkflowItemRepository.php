@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -12,7 +12,10 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
-class WorkflowItemRepository extends EntityRepository
+/**
+ * Doctrine repository for WorkflowItem entity
+ */
+class WorkflowItemRepository extends ServiceEntityRepository
 {
     const DELETE_BATCH_SIZE = 1000;
 
@@ -139,22 +142,18 @@ class WorkflowItemRepository extends EntityRepository
         }
     }
 
-    /**
-     * @param array $workflowItemIds
-     */
     protected function clearWorkflowItems(array $workflowItemIds)
     {
         if (empty($workflowItemIds)) {
             return;
         }
 
-        $expressionBuilder = $this->createQueryBuilder('workflowItem')->expr();
-        $entityManager = $this->getEntityManager();
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete(WorkflowItem::class, 'workflowItem')
+            ->where($qb->expr()->in('workflowItem.id', ':workflowItemIds'))
+            ->setParameter('workflowItemIds', $workflowItemIds);
 
-        $deleteCondition = $expressionBuilder->in('workflowItem.id', $workflowItemIds);
-        $deleteDql = "DELETE OroWorkflowBundle:WorkflowItem workflowItem WHERE {$deleteCondition}";
-
-        $entityManager->createQuery($deleteDql)->execute();
+        $qb->getQuery()->execute();
     }
 
     /**

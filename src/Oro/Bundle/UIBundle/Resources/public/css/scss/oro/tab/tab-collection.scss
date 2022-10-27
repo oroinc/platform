@@ -1,21 +1,22 @@
 /* @theme: admin.oro; */
 
 .tab-collection {
-    border-bottom: 1px solid #ddd;
-
-    li {
+    li:not(.dropdown) {
         > a {
-            padding-right: 7px;
-        }
+            position: relative;
 
-        > a:after {
-            visibility: hidden;
-            content: '*';
-            margin-left: 1px;
+            &::after {
+                position: absolute;
+                right: 10px;
+
+                visibility: hidden;
+
+                content: '*';
+            }
         }
 
         &.changed {
-            > a:after {
+            > a::after {
                 visibility: visible;
             }
         }

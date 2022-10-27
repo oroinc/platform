@@ -2,24 +2,29 @@
 
 namespace Oro\Bundle\PlatformBundle\Manager;
 
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Manager to control OptionalListenerInterface execution
+ */
 class OptionalListenerManager
 {
     /**
-     * @var array
+     * @var OptionalListenerInterface[]
      */
     protected $optionalListeners = [];
+
+    /**
+     * @var OptionalListenerInterface[]
+     */
+    protected $disabledListeners = [];
 
     /**
      * @var ContainerInterface
      */
     protected $container;
 
-    /**
-     * @param array $optionalListeners
-     * @param ContainerInterface $container
-     */
     public function __construct(array $optionalListeners, ContainerInterface $container)
     {
         $this->optionalListeners = $optionalListeners;
@@ -45,6 +50,8 @@ class OptionalListenerManager
     {
         if (in_array($listenerId, $this->optionalListeners)) {
             $this->container->get($listenerId)->setEnabled(false);
+
+            $this->disabledListeners[$listenerId] = $listenerId;
         } else {
             throw new \InvalidArgumentException(
                 sprintf('Listener "%s" does not exist or not optional', $listenerId)
@@ -54,8 +61,6 @@ class OptionalListenerManager
 
     /**
      * Disable specified listeners
-     *
-     * @param array $listeners
      */
     public function disableListeners(array $listeners)
     {
@@ -75,6 +80,8 @@ class OptionalListenerManager
     {
         if (in_array($listenerId, $this->optionalListeners)) {
             $this->container->get($listenerId)->setEnabled(true);
+
+            unset($this->disabledListeners[$listenerId]);
         } else {
             throw new \InvalidArgumentException(
                 sprintf('Listener "%s" does not exist or not optional', $listenerId)
@@ -84,13 +91,16 @@ class OptionalListenerManager
 
     /**
      * Enable specified listeners
-     *
-     * @param array $listeners
      */
     public function enableListeners(array $listeners)
     {
         foreach ($listeners as $listener) {
             $this->enableListener($listener);
         }
+    }
+
+    public function getDisabledListeners(): array
+    {
+        return array_values($this->disabledListeners);
     }
 }

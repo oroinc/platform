@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Filter;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -17,10 +17,6 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
     /** @var ManagerRegistry */
     private $managerRegistry;
 
-    /**
-     * @param ScopeManager $scopeManager
-     * @param ManagerRegistry $managerRegistry
-     */
     public function __construct(ScopeManager $scopeManager, ManagerRegistry $managerRegistry)
     {
         $this->scopeManager = $scopeManager;

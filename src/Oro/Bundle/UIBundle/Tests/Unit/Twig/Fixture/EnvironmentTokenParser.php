@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture;
 
-class EnvironmentTokenParser extends \Twig_TokenParser
+use Twig\Token;
+use Twig\TokenParser\AbstractTokenParser;
+
+class EnvironmentTokenParser extends AbstractTokenParser
 {
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token)
     {
     }
 

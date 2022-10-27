@@ -9,6 +9,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -17,8 +18,18 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class ContextsExtension extends AbstractTypeExtension
+/**
+ * The form extension that adds "contexts" field to forms for activity entities.
+ * This field is used to associate the activity entity with other entities
+ * that participates in the activity or have a relation to it.
+ *
+ * Example: if there is an email thread (an activity) where an user is having conversation with a customer (Account)
+ * about a deal (an Opportunity) - both these records will make sense as contexts for the email thread.
+ */
+class ContextsExtension extends AbstractTypeExtension implements ServiceSubscriberInterface
 {
     use FormExtendedTypeTrait;
 
@@ -28,34 +39,34 @@ class ContextsExtension extends AbstractTypeExtension
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var ActivityManager */
-    protected $activityManager;
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
 
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    /** @var ContainerInterface */
+    protected $container;
 
-    /** @var EntityRoutingHelper */
-    protected $entityRoutingHelper;
-
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ActivityManager     $activityManager
-     * @param EntityAliasResolver $entityAliasResolver
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param RequestStack        $requestStack
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        ActivityManager $activityManager,
-        EntityAliasResolver $entityAliasResolver,
-        EntityRoutingHelper $entityRoutingHelper,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        AuthorizationCheckerInterface $authorizationChecker,
+        ContainerInterface $container
     ) {
-        $this->doctrineHelper      = $doctrineHelper;
-        $this->activityManager     = $activityManager;
-        $this->entityAliasResolver = $entityAliasResolver;
-        $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->requestStack        = $requestStack;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->requestStack = $requestStack;
+        $this->authorizationChecker = $authorizationChecker;
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_activity.manager' => ActivityManager::class,
+            'oro_entity.entity_alias_resolver' => EntityAliasResolver::class,
+            'oro_entity.routing_helper' => EntityRoutingHelper::class
+        ];
     }
 
     /**
@@ -68,7 +79,7 @@ class ContextsExtension extends AbstractTypeExtension
         }
 
         $className = $options['data_class'];
-        $alias     = $this->entityAliasResolver->getPluralAlias($className);
+        $alias = $this->getEntityAliasResolver()->getPluralAlias($className);
 
         $defaultOptions = [
             'label'          => 'oro.activity.contexts.label',
@@ -95,12 +106,15 @@ class ContextsExtension extends AbstractTypeExtension
             FormEvents::POST_SET_DATA,
             [$this, 'addDefaultContextListener']
         );
+
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            [$this, 'setActivityTargetsContext']
+        );
     }
 
     /**
      * Adds default or existent activity contexts data to the form
-     *
-     * @param FormEvent $event
      */
     public function addDefaultContextListener(FormEvent $event)
     {
@@ -109,18 +123,35 @@ class ContextsExtension extends AbstractTypeExtension
         $form   = $event->getForm();
 
         if ($entity) {
+            $entityRoutingHelper = $this->getEntityRoutingHelper();
             $request = $this->requestStack->getCurrentRequest();
-            $targetEntityClass = $this->entityRoutingHelper->getEntityClassName($request);
-            $targetEntityId    = $this->entityRoutingHelper->getEntityId($request);
-            $contexts          = [];
+            $targetEntityClass = $entityRoutingHelper->getEntityClassName($request);
+            $targetEntityId = $entityRoutingHelper->getEntityId($request);
+            $contexts = [];
 
             if ($entity->getId()) {
                 $contexts = $entity->getActivityTargets();
             } elseif ($targetEntityClass && $request->getMethod() === 'GET') {
-                $contexts[] = $this->entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
+                $contexts[] = $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
             }
 
-            $form->get('contexts')->setData($contexts);
+            $form->get('contexts')->setData($this->getAccessibleContexts($contexts));
+        }
+    }
+
+    /**
+     * Set activity targets with context data to the form
+     */
+    public function setActivityTargetsContext(FormEvent $event)
+    {
+        /** @var ActivityInterface $entity */
+        $entity = $event->getData();
+        $form   = $event->getForm();
+
+        if ($entity && $form->isSubmitted() && $form->isValid() && $form->has('contexts')) {
+            $contexts = $this->getAccessibleContexts($form->get('contexts')->getData());
+            $inaccessibleContexts = $this->getInaccessibleContexts($entity->getActivityTargets());
+            $this->getActivityManager()->setActivityTargets($entity, array_merge($contexts, $inaccessibleContexts));
         }
     }
 
@@ -165,8 +196,53 @@ class ContextsExtension extends AbstractTypeExtension
             return false;
         }
 
-        $activities = $this->activityManager->getActivityTypes();
+        $activities = $this->getActivityManager()->getActivityTypes();
 
         return in_array($className, $activities, true);
+    }
+
+    /**
+     * @param iterable|object[] $contexts
+     * @return array
+     */
+    protected function getAccessibleContexts($contexts): array
+    {
+        $result = [];
+        foreach ($contexts as $context) {
+            if ($this->authorizationChecker->isGranted('VIEW', $context)) {
+                $result[] = $context;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param iterable|object[] $contexts
+     * @return array
+     */
+    protected function getInaccessibleContexts($contexts): array
+    {
+        $result = [];
+        foreach ($contexts as $context) {
+            if (!$this->authorizationChecker->isGranted('VIEW', $context)) {
+                $result[] = $context;
+            }
+        }
+        return $result;
+    }
+
+    protected function getActivityManager(): ActivityManager
+    {
+        return $this->container->get('oro_activity.manager');
+    }
+
+    protected function getEntityAliasResolver(): EntityAliasResolver
+    {
+        return $this->container->get('oro_entity.entity_alias_resolver');
+    }
+
+    protected function getEntityRoutingHelper(): EntityRoutingHelper
+    {
+        return $this->container->get('oro_entity.routing_helper');
     }
 }

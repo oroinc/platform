@@ -2,110 +2,114 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Cache;
 
+use Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Twig\Environment;
 
 class EntityCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
+    private function getRenderParameters(string $ext): array
+    {
+        return [
+            'EmailAddress' . $ext . '.twig',
+            [
+                'namespace' => 'Test\SomeNamespace',
+                'className' => 'TestEmailAddressProxy',
+                'owners'    => [
+                    [
+                        'targetEntity' => 'Oro\TestUser',
+                        'columnName'   => 'owner_testuser_id',
+                        'fieldName'    => 'owner1'
+                    ],
+                    [
+                        'targetEntity' => 'Oro\TestContact',
+                        'columnName'   => 'owner_testcontact_id',
+                        'fieldName'    => 'owner2'
+                    ],
+                    [
+                        'targetEntity' => 'Acme\TestUser',
+                        'columnName'   => 'owner_acme_testuser_id',
+                        'fieldName'    => 'owner3'
+                    ],
+                ]
+            ]
+        ];
+    }
+
+    private function getWriteCacheFileParameters(string $ext): array
+    {
+        return [
+            'SomeDir' . DIRECTORY_SEPARATOR . 'TestEmailAddressProxy' . $ext,
+            'test' . $ext
+        ];
+    }
+
     public function testWarmUpAndIsOptional()
     {
-        $oroProvider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $oroProvider = $this->createMock(EmailOwnerProviderInterface::class);
         $oroProvider->expects($this->any())
             ->method('getEmailOwnerClass')
-            ->will($this->returnValue('Oro\TestUser'));
+            ->willReturn('Oro\TestUser');
 
-        $oroCrmProvider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $oroCrmProvider = $this->createMock(EmailOwnerProviderInterface::class);
         $oroCrmProvider->expects($this->any())
             ->method('getEmailOwnerClass')
-            ->will($this->returnValue('Oro\TestContact'));
+            ->willReturn('Oro\TestContact');
 
-        $acmeProvider = $this->createMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $acmeProvider = $this->createMock(EmailOwnerProviderInterface::class);
         $acmeProvider->expects($this->any())
             ->method('getEmailOwnerClass')
-            ->will($this->returnValue('Acme\TestUser'));
+            ->willReturn('Acme\TestUser');
 
         $storage = new EmailOwnerProviderStorage();
         $storage->addProvider($oroProvider);
         $storage->addProvider($oroCrmProvider);
         $storage->addProvider($acmeProvider);
 
-        $kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-
-        $warmer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer')
-            ->setConstructorArgs(array($storage, 'SomeDir', 'Test\SomeNamespace', 'Test%sProxy', $kernel))
-            ->setMethods(array('createFilesystem', 'createTwigEnvironment', 'writeCacheFile'))
+        $kernel = $this->createMock(KernelInterface::class);
+        $warmer = $this->getMockBuilder(EntityCacheWarmer::class)
+            ->setConstructorArgs([$storage, 'SomeDir', 'Test\SomeNamespace', 'Test%sProxy', $kernel])
+            ->onlyMethods(['createFilesystem', 'createTwigEnvironment', 'writeCacheFile'])
             ->getMock();
 
-        $fs = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $twig = $this->getMockBuilder('\Twig_Environment')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fs = $this->createMock(Filesystem::class);
+        $twig = $this->createMock(Environment::class);
 
         $warmer->expects($this->once())
             ->method('createFilesystem')
-            ->will($this->returnValue($fs));
-
+            ->willReturn($fs);
         $warmer->expects($this->once())
             ->method('createTwigEnvironment')
-            ->will($this->returnValue($twig));
+            ->willReturn($twig);
 
         $fs->expects($this->once())
             ->method('exists')
-            ->with($this->equalTo('SomeDir'));
-
+            ->with('SomeDir');
         $fs->expects($this->once())
             ->method('mkdir')
-            ->with($this->equalTo('SomeDir'), $this->equalTo(0777));
+            ->with('SomeDir', 0777);
 
-        $this->setTwigAndSaveExpectations($twig, $warmer, '.php', 0);
-        $this->setTwigAndSaveExpectations($twig, $warmer, '.orm.yml', 1);
-
-        $warmer->warmup('');
-        $this->assertFalse($warmer->isOptional());
-    }
-
-    private function setTwigAndSaveExpectations(
-        \PHPUnit\Framework\MockObject\MockObject $twig,
-        \PHPUnit\Framework\MockObject\MockObject $warmer,
-        $ext,
-        $at
-    ) {
-        $twig->expects($this->at($at))
+        $twig->expects($this->exactly(2))
             ->method('render')
-            ->with(
-                $this->equalTo('EmailAddress' . $ext . '.twig'),
-                $this->equalTo(
-                    array(
-                        'namespace' => 'Test\SomeNamespace',
-                        'className' => 'TestEmailAddressProxy',
-                        'owners'    => array(
-                            array(
-                                'targetEntity' => 'Oro\TestUser',
-                                'columnName'   => 'owner_testuser_id',
-                                'fieldName'    => 'owner1'
-                            ),
-                            array(
-                                'targetEntity' => 'Oro\TestContact',
-                                'columnName'   => 'owner_testcontact_id',
-                                'fieldName'    => 'owner2'
-                            ),
-                            array(
-                                'targetEntity' => 'Acme\TestUser',
-                                'columnName'   => 'owner_acme_testuser_id',
-                                'fieldName'    => 'owner3'
-                            ),
-                        )
-                    )
-                )
+            ->withConsecutive(
+                $this->getRenderParameters('.php'),
+                $this->getRenderParameters('.orm.yml')
             )
-            ->will($this->returnValue('test' . $ext));
-        $warmer->expects($this->at($at + 2))
-            ->method('writeCacheFile')
-            ->with(
-                $this->equalTo('SomeDir' . DIRECTORY_SEPARATOR . 'TestEmailAddressProxy' . $ext),
-                $this->equalTo('test' . $ext)
+            ->willReturnOnConsecutiveCalls(
+                'test.php',
+                'test.orm.yml'
             );
+        $warmer->expects($this->exactly(2))
+            ->method('writeCacheFile')
+            ->withConsecutive(
+                $this->getWriteCacheFileParameters('.php'),
+                $this->getWriteCacheFileParameters('.orm.yml')
+            );
+
+        $warmer->warmUp('');
+        $this->assertFalse($warmer->isOptional());
     }
 }

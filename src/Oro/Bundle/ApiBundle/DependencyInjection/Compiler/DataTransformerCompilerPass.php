@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -12,6 +12,8 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DataTransformerCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const DATA_TRANSFORMER_REGISTRY_SERVICE_ID = 'oro_api.data_transformer_registry';
     private const DATA_TRANSFORMER_TAG                 = 'oro.api.data_transformer';
 
@@ -20,28 +22,30 @@ class DataTransformerCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $services = [];
         $transformers = [];
         $taggedServices = $container->findTaggedServiceIds(self::DATA_TRANSFORMER_TAG);
-        foreach ($taggedServices as $id => $attributes) {
-            foreach ($attributes as $tagAttributes) {
-                $transformers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
-                    new Reference($id),
-                    $tagAttributes['dataType'],
-                    DependencyInjectionUtil::getRequestType($tagAttributes)
+        foreach ($taggedServices as $id => $tags) {
+            $services[$id] = new Reference($id);
+            foreach ($tags as $attributes) {
+                $transformers[$this->getPriorityAttribute($attributes)][] = [
+                    $id,
+                    $attributes['dataType'],
+                    $this->getRequestTypeAttribute($attributes)
                 ];
             }
         }
-        if (empty($transformers)) {
-            return;
-        }
-
-        $transformers = DependencyInjectionUtil::sortByPriorityAndFlatten($transformers);
 
         $groupedTransformers = [];
-        foreach ($transformers as list($transformer, $dataType, $requestType)) {
-            $groupedTransformers[$dataType][] = [$transformer, $requestType];
+        if ($transformers) {
+            $transformers = $this->sortByPriorityAndFlatten($transformers);
+            foreach ($transformers as [$id, $dataType, $requestType]) {
+                $groupedTransformers[$dataType][] = [$id, $requestType];
+            }
         }
+
         $container->getDefinition(self::DATA_TRANSFORMER_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $groupedTransformers);
+            ->replaceArgument(0, $groupedTransformers)
+            ->replaceArgument(1, ServiceLocatorTagPass::register($container, $services));
     }
 }

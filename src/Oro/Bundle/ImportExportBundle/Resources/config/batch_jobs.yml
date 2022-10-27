@@ -43,12 +43,11 @@ connector:
             steps:
                 import:
                     title:     import
-                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    class:     Oro\Bundle\BatchBundle\Step\CumulativeItemStep
                     services:
                         reader:    oro_importexport.reader.csv
                         processor: oro_importexport.processor.import_delegate
-                        writer:    oro_importexport.writer.entity
-                    parameters: ~
+                        writer:    oro_importexport.writer.cumulative
         entity_export_to_xlsx:
             title: "Entity Export to XLS"
             type: export

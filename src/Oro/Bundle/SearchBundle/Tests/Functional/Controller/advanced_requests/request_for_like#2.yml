@@ -1,6 +1,6 @@
-# search by all strings LIKE "%em5%" so it should find only "item5@mail.com"
+# search by all strings LIKE "%item5@%" so it should find only "item5@mail.com"
 request:
-    query: "from oro_test_item where stringValue like em5@ order_by stringValue desc"
+    query: "from oro_test_item where stringValue like item5@ order_by stringValue desc"
 response:
     records_count: 1
     count: 1
@@ -9,12 +9,4 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 entity_label: "oro.testframework.item.entity_label"
-                record_string: "item5@mail.com 0123-456500"
                 record_url: http://localhost%oro_default_prefix%search/
-    soap:
-        data:
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: "item5@mail.com 0123-456300"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData: []

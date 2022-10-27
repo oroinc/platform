@@ -1,18 +1,17 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Block\OptionResolver;
+namespace Oro\Component\Layout\Tests\Unit\Block\OptionsResolver;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Options;
 
 class OptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OptionsResolver
-     */
-    protected $optionResolver;
+    /** @var OptionsResolver */
+    private $optionResolver;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->optionResolver = new OptionsResolver();
     }
@@ -31,6 +30,14 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->optionResolver->hasDefault('default_option'));
         $this->assertTrue($this->optionResolver->hasDefault('required_option_with_default'));
         $this->assertFalse($this->optionResolver->hasDefault('not_existing_option'));
+        $this->assertSame(
+            [
+                'default_option' => 'default_value',
+                'default_option2' => 'default_value2',
+                'required_option_with_default' => false
+            ],
+            $this->optionResolver->getDefaults()
+        );
 
         // Required
         $this->optionResolver->setRequired('required_option');
@@ -85,12 +92,11 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->optionResolver->resolve([]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @expectedExceptionMessage Setting options via array access is not supported. Use setDefault() instead.
-     */
     public function testOffsetSet()
     {
+        $this->expectException(AccessException::class);
+        $this->expectExceptionMessage('Setting options via array access is not supported. Use setDefault() instead.');
+
         $this->optionResolver->setDefault('default_option', 'default_value');
 
         $this->optionResolver->setDefault(

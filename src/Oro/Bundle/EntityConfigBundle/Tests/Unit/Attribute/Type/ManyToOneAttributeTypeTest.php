@@ -8,9 +8,9 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Type\ManyToOneAttributeType;
 class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,11 +23,6 @@ class ManyToOneAttributeTypeTest extends AttributeTypeTestCase
     protected function getAttributeType()
     {
         return new ManyToOneAttributeType($this->entityNameResolver, $this->doctrineHelper);
-    }
-
-    public function testGetType()
-    {
-        $this->assertEquals('manyToOne', $this->getAttributeType()->getType());
     }
 
     /**

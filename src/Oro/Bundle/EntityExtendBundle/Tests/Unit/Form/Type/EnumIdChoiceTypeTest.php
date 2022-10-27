@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumIdChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -13,25 +13,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EnumIdChoiceTypeTest extends TypeTestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
-
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityManager;
+    private $entityManager;
 
     /** @var EnumIdChoiceType */
-    protected $type;
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->doctrine = $this->createMock(ManagerRegistry::class);
+
         $this->entityManager = $this->createMock(EntityManager::class);
-        $this->doctrine->expects($this->any())
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
 
-        $this->type = new EnumIdChoiceType($this->doctrine);
+        $this->type = new EnumIdChoiceType($doctrine);
     }
 
     public function testGetParent()
@@ -46,7 +45,6 @@ class EnumIdChoiceTypeTest extends TypeTestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver **/
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')

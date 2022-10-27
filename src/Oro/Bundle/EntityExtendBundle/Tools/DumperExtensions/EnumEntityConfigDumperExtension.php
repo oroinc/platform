@@ -15,6 +15,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
+/**
+ * Config extension dumper for entity with enum field
+ */
 class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
     /** @var ConfigManager */
@@ -32,13 +35,6 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
     /** @var ExtendEntityConfigProviderInterface */
     protected $extendEntityConfigProvider;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param RelationBuilder $relationBuilder
-     * @param FieldTypeHelper $fieldTypeHelper
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param ExtendEntityConfigProviderInterface $extendEntityConfigProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         RelationBuilder $relationBuilder,
@@ -66,6 +62,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
      * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preUpdate()
     {
@@ -109,7 +106,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                         ? ExtendHelper::buildEnumCode($enumName)
                         : ExtendHelper::generateEnumCode(
                             $fieldConfigId->getClassName(),
-                            $fieldConfigId->getFieldName()
+                            $fieldConfigId->getFieldName(),
+                            $this->nameGenerator->getMaxEnumCodeSize()
                         );
 
                     $fieldOptions['enum']['enum_code'] = $enumCode;
@@ -149,14 +147,16 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
     /**
      * {@inheritdoc}
+     * @throws \ReflectionException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function postUpdate()
     {
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $entityConfigs        = $this->extendEntityConfigProvider->getExtendEntityConfigs();
         foreach ($entityConfigs as $entityConfig) {
+            $entityClassName = $entityConfig->getId()->getClassName();
             if ($entityConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
-                $entityClassName = $entityConfig->getId()->getClassName();
                 $schema          = $entityConfig->get('schema', false, []);
                 if (!empty($schema['doctrine'][$entityClassName]['repositoryClass'])) {
                     continue;
@@ -170,10 +170,19 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 $this->configManager->persist($entityConfig);
             } elseif ($entityConfig->is('is_extend')) {
                 $fieldConfigs = $extendConfigProvider->getConfigs($entityConfig->getId()->getClassName());
+                $reflectionEntityClass = class_exists($entityClassName)
+                    ? new \ReflectionClass($entityClassName)
+                    : null;
                 foreach ($fieldConfigs as $fieldConfig) {
                     /** @var FieldConfigId $fieldConfigId */
                     $fieldConfigId = $fieldConfig->getId();
                     if ($fieldConfigId->getFieldType() !== 'multiEnum') {
+                        continue;
+                    }
+
+                    if ($fieldConfig->get('state') === ExtendScope::STATE_DELETE
+                        && $reflectionEntityClass
+                        && !$reflectionEntityClass->hasProperty($fieldConfigId->getFieldName())) {
                         continue;
                     }
 

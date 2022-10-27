@@ -1,231 +1,230 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\GeneratorExtensions;
 
-use CG\Core\DefaultGeneratorStrategy;
-use CG\Generator\PhpClass;
+use Doctrine\Inflector\InflectorFactory;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClass;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructor;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructorWithArgs;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension;
+use Oro\Component\PhpUtils\ClassGenerator;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ExtendEntityGeneratorExtension */
-    protected $extension;
+    private ExtendEntityGeneratorExtension $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->extension = new ExtendEntityGeneratorExtension();
+        $this->extension = new ExtendEntityGeneratorExtension(InflectorFactory::create()->build());
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
-        $this->assertTrue(
-            $this->extension->supports([])
-        );
+        self::assertTrue($this->extension->supports([]));
     }
 
-    public function testEmptyCustom()
+    public function testEmptyCustom(): void
     {
         $schema = [
-            'type'      => 'Custom',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => [],
-            'addremove' => []
+            'type' => 'Custom',
+            'property' => [],
+            'relation' => [],
+            'default' => [],
+            'addremove' => [],
         ];
         $this->assertGeneration('empty_custom.txt', $schema);
     }
 
-    public function testEmptyCustomWithInherit()
+    public function testEmptyCustomWithInherit(): void
     {
         $schema = [
-            'type'      => 'Custom',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => [],
+            'type' => 'Custom',
+            'property' => [],
+            'relation' => [],
+            'default' => [],
             'addremove' => [],
-            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructor'
+            'inherit' => ParentClassWithConstructor::class,
         ];
         $this->assertGeneration('empty_custom_with_inherit.txt', $schema);
     }
 
-    public function testEmptyExtend()
+    public function testEmptyExtend(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => [],
-            'addremove' => []
+            'type' => 'Extend',
+            'property' => [],
+            'relation' => [],
+            'default' => [],
+            'addremove' => [],
         ];
         $this->assertGeneration('empty_extend.txt', $schema);
     }
 
-    public function testEmptyExtendWithParent()
+    public function testEmptyExtendWithParent(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClass',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => [],
-            'addremove' => []
+            'type' => 'Extend',
+            'inherit' => ParentClass::class,
+            'property' => [],
+            'relation' => [],
+            'default' => [],
+            'addremove' => [],
         ];
         $this->assertGeneration('empty_extend_with_parent.txt', $schema);
     }
 
-    public function testEmptyExtendWithParentConstructor()
+    public function testEmptyExtendWithParentConstructor(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructor',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => [],
-            'addremove' => []
+            'type' => 'Extend',
+            'inherit' => ParentClassWithConstructor::class,
+            'property' => [],
+            'relation' => [],
+            'default' => [],
+            'addremove' => [],
         ];
         $this->assertGeneration('empty_extend_with_parent_constructor.txt', $schema);
     }
 
-    public function testExtendWithParentConstructorWithArgs()
+    public function testExtendWithParentConstructorWithArgs(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructorWithArgs',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => [],
-            'addremove' => []
+            'type' => 'Extend',
+            'inherit' => ParentClassWithConstructorWithArgs::class,
+            'property' => [],
+            'relation' => [],
+            'default' => [],
+            'addremove' => [],
         ];
         $this->assertGeneration('extend_with_parent_constructor_with_args.txt', $schema);
     }
 
-    public function testProperties()
+    public function testProperties(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'property'  => ['field1' => 'field1', 'field_2' => 'field_2'],
-            'relation'  => [],
-            'default'   => [],
-            'addremove' => []
+            'type' => 'Extend',
+            'property' => ['field1' => 'field1', 'field_2' => 'field_2'],
+            'relation' => [],
+            'default' => [],
+            'addremove' => [],
+            'entity' => 'CustomEntity',
+            'doctrine' => [
+                'CustomEntity' => [
+                    'fields' => [
+                        'field1' => [],
+                        'field_2' => ['default' => true, 'type' => 'boolean'],
+                    ],
+                ],
+            ],
         ];
         $this->assertGeneration('properties.txt', $schema);
     }
 
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => ['default_rel1' => 'default_rel1', 'default_rel_2' => 'default_rel_2'],
-            'addremove' => []
+            'type' => 'Extend',
+            'property' => [],
+            'relation' => [],
+            'default' => ['default_rel1' => 'default_rel1', 'default_rel_2' => 'default_rel_2'],
+            'addremove' => [],
         ];
         $this->assertGeneration('defaults.txt', $schema);
     }
 
-    public function testCollections()
+    public function testCollections(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => [],
+            'type' => 'Extend',
+            'property' => [],
+            'relation' => [],
+            'default' => [],
             'addremove' => [
-                'rel1'  => [
-                    'self'                => 'rel1',
+                'rel1' => [
+                    'self' => 'rel1',
                     'is_target_addremove' => false,
-                    'target'              => 'target1',
+                    'target' => 'target1',
                 ],
                 'rel_2' => [
-                    'self'                => 'rel_2',
+                    'self' => 'rel_2',
                     'is_target_addremove' => true,
-                    'target'              => 'target_2',
+                    'target' => 'target_2',
                 ],
-            ]
+            ],
         ];
         $this->assertGeneration('collections.txt', $schema);
     }
 
-    public function testCollectionsWithPluralNames()
+    public function testCollectionsWithPluralNames(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => [],
+            'type' => 'Extend',
+            'property' => [],
+            'relation' => [],
+            'default' => [],
             'addremove' => [
-                'owners'  => [
-                    'self'                => 'owners',
+                'owners' => [
+                    'self' => 'owners',
                     'is_target_addremove' => true,
-                    'target'              => 'targets',
+                    'target' => 'targets',
                 ],
-            ]
+            ],
         ];
         $this->assertGeneration('collections_with_plural_names.txt', $schema);
     }
 
-    public function testRelations()
+    public function testRelations(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'property'  => [],
-            'relation'  => ['rel1' => 'rel1', 'rel_2' => 'rel_2'],
-            'default'   => [],
+            'type' => 'Extend',
+            'property' => [],
+            'relation' => ['rel1' => 'rel1', 'rel_2' => 'rel_2'],
+            'default' => [],
             'addremove' => [
-                'rel1'  => [
-                    'self'                => 'rel1',
+                'rel1' => [
+                    'self' => 'rel1',
                     'is_target_addremove' => false,
-                    'target'              => 'target1',
+                    'target' => 'target1',
                 ],
-            ]
+            ],
         ];
         $this->assertGeneration('relations.txt', $schema);
     }
 
-    public function testCollectionsWithoutTarget()
+    public function testCollectionsWithoutTarget(): void
     {
         $schema = [
-            'type'      => 'Extend',
-            'property'  => [],
-            'relation'  => [],
-            'default'   => [],
+            'type' => 'Extend',
+            'property' => [],
+            'relation' => [],
+            'default' => [],
             'addremove' => [
-                'rel1'  => [
+                'rel1' => [
                     'self' => 'rel1',
                 ],
                 'rel_2' => [
                     'self' => 'rel_2',
                 ],
-            ]
+            ],
         ];
         $this->assertGeneration('collections_without_target.txt', $schema);
     }
 
-    /**
-     * @param string $expectedFile
-     * @param array  $schema
-     * @param bool   $dump
-     */
-    protected function assertGeneration($expectedFile, $schema, $dump = false)
+    protected function assertGeneration(string $expectedFile, array $schema): void
     {
-        $class = PhpClass::create('Test\Entity');
+        $class = new ClassGenerator('Test\Entity');
 
         $this->extension->generate($schema, $class);
-        $strategy  = new DefaultGeneratorStrategy();
-        $classBody = $strategy->generate($class);
-        if ($dump) {
-            print_r("\n" . $classBody . "\n");
-        }
-        $expectedBody = file_get_contents(__DIR__ . '/../Fixtures/' . $expectedFile);
+        $expectedCode = \file_get_contents(__DIR__ . '/../Fixtures/' . $expectedFile);
 
-        /**
-         * Support different line endings.
-         */
-        $expectedBody = str_replace(PHP_EOL, "\n", $expectedBody);
-        $classBody = str_replace(PHP_EOL, "\n", $classBody);
-        $expectedBody = trim($expectedBody);
-        $classBody = trim($classBody);
+        // Support different line endings.
+        $expectedCode = \trim(\str_replace(PHP_EOL, "\n", $expectedCode));
+        $generatedCode = \trim(\str_replace(PHP_EOL, "\n", $class->print()));
 
-        $this->assertEquals($expectedBody, $classBody);
+        self::assertEquals($expectedCode, $generatedCode);
     }
 }

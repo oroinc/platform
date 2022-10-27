@@ -1,6 +1,6 @@
 {% macro renderView(entity) %}
     {% set tagCloudElId = 'tags-' ~ random() %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     <div {{ UI.renderPageComponentAttributes({
         module: 'oroform/js/app/components/inline-editable-view-component',
         options: {
@@ -42,10 +42,10 @@
 {% macro tagSortActions() %}
     <ul class="tag-sort-actions inline">
         <li>
-            <a href="javascript:void(0);" class="no-hash active">{{ 'oro.tag.menu.all_tags'|trans }}</a>
+            <a href="#" class="no-hash active">{{ 'oro.tag.menu.all_tags'|trans }}</a>
         </li>
         <li>
-            <a href="javascript:void(0);" data-type="owner" class="no-hash">{{ 'oro.tag.menu.my_tags'|trans }}</a>
+            <a href="#" data-type="owner" class="no-hash">{{ 'oro.tag.menu.my_tags'|trans }}</a>
         </li>
     </ul>
 {% endmacro %}

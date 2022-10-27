@@ -1,36 +1,43 @@
-parameters:
-    oro_installer.yaml_persister.class:               Oro\Bundle\InstallerBundle\Persister\YamlPersister
-    oro_installer.script_manager.class:               Oro\Bundle\InstallerBundle\ScriptManager
 services:
     oro_installer.yaml_persister:
-        class: '%oro_installer.yaml_persister.class%'
+        class: Oro\Bundle\InstallerBundle\Persister\YamlPersister
         arguments:
             - '%kernel.project_dir%/config'
             - '%kernel.environment%'
 
-    kernel.listener.install.event:
-        class: Oro\Bundle\InstallerBundle\EventListener\RequestListener
-        arguments:
-            - '%installed%'
-            - '%kernel.debug%'
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 10 }
-
     oro_installer.script_manager:
-        class: '%oro_installer.script_manager.class%'
+        class: Oro\Bundle\InstallerBundle\ScriptManager
         arguments:
             - '@kernel'
 
-    oro_installer.namespace_migration:
-        class: 'Oro\Bundle\InstallerBundle\CacheWarmer\NamespaceMigration'
+    oro_installer.platform_update_checker:
+        class: Oro\Bundle\InstallerBundle\ChainPlatformUpdateChecker
+        arguments:
+            - !tagged_iterator oro.installer.platform_update_checker
+
+    oro_installer.requirements_provider:
+        class: Oro\Bundle\InstallerBundle\Provider\PlatformRequirementsProvider
+        arguments:
+            - '@doctrine.dbal.default_connection'
+            - '%kernel.project_dir%'
+            - {
+                  liip_imagine.jpegoptim.binary: '%liip_imagine.jpegoptim.binary%',
+                  liip_imagine.pngquant.binary: '%liip_imagine.pngquant.binary%'
+              }
+        tags:
+            - { name: oro.requirements_provider }
+
+    oro_installer.requirements_provider.database.mysql:
+        class: Oro\Bundle\InstallerBundle\Provider\MysqlDatabaseRequirementsProvider
         arguments:
             - '@doctrine'
-
-    oro_installer.assets_install_command_listener:
-        class: Oro\Bundle\InstallerBundle\EventListener\AssetsInstallCommandListener
-        arguments:
-            - '@filesystem'
-            - '%kernel.project_dir%'
         tags:
-            - { name: kernel.event_listener, event: console.command, method: beforeExecute }
-            - { name: kernel.event_listener, event: console.terminate, method: afterExecute }
+            - { name: oro.requirements_provider }
+
+    kernel.listener.install.event:
+        class: Oro\Bundle\InstallerBundle\EventListener\RequestListener
+        arguments:
+            - '@oro_distribution.handler.application_status'
+            - '%kernel.debug%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 10 }

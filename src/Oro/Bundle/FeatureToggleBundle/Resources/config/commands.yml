@@ -1,0 +1,17 @@
+services:
+    _defaults:
+        public: false
+
+    Oro\Bundle\FeatureToggleBundle\Command\ConfigDumpReferenceCommand:
+        arguments:
+            - '@oro_featuretoggle.configuration'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\FeatureToggleBundle\Command\ConfigDebugCommand:
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+            - '@oro_featuretoggle.configuration_extension'
+            - '@translator'
+        tags:
+            - { name: console.command }

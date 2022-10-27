@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\UserBundle\Entity\Manager\RoleManager;
+use Oro\Bundle\UserBundle\Entity\Role;
 
 class RoleManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \Oro\Bundle\UserBundle\Entity\Manager\RoleManager
-     */
+    /** @var \Oro\Bundle\UserBundle\Entity\Manager\RoleManager */
     private $manager;
 
     private $em;
@@ -17,23 +17,21 @@ class RoleManagerTest extends \PHPUnit\Framework\TestCase
 
     private $role;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManager::class);
 
-        $this->repository = $this->createPartialMock(
-            'Doctrine\Common\Persistence\ObjectRepository',
-            array('find', 'findAll', 'findBy', 'findOneBy', 'getClassName', 'getUserQueryBuilder')
-        );
+        $this->repository = $this->getMockBuilder(\Doctrine\Persistence\ObjectRepository::class)
+            ->onlyMethods(['find', 'findAll', 'findBy', 'findOneBy', 'getClassName'])
+            ->addMethods(['getUserQueryBuilder'])
+            ->getMock();
 
         $this->em->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($this->repository));
+            ->willReturn($this->repository);
 
         $this->manager = new RoleManager($this->em);
-        $this->role = $this->getMockForAbstractClass('Oro\Bundle\UserBundle\Entity\Role');
+        $this->role = $this->createMock(Role::class);
     }
 
     public function testGetUserQueryBuilder()
@@ -41,7 +39,7 @@ class RoleManagerTest extends \PHPUnit\Framework\TestCase
         $this->repository->expects($this->once())
             ->method('getUserQueryBuilder')
             ->with($this->role)
-            ->will($this->returnValue(array()));
+            ->willReturn([]);
 
         $this->manager->getUserQueryBuilder($this->role);
     }

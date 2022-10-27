@@ -2,146 +2,36 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Doctrine\ORM\UnitOfWork;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\Contact as TestTargetEntity;
+use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\ContactEmail as TestEntity;
 use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableField;
 use Oro\Bundle\FormBundle\Validator\Constraints\UnchangeableFieldValidator;
-use Oro\Component\Testing\Validator\AbstractConstraintValidatorTest;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
+class UnchangeableFieldValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var Query|\PHPUnit\Framework\MockObject\MockObject */
-    private $query;
-
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $classMetadata;
-
-    /** @var ObjectRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    protected function setUp()
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
+    protected function setUp(): void
     {
-        $this->mockDoctrine();
-        parent::setUp();
-    }
-
-    public function testViolationRaisedInCaseValueHasChanged()
-    {
-        $constraint = new UnchangeableField();
-
-        $this->objectIsNotNew();
-        $this->prepareClassMetadata([]);
-
-        $this->query->expects($this->once())
-            ->method('getSingleScalarResult')
-            ->willReturn('old value');
-
-        $this->validator->validate('new value', $constraint);
-
-        $this->buildViolation($constraint->message)
-            ->atPath('property.path')
-            ->assertRaised();
-    }
-
-    public function testViolationShouldNotBeRaisedForNewObjects()
-    {
-        $constraint = new UnchangeableField();
-
-        $this->objectIsNew();
-        $this->prepareClassMetadata([]);
-
-        $this->query->expects($this->never())
-            ->method('getSingleScalarResult');
-
-        $this->validator->validate('new value', $constraint);
-
-        $this->assertNoViolation();
-    }
-
-    public function testViolationShouldNotBeRaisedIfPreviousValueWasNull()
-    {
-        $constraint = new UnchangeableField();
-
-        $this->objectIsNotNew();
-        $this->prepareClassMetadata([]);
-
-        $this->query->expects($this->once())
-            ->method('getSingleScalarResult')
-            ->willReturn(null);
-
-        $this->validator->validate('new value', $constraint);
-
-        $this->assertNoViolation();
-    }
-
-    public function testViolationShouldNotBeRaisedIfValueHasNotChanged()
-    {
-        $constraint = new UnchangeableField();
-
-        $this->objectIsNotNew();
-        $this->prepareClassMetadata([]);
-
-        $this->query->expects($this->once())
-            ->method('getSingleScalarResult')
-            ->willReturn('new value');
-
-        $this->validator->validate('new value', $constraint);
-
-        $this->assertNoViolation();
-    }
-
-    private function mockDoctrine()
-    {
-        $this->query = $this->createMock(AbstractQuery::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-        $this->classMetadata = $this->createMock(ClassMetadata::class);
-        $this->manager = $this->createMock(ObjectManager::class);
-        $this->repository = $this->createMock(EntityRepository::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-
-        $queryBuilder->expects($this->any())
-            ->method('select')
-            ->willReturnSelf();
-
-        $queryBuilder->expects($this->any())
-            ->method('where')
-            ->willReturnSelf();
-
-        $queryBuilder->expects($this->any())
-            ->method('setParameter')
-            ->willReturnSelf();
-
-        $queryBuilder->expects($this->any())
-            ->method('getQuery')
-            ->willReturn($this->query);
-
-        $this->repository->expects($this->any())
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-
-        $this->manager->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($this->repository);
-
-        $this->manager->expects($this->any())
-            ->method('getClassMetadata')
-            ->willReturn($this->classMetadata);
-
-        $this->doctrineHelper->expects($this->any())
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityManagerForClass')
-            ->willReturn($this->manager);
+            ->willReturn($this->em);
+
+        parent::setUp();
     }
 
     protected function createValidator()
@@ -149,28 +39,415 @@ class UnchangeableFieldValidatorTest extends AbstractConstraintValidatorTest
         return new UnchangeableFieldValidator($this->doctrineHelper);
     }
 
-    private function objectIsNotNew()
+    /**
+     * @param string $entityClass
+     * @param bool   $isIdentifierComposite
+     *
+     * @return ClassMetadata|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function getClassMetadata(string $entityClass, bool $isIdentifierComposite = false)
     {
-        $this->classMetadata->expects($this->any())
-            ->method('getIdentifierValues')
-            ->willReturn(['id' => 1, 'relation' => (object)['id' => 10]]);
-    }
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->name = $entityClass;
+        $metadata->isIdentifierComposite = $isIdentifierComposite;
 
-    private function objectIsNew()
-    {
-        // doesn't find an identifier cause it's new object
-        $this->classMetadata->expects($this->any())
-            ->method('getIdentifierValues')
-            ->willReturn([]);
+        return $metadata;
     }
 
     /**
-     * @param array $return
+     * @param object $object
+     * @param string $propertyName
+     * @param mixed  $returnValue
      */
-    private function prepareClassMetadata(array $return)
+    private function expectOriginalEntityData($object, string $propertyName, $returnValue)
     {
-        $this->classMetadata->expects($this->any())
-            ->method('getAssociationMappings')
-            ->willReturn($return);
+        $uow = $this->createMock(UnitOfWork::class);
+        $this->em->expects(self::once())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $uow->expects(self::once())
+            ->method('getOriginalEntityData')
+            ->with(self::identicalTo($object))
+            ->willReturn([$propertyName => $returnValue]);
+    }
+
+    public function changedFieldValueDataProvider(): array
+    {
+        return [
+            'changed value'         => [
+                'old value' => 'old value',
+                'new value' => 'new value'
+            ],
+            'changed value is null' => [
+                'old value' => 'old value',
+                'new value' => null
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider changedFieldValueDataProvider
+     */
+    public function testViolationRaisedInCaseFieldValueHasChanged($oldValue, $newValue)
+    {
+        $object = new TestEntity();
+        $fieldName = 'email';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(TestEntity::class)
+            ->willReturn($metadata);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($fieldName)
+            ->willReturn(false);
+
+        $this->expectOriginalEntityData($object, $fieldName, $oldValue);
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $fieldName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->atPath('property.path')
+            ->assertRaised();
+    }
+
+    public function notChangedFieldValueDataProvider(): array
+    {
+        return [
+            'not changed value'         => [
+                'old value' => 'value',
+                'new value' => 'value'
+            ],
+            'not changed value is null' => [
+                'old value' => null,
+                'new value' => null
+            ],
+            'old value was null'        => [
+                'old value' => null,
+                'new value' => 'value'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider notChangedFieldValueDataProvider
+     */
+    public function testViolationShouldNotBeRaisedInCaseFieldValueHasNotChanged($oldValue, $newValue)
+    {
+        $object = new TestEntity();
+        $fieldName = 'email';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(TestEntity::class)
+            ->willReturn($metadata);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($fieldName)
+            ->willReturn(false);
+
+        $this->expectOriginalEntityData($object, $fieldName, $oldValue);
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $fieldName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testViolationRaisedInCaseAssociationValueHasChanged()
+    {
+        $oldValue = new TestTargetEntity();
+        $oldValueId = ['id' => 1];
+        $newValue = new TestTargetEntity();
+        $newValueId = ['id' => 2];
+
+        $object = new TestEntity();
+        $associationName = 'owner';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+        $targetMetadata = $this->getClassMetadata(TestTargetEntity::class);
+
+        $this->em->expects(self::exactly(2))
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [TestEntity::class, $metadata],
+                [TestTargetEntity::class, $targetMetadata]
+            ]);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($associationName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with($associationName)
+            ->willReturn(TestTargetEntity::class);
+        $targetMetadata->expects(self::exactly(2))
+            ->method('getIdentifierValues')
+            ->willReturnMap([
+                [$oldValue, $oldValueId],
+                [$newValue, $newValueId]
+            ]);
+
+        $this->expectOriginalEntityData($object, $associationName, $oldValue);
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $associationName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->atPath('property.path')
+            ->assertRaised();
+    }
+
+    public function testViolationRaisedInCaseAssociationValueHasChangedToNull()
+    {
+        $oldValue = new TestTargetEntity();
+        $oldValueId = ['id' => 1];
+
+        $object = new TestEntity();
+        $associationName = 'owner';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+        $targetMetadata = $this->getClassMetadata(TestTargetEntity::class);
+
+        $this->em->expects(self::exactly(2))
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [TestEntity::class, $metadata],
+                [TestTargetEntity::class, $targetMetadata]
+            ]);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($associationName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with($associationName)
+            ->willReturn(TestTargetEntity::class);
+        $targetMetadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->with(self::identicalTo($oldValue))
+            ->willReturn($oldValueId);
+
+        $this->expectOriginalEntityData($object, $associationName, $oldValue);
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $associationName);
+        $this->validator->validate(null, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->atPath('property.path')
+            ->assertRaised();
+    }
+
+    public function testViolationShouldNotBeRaisedInCaseAssociationValueHasNotChanged()
+    {
+        $oldValue = new TestTargetEntity();
+        $oldValueId = ['id' => 1];
+        $newValue = new TestTargetEntity();
+        $newValueId = ['id' => 1];
+
+        $object = new TestEntity();
+        $associationName = 'owner';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+        $targetMetadata = $this->getClassMetadata(TestTargetEntity::class);
+
+        $this->em->expects(self::exactly(2))
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [TestEntity::class, $metadata],
+                [TestTargetEntity::class, $targetMetadata]
+            ]);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($associationName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with($associationName)
+            ->willReturn(TestTargetEntity::class);
+        $targetMetadata->expects(self::exactly(2))
+            ->method('getIdentifierValues')
+            ->willReturnMap([
+                [$oldValue, $oldValueId],
+                [$newValue, $newValueId]
+            ]);
+
+        $this->expectOriginalEntityData($object, $associationName, $oldValue);
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $associationName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testViolationShouldNotBeRaisedInCaseAssociationValueHasNotChangedAndBothOldAndNewValuesAreNull()
+    {
+        $object = new TestEntity();
+        $associationName = 'owner';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+        $targetMetadata = $this->getClassMetadata(TestTargetEntity::class);
+
+        $this->em->expects(self::exactly(2))
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [TestEntity::class, $metadata],
+                [TestTargetEntity::class, $targetMetadata]
+            ]);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($associationName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with($associationName)
+            ->willReturn(TestTargetEntity::class);
+        $targetMetadata->expects(self::never())
+            ->method('getIdentifierValues');
+
+        $this->expectOriginalEntityData($object, $associationName, null);
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $associationName);
+        $this->validator->validate(null, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testViolationShouldNotBeRaisedInCaseAssociationValueWasNull()
+    {
+        $newValue = new TestTargetEntity();
+
+        $object = new TestEntity();
+        $associationName = 'owner';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+        $targetMetadata = $this->getClassMetadata(TestTargetEntity::class);
+
+        $this->em->expects(self::exactly(2))
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [TestEntity::class, $metadata],
+                [TestTargetEntity::class, $targetMetadata]
+            ]);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($associationName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with($associationName)
+            ->willReturn(TestTargetEntity::class);
+        $targetMetadata->expects(self::never())
+            ->method('getIdentifierValues');
+
+        $this->expectOriginalEntityData($object, $associationName, null);
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $associationName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testViolationShouldNotBeRaisedInCaseAssociationValueToBeValidatedHasInvalidType()
+    {
+        $newValue = 'new value';
+
+        $object = new TestEntity();
+        $associationName = 'owner';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(TestEntity::class)
+            ->willReturn($metadata);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($associationName)
+            ->willReturn(true);
+        $metadata->expects(self::never())
+            ->method('getAssociationTargetClass');
+        $metadata->expects(self::never())
+            ->method('getIdentifierValues');
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $associationName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testViolationShouldNotBeRaisedInCaseAssociationValueToBeValidatedHasInvalidTypeOfObject()
+    {
+        $newValue = new \stdClass();
+
+        $object = new TestEntity();
+        $associationName = 'owner';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(TestEntity::class)
+            ->willReturn($metadata);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($associationName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with($associationName)
+            ->willReturn(TestTargetEntity::class);
+        $metadata->expects(self::never())
+            ->method('getIdentifierValues');
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $associationName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testShouldThrowExceptionInCaseTargetEntityHasCompositeIdentifier()
+    {
+        $newValue = new TestTargetEntity();
+
+        $object = new TestEntity();
+        $associationName = 'owner';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+        $targetMetadata = $this->getClassMetadata(TestTargetEntity::class, true);
+
+        $this->em->expects(self::exactly(2))
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [TestEntity::class, $metadata],
+                [TestTargetEntity::class, $targetMetadata]
+            ]);
+        $metadata->expects(self::any())
+            ->method('hasAssociation')
+            ->with($associationName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with($associationName)
+            ->willReturn(TestTargetEntity::class);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(sprintf(
+            '%s is not allowed to be used for %s::%s because the target entity %s has composite identifier.',
+            UnchangeableFieldValidator::class,
+            TestEntity::class,
+            $associationName,
+            TestTargetEntity::class
+        ));
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $associationName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->assertNoViolation();
     }
 }

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
@@ -14,137 +14,108 @@ use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
  */
 class CollectListManager
 {
-    /** @var ActivityListChainProvider */
-    protected $chainProvider;
+    private ActivityListChainProvider $chainProvider;
 
-    /**
-     * @param ActivityListChainProvider $chainProvider
-     */
     public function __construct(ActivityListChainProvider $chainProvider)
     {
         $this->chainProvider = $chainProvider;
     }
 
     /**
-     * Check if given entity supports by activity list providers
-     *
-     * @param $entity
-     * @return bool
+     * Checks if the given entity is supported activity entity.
      */
-    public function isSupportedEntity($entity)
+    public function isSupportedEntity(object $entity): bool
     {
         return $this->chainProvider->isSupportedEntity($entity);
     }
 
     /**
-     * Check if given owner entity supports by activity list providers
-     *
-     * @param $entity
-     * @return bool
+     * Checks if given owner entity is supported activity owner entity.
      */
-    public function isSupportedOwnerEntity($entity)
+    public function isSupportedOwnerEntity(object $entity): bool
     {
         return $this->chainProvider->isSupportedOwnerEntity($entity);
     }
 
-    /**
-     * @param array         $deletedEntities
-     * @param EntityManager $entityManager
-     */
-    public function processDeletedEntities($deletedEntities, EntityManager $entityManager)
+    public function processDeletedEntities(array $deletedEntities, EntityManagerInterface $entityManager): void
     {
-        if (!empty($deletedEntities)) {
-            foreach ($deletedEntities as $entity) {
-                $entityManager->getRepository(ActivityList::ENTITY_NAME)
-                    ->deleteActivityListsByRelatedActivityData($entity['class'], $entity['id']);
-            }
+        if (!$deletedEntities) {
+            return;
+        }
+
+        foreach ($deletedEntities as $entity) {
+            $entityManager->getRepository(ActivityList::class)
+                ->deleteActivityListsByRelatedActivityData($entity['class'], $entity['id']);
         }
     }
 
-    /**
-     * @param array         $updatedEntities
-     * @param EntityManager $entityManager
-     * @return bool
-     */
-    public function processUpdatedEntities($updatedEntities, EntityManager $entityManager)
+    public function processUpdatedEntities(array $updatedEntities, EntityManagerInterface $entityManager): bool
     {
-        if (!empty($updatedEntities)) {
-            $metaData = $entityManager->getClassMetadata(ActivityList::ENTITY_CLASS);
-            foreach ($updatedEntities as $entity) {
-                $activityList = $this->chainProvider->getUpdatedActivityList($entity, $entityManager);
-                if ($activityList) {
+        if (!$updatedEntities) {
+            return false;
+        }
+
+        $metaData = $entityManager->getClassMetadata(ActivityList::class);
+        foreach ($updatedEntities as $entity) {
+            $activityList = $this->chainProvider->getUpdatedActivityList($entity, $entityManager);
+            if ($activityList) {
+                $entityManager->persist($activityList);
+                $entityManager->getUnitOfWork()->computeChangeSet($metaData, $activityList);
+            }
+        }
+
+        return true;
+    }
+
+    public function processInsertEntities(array $insertedEntities, EntityManagerInterface $entityManager): bool
+    {
+        if (!$insertedEntities) {
+            return false;
+        }
+
+        foreach ($insertedEntities as $entity) {
+            $activityList = $this->chainProvider->getActivityListEntitiesByActivityEntity($entity);
+            if ($activityList) {
+                $activityListProvider = $this->chainProvider->getProviderForEntity($entity);
+                $this->fillOwners($activityListProvider, $entity, $activityList, $entityManager);
+                if ($activityListProvider->isActivityListApplicable($activityList)) {
                     $entityManager->persist($activityList);
-                    $entityManager->getUnitOfWork()->computeChangeSet(
-                        $metaData,
-                        $activityList
-                    );
                 }
             }
-
-            return true;
         }
 
-        return false;
+        return true;
     }
 
     /**
-     * @param array         $insertedEntities
-     * @param EntityManager $entityManager
-     *
-     * @return bool
+     * Fills activity list owners from activity entity.
      */
-    public function processInsertEntities($insertedEntities, EntityManager $entityManager)
+    public function processFillOwners(array $entities, EntityManagerInterface $entityManager): bool
     {
-        if (!empty($insertedEntities)) {
-            foreach ($insertedEntities as $entity) {
-                $activityList = $this->chainProvider->getActivityListEntitiesByActivityEntity($entity);
-                if ($activityList) {
-                    $entityManager->persist($activityList);
-                    $this->fillOwners($this->chainProvider->getProviderForEntity($entity), $entity, $activityList);
-                }
-            }
-
-            return true;
+        if (!$entities) {
+            return false;
         }
 
-        return false;
-    }
-
-    /**
-     * Fill Activity list owners from activity entity
-     *
-     * @param array $entities
-     * @param EntityManager $entityManager
-     *
-     * @return bool
-     */
-    public function processFillOwners($entities, EntityManager $entityManager)
-    {
-        if ($entities) {
-            foreach ($entities as $entity) {
-                $activityProvider = $this->chainProvider->getProviderForOwnerEntity($entity);
-                $activityList = $this->chainProvider->getActivityListByEntity($entity, $entityManager);
-                if ($activityList) {
-                    $this->fillOwners($activityProvider, $entity, $activityList);
+        foreach ($entities as $entity) {
+            $activityList = $this->chainProvider->getActivityListByEntity($entity, $entityManager);
+            if ($activityList) {
+                $activityListProvider = $this->chainProvider->getProviderForOwnerEntity($entity);
+                $this->fillOwners($activityListProvider, $entity, $activityList, $entityManager);
+                if (!$activityListProvider->isActivityListApplicable($activityList)) {
+                    $entityManager->remove($activityList);
                 }
             }
-
-            return true;
         }
 
-        return false;
+        return true;
     }
 
-    /**
-     * @param ActivityListProviderInterface $provider
-     * @param object $entity
-     * @param ActivityList $activityList
-     */
-    protected function fillOwners(
+    private function fillOwners(
         ActivityListProviderInterface $provider,
-        $entity,
-        ActivityList $activityList
-    ) {
+        object $entity,
+        ActivityList $activityList,
+        EntityManagerInterface $entityManager
+    ): void {
         $oldActivityOwners = $activityList->getActivityOwners();
         $newActivityOwners = $provider->getActivityOwners($entity, $activityList);
         $newActivityOwners = new ArrayCollection($newActivityOwners);
@@ -152,14 +123,13 @@ class CollectListManager
         foreach ($oldActivityOwners as $oldOwner) {
             if (!$oldOwner->isOwnerInCollection($newActivityOwners)) {
                 $activityList->removeActivityOwner($oldOwner);
+                $entityManager->remove($oldOwner);
             }
         }
 
-        if ($newActivityOwners) {
-            foreach ($newActivityOwners as $newOwner) {
-                if (!$newOwner->isOwnerInCollection($oldActivityOwners)) {
-                    $activityList->addActivityOwner($newOwner);
-                }
+        foreach ($newActivityOwners as $newOwner) {
+            if (!$newOwner->isOwnerInCollection($oldActivityOwners)) {
+                $activityList->addActivityOwner($newOwner);
             }
         }
     }

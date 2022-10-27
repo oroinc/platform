@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
@@ -11,96 +10,85 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * ConfigEntityGrid controller
+ *
  * @package Oro\Bundle\EntityExtendBundle\Controller
  * @Route("/entity/extend/entity")
- * BAP-17635 Discuss ACL impl., currently acl is disabled
  * @AclAncestor("oro_entityconfig_manage")
  */
-class ConfigEntityGridController extends Controller
+class ConfigEntityGridController extends AbstractController
 {
     /**
-     * @param Request $request
+     * @param Request           $request
      * @param EntityConfigModel $entity
-     * @return array
-     *
+     * @return RedirectResponse|array
      * @Route(
      *      "/unique-key/{id}",
      *      name="oro_entityextend_entity_unique_key",
      *      requirements={"id"="\d+"},
      *      defaults={"id"=0}
      * )
-     * Acl(
-     *      id="oro_entityextend_entity_unique_key",
-     *      label="oro.entity_extend.action.config_entity_grid.unique",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template
      */
-    public function uniqueAction(Request $request, EntityConfigModel $entity)
+    public function uniqueAction(Request $request, EntityConfigModel $entity): RedirectResponse|array
     {
-        $className      = $entity->getClassName();
-        $entityProvider = $this->get('oro_entity_config.provider.entity');
-        $entityConfig   = $entityProvider->getConfig($className);
+        $className = $entity->getClassName();
+
+        $configManager = $this->getConfigManager();
+        $extendEntityConfig = $configManager->getProvider('extend')->getConfig($className);
 
         $form = $this->createForm(
             UniqueKeyCollectionType::class,
-            $entityConfig->get('unique_key', false, []),
+            $extendEntityConfig->get('unique_key', false, []),
             [
                 'className' => $className
             ]
         );
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->isMethod('POST')) {
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $entityConfig->set('unique_key', $form->getData());
-                $configManager = $entityProvider->getConfigManager();
-                $configManager->persist($entityConfig);
+                $extendEntityConfig->set('unique_key', $form->getData());
+                $configManager->persist($extendEntityConfig);
                 $configManager->flush();
 
-                return $this->get('oro_ui.router')->redirect($entity);
+                return $this->getRouter()->redirect($entity);
             }
         }
 
-        return array(
-            'form'          => $form->createView(),
-            'entity_id'     => $entity->getId(),
-            'entity_config' => $entityConfig
-        );
+        return [
+            'form' => $form->createView(),
+            'entity_id' => $entity->getId(),
+            'entity_config' => $configManager->getProvider('entity')->getConfig($className)
+        ];
     }
 
     /**
      * @Route("/create", name="oro_entityextend_entity_create")
-     * Acl(
-     *      id="oro_entityextend_entity_create",
-     *      label="oro.entity_extend.action.config_entity_grid.create",
-     *      type="action",
-     *      group_name=""
-     * )
      * @Template
      * @param Request $request
      * @return array|RedirectResponse
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): RedirectResponse|array
     {
-        /** @var ConfigManager $configManager */
-        $configManager = $this->get('oro_entity_config.config_manager');
+        $configManager = $this->getConfigManager();
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->isMethod('POST')) {
             $formData = $request->request->get('oro_entity_config_type');
             if (!$formData || !isset($formData['model']['className'])) {
                 throw new BadRequestHttpException(
@@ -109,12 +97,11 @@ class ConfigEntityGridController extends Controller
             }
             $className = ExtendHelper::ENTITY_NAMESPACE . $formData['model']['className'];
 
-            $entityModel  = $configManager->createConfigEntityModel($className);
+            $entityModel = $configManager->createConfigEntityModel($className);
             $extendConfig = $configManager->getProvider('extend')->getConfig($className);
             $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
             $extendConfig->set('state', ExtendScope::STATE_NEW);
             $extendConfig->set('upgradeable', false);
-            $extendConfig->set('origin', ExtendScope::ORIGIN_CUSTOM);
             $extendConfig->set('is_extend', true);
 
             $config = $configManager->getProvider('security')->getConfig($className);
@@ -125,41 +112,35 @@ class ConfigEntityGridController extends Controller
             $entityModel = $configManager->createConfigEntityModel();
         }
 
-        $form = $this->createForm(
-            ConfigType::class,
-            null,
-            array(
-                'config_model' => $entityModel,
-            )
-        );
+        $form = $this->createForm(ConfigType::class, null, ['config_model' => $entityModel]);
 
         $cloneEntityModel = clone $entityModel;
         $cloneEntityModel->setClassName('');
         $form->add(
             'model',
             EntityType::class,
-            array(
+            [
                 'data' => $cloneEntityModel,
-            )
+            ]
         );
 
-        if ($request->getMethod() == 'POST') {
+        if ($request->isMethod('POST')) {
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
                 //persist data inside the form
-                $this->get('session')->getFlashBag()->add(
+                $request->getSession()->getFlashBag()->add(
                     'success',
-                    $this->get('translator')->trans('oro.entity_extend.controller.config_entity.message.saved')
+                    $this->getTranslator()->trans('oro.entity_extend.controller.config_entity.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirect($entityModel);
+                return $this->getRouter()->redirect($entityModel);
             }
         }
 
-        return array(
+        return [
             'form' => $form->createView(),
-        );
+        ];
     }
 
     /**
@@ -167,36 +148,34 @@ class ConfigEntityGridController extends Controller
      *      "/remove/{id}",
      *      name="oro_entityextend_entity_remove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"DELETE"}
      * )
-     * Acl(
-     *      id="oro_entityextend_entity_remove",
-     *      label="oro.entity_extend.action.config_entity_grid.remove",
-     *      type="action",
-     *      group_name=""
-     * )
+     * @CsrfProtection()
+     *
+     * @param EntityConfigModel $entity
+     * @return JsonResponse|Response
      */
-    public function removeAction(EntityConfigModel $entity)
+    public function removeAction(EntityConfigModel $entity): JsonResponse|Response
     {
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find EntityConfigModel entity.');
-        }
-
-        /** @var ConfigManager $configManager */
-        $configManager = $this->get('oro_entity_config.config_manager');
-
+        $configManager = $this->getConfigManager();
         $entityConfig = $configManager->getProvider('extend')->getConfig($entity->getClassName());
 
         if ($entityConfig->get('owner') == ExtendScope::OWNER_SYSTEM) {
-            return new Response('', Codes::HTTP_FORBIDDEN);
+            return new Response('', Response::HTTP_FORBIDDEN);
         }
 
-        $entityConfig->set('state', ExtendScope::STATE_DELETE);
+        if ($entityConfig->get('state', ExtendScope::STATE_NEW)) {
+            $configEntityManager = $configManager->getEntityManager();
+            $configEntityManager->remove($entity);
+            $configEntityManager->flush();
+        } else {
+            $entityConfig->set('state', ExtendScope::STATE_DELETE);
+            $configManager->persist($entityConfig);
+            $configManager->flush();
+        }
 
-        $configManager->persist($entityConfig);
-        $configManager->flush();
-
-        return new JsonResponse(array('message' => 'Item deleted', 'successful' => true), Codes::HTTP_OK);
+        return new JsonResponse(['message' => 'Item deleted', 'successful' => true], Response::HTTP_OK);
     }
 
     /**
@@ -204,28 +183,21 @@ class ConfigEntityGridController extends Controller
      *      "/unremove/{id}",
      *      name="oro_entityextend_entity_unremove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"POST"}
      * )
-     * Acl(
-     *      id="oro_entityextend_entity_unremove",
-     *      label="oro.entity_extend.action.config_entity_grid.unremove",
-     *      type="action",
-     *      group_name=""
-     * )
+     * @CsrfProtection()
+     *
+     * @param EntityConfigModel $entity
+     * @return JsonResponse|Response
      */
-    public function unremoveAction(EntityConfigModel $entity)
+    public function unremoveAction(EntityConfigModel $entity): JsonResponse|Response
     {
-        if (!$entity) {
-            throw $this->createNotFoundException('Unable to find EntityConfigModel entity.');
-        }
-
-        /** @var ConfigManager $configManager */
-        $configManager = $this->get('oro_entity_config.config_manager');
-
+        $configManager = $this->getConfigManager();
         $entityConfig = $configManager->getProvider('extend')->getConfig($entity->getClassName());
 
         if ($entityConfig->get('owner') == ExtendScope::OWNER_SYSTEM) {
-            return new Response('', Codes::HTTP_FORBIDDEN);
+            return new Response('', Response::HTTP_FORBIDDEN);
         }
 
         $entityConfig->set(
@@ -236,6 +208,36 @@ class ConfigEntityGridController extends Controller
         $configManager->persist($entityConfig);
         $configManager->flush();
 
-        return new JsonResponse(array('message' => 'Item was restored', 'successful' => true), Codes::HTTP_OK);
+        return new JsonResponse(['message' => 'Item was restored', 'successful' => true], Response::HTTP_OK);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                Router::class,
+                ConfigManager::class,
+                TranslatorInterface::class
+            ]
+        );
+    }
+
+    private function getRouter(): Router
+    {
+        return $this->get(Router::class);
+    }
+
+    private function getConfigManager(): ConfigManager
+    {
+        return $this->get(ConfigManager::class);
+    }
+
+    private function getTranslator(): TranslatorInterface
+    {
+        return $this->get(TranslatorInterface::class);
     }
 }

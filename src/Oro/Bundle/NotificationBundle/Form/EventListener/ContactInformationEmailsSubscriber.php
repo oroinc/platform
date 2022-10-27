@@ -17,9 +17,6 @@ class ContactInformationEmailsSubscriber implements EventSubscriberInterface
      */
     private $contactInformationEmailsProvider;
 
-    /**
-     * @param ContactInformationEmailsProvider $contactInformationEmailsProvider
-     */
     public function __construct(
         ContactInformationEmailsProvider $contactInformationEmailsProvider
     ) {
@@ -37,9 +34,6 @@ class ContactInformationEmailsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         /** @var EmailNotification $eventObject */
@@ -53,9 +47,6 @@ class ContactInformationEmailsSubscriber implements EventSubscriberInterface
         $this->initAdditionalRecipientChoices($entityName, $event->getForm());
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event)
     {
         /** @var EmailNotification $eventObject */
@@ -69,10 +60,6 @@ class ContactInformationEmailsSubscriber implements EventSubscriberInterface
         $this->initAdditionalRecipientChoices($entityName, $event->getForm());
     }
 
-    /**
-     * @param $entityName
-     * @param FormInterface $form
-     */
     private function initAdditionalRecipientChoices($entityName, FormInterface $form)
     {
         $choices = [];

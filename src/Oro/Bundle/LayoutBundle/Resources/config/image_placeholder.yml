@@ -1,0 +1,30 @@
+services:
+    oro_layout.provider.image_placeholder.config.abstract:
+        class: 'Oro\Bundle\LayoutBundle\Provider\Image\ConfigImagePlaceholderProvider'
+        abstract: true
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_attachment.manager'
+
+    oro_layout.provider.image_placeholder.theme.abstract:
+        class: 'Oro\Bundle\LayoutBundle\Provider\Image\ThemeImagePlaceholderProvider'
+        abstract: true
+        arguments:
+            - '@oro_layout.layout_context_holder'
+            - '@oro_layout.theme_manager'
+            - '@oro_attachment.imagine.provider.url'
+
+    oro_layout.provider.image_placeholder.default.abstract:
+        class: 'Oro\Bundle\LayoutBundle\Provider\Image\DefaultImagePlaceholderProvider'
+        abstract: true
+        arguments:
+            - '@oro_attachment.imagine.provider.url'
+
+    oro_layout.provider.image_placeholder.chain.abstract:
+        class: 'Oro\Bundle\LayoutBundle\Provider\Image\ChainImagePlaceholderProvider'
+        abstract: true
+
+    oro_layout.provider.image_placeholder.cache.abstract:
+        class: 'Oro\Bundle\LayoutBundle\Provider\Image\CacheImagePlaceholderProvider'
+        abstract: true

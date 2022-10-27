@@ -23,7 +23,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectNestedObjectMetadataFactory */
     private $objectNestedObjectMetadataFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->nestedObjectMetadataHelper = $this->createMock(NestedObjectMetadataHelper::class);
         $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);
@@ -36,7 +36,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateAndAddNestedObjectMetadataForExcludedTargetField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $config = new EntityDefinitionConfig();
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -50,7 +50,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $targetField->setExcluded();
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         $this->nestedObjectMetadataHelper->expects(self::once())
@@ -85,7 +85,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateAndAddNestedObjectMetadataForExcludedTargetFieldWhenExcludedPropertiesShouldNotBeIgnored()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $config = new EntityDefinitionConfig();
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -101,7 +101,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $linkedField = new EntityDefinitionFieldConfig();
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new FieldMetadata();
 
@@ -159,7 +159,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateAndAddNestedObjectMetadataForField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $config = new EntityDefinitionConfig();
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -174,7 +174,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $linkedField = new EntityDefinitionFieldConfig();
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new FieldMetadata();
 
@@ -232,7 +232,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateAndAddNestedObjectMetadataForMetaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $config = new EntityDefinitionConfig();
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -248,7 +248,7 @@ class ObjectNestedObjectMetadataFactoryTest extends \PHPUnit\Framework\TestCase
         $linkedField->setMetaProperty(true);
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new MetaPropertyMetadata();
 

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
+use Oro\Bundle\MigrationBundle\Migration\SchemaUpdateQuery;
+use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\SqlSchemaUpdateMigrationQuery;
 
 class SqlSchemaUpdateMigrationQueryTest extends \PHPUnit\Framework\TestCase
@@ -10,8 +12,8 @@ class SqlSchemaUpdateMigrationQueryTest extends \PHPUnit\Framework\TestCase
     {
         $query = new SqlSchemaUpdateMigrationQuery('ALTER TABLE');
 
-        $this->assertInstanceOf('Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery', $query);
-        $this->assertInstanceOf('Oro\Bundle\MigrationBundle\Migration\SchemaUpdateQuery', $query);
+        $this->assertInstanceOf(SqlMigrationQuery::class, $query);
+        $this->assertInstanceOf(SchemaUpdateQuery::class, $query);
         $this->assertTrue($query->isUpdateRequired());
     }
 }

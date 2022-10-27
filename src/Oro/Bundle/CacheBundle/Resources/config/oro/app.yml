@@ -1,0 +1,23 @@
+framework:
+    cache:
+        pools:
+            cache.annotations:
+                adapter: oro.cache.adapter.persistent
+            cache.serializer:
+                adapter: oro.cache.adapter.persistent
+            cache.validator:
+                adapter: oro.cache.adapter.persistent
+
+            # These pools are not an active pool of caches, but only describe the structure of child caches.
+            # This is necessary in order to be able to describe caches with unique namespaces.
+            #
+            # See Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CachePoolConfigurationPass
+            oro.data.cache:
+                adapters:
+                    - oro.cache.adapter.array
+                    - oro.cache.adapter.persistent
+            oro.data.cache.without_memory_cache:
+                adapter: oro.cache.adapter.persistent
+
+    annotations:
+        cache: php_array

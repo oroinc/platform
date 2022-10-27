@@ -1,0 +1,6 @@
+services:
+    oro_api.not_allowed.initialize_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\NotAllowed\InitializeConfigExtras
+        tags:
+            - { name: oro.api.processor, action: not_allowed, group: initialize, priority: 10 }
+

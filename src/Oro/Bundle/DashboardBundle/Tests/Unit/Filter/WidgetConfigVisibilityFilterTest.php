@@ -3,38 +3,39 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class WidgetConfigVisibilityFilterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetConfigVisibilityFilter */
-    protected $widgetConfigVisibilityFilter;
+    private $widgetConfigVisibilityFilter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $resolver = $this->createMock('Oro\Component\Config\Resolver\ResolverInterface');
+        $resolver = $this->createMock(ResolverInterface::class);
         $resolver->expects($this->any())
             ->method('resolve')
-            ->will($this->returnCallback(function (array $value) {
+            ->willReturnCallback(function (array $value) {
                 return [$value === ['@true']];
-            }));
+            });
 
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->will($this->returnCallback(function ($acl) {
+            ->willReturnCallback(function ($acl) {
                 return $acl === 'enabled_acl';
-            }));
+            });
 
-        $featureChecker = $this->getMockBuilder('Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $featureChecker = $this->createMock(FeatureChecker::class);
         $featureChecker->expects($this->any())
             ->method('isResourceEnabled')
-            ->will($this->returnCallback(function ($resource, $resourceType) {
-                return $resourceType === 'dashboard_widgets' &&
-                    strpos($resource, 'enabled') === 0 || strpos($resource, 'widget.enabled') === 0;
-            }));
+            ->willReturnCallback(function ($resource, $resourceType) {
+                return
+                    ('dashboard_widgets' === $resourceType && str_starts_with($resource, 'enabled'))
+                    || str_starts_with($resource, 'widget.enabled');
+            });
 
         $this->widgetConfigVisibilityFilter = new WidgetConfigVisibilityFilter(
             $authorizationChecker,
@@ -46,7 +47,7 @@ class WidgetConfigVisibilityFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterConfigsProvider
      */
-    public function testFilterConfigs(array $configs, $widgetName, $expectedConfigs)
+    public function testFilterConfigs(array $configs, ?string $widgetName, array $expectedConfigs)
     {
         $this->assertEquals(
             $expectedConfigs,
@@ -54,7 +55,7 @@ class WidgetConfigVisibilityFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function filterConfigsProvider()
+    public function filterConfigsProvider(): array
     {
         return [
             'widgets' => [

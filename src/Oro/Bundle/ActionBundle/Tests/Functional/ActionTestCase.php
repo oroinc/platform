@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class ActionTestCase extends WebTestCase
 {
+    use OperationAwareTestTrait;
+
     /** @var ActionGroupRegistry */
     private $actionGroupRegistry;
 
@@ -26,7 +28,7 @@ abstract class ActionTestCase extends WebTestCase
     protected function getActionGroupRegistry()
     {
         if (null === $this->actionGroupRegistry) {
-            $this->actionGroupRegistry = $this->getContainer()->get('oro_action.action_group_registry');
+            $this->actionGroupRegistry = $this->getContainer()->get(ActionGroupRegistry::class);
         }
 
         return $this->actionGroupRegistry;
@@ -73,14 +75,14 @@ abstract class ActionTestCase extends WebTestCase
             ContextHelper::ENTITY_ID_PARAM => $entityId,
         ], $data);
 
-        /* @var $requestStack RequestStack */
+        /* @var RequestStack $requestStack */
         $requestStack = $this->getContainer()->get('request_stack');
         $requestStack->push(new Request($request));
 
-        /* @var $provider ButtonProvider */
+        /* @var ButtonProvider $provider */
         $provider = $this->getContainer()->get('oro_action.provider.button');
 
-        /* @var $contextProvider ButtonSearchContextProvider */
+        /* @var ButtonSearchContextProvider $contextProvider */
         $contextProvider = $this->getContainer()->get('oro_action.provider.button_search_context');
         $context = $contextProvider->getButtonSearchContext();
 
@@ -144,12 +146,6 @@ abstract class ActionTestCase extends WebTestCase
         array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'],
         $expectedCode = Response::HTTP_OK
     ) {
-        $container = $this->getContainer();
-
-        if ($container->hasParameter($entityClass)) {
-            $entityClass = $container->getParameter($entityClass);
-        }
-
         $this->assertExecuteOperation('DELETE', $entityId, $entityClass, [], $server, $expectedCode);
 
         $this->assertEquals(
@@ -160,7 +156,7 @@ abstract class ActionTestCase extends WebTestCase
                 'redirectUrl' => $this->getUrl($redirectUrl),
                 'pageReload' => true
             ],
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
     }
 
@@ -206,36 +202,6 @@ abstract class ActionTestCase extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $this->assertContains($message, $crawler->html());
-    }
-
-    /**
-     * @param $operationName
-     * @param $entityId
-     * @param $entityClass
-     * @param $datagrid
-     *
-     * @return array
-     */
-    protected function getOperationExecuteParams($operationName, $entityId, $entityClass, $datagrid = null)
-    {
-        $actionContext = [
-            'entityId'    => $entityId,
-            'entityClass' => $entityClass,
-            'datagrid'    => $datagrid
-        ];
-        $container = self::getContainer();
-        $operation = $container->get('oro_action.operation_registry')->findByName($operationName);
-        $actionData = $container->get('oro_action.helper.context')->getActionData($actionContext);
-
-        $tokenData = $container
-            ->get('oro_action.operation.execution.form_provider')
-            ->createTokenData($operation, $actionData);
-        // this is done because of unclear behaviour symfony mocked token session storage
-        // which do not save data before embedded request done and created data do not available in sub request
-        // in the test environment
-        $container->get('session')->save();
-
-        return $tokenData;
+        self::assertStringContainsString($message, $crawler->html());
     }
 }

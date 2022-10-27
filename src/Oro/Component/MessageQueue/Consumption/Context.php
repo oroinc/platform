@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption;
 
 use Oro\Component\MessageQueue\Consumption\Exception\IllegalContextModificationException;
@@ -7,6 +8,9 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Holds information about message consuming.
+ */
 class Context
 {
     /**
@@ -20,9 +24,9 @@ class Context
     private $messageConsumer;
 
     /**
-     * @var MessageProcessorInterface
+     * @var string
      */
-    private $messageProcessor;
+    private string $messageProcessorName = '';
 
     /**
      * @var LoggerInterface
@@ -59,13 +63,10 @@ class Context
      */
     private $interruptedReason;
 
-    /**
-     * @param SessionInterface $session
-     */
     public function __construct(SessionInterface $session)
     {
         $this->session = $session;
-        
+
         $this->executionInterrupted = false;
     }
 
@@ -77,9 +78,6 @@ class Context
         return $this->message;
     }
 
-    /**
-     * @param MessageInterface $message
-     */
     public function setMessage(MessageInterface $message)
     {
         if ($this->message) {
@@ -105,9 +103,6 @@ class Context
         return $this->messageConsumer;
     }
 
-    /**
-     * @param MessageConsumerInterface $messageConsumer
-     */
     public function setMessageConsumer(MessageConsumerInterface $messageConsumer)
     {
         if ($this->messageConsumer) {
@@ -117,24 +112,14 @@ class Context
         $this->messageConsumer = $messageConsumer;
     }
 
-    /**
-     * @return MessageProcessorInterface
-     */
-    public function getMessageProcessor()
+    public function getMessageProcessorName(): string
     {
-        return $this->messageProcessor;
+        return $this->messageProcessorName;
     }
 
-    /**
-     * @param MessageProcessorInterface $messageProcessor
-     */
-    public function setMessageProcessor(MessageProcessorInterface $messageProcessor)
+    public function setMessageProcessorName(string $messageProcessorName): void
     {
-        if ($this->messageProcessor) {
-            throw new IllegalContextModificationException('The message processor could be set once');
-        }
-
-        $this->messageProcessor = $messageProcessor;
+        $this->messageProcessorName = $messageProcessorName;
     }
 
     /**
@@ -145,9 +130,6 @@ class Context
         return $this->exception;
     }
 
-    /**
-     * @param \Exception $exception
-     */
     public function setException(\Exception $exception)
     {
         $this->exception = $exception;
@@ -217,15 +199,12 @@ class Context
         return $this->logger;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger)
     {
         if ($this->logger) {
             throw new IllegalContextModificationException('The logger modification is not allowed');
         }
-        
+
         $this->logger = $logger;
     }
 

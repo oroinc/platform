@@ -2,9 +2,13 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
+use Brick\Math\BigDecimal;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
+/**
+ * Abstract datagrid Property formatter
+ */
 abstract class AbstractProperty implements PropertyInterface
 {
     /** @var array */
@@ -87,7 +91,8 @@ abstract class AbstractProperty implements PropertyInterface
                 $result = (string)$value;
                 break;
             case self::TYPE_DECIMAL:
-                $result = floatval($value);
+                $bigDecimalValue = BigDecimal::of($value);
+                $result = $bigDecimalValue->getScale() > \PHP_FLOAT_DIG ? $value : (float)$value;
                 break;
             case self::TYPE_INTEGER:
                 $result = intval($value);
@@ -110,7 +115,6 @@ abstract class AbstractProperty implements PropertyInterface
 
         return $result;
     }
-
 
     /**
      * Format raw value.

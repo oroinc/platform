@@ -9,23 +9,25 @@ class WindowsFileCacheIsolatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider onlyFileHandlerIsApplicableProvider
-     * @param string $sessionHandlerParameter
-     * @param boolean $expectedResult
      */
-    public function testOnlyFileHandlerIsApplicable($sessionHandlerParameter, $expectedResult)
+    public function testOnlyFileHandlerIsApplicable(string $sessionHandlerParameter, bool $expectedResult)
     {
         $containerMock = $this->createMock(ContainerInterface::class);
-        $containerMock->method('getParameter')->willReturn($sessionHandlerParameter);
+        $containerMock->expects($this->any())
+            ->method('getParameter')
+            ->willReturn($sessionHandlerParameter);
         $isolatorMock = $this->getMockBuilder(WindowsFileCacheIsolator::class)
             ->disableOriginalConstructor()
-            ->setMethods(['isApplicableOS'])
+            ->onlyMethods(['isApplicableOS'])
             ->getMock();
-        $isolatorMock->method('isApplicableOS')->willReturn(true);
+        $isolatorMock->expects($this->any())
+            ->method('isApplicableOS')
+            ->willReturn(true);
 
         self::assertSame($expectedResult, $isolatorMock->isApplicable($containerMock));
     }
 
-    public function onlyFileHandlerIsApplicableProvider()
+    public function onlyFileHandlerIsApplicableProvider(): array
     {
         return [
             [

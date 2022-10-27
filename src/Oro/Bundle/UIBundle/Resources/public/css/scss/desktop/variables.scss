@@ -1,7 +1,11 @@
 /* @theme: admin.oro; */
 
-@import "variables/form-variables";
-@import "variables/app-header";
-@import "variables/app-logo";
-@import "variables/pin-bar";
-@import "variables/modal";
+$desktop-content-padding: 24px !default;
+
+@import 'variables/form-variables';
+@import 'variables/app-header';
+@import 'variables/app-logo';
+@import 'variables/dialog';
+@import 'variables/pin-bar';
+@import 'variables/modal';
+@import 'variables/layout';

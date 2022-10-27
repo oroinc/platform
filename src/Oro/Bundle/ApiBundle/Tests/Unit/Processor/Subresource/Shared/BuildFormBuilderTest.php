@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildFormBuilder;
@@ -19,10 +21,13 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
     private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
-    private const TEST_ASSOCIATION_NAME  = 'testAssociation';
+    private const TEST_ASSOCIATION_NAME = 'testAssociation';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     private $formFactory;
@@ -33,7 +38,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
     /** @var BuildFormBuilder */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,6 +48,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new BuildFormBuilder(
             new FormHelper(
                 $this->formFactory,
+                $this->createMock(DataTypeGuesser::class),
                 $this->createMock(PropertyAccessorInterface::class),
                 $this->container
             )
@@ -71,19 +77,18 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($form, $this->context->getForm());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The parent entity object must be added to the context before creation of the form builder.
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWhenNoParentEntity()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The parent entity object must be added to the context before creation of the form builder.'
+        );
+
         $this->formFactory->expects(self::never())
             ->method('createNamedBuilder');
 
         $this->context->setParentConfig(new EntityDefinitionConfig());
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
         $this->processor->process($this->context);
     }
 
@@ -95,7 +100,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -108,7 +113,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'enable_validation'    => false
+                    'enable_validation'    => false,
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -139,7 +145,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->setParentResourceClass($parentBaseEntityClass);
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -152,7 +158,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                     'data_class'           => $parentEntityClass,
                     'validation_groups'    => ['Default', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'enable_validation'    => false
+                    'enable_validation'    => false,
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -184,7 +191,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->setParentResourceClass($parentBaseEntityClass);
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -197,7 +204,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                     'data_class'           => $parentEntityClass,
                     'validation_groups'    => ['Default', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'enable_validation'    => false
+                    'enable_validation'    => false,
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -230,7 +238,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $associationConfig->setFormType('customType');
         $associationConfig->setFormOptions(['trim' => false]);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME))
             ->setPropertyPath('realAssociationName');
 
@@ -244,7 +252,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['test', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'enable_validation'    => false
+                    'enable_validation'    => false,
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -272,7 +281,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME))
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
@@ -286,7 +295,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'enable_validation'    => false
+                    'enable_validation'    => false,
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -318,7 +328,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
         $parentConfig->setFormEventSubscribers([$eventSubscriberServiceId]);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -331,7 +341,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'enable_validation'    => false
+                    'enable_validation'    => false,
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -366,7 +377,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
         $parentConfig->setFormEventSubscribers([$eventSubscriber]);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -379,7 +390,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'enable_validation'    => false
+                    'enable_validation'    => false,
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);
@@ -408,7 +420,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->setFormType('test_form');
         $parentConfig->setFormEventSubscribers(['test_event_subscriber']);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -421,7 +433,8 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
                     'data_class'           => self::TEST_PARENT_CLASS_NAME,
                     'validation_groups'    => ['Default', 'api'],
                     'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
-                    'enable_validation'    => false
+                    'enable_validation'    => false,
+                    'api_context'          => $this->context
                 ]
             )
             ->willReturn($formBuilder);

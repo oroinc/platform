@@ -1,0 +1,23 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager:
+            replaceActivityTargetWithPlainQuery:
+                targetField: true
+                tableName: true
+                activityField: true
+        Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper:
+            getSubQuery:
+                field: true
+                entityIdExpr: true
+    properties:
+        Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter:
+            createActivityQueryBuilder:
+                activityAlias: true
+                activityListAlias: true
+    safe_methods:
+        Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository:
+            getAssociationName: true
+        Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter:
+            getEntityAlias: true
+            createRelatedActivityDql: true

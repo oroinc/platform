@@ -1,18 +1,18 @@
 entity_config:
     workflow:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#workflow
         entity:
             items:
                 show_step_in_grid:
                     options:
                         priority:           250
-                        default_value:      true
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             label:          oro.workflow.entity_config.show_step_in_grid.label
                             required:       false
                             choices:
-                                oro.workflow.entity_config.show_step_in_grid.choice.hide: 0
-                                oro.workflow.entity_config.show_step_in_grid.choice.show: 1
+                                oro.workflow.entity_config.show_step_in_grid.choice.hide: false
+                                oro.workflow.entity_config.show_step_in_grid.choice.show: true
                             placeholder:    false
                             block:          other

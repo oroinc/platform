@@ -1,76 +1,74 @@
 <?php
 
-
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ThemeBundle\Exception\ThemeNotFoundException;
+use Oro\Bundle\ThemeBundle\Model\Theme;
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 
 class ThemeRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ThemeRegistry
-     */
-    protected $themeRegistry;
-
-    protected $themeSettings = array(
-        'foo' => array(
+    private const THEME_SETTINGS = [
+        'foo' => [
             'label' => 'Foo Theme',
-            'styles' => array('style.css'),
             'icon' => 'favicon.ico',
             'logo' => 'logo.png',
-            'screenshot' => 'screenshot.png'
-        ),
-        'bar' => array(
-            'styles' => array('style.css')
-        )
-    );
+            'screenshot' => 'screenshot.png',
+            'rtl_support' => true,
+        ],
+        'bar' => [
+        ]
+    ];
 
-    protected function setUp()
+    private ThemeRegistry $themeRegistry;
+
+    protected function setUp(): void
     {
-        $this->themeRegistry = new ThemeRegistry($this->themeSettings);
+        $this->themeRegistry = new ThemeRegistry(self::THEME_SETTINGS);
     }
 
-    public function testGetTheme()
+    public function testGetTheme(): void
     {
         $fooTheme = $this->themeRegistry->getTheme('foo');
-        $this->assertInstanceOf('Oro\Bundle\ThemeBundle\Model\Theme', $fooTheme);
-        $this->assertEquals(array('style.css'), $fooTheme->getStyles());
-        $this->assertEquals('Foo Theme', $fooTheme->getLabel());
-        $this->assertEquals('favicon.ico', $fooTheme->getIcon());
-        $this->assertEquals('logo.png', $fooTheme->getLogo());
-        $this->assertEquals('screenshot.png', $fooTheme->getScreenshot());
-        $this->assertSame($fooTheme, $this->themeRegistry->getTheme('foo'));
+        self::assertInstanceOf(Theme::class, $fooTheme);
+        self::assertEquals('Foo Theme', $fooTheme->getLabel());
+        self::assertEquals('favicon.ico', $fooTheme->getIcon());
+        self::assertEquals('logo.png', $fooTheme->getLogo());
+        self::assertEquals('screenshot.png', $fooTheme->getScreenshot());
+        self::assertTrue($fooTheme->isRtlSupport());
+        self::assertSame($fooTheme, $this->themeRegistry->getTheme('foo'));
 
         $barTheme = $this->themeRegistry->getTheme('bar');
-        $this->assertInstanceOf('Oro\Bundle\ThemeBundle\Model\Theme', $barTheme);
-        $this->assertEquals(array('style.css'), $barTheme->getStyles());
-        $this->assertNull($barTheme->getLabel());
-        $this->assertNull($barTheme->getIcon());
-        $this->assertNull($barTheme->getLogo());
-        $this->assertNull($barTheme->getScreenshot());
-        $this->assertSame($barTheme, $this->themeRegistry->getTheme('bar'));
+        self::assertInstanceOf(Theme::class, $barTheme);
+        self::assertNull($barTheme->getLabel());
+        self::assertNull($barTheme->getIcon());
+        self::assertNull($barTheme->getLogo());
+        self::assertNull($barTheme->getScreenshot());
+        self::assertFalse($barTheme->isRtlSupport());
+        self::assertSame($barTheme, $this->themeRegistry->getTheme('bar'));
 
-        $this->assertEquals(
-            array('foo' => $fooTheme, 'bar' => $barTheme),
+        self::assertEquals(
+            ['foo' => $fooTheme, 'bar' => $barTheme],
             $this->themeRegistry->getAllThemes()
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ThemeBundle\Exception\ThemeNotFoundException
-     * @expectedExceptionMessage Theme "baz" not found.
-     */
-    public function testGetThemeNotFoundException()
+    public function testGetThemeNotFoundException(): void
     {
+        $this->expectException(ThemeNotFoundException::class);
+        $this->expectExceptionMessage('Theme "baz" not found.');
+
         $this->themeRegistry->getTheme('baz');
     }
 
-    public function testGetActiveTheme()
+    public function testGetActiveTheme(): void
     {
-        $this->assertNull($this->themeRegistry->getActiveTheme());
+        self::assertNull($this->themeRegistry->getActiveTheme());
+
         $this->themeRegistry->setActiveTheme('foo');
         $activeTheme = $this->themeRegistry->getActiveTheme();
-        $this->assertInstanceOf('Oro\Bundle\ThemeBundle\Model\Theme', $activeTheme);
-        $this->assertEquals('foo', $activeTheme->getName());
+
+        self::assertInstanceOf(Theme::class, $activeTheme);
+        self::assertEquals('foo', $activeTheme->getName());
     }
 }

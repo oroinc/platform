@@ -1,20 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var SearchSuggestionCollection;
-    var _ = require('underscore');
-    var LoadMoreCollection = require('oroui/js/app/models/load-more-collection');
+    const _ = require('underscore');
+    const LoadMoreCollection = require('oroui/js/app/models/load-more-collection');
 
-    SearchSuggestionCollection = LoadMoreCollection.extend({
+    const SearchSuggestionCollection = LoadMoreCollection.extend({
         minSearchLength: 0,
 
         limitPropertyName: 'max_results',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SearchSuggestionCollection() {
-            SearchSuggestionCollection.__super__.constructor.apply(this, arguments);
+        constructor: function SearchSuggestionCollection(...args) {
+            SearchSuggestionCollection.__super__.constructor.apply(this, args);
         },
 
         initialize: function(models, options) {

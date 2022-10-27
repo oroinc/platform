@@ -7,7 +7,6 @@ use Oro\Bundle\EntityBundle\Exception\RecordNotFoundException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -29,11 +28,6 @@ class EntityRoutingHelper
     /** @var UrlGeneratorInterface */
     protected $urlGenerator;
 
-    /**
-     * @param EntityClassNameHelper $entityClassNameHelper
-     * @param DoctrineHelper        $doctrineHelper
-     * @param UrlGeneratorInterface $urlGenerator
-     */
     public function __construct(
         EntityClassNameHelper $entityClassNameHelper,
         DoctrineHelper $doctrineHelper,
@@ -42,34 +36,6 @@ class EntityRoutingHelper
         $this->entityClassNameHelper = $entityClassNameHelper;
         $this->doctrineHelper        = $doctrineHelper;
         $this->urlGenerator          = $urlGenerator;
-    }
-
-    /**
-     * Encodes the class name into the format that can be used in route parameters
-     *
-     * @param string $className The class name
-     *
-     * @return string The encoded class name
-     *
-     * @deprecated since 1.8, use getUrlSafeClassName
-     */
-    public function encodeClassName($className)
-    {
-        return $this->entityClassNameHelper->getUrlSafeClassName($className);
-    }
-
-    /**
-     * Decodes the given string into the class name
-     *
-     * @param string $className The encoded class name
-     *
-     * @return string The class name
-     *
-     * @deprecated since 1.8, use resolveEntityClass
-     */
-    public function decodeClassName($className)
-    {
-        return $this->entityClassNameHelper->resolveEntityClass($className, true);
     }
 
     /**
@@ -106,7 +72,7 @@ class EntityRoutingHelper
      */
     public function getAction(Request $request)
     {
-        return $request->query->get(self::PARAM_ACTION);
+        return $request->get(self::PARAM_ACTION);
     }
 
     /**
@@ -117,9 +83,9 @@ class EntityRoutingHelper
      *
      * @return string|null
      */
-    public function getEntityClassName(Request $request, $paramName = self::PARAM_ENTITY_CLASS)
+    public function getEntityClassName(Request $request, string $paramName = self::PARAM_ENTITY_CLASS)
     {
-        $className = $request->query->get($paramName);
+        $className = $request->get($paramName);
         if ($className) {
             $className = $this->resolveEntityClass($className);
         }
@@ -135,9 +101,9 @@ class EntityRoutingHelper
      *
      * @return mixed
      */
-    public function getEntityId(Request $request, $paramName = self::PARAM_ENTITY_ID)
+    public function getEntityId(Request $request, string $paramName = self::PARAM_ENTITY_ID)
     {
-        return $request->query->get($paramName);
+        return $request->get($paramName);
     }
 
     /**

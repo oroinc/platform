@@ -3,12 +3,19 @@ oro_report:
     type:         annotation
     prefix:       /report
 
-oro_report_api:
-    resource:     "@OroReportBundle/Resources/config/oro/routing_api.yml"
-    type: rest
-    prefix: api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_delete_report:
+    path: '/api/rest/{version}/reports/{id}.{_format}'
+    methods: [DELETE]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\ReportBundle\Controller\Api\Rest\ReportController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1

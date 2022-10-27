@@ -5,11 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Cron;
 use Oro\Bundle\WorkflowBundle\Command\HandleTransitionCronTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 
+/**
+ * Schedules cron commands to execute transition.
+ */
 class TransitionTriggerCronScheduler extends AbstractTriggerCronScheduler
 {
-    /** @var string */
-    protected static $command = HandleTransitionCronTriggerCommand::NAME;
-
     /**
      * @param TransitionCronTrigger $cronTrigger
      * @return void
@@ -22,7 +22,7 @@ class TransitionTriggerCronScheduler extends AbstractTriggerCronScheduler
         };
 
         $this->deferredScheduler->addSchedule(
-            static::$command,
+            HandleTransitionCronTriggerCommand::getDefaultName(),
             $argumentsCallback,
             $cronTrigger->getCron()
         );
@@ -35,7 +35,7 @@ class TransitionTriggerCronScheduler extends AbstractTriggerCronScheduler
     public function removeSchedule(TransitionCronTrigger $cronTrigger)
     {
         $this->deferredScheduler->removeSchedule(
-            static::$command,
+            HandleTransitionCronTriggerCommand::getDefaultName(),
             $this->buildArguments($cronTrigger),
             $cronTrigger->getCron()
         );

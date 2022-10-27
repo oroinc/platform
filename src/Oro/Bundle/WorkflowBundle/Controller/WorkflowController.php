@@ -4,19 +4,20 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
+use Oro\Bundle\WorkflowBundle\Provider\PageData\StartTransitionPageDataProvider;
+use Oro\Bundle\WorkflowBundle\Provider\PageData\TransitionPageDataProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * Workflow controller
  * @Route("/workflow")
  */
-class WorkflowController extends Controller
+class WorkflowController extends AbstractController
 {
-    const DEFAULT_TRANSITION_TEMPLATE = 'OroWorkflowBundle:Workflow:transitionForm.html.twig';
-
     /**
      * @Route(
      *      "/start/{workflowName}/{transitionName}",
@@ -30,10 +31,9 @@ class WorkflowController extends Controller
      */
     public function startTransitionAction($workflowName, $transitionName, Request $request)
     {
-        $presenter = $this->get('oro_workflow.provider.page_data.start_transition');
-
         return $this->buildResponse(
-            $presenter->getData($workflowName, $transitionName, $request->get('entityId', 0))
+            $this->get(StartTransitionPageDataProvider::class)
+                ->getData($workflowName, $transitionName, $request->get('entityId', 0))
         );
     }
 
@@ -54,10 +54,8 @@ class WorkflowController extends Controller
      */
     public function transitionAction($transitionName, WorkflowItem $workflowItem)
     {
-        $presenter = $this->get('oro_workflow.provider.page_data.transition');
-
         return $this->buildResponse(
-            $presenter->getData($transitionName, $workflowItem)
+            $this->get(TransitionPageDataProvider::class)->getData($transitionName, $workflowItem)
         );
     }
 
@@ -71,8 +69,19 @@ class WorkflowController extends Controller
         $transition = $data['transition'];
 
         return $this->render(
-            $transition->getPageTemplate() ?: self::DEFAULT_TRANSITION_TEMPLATE,
+            $transition->getPageTemplate() ?: '@OroWorkflow/Workflow/transitionForm.html.twig',
             $data
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(parent::getSubscribedServices(), [
+            StartTransitionPageDataProvider::class,
+            TransitionPageDataProvider::class,
+        ]);
     }
 }

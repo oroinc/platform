@@ -1,49 +1,48 @@
 define(function(require) {
     'use strict';
 
-    var AbstractActionView;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    AbstractActionView = BaseView.extend({
+    const AbstractActionView = BaseView.extend({
         /**
          * @property {Object}
          */
         options: {
             $tree: '',
             action: '',
-            template: require('tpl!oroui/templates/jstree-action.html'),
+            template: require('tpl-loader!oroui/templates/jstree-action.html'),
             icon: '',
             label: ''
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-role="jstree-action"]': 'onClick'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AbstractActionView() {
-            AbstractActionView.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractActionView(options) {
+            AbstractActionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options);
-            AbstractActionView.__super__.initialize.apply(this, arguments);
+            AbstractActionView.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
-            var $el = $(this.options.template(this.options));
+            const $el = $(this.options.template(this.options));
             if (this.$el) {
                 this.$el.replaceWith($el);
             }
@@ -54,7 +53,7 @@ define(function(require) {
         onClick: function() {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -62,7 +61,7 @@ define(function(require) {
             }
 
             delete this.options;
-            AbstractActionView.__super__.dispose.apply(this, arguments);
+            AbstractActionView.__super__.dispose.call(this);
         }
     });
 

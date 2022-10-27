@@ -1,8 +1,12 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Provider;
 
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 
+/**
+ * Provides information about number of seconds, after which job should be considered as stale.
+ */
 class JobConfigurationProvider implements JobConfigurationProviderInterface
 {
     const JOBS_ARRAY_KEY = 'jobs';
@@ -24,9 +28,6 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
             ?? null;
     }
 
-    /**
-     * @param array $jobConfiguration
-     */
     public function setConfiguration(array $jobConfiguration)
     {
         $this->configuration = $jobConfiguration;
@@ -63,7 +64,7 @@ class JobConfigurationProvider implements JobConfigurationProviderInterface
     private function getJobNameDelimiter($jobName)
     {
         foreach (self::JOB_NAME_DELIMITERS as $delimiter) {
-            if (false !== strpos($jobName, $delimiter)) {
+            if (str_contains($jobName, $delimiter)) {
                 return $delimiter;
             }
         }

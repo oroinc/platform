@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var EmailNotificationCollectionView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var emailsGridRouteBuilder = require('oroemail/js/util/emails-grid-route-builder');
-    var EmailNotificationView = require('./email-notification-item-view');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const emailsGridRouteBuilder = require('oroemail/js/util/emails-grid-route-builder');
+    const EmailNotificationView = require('./email-notification-item-view');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
-    EmailNotificationCollectionView = BaseCollectionView.extend({
-        template: require('tpl!oroemail/templates/email-notification/email-notification-collection-view.html'),
+    const EmailNotificationCollectionView = BaseCollectionView.extend({
+        template: require('tpl-loader!oroemail/templates/email-notification/email-notification-collection-view.html'),
         itemView: EmailNotificationView,
         animationDuration: 0,
         listSelector: '.items',
@@ -45,14 +44,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailNotificationCollectionView() {
-            EmailNotificationCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailNotificationCollectionView(options) {
+            EmailNotificationCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             EmailNotificationCollectionView.__super__.initialize.call(this, options);
@@ -66,12 +65,12 @@ define(function(require) {
         render: function() {
             EmailNotificationCollectionView.__super__.render.call(this);
             this.updateViewMode();
-            _.defer(_.bind(this.adjustMaxHeight, this));
+            _.defer(this.adjustMaxHeight.bind(this));
         },
 
         getTemplateData: function() {
-            var data = EmailNotificationCollectionView.__super__.getTemplateData.call(this);
-            var visibleUnreadEmails = this.collection.filter(function(item) {
+            const data = EmailNotificationCollectionView.__super__.getTemplateData.call(this);
+            const visibleUnreadEmails = this.collection.filter(function(item) {
                 return item.get('seen') === false;
             }).length;
             _.extend(data, _.pick(this, [
@@ -87,7 +86,7 @@ define(function(require) {
 
         updateViewMode: function() {
             if (!this.isActiveTypeDropDown('notification')) {
-                var $iconEnvelope = this.$el.find('.dropdown-toggle .fa-envelope');
+                const $iconEnvelope = this.$el.find('.dropdown-toggle .fa-envelope');
                 if (this.collection.models.length === 0) {
                     this.setModeDropDownMenu('empty');
                     $iconEnvelope.removeClass('highlight');
@@ -103,10 +102,10 @@ define(function(require) {
         },
 
         adjustMaxHeight: function() {
-            var rect;
-            var contentRect;
-            var maxHeight;
-            var $list;
+            let rect;
+            let contentRect;
+            let maxHeight;
+            let $list;
             if (this.el) {
                 maxHeight = parseInt(this.$el.css('max-height'));
                 $list = this.$list;
@@ -120,8 +119,9 @@ define(function(require) {
 
         _markAsRead: function(ids) {
             $.ajax({
+                method: 'POST',
                 url: routing.generate('oro_email_mark_all_as_seen', ids),
-                success: _.bind(function(response) {
+                success: response => {
                     this.collection.markAllAsRead();
                     this.collection.unreadEmailsCount = 0;
                     this.countNewEmail = 0;
@@ -129,13 +129,13 @@ define(function(require) {
                     if (response.successful) {
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
                     }
-                }, this),
+                },
                 errorHandlerMessage: __('oro.email.error.mark_as_read')
             });
         },
 
         onClickMarkVisibleAsRead: function() {
-            var ids = [];
+            const ids = [];
             this.collection.each(function(email) {
                 if (email.get('seen') === false) {
                     ids.push(email.get('id'));

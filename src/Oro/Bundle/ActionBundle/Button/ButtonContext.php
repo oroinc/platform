@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Button;
 
+/**
+ * Represents action button context.
+ */
 class ButtonContext
 {
     /** @var string */
@@ -10,8 +13,7 @@ class ButtonContext
     /** @var int|string|array|null */
     protected $entityId;
 
-    /** @var string */
-    protected $routeName;
+    protected string $routeName = '';
 
     /** @var string */
     protected $datagridName;
@@ -19,14 +21,11 @@ class ButtonContext
     /** @var string */
     protected $group;
 
-    /** @var string */
-    protected $executionRoute;
+    protected string $executionRoute = '';
 
-    /** @var string */
-    protected $formDialogRoute;
+    protected string $formDialogRoute = '';
 
-    /** @var string */
-    protected $formPageRoute;
+    protected string $formPageRoute = '';
 
     /** @var string */
     protected $originalUrl;
@@ -70,20 +69,12 @@ class ButtonContext
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getRouteName()
+    public function getRouteName(): string
     {
         return $this->routeName;
     }
 
-    /**
-     * @param string $routeName
-     *
-     * @return $this
-     */
-    public function setRouteName($routeName)
+    public function setRouteName(string $routeName): self
     {
         $this->routeName = $routeName;
 
@@ -130,60 +121,36 @@ class ButtonContext
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getExecutionRoute()
+    public function getExecutionRoute(): string
     {
         return $this->executionRoute;
     }
 
-    /**
-     * @param string $executionRoute
-     *
-     * @return $this
-     */
-    public function setExecutionRoute($executionRoute)
+    public function setExecutionRoute(string $executionRoute): self
     {
         $this->executionRoute = $executionRoute;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getFormDialogRoute()
+    public function getFormDialogRoute(): string
     {
         return $this->formDialogRoute;
     }
 
-    /**
-     * @param string $formDialogRoute
-     *
-     * @return $this
-     */
-    public function setFormDialogRoute($formDialogRoute)
+    public function setFormDialogRoute(string $formDialogRoute): self
     {
         $this->formDialogRoute = $formDialogRoute;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getFormPageRoute()
+    public function getFormPageRoute(): string
     {
         return $this->formPageRoute;
     }
 
-    /**
-     * @param string $formPageRoute
-     *
-     * @return $this
-     */
-    public function setFormPageRoute($formPageRoute)
+    public function setFormPageRoute(string $formPageRoute): self
     {
         $this->formPageRoute = $formPageRoute;
 

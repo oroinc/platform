@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ActivityBundle\Migrations\Schema\v1_0\UpdateActivityButtonConfigQuery;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -35,7 +36,7 @@ class OroActivityBundleInstaller implements Installation, ContainerAwareInterfac
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
+        if ($this->container->get(ApplicationState::class)->isInstalled()) {
             $queries->addPreQuery(new UpdateActivityButtonConfigQuery());
         }
     }

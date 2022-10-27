@@ -6,74 +6,54 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
+use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateEntityChoiceType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationCollectionType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType;
-use Oro\Bundle\EmailBundle\Tests\Unit\Form\Type\Stub\EmailTemplateTranslationTypeStub;
-use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Bundle\TranslationBundle\Form\Type\GedmoTranslationsType;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTemplateTypeTest extends FormIntegrationTestCase
 {
-    use EntityTrait;
-
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /**
-     * @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $localeSettings;
-
-    /**
-     * @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $localizationManager;
 
-    /**
-     * @var EmailTemplateType
-     */
+    /** @var EmailTemplateType */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->localeSettings = $this->createMock(LocaleSettings::class);
         $this->localizationManager = $this->createMock(LocalizationManager::class);
 
-        $this->type = new EmailTemplateType(
-            $this->configManager,
-            $this->localeSettings
-        );
-        $this->type->setLocalizationManager($this->localizationManager);
+        $this->type = new EmailTemplateType($this->configManager, $this->localizationManager);
 
         parent::setUp();
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        /** @var EntityProvider|\PHPUnit\Framework\MockObject\MockObject $entityProvider */
         $entityProvider = $this->createMock(EntityProvider::class);
         $entityProvider->expects($this->any())
             ->method('getEntities')
@@ -81,35 +61,46 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
                 ['name' => \stdClass::class, 'label' => \stdClass::class . '_label'],
                 ['name' => \stdClass::class . '_new', 'label' => \stdClass::class . '_new_label'],
             ]);
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
-        $configManager = $this->createMock(ConfigManager::class);
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
-        $configProvider = $this->createMock(ConfigProvider::class);
-        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
-        $translator = $this->createMock(Translator::class);
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
+
+        $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
+        $htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn(['br', 'a']);
 
         return [
             new PreloadedExtension(
                 [
-                    EmailTemplateType::class => $this->type,
-                    new EntityChoiceType($entityProvider),
+                    $this->type,
+                    new EmailTemplateEntityChoiceType($entityProvider),
                     new Select2ChoiceType(),
-                    EmailTemplateTranslationType::class => new EmailTemplateTranslationTypeStub(
-                        $configManager,
-                        GedmoTranslationsType::class
-                    ),
+                    new EmailTemplateTranslationCollectionType(),
+                    new EmailTemplateTranslationType($translator, $this->localizationManager),
+                    new OroRichTextType(
+                        $this->createMock(ConfigManager::class),
+                        $htmlTagProvider,
+                        $this->createMock(ContextInterface::class),
+                        new HtmlTagHelper($htmlTagProvider)
+                    )
                 ],
                 [
-                    FormType::class => [new TooltipFormExtension($configProvider, $translator)],
+                    FormType::class => [new TooltipFormExtensionStub($this)],
                 ]
             ),
-            new ValidatorExtension(Validation::createValidator())
+            new ValidatorExtension(Validation::createValidator()),
         ];
     }
 
-    protected function tearDown()
+    private function getLocalization(int $id): Localization
     {
-        unset($this->type);
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
+
+        return $localization;
     }
 
     public function testConfigureOptions()
@@ -124,106 +115,149 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     * @param EmailTemplate $defaultData
-     * @param array $submittedData
-     * @param EmailTemplate $expectedData
      */
-    public function testSubmit(EmailTemplate $defaultData, array $submittedData, EmailTemplate $expectedData)
-    {
-        $this->assertLanguages(['en'], [777 => 'de'], 'en');
-        $form = $this->factory->create(
-            EmailTemplateType::class,
-            $defaultData,
-            ['additional_language_codes' => ['fr']]
-        );
+    public function testSubmit(
+        EmailTemplate $defaultData,
+        array $localizations,
+        array $submittedData,
+        EmailTemplate $expectedData,
+        bool $htmlPurifier
+    ) {
+        $this->localizationManager->expects($this->once())
+            ->method('getLocalizations')
+            ->willReturn($localizations);
+
+        $this->configManager->expects($this->exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                ['oro_form.wysiwyg_enabled', false, false, null, null],
+                ['oro_email.sanitize_html', false, false, null, $htmlPurifier]
+            ]);
+
+        $form = $this->factory->create(EmailTemplateType::class, $defaultData);
+
 
         $this->assertEquals($defaultData, $form->getData());
         $this->assertEquals($defaultData, $form->getViewData());
 
         $form->submit($submittedData);
-        $this->assertTrue($form->isValid());
 
+        $wysiwygOptions = $form->get('translations')->getConfig()->getOption('wysiwyg_options');
+
+        $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expectedData, $form->getData());
+        $this->assertTrue((count($wysiwygOptions) === 1) === $htmlPurifier);
+        $this->assertFalse($wysiwygOptions['convert_urls']);
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
-        $emailTemplate = new EmailTemplate();
-        $emailTemplate->setName('some name');
-        $emailTemplate->setEntityName(\stdClass::class);
-        $emailTemplate->setType('txt');
-        $translations = new ArrayCollection([(new EmailTemplateTranslation())->setLocale('en')]);
-        $emailTemplate->setTranslations($translations);
+        $localizationA = $this->getLocalization(1);
+        $localizationB = $this->getLocalization(42);
 
-        $editedTemplate = clone $emailTemplate;
-        $editedTemplate->setName('new some name');
-        $editedTemplate->setType('html');
-        $editedTemplate->setEntityName(\stdClass::class . '_new');
-        $editedTranslations = clone $translations;
-        $editedTranslations->first()->setObject($editedTemplate);
-        $editedTemplate->setTranslations($editedTranslations);
+        $localizations = [
+            $localizationA->getId() => $localizationA,
+            $localizationB->getId() => $localizationB,
+        ];
+
+        $newEmailTemplate = (new EmailTemplate())
+            ->setName('some name')
+            ->setEntityName(\stdClass::class)
+            ->setType('txt')
+            ->setSubject('Default subject')
+            ->setContent('Default content')
+            ->setTranslations(new ArrayCollection([
+                (new EmailTemplateTranslation())
+                    ->setLocalization($localizationA)
+                    ->setSubject('Subject for "A"')
+                    ->setSubjectFallback(false)
+                    ->setContentFallback(true),
+                (new EmailTemplateTranslation())
+                    ->setLocalization($localizationB)
+                    ->setSubjectFallback(true)
+                    ->setContent('Content for "B"')
+                    ->setContentFallback(false),
+            ]));
+
+        $editedEmailTemplate = (new EmailTemplate())
+            ->setName('new some name')
+            ->setEntityName(\stdClass::class . '_new')
+            ->setType('html')
+            ->setSubject('New default subject')
+            ->setContent('New default content')
+            ->setTranslations(new ArrayCollection([
+                (new EmailTemplateTranslation())
+                    ->setLocalization($localizationA)
+                    ->setSubjectFallback(true)
+                    ->setContent('New content for "A"')
+                    ->setContentFallback(false),
+                (new EmailTemplateTranslation())
+                    ->setLocalization($localizationB)
+                    ->setSubject('New subject for "B"')
+                    ->setSubjectFallback(false)
+                    ->setContentFallback(true),
+            ]));
 
         return [
             'new template' => [
                 'defaultData' => new EmailTemplate(),
+                'localizations' => $localizations,
                 'submittedData' => [
                     'name' => 'some name',
                     'type' => 'txt',
                     'entityName' => \stdClass::class,
-                    'translations' => $translations,
+                    'translations' => [
+                        'default' => [
+                            'subject' => 'Default subject',
+                            'subjectFallback' => '1',
+                            'content' => 'Default content',
+                            'contentFallback' => '1',
+                        ],
+                        1 => [
+                            'subject' => 'Subject for "A"',
+                            'contentFallback' => '1',
+                        ],
+                        42 => [
+                            'subjectFallback' => '1',
+                            'content' => 'Content for "B"',
+                        ],
+                    ],
                     'parentTemplate' => '',
                 ],
-                'expectedData' => $emailTemplate,
+                'expectedData' => $newEmailTemplate,
+                'htmlPurifier' => false
             ],
             'edit promotion' => [
-                'defaultData' => $emailTemplate,
+                'defaultData' => $newEmailTemplate,
+                'localizations' => $localizations,
                 'submittedData' => [
                     'name' => 'new some name',
                     'type' => 'html',
                     'entityName' => \stdClass::class . '_new',
-                    'translations' => $editedTranslations,
+                    'translations' => [
+                        'default' => [
+                            'subject' => 'New default subject',
+                            'subjectFallback' => '1',
+                            'content' => 'New default content',
+                            'contentFallback' => '1',
+                        ],
+                        1 => [
+                            'subjectFallback' => '1',
+                            'content' => 'New content for "A"',
+                        ],
+                        42 => [
+                            'subject' => 'New subject for "B"',
+                            'contentFallback' => '1',
+                        ],
+                    ],
                 ],
-                'expectedData' => $editedTemplate,
+                'expectedData' => $editedEmailTemplate,
+                'htmlPurifier' => true
             ],
         ];
-    }
-
-    /**
-     * @param string[] $languages
-     * @param string[] $localizations [id => languageCode, ...]
-     * @param string $language
-     */
-    private function assertLanguages(array $languages, array $localizations, string $language)
-    {
-        $this->configManager->expects($this->at(0))
-            ->method('get')
-            ->with('oro_locale.languages')
-            ->willReturn($languages);
-        $localizationIds = array_keys($localizations);
-        $this->configManager->expects($this->at(1))
-            ->method('get')
-            ->with(Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS))
-            ->willReturn($localizationIds);
-
-        array_walk($localizations, function (&$value, $key) {
-            $value = $this->getEntity(
-                Localization::class,
-                [
-                    'id' => $key,
-                    'language' => (new Language())->setCode($value)
-                ]
-            );
-        });
-        $this->localizationManager->expects($this->once())
-            ->method('getLocalizations')
-            ->with($localizationIds)
-            ->willReturn($localizations);
-        $this->localeSettings->expects($this->any())
-            ->method('getLanguage')
-            ->willReturn($language);
     }
 }

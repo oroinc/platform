@@ -12,8 +12,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('oro_theme');
+        $treeBuilder = new TreeBuilder('oro_theme');
+        $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->beforeNormalization()
@@ -23,7 +23,7 @@ class Configuration implements ConfigurationInterface
                     }
 
                     foreach ($value['themes'] as $themeName => $value) {
-                        if (false !== strpos($themeName, '-') && false === strpos($themeName, '_')) {
+                        if (str_contains($themeName, '-') && !str_contains($themeName, '_')) {
                             return true;
                         }
                     }
@@ -45,26 +45,8 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->scalarNode('screenshot')
                             ->end()
-                            ->arrayNode('styles')
-                                ->beforeNormalization()
-                                    ->always(
-                                        function ($value) {
-                                            if (is_string($value)) {
-                                                return array($value);
-                                            }
-                                            return $value;
-                                        }
-                                    )
-                                ->end()
-                                ->validate()
-                                    ->always(
-                                        function ($value) {
-                                            return array_unique($value);
-                                        }
-                                    )
-                                ->end()
-                                ->prototype('scalar')
-                                ->end()
+                            ->booleanNode('rtl_support')
+                                ->info('Defines whether Theme supports RTL and additional *.rtl.css have to be build')
                             ->end()
                         ->end()
                     ->end()

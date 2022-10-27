@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\AccessRule;
 
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\AccessDenied;
+use Oro\Bundle\SecurityBundle\AccessRule\Expr\Association;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Exists;
@@ -20,114 +21,79 @@ abstract class Visitor
 {
     /**
      * Converts a comparison expression into the target query language output.
-     *
-     * @param Comparison $comparison
-     *
-     * @return mixed
      */
-    abstract public function walkComparison(Comparison $comparison);
+    abstract public function walkComparison(Comparison $comparison): mixed;
 
     /**
      * Converts a value expression into the target query language part.
-     *
-     * @param Value $value
-     *
-     * @return mixed
      */
-    abstract public function walkValue(Value $value);
+    abstract public function walkValue(Value $value): mixed;
 
     /**
      * Converts a composite expression into the target query language output.
-     *
-     * @param CompositeExpression $expr
-     *
-     * @return mixed
      */
-    abstract public function walkCompositeExpression(CompositeExpression $expr);
+    abstract public function walkCompositeExpression(CompositeExpression $expr): mixed;
 
     /**
      * Converts an access denied expression into the target query language part.
-     *
-     * @param AccessDenied $accessDenied
-     *
-     * @return mixed
      */
-    abstract public function walkAccessDenied(AccessDenied $accessDenied);
+    abstract public function walkAccessDenied(AccessDenied $accessDenied): mixed;
 
     /**
      * Converts a path expression into the target query language part.
-     *
-     * @param Path $path
-     *
-     * @return mixed
      */
-    abstract public function walkPath(Path $path);
+    abstract public function walkPath(Path $path): mixed;
 
     /**
      * Converts a subquery expression into the target query language output.
-     *
-     * @param Subquery $subquery
-     *
-     * @return mixed
      */
-    abstract public function walkSubquery(Subquery $subquery);
+    abstract public function walkSubquery(Subquery $subquery): mixed;
 
     /**
      * Converts an exist expression into the target query language output.
-     *
-     * @param Exists $existsExpr
-     *
-     * @return mixed
      */
-    abstract public function walkExists(Exists $existsExpr);
+    abstract public function walkExists(Exists $existsExpr): mixed;
 
     /**
      * Converts a null comparison expression into the target query language output.
-     *
-     * @param NullComparison $comparison
-     *
-     * @return mixed
      */
-    abstract public function walkNullComparison(NullComparison $comparison);
+    abstract public function walkNullComparison(NullComparison $comparison): mixed;
+
+    /**
+     * Converts an association expression into the target query language output.
+     */
+    abstract public function walkAssociation(Association $association): mixed;
 
     /**
      * Dispatches walking an expression to the appropriate handler.
      *
-     * @param ExpressionInterface $expr
+     * @throws \RuntimeException if an expression cannot be built
      *
-     * @return mixed
-     *
-     * @throws \RuntimeException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function dispatch(ExpressionInterface $expr)
+    public function dispatch(ExpressionInterface $expr): mixed
     {
         switch (true) {
             case ($expr instanceof Comparison):
                 return $this->walkComparison($expr);
-
             case ($expr instanceof Value):
                 return $this->walkValue($expr);
-
             case ($expr instanceof CompositeExpression):
                 return $this->walkCompositeExpression($expr);
-
             case ($expr instanceof AccessDenied):
                 return $this->walkAccessDenied($expr);
-
             case ($expr instanceof Path):
                 return $this->walkPath($expr);
-
             case ($expr instanceof Subquery):
                 return $this->walkSubquery($expr);
-
             case ($expr instanceof Exists):
                 return $this->walkExists($expr);
-
             case ($expr instanceof NullComparison):
                 return $this->walkNullComparison($expr);
-
+            case ($expr instanceof Association):
+                return $this->walkAssociation($expr);
             default:
-                throw new \RuntimeException('Unknown Expression ' . get_class($expr));
+                throw new \RuntimeException('Unknown Expression ' . \get_class($expr));
         }
     }
 }

@@ -2,6 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
+use ArrayIterator;
+use DateTime;
+use DateTimeZone;
+use Laminas\Mail\Address\AddressInterface;
+use Laminas\Mail\Header\AbstractAddressList;
+use Laminas\Mail\Header\HeaderInterface;
+use Laminas\Mail\Headers;
+use Laminas\Mail\Storage\Exception as MailException;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
@@ -10,15 +18,14 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
 use Oro\Bundle\ImapBundle\Util\DateTimeParser;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\AcceptHeader;
 use Symfony\Component\HttpFoundation\AcceptHeaderItem;
-use Zend\Mail\Address\AddressInterface;
-use Zend\Mail\Header\AbstractAddressList;
-use Zend\Mail\Header\HeaderInterface;
-use Zend\Mail\Headers;
-use Zend\Mail\Storage\Exception as MailException;
+use Throwable;
 
 /**
+ * Manager that simplify work with IMAP server and emails that was received throw IMAP server.
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -32,9 +39,6 @@ class ImapEmailManager
     /** @var ImapConnector */
     protected $connector;
 
-    /**
-     * @param ImapConnector $connector
-     */
     public function __construct(ImapConnector $connector)
     {
         $this->connector = $connector;
@@ -136,7 +140,7 @@ class ImapEmailManager
     }
 
     /**
-     * @param \DateTime $startDate
+     * @param DateTime $startDate
      *
      * @return ImapEmailIterator
      */
@@ -166,7 +170,7 @@ class ImapEmailManager
      * @param int $uid The UID of an email message
      *
      * @return Email|null An Email DTO or null if an email with the given UID was not found
-     * @throws \RuntimeException When message can't be parsed correctly
+     * @throws RuntimeException When message can't be parsed correctly
      */
     public function findEmail($uid)
     {
@@ -186,7 +190,7 @@ class ImapEmailManager
      *
      * @return Email
      *
-     * @throws \RuntimeException if the given message cannot be converted to {@see Email} object
+     * @throws RuntimeException if the given message cannot be converted to {@see Email} object
      */
     public function convertToEmail(Message $msg)
     {
@@ -209,9 +213,21 @@ class ImapEmailManager
                 ->setRefs($this->getReferences($headers, 'References'))
                 ->setXMessageId($this->getString($headers, 'X-GM-MSG-ID'))
                 ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'))
-                ->setMessageId($this->getMessageId($headers, 'Message-ID'))
                 ->setMultiMessageId($this->getMultiMessageId($headers, 'Message-ID'))
                 ->setAcceptLanguageHeader($this->getAcceptLanguage($headers));
+
+            $messageId = $this->getMessageId($headers, 'Message-ID');
+            // Some messages can have no 'Message-ID' header. In this case calculate the id from Received header.
+            if ($messageId === '') {
+                if ($headers->has('Received')) {
+                    $header = $headers->get('Received');
+                    $header->rewind();
+                    $messageId = md5($header->current()->getFieldValue());
+                } elseif ($headers->has('InternalDate')) {
+                    $messageId = md5($headers->get('InternalDate')->getFieldValue());
+                }
+            }
+            $email->setMessageId($messageId);
 
             foreach ($this->getRecipients($headers, 'To') as $val) {
                 $email->addToRecipient($val);
@@ -224,14 +240,15 @@ class ImapEmailManager
             }
 
             return $email;
-        } catch (\Throwable $e) {
-            throw new \RuntimeException(
+        } catch (Throwable $e) {
+            throw new RuntimeException(
                 sprintf(
-                    "Cannot parse email message. Subject: %s. Error: %s. Stacktrace:\n%s",
+                    "Cannot parse email message. Subject: %s. Error: %s.",
                     $email->getSubject(),
-                    $e->getMessage(),
-                    $e->getTraceAsString()
-                )
+                    $e->getMessage()
+                ),
+                $e->getCode(),
+                $e
             );
         }
     }
@@ -249,8 +266,8 @@ class ImapEmailManager
 
         if ($header === false) {
             return '';
-        } elseif (!$header instanceof \ArrayIterator) {
-            $header = new \ArrayIterator([$header]);
+        } elseif (!$header instanceof ArrayIterator) {
+            $header = new ArrayIterator([$header]);
         }
 
         $items = [];
@@ -271,12 +288,12 @@ class ImapEmailManager
      * @param Headers $headers
      * @param string  $name
      * @param int     $lengthLimit If more than 0 returns part of header specified length
-     * @param bool    $strict      If FALSE and there are several headers exist
+     * @param bool    $strict If FALSE and there are several headers exist
      *                             than the value of the first header is returned
      *
      * @return string
      *
-     * @throws \RuntimeException if a value of the requested header cannot be converted to a string
+     * @throws RuntimeException if a value of the requested header cannot be converted to a string
      */
     protected function getString(Headers $headers, $name, $lengthLimit = 0, $strict = true)
     {
@@ -286,7 +303,7 @@ class ImapEmailManager
         }
 
         $headerValue = '';
-        if ($header instanceof \ArrayIterator) {
+        if ($header instanceof ArrayIterator) {
             if ($strict) {
                 $values = [];
                 $header->rewind();
@@ -294,10 +311,10 @@ class ImapEmailManager
                     $values[] = sprintf('"%s"', $header->current()->getFieldValue());
                     $header->next();
                 }
-                throw new \RuntimeException(
+                throw new RuntimeException(
                     sprintf(
                         'It is expected that the header "%s" has a string value, '
-                        . 'but several values are returned. Values: %s.',
+                        .'but several values are returned. Values: %s.',
                         $name,
                         implode(', ', $values)
                     )
@@ -328,7 +345,7 @@ class ImapEmailManager
     {
         $header = $headers->get($name);
         $values = [];
-        if ($header instanceof \ArrayIterator) {
+        if ($header instanceof ArrayIterator) {
             $header->rewind();
             while ($header->valid()) {
                 $values[] = $header->current()->getFieldValue();
@@ -354,7 +371,7 @@ class ImapEmailManager
         $header = $headers->get($name);
         if ($header === false) {
             return '';
-        } elseif ($header instanceof \ArrayIterator) {
+        } elseif ($header instanceof ArrayIterator) {
             $header->rewind();
             if ($header->valid()) {
                 return $header->current()->getFieldValue();
@@ -380,7 +397,7 @@ class ImapEmailManager
         $header = $headers->get($name);
         if ($header === false) {
             return null;
-        } elseif ($header instanceof \ArrayIterator) {
+        } elseif ($header instanceof ArrayIterator) {
             $header->rewind();
             while ($header->valid()) {
                 $values[] = sprintf('"%s"', $header->current()->getFieldValue());
@@ -397,9 +414,9 @@ class ImapEmailManager
      * Gets an email header as DateTime type
      *
      * @param Headers $headers
-     * @param string $name
+     * @param string  $name
      *
-     * @return \DateTime
+     * @return DateTime
      * @throws \Exception if header contain incorrect DateTime string
      */
     protected function getDateTime(Headers $headers, $name)
@@ -409,7 +426,7 @@ class ImapEmailManager
             return $this->convertToDateTime($val->getFieldValue());
         }
 
-        return new \DateTime('0001-01-01', new \DateTimeZone('UTC'));
+        return new DateTime('0001-01-01', new DateTimeZone('UTC'));
     }
 
     /**
@@ -417,28 +434,33 @@ class ImapEmailManager
      *
      * @param Headers $headers
      *
-     * @return \DateTime
+     * @return DateTime
      * @throws \Exception if Received header contain incorrect DateTime string
      */
     protected function getReceivedAt(Headers $headers)
     {
+        // Some messages do not contain Received header (e.g. from Sent folder)
         $val = $headers->get('Received');
+        if (false === $val) {
+            return $this->getDateTime($headers, 'Date');
+        }
+
         $str = '';
         if ($val instanceof HeaderInterface) {
             $str = $val->getFieldValue();
-        } elseif ($val instanceof \ArrayIterator) {
+        } elseif ($val instanceof ArrayIterator) {
             $val->rewind();
             $str = $val->current()->getFieldValue();
         }
 
         $delim = strrpos($str, ';');
-        if ($delim !== false) {
+        if (false !== $delim) {
             $str = trim(preg_replace('@[\r\n]+@', '', substr($str, $delim + 1)));
 
             return $this->convertToDateTime($str);
         }
 
-        return new \DateTime('0001-01-01', new \DateTimeZone('UTC'));
+        return new DateTime('0001-01-01', new DateTimeZone('UTC'));
     }
 
     /**
@@ -451,7 +473,7 @@ class ImapEmailManager
      */
     protected function getRecipients(Headers $headers, $name)
     {
-        $result = array();
+        $result = [];
         $val = $headers->get($name);
         if ($val instanceof AbstractAddressList) {
             /** @var AddressInterface $addr */
@@ -469,6 +491,7 @@ class ImapEmailManager
      * @param Headers $headers
      *
      * @return integer
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getImportance(Headers $headers)
     {
@@ -489,7 +512,7 @@ class ImapEmailManager
             if ($labels->getFieldValue() === '\\\\Important') {
                 return 1;
             }
-        } elseif ($labels instanceof \ArrayIterator) {
+        } elseif ($labels instanceof ArrayIterator) {
             foreach ($labels as $label) {
                 if ($label instanceof HeaderInterface && $label->getFieldValue() === '\\\\Important') {
                     return 1;
@@ -505,7 +528,7 @@ class ImapEmailManager
      *
      * @param string $value
      *
-     * @return \DateTime
+     * @return DateTime
      *
      * @throws \Exception
      */

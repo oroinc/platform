@@ -2,59 +2,50 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class AuditManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const SCOPE = 'testScope';
-    const ENTITY_CLASS = 'Test\Entity';
+    private const SCOPE = 'testScope';
+    private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var AuditManager */
     private $auditManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->tokenStorage = $this->createMock(
-            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'
-        );
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManager')
             ->with(null)
             ->willReturn($this->em);
 
         $this->auditManager = new AuditManager($this->tokenStorage, $doctrine);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->tokenStorage, $this->configManager, $this->auditManager);
     }
 
     public function testBuildEntity()
@@ -109,7 +100,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildEntityWithUnsupportedSecurityToken()
     {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn('test');
@@ -122,14 +113,11 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
         $this->auditManager->buildEntity($this->configManager);
     }
 
-    /**
-     * @return UserInterface
-     */
-    protected function initSecurityContext()
+    private function initSecurityContext(): UserInterface
     {
-        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock(UserInterface::class);
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
@@ -138,9 +126,7 @@ class AuditManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn($token);
 
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn($classMetadata);

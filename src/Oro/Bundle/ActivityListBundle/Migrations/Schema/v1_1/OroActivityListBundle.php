@@ -18,8 +18,6 @@ class OroActivityListBundle implements Migration
 
     /**
      * Add group head field
-     *
-     * @param Schema $schema
      */
     public static function addColumns(Schema $schema)
     {

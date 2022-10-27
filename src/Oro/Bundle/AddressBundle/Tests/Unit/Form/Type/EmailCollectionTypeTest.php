@@ -6,15 +6,10 @@ use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 
 class EmailCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailCollectionType
-     */
-    protected $type;
+    /** @var EmailCollectionType */
+    private $type;
 
-    /**
-     * Setup test env
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new EmailCollectionType();
     }

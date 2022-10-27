@@ -3,32 +3,36 @@
 namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
+use Oro\Component\Config\ResourcesContainerInterface;
 
+/**
+ * Loads ACL annotations from "Resources/config/oro/acls.yml" files.
+ */
 class AclConfigLoader implements AclAnnotationLoaderInterface
 {
+    private const CONFIG_FILE = 'Resources/config/oro/acls.yml';
+    private const ROOT_NODE   = 'acls';
+
     /**
-     * Loads ACL annotations from config files
-     *
-     * @param AclAnnotationStorage $storage
+     * {@inheritdoc}
      */
-    public function load(AclAnnotationStorage $storage)
+    public function load(AclAnnotationStorage $storage, ResourcesContainerInterface $resourcesContainer): void
     {
-        $configLoader = OroSecurityExtension::getAclConfigLoader();
-        $resources = $configLoader->load();
-        $root = OroSecurityExtension::ACLS_CONFIG_ROOT_NODE;
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_acl_config', self::CONFIG_FILE);
+        $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
-            if (array_key_exists($root, $resource->data) && is_array($resource->data[$root])) {
-                foreach ($resource->data[$root] as $id => $data) {
+            if (isset($resource->data[self::ROOT_NODE]) && \is_array($resource->data[self::ROOT_NODE])) {
+                foreach ($resource->data[self::ROOT_NODE] as $id => $data) {
                     $data['id'] = $id;
                     $storage->add(new AclAnnotation($data));
                     if (isset($data['bindings'])) {
                         foreach ($data['bindings'] as $binding) {
                             $storage->addBinding(
                                 $id,
-                                isset($binding['class']) ? $binding['class'] : null,
-                                isset($binding['method']) ? $binding['method'] : null
+                                $binding['class'] ?? null,
+                                $binding['method'] ?? null
                             );
                         }
                     }

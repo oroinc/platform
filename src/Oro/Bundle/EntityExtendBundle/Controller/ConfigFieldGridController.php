@@ -2,36 +2,34 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler;
+use Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class ConfigGridController
+ * The controller for FieldConfigModel entity.
  *
  * @package Oro\Bundle\EntityExtendBundle\Controller
  * @Route("/entity/extend/field")
- * BAP-17635 Discuss ACL impl., currently acl is disabled
  * @AclAncestor("oro_entityconfig_manage")
  */
-class ConfigFieldGridController extends Controller
+class ConfigFieldGridController extends AbstractController
 {
     /**
      * @Route("/create/{id}", name="oro_entityextend_field_create", requirements={"id"="\d+"}, defaults={"id"=0})
-     * Acl(
-     *      id="oro_entityextend_field_create",
-     *      label="oro.entity_extend.action.config_field_grid.create",
-     *      type="action",
-     *      group_name=""
-     * )
      *
      * @Template
      * @param Request $request
@@ -40,11 +38,11 @@ class ConfigFieldGridController extends Controller
      */
     public function createAction(Request $request, EntityConfigModel $entityConfigModel)
     {
-        /** @var ConfigProvider $entityConfigProvider */
-        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
-
-        if (!$extendConfigProvider->getConfig($entityConfigModel->getClassName())->is('is_extend')) {
-            $this->get('session')->getFlashBag()->add('error', $entityConfigModel->getClassName() . 'isn\'t extend');
+        if (!$this->getExtendConfigProvider()->getConfig($entityConfigModel->getClassName())->is('is_extend')) {
+            $request->getSession()->getFlashBag()->add(
+                'error',
+                $entityConfigModel->getClassName() . 'isn\'t extend'
+            );
 
             return $this->redirect(
                 $this->generateUrl('oro_entityconfig_fields', ['id' => $entityConfigModel->getId()])
@@ -56,20 +54,12 @@ class ConfigFieldGridController extends Controller
 
         $formAction = $this->generateUrl('oro_entityextend_field_create', ['id' => $entityConfigModel->getId()]);
 
-        return $this
-            ->get('oro_entity_config.form.handler.create_update_config_field_handler')
-            ->handleCreate($request, $fieldConfigModel, $formAction);
+        return $this->getCreateUpdateConfigFieldHandler()->handleCreate($request, $fieldConfigModel, $formAction);
     }
 
     /**
      * @Route("/update/{id}", name="oro_entityextend_field_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * Acl(
-     *      id="oro_entityextend_field_update",
-     *      label="oro.entity_extend.action.config_field_grid.update",
-     *      type="action",
-     *      group_name=""
-     * )
-     * @Template("OroEntityConfigBundle:Config:fieldUpdate.html.twig")
+     * @Template("@OroEntityConfig/Config/fieldUpdate.html.twig")
      * @param Request $request
      * @param EntityConfigModel $entity
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse|Response
@@ -77,22 +67,19 @@ class ConfigFieldGridController extends Controller
     public function updateAction(Request $request, EntityConfigModel $entity)
     {
         $redirectUrl = $this->generateUrl('oro_entityextend_field_create', ['id' => $entity->getId()]);
-        $successMessage = $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.saved');
+        $successMessage = $this->getTranslator()->trans('oro.entity_extend.controller.config_field.message.saved');
         $formAction = $this->generateUrl('oro_entityextend_field_update', ['id' => $entity->getId()]);
 
-        return $this->get('oro_entity_config.form.handler.create_update_config_field_handler')
+        return $this->getCreateUpdateConfigFieldHandler()
             ->handleFieldSave($request, $entity, $redirectUrl, $formAction, $successMessage);
     }
 
     /**
-     * @param FieldConfigModel $fieldConfigModel
      * @throws AccessDeniedException
      */
     private function ensureFieldConfigModelIsCustom(FieldConfigModel $fieldConfigModel)
     {
-        /** @var ConfigProvider $extendConfigProvider */
-        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
-        $fieldConfig = $extendConfigProvider->getConfig(
+        $fieldConfig = $this->getExtendConfigProvider()->getConfig(
             $fieldConfigModel->getEntity()->getClassName(),
             $fieldConfigModel->getFieldName()
         );
@@ -107,27 +94,21 @@ class ConfigFieldGridController extends Controller
      *      "/remove/{id}",
      *      name="oro_entityextend_field_remove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"DELETE"}
      * )
-     * Acl(
-     *      id="oro_entityextend_field_remove",
-     *      label="oro.entity_extend.action.config_field_grid.remove",
-     *      type="action",
-     *      group_name=""
-     * )
+     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return Response
      */
     public function removeAction(FieldConfigModel $field)
     {
         $this->ensureFieldConfigModelIsCustom($field);
-        $successMessage = $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.deleted');
 
-        $response = $this
-            ->get('oro_entity_config.form.handler.remove_restore_field_handler')
-            ->handleRemove($field, $successMessage);
-
-        return $response;
+        return $this->getRemoveRestoreConfigFieldHandler()->handleRemove(
+            $field,
+            $this->getTranslator()->trans('oro.entity_extend.controller.config_field.message.deleted')
+        );
     }
 
     /**
@@ -135,14 +116,10 @@ class ConfigFieldGridController extends Controller
      *      "/unremove/{id}",
      *      name="oro_entityextend_field_unremove",
      *      requirements={"id"="\d+"},
-     *      defaults={"id"=0}
+     *      defaults={"id"=0},
+     *      methods={"POST"}
      * )
-     * Acl(
-     *      id="oro_entityextend_field_unremove",
-     *      label="oro.entity_extend.action.config_field_grid.unremove",
-     *      type="action",
-     *      group_name=""
-     * )
+     * @CsrfProtection()
      * @param FieldConfigModel $field
      * @return Response
      */
@@ -150,10 +127,46 @@ class ConfigFieldGridController extends Controller
     {
         $this->ensureFieldConfigModelIsCustom($field);
 
-        return $this->get('oro_entity_config.form.handler.remove_restore_field_handler')->handleRestore(
+        return $this->getRemoveRestoreConfigFieldHandler()->handleRestore(
             $field,
-            $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.cannot_be_restored'),
-            $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.restored')
+            $this->getTranslator()->trans('oro.entity_extend.controller.config_field.message.cannot_be_restored'),
+            $this->getTranslator()->trans('oro.entity_extend.controller.config_field.message.restored')
+        );
+    }
+
+    private function getExtendConfigProvider(): ConfigProvider
+    {
+        return $this->get(ConfigManager::class)->getProvider('extend');
+    }
+
+    protected function getTranslator(): TranslatorInterface
+    {
+        return $this->get(TranslatorInterface::class);
+    }
+
+    protected function getCreateUpdateConfigFieldHandler(): CreateUpdateConfigFieldHandler
+    {
+        return $this->get(CreateUpdateConfigFieldHandler::class);
+    }
+
+    protected function getRemoveRestoreConfigFieldHandler(): RemoveRestoreConfigFieldHandler
+    {
+        return $this->get(RemoveRestoreConfigFieldHandler::class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices(): array
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                RemoveRestoreConfigFieldHandler::class,
+                CreateUpdateConfigFieldHandler::class,
+                ConfigManager::class,
+            ]
         );
     }
 }

@@ -6,7 +6,10 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class ApiDocMetadata implements \Serializable
+/**
+ * Holds all the metadata for API documentation.
+ */
+class ApiDocMetadata
 {
     /** @var string */
     protected $action;
@@ -70,20 +73,14 @@ class ApiDocMetadata implements \Serializable
         return $this->requestType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
         // do nothing because this class do not need serialization
         // and implements Serializable interface just to avoid failure of CachingApiDocExtractor
-        return '';
+        return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         // do nothing because this class do not need serialization
         // and implements Serializable interface just to avoid failure of CachingApiDocExtractor

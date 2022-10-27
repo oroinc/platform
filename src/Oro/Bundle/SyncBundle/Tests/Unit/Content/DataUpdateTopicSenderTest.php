@@ -15,27 +15,19 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
     private const TEST_TAG1 = 'TestTag1';
     private const TEST_TAG2 = 'TestTag2';
 
-    /**
-     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $websocketClient;
 
-    /**
-     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $connectionChecker;
 
-    /**
-     * @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenStorage;
 
-    /**
-     * @var DataUpdateTopicSender
-     */
+    /** @var DataUpdateTopicSender */
     private $dataUpdateTopicSender;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);
@@ -53,21 +45,17 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $user = $this->createMock(UserInterface::class);
 
-        $this->tokenStorage
-            ->expects(self::once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
-        $token
-            ->expects(self::once())
+        $token->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
-        $user
-            ->expects(self::once())
+        $user->expects(self::once())
             ->method('getUserName')
             ->willReturn(self::TEST_USERNAME);
 
-        $this->connectionChecker
-            ->expects(self::once())
+        $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
             ->willReturn(true);
 
@@ -75,8 +63,7 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
             ['username' => self::TEST_USERNAME, 'tagname' => self::TEST_TAG1],
             ['username' => self::TEST_USERNAME, 'tagname' => self::TEST_TAG2],
         ];
-        $this->websocketClient
-            ->expects(self::once())
+        $this->websocketClient->expects(self::once())
             ->method('publish')
             ->with('oro/data/update', $expectedMessage);
 
@@ -86,13 +73,11 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
 
     public function testSendWithoutToken()
     {
-        $this->tokenStorage
-            ->expects(self::once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
 
-        $this->connectionChecker
-            ->expects(self::once())
+        $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
             ->willReturn(true);
 
@@ -100,8 +85,7 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
             ['username' => null, 'tagname' => self::TEST_TAG1],
             ['username' => null, 'tagname' => self::TEST_TAG2]
         ];
-        $this->websocketClient
-            ->expects(self::once())
+        $this->websocketClient->expects(self::once())
             ->method('publish')
             ->with('oro/data/update', $expectedMessage);
 
@@ -113,17 +97,14 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->createMock(TokenInterface::class);
 
-        $this->tokenStorage
-            ->expects(self::once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
-        $token
-            ->expects(self::once())
+        $token->expects(self::once())
             ->method('getUser')
             ->willReturn(self::TEST_USERNAME);
 
-        $this->connectionChecker
-            ->expects(self::once())
+        $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
             ->willReturn(true);
 
@@ -131,8 +112,7 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
             ['username' => null, 'tagname' => self::TEST_TAG1],
             ['username' => null, 'tagname' => self::TEST_TAG2]
         ];
-        $this->websocketClient
-            ->expects(self::once())
+        $this->websocketClient->expects(self::once())
             ->method('publish')
             ->with('oro/data/update', $expectedMessage);
 
@@ -142,16 +122,13 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
 
     public function testSendWithoutTags()
     {
-        $this->tokenStorage
-            ->expects(self::never())
+        $this->tokenStorage->expects(self::never())
             ->method('getToken');
 
-        $this->connectionChecker
-            ->expects(self::never())
+        $this->connectionChecker->expects(self::never())
             ->method('checkConnection');
 
-        $this->websocketClient
-            ->expects(self::never())
+        $this->websocketClient->expects(self::never())
             ->method('publish');
 
         $this->dataUpdateTopicSender->send([]);
@@ -159,17 +136,14 @@ class DataUpdateTopicSenderTest extends \PHPUnit\Framework\TestCase
 
     public function testSendNoConnection()
     {
-        $this->tokenStorage
-            ->expects(self::never())
+        $this->tokenStorage->expects(self::never())
             ->method('getToken');
 
-        $this->connectionChecker
-            ->expects(self::once())
+        $this->connectionChecker->expects(self::once())
             ->method('checkConnection')
             ->willReturn(false);
 
-        $this->websocketClient
-            ->expects(self::never())
+        $this->websocketClient->expects(self::never())
             ->method('publish');
 
         $this->dataUpdateTopicSender->send([self::TEST_TAG1, self::TEST_TAG2]);

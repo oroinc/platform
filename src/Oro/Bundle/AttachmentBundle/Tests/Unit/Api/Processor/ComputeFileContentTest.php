@@ -4,39 +4,31 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Api\Processor;
 
 use Gaufrette\Exception\FileNotFound;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData\CustomizeLoadedDataProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Psr\Log\LoggerInterface;
 
-class ComputeFileContentTest extends \PHPUnit\Framework\TestCase
+class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fileManager;
+    private $fileManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
-
-    /** @var CustomizeLoadedDataContext */
-    protected $context;
+    private $logger;
 
     /** @var ComputeFileContent */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
+        parent::setUp();
 
-        $this->context = new CustomizeLoadedDataContext();
+        $this->fileManager = $this->createMock(FileManager::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->processor = new ComputeFileContent($this->fileManager, $this->logger);
-    }
-
-    public function testProcessWhenNoData()
-    {
-        $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasResult());
     }
 
     public function testProcessWhenNoConfigForContentField()
@@ -164,12 +156,11 @@ class ComputeFileContentTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage some error
-     */
     public function testProcessWhenUnexpectedExceptionOccurred()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('some error');
+
         $config = new EntityDefinitionConfig();
         $config->addField('content')->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
         $config->addField('filename')->setExcluded();

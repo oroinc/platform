@@ -15,19 +15,12 @@ class WidgetConfigurationLoadListener
     /** @var Builder */
     protected $datagridBuilder;
 
-    /**
-     * @param ServiceLink $datagridManagerLink
-     * @param Builder     $datagridBuilder
-     */
     public function __construct(ServiceLink $datagridManagerLink, Builder $datagridBuilder)
     {
         $this->datagridManagerLink = $datagridManagerLink;
         $this->datagridBuilder = $datagridBuilder;
     }
 
-    /**
-     * @param WidgetConfigurationLoadEvent $event
-     */
     public function onWidgetConfigurationLoad(WidgetConfigurationLoadEvent $event)
     {
         $configuration = $event->getConfiguration();

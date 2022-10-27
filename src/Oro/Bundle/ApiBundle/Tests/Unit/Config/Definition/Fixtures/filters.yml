@@ -59,6 +59,24 @@ dash_in_field_name:
             fields:
                 test-field: []
 
+options_with_name_option:
+    config:
+        filters:
+            fields:
+                field1:
+                    options:
+                        mapping:
+                            item1: item_1
+                            name: name_1
+    expected:
+        filters:
+            fields:
+                field1:
+                    options:
+                        mapping:
+                            item1: item_1
+                            name: name_1
+
 full:
     config:
         filters:
@@ -73,7 +91,6 @@ full:
                     collection: true
                     allow_array: true
                     allow_range: true
-                    collection: true
                     description: description1
                 field4:
                     exclude: false
@@ -113,7 +130,7 @@ invalid_field_exclude:
                 field1:
                     exclude: 123
     expected: []
-    error: 'Invalid type for path "entity.filters.fields.field1.exclude". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.filters.fields.field1.exclude". Expected "bool", but got "int".'
 
 null_field_property_path:
     config:
@@ -140,7 +157,7 @@ invalid_field_allow_array:
                 field1:
                     allow_array: 123
     expected: []
-    error: 'Invalid type for path "entity.filters.fields.field1.allow_array". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.filters.fields.field1.allow_array". Expected "bool", but got "int".'
 
 invalid_field_allow_range:
     config:
@@ -149,7 +166,7 @@ invalid_field_allow_range:
                 field1:
                     allow_range: 123
     expected: []
-    error: 'Invalid type for path "entity.filters.fields.field1.allow_range". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.filters.fields.field1.allow_range". Expected "bool", but got "int".'
 
 invalid_field_collection:
     config:
@@ -158,7 +175,7 @@ invalid_field_collection:
                 field1:
                     collection: 123
     expected: []
-    error: 'Invalid type for path "entity.filters.fields.field1.collection". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.filters.fields.field1.collection". Expected "bool", but got "int".'
 
 null_field_description:
     config:
@@ -203,7 +220,7 @@ invalid_field_type:
                 field1:
                     type: []
     expected: []
-    error: 'Invalid type for path "entity.filters.fields.field1.type". Expected scalar, but got array.'
+    error: 'Invalid type for path "entity.filters.fields.field1.type". Expected "scalar", but got "array".'
 
 field_type:
     config:
@@ -246,7 +263,7 @@ invalid_field_options:
                 field1:
                     options: test
     expected: []
-    error: 'Invalid type for path "entity.filters.fields.field1.options". Expected array, but got string'
+    error: 'Invalid type for path "entity.filters.fields.field1.options". Expected "array", but got "string"'
 
 field_options:
     config:
@@ -291,7 +308,7 @@ invalid_field_operators:
                 field1:
                     operators: test
     expected: []
-    error: 'Invalid type for path "entity.filters.fields.field1.operators". Expected array, but got string'
+    error: 'Invalid type for path "entity.filters.fields.field1.operators". Expected "array", but got "string"'
 
 field_operators:
     config:

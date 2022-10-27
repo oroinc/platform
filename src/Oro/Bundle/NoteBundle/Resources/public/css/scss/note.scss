@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable selector-max-compound-selectors */
+
 .notes {
     position: relative;
 
@@ -7,11 +9,13 @@
         margin-top: $note-item-margin-top;
 
         .list-item {
-            padding: $content-padding-medium;
-            display: inline-block;
+            display: block;
+            border-top: 1px solid $primary-830;
+            border-bottom: 0;
+            padding: $note-message-list-item-offset;
 
             .visual {
-                margin-#{$start}: $note-message-padding - ($note-avatar-size + $note-avatar-margin);
+                margin-left: $note-message-padding - ($note-avatar-size + $note-avatar-margin-horizontal);
                 display: block;
 
                 img {
@@ -21,15 +25,24 @@
                 }
 
                 .avatar {
-                    border-radius: $note-avatar-size / 2;
+                    border-radius: $note-avatar-size * .5;
                     overflow: hidden;
                     display: inline-block;
-                    float: #{$start};
+                    float: left;
                     width: $note-avatar-size;
-                    height: $note-avatar-size;
-                    margin-#{$end}: $note-avatar-margin;
-                    margin-top: ($note-avatar-size - $font-size-base) / 2;
+                    font-size: $note-avatar-size;
+                    margin-right: $note-avatar-margin-horizontal;
+                    margin-top: $note-avatar-margin-vertical;
+                    text-align: center;
+                    line-height: $note-avatar-size;
+                    color: $note-avatar-color;
                 }
+            }
+
+            .avatar-placeholder {
+                display: inline-block;
+
+                @include fa-icon($note-avatar-placeholder);
             }
 
             .user {
@@ -47,7 +60,7 @@
                 white-space: nowrap;
 
                 .details {
-                    padding-#{$start}: 7px;
+                    padding-left: 7px;
                 }
             }
 
@@ -63,30 +76,24 @@
                 .message {
                     color: $primary-550;
 
-                    &:before {
+                    &::before {
                         content: '- ';
                     }
                 }
             }
 
             .labels {
-                text-align: #{$end};
+                text-align: right;
             }
 
             .label {
-                border-radius: ($badge-font-size / 2) + $badge-padding-y;
+                border-radius: ($badge-font-size * .5) + $badge-padding-y;
                 background: $primary-830;
                 padding: $badge-padding-y $badge-padding-x;
                 font-size: $badge-font-size;
                 line-height: 1;
                 color: $primary-500;
             }
-        }
-
-        .list-item {
-            display: block;
-            border-top: 1px solid $primary-830;
-            border-bottom: 0;
         }
 
         .list-item:last-child {
@@ -105,11 +112,11 @@
                 display: table;
                 border-collapse: separate;
 
-                & > div {
+                > div {
                     display: table-cell;
 
                     &:not(:first-child) {
-                        padding-#{$start}: $note-heading-margin;
+                        padding-left: $note-heading-margin;
                     }
                 }
 
@@ -122,25 +129,21 @@
                 .accordion-toggle {
                     display: inline-block;
                     padding: 0;
-                    min-width: $note-icon-size + 1;
-                    margin-#{$end}: -($note-icon-size + 1);
-                    float: #{$start};
+                    min-width: $note-accordion-icon-size + 1;
+                    margin-right: -($note-accordion-icon-size + 1);
+                    float: left;
                     position: relative;
 
-                    &:before {
-                        content: '\f147';
-                        font-family: FontAwesome;
-                        color: #727272;
+                    @include fa-icon($note-accordion-icon, before, true) {
+                        color: $primary-550;
+                        font-size: $note-accordion-icon-size;
+                        line-height: $note-accordion-line-height;
+                    }
+
+                    &.collapsed {
+                        @include fa-icon($note-accordion-collapsed-icon);
                     }
                 }
-
-                .accordion-toggle.collapsed:before {
-                    content: '\f196';
-                }
-            }
-
-            .accordion-heading.in .message {
-                display: none;
             }
 
             .accordion-body.collapse {
@@ -150,7 +153,7 @@
             .accordion-body {
                 .message {
                     display: none;
-                    padding-top: $content-padding-small;
+                    padding-top: $content-padding-small * .5;
                     overflow-x: auto;
                 }
 
@@ -159,9 +162,13 @@
                 }
             }
 
+            .accordion-heading.in .message {
+                display: none;
+            }
+
             .accordion-body.in .message {
                 display: block;
-                padding-#{$start}: $note-message-padding;
+                padding-left: $note-message-padding;
             }
         }
     }
@@ -176,33 +183,48 @@
     }
 
     .thumbnail {
-        background: #eee none repeat scroll 0 0;
-        border: medium none;
-        border-radius: 6px;
-        height: 80px;
-        padding: 0;
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 110px;
+        height: 80px;
+        text-align: center;
+        background: $primary-750;
+        border-radius: 4px;
     }
 
     .link-to-record {
         padding-top: 10px;
 
         .fa {
-            color: #444;
+            color: $additional-dark;
             font-size: 15px;
-            margin-left: 0;
-            margin-right: 1px;
+            margin: 0 1px 0 0;
         }
     }
 }
 
-.btn.btn-link.fa-close.remove-attachment {
-    text-decoration: none;
-}
+.ui-dialog {
+    .note-form {
+        .form-horizontal {
+            width: 617px;
+            margin: auto;
 
-.ui-dialog .note-form textarea,
-.ui-dialog .note-form .mce-tinymce {
-    width: 100%;
-    box-sizing: border-box;
+            .control-group {
+                .controls {
+                    input,
+                    textarea,
+                    .select2-container,
+                    .validate-group {
+                        width: 100%;
+                        max-width: 100%;
+                    }
+
+                    textarea {
+                        height: 200px;
+                    }
+                }
+            }
+        }
+    }
 }

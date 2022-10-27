@@ -4,8 +4,12 @@
     display: $jstree-actions-display;
 
     &__handle {
-        padding: $jstree-actions-handle-offset;
         color: $jstree-actions-handle-color;
+
+        &.btn {
+            padding: $jstree-actions-handle-offset;
+            width: 16px;
+        }
 
         &:hover {
             color: $jstree-actions-handle-hover-color;
@@ -17,31 +21,26 @@
 
         &--inline {
             margin: $jstree-actions-menu-inline-margin;
+            align-items: $jstree-actions-menu-inline-li-align-items;
             list-style: $jstree-actions-menu-inline-list-style;
 
             li {
                 display: $jstree-actions-menu-inline-li-display;
-                padding: $jstree-actions-menu-inline-li-padding;
+                padding-right: $jstree-actions-menu-item-gap;
 
-                &:before {
+                &:not(:first-child)::before {
                     content: $jstree-actions-menu-inline-li-before-content;
-                    width: $jstree-actions-menu-inline-li-before-width;
                     height: $jstree-actions-menu-inline-li-before-height;
-                    margin: $jstree-actions-menu-inline-li-before-margin;
-                    background: $jstree-actions-menu-inline-li-before-background;
-                }
-
-                &:first-child {
-                    &:before {
-                        display: none;
-                    }
+                    border-left: 1px solid $jstree-actions-menu-separator-color;
+                    margin-right: $jstree-actions-menu-item-gap;
+                    align-self: center;
                 }
 
                 .action {
                     padding: 0;
                 }
 
-                [class*="fa-"] {
+                [class*='fa-'] {
                     display: none;
                 }
             }

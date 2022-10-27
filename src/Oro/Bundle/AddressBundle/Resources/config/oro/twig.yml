@@ -1,2 +1,2 @@
 bundles:
-    - OroAddressBundle:Include:fields.html.twig
+    - '@OroAddress/Include/fields.html.twig'

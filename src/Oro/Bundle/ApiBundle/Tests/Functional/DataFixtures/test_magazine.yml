@@ -1,0 +1,12 @@
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestArticle:
+    article{1..3}:
+        headline: 'Article <current()>'
+        body: 'Article <current()> Body'
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestMagazine:
+    magazine1:
+        name: 'Magazine 1'
+        articles: ['@article1', '@article2', '@article3']
+        bestArticle: '@article1'
+    magazine2:
+        name: 'Magazine 2'

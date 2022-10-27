@@ -1,19 +1,20 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var FiltersManager;
-    var template = require('tpl!orofilter/templates/filters-container.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var MultiselectDecorator = require('./multiselect-decorator');
-    var filterWrapper = require('./datafilter-wrapper');
-    var FiltersStateView = require('./app/views/filters-state-view');
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var FilterDialogWidget = require('orofilter/js/app/views/filter-dialog-widget');
+    const template = require('tpl-loader!orofilter/templates/filters-container.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const MultiselectDecorator = require('orofilter/js/multiselect-decorator');
+    const filterWrapper = require('orofilter/js/datafilter-wrapper');
+    const FiltersStateView = require('orofilter/js/app/views/filters-state-view');
+    const persistentStorage = require('oroui/js/persistent-storage');
+    const FilterDialogWidget = require('orofilter/js/app/views/filter-dialog-widget');
+    const config = require('module-config').default(module.id);
+    const DEFAULT_STORAGE_KEY = 'filters-state';
 
     /**
      * View that represents all grid filters
@@ -26,7 +27,7 @@ define(function(require) {
      * @event updateFilter  on update data of specific filter
      * @event disableFilter on disable specific filter
      */
-    FiltersManager = BaseView.extend({
+    const FiltersManager = BaseView.extend({
         /**
          * List of filter objects
          *
@@ -59,7 +60,7 @@ define(function(require) {
          *  Is used in template for render additional html
          * @property {String} 'collapse-mode' | 'toggle-mode'
          */
-        renderMode: '',
+        renderMode: 'dropdown-mode',
 
         /**
          * Add filter button hint
@@ -118,11 +119,31 @@ define(function(require) {
         dropdownContainer: 'body',
 
         /**
+         * Separate container selector where filter hint will placed
+         *
+         * @property {string}
+         */
+        outerHintContainer: void 0,
+
+        /**
          * Flag for close previous open filters
          *
          * @property
          */
-        hidePreviousOpenFilters: true,
+        autoClose: true,
+
+        /**
+         * Key that's used to fetch data about filters state view mode from persistent storage
+         *
+         * @property
+         */
+        storageKey: null,
+
+        /**
+         * Show or hide Manage filters button
+         * @property {Boolean}
+         */
+        enableMultiselectWidget: false,
 
         /** @property */
         events: {
@@ -133,18 +154,20 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'filters:update mediator': '_onChangeFilterSelect',
             'filters:reset mediator': '_onReset'
         },
 
+        noWrap: true,
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function FiltersManager() {
-            FiltersManager.__super__.constructor.apply(this, arguments);
+        constructor: function FiltersManager(options) {
+            FiltersManager.__super__.constructor.call(this, options);
         },
 
         /**
@@ -155,17 +178,27 @@ define(function(require) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            var prop = ['addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'viewMode'];
+            _.extend(this, _.pick(options,
+                'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'template', 'renderMode',
+                'autoClose', 'outerHintContainer', 'enableMultiselectWidget', 'multiselectParameters',
+                'filterContainer'
+            ));
+
             this.template = this.getTemplateFunction();
-            this.filters = {};
+            this.filters = _.extend({}, options.filters);
+            this.storageKey = options.filtersStateStorageKey || config.filtersStateStorageKey || DEFAULT_STORAGE_KEY;
 
-            _.extend(this, _.pick(options, prop));
+            if (options.forcedViewMode) {
+                this.viewMode = options.forcedViewMode;
+            } else {
+                this.viewMode = persistentStorage.getItem(this.storageKey);
 
-            if (options.filters) {
-                _.extend(this.filters, options.filters);
+                if (this.viewMode === null) {
+                    this.viewMode = options.defaultFiltersViewMode || FiltersManager.STATE_VIEW_MODE;
+                }
             }
 
-            var filterListeners = {
+            const filterListeners = {
                 update: this._onFilterUpdated,
                 change: this._onFilterChanged,
                 disable: this._onFilterDisabled,
@@ -173,43 +206,62 @@ define(function(require) {
             };
 
             if (tools.isMobile()) {
-                var outsideActionEvents = 'click.' + this.cid + ' shown.bs.dropdown.' + this.cid;
+                const outsideActionEvents = 'click.' + this.cid + ' shown.bs.dropdown.' + this.cid;
                 filterListeners.updateCriteriaClick = this._onUpdateCriteriaClick;
                 $('body').on(outsideActionEvents, this._onOutsideActionEvent.bind(this));
             }
 
             _.each(this.filters, function(filter) {
                 if (filter.wrappable) {
-                    _.extend(filter, filterWrapper);
+                    Object.assign(filter, filterWrapper);
+                }
+                if (this.autoClose === false) {
+                    Object.assign(filter, {autoClose: this.autoClose});
                 }
                 this.listenTo(filter, filterListeners);
+                filter.trigger('total-records-count-updated', this.collection.state.totalRecords);
             }, this);
 
             if (this.isFiltersStateViewNeeded(options)) {
-                var $container = this.$el.closest('body, .ui-dialog');
-                var filtersStateView = new FiltersStateView({
-                    el: $container.find(options.filtersStateElement).first(),
-                    filters: options.filters
+                const filtersStateView = new FiltersStateView({
+                    el: options.filtersStateElement,
+                    filters: options.filters,
+                    useAnimationOnInit: options.useFiltersStateAnimationOnInit
                 });
 
                 this.subview('filters-state', filtersStateView);
                 this.listenTo(filtersStateView, 'clicked', function() {
                     this.setViewMode(FiltersManager.MANAGE_VIEW_MODE);
+
+                    const filter = Object.values(this.filters)
+                        .find(filter => {
+                            return filter.visible &&
+                                   filter.renderable &&
+                                   filter.getCriteriaSelector().attr('tabindex') !== '-1';
+                        });
+
+                    if (filter && $.contains(filtersStateView.el, document.activeElement)) {
+                        filter.getCriteriaSelector().trigger('focus');
+                    }
                 });
             }
 
-            FiltersManager.__super__.initialize.apply(this, arguments);
+            FiltersManager.__super__.initialize.call(this, options);
+        },
+
+        hasFilters: function() {
+            return !_.isEmpty(this.filters);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateListeners: function() {
             if (!_.isEmpty(this.filters)) {
                 this.listenTo(mediator, 'datagrid:metadata-loaded', this.updateFilters);
             }
 
-            return FiltersManager.__super__.delegateListeners.apply(this, arguments);
+            return FiltersManager.__super__.delegateListeners.call(this);
         },
 
         /**
@@ -217,8 +269,11 @@ define(function(require) {
          */
         updateFilters: function(grid) {
             _.each(grid.metadata.filters, function(metadata) {
-                if (this.filters[metadata.name]) {
-                    this.filters[metadata.name].trigger('metadata-loaded', metadata);
+                const filter = this.filters[metadata.name];
+                if (filter) {
+                    filter.setRenderMode(this.renderMode);
+                    filter.trigger('total-records-count-updated', this.collection.state.totalRecords);
+                    filter.trigger('metadata-loaded', metadata);
                 }
             }, this);
 
@@ -226,24 +281,33 @@ define(function(require) {
         },
 
         checkFiltersVisibility: function() {
-            var filterSelector = this.$(this.filterSelector);
+            _.each(this.filters, filter => {
+                if (filter.visible && filter.renderable) {
+                    this._renderFilter(filter).show();
+                } else if (!filter.visible) {
+                    filter.hide();
+                }
+            });
+
+            this.checkFiltersSelectVisibility();
+        },
+
+        checkFiltersSelectVisibility: function() {
+            const filterSelector = this.$(this.filterSelector);
+
             if (!filterSelector.length) {
                 return;
             }
-            _.each(this.filters, function(filter) {
-                var option = filterSelector.find('option[value="' + filter.name + '"]');
+
+            _.each(this.filters, filter => {
+                const option = filterSelector.find(`option[value="${filter.name}"]`);
+
                 if (filter.visible && option.hasClass('hidden')) {
-                    option.removeClass('hidden');
-
-                    if (filter.enabled) {
-                        this._renderFilter(filter).show();
-                    }
+                    option.removeClass('hidden').removeAttr('disabled');
                 } else if (!filter.visible && !option.hasClass('hidden')) {
-                    option.addClass('hidden');
-
-                    filter.hide();
+                    option.addClass('hidden').attr('disabled', true);
                 }
-            }, this);
+            });
 
             this._refreshSelectWidget();
         },
@@ -257,7 +321,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -268,10 +332,7 @@ define(function(require) {
                 filter.dispose();
             });
             delete this.filters;
-            if (this.selectWidget) {
-                this.selectWidget.dispose();
-                delete this.selectWidget;
-            }
+            this._disposeSelectWidget();
             FiltersManager.__super__.dispose.call(this);
         },
 
@@ -294,8 +355,8 @@ define(function(require) {
          * @protected
          */
         _onFilterChanged: function() {
-            this._publishCountChangedFilters();
             this._publishCountSelectedFilters();
+            this._publishCountChangedFilters();
         },
 
         /**
@@ -314,7 +375,7 @@ define(function(require) {
         },
 
         _onFilterShowCriteria: function(shownFilter) {
-            if (this.hidePreviousOpenFilters) {
+            if (this.autoClose) {
                 _.each(this.filters, function(filter) {
                     if (filter !== shownFilter) {
                         _.result(filter, 'ensurePopupCriteriaClosed');
@@ -329,9 +390,9 @@ define(function(require) {
          * Returns list of filter raw values
          */
         getValues: function() {
-            var values = {};
+            const values = {};
             _.each(this.filters, function(filter) {
-                if (filter.enabled) {
+                if (filter.renderable) {
                     values[filter.name] = filter.getValue();
                 }
             }, this);
@@ -392,7 +453,7 @@ define(function(require) {
             if (_.isEmpty(filters)) {
                 return this;
             }
-            var optionsSelectors = [];
+            const optionsSelectors = [];
 
             _.each(filters, function(filter) {
                 this._renderFilter(filter);
@@ -402,11 +463,11 @@ define(function(require) {
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
 
-            if (!this.$(this.filterSelector).length) {
+            if (!this.enableMultiselectWidget) {
                 return;
             }
 
-            var options = this.$(this.filterSelector).find(optionsSelectors.join(','));
+            const options = this.$(this.filterSelector).find(optionsSelectors.join(','));
             if (options.length) {
                 options.prop('selected', true);
             }
@@ -428,17 +489,17 @@ define(function(require) {
             if (_.isEmpty(filters)) {
                 return this;
             }
-            var optionsSelectors = [];
+            const optionsSelectors = [];
 
             _.each(filters, function(filter) {
                 filter.disable();
                 optionsSelectors.push('option[value="' + filter.name + '"]:selected');
             }, this);
 
-            if (!this.$(this.filterSelector).length) {
+            if (!this.enableMultiselectWidget) {
                 return;
             }
-            var options = this.$(this.filterSelector).find(optionsSelectors.join(','));
+            const options = this.$(this.filterSelector).find(optionsSelectors.join(','));
             if (options.length) {
                 options.prop('selected', false);
             }
@@ -456,7 +517,8 @@ define(function(require) {
          */
         _renderFilter: function(filter) {
             if (!filter.isRendered()) {
-                var oldEl = filter.$el;
+                const oldEl = filter.$el;
+
                 filter.setRenderMode(this.renderMode);
                 // filter rendering process replaces $el
                 filter.render();
@@ -475,7 +537,9 @@ define(function(require) {
         getTemplateData: function() {
             return {
                 filters: this.filters,
-                renderMode: this.renderMode
+                renderMode: this.renderMode,
+                outerHintContainer: this.outerHintContainer,
+                enableMultiselectWidget: this.enableMultiselectWidget
             };
         },
 
@@ -485,25 +549,25 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            this.setElement(
-                $(this.template(this.getTemplateData()))
-            );
+            FiltersManager.__super__.render.call(this);
 
             this.dropdownContainer = this.$el.find('.filter-container');
-            var $filterItems = this.dropdownContainer.find('.filter-items');
+            const $filterItems = this.dropdownContainer.find('.filter-items');
 
             _.each(this.filters, function(filter) {
                 if (_.isFunction(filter.setDropdownContainer)) {
                     filter.setDropdownContainer(this.dropdownContainer);
                 }
-                if (!filter.enabled || !filter.visible) {
+
+                filter.setRenderMode(this.renderMode);
+
+                if (!filter.renderable || !filter.visible) {
                     // append element to reserve space
                     // empty elements are hidden by default
                     $filterItems.append(filter.$el);
                     return;
                 }
 
-                filter.setRenderMode(this.renderMode);
                 filter.render();
                 $filterItems.append(filter.$el);
                 filter.rendered();
@@ -512,20 +576,39 @@ define(function(require) {
             this.trigger('rendered');
 
             if (_.isEmpty(this.filters)) {
-                this.$el.hide();
-            } else {
+                this.hide();
+            } else if (this.enableMultiselectWidget) {
                 this._initializeSelectWidget();
             }
-            var filtersStateView = this.subview('filters-state');
+            const filtersStateView = this.subview('filters-state');
             if (filtersStateView) {
                 filtersStateView.render();
                 if (this.viewMode === FiltersManager.MANAGE_VIEW_MODE) {
                     filtersStateView.hide();
-                } else if (this.viewMode === FiltersManager.STATE_VIEW_MODE) {
-                    this.$el.hide();
                 }
             }
+
+            if (this.viewMode === FiltersManager.STATE_VIEW_MODE) {
+                this.hide();
+            }
+
+            this.appendToContainer();
             return this;
+        },
+
+        show: function() {
+            this.$el.show();
+            this.trigger('visibility-change', true);
+        },
+
+        hide: function() {
+            this.$el.hide();
+            this.trigger('visibility-change', false);
+        },
+
+        appendToContainer() {
+            this.$el.prependTo(this.filterContainer);
+            this.trigger('visibility-change', this.$el.is(':visible'));
         },
 
         /**
@@ -533,7 +616,8 @@ define(function(require) {
          * @private
          */
         _publishCountSelectedFilters: function(count) {
-            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateSelectedFilters();
+            const countFilters = (!_.isUndefined(count) && _.isNumber(count))
+                ? count : this._calculateSelectedFilters();
 
             mediator.trigger(
                 'filterManager:selectedFilters:count:' + this.collection.options.gridName,
@@ -548,7 +632,7 @@ define(function(require) {
          * @private
          */
         _publishCountChangedFilters: function(count) {
-            var countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateChangedFilters();
+            const countFilters = (!_.isUndefined(count) && _.isNumber(count)) ? count : this._calculateChangedFilters();
 
             mediator.trigger(
                 'filterManager:changedFilters:count:' + this.collection.options.gridName,
@@ -562,8 +646,8 @@ define(function(require) {
          */
         _calculateSelectedFilters: function() {
             return _.reduce(this.filters, function(memo, filter) {
-                var num = (
-                    filter.enabled &&
+                const num = (
+                    filter.renderable &&
                     !filter.isEmptyValue() &&
                     !_.isEqual(filter.emptyValue, filter.value)
                 ) ? 1 : 0;
@@ -573,27 +657,29 @@ define(function(require) {
         },
 
         /**
-         * @returns {Number} count of selected filters
+         * @returns {Number} count of changed filters
          * @private
          */
         _calculateChangedFilters: function() {
-            return _.reduce(this.filters, function(memo, filter) {
-                var domVal = filter._readDOMValue();
+            return this.getChangedFilters().length;
+        },
 
-                var num = (filter.enabled &&
-                   !_.isEqual(filter.value, domVal) &&
-                   !_.isEqual(filter.emptyValue, domVal) &&
-                   !_.isUndefined(domVal.type) &&
-                   !_.isEmpty(domVal.value)
-                ) ? 1 : 0;
+        /**
+         * @returns {jQuery.Element}
+         */
+        getHintContainer: function() {
+            let $container = this.dropdownContainer;
 
-                return memo + num;
-            }, 0);
+            if (this.outerHintContainer) {
+                $container = $(this.outerHintContainer);
+            }
+
+            return $container.find('.filter-items-hint');
         },
 
         _resetHintContainer: function() {
-            var $container = this.dropdownContainer.find('.filter-items-hint');
-            var show = false;
+            const $container = this.getHintContainer();
+            let show = false;
             $container.children('span').each(function() {
                 if (this.style.display !== 'none') {
                     show = true;
@@ -609,14 +695,23 @@ define(function(require) {
             this._publishCountSelectedFilters();
         },
 
+        _disposeSelectWidget() {
+            if (this.selectWidget) {
+                this.$(this.filterSelector).off(`remove${this.eventNamespace()}`);
+                this.selectWidget.dispose();
+                delete this.selectWidget;
+            }
+        },
+
         /**
          * Initialize multiselect widget
          *
          * @protected
          */
         _initializeSelectWidget: function() {
-            var $button;
-            var multiselectDefaults = {
+            this._disposeSelectWidget();
+
+            const multiselectDefaults = {
                 multiple: true,
                 selectedList: 0,
                 classes: 'select-filter-widget',
@@ -625,39 +720,42 @@ define(function(require) {
                     at: 'left bottom'
                 }
             };
-            var options = _.extend(
+
+            if (this.multiselectParameters.appendTo) {
+                this.multiselectParameters.appendTo = this.$el.find(this.multiselectParameters.appendTo);
+            }
+
+            const options = _.extend(
                 multiselectDefaults,
                 {
+                    minWidth: 'none',
                     selectedText: this.addButtonHint,
-                    beforeopen: _.bind(function() {
-                        _.each(this.filters, function(filter) {
-                            filter.close();
-                        });
+                    beforeopen: () => {
                         this.selectWidget.onBeforeOpenDropdown();
-                    }, this),
-                    open: _.bind(function() {
+                    },
+                    open: () => {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
-                    }, this),
-                    refresh: _.bind(function() {
+                    },
+                    refresh: () => {
                         this.selectWidget.onRefresh();
-                    }, this),
+                    },
+                    close: () => {
+                        this.selectWidget.onClose();
+                    },
                     appendTo: this.dropdownContainer
                 },
                 this.multiselectParameters
             );
 
-            if (!this.$(this.filterSelector).length) {
-                return;
-            }
-
+            this.$(this.filterSelector).on(`remove${this.eventNamespace()}`, this._disposeSelectWidget.bind(this));
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.filterSelector),
                 parameters: options
             });
 
             this.selectWidget.setViewDesign(this);
-            $button = this.selectWidget.multiselect('instance').button;
+            const $button = this.selectWidget.multiselect('instance').button;
             this._setButtonDesign($button);
             this._setButtonReset();
         },
@@ -668,7 +766,7 @@ define(function(require) {
          * @protected
          */
         _refreshSelectWidget: function() {
-            if (!this.selectWidget) {
+            if (!this.selectWidget && !this.enableMultiselectWidget) {
                 return;
             }
             this.selectWidget.multiselect('refresh');
@@ -692,7 +790,7 @@ define(function(require) {
         _createButtonReset: function() {
             return $(
                 '<div class="ui-multiselect-footer">' +
-                    '<a href="javascript:void(0);" class="ui-multiselect-reset" data-role="reset-filters">' +
+                    '<a href="#" class="ui-multiselect-reset" role="button" data-role="reset-filters">' +
                         '<i class="fa-refresh"></i>' + this.multiselectResetButtonLabel + '' +
                     '</a>' +
                 '</div>'
@@ -705,8 +803,8 @@ define(function(require) {
          * @protected
          */
         _setButtonReset: function() {
-            var $footerContainer = this._createButtonReset();
-            var instance = this.selectWidget.multiselect('instance');
+            const $footerContainer = this._createButtonReset();
+            const instance = this.selectWidget.multiselect('instance');
             instance.menu.append($footerContainer);
         },
 
@@ -716,8 +814,8 @@ define(function(require) {
          * @protected
          */
         _setDropdownWidth: function() {
-            var widget = this.selectWidget.getWidget();
-            var requiredWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
+            const widget = this.selectWidget.getWidget();
+            const requiredWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
         },
 
@@ -733,9 +831,9 @@ define(function(require) {
             }
 
             _.each(this.filters, function(filter, name) {
-                if (!filter.enabled && _.indexOf(activeFilters, name) !== -1) {
+                if (!filter.renderable && _.indexOf(activeFilters, name) !== -1) {
                     this.enableFilter(filter);
-                } else if (filter.enabled && _.indexOf(activeFilters, name) === -1) {
+                } else if (filter.renderable && _.indexOf(activeFilters, name) === -1) {
                     this.disableFilter(filter);
                 }
             }, this);
@@ -759,7 +857,7 @@ define(function(require) {
          */
         _onDropdownToggle: function(e) {
             e.preventDefault();
-            var dialogWidget = new FilterDialogWidget({
+            const dialogWidget = new FilterDialogWidget({
                 title: this.filterDialogTitle,
                 content: this.dropdownContainer
             });
@@ -792,7 +890,7 @@ define(function(require) {
          */
         _onUpdateCriteriaClick: function(filter) {
             filter.once('update', this.closeDropdown, this);
-            _.defer(_.bind(filter.off, filter, 'update', this.closeDropdown, this));
+            _.defer(filter.off.bind(filter, 'update', this.closeDropdown, this));
         },
 
         getViewMode: function() {
@@ -800,29 +898,22 @@ define(function(require) {
         },
 
         setViewMode: function(mode) {
-            if (this.viewMode === mode) {
+            const modes = [FiltersManager.STATE_VIEW_MODE, FiltersManager.MANAGE_VIEW_MODE];
+
+            if (this.viewMode === mode || !_.contains(modes, mode)) {
                 return;
             }
-            if (mode === FiltersManager.STATE_VIEW_MODE) {
-                this.$el.hide();
-                _.result(this.subview('filters-state'), 'show');
-            } else if (mode === FiltersManager.MANAGE_VIEW_MODE) {
-                if (!_.isEmpty(this.filters)) {
-                    this.$el.show();
-                }
-                _.result(this.subview('filters-state'), 'hide');
-            } else {
-                return;
-            }
-            this.viewMode = mode;
-            persistentStorage.setItem(FiltersManager.STORAGE_KEY, mode);
+
             this.trigger('changeViewMode', mode);
+            _.result(this.subview('filters-state'), mode === FiltersManager.STATE_VIEW_MODE ? 'show' : 'hide');
+            this.viewMode = mode;
+            persistentStorage.setItem(this.storageKey, mode);
         },
 
         getChangedFilters: function() {
             return _.filter(this.filters, function(filter) {
                 return (
-                    filter.enabled &&
+                    filter.renderable &&
                     filter._isDOMValueChanged()
                 );
             });
@@ -830,9 +921,8 @@ define(function(require) {
     });
 
     _.extend(FiltersManager, {
-        MANAGE_VIEW_MODE: 0,
-        STATE_VIEW_MODE: 1,
-        STORAGE_KEY: 'filter-view-mode-state'
+        MANAGE_VIEW_MODE: 'expanded',
+        STATE_VIEW_MODE: 'collapsed'
     });
 
     return FiltersManager;

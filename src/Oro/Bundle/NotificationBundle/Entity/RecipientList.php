@@ -6,10 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * EmailNotification
+ * Holds recipients of email notification.
  *
  * @ORM\Table("oro_notification_recip_list")
  * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository")
@@ -195,6 +194,8 @@ class RecipientList
     public function setAdditionalEmailAssociations($additionalEmailAssociations)
     {
         $this->additionalEmailAssociations = $additionalEmailAssociations;
+
+        return $this;
     }
 
     /**
@@ -236,28 +237,6 @@ class RecipientList
     }
 
     /**
-     * Custom validation constraint
-     * Not valid if no one recipient specified
-     *
-     * @param ExecutionContextInterface $context
-     */
-    public function isValid(ExecutionContextInterface $context)
-    {
-        $notValid =
-            $this->getGroups()->isEmpty()
-            && $this->getUsers()->isEmpty()
-            && $this->getEmail() == null
-            && $this->getEntityEmails() === [];
-
-        if ($notValid) {
-            $propertyPath = $context->getPropertyPath() . '.recipientList';
-            $context->buildViolation('oro.notification.validators.recipient_list.empty.message')
-                ->atPath($propertyPath)
-                ->addViolation();
-        }
-    }
-
-    /**
      * @return array
      */
     public function getEntityEmails()
@@ -265,11 +244,10 @@ class RecipientList
         return $this->entityEmails;
     }
 
-    /**
-     * @param array $entityEmails
-     */
     public function setEntityEmails(array $entityEmails)
     {
         $this->entityEmails = $entityEmails;
+
+        return $this;
     }
 }

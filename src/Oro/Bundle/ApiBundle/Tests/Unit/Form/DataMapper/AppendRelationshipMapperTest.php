@@ -16,6 +16,9 @@ use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
@@ -27,25 +30,19 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
     /** @var AppendRelationshipMapper */
     private $mapper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+
         $this->mapper = new AppendRelationshipMapper($this->propertyAccessor);
     }
 
-    /**
-     * @param FormConfigInterface $config
-     * @param bool                $synchronized
-     * @param bool                $submitted
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|Form
-     */
-    private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
+    private function getForm(FormConfigInterface $config, bool $synchronized = true, bool $submitted = true): Form
     {
         $form = $this->getMockBuilder(Form::class)
             ->setConstructorArgs([$config])
-            ->setMethods(['isSynchronized', 'isSubmitted'])
+            ->onlyMethods(['isSynchronized', 'isSubmitted'])
             ->getMock();
 
         $form->expects(self::any())
@@ -153,7 +150,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
 
         $form = $this->getMockBuilder(Form::class)
             ->setConstructorArgs([$config])
-            ->setMethods(['setData'])
+            ->onlyMethods(['setData'])
             ->getMock();
 
         $form->expects(self::once())

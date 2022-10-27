@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineListenersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class LazyDoctrineListenersPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldMarkDoctrineEventListenersAsLazyAndPublic()
+    public function testShouldMarkDoctrineEventListenersAsLazyAndPublic(): void
     {
         $container = new ContainerBuilder();
         $container->register('public_listener')
@@ -18,9 +18,9 @@ class LazyDoctrineListenersPassTest extends \PHPUnit\Framework\TestCase
         $container->register('lazy_listener')
             ->addTag('doctrine.event_listener', ['lazy' => true]);
         $container->register('not_lazy_listener')
+            ->setPublic(true)
             ->addTag('doctrine.event_listener', ['lazy' => false]);
         $container->register('private_lazy_listener')
-            ->setPublic(false)
             ->addTag('doctrine.event_listener', ['lazy' => true]);
         $container->register('private_not_lazy_listener')
             ->setPublic(false)

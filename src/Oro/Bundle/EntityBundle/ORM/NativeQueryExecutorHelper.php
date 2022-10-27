@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Parser;
 use Doctrine\ORM\Query\QueryException;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 
+/**
+ * Provides a set of methods to help the native SQL query execution.
+ */
 class NativeQueryExecutorHelper
 {
     /**
@@ -22,94 +25,39 @@ class NativeQueryExecutorHelper
     protected $tablesNames = [];
 
     /**
+     * @var array
+     */
+    protected $tablesColumns = [];
+
+    /**
      * @var array|ClassMetadata[]
      */
     protected $classesMetadata = [];
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
 
     /**
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     *
-     * Copy of Doctrine\ORM\Query::processParameterMappings
-     *
      * @param Query $query
      * @return array
      * @throws QueryException
      */
     public function processParameterMappings(Query $query)
     {
-        $parser = new Parser($query);
-        $parseResult = $parser->parse();
-        $paramMappings = $parseResult->getParameterMappings();
-        $resultSetMapping = $parseResult->getResultSetMapping();
+        $paramMappings = QueryUtil::parseQuery($query)->getParameterMappings();
 
         $paramCount = count($query->getParameters());
         $mappingCount = count($paramMappings);
-
         if ($paramCount > $mappingCount) {
             throw QueryException::tooManyParameters($mappingCount, $paramCount);
-        } elseif ($paramCount < $mappingCount) {
+        }
+        if ($paramCount < $mappingCount) {
             throw QueryException::tooFewParameters($mappingCount, $paramCount);
         }
 
-        $sqlParams = [];
-        $types = [];
-
-        foreach ($query->getParameters() as $parameter) {
-            $key = $parameter->getName();
-            $value = $parameter->getValue();
-            $rsm = $resultSetMapping;
-
-            if (!isset($paramMappings[$key])) {
-                throw QueryException::unknownParameter($key);
-            }
-
-            if (isset($rsm->metadataParameterMapping[$key]) && $value instanceof ClassMetadata) {
-                $value = $value->getMetadataValue($rsm->metadataParameterMapping[$key]);
-            }
-
-            $value = $query->processParameterValue($value);
-            $type = ($parameter->getValue() === $value)
-                ? $parameter->getType()
-                : Query\ParameterTypeInferer::inferType($value);
-
-            foreach ($paramMappings[$key] as $position) {
-                $types[$position] = $type;
-            }
-
-            $sqlPositions = $paramMappings[$key];
-
-            // optimized multi value sql positions away for now,
-            // they are not allowed in DQL anyways.
-            $value = [$value];
-            $countValue = count($value);
-
-            for ($i = 0, $l = count($sqlPositions); $i < $l; $i++) {
-                $sqlParams[$sqlPositions[$i]] = $value[($i % $countValue)];
-            }
-        }
-
-        if (count($sqlParams) !== count($types)) {
-            throw QueryException::parameterTypeMismatch();
-        }
-
-        if ($sqlParams) {
-            ksort($sqlParams);
-            $sqlParams = array_values($sqlParams);
-
-            ksort($types);
-            $types = array_values($types);
-        }
-
-        return [$sqlParams, $types];
+        return QueryUtil::processParameterMappings($query, $paramMappings);
     }
 
     /**
@@ -144,5 +92,28 @@ class NativeQueryExecutorHelper
         }
 
         return $this->classesMetadata[$className];
+    }
+
+    public function getColumns(string $className, array $fields): array
+    {
+        $result = [];
+
+        foreach ($fields as $field) {
+            if (!isset($this->tablesColumns[$className][$field])) {
+                $classMetadata = $this->getClassMetadata($className);
+                if (!$classMetadata->hasField($field) && !$classMetadata->hasAssociation($field)) {
+                    throw new \InvalidArgumentException(sprintf('Field %s is not known for %s', $field, $className));
+                }
+                if ($classMetadata->hasAssociation($field)) {
+                    $mapping = $classMetadata->getAssociationMapping($field);
+                    $this->tablesColumns[$className][$field] = array_shift($mapping['joinColumnFieldNames']);
+                } else {
+                    $this->tablesColumns[$className][$field] = $classMetadata->getColumnName($field);
+                }
+            }
+            $result[] = $this->tablesColumns[$className][$field];
+        }
+
+        return $result;
     }
 }

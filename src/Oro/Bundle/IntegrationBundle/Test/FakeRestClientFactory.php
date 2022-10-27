@@ -3,10 +3,12 @@
 namespace Oro\Bundle\IntegrationBundle\Test;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientFactoryInterface;
-use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
 use Oro\Bundle\IntegrationBundle\Test\FakeRestResponse as Response;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Factory for the fake REST client with pre-configured responses using fixtures
+ */
 class FakeRestClientFactory implements RestClientFactoryInterface
 {
     const DEFAULT_RESPONSE = '__DEFAULT__';
@@ -34,7 +36,8 @@ class FakeRestClientFactory implements RestClientFactoryInterface
     }
 
     /**
-     * @return array returns array responses from fixture
+     * @param FakeRestClient $fakeClient
+     * @return void returns array responses from fixture
      */
     protected function loadFixture(FakeRestClient $fakeClient)
     {

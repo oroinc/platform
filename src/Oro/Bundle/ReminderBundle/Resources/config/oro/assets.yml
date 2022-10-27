@@ -1,4 +1,7 @@
-assets:
-    css:
-        ororeminder:
-            - 'bundles/ororeminder/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/ororeminder/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/ororeminder/css/scss/main.scss'

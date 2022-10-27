@@ -7,6 +7,9 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
 {
     public function testNoRestrictions()
@@ -477,12 +480,11 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         );
     }
 
-    /**
-     * @expectedException LogicException
-     * @expectedExceptionMessage Computed conditions cannot be mixed with uncomputed.
-     */
     public function testComputedWithUnComputedRestrictionsTogetherShouldReturnExceptionWhenRestrictionsAreMixed()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Computed conditions cannot be mixed with uncomputed.');
+
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.status, COUNT(u.id)'])
             ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')

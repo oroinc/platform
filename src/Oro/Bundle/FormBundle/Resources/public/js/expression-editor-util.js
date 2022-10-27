@@ -1,8 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var ExpressionEditorUtil;
-    var _ = require('underscore');
+    const _ = require('underscore');
     var BaseClass = require('oroui/js/base-class');
     var Token = require('oroexpressionlanguage/js/extend/token');
     var ExpressionLanguage = require('oroexpressionlanguage/js/extend/expression-language');

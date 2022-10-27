@@ -1,0 +1,24 @@
+services:
+    oro_message_queue.mock_lifecycle_message.cache:
+        public: true
+        class: 'Symfony\Component\Cache\Adapter\PdoAdapter'
+        arguments:
+            - '@doctrine.dbal.message_queue_connection'
+            - ''
+            - 0
+            - { db_table: oro_behat_message_queue }
+
+    oro_message_queue.client.mock_lifecycle_message_producer:
+        class: Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client\MockLifecycleMessageProducer
+        decorates: oro_message_queue.client.message_producer
+        decoration_priority: -254
+        arguments:
+            - '@.inner'
+            - '@oro_message_queue.mock_lifecycle_message.cache'
+
+    oro_message_queue.client.mock_lifecycle_message_extension:
+        class: Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client\ConsumptionExtension\MockLifecycleMessageExtension
+        arguments:
+            - '@oro_message_queue.mock_lifecycle_message.cache'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', persistent: true }

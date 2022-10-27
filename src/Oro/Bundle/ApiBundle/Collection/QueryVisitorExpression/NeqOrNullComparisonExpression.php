@@ -41,14 +41,6 @@ class NeqOrNullComparisonExpression implements ComparisonExpressionInterface
         return $builder->orX($mainExpr, $builder->isNull($expression));
     }
 
-    /**
-     * @param QueryExpressionVisitor $visitor
-     * @param string                 $field
-     * @param string                 $parameterName
-     * @param Range                  $value
-     *
-     * @return Expr\Func
-     */
     private function walkRangeExpression(
         QueryExpressionVisitor $visitor,
         string $field,
@@ -64,11 +56,12 @@ class NeqOrNullComparisonExpression implements ComparisonExpressionInterface
         $subquery = $visitor->createSubquery($field);
         $subquery->andWhere(
             $subquery->expr()->between(
-                QueryBuilderUtil::getSingleRootAlias($subquery),
+                QueryBuilderUtil::getSelectExpr($subquery),
                 $visitor->buildPlaceholder($fromParameterName),
                 $visitor->buildPlaceholder($toParameterName)
             )
         );
+        $subquery->select(QueryBuilderUtil::getSingleRootAlias($subquery));
 
         $builder = $visitor->getExpressionBuilder();
 

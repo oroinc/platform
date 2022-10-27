@@ -3,26 +3,22 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
+use Oro\Bundle\NotificationBundle\Entity\RecipientList;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailNotificationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailNotification
-     */
-    protected $entity;
+    private EmailNotification $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new EmailNotification();
 
         // get id should return null cause this entity was not loaded from DB
         $this->assertNull($this->entity->getId());
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entity);
     }
 
     public function testGetterSetterForEntityName()
@@ -34,7 +30,7 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
 
     public function testGetterSetterForTemplate()
     {
-        $emailTemplate = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
+        $emailTemplate = $this->createMock(EmailTemplate::class);
         $this->assertNull($this->entity->getTemplate());
         $this->entity->setTemplate($emailTemplate);
         $this->assertEquals($emailTemplate, $this->entity->getTemplate());
@@ -42,18 +38,17 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
 
     public function testGetterSetterForEvent()
     {
-        $this->assertNull($this->entity->getEvent());
+        $this->assertNull($this->entity->getEventName());
 
-        $event = $this->createMock('Oro\Bundle\NotificationBundle\Entity\Event', array(), array('test.name'));
-        $this->entity->setEvent($event);
-        $this->assertEquals($event, $this->entity->getEvent());
+        $this->entity->setEventName('test.name');
+        $this->assertEquals('test.name', $this->entity->getEventName());
     }
 
     public function testGetterSetterForRecipients()
     {
         $this->assertNull($this->entity->getRecipientList());
 
-        $list = $this->createMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
+        $list = $this->createMock(RecipientList::class);
         $this->entity->setRecipientList($list);
         $this->assertEquals($list, $this->entity->getRecipientList());
     }
@@ -62,16 +57,18 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertTrue($this->entity->getRecipientUsersList()->isEmpty());
 
-        $userMock1 = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-        $userMock2 = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-        $collection = new ArrayCollection(array($userMock1, $userMock2));
+        $userMock1 = $this->createMock(User::class);
+        $userMock2 = $this->createMock(User::class);
+        $collection = new ArrayCollection([$userMock1, $userMock2]);
 
-        $list = $this->createMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
-        $list->expects($this->once())->method('getUsers')->will($this->returnValue($collection));
+        $list = $this->createMock(RecipientList::class);
+        $list->expects($this->once())
+            ->method('getUsers')
+            ->willReturn($collection);
         $this->entity->setRecipientList($list);
 
         $actual = $this->entity->getRecipientUsersList();
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
+        $this->assertInstanceOf(ArrayCollection::class, $actual);
         $this->assertEquals($collection, $actual);
     }
 
@@ -79,17 +76,19 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertTrue($this->entity->getRecipientGroupsList()->isEmpty());
 
-        $groupMock1 = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
-        $groupMock2 = $this->createMock('Oro\Bundle\UserBundle\Entity\Group');
+        $groupMock1 = $this->createMock(Group::class);
+        $groupMock2 = $this->createMock(Group::class);
 
-        $collection = new ArrayCollection(array($groupMock1, $groupMock2));
+        $collection = new ArrayCollection([$groupMock1, $groupMock2]);
 
-        $list = $this->createMock('Oro\Bundle\NotificationBundle\Entity\RecipientList');
-        $list->expects($this->once())->method('getGroups')->will($this->returnValue($collection));
+        $list = $this->createMock(RecipientList::class);
+        $list->expects($this->once())
+            ->method('getGroups')
+            ->willReturn($collection);
         $this->entity->setRecipientList($list);
 
         $actual = $this->entity->getRecipientGroupsList();
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
+        $this->assertInstanceOf(ArrayCollection::class, $actual);
         $this->assertEquals($collection, $actual);
     }
 }

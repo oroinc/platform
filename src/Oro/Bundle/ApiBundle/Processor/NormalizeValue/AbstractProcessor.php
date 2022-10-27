@@ -43,10 +43,8 @@ abstract class AbstractProcessor implements ProcessorInterface
     /**
      * Adds to the context a regular expression that can be used to validate a value
      * of a data-type this processor works with.
-     *
-     * @param NormalizeValueContext $context
      */
-    public function processRequirement(NormalizeValueContext $context)
+    protected function processRequirement(NormalizeValueContext $context)
     {
         if ($context->isArrayAllowed()) {
             $requirement = $this->getArrayRequirement($context->getArrayDelimiter());
@@ -96,14 +94,12 @@ abstract class AbstractProcessor implements ProcessorInterface
 
     /**
      * Does a value normalization (conversion to a concrete data-type) if needed.
-     *
-     * @param NormalizeValueContext $context
      */
     protected function processNormalization(NormalizeValueContext $context)
     {
         $value = $context->getResult();
         if (null !== $value && $this->isValueNormalizationRequired($value)) {
-            if ($context->isRangeAllowed() && false !== strpos($value, $context->getRangeDelimiter())) {
+            if ($context->isRangeAllowed() && str_contains($value, $context->getRangeDelimiter())) {
                 $context->setResult($this->normalizeRangeValue($value, $context->getRangeDelimiter()));
             } elseif ($context->isArrayAllowed()) {
                 $context->setResult($this->normalizeArrayValue($value, $context->getArrayDelimiter()));
@@ -142,13 +138,12 @@ abstract class AbstractProcessor implements ProcessorInterface
         } catch (\Exception $e) {
             if (count($values) === 1) {
                 throw $e;
-            } else {
-                throw new \UnexpectedValueException(
-                    sprintf('Expected an array of %s. Given "%s".', $this->getDataTypePluralString(), $value),
-                    0,
-                    $e
-                );
             }
+            throw new \UnexpectedValueException(
+                sprintf('Expected an array of %s. Given "%s".', $this->getDataTypePluralString(), $value),
+                0,
+                $e
+            );
         }
 
         if (count($normalizedValue) === 1) {
@@ -170,7 +165,7 @@ abstract class AbstractProcessor implements ProcessorInterface
         $delimiterPos = strpos($value, $rangeDelimiter);
         $values = [
             substr($value, 0, $delimiterPos),
-            substr($value, $delimiterPos + strlen($rangeDelimiter))
+            substr($value, $delimiterPos + \strlen($rangeDelimiter))
         ];
         try {
             $normalizedValues = $this->normalizeValues($values);

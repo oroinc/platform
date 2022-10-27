@@ -1,5 +1,5 @@
 <% if (!_.isMobile()) { %>
-    <span><%= _.__('oro.datagrid.pagination.label') %>:</span>
+    <span><%- _.__('oro.datagrid.pagination.label') %>:</span>
 <% } %>
 
 <% _.each(handles, function (handle) { %>
@@ -23,6 +23,6 @@
 <% }); %>
 
 <% if (!_.isMobile()) { %>
-    <span><%- _.__('oro.datagrid.pagination.totalPages', {totalPages: state.totalPages || 1}) %></span>
-    <span><%- _.__('oro.datagrid.pagination.totalRecords', {totalRecords: state.totalRecords}) %></span>
+    <span><%- _.__('oro.datagrid.pagination.totalPages', {totalPages: state.totalPages || 1}, state.totalPages || 1) %></span>
+    <span><%- _.__('oro.datagrid.pagination.totalRecords', {totalRecords: state.totalRecords}, state.totalRecords) %></span>
 <% } %>

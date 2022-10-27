@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema;
 
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
@@ -13,8 +14,11 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChanged;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
@@ -34,6 +38,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_5\SetOwnerForEmailTemplates as Em
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganization;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v2_0\OroUserBundle as OroUserBundle20;
+use Oro\Bundle\UserBundle\Migrations\Schema\v2_9\SetOwnerForEmailOrganizationOnDeleteCascade;
 
 /**
  * ORO installer for UserBundle
@@ -43,10 +48,12 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v2_0\OroUserBundle as OroUserBundle2
  */
 class OroUserBundleInstaller implements
     Installation,
+    DatabasePlatformAwareInterface,
     AttachmentExtensionAwareInterface,
     ExtendExtensionAwareInterface,
     ActivityExtensionAwareInterface
 {
+    use DatabasePlatformAwareTrait;
     use AttachmentExtensionAwareTrait;
 
     /** @var ActivityExtension */
@@ -60,7 +67,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v2_3';
+        return 'v2_9';
     }
 
     /**
@@ -85,7 +92,7 @@ class OroUserBundleInstaller implements
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
-        $this->createOroUserEmailTable($schema);
+        $this->createOroUserEmailTable($schema, $queries);
         $this->createOroUserApiTable($schema);
 
         $this->createOroUserTable($schema);
@@ -99,7 +106,7 @@ class OroUserBundleInstaller implements
         $this->createOroAccessGroupTable($schema);
         $this->createOroUserAccessGroupRoleTable($schema);
         $this->createOroAccessRoleTable($schema);
-        $this->createOroUserStatusTable($schema);
+        $this->createOroUserLoginAttemptsTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroUserEmailForeignKeys($schema);
@@ -110,7 +117,7 @@ class OroUserBundleInstaller implements
         $this->addOroUserBusinessUnitForeignKeys($schema);
         $this->addOroAccessGroupForeignKeys($schema);
         $this->addOroUserAccessGroupRoleForeignKeys($schema);
-        $this->addOroUserStatusForeignKeys($schema);
+        $this->addOroUserLoginAttemptsForeignKeys($schema);
 
         EmailTemplateOwner::addOwnerToOroEmailTemplate($schema);
         OroUserBundle::addOwnerToOroEmailAddress($schema);
@@ -142,18 +149,20 @@ class OroUserBundleInstaller implements
         AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
         AddImpersonationTable::createOroUserImpersonationTable($schema);
         AddImpersonationIpColumn::addColumn($schema);
+        $table = $schema->getTable('oro_user_impersonation');
+        $table->addIndex(['ip_address'], 'oro_user_imp_ip');
+
         AddAuthStatusColumn::addAuthStatusFieldAndValues($schema, $queries, $this->extendExtension);
         OroUserBundle20::addEmailUserIndexes($schema);
+        SetOwnerForEmailOrganizationOnDeleteCascade::updateOrganizationConstraint($schema);
 
         $this->addRelationsToScope($schema);
     }
 
     /**
      * Create oro_user_email table
-     *
-     * @param Schema $schema
      */
-    protected function createOroUserEmailTable(Schema $schema)
+    protected function createOroUserEmailTable(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('oro_user_email');
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
@@ -161,12 +170,17 @@ class OroUserBundleInstaller implements
         $table->addColumn('email', 'string', ['length' => 255, 'precision' => 0]);
         $table->addIndex(['user_id'], 'IDX_8600BE16A76ED395', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['email'], 'idx_user_email', []);
+
+        if ($this->platform instanceof PostgreSqlPlatform) {
+            $queries->addPostQuery(new SqlMigrationQuery(
+                'CREATE INDEX idx_user_email_ci ON oro_user_email (LOWER(email))'
+            ));
+        }
     }
 
     /**
      * Create oro_user_api table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserApiTable(Schema $schema)
     {
@@ -183,16 +197,14 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserTable(Schema $schema)
     {
         $table = $schema->createTable('oro_user');
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
-        $table->addColumn('status_id', 'integer', ['notnull' => false]);
         $table->addColumn('username', 'string', ['length' => 255, 'precision' => 0]);
+        $table->addColumn('username_lowercase', 'string', ['length' => 255]);
         $table->addColumn('email', 'string', ['length' => 255, 'precision' => 0]);
         $table->addColumn('email_lowercase', 'string', ['length' => 255]);
         $table->addColumn(
@@ -222,18 +234,16 @@ class OroUserBundleInstaller implements
         $table->addColumn('createdAt', 'datetime', ['precision' => 0]);
         $table->addColumn('updatedAt', 'datetime', ['precision' => 0]);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
+        $table->addIndex(['username_lowercase'], 'idx_oro_user_username_lowercase', []);
         $table->addUniqueIndex(['email'], 'UNIQ_F82840BCE7927C74');
         $table->addIndex(['email_lowercase'], 'idx_oro_user_email_lowercase', []);
         $table->addIndex(['phone'], 'oro_idx_user_phone');
         $table->addIndex(['business_unit_owner_id'], 'IDX_F82840BC59294170', []);
-        $table->addUniqueIndex(['status_id'], 'UNIQ_F82840BC6BF700BD');
         $table->setPrimaryKey(['id']);
     }
 
     /**
      * Create oro_user_access_role table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserAccessRoleTable(Schema $schema)
     {
@@ -247,8 +257,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_access_group table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserAccessGroupTable(Schema $schema)
     {
@@ -262,8 +270,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_business_unit table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserBusinessUnitTable(Schema $schema)
     {
@@ -277,8 +283,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_access_group table
-     *
-     * @param Schema $schema
      */
     protected function createOroAccessGroupTable(Schema $schema)
     {
@@ -291,8 +295,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_user_access_group_role table
-     *
-     * @param Schema $schema
      */
     protected function createOroUserAccessGroupRoleTable(Schema $schema)
     {
@@ -306,8 +308,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Create oro_access_role table
-     *
-     * @param Schema $schema
      */
     protected function createOroAccessRoleTable(Schema $schema)
     {
@@ -333,26 +333,25 @@ class OroUserBundleInstaller implements
         $table->setPrimaryKey(['id']);
     }
 
-    /**
-     * Create oro_user_status table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroUserStatusTable(Schema $schema)
+    private function createOroUserLoginAttemptsTable(Schema $schema): void
     {
-        $table = $schema->createTable('oro_user_status');
-        $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
+        $table = $schema->createTable('oro_user_login');
+        $table->addColumn('id', 'guid', ['notnull' => false]);
+        $table->addColumn('attempt_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addColumn('success', 'boolean', ['notnull' => true]);
+        $table->addColumn('source', 'integer', ['notnull' => true]);
+        $table->addColumn('username', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('user_id', 'integer', ['notnull' => false]);
-        $table->addColumn('status', 'string', ['length' => 255, 'precision' => 0]);
-        $table->addColumn('created_at', 'datetime', ['precision' => 0]);
-        $table->addIndex(['user_id'], 'IDX_D8DDF7AAA76ED395', []);
+        $table->addColumn('ip', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('user_agent', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('context', 'json', ['notnull' => true, 'comment' => '(DC2Type:json)']);
+        $table->addIndex(['user_id'], 'idx_aa4c6465a76ed395', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['attempt_at'], 'oro_user_log_att_at_idx');
     }
 
     /**
      * Add oro_user_email foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserEmailForeignKeys(Schema $schema)
     {
@@ -367,8 +366,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_api foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserApiForeignKeys(Schema $schema)
     {
@@ -389,8 +386,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserForeignKeys(Schema $schema)
     {
@@ -401,18 +396,10 @@ class OroUserBundleInstaller implements
             ['id'],
             ['onDelete' => 'SET NULL']
         );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user_status'),
-            ['status_id'],
-            ['id'],
-            []
-        );
     }
 
     /**
      * Add oro_user_access_role foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserAccessRoleForeignKeys(Schema $schema)
     {
@@ -433,8 +420,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_access_group foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserAccessGroupForeignKeys(Schema $schema)
     {
@@ -455,8 +440,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_business_unit foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserBusinessUnitForeignKeys(Schema $schema)
     {
@@ -477,8 +460,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_access_group foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAccessGroupForeignKeys(Schema $schema)
     {
@@ -493,8 +474,6 @@ class OroUserBundleInstaller implements
 
     /**
      * Add oro_user_access_group_role foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroUserAccessGroupRoleForeignKeys(Schema $schema)
     {
@@ -513,25 +492,17 @@ class OroUserBundleInstaller implements
         );
     }
 
-    /**
-     * Add oro_user_status foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addOroUserStatusForeignKeys(Schema $schema)
+    private function addOroUserLoginAttemptsForeignKeys(Schema $schema): void
     {
-        $table = $schema->getTable('oro_user_status');
+        $table = $schema->getTable('oro_user_login');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id'],
-            []
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addOroAccessGroupIndexes(Schema $schema)
     {
         $table = $schema->getTable('oro_access_group');
@@ -539,9 +510,6 @@ class OroUserBundleInstaller implements
         $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addRelationsToScope(Schema $schema)
     {
         if ($schema->hasTable('oro_scope')) {
@@ -564,9 +532,6 @@ class OroUserBundleInstaller implements
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function updateOroEmailUserTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_user');

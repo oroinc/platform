@@ -2,114 +2,77 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Menu\NavigationMostviewedBuilder;
+use Oro\Bundle\NavigationBundle\Provider\NavigationItemsProviderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class NavigationMostviewedBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    /** @var NavigationItemsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $navigationItemsProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $factory;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var NavigationMostviewedBuilder */
-    protected $builder;
+    private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->em = $this->createMock(EntityManager::class);
-        $this->factory = $this->createMock(ItemFactory::class);
-        $this->router = $this->createMock(RouterInterface::class);
-        $this->featureChecker = $this->createMock(FeatureChecker::class);
+        $this->navigationItemsProvider = $this->createMock(NavigationItemsProviderInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->builder = new NavigationMostviewedBuilder(
             $this->tokenAccessor,
-            $this->em,
-            $this->factory,
-            $this->router
+            $this->navigationItemsProvider,
+            $this->configManager
         );
-        $this->builder->setFeatureChecker($this->featureChecker);
-        $this->builder->addFeature('email');
     }
 
-    public function testBuild()
+    public function testBuild(): void
     {
-        $organization   = new Organization();
-        $type           = 'mostviewed';
-        $maxItems       = 20;
-        $userId         = 1;
+        $organization = new Organization();
+        $type = 'mostviewed';
+        $maxItems = 20;
 
-        $user = $this->getMockBuilder('stdClass')
-            ->setMethods(array('getId'))
-            ->getMock();
-        $user->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue($userId));
+        $user = $this->createMock(User::class);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
+
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue($organization));
+            ->willReturn($organization);
 
-        $item = $this->createMock('Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface');
-        $this->factory->expects($this->once())
-            ->method('createItem')
-            ->with($type, array())
-            ->will($this->returnValue($item));
-
-        $repository = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository->expects($this->once())
+        $this->navigationItemsProvider->expects($this->once())
             ->method('getNavigationItems')
             ->with(
-                $userId,
+                $user,
                 $organization,
                 $type,
-                array(
+                [
                     'max_items' => $maxItems,
-                    'order_by' => array(array('field' => NavigationHistoryItem::NAVIGATION_HISTORY_COLUMN_VISIT_COUNT))
-                )
+                    'order_by' => [['field' => NavigationHistoryItem::NAVIGATION_HISTORY_COLUMN_VISIT_COUNT]],
+                ]
             )
-            ->will($this->returnValue(array()));
+            ->willReturn([]);
 
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with(get_class($item))
-            ->will($this->returnValue($repository));
-
-        $configMock = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configMock->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
-            ->with($this->equalTo('oro_navigation.max_items'))
-            ->will($this->returnValue($maxItems));
+            ->with('oro_navigation.max_items')
+            ->willReturn($maxItems);
 
-        $menu = $this->getMockBuilder('Knp\Menu\ItemInterface')->getMock();
+        $menu = $this->createMock(\Knp\Menu\ItemInterface::class);
 
-        $this->builder->setConfigManager($configMock);
-        $this->builder->build($menu, array(), $type);
+        $this->builder->build($menu, [], $type);
     }
 }

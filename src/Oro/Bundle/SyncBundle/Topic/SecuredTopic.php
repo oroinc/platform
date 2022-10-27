@@ -14,10 +14,6 @@ class SecuredTopic extends BroadcastTopic
 {
     use UserAwareTopicTrait;
 
-    /**
-     * @param string $topicName
-     * @param ClientManipulatorInterface $clientManipulator
-     */
     public function __construct(string $topicName, ClientManipulatorInterface $clientManipulator)
     {
         parent::__construct($topicName);
@@ -35,10 +31,6 @@ class SecuredTopic extends BroadcastTopic
         }
     }
 
-    /**
-     * @param WampRequest $request
-     * @return int
-     */
     private function getUserId(WampRequest $request): int
     {
         return $request->getAttributes()->getInt('user_id');

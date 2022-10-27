@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_14_1;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -56,7 +56,7 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
     protected function fixEnums(array $fields, LoggerInterface $logger, $dryRun = false): array
     {
         $query = 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id';
-        $types = ['data' => Type::TARRAY, 'id' => Type::INTEGER];
+        $types = ['data' => Types::ARRAY, 'id' => Types::INTEGER];
 
         $entityIds = [];
         foreach ($fields as $field) {
@@ -68,7 +68,7 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
             $params = ['data' => $data, 'id' => $field['id']];
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
 
             $entityIds[] = $field['entity_id'];
@@ -90,25 +90,20 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $selectQuery, $selectParams, $selectTypes);
 
         $updateQuery = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
-        $updateTypes = ['data' => Type::TARRAY, 'id' => Type::INTEGER];
+        $updateTypes = ['data' => Types::ARRAY, 'id' => Types::INTEGER];
 
         foreach ($this->connection->fetchAll($selectQuery, $selectParams, $selectTypes) as $row) {
-            $data = $this->connection->convertToPHPValue($row['data'], Type::TARRAY);
+            $data = $this->connection->convertToPHPValue($row['data'], Types::ARRAY);
             $data['extend']['upgradeable'] = true;
 
             $updateParams = ['data' => $data, 'id' => $row['id']];
             $this->logQuery($logger, $updateQuery, $updateParams, $updateTypes);
             if (!$dryRun) {
-                $this->connection->executeUpdate($updateQuery, $updateParams, $updateTypes);
+                $this->connection->executeStatement($updateQuery, $updateParams, $updateTypes);
             }
         }
     }
 
-    /**
-     * @param LoggerInterface $logger
-     *
-     * @return array
-     */
     protected function loadEntitiesBrokenFields(LoggerInterface $logger): array
     {
         $sql = 'SELECT id, entity_id, data FROM oro_entity_config_field';
@@ -116,7 +111,7 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
 
         $result = [];
         foreach ($this->connection->fetchAll($sql) as $row) {
-            $data = $this->connection->convertToPHPValue($row['data'], Type::TARRAY);
+            $data = $this->connection->convertToPHPValue($row['data'], Types::ARRAY);
             if ($this->isBrokenEnum($data)) {
                 $row['data'] = $data;
                 $result[] = $row;
@@ -126,10 +121,6 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
         return $result;
     }
 
-    /**
-     * @param array $data
-     * @return bool
-     */
     protected function isBrokenEnum(array $data): bool
     {
         return !empty($data['enum'])

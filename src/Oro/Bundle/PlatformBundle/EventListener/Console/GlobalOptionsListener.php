@@ -14,17 +14,11 @@ class GlobalOptionsListener
      */
     private $globalOptionsRegistry;
 
-    /**
-     * @param GlobalOptionsProviderRegistry $globalOptionsRegistry
-     */
     public function __construct(GlobalOptionsProviderRegistry $globalOptionsRegistry)
     {
         $this->globalOptionsRegistry = $globalOptionsRegistry;
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
         $command = $event->getCommand();
@@ -35,10 +29,6 @@ class GlobalOptionsListener
         $this->globalOptionsRegistry->resolveGlobalOptions($input);
     }
 
-    /**
-     * @param Command $command
-     * @param InputInterface $input
-     */
     private function rebindDefinition(Command $command, InputInterface $input)
     {
         /**

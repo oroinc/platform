@@ -4,7 +4,7 @@ services:
         arguments:
             - '@oro_test.alice_loader'
             - '@oro_behat_extension.isolation.doctrine_isolator'
-            - '@symfony2_extension.kernel'
+            - '@fob_symfony.kernel'
         tags:
             - { name: cli.controller, priority: 700 }
 
@@ -47,5 +47,6 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\InputOutputController
         arguments:
             - '@oro_behat_extension.isolation.test_isolation_subscriber'
+            - '@oro_behat_extension.isolation.message_queue_isolation_subscriber'
         tags:
             - { name: 'cli.controller', priority: 100 }

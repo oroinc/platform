@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The registry that allows to get the entity override provider for a specific request type.
@@ -40,10 +40,6 @@ class EntityOverrideProviderRegistry
 
     /**
      * Returns the entity override provider that contains entity substitutions for the given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return EntityOverrideProviderInterface
      *
      * @throws \LogicException if a entity override provider does not exist for the given request type
      */

@@ -1,25 +1,18 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 
 class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AbstractTypedAddress
-     */
-    protected $address;
+    /** @var AbstractTypedAddress */
+    private $address;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->address = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress');
-    }
-
-    protected function tearDown()
-    {
-        unset($this->address);
+        $this->address = $this->getMockForAbstractClass(AbstractTypedAddress::class);
     }
 
     public function testAddType()
@@ -43,17 +36,17 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeNames()
     {
-        $this->assertEquals(array(), $this->address->getTypeNames());
+        $this->assertSame([], $this->address->getTypeNames());
 
         $this->address->addType(new AddressType('billing'));
         $this->address->addType(new AddressType('shipping'));
 
-        $this->assertEquals(array('billing', 'shipping'), $this->address->getTypeNames());
+        $this->assertEquals(['billing', 'shipping'], $this->address->getTypeNames());
     }
 
     public function testGetTypeLabels()
     {
-        $this->assertEquals(array(), $this->address->getTypeLabels());
+        $this->assertSame([], $this->address->getTypeLabels());
 
         $billing = new AddressType('billing');
         $billing->setLabel('Billing');
@@ -63,7 +56,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
         $shipping->setLabel('Shipping');
         $this->address->addType($shipping);
 
-        $this->assertEquals(array('Billing', 'Shipping'), $this->address->getTypeLabels());
+        $this->assertEquals(['Billing', 'Shipping'], $this->address->getTypeLabels());
     }
 
     public function testGetTypeByName()

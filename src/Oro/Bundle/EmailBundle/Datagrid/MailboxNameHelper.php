@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Contains methods to get the text representation of a mailbox.
@@ -14,9 +14,6 @@ class MailboxNameHelper
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;

@@ -9,35 +9,28 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $eventDispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    /**
-     * @var FlashBag|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $flashBag;
+    /** @var FlashBag|\PHPUnit\Framework\MockObject\MockObject */
+    private $flashBag;
 
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var ExtendableCondition
-     */
-    protected $extendableCondition;
+    /** @var ExtendableCondition */
+    private $extendableCondition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->flashBag = $this->createMock(FlashBag::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
+
         $this->extendableCondition = new ExtendableCondition(
             $this->eventDispatcher,
             $this->flashBag,
@@ -46,7 +39,7 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
         $this->extendableCondition->setContextAccessor(new ContextAccessor());
     }
 
-    public function testIsConditionAllowedIsTrueIfNoEvents()
+    public function testIsConditionAllowedIsTrueIfNoEvents(): void
     {
         $options = ['events' => []];
         $this->extendableCondition->initialize($options);
@@ -54,7 +47,7 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->extendableCondition->isConditionAllowed([]));
     }
 
-    public function testIsConditionAllowedIsTrueIfNoEventListeners()
+    public function testIsConditionAllowedIsTrueIfNoEventListeners(): void
     {
         $options = ['events' => ['aaa']];
         $this->extendableCondition->initialize($options);
@@ -65,10 +58,7 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->extendableCondition->isConditionAllowed([]));
     }
 
-    /**
-     * @param array $options
-     */
-    private function expectsDispatchWithErrors(array $options)
+    private function expectsDispatchWithErrors(array $options): void
     {
         $this->extendableCondition->initialize($options);
         $this->eventDispatcher->expects($this->once())
@@ -76,37 +66,30 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(
-                function ($eventName, ExtendableConditionEvent $event) {
-                    $event->addError('First error');
-                    $event->addError('Second error');
-                }
-            );
+            ->willReturnCallback(function (ExtendableConditionEvent $event) {
+                $event->addError('First error');
+                $event->addError('Second error');
+
+                return $event;
+            });
     }
 
     /**
      * @dataProvider notDisplayingErrorsDataProvider
-     * @param array $context
-     * @param array $options
      */
-    public function testIsConditionAllowedWhenNotDisplayingErrors(array $context, array $options)
+    public function testIsConditionAllowedWhenNotDisplayingErrors(array $context, array $options): void
     {
         $this->expectsDispatchWithErrors(array_merge(['events' => ['aaa']], $options));
 
-        $this->translator
-            ->expects($this->exactly(2))
+        $this->translator->expects($this->exactly(2))
             ->method('trans');
-        $this->flashBag
-            ->expects($this->never())
+        $this->flashBag->expects($this->never())
             ->method('add');
 
         $this->assertFalse($this->extendableCondition->isConditionAllowed($context));
     }
 
-    /**
-     * @return array
-     */
-    public function notDisplayingErrorsDataProvider()
+    public function notDisplayingErrorsDataProvider(): array
     {
         return [
             'show errors is false by default' => [
@@ -132,21 +115,19 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider displayingErrorsDataProvider
-     * @param array $context
-     * @param array $options
-     * @param string $expectedMessageType
      */
-    public function testIsConditionAllowedWhenDisplayingErrors(array $context, array $options, $expectedMessageType)
-    {
+    public function testIsConditionAllowedWhenDisplayingErrors(
+        array $context,
+        array $options,
+        string $expectedMessageType
+    ): void {
         $this->expectsDispatchWithErrors(array_merge(['events' => ['aaa']], $options));
 
-        $this->translator
-            ->expects($this->exactly(2))
+        $this->translator->expects($this->exactly(2))
             ->method('trans')
             ->withConsecutive(['First error'], ['Second error'])
             ->willReturnOnConsecutiveCalls('Translated first error', 'Translated second error');
-        $this->flashBag
-            ->expects($this->exactly(2))
+        $this->flashBag->expects($this->exactly(2))
             ->method('add')
             ->withConsecutive(
                 [$expectedMessageType, 'Translated first error'],
@@ -156,10 +137,7 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->extendableCondition->isConditionAllowed($context));
     }
 
-    /**
-     * @return array
-     */
-    public function displayingErrorsDataProvider()
+    public function displayingErrorsDataProvider(): array
     {
         return [
             'show messages with default message type when no message type given' => [
@@ -190,14 +168,14 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitializeThrowsExceptionIfNoEventsSpecified()
+    public function testInitializeThrowsExceptionIfNoEventsSpecified(): void
     {
         $options = [];
         $this->expectException(MissingOptionsException::class);
         $this->extendableCondition->initialize($options);
     }
 
-    public function testInitializeNotThrowsException()
+    public function testInitializeNotThrowsException(): void
     {
         $options = ['events' => ['aaa', 'bbb']];
         $this->extendableCondition->initialize($options);

@@ -8,34 +8,28 @@ use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransform
 class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param mixed $data
-     * @param array $result
-     *
      * @dataProvider transformDataProvider
      */
-    public function testTransform($data, array $result)
+    public function testTransform(ArrayCollection|array $data, array $result)
     {
         $transformer = new CollectionToArrayTransformer();
 
         $this->assertEquals($result, $transformer->transform($data));
     }
 
-    /**
-     * @return array
-     */
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
-        $testArray = array(1, 2, 3);
+        $testArray = [1, 2, 3];
 
-        return array(
-            'empty array' => array(
-                'data'   => array(),
-                'result' => array(),
-            ),
-            'collection' => array(
+        return [
+            'empty array' => [
+                'data'   => [],
+                'result' => [],
+            ],
+            'collection' => [
                 'data'   => new ArrayCollection($testArray),
                 'result' => $testArray
-            ),
-        );
+            ],
+        ];
     }
 }

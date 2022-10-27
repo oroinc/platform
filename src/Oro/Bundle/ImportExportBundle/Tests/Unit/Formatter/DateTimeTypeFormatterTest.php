@@ -5,35 +5,25 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DateTimeTypeFormatter
-     */
-    protected $formatter;
+    /** @var DateTimeTypeFormatter */
+    private $formatter;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
-        $translator      = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+
         $this->formatter = new DateTimeTypeFormatter($localeSettings, $translator);
     }
 
     /**
      * @dataProvider formatTypeProvider
-     * @param string          $value
-     * @param string          $type
-     * @param \Exception|null $exception
      */
-    public function testFormatType($value, $type, \Exception $exception = null)
+    public function testFormatType(string $value, string $type, \Exception $exception = null)
     {
         if (null !== $exception) {
             $this->expectException(get_class($exception));
@@ -42,10 +32,7 @@ class DateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter->formatType($value, $type);
     }
 
-    /**
-     * @return array
-     */
-    public function formatTypeProvider()
+    public function formatTypeProvider(): array
     {
         $value = (new \DateTime())->format('d/m/Y H:i:s');
 

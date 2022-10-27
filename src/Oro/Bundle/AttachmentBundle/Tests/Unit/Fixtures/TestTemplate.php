@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures;
 
-class TestTemplate extends \Twig_Template
+use Twig\Source;
+use Twig\Template;
+
+class TestTemplate extends Template
 {
     /**
      * {@inheritdoc}
@@ -17,6 +20,22 @@ class TestTemplate extends \Twig_Template
      */
     protected function doDisplay(array $context, array $blocks = array())
     {
-        echo "test";
+        echo 'test';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDebugInfo()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSourceContext()
+    {
+        return new Source('test', 'test');
     }
 }

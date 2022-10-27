@@ -17,10 +17,6 @@ class ConfigFieldHandler
     /** @var RequestStack */
     private $requestStack;
 
-    /**
-     * @param ConfigHelperHandler $configHelperHandler
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         ConfigHelperHandler $configHelperHandler,
         RequestStack $requestStack
@@ -44,9 +40,7 @@ class ConfigFieldHandler
         $request = $this->requestStack->getCurrentRequest();
 
         if ($this->configHelperHandler->isFormValidAfterSubmit($request, $form)) {
-            return $this
-                ->configHelperHandler->showClearCacheMessage()
-                ->showSuccessMessageAndRedirect($fieldConfigModel, $successMessage);
+            return $this->configHelperHandler->showSuccessMessageAndRedirect($fieldConfigModel, $successMessage);
         }
 
         return $this->configHelperHandler->constructConfigResponse($fieldConfigModel, $form, $formAction);

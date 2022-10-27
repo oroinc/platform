@@ -1,15 +1,19 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption\Dbal\Extension;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalSessionInterface;
 
+/**
+ * Redeliver orphan messages.
+ */
 class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
 {
     /**
@@ -63,12 +67,12 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
      */
     public function onBeforeReceive(Context $context)
     {
-        /** @var DbalSession $session */
+        /** @var DbalSessionInterface $session */
         $session = $context->getSession();
-        if (false == $session instanceof DbalSession) {
+        if (false == $session instanceof DbalSessionInterface) {
             throw new \LogicException(sprintf(
                 'Unexpected instance of session. expected:"%s", actual:"%s"',
-                DbalSession::class,
+                DbalSessionInterface::class,
                 is_object($session) ? get_class($session) : gettype($session)
             ));
         }
@@ -88,12 +92,12 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
      */
     public function onInterrupted(Context $context)
     {
-        /** @var DbalSession $session */
+        /** @var DbalSessionInterface $session */
         $session = $context->getSession();
-        if (false == $session instanceof DbalSession) {
+        if (false == $session instanceof DbalSessionInterface) {
             throw new \LogicException(sprintf(
                 'Unexpected instance of session. expected:"%s", actual:"%s"',
-                DbalSession::class,
+                DbalSessionInterface::class,
                 is_object($session) ? get_class($session) : gettype($session)
             ));
         }
@@ -101,9 +105,6 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         $this->pidFileManager->removePidFile($context->getMessageConsumer()->getConsumerId());
     }
 
-    /**
-     * @param Context $context
-     */
     private function saveProcessPid(Context $context)
     {
         /** @var DbalMessageConsumer $consumer */
@@ -112,29 +113,30 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         $this->pidFileManager->createPidFile($consumer->getConsumerId());
     }
 
-    /**
-     * @param Context $context
-     */
     private function redeliverOrphanMessages(Context $context)
     {
-        // find orphan consumerIds
+        $pidsFileInfo = $this->pidFileManager->getListOfPidsFileInfo();
+        if (!$pidsFileInfo) {
+            return;
+        }
+
+        // Finds currently running consumers.
         $runningPids = $this->cliProcessManager->getListOfProcessesPids($this->consumerProcessPattern);
         $orphanConsumerIds = [];
-        foreach ($this->pidFileManager->getListOfPidsFileInfo() as $pidFileInfo) {
-            if (! in_array($pidFileInfo['pid'], $runningPids)) {
+        foreach ($pidsFileInfo as $pidFileInfo) {
+            if (!in_array($pidFileInfo['pid'], $runningPids, false)) {
                 $orphanConsumerIds[] = $pidFileInfo['consumerId'];
             }
         }
 
-        if (! $orphanConsumerIds) {
+        if (!$orphanConsumerIds) {
             return;
         }
 
         // redeliver orphan messages
-        /** @var DbalSession $session */
+        /** @var DbalSessionInterface $session */
         $session = $context->getSession();
         $connection = $session->getConnection();
-        $dbal = $connection->getDBALConnection();
 
         $sql = sprintf(
             'UPDATE %s SET consumer_id=NULL, redelivered=:isRedelivered '.
@@ -142,14 +144,16 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
             $connection->getTableName()
         );
 
-        $dbal->executeUpdate(
+        /** @var Connection $dbal */
+        $dbal = $connection->getDBALConnection();
+        $dbal->executeStatement(
             $sql,
             [
                 'isRedelivered' => true,
                 'consumerIds' => $orphanConsumerIds,
             ],
             [
-                'isRedelivered' => Type::BOOLEAN,
+                'isRedelivered' => Types::BOOLEAN,
                 'consumerIds' => Connection::PARAM_STR_ARRAY,
             ]
         );

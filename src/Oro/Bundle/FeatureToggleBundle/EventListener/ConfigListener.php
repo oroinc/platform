@@ -9,38 +9,20 @@ use Oro\Bundle\FeatureToggleBundle\Event\FeatureChange;
 use Oro\Bundle\FeatureToggleBundle\Event\FeaturesChange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Resets the feature checker cache after a system configuration option associated with a feature is changed
+ * and after the system configuration scope is changed.
+ * Dispatches "oro_featuretoggle.feature.change" and "oro_featuretoggle.feature.change.{feature_name}" events
+ * after a system configuration option associated with a feature is changed.
+ */
 class ConfigListener
 {
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
+    private ConfigurationManager $featureConfigManager;
+    private FeatureChecker $featureChecker;
+    private array $featuresStates = [];
+    private array $affectedFeatures = [];
 
-    /**
-     * @var ConfigurationManager
-     */
-    protected $featureConfigManager;
-
-    /**
-     * @var FeatureChecker
-     */
-    protected $featureChecker;
-
-    /**
-     * @var array
-     */
-    protected $featuresStates = [];
-
-    /**
-     * @var array
-     */
-    protected $affectedFeatures = [];
-
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ConfigurationManager $featureConfigManager
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         ConfigurationManager $featureConfigManager,
@@ -51,39 +33,39 @@ class ConfigListener
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * @param ConfigSettingsUpdateEvent $event
-     */
-    public function onSettingsSaveBefore(ConfigSettingsUpdateEvent $event)
+    public function onSettingsSaveBefore(ConfigSettingsUpdateEvent $event): void
     {
-        $configKeys = array_keys($event->getSettings());
-        $this->affectedFeatures = $this->getAllAffectedFeatures($configKeys);
-
+        $this->affectedFeatures = $this->getAllAffectedFeatures(array_keys($event->getSettings()));
         $this->featuresStates = $this->getFeaturesStates();
     }
 
-    public function onUpdateAfter()
+    public function onUpdateAfter(): void
     {
         $this->featureChecker->resetCache();
-        $changedFeaturesStates = $this->getFeaturesStates();
 
-        $changedFeatures = array_diff_assoc($changedFeaturesStates, $this->featuresStates);
-
+        $changedFeatures = array_diff_assoc($this->getFeaturesStates(), $this->featuresStates);
         if ($changedFeatures) {
-            $event = new FeaturesChange($changedFeatures);
-            $this->eventDispatcher->dispatch(FeaturesChange::NAME, $event);
-            
+            $this->eventDispatcher->dispatch(
+                new FeaturesChange($changedFeatures),
+                FeaturesChange::NAME
+            );
             foreach ($changedFeatures as $featureName => $state) {
-                $event = new FeatureChange($featureName, $state);
-                $this->eventDispatcher->dispatch(FeatureChange::NAME . '.' . $featureName, $event);
+                $this->eventDispatcher->dispatch(
+                    new FeatureChange($featureName, $state),
+                    FeatureChange::NAME . '.' . $featureName
+                );
             }
         }
+        $this->affectedFeatures = [];
+        $this->featuresStates = [];
     }
 
-    /**
-     * @return array
-     */
-    protected function getFeaturesStates()
+    public function onScopeIdChange(): void
+    {
+        $this->featureChecker->resetCache();
+    }
+
+    private function getFeaturesStates(): array
     {
         $featuresStates = [];
         foreach ($this->affectedFeatures as $feature) {
@@ -93,33 +75,17 @@ class ConfigListener
         return $featuresStates;
     }
 
-    public function onScopeIdChange()
+    private function getAllAffectedFeatures(array $configKeys): array
     {
-        $this->featureChecker->resetCache();
-    }
-
-    /**
-     * @param array $configKeys
-     * @return array
-     */
-    protected function getAllAffectedFeatures(array $configKeys)
-    {
-        $features = [];
+        $affectedFeatures = [];
         foreach ($configKeys as $configKey) {
             $feature = $this->featureConfigManager->getFeatureByToggle($configKey);
             if ($feature) {
-                $features[] = $feature;
+                $affectedFeatures[] = [$feature];
+                $affectedFeatures[] = $this->featureConfigManager->getFeatureDependents($feature);
             }
         }
 
-        $affectedFeatures = [];
-        foreach ($features as $feature) {
-            $affectedFeatures[] = $feature;
-
-            $dependentFeatures = $this->featureConfigManager->getFeatureDependents($feature);
-            $affectedFeatures = array_merge($affectedFeatures, $dependentFeatures, [$feature]);
-        }
-        
-        return array_unique($affectedFeatures);
+        return array_unique(array_merge(...$affectedFeatures));
     }
 }

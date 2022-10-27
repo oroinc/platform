@@ -7,60 +7,45 @@ use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CreateQueuesCommand */
-    private $command;
+    private DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
-    /** @var Container */
-    private $container;
+    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $driver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private CreateQueuesCommand $command;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $driver;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
         $this->driver = $this->createMock(DriverInterface::class);
 
-        $this->command = new CreateQueuesCommand();
-
-        $this->container = new Container();
-        $this->container->set('oro_message_queue.client.meta.destination_meta_registry', $this->registry);
-        $this->container->set('oro_message_queue.client.driver', $this->driver);
-        $this->command->setContainer($this->container);
+        $this->command = new CreateQueuesCommand($this->driver, $this->registry);
     }
 
-    public function testShouldHaveCommandName()
+    public function testShouldHaveCommandName(): void
     {
-        $this->assertEquals('oro:message-queue:create-queues', $this->command->getName());
+        self::assertEquals('oro:message-queue:create-queues', $this->command->getName());
     }
 
-    public function testShouldCreateQueues()
+    public function testShouldCreateQueues(): void
     {
         $destinationMeta1 = new DestinationMeta('', 'queue1');
         $destinationMeta2 = new DestinationMeta('', 'queue2');
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
-            ->will($this->returnValue([$destinationMeta1, $destinationMeta2]));
+            ->willReturn([$destinationMeta1, $destinationMeta2]);
 
-        $this->driver->expects($this->at(0))
+        $this->driver->expects(self::exactly(2))
             ->method('createQueue')
-            ->with('queue1');
-        $this->driver->expects($this->at(1))
-            ->method('createQueue')
-            ->with('queue2');
+            ->withConsecutive(['queue1'], ['queue2']);
 
         $tester = new CommandTester($this->command);
         $tester->execute([]);
 
-        $this->assertContains('Creating queue: queue1', $tester->getDisplay());
-        $this->assertContains('Creating queue: queue2', $tester->getDisplay());
+        self::assertStringContainsString('Creating queue: queue1', $tester->getDisplay());
+        self::assertStringContainsString('Creating queue: queue2', $tester->getDisplay());
     }
 }

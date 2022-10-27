@@ -13,9 +13,6 @@ class IntegrationIconProvider implements IntegrationIconProviderInterface
      */
     private $typesRegistryLink;
 
-    /**
-     * @param ServiceLink $typesRegistryLink
-     */
     public function __construct(ServiceLink $typesRegistryLink)
     {
         $this->typesRegistryLink = $typesRegistryLink;

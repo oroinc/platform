@@ -1,6 +1,6 @@
 define(function(require) {
     'use strict';
-    var UnloadMessagesGroup = require('./unload-messages-group');
-    var apiAccessorUnloadMessagesGroup = new UnloadMessagesGroup({});
+    const UnloadMessagesGroup = require('./unload-messages-group');
+    const apiAccessorUnloadMessagesGroup = new UnloadMessagesGroup({});
     return apiAccessorUnloadMessagesGroup;
 });

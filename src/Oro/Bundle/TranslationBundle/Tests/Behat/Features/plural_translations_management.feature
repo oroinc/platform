@@ -8,21 +8,17 @@ Feature: Plural translations management
 
   Scenario: Feature background
     Given I login as administrator
-    And I go to System/Localization/Translations
-    When I click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Change language settings
     Given I go to System/Configuration
-    And I follow "System Configuration/General Setup/Language Settings" on configuration sidebar
-    When I fill "Language Settings System Config Form" with:
-      | Supported languages  | Russian (Russia) |
-      | Use Default Language | false            |
-      | Default Language     | Russian (Russia) |
+    And I follow "System Configuration/General Setup/Localization" on configuration sidebar
+    When I fill form with:
+      | Enabled Localizations | Russian (Russia) |
+      | Default Localization  | Russian (Russia) |
     And I save form
     Then I should see "Configuration saved" flash message
 
   Scenario: I check that plural translations are displayed without errors in case when there are not all plural forms translated
     Given I go to System/User Management/Roles
     When I click on Administrator in grid
-    Then I should see "9 записи (множ. число 1 форма)"
+    Then I should see "10 записей (множ. число 2 форма)"

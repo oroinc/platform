@@ -6,8 +6,7 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
-use Behat\Testwork\EventDispatcher\Event\AfterExerciseCompleted;
-use Behat\Testwork\EventDispatcher\Event\BeforeExerciseCompleted;
+use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
@@ -15,7 +14,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
-use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\SkipIsolatorsTrait;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -23,28 +21,30 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
+/**
+ * Registers test isolators
+ */
 class TestIsolationSubscriber implements EventSubscriberInterface
 {
-    use SkipIsolatorsTrait;
-
     const ISOLATOR_THRESHOLD = 500;
 
     const YES_PATTERN = '/^Y/i';
 
     /** @var IsolatorInterface[] */
-    protected $isolators;
+    private array $isolators = [];
 
     /** @var IsolatorInterface[] */
-    protected $reverseIsolators;
+    private array $reverseIsolators;
 
-    /** @var OutputInterface */
-    private $output;
+    private ?OutputInterface $output = null;
 
-    /** @var InputInterface */
-    protected $input;
+    private ?InputInterface $input = null;
 
-    /** @var Stopwatch */
-    private $stopwatch;
+    private Stopwatch $stopwatch;
+
+    private bool $skip = false;
+
+    private array $skipIsolatorsTags = [];
 
     /**
      * @param IsolatorInterface[] $isolators
@@ -62,15 +62,33 @@ class TestIsolationSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            BeforeExerciseCompleted::BEFORE => ['beforeExercise', 100],
+            ExerciseCompleted::BEFORE => ['beforeExercise', 100],
             BeforeFeatureTested::BEFORE => ['beforeFeature', 100],
             BeforeScenarioTested::BEFORE => ['beforeScenario', 100],
             AfterScenarioTested::AFTER => ['afterScenario', -100],
             AfterFeatureTested::AFTER => ['afterFeature', -100],
-            AfterExerciseCompleted::AFTER => ['afterExercise', -100],
+            ExerciseCompleted::AFTER => ['afterExercise', -100],
         ];
     }
 
+    public function skip(): void
+    {
+        $this->skip = true;
+    }
+
+    public function skipIsolatorsTags(array $tags)
+    {
+        $this->skipIsolatorsTags = $tags;
+    }
+
+    public function getIsolatorsTags(): array
+    {
+        return array_unique(array_map(fn ($isolator) => $isolator->getTag(), $this->isolators));
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     public function beforeExercise()
     {
         if ($this->skip) {
@@ -78,7 +96,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         }
 
         foreach ($this->isolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
@@ -105,7 +123,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
         $this->output->writeln('<comment>Begin isolating application state</comment>');
         foreach ($this->isolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
@@ -124,9 +142,6 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $this->output->writeln('<comment>Application ready for tests</comment>');
     }
 
-    /**
-     * @param BeforeFeatureTested $event
-     */
     public function beforeFeature(BeforeFeatureTested $event)
     {
         if ($this->skip) {
@@ -136,7 +151,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $event = new BeforeIsolatedTestEvent($this->output, $event->getFeature());
 
         foreach ($this->isolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
@@ -177,7 +192,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $event = new AfterIsolatedTestEvent($this->output);
 
         foreach ($this->reverseIsolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
@@ -195,7 +210,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function afterExercise()
+    public function afterExercise(ExerciseCompleted $event)
     {
         if ($this->skip) {
             return;
@@ -205,7 +220,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
         $this->output->writeln('<comment>Begin clean up isolation environment</comment>');
         foreach ($this->reverseIsolators as $isolator) {
-            if (in_array($isolator->getTag(), $this->skipIsolators)) {
+            if (in_array($isolator->getTag(), $this->skipIsolatorsTags)) {
                 continue;
             }
 
@@ -224,17 +239,11 @@ class TestIsolationSubscriber implements EventSubscriberInterface
         $this->output->writeln('<comment>Isolation environment is clean</comment>');
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
     }
 
-    /**
-     * @param InputInterface $input
-     */
     public function setInput(InputInterface $input)
     {
         $this->input = $input;

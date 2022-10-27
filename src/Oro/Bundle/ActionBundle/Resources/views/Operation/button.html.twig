@@ -1,32 +1,43 @@
-{% set linkTitle = params.frontendOptions.title|default(params.label)|trans %}
+{% set linkTitle = params.frontendOptions.title is defined ? params.frontendOptions.title|trans : '' %}
 {% set linkLabel = params.label|trans %}
+{% set linkAriaLabel = params.frontendOptions.options.ariaLabel is defined ? params.frontendOptions.options.ariaLabel|trans : '' %}
 {% set isAjax = false %}
 
 {% block button %}
     {% set options = oro_action_frontend_options(button) %}
     {% set buttonOptions = options.options %}
     {% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
-        {% block link %}
-            <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
-                href="javascript:void(0);"
-                class="icons-holder-text operation-button {{ params.buttonOptions.class|default('') }} {{ aClass|default('') }} {{ params.buttonOptions.aCss|default('') }}"
-                title="{{ linkTitle }}"
-                {% for name,value in options.data %}
-                    data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
-                {% endfor %}
-                data-operation-url="{{ buttonOptions.url }}"
-                data-options="{{ buttonOptions|json_encode }}"
-                data-page-component-module="oroaction/js/app/components/button-component"
-                role="button"
-                {% if not button.buttonContext.enabled %}
-                    disabled="disabled"
-                {% endif %}
-            >
-                {% if params.buttonOptions.icon is defined or params.buttonOptions.iCss is defined %}
-                    <span class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text" aria-hidden="true"></span>
-                {% endif %}
-                {{ linkLabel|trim }}
-            </a>
-        {% endblock %}
+    {% block link %}
+        {% set classes = 'icons-holder-text operation-button ' ~ params.buttonOptions.class|default('')|trim ~ ' ' ~ aClass|default('')|trim ~ ' ' ~ params.buttonOptions.aCss|default('')|trim  %}
+        {% set classes = classes|split(' ')|array_unique|join(' ') %}
+        <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
+           href="#"
+           class="{{ classes }}"
+           {% if linkTitle is not empty %}
+               title="{{ linkTitle }}"
+           {% endif %}
+           {% if linkAriaLabel is not empty %}
+               aria-label="{{ linkAriaLabel }}"
+           {% endif %}
+           {% for name,value in options.data %}
+               data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
+           {% endfor %}
+           data-operation-url="{{ buttonOptions.url }}"
+           data-options="{{ buttonOptions|json_encode }}"
+           {# Use the default component if the custom one is not defined in options. #}
+           {% if 'page-component-module' not in options.data|default({})|keys %}
+               data-page-component-module="oroaction/js/app/components/button-component"
+           {% endif %}
+           role="{{ linkRole|default("button") }}"
+           {% if not button.buttonContext.enabled %}
+               disabled="disabled"
+           {% endif %}
+        >
+            {% if params.buttonOptions.icon is defined or params.buttonOptions.iCss is defined %}
+                <span class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text" aria-hidden="true"></span>
+            {% endif %}
+            {{ linkLabel|trim }}
+        </a>
+    {% endblock %}
     {% if not onlyLink|default(false) %}</div>{% endif %}
 {% endblock %}

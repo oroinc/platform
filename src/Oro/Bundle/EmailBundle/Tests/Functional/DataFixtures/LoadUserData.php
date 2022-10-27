@@ -3,13 +3,17 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LoadUserData extends AbstractFixture implements ContainerAwareInterface
+class LoadUserData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
      * @var ContainerInterface
@@ -27,20 +31,29 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
     /**
      * {@inheritdoc}
      */
+    public function getDependencies()
+    {
+        return [LoadBusinessUnit::class];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function load(ObjectManager $manager)
     {
         $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
+        $organization = $manager->getRepository(Organization::class)->getFirst();
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
 
         $user = $userManager->createUser();
         $user->setUsername('simple_user')
+            ->setOwner($this->getReference('business_unit'))
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
             ->setOrganization($organization)
             ->addOrganization($organization)
             ->setEnabled(true)
-            ->addRole($role);
+            ->addUserRole($role);
         $folder = new EmailFolder();
         $folder->setName('sent');
         $folder->setFullName('sent');
@@ -57,13 +70,15 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
 
         $user2 = $userManager->createUser();
         $user2->setUsername('simple_user2')
+            ->setOwner($this->getReference('business_unit'))
             ->setPlainPassword('simple_password2')
             ->setFirstName('Elley')
             ->setLastName('Towards')
             ->setEmail('simple_user2@example.com')
             ->setOrganization($organization)
             ->addOrganization($organization)
-            ->setEnabled(true);
+            ->setEnabled(true)
+            ->addUserRole($role);
         $folder2 = new EmailFolder();
         $folder2->setName('sent');
         $folder2->setFullName('sent');

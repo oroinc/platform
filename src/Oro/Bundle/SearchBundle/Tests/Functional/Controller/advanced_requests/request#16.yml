@@ -5,5 +5,3 @@ response:
     count: 0
     rest:
         data: []
-    soap:
-        data: []

@@ -8,9 +8,9 @@ use Oro\Bundle\ConfigBundle\Api\Processor\GetList\Rest\FixConfigurationSectionsR
 class FixConfigurationSectionsResultDocumentTest extends GetListProcessorTestCase
 {
     /** @var FixConfigurationSectionsResultDocument */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

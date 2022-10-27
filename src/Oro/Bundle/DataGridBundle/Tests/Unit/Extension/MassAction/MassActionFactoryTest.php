@@ -7,82 +7,63 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
-    /** @var MassActionFactory */
-    protected $massActionFactory;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    private function getActionFactory(array $actions): MassActionFactory
     {
-        $this->container = $this->createMock(ContainerInterface::class);
+        $containerBuilder = TestContainerBuilder::create();
+        foreach ($actions as $type => $action) {
+            $containerBuilder->add($type, $action);
+        }
 
-        $this->massActionFactory = new MassActionFactory($this->container);
+        return new MassActionFactory($containerBuilder->getContainer($this));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "type" option must be defined. Action: action1.
-     */
     public function testCreateActionWithoutType()
     {
-        $this->massActionFactory->createAction('action1', []);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "type" option must be defined. Action: action1.');
+
+        $factory = $this->getActionFactory([]);
+        $factory->createAction('action1', []);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage Unknown action type "type1". Action: action1.
-     */
     public function testCreateUnregisteredAction()
     {
-        $this->massActionFactory->createAction('action1', ['type' => 'type1']);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unknown action type "type1". Action: action1.');
+
+        $factory = $this->getActionFactory([]);
+        $factory->createAction('action1', ['type' => 'type1']);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage An action should be an instance of "Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface", got "stdClass".
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateActionForInvalidActionClass()
     {
-        $this->massActionFactory->registerAction('type1', 'mass_action_service.type1');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
+            'An action should be an instance of "%s", got "stdClass".',
+            ActionInterface::class
+        ));
 
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('mass_action_service.type1')
-            ->willReturn(new \stdClass());
-
-        $this->massActionFactory->createAction('action1', ['type' => 'type1']);
+        $factory = $this->getActionFactory(['type1' => new \stdClass()]);
+        $factory->createAction('action1', ['type' => 'type1']);
     }
 
     public function testCreateActionWhenRegularActionIsCreatedInsteadOfMassAction()
     {
         $action = $this->createMock(ActionInterface::class);
-        $this->massActionFactory->registerAction('type1', 'mass_action_service.type1');
-
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('mass_action_service.type1')
-            ->willReturn($action);
+        $factory = $this->getActionFactory(['type1' => $action]);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'An action should be an instance of "%s", got "%s".',
-                MassActionInterface::class,
-                get_class($action)
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'An action should be an instance of "%s", got "%s".',
+            MassActionInterface::class,
+            get_class($action)
+        ));
 
-        $this->massActionFactory->createAction('action1', ['type' => 'type1']);
+        $factory->createAction('action1', ['type' => 'type1']);
     }
 
     public function testCreateAction()
@@ -91,12 +72,7 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
 
-        $this->massActionFactory->registerAction('type1', 'mass_action_service.type1');
-
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('mass_action_service.type1')
-            ->willReturn($action);
+        $factory = $this->getActionFactory(['type1' => $action]);
 
         $action->expects(self::once())
             ->method('setOptions')
@@ -104,7 +80,7 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame(
             $action,
-            $this->massActionFactory->createAction($actionName, $actionConfig)
+            $factory->createAction($actionName, $actionConfig)
         );
     }
 }

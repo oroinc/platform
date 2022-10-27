@@ -11,18 +11,11 @@ class TransitionOptionsResolver
     /** @var OptionsResolver */
     protected $optionsResolver;
 
-    /**
-     * @param OptionsResolver $optionsResolver
-     */
     public function __construct(OptionsResolver $optionsResolver)
     {
         $this->optionsResolver = $optionsResolver;
     }
 
-    /**
-     * @param Transition $transition
-     * @param WorkflowItem $workflowItem
-     */
     public function resolveTransitionOptions(Transition $transition, WorkflowItem $workflowItem)
     {
         $frontendOptions = $transition->getFrontendOptions();

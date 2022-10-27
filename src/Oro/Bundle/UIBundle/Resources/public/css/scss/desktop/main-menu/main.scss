@@ -14,6 +14,7 @@
     &:hover,
     &:focus {
         color: $menu-item-first-level-text-color-active;
+        outline: none;
     }
 
     &::before {
@@ -22,13 +23,12 @@
 }
 
 // common decoration
-@import "main-menu";
+@import 'main-menu';
 
 // menu top decoration
-@import "main-menu-top";
+@import 'main-menu-top';
 
 // sided menu decoration
-@import "main-menu-sided";
-@import "side-menu-overlay";
-
-@import "main-menu-toggler";
+@import 'main-menu-sided';
+@import 'side-menu-overlay';
+@import 'main-menu-toggler';

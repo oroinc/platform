@@ -9,14 +9,14 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for sorting entity fields.
+ */
 class WidgetSortByType extends AbstractType
 {
     /** @var EntityFieldProvider */
     protected $fieldProvider;
 
-    /**
-     * @param EntityFieldProvider $fieldProvider
-     */
     public function __construct(EntityFieldProvider $fieldProvider)
     {
         $this->fieldProvider = $fieldProvider;
@@ -84,8 +84,10 @@ class WidgetSortByType extends AbstractType
     {
         $choices = [];
 
-        //@TODO change logic of grabbing choices. They should grab from datagrid config
-        $fields = $this->fieldProvider->getFields($className);
+        $fields = $this->fieldProvider->getEntityFields(
+            $className,
+            EntityFieldProvider::OPTION_APPLY_EXCLUSIONS | EntityFieldProvider::OPTION_TRANSLATE
+        );
         foreach ($fields as $field) {
             $choices[$field['label']] = $field['name'];
         }

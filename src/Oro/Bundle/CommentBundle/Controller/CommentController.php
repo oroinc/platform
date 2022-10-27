@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\CommentBundle\Controller;
 
+use Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * Serves comment actions.
  * @Route("/comments")
  */
-class CommentController extends Controller
+class CommentController extends AbstractController
 {
     /**
      * @Route(
@@ -20,14 +22,27 @@ class CommentController extends Controller
      *
      * @AclAncestor("oro_comment_view")
      *
-     * @Template("OroCommentBundle:Comment:form.html.twig")
+     * @Template("@OroComment/Comment/form.html.twig")
      */
     public function getFormAction()
     {
-        $form = $this->get('oro_comment.form.comment.api');
+        $form = $this->get(CommentTypeApi::class);
 
         return [
             'form' => $form->createView()
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                CommentTypeApi::class,
+            ]
+        );
     }
 }

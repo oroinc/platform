@@ -19,17 +19,11 @@ class OrganizationUsersHandler extends UserSearchHandler
     /** @var SearchCriteria */
     protected $searchUserCriteria;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
     {
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * @param SearchCriteria $searchCriteria
-     */
     public function setSearchUserCriteria(SearchCriteria $searchCriteria)
     {
         $this->searchUserCriteria = $searchCriteria;

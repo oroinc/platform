@@ -11,23 +11,14 @@ class WampClientFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $factory = new WampClientFactory();
 
-        /** @var ClientAttributes|\PHPUnit\Framework\MockObject\MockObject $clientAttributes */
         $clientAttributes = $this->createMock(ClientAttributes::class);
-
-        $clientAttributes
-            ->expects(self::once())
+        $clientAttributes->expects(self::once())
             ->method('getHost');
-
-        $clientAttributes
-            ->expects(self::once())
+        $clientAttributes->expects(self::once())
             ->method('getPort');
-
-        $clientAttributes
-            ->expects(self::once())
+        $clientAttributes->expects(self::once())
             ->method('getTransport');
-
-        $clientAttributes
-            ->expects(self::once())
+        $clientAttributes->expects(self::once())
             ->method('getContextOptions');
 
         $factory->createClient($clientAttributes);

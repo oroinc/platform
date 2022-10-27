@@ -3,18 +3,104 @@ oro_behat_extension:
     OroEmailBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroDataGridBundle::GridContext
-        - OroNavigationBundle::FeatureContext
-        - OroNavigationBundle::PinbarContext
-        - OroEmailBundle::FeatureContext
-        - OroEmailBundle::EmailFeatureToggleContext
-        - OroFormBundle::FormContext
-        - OroUserBundle::FeatureContext
-        - OroActivityListBundle::ActivityContext
-        - OroConfigBundle::FeatureContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\NavigationBundle\Tests\Behat\Context\PinbarContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailFeatureToggleContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\WysiwygContext
+        - Oro\Bundle\UserBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\ActivityListBundle\Tests\Behat\Context\ActivityContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\GoogleImapEnableContext
+        - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
+        - Oro\Bundle\QueryDesignerBundle\Tests\Behat\Context\QueryDesignerContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
+    Email Synchronization Settings System Config Form Other:
+      selector: "div[id^='configuration-options-block']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Enable SMTP:
+            type: 'css'
+            locator: '[name$="[useSmtp]"]'
+          SMTP Host:
+            type: 'css'
+            locator: '[name$="[smtpHost]"]'
+          SMTP Port:
+            type: 'css'
+            locator: '[name$="[smtpPort]"]'
+          Encryption:
+            type: 'css'
+            locator: '[name$="[smtpEncryption]"]'
+          Password:
+            type: 'css'
+            locator: '[name$="[password]"]'
+          Enable IMAP:
+            type: 'css'
+            locator: '[name$="[useImap]"]'
+          IMAP Host:
+            type: 'css'
+            locator: '[name$="[imapHost]"]'
+          IMAP Port:
+            type: 'css'
+            locator: '[name$="[imapPort]"]'
+          IMAP Encryption:
+            type: 'css'
+            locator: '[name$="[imapEncryption]"]'
+          User:
+            type: 'css'
+            locator: '[name$="[user]"]'
+
+    Add Autoresponse Rule Form:
+      selector: "form[id^='oro_email_autoresponserule']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Status:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[active]"]'
+          Name:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[name]"]'
+          Response Template:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][existing_entity]"]'
+            element: Select2Entity
+          Type:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][type]"]'
+          Default Subject:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][default][subject]"]'
+          Default Content:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][default][content]"]'
+          English Subject:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][1][subject]"]'
+          English Subject Fallback:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][1][subjectFallback]"]'
+          English Content:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][1][content]"]'
+          English Content Fallback:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][translations][1][contentFallback]"]'
+          Save Response as Email Template:
+            type: 'css'
+            locator: '[name="oro_email_autoresponserule[template][new_entity][visible]"]'
+
+    Autoresponse Rules Grid:
+      selector: '[id^="grid-email-auto-response-rules"]'
+      class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+
     Email Form:
       selector: "form[id^='oro_email_email']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
@@ -37,32 +123,39 @@ oro_behat_extension:
           Subject:
             type: 'css'
             locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject"]'
+          Subject Fallback:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__subject-fallback"]'
           Content:
             type: 'css'
             locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content"]'
+          Content Fallback:
+            type: 'css'
+            locator: 'div[class^="emailtemplate-translatation-fields-"].tab-pane.active [data-name="field__content-fallback"]'
 
     EmailNotificationLink:
       selector: 'a.email-notification-icon'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ShortEmailList:
       selector: 'div.short-emails-list'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     EmailListItem:
       selector: 'ul.items li'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     EmailTitle:
       selector: 'div.title'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ReadUnreadIcon:
       selector: 'i.mail-icon'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     RemoveEmail:
       selector: '.select2-search-choice-close'
+
+    Remove Email To Field:
+      selector: '[id^="s2id_oro_email_email_to"] .select2-search-choice-close'
+
+    Email To Field:
+      selector: 'input[aria-describedby^="oro_email_email_to"]'
 
     Email Templates Grid:
       selector: '[id^="grid-email-templates"]'
@@ -74,12 +167,39 @@ oro_behat_extension:
     Red dot image:
       selector:
         type: xpath
-        locator: '//img[@alt="Red dot"][@src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mP8z8AARBDAiJMDAIzoBf5Dp2P2AAAAAElFTkSuQmCC"]'
+        locator: '//img[@alt="red-dot"]'
 
     Blue dot image:
       selector:
         type: xpath
-        locator: '//img[@alt="Blue dot"][@src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAAEklEQVR42mNkYPj/nwEKGHFyAIbuBf4sIeHsAAAAAElFTkSuQmCC"]'
+        locator: '//img[@alt="blue-dot"]'
+
+    Upload Email Attachment Link:
+      selector: 'a.upload-new'
+
+    Upload Email Attachment File:
+      selector: '[name^="oro_email_email[attachments]"][type="file"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\FileField
+
+    Preview Email:
+      selector: 'iframe#preview-frame'
+
+    Ellipsis button:
+      selector:
+        type: xpath
+        locator: '//div[@class="emailtemplate-translatation oro-tabs tabbable"]//a[@role="button"]'
+
+    Email Page Contexts:
+      selector: 'div.activity-context-activity'
+
+    Email Template Default Content:
+      selector: 'textarea[name="oro_email_emailtemplate[translations][default][content]"]'
+
+    Autoresponse Rule Default Content:
+      selector: 'textarea[name="oro_email_autoresponserule[template][new_entity][translations][default][content]"]'
+
+    Email Template Login Absolute Link:
+      selector: 'a.oro_email_template_login_link[href="http://localhost/admin/user/login"]'
 
   pages:
     User Emails:

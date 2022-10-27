@@ -6,8 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 
 /**
- * Builds response based on the context state
- * and add the response document builder to the context.
+ * Builds the response based on the context state.
  */
 class BuildSingleItemResultDocument extends BuildResultDocument
 {

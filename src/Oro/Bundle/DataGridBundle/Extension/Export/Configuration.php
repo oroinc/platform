@@ -5,19 +5,21 @@ namespace Oro\Bundle\DataGridBundle\Extension\Export;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Configuration class for the datagrid export configuration.
+ */
 class Configuration implements ConfigurationInterface
 {
-    const XLSX_MAX_EXPORT_RECORDS = 10000;
-    const OPTION_PAGE_SIZE = 'page_size';
+    public const XLSX_MAX_EXPORT_RECORDS = 10000;
 
     /**
      * {@inheritDoc}
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('export');
 
-        $builder->root('export')
+        $builder->getRootNode()
             ->treatTrueLike(
                 [
                     'csv' => [
@@ -41,8 +43,6 @@ class Configuration implements ConfigurationInterface
                     ->booleanNode('show_max_export_records_dialog')
                     ->end()
                     ->integerNode('max_export_records')
-                    ->end()
-                    ->integerNode(self::OPTION_PAGE_SIZE)
                     ->end()
                 ->end()
             ->end();

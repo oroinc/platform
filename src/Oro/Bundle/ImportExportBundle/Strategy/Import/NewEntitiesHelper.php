@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
+use Doctrine\Common\Util\ClassUtils;
+
+/**
+ * Storage for new entities
+ */
 class NewEntitiesHelper
 {
     /**
@@ -27,9 +32,7 @@ class NewEntitiesHelper
      */
     public function getEntity($key, $default = null)
     {
-        return isset($this->newEntities[$key])
-            ? $this->newEntities[$key]
-            : $default;
+        return $this->newEntities[$key] ?? $default;
     }
 
     /**
@@ -59,9 +62,7 @@ class NewEntitiesHelper
      */
     public function getEntityUsage($hashKey)
     {
-        return isset($this->newEntitiesUsages[$hashKey])
-            ? $this->newEntitiesUsages[$hashKey]
-            : 0;
+        return $this->newEntitiesUsages[$hashKey] ?? 0;
     }
 
     public function onFlush()
@@ -74,5 +75,44 @@ class NewEntitiesHelper
     {
         $this->newEntities       = [];
         $this->newEntitiesUsages = [];
+    }
+
+    /**
+     * @param object $entity
+     * @param null|string $prefix
+     *
+     * @return string
+     */
+    public function getEntityHashKey($entity, $prefix = null)
+    {
+        return $prefix . spl_object_hash($entity);
+    }
+
+    /**
+     * Save new entity to newEntitiesHelper storage by key constructed from identityValues
+     * and this strategy context for reuse if there will be entity with the same identity values
+     * it has not been created again but has been fetched from this storage
+     *
+     * @param object $entity
+     * @param array|null $identityValues
+     * @param null|string $hashPrefix
+     * @return object|null
+     */
+    public function storeNewEntity($entity, array $identityValues = null, $hashPrefix = null)
+    {
+        $knownNewEntity = null;
+        if ($identityValues) {
+            $entityClass = ClassUtils::getClass($entity);
+            $newEntityKey = sprintf('%s:%s', $entityClass, serialize($identityValues));
+            $knownNewEntity = $this->getEntity($newEntityKey);
+            if (null === $knownNewEntity) {
+                $this->setEntity($newEntityKey, $entity);
+                $this->incrementEntityUsage($this->getEntityHashKey($entity, $hashPrefix));
+            } else {
+                $this->incrementEntityUsage($this->getEntityHashKey($knownNewEntity, $hashPrefix));
+            }
+        }
+
+        return $knownNewEntity;
     }
 }

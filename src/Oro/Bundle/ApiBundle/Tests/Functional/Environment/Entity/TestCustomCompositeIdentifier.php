@@ -91,17 +91,11 @@ class TestCustomCompositeIdentifier implements TestFrameworkEntityInterface
         return $this->children;
     }
 
-    /**
-     * @param TestCustomCompositeIdentifier $item
-     */
     public function addChild(TestCustomCompositeIdentifier $item)
     {
         $this->children->add($item);
     }
 
-    /**
-     * @param TestCustomCompositeIdentifier $item
-     */
     public function removeChild(TestCustomCompositeIdentifier $item)
     {
         $this->children->removeElement($item);

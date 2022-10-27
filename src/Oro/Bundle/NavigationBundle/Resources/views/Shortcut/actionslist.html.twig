@@ -1,6 +1,6 @@
 {% extends bap.layout %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroNavigationBundle::macros.html.twig' as Navigation %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroNavigation/macros.html.twig' as Navigation %}
 
 {% block title %}{% trans %}Shortcut Actions List{% endtrans %}{% endblock %}
 {% block content %}
@@ -17,22 +17,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                {% for action in actionsList if action.url %}
-                    <tr>
-                        {% if action.dialog is defined and action.dialog %}
-                            <td>
-                                {{ Navigation.renderClientLink(action.dialog_config, {
-                                    entityClass: oro_class_name(app.user, true),
-                                    entityId: app.user.id
-                                }) }}
-                            </td>
-                            <td>{{ action.description|trans }}</td>
-                        {% else %}
-                            <td><a href="{{ action.url }}">{{ action.label|trans }}</a></td>
-                            <td>{{ action.description|trans }}</td>
-                        {% endif %}
+                {% for action in actionsList %}
+                    {% if action.url %}
+                        <tr>
+                            {% if action.dialog is defined and action.dialog %}
+                                <td>
+                                    {{ Navigation.renderClientLink(action.dialog_config, {
+                                        entityClass: oro_class_name(app.user, true),
+                                        entityId: app.user.id
+                                    }) }}
+                                </td>
+                                <td>{{ action.description|trans }}</td>
+                            {% else %}
+                                <td><a href="{{ action.url }}">{{ action.label|trans }}</a></td>
+                                <td>{{ action.description|trans }}</td>
+                            {% endif %}
 
-                    </tr>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
                 </tbody>
             </table>

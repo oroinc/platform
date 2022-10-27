@@ -11,15 +11,13 @@ interface ConfigurationSectionInterface
 {
     /**
      * Builds the definition of a section configuration.
-     *
-     * @param NodeBuilder $node
      */
     public function configure(NodeBuilder $node): void;
 
     /**
      * Checks if this section can be added to the given configuration section.
      *
-     * @param string $section Configuration section, e.g. entities.entity, relations.entity, etc.
+     * @param string $section Configuration section, e.g. "entities.entity", "filters.field", etc.
      *
      * @return bool
      */
@@ -27,8 +25,6 @@ interface ConfigurationSectionInterface
 
     /**
      * Injects the configuration settings.
-     *
-     * @param ConfigurationSettingsInterface $settings
      */
     public function setSettings(ConfigurationSettingsInterface $settings): void;
 }

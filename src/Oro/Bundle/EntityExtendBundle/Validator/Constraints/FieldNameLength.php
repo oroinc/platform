@@ -9,21 +9,21 @@ use Symfony\Component\Validator\Constraints\Length;
  */
 class FieldNameLength extends Length
 {
-    // By default should be created fields with name which lenght more than 1.
+    // By default should be created fields with name which length more than 1.
     public const MIN_LENGTH = 2;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct($options = null)
+    public function __construct()
     {
-        // this constraint must not be configured from the outside
+        parent::__construct(null, self::MIN_LENGTH);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return 'oro_entity_extend.validator.field_name_length';
     }

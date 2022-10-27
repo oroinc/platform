@@ -36,11 +36,6 @@ class OroJquerySelect2HiddenType extends AbstractType
      */
     protected $configProvider;
 
-    /**
-     * @param EntityManager  $entityManager
-     * @param SearchRegistry $registry
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(
         EntityManager $entityManager,
         SearchRegistry $registry,
@@ -118,9 +113,6 @@ class OroJquerySelect2HiddenType extends AbstractType
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     protected function setConverterNormalizer(OptionsResolver $resolver)
     {
         $resolver->setNormalizer(
@@ -146,10 +138,6 @@ class OroJquerySelect2HiddenType extends AbstractType
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     * @param array                    $defaultConfig
-     */
     protected function setConfigsNormalizer(OptionsResolver $resolver, array $defaultConfig)
     {
         $resolver->setNormalizer(
@@ -199,10 +187,6 @@ class OroJquerySelect2HiddenType extends AbstractType
 
     /**
      * Set data-title attribute to element to show selected value
-     *
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {

@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension;
 use Oro\Component\Layout\Block\Type\BaseType;
-use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder;
@@ -15,19 +15,15 @@ use Oro\Component\Layout\OptionValueBag;
 class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ClassAttributeExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        /** @var ExpressionEncoderRegistry|\PHPUnit\Framework\MockObject\MockObject $encoderRegistry */
-        $encoderRegistry = $this
-            ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $encoderRegistry = $this->createMock(ExpressionEncoderRegistry::class);
         $encoderRegistry->expects($this->any())
             ->method('get')
             ->with('json')
-            ->will($this->returnValue(new JsonExpressionEncoder(new ExpressionManipulator())));
+            ->willReturn(new JsonExpressionEncoder(new ExpressionManipulator()));
 
         $this->extension = new ClassAttributeExtension($encoderRegistry);
     }
@@ -41,10 +37,10 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock(BlockInterface::class);
         $block->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
         $view = new BlockView();
 
         $classAttr = new OptionValueBag();
@@ -53,7 +49,7 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
         $view->vars['attr']['class'] = $classAttr;
 
         $context['expressions_evaluate'] = true;
-        $this->extension->finishView($view, $block, new Options());
+        $this->extension->finishView($view, $block);
 
         $this->assertEquals('test_class', $view->vars['attr']['class']);
     }
@@ -62,10 +58,10 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock(BlockInterface::class);
         $block->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
         $view = new BlockView();
 
         $classAttr = new OptionValueBag();
@@ -74,7 +70,7 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
         $view->vars['attr']['class'] = $classAttr;
 
         $context['expressions_evaluate'] = true;
-        $this->extension->finishView($view, $block, new Options());
+        $this->extension->finishView($view, $block);
 
         $this->assertArrayNotHasKey('class', $view->vars['attr']);
     }
@@ -83,10 +79,10 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock(BlockInterface::class);
         $block->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
         $view = new BlockView();
 
         $classAttr = new OptionValueBag();
@@ -95,7 +91,7 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
         $view->vars['attr']['class'] = $classAttr;
 
         $context['expressions_evaluate'] = false;
-        $this->extension->finishView($view, $block, new Options());
+        $this->extension->finishView($view, $block);
 
         $this->assertSame($classAttr, $view->vars['attr']['class']);
     }
@@ -104,10 +100,10 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock(BlockInterface::class);
         $block->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
         $view = new BlockView();
 
         $classAttr = new OptionValueBag();
@@ -117,7 +113,7 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
 
         $context['expressions_evaluate'] = false;
         $context['expressions_encoding'] = 'json';
-        $this->extension->finishView($view, $block, new Options());
+        $this->extension->finishView($view, $block);
 
         $this->assertEquals('{"@actions":[{"name":"add","args":["test_class"]}]}', $view->vars['attr']['class']);
     }
@@ -126,17 +122,17 @@ class ClassAttributeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
         $context->set('css_class', 'test_class');
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock(BlockInterface::class);
         $block->expects($this->once())
             ->method('getContext')
-            ->will($this->returnValue($context));
+            ->willReturn($context);
         $view = new BlockView();
 
         $view->vars['attr']['class'] = '';
 
         $context['expressions_evaluate'] = false;
         $context['expressions_encoding'] = 'json';
-        $this->extension->finishView($view, $block, new Options());
+        $this->extension->finishView($view, $block);
 
         $this->assertArrayNotHasKey('class', $view->vars['attr']);
     }

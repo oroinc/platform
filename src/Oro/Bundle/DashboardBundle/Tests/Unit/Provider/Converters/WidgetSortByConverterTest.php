@@ -4,36 +4,37 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetSortByConverter;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetSortByConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetSortByConverter */
-    protected $widgetSortByConverter;
+    private $widgetSortByConverter;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $configId = $this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
+        $configId = $this->createMock(ConfigIdInterface::class);
         $config = new Config($configId, ['label' => 'existingLabel']);
 
-        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $entityConfigProvider->expects($this->any())
             ->method('hasConfig')
-            ->will($this->returnCallback(function ($className, $property) {
+            ->willReturnCallback(function ($className, $property) {
                 return $className === 'TestClass' && $property === 'existing';
-            }));
+            });
         $entityConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with('TestClass', 'existing')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnCallback(function ($id) {
+            ->willReturnCallback(function ($id) {
                 return $id;
-            }));
+            });
 
         $this->widgetSortByConverter = new WidgetSortByConverter(
             $entityConfigProvider,
@@ -44,12 +45,12 @@ class WidgetSortByConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider viewValueProvider
      */
-    public function testViewValue($passedValue, $expectedValue)
+    public function testViewValue(?array $passedValue, ?string $expectedValue)
     {
         $this->assertEquals($expectedValue, $this->widgetSortByConverter->getViewValue($passedValue));
     }
 
-    public function viewValueProvider()
+    public function viewValueProvider(): array
     {
         return [
             [

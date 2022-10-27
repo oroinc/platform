@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub;
 
-use Oro\Bundle\ApiBundle\Config\AbstractConfigExtension;
+use Oro\Bundle\ApiBundle\Config\Extension\AbstractConfigExtension;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 class TestConfigExtension extends AbstractConfigExtension

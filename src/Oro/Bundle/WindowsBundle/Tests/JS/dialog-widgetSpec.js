@@ -1,35 +1,30 @@
 define(function(require) {
     'use strict';
 
-    require('jasmine-jquery');
-
-    var DialogWidget = require('oro/dialog-widget');
-    var $ = require('jquery');
-
-    var content = require('text!./Fixture/dialog-widget-content.html');
+    const DialogWidget = require('oro/dialog-widget');
 
     describe('oro/dialog-widget', function() {
         describe('check focus on dialog content', function() {
             beforeEach(function() {
-                window.setFixtures(content);
-                this.$dialog = $('div#dialog');
-                this.$input = this.$dialog.find('#first-input');
-
                 this.dialog = new DialogWidget({
-                    el: this.$dialog.get(0)
+                    stateEnabled: false
                 });
-                this.dialog.widget = this.$dialog.find('#widget');
+            });
+
+            afterEach(function() {
+                this.dialog.dispose();
             });
 
             it('first visible input should be focused', function() {
+                this.dialog.setContent('<div class="widget-content"><form><input></form></div>');
                 this.dialog.focusContent();
-                expect(document.activeElement).toEqual(this.$input.get(0));
+                expect(document.activeElement).toEqual(this.dialog.$(':input').get(0));
             });
 
             it('dialog element should be focused', function() {
-                this.$input.hide();
+                this.dialog.setContent('<div class="widget-content"></div>');
                 this.dialog.focusContent();
-                expect(document.activeElement).toEqual(this.$dialog.get(0));
+                expect(document.activeElement).toEqual(this.dialog.$el.parent().get(0));
             });
         });
     });

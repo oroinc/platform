@@ -3,30 +3,26 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
 /**
- * Twig extension with filters that helps prepare HTML for the output.
+ * Provides Twig filters for HTML output preparation:
+ *   - oro_html_strip_tags
+ *   - oro_attribute_name_purify
+ *   - oro_html_sanitize
+ *   - oro_html_escape
  */
-class HtmlTagExtension extends \Twig_Extension
+class HtmlTagExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?HtmlTagHelper $htmlTagHelper = null;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return HtmlTagHelper
-     */
-    protected function getHtmlTagHelper()
-    {
-        return $this->container->get('oro_ui.html_tag_helper');
     }
 
     /**
@@ -35,10 +31,10 @@ class HtmlTagExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('oro_html_strip_tags', [$this, 'htmlStripTags'], ['is_safe' => ['all']]),
-            new \Twig_SimpleFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
-            new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFilter('oro_html_escape', [$this, 'htmlEscape'], ['is_safe' => ['html']]),
+            new TwigFilter('oro_html_strip_tags', [$this, 'htmlStripTags'], ['is_safe' => ['all']]),
+            new TwigFilter('oro_attribute_name_purify', [$this, 'attributeNamePurify']),
+            new TwigFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
+            new TwigFilter('oro_html_escape', [$this, 'htmlEscape'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -61,7 +57,7 @@ class HtmlTagExtension extends \Twig_Extension
      */
     public function attributeNamePurify($string)
     {
-        return preg_replace('/[^a-z0-9_-]+/i', '', $string);
+        return preg_replace('/[^a-z0-9\_\-]+/i', '', $string);
     }
 
     /**
@@ -78,7 +74,7 @@ class HtmlTagExtension extends \Twig_Extension
     /**
      * Allow HTML tags all forbidden tags will be escaped
      *
-     * @param $string
+     * @param string $string
      * @return string
      */
     public function htmlEscape($string)
@@ -87,10 +83,21 @@ class HtmlTagExtension extends \Twig_Extension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return 'oro_ui.html_tag';
+        return [
+            'oro_ui.html_tag_helper' => HtmlTagHelper::class,
+        ];
+    }
+
+    private function getHtmlTagHelper(): HtmlTagHelper
+    {
+        if (null === $this->htmlTagHelper) {
+            $this->htmlTagHelper = $this->container->get('oro_ui.html_tag_helper');
+        }
+
+        return $this->htmlTagHelper;
     }
 }

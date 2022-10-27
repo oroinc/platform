@@ -1,0 +1,29 @@
+parameters:
+    liip_imagine.controller.filter_action: 'oro_attachment.controller.imagine::filterAction'
+
+services:
+    _defaults:
+        public: true
+
+    oro_attachment.controller.imagine:
+        class: Oro\Bundle\AttachmentBundle\Controller\ImagineController
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: 'oro_attachment.imagine.filter_service', key: Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService }
+
+    oro_attachment.controller.file:
+        class: Oro\Bundle\AttachmentBundle\Controller\FileController
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_attachment.manager.image_resize, key: Oro\Bundle\AttachmentBundle\Manager\ImageResizeManagerInterface }
+            - { name: container.service_subscriber, id: oro_attachment.provider.file_name, key: Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface }
+
+    Oro\Bundle\AttachmentBundle\Controller\AttachmentController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

@@ -1,7 +1,6 @@
 services:
     oro_api.normalize_value.processor:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValueProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - normalize_value
@@ -27,7 +26,12 @@ services:
     oro_api.normalize_value.string:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeString
         tags:
-            - { name: oro.api.processor, action: normalize_value, dataType: string|guid|currency, priority: -10 }
+            - { name: oro.api.processor, action: normalize_value, dataType: string|currency, priority: -10 }
+
+    oro_api.normalize_value.guid:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeGuid
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: guid, priority: -10 }
 
     oro_api.normalize_value.integer:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeInteger
@@ -58,6 +62,11 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: float|percent, priority: -10 }
+
+    oro_api.normalize_value.percent_100:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizePercent100
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: percent_100, priority: -10 }
 
     #
     # REST API processors

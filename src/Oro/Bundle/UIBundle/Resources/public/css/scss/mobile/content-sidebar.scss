@@ -2,25 +2,7 @@
 
 .content-with-sidebar {
     &--container {
-        margin: $content-sidebar-container-mobile-offset;
-
         @include safe-area-offset(padding, 0);
-
-        .scrollspy.container-fluid {
-            margin-top: 0;
-        }
-    }
-
-    &--sidebar {
-        max-width: $content-sidebar-mobile-max-width;
-        min-height: $content-sidebar-mobile-min-height;
-        margin: $content-sidebar-mobile-margin;
-
-        overflow: visible;
-
-        &.content-sidebar-maximized {
-            width: 100%;
-        }
     }
 
     &--controls {
@@ -29,5 +11,78 @@
 
     &--control {
         width: auto;
+    }
+
+    &--header {
+        padding: $content-padding;
+    }
+
+    &--sidebar {
+        max-width: $content-sidebar-mobile-max-width;
+        min-height: $content-sidebar-mobile-min-height;
+
+        overflow: visible;
+
+        &.content-sidebar-maximized {
+            width: 100%;
+        }
+
+        &.content-sidebar-minimized {
+            width: 0;
+            visibility: hidden;
+
+            .content-with-sidebar--header {
+                padding-top: 0;
+            }
+
+            .content-with-sidebar--controls {
+                position: absolute;
+                left: 0;
+                z-index: $mobile-app-header-z-index - 10;
+                height: 40px;
+                width: 32px;
+                background-color: $content-with-sidebar-controls-background;
+                border-radius: 0 50% 50% 0;
+                visibility: visible;
+
+                .line-pattern {
+                    position: fixed;
+                    left: 0;
+                    height: 100vh;
+                    width: 5px;
+                    background-color: $content-with-sidebar-controls-background;
+                    content: '';
+                }
+            }
+
+            .content-with-sidebar--control {
+                i {
+                    color: $content-with-sidebar-controls-color;
+                    padding: 12px 0;
+                    margin-left: 8px;
+                }
+            }
+        }
+
+        .sidebar-items {
+            padding: $content-sidebar-items-mobile-offset-inner;
+        }
+
+        .jstree-wrapper {
+            padding: $content-sidebar-jstree-wrapper-mobile-inner-offset;
+
+            .jstree {
+                margin: $content-sidebar-jstree-wrapper-jstree-mobile-inner-offset;
+            }
+        }
+    }
+}
+
+.layout-content,
+.scrollable-container {
+    .content-with-sidebar {
+        &--sidebar {
+            margin: $content-sidebar-mobile-margin;
+        }
     }
 }

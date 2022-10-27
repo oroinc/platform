@@ -2,28 +2,27 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Symfony\Component\Intl\Intl;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Intl\Exception\MissingResourceException;
+use Symfony\Component\Intl\Languages;
+use Symfony\Component\Intl\Locales;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Returns the human readable language name based on language code and system language.
+ */
 class LanguageCodeFormatter
 {
-    const CONFIG_KEY_DEFAULT_LANGUAGE = 'oro_locale.language';
-
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var LocaleSettings */
+    protected $localeSettings;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param ConfigManager $configManager
-     */
-    public function __construct(TranslatorInterface $translator, ConfigManager $configManager)
+    public function __construct(TranslatorInterface $translator, LocaleSettings $localeSettings)
     {
         $this->translator = $translator;
-        $this->configManager = $configManager;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -36,13 +35,30 @@ class LanguageCodeFormatter
             return $this->translator->trans('N/A');
         }
 
-        $name = Intl::getLanguageBundle()->getLanguageName(
-            $code,
-            null,
-            $this->configManager->get(self::CONFIG_KEY_DEFAULT_LANGUAGE)
-        );
+        $lang = $this->localeSettings->getLanguage();
+        try {
+            return $this->postProcessLanguageName(Languages::getName($code, $lang), $code);
+        } catch (MissingResourceException $e) {
+            return $code;
+        }
+    }
 
-        return $name ?: $code;
+    /**
+     * If its custom language code we should append custom code suffix
+     *
+     * en_plastimo    -> English Plastimo
+     * en_CA_plastimo -> Canadian English Plastimo
+     */
+    private function postProcessLanguageName(string $languageName, string $code): string
+    {
+        $codePieces = explode('_', $code);
+        $diff = \count($codePieces) - \count(explode(' ', $languageName));
+
+        if ($diff > 0) {
+            $languageName .= ' '.ucwords(implode(' ', array_slice($codePieces, -$diff)));
+        }
+
+        return $languageName;
     }
 
     /**
@@ -55,11 +71,38 @@ class LanguageCodeFormatter
             return $this->translator->trans('N/A');
         }
 
-        $name = Intl::getLocaleBundle()->getLocaleName(
-            $code,
-            $this->configManager->get(self::CONFIG_KEY_DEFAULT_LANGUAGE)
-        );
+        $lang = $this->localeSettings->getLanguage();
 
-        return $name ?: $code;
+        return Locales::exists($code) ?
+            Locales::getName($code, $lang) :
+            $this->formatNotExistsLocaleCode($code, $lang);
+    }
+
+    /**
+     * Format partially intl supported locale to the human readable format
+     *
+     * en_plastimo => English Plastimo
+     * en_CA_plastimo => English (Canada) Plastimo
+     */
+    private function formatNotExistsLocaleCode(string $code, string $lang): string
+    {
+        $pieces = explode('_', $code);
+        $piecesAmount = \count($pieces);
+
+        if (1 === $piecesAmount) {
+            return $code;
+        }
+
+        if ($piecesAmount > 1) {
+            for ($i = $piecesAmount - 1; $i > 0; --$i) {
+                $partialCode = implode('_', array_slice($pieces, 0, $i));
+                if (Locales::exists($partialCode)) {
+                    return Locales::getName($partialCode, $lang)
+                        . ' ' . ucwords(implode(' ', array_slice($pieces, $i)));
+                }
+            }
+        }
+
+        return $code;
     }
 }

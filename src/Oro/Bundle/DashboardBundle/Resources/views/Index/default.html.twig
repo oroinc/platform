@@ -1,12 +1,12 @@
 {% extends bap.layout %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% oro_title_set({params : {"%name%": dashboard.getLabel() }}) %}
 {% block breadcrumb %}
     {% set breadcrumbs = [
         {'label': 'oro.dashboard.menu.dashboards_tab.label'|trans },
         {'label': dashboard.getLabel()|trans }
     ] %}
-    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+    {% include '@OroNavigation/Menu/breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}
 {% block content %}
 {% set widgetIdPrefix = 'dashboard-widget-' ~ random() ~ '-' %}
@@ -48,14 +48,14 @@
     availableWidgets: availableWidgets
 } %}
 
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 <div class="layout-content dashboard-container-wrapper" {{ UI.renderPageComponentAttributes({
     view: 'orodashboard/js/app/views/dashboard-container-view',
     options: dashboardContainerOptions
 }) }}>
     <div class="container-fluid page-title">
-        <div class="navigation clearfix navbar-extra navbar-extra-right">
+        <div class="navigation navbar-extra navbar-extra-right">
             <div class="row">
                 {% block title %}
                 <div class="pull-left pull-left-extra">
@@ -68,15 +68,18 @@
                 {% endblock title %}
 
                 {% block navButtons %}
+                    {% import '@OroUI/macros.html.twig' as UI %}
+
                     {% if dashboards|length > 1 %}
-                        <div class="dashboard-selector-container pull-right title-buttons-container">
+                        <div class="dashboard-selector-container pull-right">
                             <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>
                             <select id="dashboard_selector" {{ UI.renderPageComponentAttributes({
                                 view: 'orodashboard/js/app/views/dashboard-change-view'
                             }) }}>
                                 {% for dashboardModel in dashboards %}
                                     <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
-                                        {{ dashboardModel.getLabel()|trans|truncate(50) }}
+                                        {% set translatedLabel = dashboardModel.getLabel()|trans %}
+                                        {{ translatedLabel|length <= 50 ? translatedLabel : translatedLabel|slice(0, 50)|trim(side='right') ~ '...' }}
                                     </option>
                                 {% endfor %}
                             </select>
@@ -90,46 +93,46 @@
 
                     <div class="pull-right title-buttons-container">
                         {% if allowEdit %}
-                            <a href="javascript:void(0);" class="dashboard-widgets-add btn main-group">
+                            <a href="#" class="dashboard-widgets-add btn main-group">
                                 <span class="fa-plus"></span>
                                 {{- 'oro.dashboard.add_dashboard_widgets.add_widget'|trans|trim -}}
                             </a>
                         {% endif %}
 
-                        {% if is_granted('DELETE', dashboard.entity) or is_granted('oro_dashboard_create') or is_granted('EDIT', dashboard.entity) %}
-                            {% set html %}
-                                {% if is_granted('EDIT', dashboard.entity) %}
-                                    {{ UI.dropdownItem({
-                                        'path': path('oro_dashboard_update', {id:dashboard.id}),
-                                        'title': 'oro.dashboard.edit_dashboard_link.title'|trans,
-                                        'label': 'oro.dashboard.edit_dashboard_link.text'|trans,
-                                        'aCss': 'dropdown-item',
-                                        'iCss': 'fa-pencil-square-o'
+                        {% set html %}
+                            {% if is_granted('EDIT', dashboard.entity) and feature_resource_enabled('Oro\\Bundle\\DashboardBundle\\Entity\\Dashboard', 'entities') %}
+                                {{ UI.dropdownItem({
+                                    'path': path('oro_dashboard_update', {id:dashboard.id}),
+                                    'title': 'oro.dashboard.edit_dashboard_link.title'|trans,
+                                    'label': 'oro.dashboard.edit_dashboard_link.text'|trans,
+                                    'aCss': 'dropdown-item',
+                                    'iCss': 'fa-pencil-square-o'
+                                }) }}
+                            {% endif %}
+                            {% if is_granted('oro_dashboard_create') and feature_resource_enabled('Oro\\Bundle\\DashboardBundle\\Entity\\Dashboard', 'entities') %}
+                                {{ UI.dropdownItem({
+                                    'path': path('oro_dashboard_create'),
+                                    'title': 'oro.dashboard.create_dashboard_link.title'|trans,
+                                    'label': 'oro.dashboard.create_dashboard_link.text'|trans,
+                                    'aCss': 'dropdown-item',
+                                    'iCss': 'fa-plus'
+                                }) }}
+                            {% endif %}
+                            {% if is_granted('DELETE', dashboard.entity) and feature_resource_enabled('Oro\\Bundle\\DashboardBundle\\Entity\\Dashboard', 'entities') %}
+                                <li>
+                                    {{ UI.deleteLink({
+                                        'dataUrl': path('oro_api_delete_dashboard', {id:dashboard.id}),
+                                        'dataRedirect': path('oro_dashboard_index'),
+                                        'aCss': 'no-hash remove-button dropdown-item',
+                                        'id': 'btn-remove-user',
+                                        'dataId': dashboard.id,
+                                        'entity_label': 'oro.dashboard.entity_label'|trans
                                     }) }}
-                                {% endif %}
-                                {% if is_granted('oro_dashboard_create') %}
-                                    {{ UI.dropdownItem({
-                                        'path': path('oro_dashboard_create'),
-                                        'title': 'oro.dashboard.create_dashboard_link.title'|trans,
-                                        'label': 'oro.dashboard.create_dashboard_link.text'|trans,
-                                        'aCss': 'dropdown-item',
-                                        'iCss': 'fa-plus'
-                                    }) }}
-                                {% endif %}
-                                {% if is_granted('DELETE', dashboard.entity) %}
-                                    <li>
-                                        {{  UI.deleteLink({
-                                            'dataUrl': path('oro_api_delete_dashboard', {id:dashboard.id}),
-                                            'dataRedirect': path('oro_dashboard_index'),
-                                            'aCss': 'no-hash remove-button dropdown-item',
-                                            'id': 'btn-remove-user',
-                                            'dataId': dashboard.id,
-                                            'entity_label': 'oro.dashboard.entity_label'|trans
-                                        }) }}
-                                    </li>
-                                {% endif %}
-                            {% endset %}
+                                </li>
+                            {% endif %}
+                        {% endset %}
 
+                        {% if html|trim is not empty %}
                             {{ UI.dropdownButton({
                                 'label': 'oro.dashboard.tools_dropdown.label'|trans,
                                 'iCss': 'fa-cog',
@@ -151,8 +154,9 @@
             <div class="responsive-section {{ contentClass }}">
                 <div class="clearfix">
                 {% block widgets %}
+                    {% import _self as dashboardMacros %}
                     {{
-                        _self.renderWidgetsColumn({
+                        dashboardMacros.renderWidgetsColumn({
                             'widgets': dashboard.getOrderedColumnWidgets(0, false, true),
                             'columnElementId': 'dashboard-column-0',
                             'columnClass': 'dashboard-column',
@@ -161,7 +165,7 @@
                         })
                     }}
                     {{
-                        _self.renderWidgetsColumn({
+                        dashboardMacros.renderWidgetsColumn({
                             'widgets': dashboard.getOrderedColumnWidgets(1, true, false),
                             'columnElementId': 'dashboard-column-1',
                             'columnClass': 'dashboard-column',

@@ -11,8 +11,6 @@ class Column extends BaseColumn
 {
     /**
      * Constructor
-     *
-     * @param array $args
      */
     public function __construct(array $args)
     {

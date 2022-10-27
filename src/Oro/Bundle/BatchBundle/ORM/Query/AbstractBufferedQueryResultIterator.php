@@ -7,6 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Oro\Component\DoctrineUtils\ORM\Walker\PreciseOrderByWalker;
 
+/**
+ * Base class for buffered Doctrine Query result iterator
+ */
 abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResultIteratorInterface
 {
     /** @var bool */
@@ -125,7 +128,7 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
     /**
      * {@inheritDoc}
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->current;
     }
@@ -133,7 +136,7 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
     /**
      * {@inheritDoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return null !== $this->current;
     }
@@ -161,9 +164,6 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
         return $this->query;
     }
 
-    /**
-     * @param Query $query
-     */
     abstract protected function initializeQuery(Query $query);
 
     /**

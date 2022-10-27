@@ -24,11 +24,6 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
     /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
-    /**
-     * @param ConfigManager                      $configManager
-     * @param RelationBuilder                    $relationBuilder
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     */
     public function __construct(
         ConfigManager $configManager,
         RelationBuilder $relationBuilder,

@@ -10,12 +10,11 @@ use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 class YamlToSearchQueryConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $query;
+    private $query;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->query = $this->getMockBuilder(SearchQueryInterface::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->query = $this->createMock(SearchQueryInterface::class);
     }
 
     public function testProcessSelectFrom()
@@ -30,15 +29,15 @@ class YamlToSearchQueryConverterTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->query->expects($this->at(0))
+        $this->query->expects($this->once())
             ->method('setFrom')
             ->with('product');
-        $this->query->expects($this->at(1))
+        $this->query->expects($this->exactly(2))
             ->method('addSelect')
-            ->with('text.sku');
-        $this->query->expects($this->at(2))
-            ->method('addSelect')
-            ->with('text.name');
+            ->withConsecutive(
+                ['text.sku'],
+                ['text.name']
+            );
 
         $testable = new YamlToSearchQueryConverter();
         $testable->process($this->query, $config);
@@ -55,18 +54,11 @@ class YamlToSearchQueryConverterTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->query->expects($this->at(0))
+        $this->query->expects($this->exactly(2))
             ->method('addWhere')
-            ->with(
-                new Comparison('id', '!=', 'parent'),
-                AbstractSearchQuery::WHERE_AND
-            );
-
-        $this->query->expects($this->at(1))
-            ->method('addWhere')
-            ->with(
-                new Comparison('name', '=', 'test'),
-                AbstractSearchQuery::WHERE_OR
+            ->withConsecutive(
+                [new Comparison('id', '!=', 'parent'), AbstractSearchQuery::WHERE_AND],
+                [new Comparison('name', '=', 'test'), AbstractSearchQuery::WHERE_OR]
             );
 
         $testable = new YamlToSearchQueryConverter();

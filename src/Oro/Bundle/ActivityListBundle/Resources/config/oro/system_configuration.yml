@@ -13,6 +13,7 @@ system_configuration:
                 choices:
                     oro.activitylist.system_configuration.fields.sorting_field.choices.createdAt: createdAt
                     oro.activitylist.system_configuration.fields.sorting_field.choices.updatedAt: updatedAt
+                required: true
                 constraints:
                     - NotBlank: ~
         oro_activity_list.sorting_direction:
@@ -24,6 +25,7 @@ system_configuration:
                 choices:
                     oro.activitylist.system_configuration.fields.sorting_direction.choices.DESC: DESC
                     oro.activitylist.system_configuration.fields.sorting_direction.choices.ASC: ASC
+                required: true
                 constraints:
                     - NotBlank: ~
         oro_activity_list.per_page:
@@ -37,6 +39,7 @@ system_configuration:
                     25:     25
                     50:     50
                     100:    100
+                required: true
                 constraints:
                     - NotBlank: ~
         oro_activity_list.grouping:

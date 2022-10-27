@@ -4,194 +4,189 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Model\Role as SecurityRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\AbstractUserStub;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AbstractUserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @return AbstractUser
-     */
-    public function getUser()
+    public function getUser(): AbstractUser
     {
         return new AbstractUserStub();
     }
 
-    public function testUsername()
+    public function testUsername(): void
     {
         $user = $this->getUser();
         $name = 'Tony';
 
-        $this->assertNull($user->getUsername());
+        self::assertNull($user->getUsername());
 
         $user->setUsername($name);
 
-        $this->assertEquals($name, $user->getUsername());
-        $this->assertEquals($name, $user);
+        self::assertEquals($name, $user->getUsername());
+        self::assertEquals($name, $user);
     }
 
-    public function testIsPasswordRequestNonExpired()
+    public function testIsPasswordRequestNonExpired(): void
     {
         $user = $this->getUser();
         $requested = new \DateTime('-10 seconds');
 
         $user->setPasswordRequestedAt($requested);
 
-        $this->assertSame($requested, $user->getPasswordRequestedAt());
-        $this->assertTrue($user->isPasswordRequestNonExpired(15));
-        $this->assertFalse($user->isPasswordRequestNonExpired(5));
+        self::assertSame($requested, $user->getPasswordRequestedAt());
+        self::assertTrue($user->isPasswordRequestNonExpired(15));
+        self::assertFalse($user->isPasswordRequestNonExpired(5));
     }
 
-    public function testIsPasswordRequestAtCleared()
+    public function testIsPasswordRequestAtCleared(): void
     {
         $user = $this->getUser();
         $requested = new \DateTime('-10 seconds');
 
         $user->setPasswordRequestedAt(null);
-        $this->assertTrue($user->isPasswordRequestNonExpired(15));
+        self::assertTrue($user->isPasswordRequestNonExpired(15));
 
         $user->setPasswordRequestedAt($requested);
-        $this->assertFalse($user->isPasswordRequestNonExpired(5));
+        self::assertFalse($user->isPasswordRequestNonExpired(5));
     }
 
-    public function testConfirmationToken()
+    public function testConfirmationToken(): void
     {
         $user = $this->getUser();
         $token = $user->generateToken();
 
-        $this->assertNotEmpty($token);
+        self::assertNotEmpty($token);
 
         $user->setConfirmationToken($token);
 
-        $this->assertEquals($token, $user->getConfirmationToken());
+        self::assertEquals($token, $user->getConfirmationToken());
     }
 
-    public function testSetRolesWithArrayArgument()
+    public function testSetRolesWithArrayArgument(): void
     {
         $roles = [new Role(User::ROLE_DEFAULT)];
         $user = $this->getUser();
-        $this->assertEmpty($user->getRoles());
-        $user->setRoles($roles);
-        $this->assertEquals($roles, $user->getRoles());
+        self::assertEmpty($user->getUserRoles());
+        $user->setUserRoles($roles);
+        self::assertEquals($roles, $user->getUserRoles());
     }
 
-    public function testSetRolesWithCollectionArgument()
+    public function testSetRolesWithCollectionArgument(): void
     {
         $roles = new ArrayCollection([new Role(User::ROLE_DEFAULT)]);
         $user = $this->getUser();
-        $this->assertEmpty($user->getRoles());
-        $user->setRoles($roles);
-        $this->assertEquals($roles->toArray(), $user->getRoles());
+        self::assertEmpty($user->getUserRoles());
+        $user->setUserRoles($roles);
+        self::assertEquals($roles->toArray(), $user->getUserRoles());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage must be an instance of Symfony\Component\Security\Core\Role\RoleInterface or an array
-     */
-    public function testSetRolesThrowsInvalidArgumentException()
+    public function testSetRolesThrowsInvalidArgumentException(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be an instance of ' . SecurityRole::class . ' or an array');
+
         $user = $this->getUser();
-        $user->setRoles('roles');
+        $user->setUserRoles('roles');
     }
 
-    public function testHasRoleWithStringArgument()
-    {
-        $user = $this->getUser();
-        $role = new Role(User::ROLE_DEFAULT);
-
-        $this->assertFalse($user->hasRole(User::ROLE_DEFAULT));
-        $user->addRole($role);
-        $this->assertTrue($user->hasRole(User::ROLE_DEFAULT));
-    }
-
-    public function testHasRoleWithObjectArgument()
+    public function testHasRoleWithStringArgument(): void
     {
         $user = $this->getUser();
         $role = new Role(User::ROLE_DEFAULT);
 
-        $this->assertFalse($user->hasRole($role));
-        $user->addRole($role);
-        $this->assertTrue($user->hasRole($role));
+        self::assertFalse($user->hasRole(User::ROLE_DEFAULT));
+        $user->addUserRole($role);
+        self::assertTrue($user->hasRole(User::ROLE_DEFAULT));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage must be an instance of Symfony\Component\Security\Core\Role\RoleInterface or a string
-     */
-    public function testHasRoleThrowsInvalidArgumentException()
+    public function testHasRoleWithObjectArgument(): void
     {
+        $user = $this->getUser();
+        $role = new Role(User::ROLE_DEFAULT);
+
+        self::assertFalse($user->hasRole($role));
+        $user->addUserRole($role);
+        self::assertTrue($user->hasRole($role));
+    }
+
+    public function testHasRoleThrowsInvalidArgumentException(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be an instance of ' . SecurityRole::class . ' or a string');
+
         $user = $this->getUser();
         $user->hasRole(new \stdClass());
     }
 
-    public function testRemoveRoleWithStringArgument()
+    public function testRemoveUserRoleWithStringArgument(): void
     {
         $user = $this->getUser();
         $role = new Role(User::ROLE_DEFAULT);
-        $user->addRole($role);
+        $user->addUserRole($role);
 
-        $this->assertTrue($user->hasRole($role));
-        $user->removeRole(User::ROLE_DEFAULT);
-        $this->assertFalse($user->hasRole($role));
+        self::assertTrue($user->hasRole($role));
+        $user->removeUserRole(User::ROLE_DEFAULT);
+        self::assertFalse($user->hasRole($role));
     }
 
-    public function testRemoveRoleWithObjectArgument()
+    public function testRemoveUserRoleWithObjectArgument(): void
     {
         $user = $this->getUser();
         $role = new Role(User::ROLE_DEFAULT);
-        $user->addRole($role);
+        $user->addUserRole($role);
 
-        $this->assertTrue($user->hasRole($role));
-        $user->removeRole($role);
-        $this->assertFalse($user->hasRole($role));
+        self::assertTrue($user->hasRole($role));
+        $user->removeUserRole($role);
+        self::assertFalse($user->hasRole($role));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage must be an instance of Symfony\Component\Security\Core\Role\RoleInterface or a string
-     */
-    public function testRemoveRoleThrowsInvalidArgumentException()
+    public function testRemoveUserRoleThrowsInvalidArgumentException(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must be an instance of ' . SecurityRole::class . ' or a string');
+
         $user = $this->getUser();
-        $user->removeRole(new \stdClass());
+        $user->removeUserRole(new \stdClass());
     }
 
-    public function testIsEnabled()
+    public function testIsEnabled(): void
     {
         $user = $this->getUser();
 
-        $this->assertTrue($user->isEnabled());
-        $this->assertTrue($user->isAccountNonExpired());
-        $this->assertTrue($user->isAccountNonLocked());
+        self::assertTrue($user->isEnabled());
 
         $user->setEnabled(false);
 
-        $this->assertFalse($user->isEnabled());
-        $this->assertFalse($user->isAccountNonLocked());
+        self::assertFalse($user->isEnabled());
     }
 
-    public function testSerializing()
+    public function testSerializing(): void
     {
         $user = $this->getUser();
         $clone = clone $user;
-        $data = $user->serialize();
+        $data = $user->__serialize();
 
-        $this->assertNotEmpty($data);
+        self::assertNotEmpty($data);
 
         $user
             ->setPassword('new-pass')
             ->setConfirmationToken('token')
             ->setUsername('new-name');
 
-        $user->unserialize($data);
+        $user->__unserialize($data);
 
-        $this->assertEquals($clone, $user);
+        self::assertEquals($clone, $user);
     }
 
-    public function testPassword()
+    public function testPassword(): void
     {
         $user = $this->getUser();
         $pass = 'anotherPassword';
@@ -199,15 +194,15 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         $user->setPassword($pass);
         $user->setPlainPassword($pass);
 
-        $this->assertEquals($pass, $user->getPassword());
-        $this->assertEquals($pass, $user->getPlainPassword());
+        self::assertEquals($pass, $user->getPassword());
+        self::assertEquals($pass, $user->getPlainPassword());
 
         $user->eraseCredentials();
 
-        $this->assertNull($user->getPlainPassword());
+        self::assertNull($user->getPlainPassword());
     }
 
-    public function testUnserialize()
+    public function testUnserialize(): void
     {
         $user = $this->getUser();
         $serialized = [
@@ -218,42 +213,29 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
             'confirmation_token',
             10
         ];
-        $user->unserialize(serialize($serialized));
+        $user->__unserialize($serialized);
 
-        $this->assertEquals($serialized[0], $user->getPassword());
-        $this->assertEquals($serialized[1], $user->getSalt());
-        $this->assertEquals($serialized[2], $user->getUsername());
-        $this->assertEquals($serialized[3], $user->isEnabled());
-        $this->assertEquals($serialized[4], $user->getConfirmationToken());
-        $this->assertEquals($serialized[5], $user->getId());
-    }
-
-    public function testIsCredentialsNonExpired()
-    {
-        $user = $this->getUser();
-        $this->assertTrue($user->isCredentialsNonExpired());
+        self::assertEquals($serialized[0], $user->getPassword());
+        self::assertEquals($serialized[1], $user->getSalt());
+        self::assertEquals($serialized[2], $user->getUsername());
+        self::assertEquals($serialized[3], $user->isEnabled());
+        self::assertEquals($serialized[4], $user->getConfirmationToken());
+        self::assertEquals($serialized[5], $user->getId());
     }
 
     /**
      * @dataProvider provider
-     * @param string $property
-     * @param mixed $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = $this->getUser();
 
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $propertyAccessor->setValue($obj, $property, $value);
-        $this->assertEquals($value, $propertyAccessor->getValue($obj, $property));
+        self::assertEquals($value, $propertyAccessor->getValue($obj, $property));
     }
 
-    /**
-     * Data provider
-     *
-     * @return array
-     */
-    public function provider()
+    public function provider(): array
     {
         return [
             ['username', 'test'],
@@ -268,13 +250,35 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testOrganization()
+    public function testOrganization(): void
     {
         $entity = $this->getUser();
         $organization = new Organization();
 
-        $this->assertNull($entity->getOrganization());
+        self::assertNull($entity->getOrganization());
         $entity->setOrganization($organization);
-        $this->assertSame($organization, $entity->getOrganization());
+        self::assertSame($organization, $entity->getOrganization());
+    }
+
+    public function testGetRoles(): void
+    {
+        $user = $this->getUser();
+
+        $user->addUserRole(new Role('SAMPLE_ROLE_1'));
+        $user->addUserRole(new Role('SAMPLE_ROLE_2'));
+
+        self::assertEquals(['SAMPLE_ROLE_1', 'SAMPLE_ROLE_2'], $user->getUserRoles());
+    }
+
+    public function testGetUserRoles(): void
+    {
+        $user = $this->getUser();
+
+        $role1 = new Role('SAMPLE_ROLE_1');
+        $role2 = new Role('SAMPLE_ROLE_2');
+        $user->addUserRole($role1);
+        $user->addUserRole($role2);
+
+        self::assertEquals([$role1, $role2], $user->getUserRoles());
     }
 }

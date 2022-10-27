@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
@@ -13,11 +18,15 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class TestHelper
 {
@@ -26,63 +35,48 @@ class TestHelper
         return new TestHelper($testCase);
     }
 
-    /**
-     * @var (\PHPUnit\Framework\TestCase
-     */
+    /** @var \PHPUnit\Framework\TestCase */
     private $testCase;
 
-    /**
-     * @param \PHPUnit\Framework\TestCase $testCase
-     */
     public function __construct(\PHPUnit\Framework\TestCase $testCase)
     {
         $this->testCase = $testCase;
     }
 
-    /**
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     * @param OwnerTree $ownerTree
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @return AclExtensionSelector
-     */
     public function createAclExtensionSelector(
         OwnershipMetadataProviderInterface $metadataProvider = null,
         OwnerTree $ownerTree = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
-    ) {
-        $doctrineHelper = $this->testCase->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+    ): AclExtensionSelector {
+        $doctrineHelper = $this->testCase->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $idAccessor = new ObjectIdAccessor($doctrineHelper);
-        $selector = new AclExtensionSelector($idAccessor);
-        $actionMetadataProvider =
-            $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider')
-                ->disableOriginalConstructor()
-                ->getMock();
+
+        $actionMetadataProvider = $this->testCase->getMockBuilder(ActionSecurityMetadataProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $actionMetadataProvider->expects($this->testCase->any())
             ->method('isKnownAction')
-            ->will($this->testCase->returnValue(true));
-        $selector->addAclExtension(
-            new ActionAclExtension($actionMetadataProvider)
-        );
-        $selector->addAclExtension(
-            $this->createEntityAclExtension($metadataProvider, $ownerTree, $idAccessor, $decisionMaker)
-        );
+            ->willReturn(true);
 
-        return $selector;
+        $container = TestContainerBuilder::create()
+            ->add('action_acl_extension', new ActionAclExtension($actionMetadataProvider))
+            ->add(
+                'entity_acl_extension',
+                $this->createEntityAclExtension($metadataProvider, $ownerTree, $idAccessor, $decisionMaker)
+            )
+            ->getContainer($this->testCase);
+
+        return new AclExtensionSelector(
+            ['action_acl_extension', 'entity_acl_extension'],
+            $container,
+            $idAccessor
+        );
     }
 
     /**
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     * @param OwnerTree $ownerTree
-     * @param ObjectIdAccessor $idAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param EntityOwnerAccessor $entityOwnerAccessor
-     * @param PermissionManager $permissionManager
-     * @param AclGroupProviderInterface $groupProvider
-     * @return EntityAclExtension
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
@@ -94,10 +88,11 @@ class TestHelper
         EntityOwnerAccessor $entityOwnerAccessor = null,
         PermissionManager $permissionManager = null,
         AclGroupProviderInterface $groupProvider = null
-    ) {
+    ): EntityAclExtension {
         if ($idAccessor === null) {
-            $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-                ->disableOriginalConstructor()->getMock();
+            $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
+                ->disableOriginalConstructor()
+                ->getMock();
 
             $idAccessor = new ObjectIdAccessor($doctrineHelper);
         }
@@ -105,77 +100,70 @@ class TestHelper
             $metadataProvider = new OwnershipMetadataProviderStub($this->testCase);
         }
         if ($entityOwnerAccessor === null) {
-            $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider);
+            $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider, (new InflectorFactory())->build());
         }
         if ($ownerTree === null) {
             $ownerTree = new OwnerTree();
         }
 
-        $treeProviderMock = $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
-            ->disableOriginalConstructor()->getMock();
+        $treeProviderMock = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $treeProviderMock->expects($this->testCase->any())
-            ->method('getTree')->will($this->testCase->returnValue($ownerTree));
+            ->method('getTree')
+            ->willReturn($ownerTree);
 
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(
                 $treeProviderMock,
                 $idAccessor,
-                new EntityOwnerAccessor($metadataProvider),
+                new EntityOwnerAccessor($metadataProvider, (new InflectorFactory())->build()),
                 $metadataProvider,
                 $this->testCase->getMockBuilder(TokenAccessorInterface::class)->getMock()
             );
         }
 
-        $config = $this->testCase->getMockBuilder('\Doctrine\ORM\Configuration')
-            ->disableOriginalConstructor()->getMock();
+        $config = $this->testCase->getMockBuilder(Configuration::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $config->expects($this->testCase->any())
             ->method('getEntityNamespaces')
-            ->will(
-                $this->testCase->returnValue(
-                    array(
-                        'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
-                    )
-                )
-            );
+            ->willReturn([
+                'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
+            ]);
 
         $em = $this->testCase->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
         $em->expects($this->testCase->any())
-            ->method('getConfiguration')->will($this->testCase->returnValue($config));
+            ->method('getConfiguration')->willReturn($config);
 
-        $doctrine = $this->testCase->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
+        $doctrine = $this->testCase->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->testCase->any())
             ->method('getManagers')
-            ->will($this->testCase->returnValue(array('default' => $em)));
+            ->willReturn(['default' => $em]);
         $doctrine->expects($this->testCase->any())
             ->method('getManagerForClass')
-            ->will($this->testCase->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
         $doctrine->expects($this->testCase->any())
             ->method('getManager')
             ->with($this->testCase->equalTo('default'))
-            ->will($this->testCase->returnValue($em));
+            ->willReturn($em);
         $doctrine->expects($this->testCase->any())
             ->method('getAliasNamespace')
-            ->will(
-                $this->testCase->returnValueMap(
-                    array(
-                        array('Test', 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'),
-                    )
-                )
-            );
+            ->willReturnMap([
+                ['Test', 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'],
+            ]);
 
-        $entityMetadataProvider =
-            $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $entityMetadataProvider = $this->testCase->getMockBuilder(EntitySecurityMetadataProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $entityMetadataProvider->expects($this->testCase->any())
             ->method('isProtectedEntity')
-            ->will($this->testCase->returnValue(true));
-        $fieldAclExtension = $this->testCase
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
+            ->willReturn(true);
+        $fieldAclExtension = $this->testCase->getMockBuilder(FieldAclExtension::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -192,23 +180,15 @@ class TestHelper
         );
     }
 
-    /**
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     * @param OwnerTree $ownerTree
-     * @param ObjectIdAccessor $idAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param ConfigManager $configManager
-     * @return FieldAclExtension
-     */
     public function createFieldAclExtension(
         OwnershipMetadataProviderInterface $metadataProvider = null,
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
         ConfigManager $configManager = null
-    ) {
+    ): FieldAclExtension {
         if ($idAccessor === null) {
-            $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
                 ->disableOriginalConstructor()
                 ->getMock();
 
@@ -221,15 +201,15 @@ class TestHelper
             $ownerTree = new OwnerTree();
         }
 
-        $treeProviderMock = $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
+        $treeProviderMock = $this->testCase->getMockBuilder(OwnerTreeProvider::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $treeProviderMock->expects($this->testCase->any())
             ->method('getTree')
-            ->will($this->testCase->returnValue($ownerTree));
+            ->willReturn($ownerTree);
 
-        $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider);
+        $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider, (new InflectorFactory())->build());
 
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(
@@ -241,53 +221,45 @@ class TestHelper
             );
         }
 
-        $config = $this->testCase->getMockBuilder('\Doctrine\ORM\Configuration')
+        $config = $this->testCase->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->getMock();
         $config->expects($this->testCase->any())
             ->method('getEntityNamespaces')
-            ->will(
-                $this->testCase->returnValue(
-                    array(
-                        'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
-                    )
-                )
-            );
+            ->willReturn([
+                'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'
+            ]);
 
-        $em = $this->testCase->getMockBuilder('Doctrine\ORM\EntityManager')
+        $em = $this->testCase->getMockBuilder(EntityManager::class)
             ->disableOriginalConstructor()
             ->getMock();
         $em->expects($this->testCase->any())
             ->method('getConfiguration')
-            ->will($this->testCase->returnValue($config));
+            ->willReturn($config);
 
-        $doctrine = $this->testCase->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
+        $doctrine = $this->testCase->getMockBuilder(ManagerRegistry::class)
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->testCase->any())
             ->method('getManagers')
-            ->will($this->testCase->returnValue(array('default' => $em)));
+            ->willReturn(['default' => $em]);
         $doctrine->expects($this->testCase->any())
             ->method('getManagerForClass')
-            ->will($this->testCase->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
         $doctrine->expects($this->testCase->any())
             ->method('getManager')
             ->with($this->testCase->equalTo('default'))
-            ->will($this->testCase->returnValue($em));
+            ->willReturn($em);
         $doctrine->expects($this->testCase->any())
             ->method('getAliasNamespace')
-            ->will(
-                $this->testCase->returnValueMap(
-                    array(
-                        array('Test', 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity'),
-                    )
-                )
-            );
+            ->willReturnMap([
+                ['Test', 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity']
+            ]);
 
-        $entityMetadataProvider =
-            $this->testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $entityMetadataProvider = $this->testCase->getMockBuilder(EntitySecurityMetadataProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         return new FieldAclExtension(
             $idAccessor,
             $metadataProvider,
@@ -303,9 +275,9 @@ class TestHelper
      *
      * @return PermissionManager|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getPermissionManagerMock(\PHPUnit\Framework\TestCase $testCase)
+    private function getPermissionManagerMock(\PHPUnit\Framework\TestCase $testCase)
     {
-        $permissionManager = $testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
+        $permissionManager = $testCase->getMockBuilder(PermissionManager::class)
             ->disableOriginalConstructor()
             ->getMock();
         $permissionManager->expects($testCase->any())
@@ -327,9 +299,9 @@ class TestHelper
      *
      * @return AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getGroupProviderMock(\PHPUnit\Framework\TestCase $testCase)
+    private function getGroupProviderMock(\PHPUnit\Framework\TestCase $testCase)
     {
-        $mock = $testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface')->getMock();
+        $mock = $testCase->getMockBuilder(AclGroupProviderInterface::class)->getMock();
         $mock->expects($testCase->any())
             ->method('getGroup')
             ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);

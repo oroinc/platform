@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EntityFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
@@ -11,22 +12,20 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class EntityFilterTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var EntityFilterType
-     */
+    /** @var EntityFilterType */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
 
-        $registry = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry', array(), '', false);
+        $registry = $this->createMock(ManagerRegistry::class);
 
-        $types = array(
+        $types = [
             new FilterType($translator),
             new ChoiceFilterType($translator),
             new EntityType($registry)
-        );
+        ];
 
         $this->formExtensions[] = new CustomFormExtension($types);
 
@@ -53,29 +52,25 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
      */
     public function configureOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
+        return [
+            [
+                'defaultOptions' => [
                     'field_type' => EntityType::class,
-                    'field_options' => array(),
+                    'field_options' => [],
                     'translatable'  => false,
-                )
-            )
-        );
+                ]
+            ]
+        ];
     }
 
     /**
      * @dataProvider bindDataProvider
-     * @param array $bindData
-     * @param array $formData
-     * @param array $viewData
-     * @param array $customOptions
      */
     public function testBindData(
         array $bindData,
         array $formData,
         array $viewData,
-        array $customOptions = array()
+        array $customOptions = []
     ) {
         // bind method should be tested in functional test
     }
@@ -85,12 +80,6 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'empty' => array(
-                'bindData' => array(),
-                'formData' => array(),
-                'viewData' => array(),
-            ),
-        );
+        return [];
     }
 }

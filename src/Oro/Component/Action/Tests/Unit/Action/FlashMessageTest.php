@@ -4,6 +4,7 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Action\Action\FlashMessage;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -12,137 +13,189 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FlashMessageTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
-    protected $contextAccessor;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface
-     */
-    protected $translator;
+    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $htmlTagHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagHelper
-     */
-    protected $htmlTagHelper;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RequestStack
-     */
-    protected $requestStack;
+    /** @var FlashMessage */
+    private $action;
 
-    /**
-     * @var FlashMessage
-     */
-    protected $action;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->requestStack = new RequestStack();
+
         $this->action = new FlashMessage(
-            $this->contextAccessor,
+            new ContextAccessor(),
             $this->translator,
             $this->htmlTagHelper,
             $this->requestStack
         );
-
-        /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->action->setDispatcher($dispatcher);
+        $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
     /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Message parameter is required
+     * @param Request|\PHPUnit\Framework\MockObject\MockObject $request
+     *
+     * @return FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    public function testInitializeException()
+    private function expectGetFlashBag(Request $request): FlashBagInterface
     {
-        $options = [];
-        $this->action->initialize($options);
+        $flashBag = $this->createMock(FlashBagInterface::class);
+        $session = $this->createMock(Session::class);
+        $request->expects(self::once())
+            ->method('getSession')
+            ->willReturn($session);
+        $session->expects(self::once())
+            ->method('getFlashBag')
+            ->willReturn($flashBag);
+
+        return $flashBag;
     }
 
-    public function testInitialize()
+    public function testInitializeWithoutMessageParameter()
     {
-        $options = [
-            'message' => 'test',
-            'type' => 'error',
-            'message_parameters' => [
-                'some' => 'other'
-            ]
-        ];
-        $this->assertEquals($this->action, $this->action->initialize($options));
-        $this->assertAttributeEquals($options['message'], 'message', $this->action);
-        $this->assertAttributeEquals($options['type'], 'type', $this->action);
-        $this->assertAttributeEquals($options['message_parameters'], 'messageParameters', $this->action);
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Parameter "message" is required.');
+
+        $this->action->initialize([]);
     }
 
-    public function testExecuteNoRequest()
+    public function testInitializeWithEmptyMessageParameter()
     {
-        $options = ['message' => 'test'];
-        $context = [];
-        $this->action->initialize($options);
-        $this->translator->expects($this->never())
-            ->method($this->anything());
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Parameter "message" is required.');
 
-        $this->action->execute($context);
+        $this->action->initialize(['message' => '']);
+    }
+
+    public function testExecuteWithoutRequest()
+    {
+        $this->action->initialize(['message' => 'test']);
+        $this->action->execute([]);
     }
 
     public function testExecute()
     {
-        $contextData = [
-            'path1' => 'val1',
-            'type_path' => 'concreteType',
-            'message_path' => 'concreteMessage'
-        ];
-
-        $context = new ItemStub($contextData);
+        $type = 'test_type';
+        $message = 'test message';
         $translatedMessage = 'Translated';
         $sanitizedMessage = 'Sanitized';
 
-        $options = [
-            'message' => new PropertyPath('message_path'),
-            'type' => new PropertyPath('type_path'),
+        $this->action->initialize([
+            'type'               => new PropertyPath('type_path'),
+            'message'            => new PropertyPath('message_path'),
             'message_parameters' => [
-                'some' => 'other',
+                'some'  => 'other',
                 'other' => new PropertyPath('path1')
             ]
-        ];
-        $this->action->initialize($options);
-
-        $flashBag = $this->createMock(FlashBagInterface::class);
-        $flashBag->expects($this->once())
-            ->method('add')
-            ->with('concreteType', $sanitizedMessage);
-
-        $session = $this->createMock(Session::class);
-        $session->expects($this->once())
-            ->method('getFlashBag')
-            ->willReturn($flashBag);
+        ]);
 
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())
-            ->method('getSession')
-            ->willReturn($session);
 
-        $this->translator->expects($this->once())
+        $flashBag = $this->expectGetFlashBag($request);
+        $flashBag->expects(self::once())
+            ->method('add')
+            ->with($type, $sanitizedMessage);
+
+        $this->translator->expects(self::once())
             ->method('trans')
-            ->with('concreteMessage', ['%some%' => 'other', '%other%' => 'val1'])
+            ->with($message, ['%some%' => 'other', '%other%' => 'val1'])
             ->willReturn($translatedMessage);
-
-        $this->htmlTagHelper->expects($this->once())
+        $this->htmlTagHelper->expects(self::once())
             ->method('sanitize')
             ->with($translatedMessage)
             ->willReturn($sanitizedMessage);
 
         $this->requestStack->push($request);
-        $this->action->execute($context);
+        $this->action->execute(new ItemStub([
+            'path1'        => 'val1',
+            'type_path'    => $type,
+            'message_path' => $message
+        ]));
+    }
+
+    public function testExecuteWithoutTranslation()
+    {
+        $type = 'test_type';
+        $message = 'test message, %some%, %other%, %missing%';
+        $updatedMessage = 'test message, other, val1, %missing%';
+        $sanitizedMessage = 'Sanitized';
+
+        $this->action->initialize([
+            'type'               => new PropertyPath('type_path'),
+            'message'            => new PropertyPath('message_path'),
+            'translate'          => new PropertyPath('translate_path'),
+            'message_parameters' => [
+                'some'  => 'other',
+                'other' => new PropertyPath('path1')
+            ]
+        ]);
+
+        $request = $this->createMock(Request::class);
+
+        $flashBag = $this->expectGetFlashBag($request);
+        $flashBag->expects(self::once())
+            ->method('add')
+            ->with($type, $sanitizedMessage);
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+        $this->htmlTagHelper->expects(self::once())
+            ->method('sanitize')
+            ->with($updatedMessage)
+            ->willReturn($sanitizedMessage);
+
+        $this->requestStack->push($request);
+        $this->action->execute(new ItemStub([
+            'path1'          => 'val1',
+            'type_path'      => $type,
+            'message_path'   => $message,
+            'translate_path' => false
+        ]));
+    }
+
+    public function testExecuteWithoutTranslationAndWithoutMessageParameters()
+    {
+        $type = 'test_type';
+        $message = 'test message';
+        $sanitizedMessage = 'Sanitized';
+
+        $this->action->initialize([
+            'type'      => new PropertyPath('type_path'),
+            'message'   => new PropertyPath('message_path'),
+            'translate' => new PropertyPath('translate_path')
+        ]);
+
+        $request = $this->createMock(Request::class);
+
+        $flashBag = $this->expectGetFlashBag($request);
+        $flashBag->expects(self::once())
+            ->method('add')
+            ->with($type, $sanitizedMessage);
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+        $this->htmlTagHelper->expects(self::once())
+            ->method('sanitize')
+            ->with($message)
+            ->willReturn($sanitizedMessage);
+
+        $this->requestStack->push($request);
+        $this->action->execute(new ItemStub([
+            'type_path'      => $type,
+            'message_path'   => $message,
+            'translate_path' => false
+        ]));
     }
 }

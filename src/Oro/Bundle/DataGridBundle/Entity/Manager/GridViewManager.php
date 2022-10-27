@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Entity\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridViewUser;
@@ -21,6 +21,9 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Manager for working with Grid Views
+ */
 class GridViewManager
 {
     const DEFAULT_VIEW_KEY = 'default_view';
@@ -30,7 +33,7 @@ class GridViewManager
     /** @var AclHelper */
     protected $aclHelper;
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var  Manager */
@@ -54,15 +57,9 @@ class GridViewManager
     /** @var string */
     protected $gridViewUserClassName;
 
-    /**
-     * @param AclHelper $aclHelper
-     * @param Registry $registry
-     * @param Manager $gridManager
-     * @param RestrictionManager $restrictionManager
-     */
     public function __construct(
         AclHelper $aclHelper,
-        Registry $registry,
+        ManagerRegistry $registry,
         Manager $gridManager,
         RestrictionManager $restrictionManager
     ) {
@@ -187,7 +184,7 @@ class GridViewManager
         if (!isset($this->cacheData[$cacheKey])) {
             $systemViews = $this->getSystemViews($gridName);
             $gridViews = [];
-            if ($user instanceof UserInterface) {
+            if ($user instanceof UserInterface && $user->getId()) {
                 /** @var GridViewRepository $repository */
                 $repository = $this->getRepository($this->gridViewClassName);
 

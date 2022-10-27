@@ -6,12 +6,7 @@ parameters:
     database_user: oro_db_user
     database_password: oro_db_pass
     database_driver_options: { 9223372036854775807: const_as_key, const_as_value: 9223372036854775807}
-    mailer_transport: null
-    mailer_host: null
-    mailer_port: null
-    mailer_encryption: null
-    mailer_user: null
-    mailer_password: null
+    mailer_dsn: null://null
     websocket_bind_address: 0.0.0.0
     websocket_bind_port: 8080
     websocket_frontend_host: null
@@ -23,7 +18,7 @@ parameters:
     search_engine_name: orm
     search_engine_host: 127.0.0.1
     search_engine_port: null
-    search_engine_index_name: oro_search
+    search_engine_index_prefix: oro_search
     search_engine_username: null
     search_engine_password: null
     search_engine_ssl_verification: null
@@ -31,14 +26,11 @@ parameters:
     search_engine_ssl_cert_password: null
     search_engine_ssl_key: null
     search_engine_ssl_key_password: null
-    website_search_engine_index_name: oro_website_search
+    website_search_engine_index_prefix: oro_website_search
     web_backend_prefix: /admin
     session_handler: null
     locale: en
     secret: ThisTokenIsNotSoSecretChangeIt
-    installed: null
-    assets_version: '540e7031'
-    assets_version_strategy: time_hash
     enterprise_licence: null
     message_queue_transport: dbal
     message_queue_transport_config: null

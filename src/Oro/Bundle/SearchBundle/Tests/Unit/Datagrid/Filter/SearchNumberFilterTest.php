@@ -9,51 +9,48 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchNumberFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
+use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SearchNumberFilter
-     */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formFactory;
+
+    /** @var SearchNumberFilter */
     private $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        /* @var $formFactory FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $formFactory = $this->createMock(FormFactoryInterface::class);
-        /* @var $filterUtility FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
-        $filterUtility = $this->createMock(FilterUtility::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
 
-        $this->filter = new SearchNumberFilter($formFactory, $filterUtility);
+        $this->filter = new SearchNumberFilter($this->formFactory, new FilterUtility());
+        $this->filter->init('test-filter', [
+            FilterUtility::DATA_NAME_KEY => 'field_name'
+        ]);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testThrowsExceptionForWrongFilterDatasourceAdapter()
     {
-        $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
-        $this->filter->apply($ds, ['type' => NumberFilterType::TYPE_GREATER_EQUAL, 'value' => 123]);
+        $this->expectException(UnexpectedTypeException::class);
+
+        $this->filter->apply(
+            $this->createMock(FilterDatasourceAdapterInterface::class),
+            ['type' => NumberFilterType::TYPE_GREATER_EQUAL, 'value' => 123]
+        );
     }
 
     /**
-     * @param string $filterType
-     * @param string $comparisonOperator
      * @dataProvider applyDataProvider
      */
-    public function testApply($filterType, $comparisonOperator)
+    public function testApply(int $filterType, string $comparisonOperator)
     {
         $fieldName = 'decimal.field';
         $fieldValue = 100;
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
         $restriction = new BaseComparison($fieldName, $comparisonOperator, $fieldValue);
         $ds->expects($this->once())
@@ -64,10 +61,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->filter->apply($ds, ['type' => $filterType, 'value' => $fieldValue]));
     }
 
-    /**
-     * @return array
-     */
-    public function applyDataProvider()
+    public function applyDataProvider(): array
     {
         return [
             '>=' => [
@@ -101,9 +95,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'decimal.field';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
         $restriction = new Comparison($fieldName, Comparison::NOT_EXISTS, null);
         $ds->expects($this->once())
@@ -118,9 +110,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'decimal.field';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
         $restriction = new Comparison($fieldName, Comparison::EXISTS, null);
         $ds->expects($this->once())
@@ -129,5 +119,47 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
 
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => $fieldName]);
         $this->assertTrue($this->filter->apply($ds, ['type' => FilterUtility::TYPE_NOT_EMPTY, 'value' => null]));
+    }
+
+    public function testGetMetadata()
+    {
+        $form = $this->createMock(FormInterface::class);
+        $view = $this->createMock(FormView::class);
+
+        $typeView = $this->createMock(FormView::class);
+        $typeView->vars['choices'] = [];
+        $view->vars['formatter_options'] = ['decimals' => 0, 'grouping' => false];
+        $view->vars['array_separator'] = ',';
+        $view->vars['array_operators'] = [9, 10];
+        $view->vars['data_type'] = 'data_integer';
+        $view->children['type'] = $typeView;
+
+        $this->formFactory->expects($this->any())
+            ->method('create')
+            ->willReturn($form);
+        $form->expects($this->any())
+            ->method('createView')
+            ->willReturn($view);
+
+        $expected = [
+            'name' => 'test-filter',
+            'label' => 'Test-filter',
+            'choices' => [],
+            'lazy' => false,
+            'formatterOptions' => [
+                'decimals' => 0,
+                'grouping' => false,
+            ],
+            'arraySeparator' => ',',
+            'arrayOperators' => [9, 10],
+            'dataType' => 'data_integer',
+        ];
+        $this->assertEquals($expected, $this->filter->getMetadata());
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

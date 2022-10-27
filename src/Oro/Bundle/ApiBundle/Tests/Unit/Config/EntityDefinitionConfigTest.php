@@ -8,6 +8,10 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testKey()
@@ -215,6 +219,10 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         $realSwapField->setPropertyPath('swapField');
         $ignoredField = $config->addField('ignoredField');
         $ignoredField->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $replacedField = $config->addField('replacedField');
+        $replacedField->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $realReplacedField = $config->addField('realReplacedField');
+        $realReplacedField->setPropertyPath('replacedField');
 
         self::assertNull($config->findField('unknown'));
         self::assertNull($config->findField('unknown', true));
@@ -260,12 +268,24 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->findField('ignoredField', true));
         self::assertNull($config->findField(ConfigUtil::IGNORE_PROPERTY_PATH));
         self::assertNull($config->findField(ConfigUtil::IGNORE_PROPERTY_PATH, true));
-        self::assertSame('ignoredField', $config->findFieldNameByPropertyPath('ignoredField'));
+        self::assertNull($config->findFieldNameByPropertyPath('ignoredField'));
         self::assertNull($config->findFieldNameByPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH));
         self::assertSame($ignoredField, $config->findFieldByPath('ignoredField'));
         self::assertNull($config->findFieldByPath('ignoredField', true));
         self::assertNull($config->findFieldByPath(ConfigUtil::IGNORE_PROPERTY_PATH));
         self::assertNull($config->findFieldByPath(ConfigUtil::IGNORE_PROPERTY_PATH, true));
+
+        self::assertSame($replacedField, $config->findField('replacedField'));
+        self::assertSame($realReplacedField, $config->findField('replacedField', true));
+        self::assertSame('realReplacedField', $config->findFieldNameByPropertyPath('replacedField'));
+        self::assertSame($replacedField, $config->findFieldByPath('replacedField'));
+        self::assertSame($realReplacedField, $config->findFieldByPath('replacedField', true));
+
+        self::assertSame($realReplacedField, $config->findField('realReplacedField'));
+        self::assertNull($config->findField('realReplacedField', true));
+        self::assertNull($config->findFieldNameByPropertyPath('realReplacedField'));
+        self::assertSame($realReplacedField, $config->findFieldByPath('realReplacedField'));
+        self::assertNull($config->findFieldByPath('realReplacedField', true));
     }
 
     public function testFindFieldByPathForChildFields()
@@ -353,6 +373,41 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($config->isExcludeAll());
         self::assertEquals([], $config->toArray());
         self::assertTrue($config->isEmpty());
+    }
+
+    public function testIsIdentifierOnlyRequested()
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertFalse($config->isIdentifierOnlyRequested());
+
+        $config->setIdentifierFieldNames(['id']);
+        $config->addField('id');
+        self::assertTrue($config->isIdentifierOnlyRequested());
+
+        $config->addField('name');
+        self::assertFalse($config->isIdentifierOnlyRequested());
+
+        $config->removeField('id');
+        self::assertFalse($config->isIdentifierOnlyRequested());
+    }
+
+    public function testIsIdentifierOnlyRequestedWithCompositeIdentifier()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $config->setIdentifierFieldNames(['id1', 'id2']);
+        $config->addField('id1');
+        $config->addField('id2');
+        self::assertTrue($config->isIdentifierOnlyRequested());
+
+        $config->addField('name');
+        self::assertFalse($config->isIdentifierOnlyRequested());
+
+        $config->removeField('id1');
+        self::assertFalse($config->isIdentifierOnlyRequested());
+
+        $config->removeField('id2');
+        self::assertFalse($config->isIdentifierOnlyRequested());
     }
 
     public function testCollapsed()
@@ -464,6 +519,20 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
+    public function testPartialLoadFlag()
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertTrue($config->isPartialLoadEnabled());
+
+        $config->disablePartialLoad();
+        self::assertFalse($config->isPartialLoadEnabled());
+        self::assertEquals(['disable_partial_load' => true], $config->toArray());
+
+        $config->enablePartialLoad();
+        self::assertTrue($config->isPartialLoadEnabled());
+        self::assertEquals([], $config->toArray());
+    }
+
     public function testIdentifierFieldNames()
     {
         $config = new EntityDefinitionConfig();
@@ -476,6 +545,23 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         $config->setIdentifierFieldNames([]);
         self::assertEquals([], $config->getIdentifierFieldNames());
         self::assertEquals([], $config->toArray());
+    }
+
+    public function testOrderBy()
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertFalse($config->hasOrderBy());
+        self::assertSame([], $config->getOrderBy());
+
+        $config->setOrderBy(['name' => 'ASC']);
+        self::assertTrue($config->hasOrderBy());
+        self::assertEquals(['name' => 'ASC'], $config->getOrderBy());
+        self::assertEquals(['order_by' => ['name' => 'ASC']], $config->toArray());
+
+        $config->setOrderBy([]);
+        self::assertFalse($config->hasOrderBy());
+        self::assertSame([], $config->getOrderBy());
+        self::assertSame([], $config->toArray());
     }
 
     public function testMaxResults()
@@ -567,6 +653,32 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
+    public function testRemoveFormConstraint()
+    {
+        $config = new EntityDefinitionConfig();
+
+        self::assertNull($config->getFormOptions());
+        self::assertNull($config->getFormConstraints());
+
+        $config->removeFormConstraint(NotNull::class);
+        self::assertNull($config->getFormConstraints());
+
+        $config->setFormOption(
+            'constraints',
+            [
+                new NotNull(),
+                new NotBlank(),
+                [NotNull::class => ['message' => 'test']]
+            ]
+        );
+
+        $config->removeFormConstraint(NotNull::class);
+        self::assertEquals(['constraints' => [new NotBlank()]], $config->getFormOptions());
+
+        $config->removeFormConstraint(NotBlank::class);
+        self::assertNull($config->getFormOptions());
+    }
+
     public function testFormEventSubscribers()
     {
         $config = new EntityDefinitionConfig();
@@ -591,11 +703,9 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    /**
-     * @expectedException \TypeError
-     */
     public function testSetInvalidValueToFormEventSubscribers()
     {
+        $this->expectException(\TypeError::class);
         $config = new EntityDefinitionConfig();
         $config->setFormEventSubscribers('subscriber1');
     }
@@ -603,20 +713,20 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
     public function testHints()
     {
         $config = new EntityDefinitionConfig();
-        self::assertEquals([], $config->getHints());
+        self::assertSame([], $config->getHints());
 
         $config->setHints(['hint1']);
         self::assertEquals(['hint1'], $config->getHints());
         self::assertEquals(['hints' => ['hint1']], $config->toArray());
 
-        $config->setHints();
-        self::assertEquals([], $config->getHints());
-        self::assertEquals([], $config->toArray());
+        $config->setHints(null);
+        self::assertSame([], $config->getHints());
+        self::assertSame([], $config->toArray());
 
         $config->setHints(['hint1']);
         $config->setHints([]);
-        self::assertEquals([], $config->getHints());
-        self::assertEquals([], $config->toArray());
+        self::assertSame([], $config->getHints());
+        self::assertSame([], $config->toArray());
     }
 
     public function testIdentifierDescription()

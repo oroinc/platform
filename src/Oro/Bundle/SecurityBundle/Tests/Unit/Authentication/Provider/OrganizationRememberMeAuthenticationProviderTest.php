@@ -2,36 +2,40 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication\Provider;
 
+use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser;
 use Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactoryInterface;
+use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OrganizationRememberMeAuthenticationProvider
-     */
-    protected $provider;
+    /** @var UserCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $userChecker;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $userChecker;
+    /** @var OrganizationRememberMeAuthenticationProvider */
+    private $provider;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->userChecker = $this->createMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
+        $this->userChecker = $this->createMock(UserCheckerInterface::class);
+
         $this->provider = new OrganizationRememberMeAuthenticationProvider($this->userChecker, 'testKey', 'provider');
         $this->provider->setTokenFactory(new OrganizationRememberMeTokenFactory());
+        $this->provider->setOrganizationGuesser(new OrganizationGuesser());
     }
 
     public function testSupports()
     {
         $organization = new Organization(2);
-        $user         = new User(1);
+        $user = new User(1);
         $user->addOrganization($organization);
 
         $token = new OrganizationRememberMeToken($user, 'provider', 'testKey', $organization);
@@ -40,20 +44,30 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
         $token = new OrganizationRememberMeToken($user, 'another', 'testKey', $organization);
         $this->assertFalse($this->provider->supports($token));
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\AbstractToken');
+        $token = $this->createMock(AbstractToken::class);
         $this->assertFalse($this->provider->supports($token));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedExceptionMessage Token Factory is not set in OrganizationRememberMeAuthenticationProvider.
-     */
     public function testAuthenticateIfTokenFactoryIsNotSet()
     {
-        $user = new User(1);
-        $organization = new Organization(2);
-        $token = new OrganizationRememberMeToken($user, 'provider', 'testKey', $organization);
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Token Factory is not set in OrganizationRememberMeAuthenticationProvider.');
+
+        $token = new OrganizationRememberMeToken(new User(1), 'provider', 'testKey', new Organization(2));
         $provider = new OrganizationRememberMeAuthenticationProvider($this->userChecker, 'testKey', 'provider');
+        $provider->authenticate($token);
+    }
+
+    public function testAuthenticateIfOrganizationGuesserIsNotSet()
+    {
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage(
+            'Organization Guesser is not set in OrganizationRememberMeAuthenticationProvider.'
+        );
+
+        $token = new OrganizationRememberMeToken(new User(1), 'provider', 'testKey', new Organization(2));
+        $provider = new OrganizationRememberMeAuthenticationProvider($this->userChecker, 'testKey', 'provider');
+        $provider->setTokenFactory($this->createMock(OrganizationRememberMeTokenFactoryInterface::class));
         $provider->authenticate($token);
     }
 
@@ -71,11 +85,11 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
 
         $resultToken = $this->provider->authenticate($token);
         $this->assertInstanceOf(
-            'Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeToken',
+            OrganizationRememberMeToken::class,
             $resultToken
         );
         $this->assertSame($user, $resultToken->getUser());
-        $this->assertSame($organization, $resultToken->getOrganizationContext());
+        $this->assertSame($organization, $resultToken->getOrganization());
     }
 
     public function testOrganizationGuessedFromUser()
@@ -91,19 +105,18 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
 
         $resultToken = $this->provider->authenticate($token);
         $this->assertInstanceOf(
-            'Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeToken',
+            OrganizationRememberMeToken::class,
             $resultToken
         );
         $this->assertSame($user, $resultToken->getUser());
-        $this->assertSame($organization, $resultToken->getOrganizationContext());
+        $this->assertSame($organization, $resultToken->getOrganization());
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     * @expectedExceptionMessage You don't have access to organization 'Inactive Org'
-     */
     public function testBadOrganizationAuthenticate()
     {
+        $this->expectException(BadUserOrganizationException::class);
+        $this->expectExceptionMessage('The user does not have access to organization "Inactive Org".');
+
         $organization = new Organization(2);
         $organization->setEnabled(false);
         $organization->setName('Inactive Org');
@@ -118,13 +131,12 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit\Framewor
         $this->provider->authenticate($token);
     }
 
-    /**
-     * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     * @expectedExceptionMessage You don't have active organization assigned.
-     */
     public function testNoAssignedOrganizations()
     {
-        $user  = new User(1);
+        $this->expectException(BadUserOrganizationException::class);
+        $this->expectExceptionMessage('The user does not have active organization assigned to it.');
+
+        $user = new User(1);
         $token = new RememberMeToken($user, 'provider', 'testKey');
 
         $this->userChecker->expects($this->once())

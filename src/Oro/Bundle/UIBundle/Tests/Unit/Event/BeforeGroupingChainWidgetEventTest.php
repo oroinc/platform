@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UI\Tests\Unit\Event;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Event;
 
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 

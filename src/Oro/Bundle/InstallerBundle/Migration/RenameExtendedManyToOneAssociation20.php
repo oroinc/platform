@@ -29,12 +29,6 @@ class RenameExtendedManyToOneAssociation20
     /** @var ExtendExtension */
     private $extendExtension;
 
-    /**
-     * @param Connection                      $connection
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param RenameExtension                 $renameExtension
-     * @param ExtendExtension                 $extendExtension
-     */
     public function __construct(
         Connection $connection,
         ExtendDbIdentifierNameGenerator $nameGenerator,
@@ -66,7 +60,7 @@ class RenameExtendedManyToOneAssociation20
 
         $targetClassNames = $this->loadTargetClassNames($entityClass);
         foreach ($targetClassNames as $targetClassName) {
-            if (0 !== strpos($targetClassName, 'Oro\\')) {
+            if (!str_starts_with($targetClassName, 'Oro\\')) {
                 continue;
             }
 
@@ -128,7 +122,7 @@ class RenameExtendedManyToOneAssociation20
                 $relationPrefix = sprintf('manyToOne|%s|', $entityClass);
                 $relations = $data['extend']['relation'];
                 foreach ($relations as $relationName => $relation) {
-                    if (0 === strpos($relationName, $relationPrefix)
+                    if (str_starts_with($relationName, $relationPrefix)
                         && array_key_exists('owner', $relation)
                         && $relation['owner']
                         && array_key_exists('target_entity', $relation)

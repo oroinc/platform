@@ -10,33 +10,21 @@ class WorkflowDefinitionScopeListener
     /** @var WorkflowScopeManager */
     protected $workflowScopeManager;
 
-    /**
-     * @param WorkflowScopeManager $workflowScopeManager
-     */
     public function __construct(WorkflowScopeManager $workflowScopeManager)
     {
         $this->workflowScopeManager = $workflowScopeManager;
     }
 
-    /**
-     * @param WorkflowChangesEvent $event
-     */
     public function onActivationWorkflowDefinition(WorkflowChangesEvent $event)
     {
         $this->workflowScopeManager->updateScopes($event->getDefinition());
     }
 
-    /**
-     * @param WorkflowChangesEvent $event
-     */
     public function onDeactivationWorkflowDefinition(WorkflowChangesEvent $event)
     {
         $this->workflowScopeManager->updateScopes($event->getDefinition(), true);
     }
 
-    /**
-     * @param WorkflowChangesEvent $event
-     */
     public function onCreateWorkflowDefinition(WorkflowChangesEvent $event)
     {
         $definition = $event->getDefinition();
@@ -46,9 +34,6 @@ class WorkflowDefinitionScopeListener
         }
     }
 
-    /**
-     * @param WorkflowChangesEvent $event
-     */
     public function onUpdateWorkflowDefinition(WorkflowChangesEvent $event)
     {
         $definition = $event->getDefinition();

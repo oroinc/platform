@@ -2,10 +2,12 @@ oro:
     entity_config:
         attributes_grid:
             delete_attribute.confirm_content: Are you sure you want to delete this attribute?
+        content_preview:
+            message_prevent_click: 'This click cannot be processed in the preview mode.'
     attribute:
         attributes_moved_to_default_group: System attributes were moved to default group
         move_from: move from
         noname: No name
         remove_confirmation_title: Remove Attribute Group with system attributes
         remove_confirmation_text: Are you sure to delete this Attribute Group? All system attributes will be moved to first one automatically.
-        attributes_import_has_finished: "Attributes import has finished, please <a href='#' data-action='page-refresh'>refresh the page</a>"
+        attributes_import_has_finished: 'Attributes import has finished, please <a href="#" data-action="page-refresh">refresh the page</a>'

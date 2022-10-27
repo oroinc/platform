@@ -28,33 +28,16 @@ parameters:
             name: TranslatableSimpleObjectHydrator
             class: Gedmo\Translatable\Hydrator\ORM\SimpleObjectHydrator
             collection: true
+
 services:
-    oro_entity.cache.warmer.logging_hydrator:
-        public: false
-        class: Oro\Bundle\EntityBundle\Cache\LoggingHydratorWarmer
-        arguments:
-            - '%oro_entity.orm.hydrators%'
-        tags:
-            - { name: kernel.cache_warmer, priority: 30 }
-
-    oro_entity.profiler.orm_logger:
-        public: false
-        class: Oro\Bundle\EntityBundle\DataCollector\OrmLogger
-        arguments:
-            - '%oro_entity.orm.hydrators%'
-            - '@doctrine'
-            - "@?debug.stopwatch"
-
     oro_entity.profiler.orm_data_collector:
         public: false
         class: Oro\Bundle\EntityBundle\DataCollector\OrmDataCollector
-        arguments:
-            - '@oro_entity.profiler.orm_logger'
         tags:
-            - { name: data_collector, template: OroEntityBundle:Collector:orm.html.twig, id: orm }
+            - { name: data_collector, template: '@OroEntity/Collector/orm.html.twig', id: orm }
 
     oro_entity.profiler.duplicate_queries_data_collector:
         public: false
         class: Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector
         tags:
-            - { name: data_collector, template: OroEntityBundle:Collector:duplicate_queries.html.twig, id: duplicate_queries }
+            - { name: data_collector, template: '@OroEntity/Collector/duplicate_queries.html.twig', id: duplicate_queries }

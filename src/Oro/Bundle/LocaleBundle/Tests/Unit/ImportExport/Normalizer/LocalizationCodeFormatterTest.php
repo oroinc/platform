@@ -8,28 +8,22 @@ use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
 class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LocalizationCodeFormatter */
-    protected $formatter;
+    private $formatter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formatter = new LocalizationCodeFormatter();
     }
 
     /**
-     * @param mixed $localization
-     * @param string $expected
-     *
      * @dataProvider nameDataProvider
      */
-    public function testFormatName($localization, $expected)
+    public function testFormatName(mixed $localization, string $expected)
     {
         $this->assertEquals($expected, $this->formatter->formatName($localization));
     }
 
-    /**
-     * @return array
-     */
-    public function nameDataProvider()
+    public function nameDataProvider(): array
     {
         return [
             [null, 'default'],
@@ -42,20 +36,14 @@ class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $localization
-     * @param string $expected
-     *
      * @dataProvider keyDataProvider
      */
-    public function testFormatKey($localization, $expected)
+    public function testFormatKey(mixed $localization, ?string $expected)
     {
         $this->assertEquals($expected, $this->formatter->formatKey($localization));
     }
 
-    /**
-     * @return array
-     */
-    public function keyDataProvider()
+    public function keyDataProvider(): array
     {
         return [
             [null, null],

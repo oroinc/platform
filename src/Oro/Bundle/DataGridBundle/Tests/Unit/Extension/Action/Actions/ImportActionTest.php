@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action\Actions;
 
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ImportAction;
 
 class ImportActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImportAction */
-    protected $action;
+    private $action;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->action = new ImportAction();
     }
@@ -40,12 +38,11 @@ class ImportActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException Oro\Bundle\DataGridBundle\Exception\LogicException
-     * @expectedExceptionMessage There is no option "importProcessor" for action "test_name"
-     */
     public function testSetOptionsWithoutExportProcessor()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('There is no option "importProcessor" for action "test_name"');
+
         $this->assertSame(
             $this->action,
             $this->action->setOptions(ActionConfiguration::create([

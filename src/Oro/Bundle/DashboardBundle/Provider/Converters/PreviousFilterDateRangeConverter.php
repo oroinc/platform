@@ -12,6 +12,7 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
 {
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {

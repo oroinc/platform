@@ -2,34 +2,34 @@
 
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Covers logic of selecting segment for some entity.
+ */
 class SegmentChoiceType extends AbstractType
 {
     /** @var ManagerRegistry */
-    protected $registry;
+    private $doctrine;
 
-    /** @var string */
-    protected $entityClass;
+    /** @var AclHelper */
+    private $aclHelper;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param string          $entityClass
-     */
-    public function __construct(ManagerRegistry $registry, $entityClass)
+    public function __construct(ManagerRegistry $doctrine, AclHelper $aclHelper)
     {
-        $this->registry = $registry;
-        $this->entityClass = $entityClass;
+        $this->doctrine = $doctrine;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'placeholder' => 'oro.segment.form.segment_choice.placeholder',
@@ -38,19 +38,18 @@ class SegmentChoiceType extends AbstractType
         $resolver->setNormalizer(
             'choices',
             function (OptionsResolver $options) {
-                /** @var SegmentRepository $repo */
-                $repo = $this->registry->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
-
-                return $repo->findByEntity($options['entityClass']);
+                return $this->doctrine->getManagerForClass(Segment::class)
+                    ->getRepository(Segment::class)
+                    ->findByEntity($this->aclHelper, $options['entityClass']);
             }
         );
         $resolver->setAllowedTypes('entityClass', ['null', 'string']);
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

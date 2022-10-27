@@ -5,11 +5,14 @@ namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Component\Config\Common\ConfigObject;
 
+/**
+ * This class represents metadata with datagrid configuration.
+ */
 class MetadataObject extends ConfigObject
 {
     const GRID_NAME_KEY        = 'gridName';
     const OPTIONS_KEY          = 'options';
-    const REQUIRED_MODULES_KEY = 'requireJSModules';
+    const REQUIRED_MODULES_KEY = 'jsmodules';
     const LAZY_KEY             = 'lazy';
 
     /**

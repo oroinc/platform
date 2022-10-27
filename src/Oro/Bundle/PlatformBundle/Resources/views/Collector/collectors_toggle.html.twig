@@ -1,0 +1,96 @@
+<script>
+    /* eslint no-var: off */
+    (function () {
+        const cookieExpires = new Date(new Date().getTime()+1000*60*60*24*365).toGMTString();
+        const trackContainerCheckbox = document.getElementById('sf-toolbar--track-container');
+        trackContainerCheckbox.addEventListener('click', function (event) {
+            let isActive = event.target.checked === true;
+            document.cookie = 'sf_toolbar_track_container=' + isActive + ';expires=' + cookieExpires + ';path=/';
+        });
+
+        const checkboxes = document.getElementsByClassName('sf-toolbar--collector-checkbox');
+        document.getElementById('sf-toolbar--all-collectors-enable').addEventListener('click', function (event) {
+            let collectors = [];
+            for (let i = 0; i < checkboxes.length; i++) {
+                collectors.push(checkboxes[i].id);
+                checkboxes[i].checked = true;
+            }
+            saveCollectorsToCookie(collectors);
+        });
+        document.getElementById('sf-toolbar--all-collectors-disable').addEventListener('click', function (event) {
+            for (let i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = false;
+            }
+            saveCollectorsToCookie([]);
+        });
+
+        for (let i = 0; i < checkboxes.length; i++) {
+            let checkbox = checkboxes[i];
+            checkbox.addEventListener('change', function (event) {
+                let isActive = event.target.checked === true;
+                let collectorsCookie = document.cookie.replace(/(?:(?:^|.*;\s*)sf_toolbar_enabled_collectors\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+                let collectors = [];
+                if (collectorsCookie) {
+                    collectors = collectorsCookie.split('~');
+                }
+                let collector = event.target.id;
+                if (isActive && collectors.indexOf(collector) === -1) {
+                    collectors.push(collector);
+                } else {
+                    const index = collectors.indexOf(collector);
+                    if (index > -1) {
+                        collectors.splice(index, 1);
+                    }
+                }
+                saveCollectorsToCookie(collectors);
+            });
+        }
+
+        function saveCollectorsToCookie(collectors) {
+            collectorsCookie = collectors.join('~');
+            document.cookie = 'sf_toolbar_enabled_collectors=' + collectorsCookie + ';expires=' + cookieExpires + ';path=/';
+        }
+    })();
+</script>
+<style>
+    .sf-toolbar-toggle-data-collectors b {
+        vertical-align: top;
+    }
+
+    .sf-toolbar-toggle-data-collectors span {
+        padding-right: 10px;
+    }
+
+    .sf-toolbar input[type="checkbox"] {
+        --checkbox-size: 13px;
+    }
+</style>
+<div class="sf-toolbar-info-group sf-toolbar-toggle-data-collectors">
+    <div class="sf-toolbar-info-piece">
+        <b>Profiler <br/> Toolbars</b>
+        {% for collectorNames in collector.collectors|batch(collector.collectors|length/2) %}
+            <span>
+                {% for collectorName in collectorNames %}
+                    <div>
+                    <input class="sf-toolbar--collector-checkbox" id="{{ collectorName }}"
+                           type="checkbox"
+                           {% if collectorName in collector.enabledCollectors %}checked{% endif %}>
+                        <label for="{{ collectorName }}">{{ collectorName }}</label>
+                    </div>
+                {% endfor %}
+                </span>
+        {% endfor %}
+        <br><br>
+        <span>
+                <a href="#" id="sf-toolbar--all-collectors-enable">enable all</a>
+                |
+                <a href="#" id="sf-toolbar--all-collectors-disable">disable all</a>
+            </span>
+        <br><br>
+        <span>
+            <input id="sf-toolbar--track-container" type="checkbox"
+                   {% if collector.trackContainerChanges %}checked{% endif %}>
+            <label for="sf-toolbar--track-container">track service container changes</label>
+            </span>
+    </div>
+</div>

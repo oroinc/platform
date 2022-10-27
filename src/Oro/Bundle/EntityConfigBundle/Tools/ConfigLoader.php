@@ -8,46 +8,36 @@ use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * The loader to load entity configs from annotations to a database.
+ */
 class ConfigLoader
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    protected ConfigManager $configManager;
+    protected EntityManagerBag $entityManagerBag;
+    protected ?LoggerInterface $logger = null;
 
-    /** @var EntityManagerBag */
-    protected $entityManagerBag;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @param ConfigManager    $configManager
-     * @param EntityManagerBag $entityManagerBag
-     */
     public function __construct(ConfigManager $configManager, EntityManagerBag $entityManagerBag)
     {
-        $this->configManager    = $configManager;
+        $this->configManager = $configManager;
         $this->entityManagerBag = $entityManagerBag;
     }
 
     /**
-     * Load entity configs from annotations to a database
+     * Loads entity configs from annotations to a database.
      *
      * @param bool                 $force  Force overwrite config's option values
-     * @param callable|null        $filter function (ClassMetadata[] $doctrineAllMetadata)
-     * @param LoggerInterface|null $logger
+     * @param \Closure|null        $filter function (ClassMetadata[] $doctrineAllMetadata)
+     * @param LoggerInterface|null $logger A logger instance
      * @param bool                 $dryRun Log modifications without apply them
-     *
-     * @throws \Exception
      */
     public function load(
-        $force = false,
+        bool $force = false,
         \Closure $filter = null,
         LoggerInterface $logger = null,
-        $dryRun = false
-    ) {
-        $this->logger = $logger ?: new NullLogger();
+        bool $dryRun = false
+    ): void {
+        $this->logger = $logger ?? new NullLogger();
         try {
             $entityManagers = $this->entityManagerBag->getEntityManagers();
             foreach ($entityManagers as $em) {
@@ -73,23 +63,15 @@ class ConfigLoader
         }
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param bool          $force
-     */
-    protected function loadEntityConfigs(ClassMetadata $metadata, $force)
+    protected function loadEntityConfigs(ClassMetadata $metadata, bool $force): void
     {
         if ($this->hasEntityConfigs($metadata)) {
             $className = $metadata->getName();
             if ($this->configManager->hasConfig($className)) {
-                $this->logger->info(
-                    sprintf('Update config for "%s" entity.', $className)
-                );
+                $this->logger->info(sprintf('Update config for "%s" entity.', $className));
                 $this->configManager->updateConfigEntityModel($className, $force);
             } else {
-                $this->logger->info(
-                    sprintf('Create config for "%s" entity.', $className)
-                );
+                $this->logger->info(sprintf('Create config for "%s" entity.', $className));
                 $this->configManager->createConfigEntityModel($className);
             }
 
@@ -113,57 +95,28 @@ class ConfigLoader
         }
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param bool   $force
-     */
-    protected function loadFieldConfigs($className, $fieldName, $fieldType, $force)
+    protected function loadFieldConfigs(string $className, string $fieldName, string $fieldType, bool $force): void
     {
         if ($this->configManager->hasConfig($className, $fieldName)) {
-            $this->logger->info(
-                sprintf('Update config for "%s" field.', $fieldName)
-            );
+            $this->logger->info(sprintf('Update config for "%s" field.', $fieldName));
             $this->configManager->updateConfigFieldModel($className, $fieldName, $force);
         } else {
-            $this->logger->info(
-                sprintf('Create config for "%s" field.', $fieldName)
-            );
+            $this->logger->info(sprintf('Create config for "%s" field.', $fieldName));
             $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType);
         }
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     *
-     * @return bool
-     */
-    protected function hasEntityConfigs(ClassMetadata $metadata)
+    protected function hasEntityConfigs(ClassMetadata $metadata): bool
     {
-        $classMetadata = $this->configManager->getEntityMetadata($metadata->getName());
-
-        return $classMetadata && $classMetadata->configurable;
+        return null !== $this->configManager->getEntityMetadata($metadata->getName());
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     *
-     * @return bool
-     */
-    protected function hasFieldConfigs(ClassMetadata $metadata, $fieldName)
+    protected function hasFieldConfigs(ClassMetadata $metadata, string $fieldName): bool
     {
         return true;
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     * @param string        $associationName
-     *
-     * @return bool
-     */
-    protected function hasAssociationConfigs(ClassMetadata $metadata, $associationName)
+    protected function hasAssociationConfigs(ClassMetadata $metadata, string $associationName): bool
     {
         return true;
     }

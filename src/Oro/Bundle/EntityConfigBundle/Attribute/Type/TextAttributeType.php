@@ -5,20 +5,15 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Provides metadata about text attribute type.
+ */
 class TextAttributeType extends StringAttributeType
 {
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
-        return 'text';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return false;
     }

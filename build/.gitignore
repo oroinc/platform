@@ -1,4 +1,4 @@
 /logs
 /node_modules
 karma.conf.js
-.php_cs.cache
+.php-cs-fixer.cache

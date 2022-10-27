@@ -13,9 +13,6 @@ class MigrationExecutorWithNameGenerator extends MigrationExecutor
      */
     protected $nameGenerator;
 
-    /**
-     * @param DbIdentifierNameGenerator $nameGenerator
-     */
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
     {
         $this->nameGenerator = $nameGenerator;

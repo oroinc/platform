@@ -12,31 +12,25 @@ use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
 
 class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 {
-    /**
-     * @var OrmSorterExtension
-     */
+    /** @var OrmSorterExtension */
     protected $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->extension = new OrmSorterExtension($this->sortersStateProvider);
+        $this->extension = new OrmSorterExtension($this->sortersStateProvider, $this->resolver);
     }
 
     public function testVisitDatasourceWithoutDefaultSorting()
     {
-        $this->sortersStateProvider
-            ->expects($this->once())
+        $this->configureResolver();
+        $this->sortersStateProvider->expects($this->once())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata = $this->getMockBuilder(ClassMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
+        $metadata = $this->createMock(ClassMetadata::class);
         $em->expects(self::once())
             ->method('getClassMetadata')
             ->with('Test\Entity')
@@ -48,9 +42,7 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
         $qb = new QueryBuilder($em);
         $qb->select('e.id')->from('Test\Entity', 'e');
 
-        $datasource = $this->getMockBuilder(OrmDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects(self::once())
             ->method('getQueryBuilder')
             ->willReturn($qb);
@@ -69,23 +61,19 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWhenQueryAlreadyHasOrderBy()
     {
-        $this->sortersStateProvider
-            ->expects($this->once())
+        $this->configureResolver();
+        $this->sortersStateProvider->expects($this->once())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects(self::never())
             ->method('getClassMetadata');
 
         $qb = new QueryBuilder($em);
         $qb->select('e.id')->from('Test\Entity', 'e')->addOrderBy('e.name');
 
-        $datasource = $this->getMockBuilder(OrmDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects(self::once())
             ->method('getQueryBuilder')
             ->willReturn($qb);
@@ -104,22 +92,18 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSortingForEmptyQuery()
     {
-        $this->sortersStateProvider
-            ->expects($this->once())
+        $this->configureResolver();
+        $this->sortersStateProvider->expects($this->once())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects(self::never())
             ->method('getClassMetadata');
 
         $qb = new QueryBuilder($em);
 
-        $datasource = $this->getMockBuilder(OrmDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects(self::once())
             ->method('getQueryBuilder')
             ->willReturn($qb);
@@ -138,23 +122,19 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSortingAndGroupBy()
     {
-        $this->sortersStateProvider
-            ->expects($this->once())
+        $this->configureResolver();
+        $this->sortersStateProvider->expects($this->once())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects(self::never())
             ->method('getClassMetadata');
 
         $qb = new QueryBuilder($em);
         $qb->select('e.id')->from('Test\Entity', 'e')->groupBy('e.name');
 
-        $datasource = $this->getMockBuilder(OrmDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects(self::once())
             ->method('getQueryBuilder')
             ->willReturn($qb);
@@ -173,23 +153,19 @@ class OrmSorterExtensionTest extends AbstractSorterExtensionTestCase
 
     public function testVisitDatasourceWithoutDefaultSortingAndMultipleGroupBy()
     {
-        $this->sortersStateProvider
-            ->expects($this->once())
+        $this->configureResolver();
+        $this->sortersStateProvider->expects($this->once())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects(self::never())
             ->method('getClassMetadata');
 
         $qb = new QueryBuilder($em);
         $qb->select('e.id')->from('Test\Entity', 'e')->addGroupBy('e.id')->addGroupBy('e.name');
 
-        $datasource = $this->getMockBuilder(OrmDatasource::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $datasource = $this->createMock(OrmDatasource::class);
         $datasource->expects(self::once())
             ->method('getQueryBuilder')
             ->willReturn($qb);

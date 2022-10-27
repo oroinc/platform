@@ -7,30 +7,18 @@ use Oro\Bundle\DistributionBundle\Entity\Bundle;
 class BundleTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @test
-     */
-    public function couldBeConstructedWithoutArgs()
-    {
-        new Bundle();
-    }
-
-    /**
-     * @test
-     *
      * @dataProvider provideSetterDataset
      */
-    public function shouldAllowToSetProperty($setter, $value)
+    public function testShouldAllowToSetProperty(string $setter, mixed $value)
     {
         $bundle = new Bundle();
         $bundle->{$setter}($value);
     }
 
     /**
-     * @test
-     *
      * @dataProvider provideSetterGetterDataset
      */
-    public function shouldReturnValueThatWasSetBefore($getter, $setter, $value)
+    public function testShouldReturnValueThatWasSetBefore(string $getter, string $setter, mixed $value)
     {
         $bundle = new Bundle();
         $bundle->{$setter}($value);
@@ -38,11 +26,7 @@ class BundleTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $bundle->{$getter}());
     }
 
-
-    /**
-     * @return array
-     */
-    public static function provideSetterGetterDataset()
+    public static function provideSetterGetterDataset(): array
     {
         return [
             ['getEnabled', 'setEnabled', true],
@@ -53,10 +37,7 @@ class BundleTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function provideSetterDataset()
+    public static function provideSetterDataset(): array
     {
         return [
             ['setEnabled', true],

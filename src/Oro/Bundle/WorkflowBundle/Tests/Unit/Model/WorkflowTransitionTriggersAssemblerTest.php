@@ -15,9 +15,13 @@ class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit\Framework\TestCas
     {
         $assembler = new WorkflowTransitionTriggersAssembler();
         $someAssembler = $this->createMock(TransitionTriggerAssemblerInterface::class);
-        $someAssembler->expects($this->once())->method('canAssemble')->willReturn(true);
+        $someAssembler->expects($this->once())
+            ->method('canAssemble')
+            ->willReturn(true);
         $trigger = $this->getMockForAbstractClass(BaseTransitionTrigger::class);
-        $someAssembler->expects($this->once())->method('assemble')->willReturn($trigger);
+        $someAssembler->expects($this->once())
+            ->method('assemble')
+            ->willReturn($trigger);
 
         $assembler->registerAssembler($someAssembler);
 
@@ -42,14 +46,12 @@ class WorkflowTransitionTriggersAssemblerTest extends \PHPUnit\Framework\TestCas
     public function testAssemblerException()
     {
         $this->expectException(AssemblerException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'Can\'t assemble trigger for %s workflow in transition %s by given options: %s',
-                'workflowName',
-                'transitionName',
-                var_export(['cron' => '* * * * *'], 1)
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'Can\'t assemble trigger for %s workflow in transition %s by given options: %s',
+            'workflowName',
+            'transitionName',
+            var_export(['cron' => '* * * * *'], 1)
+        ));
 
         $assembler = new WorkflowTransitionTriggersAssembler();
         $assembler->assembleTriggers(

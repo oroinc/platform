@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor\Options\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\Options\OptionsContext;
-use Oro\Bundle\ApiBundle\Processor\Shared\Rest\CorsHeaders;
+use Oro\Bundle\ApiBundle\Request\Rest\CorsHeaders;
+use Oro\Bundle\ApiBundle\Request\Rest\CorsSettings;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -13,15 +14,12 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetCorsMaxAge implements ProcessorInterface
 {
-    /** @var int */
-    private $preflightMaxAge;
+    /** @var CorsSettings */
+    private $corsSettings;
 
-    /**
-     * @param int $preflightMaxAge The amount of seconds the user agent is allowed to cache CORS preflight request
-     */
-    public function __construct(int $preflightMaxAge)
+    public function __construct(CorsSettings $corsSettings)
     {
-        $this->preflightMaxAge = $preflightMaxAge;
+        $this->corsSettings = $corsSettings;
     }
 
     /**
@@ -32,11 +30,11 @@ class SetCorsMaxAge implements ProcessorInterface
         /** @var OptionsContext $context */
 
         $responseHeaders = $context->getResponseHeaders();
-        if ($this->preflightMaxAge > 0
+        if ($this->corsSettings->getPreflightMaxAge() > 0
             && !$responseHeaders->has(CorsHeaders::ACCESS_CONTROL_MAX_AGE)
             && $context->getRequestHeaders()->has(CorsHeaders::ACCESS_CONTROL_REQUEST_METHOD)
         ) {
-            $responseHeaders->set(CorsHeaders::ACCESS_CONTROL_MAX_AGE, $this->preflightMaxAge);
+            $responseHeaders->set(CorsHeaders::ACCESS_CONTROL_MAX_AGE, $this->corsSettings->getPreflightMaxAge());
         }
     }
 }

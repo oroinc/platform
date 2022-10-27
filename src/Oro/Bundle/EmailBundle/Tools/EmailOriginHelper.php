@@ -20,6 +20,8 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * Helper that allows to get email origin
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailOriginHelper
@@ -29,6 +31,9 @@ class EmailOriginHelper
 
     /** @var EntityManager */
     protected $em;
+
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
@@ -42,12 +47,6 @@ class EmailOriginHelper
     /** @var array */
     protected $origins = [];
 
-    /**
-     * @param DoctrineHelper         $doctrineHelper
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param EmailOwnerProvider     $emailOwnerProvider
-     * @param EmailAddressHelper     $emailAddressHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         TokenAccessorInterface $tokenAccessor,
@@ -60,9 +59,6 @@ class EmailOriginHelper
         $this->emailAddressHelper = $emailAddressHelper;
     }
 
-    /**
-     * @param EmailModel $model
-     */
     public function setEmailModel(EmailModel $model)
     {
         $this->emailModel = $model;

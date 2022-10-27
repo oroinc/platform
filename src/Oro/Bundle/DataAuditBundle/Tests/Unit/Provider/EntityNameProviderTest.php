@@ -2,30 +2,24 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
 class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /**
-     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityNameResolver;
 
-    /**
-     * @var EntityNameProvider
-     */
+    /** @var EntityNameProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
@@ -35,10 +29,8 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resolvedNameDataProvider
-     * @param string $resolverName
-     * @param string $expected
      */
-    public function testGetEntityNameFromEntityNameResolver($resolverName, $expected)
+    public function testGetEntityNameFromEntityNameResolver(string $resolverName, string $expected)
     {
         $entityClass = '\stdObject';
         $entityId = 1;
@@ -63,10 +55,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->provider->getEntityName(Audit::class, $entityClass, $entityId));
     }
 
-    /**
-     * @return array
-     */
-    public function resolvedNameDataProvider()
+    public function resolvedNameDataProvider(): array
     {
         return [
             'less than 255 symbols' => ['test name', 'test name'],

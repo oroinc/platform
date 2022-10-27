@@ -15,9 +15,6 @@ class FiltersConfiguration extends AbstractConfigurationSection
     /** @var FilterOperatorRegistry */
     private $filterOperatorRegistry;
 
-    /**
-     * @param FilterOperatorRegistry $filterOperatorRegistry
-     */
     public function __construct(FilterOperatorRegistry $filterOperatorRegistry)
     {
         $this->filterOperatorRegistry = $filterOperatorRegistry;
@@ -51,16 +48,13 @@ class FiltersConfiguration extends AbstractConfigurationSection
                 ->values([ConfigUtil::EXCLUSION_POLICY_ALL, ConfigUtil::EXCLUSION_POLICY_NONE])
             ->end()
             ->arrayNode(ConfigUtil::FIELDS)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->normalizeKeys(false)
                 ->prototype('array')
                     ->children();
         $this->configureFieldNode($fieldNode);
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = 'filters.field';
@@ -82,11 +76,6 @@ class FiltersConfiguration extends AbstractConfigurationSection
             ->scalarNode(ConfigUtil::DESCRIPTION)->cannotBeEmpty()->end()
             ->scalarNode(ConfigUtil::PROPERTY_PATH)->cannotBeEmpty()->end()
             ->scalarNode(ConfigUtil::FILTER_TYPE)->cannotBeEmpty()->end()
-            ->arrayNode(ConfigUtil::FILTER_OPTIONS)
-                ->useAttributeAsKey('name')
-                ->performNoDeepMerging()
-                ->prototype('variable')->end()
-            ->end()
             ->arrayNode(ConfigUtil::FILTER_OPERATORS)
                 ->validate()
                     ->always(function ($value) {
@@ -101,19 +90,21 @@ class FiltersConfiguration extends AbstractConfigurationSection
                         return $value;
                     })
                 ->end()
+                ->performNoDeepMerging()
                 ->prototype('scalar')->end()
             ->end()
             ->scalarNode(ConfigUtil::DATA_TYPE)->cannotBeEmpty()->end()
             ->booleanNode(ConfigUtil::COLLECTION)->end()
             ->booleanNode(ConfigUtil::ALLOW_ARRAY)->end()
             ->booleanNode(ConfigUtil::ALLOW_RANGE)->end();
+
+        $filterOptionsNode = $node
+            ->arrayNode(ConfigUtil::FILTER_OPTIONS)
+                ->useAttributeAsKey('');
+        $filterOptionsNode->setBuilder(new VariableOrArrayTreeBuilder());
+        $filterOptionsNode->prototype('variable_or_array');
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     protected function postProcessFieldConfig(array $config): array
     {
         if (empty($config[ConfigUtil::FILTER_OPTIONS])) {

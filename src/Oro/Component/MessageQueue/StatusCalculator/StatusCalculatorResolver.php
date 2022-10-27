@@ -6,22 +6,17 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Component\MessageQueue\Job\Job;
 
+/**
+ * Resolve calculator to calculate job status and progress
+ */
 class StatusCalculatorResolver
 {
-    /**
-     * @var $collectionCalculator CollectionCalculator
-     */
+    /** @var CollectionCalculator */
     private $collectionCalculator;
 
-    /**
-     * @var $queryCalculator QueryCalculator
-     */
+    /** @var QueryCalculator */
     private $queryCalculator;
 
-    /**
-     * @param CollectionCalculator $collectionCalculator
-     * @param QueryCalculator $queryCalculator
-     */
     public function __construct(CollectionCalculator $collectionCalculator, QueryCalculator $queryCalculator)
     {
         $this->collectionCalculator = $collectionCalculator;
@@ -31,21 +26,21 @@ class StatusCalculatorResolver
     /**
      * @throws \LogicException
      *
-     * @param Job $rootJob
-     *
      * @return AbstractStatusCalculator
      */
     public function getCalculatorForRootJob(Job $rootJob)
     {
         $childJobs = $rootJob->getChildJobs();
 
-        if ($childJobs instanceof PersistentCollection && !$childJobs->isInitialized()) {
+        if ($childJobs instanceof PersistentCollection) {
             $this->queryCalculator->init($rootJob);
+
             return $this->queryCalculator;
         }
 
-        if ($childJobs instanceof Collection || $childJobs instanceof PersistentCollection) {
+        if ($childJobs instanceof Collection) {
             $this->collectionCalculator->init($rootJob);
+
             return $this->collectionCalculator;
         }
 

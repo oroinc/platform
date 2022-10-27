@@ -2,47 +2,30 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
-use Doctrine\Common\Cache\Cache;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The form type that can be used to select timezone.
  */
 class TimezoneType extends AbstractType
 {
-    /**
-     * @var array
-     */
-    protected static $timezones = null;
+    protected static ?array $timezones = null;
+    protected ?CacheInterface $cache;
 
-    /**
-     * @var Cache
-     */
-    protected $cache;
-
-    /**
-     * @param null|Cache $cache
-     */
-    public function __construct(Cache $cache = null)
+    public function __construct(CacheInterface $cache = null)
     {
         $this->cache = $cache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $cacheKey = 'timezones';
         if ($this->cache) {
-            $timezones = $this->cache->fetch($cacheKey);
-            if (false === $timezones) {
-                $this->cache->save($cacheKey, self::getTimezones());
-            } else {
-                self::$timezones = $timezones;
-            }
+            self::$timezones = $this->cache->get('timezones', function () {
+                return self::getTimezones();
+            });
         }
 
         $resolver->setDefaults(
@@ -52,26 +35,17 @@ class TimezoneType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'oro_locale_timezone';
     }
@@ -83,10 +57,8 @@ class TimezoneType extends AbstractType
      * \DateTimeZone::listIdentifiers(). They are cached during a single request,
      * so multiple timezone fields on the same page don't lead to unnecessary
      * overhead.
-     *
-     * @return array The timezone choices
      */
-    public static function getTimezones()
+    public static function getTimezones(): array
     {
         if (null === static::$timezones) {
             static::$timezones = array();
@@ -127,10 +99,8 @@ class TimezoneType extends AbstractType
 
     /**
      * Get timezone identifiers with offset sorted by offset and timezone_id.
-     *
-     * @return array
      */
-    public static function getTimezonesData()
+    public static function getTimezonesData(): array
     {
         $listIdentifiers = \DateTimeZone::listIdentifiers();
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -150,7 +120,7 @@ class TimezoneType extends AbstractType
                 if ($a['offset'] == $b['offset']) {
                     return strcmp($a['timezone_id'], $b['timezone_id']);
                 }
-                return ($a['offset'] > $b['offset']) ? 1 : -1;
+                return $a['offset'] <=> $b['offset'];
             }
         );
         return $timezones;

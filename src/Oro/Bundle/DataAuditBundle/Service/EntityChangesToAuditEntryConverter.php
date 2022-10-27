@@ -2,65 +2,58 @@
 
 namespace Oro\Bundle\DataAuditBundle\Service;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
+use Doctrine\DBAL\Exception\RetryableException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
+use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
+/**
+ * This converter is intended to add the data audit records to the database
+ * based on a list of entity changes.
+ * @see \Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener
+ */
 class EntityChangesToAuditEntryConverter
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var AuditEntityMapper */
-    private $auditEntityMapper;
-
-    /** @var AuditConfigProvider */
-    private $configProvider;
-
-    /** @var EntityNameProvider */
-    private $entityNameProvider;
-
-    /** @var SetNewAuditVersionService */
-    private $setNewAuditVersionService;
-
-    /** @var ChangeSetToAuditFieldsConverter */
-    private $changeSetToAuditFieldsConverter;
+    private ManagerRegistry $doctrine;
+    private AuditEntityMapper $auditEntityMapper;
+    private AuditConfigProvider $configProvider;
+    private EntityNameProvider $entityNameProvider;
+    private SetNewAuditVersionService $setNewAuditVersionService;
+    private AuditRecordValidator $auditRecordValidator;
+    private ChangeSetToAuditFieldsConverterInterface $changeSetToAuditFieldsConverter;
 
     /**
      * Local cache of entities metadata.
      * To avoid performance impact of getting entities metadata in "convert" method.
-     *
-     * @var array
      */
-    private $entityMetadataCache = [];
+    private array $entityMetadataCache = [];
 
-    /**
-     * @param ManagerRegistry                 $doctrine
-     * @param AuditEntityMapper               $auditEntityMapper
-     * @param AuditConfigProvider             $configProvider
-     * @param EntityNameProvider              $entityNameProvider
-     * @param SetNewAuditVersionService       $setNewAuditVersionService
-     * @param ChangeSetToAuditFieldsConverter $changeSetToAuditFieldsConverter
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         AuditEntityMapper $auditEntityMapper,
         AuditConfigProvider $configProvider,
         EntityNameProvider $entityNameProvider,
         SetNewAuditVersionService $setNewAuditVersionService,
-        ChangeSetToAuditFieldsConverter $changeSetToAuditFieldsConverter
+        AuditRecordValidator $auditRecordValidator,
+        ChangeSetToAuditFieldsConverterInterface $changeSetToAuditFieldsConverter
     ) {
         $this->doctrine = $doctrine;
         $this->auditEntityMapper = $auditEntityMapper;
         $this->configProvider = $configProvider;
         $this->entityNameProvider = $entityNameProvider;
         $this->setNewAuditVersionService = $setNewAuditVersionService;
+        $this->auditRecordValidator = $auditRecordValidator;
         $this->changeSetToAuditFieldsConverter = $changeSetToAuditFieldsConverter;
     }
 
@@ -88,12 +81,16 @@ class EntityChangesToAuditEntryConverter
     ) {
         $needFlush = false;
         $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($this->getEntityByReference($user));
+        $auditFieldClass = $this->auditEntityMapper->getAuditEntryFieldClassForAuditEntry($auditEntryClass);
         /** @var EntityManagerInterface $auditEntityManager */
         $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
         foreach ($entityChanges as $entityChange) {
+            if (!$this->auditRecordValidator->validateAuditRecord($entityChange, $auditDefaultAction)) {
+                continue;
+            }
+
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
-
             if (!$this->configProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
@@ -101,8 +98,9 @@ class EntityChangesToAuditEntryConverter
             $entityMetadata = $this->getEntityMetadata($entityClass);
             $fields = $this->changeSetToAuditFieldsConverter->convert(
                 $auditEntryClass,
+                $auditFieldClass,
                 $entityMetadata,
-                $entityChange['change_set']
+                $entityChange['change_set'] ?? []
             );
 
             if (empty($fields)) {
@@ -142,7 +140,7 @@ class EntityChangesToAuditEntryConverter
                 $needFlush = true;
             }
 
-            if (isset($entityChange['additional_fields']) && !empty($entityChange['additional_fields'])) {
+            if (!empty($entityChange['additional_fields'])) {
                 $auditEntry->setAdditionalFields($entityChange['additional_fields']);
                 $needFlush = true;
             }
@@ -179,9 +177,14 @@ class EntityChangesToAuditEntryConverter
         $auditEntityManager = $this->doctrine->getManagerForClass($auditEntryClass);
 
         foreach ($entityChanges as $entityChange) {
+            if (!$this->auditRecordValidator->validateAuditRecord($entityChange, $auditDefaultAction)) {
+                continue;
+            }
+
             $entityClass = $entityChange['entity_class'];
             $entityId = $entityChange['entity_id'];
-            if (!$this->configProvider->isAuditableEntity($entityClass)) {
+            if (\is_a($entityClass, AbstractEnumValue::class, true) ||
+                !$this->configProvider->isAuditableEntity($entityClass)) {
                 continue;
             }
 
@@ -198,7 +201,7 @@ class EntityChangesToAuditEntryConverter
                 $auditDefaultAction
             );
 
-            if (isset($entityChange['additional_fields']) && !empty($entityChange['additional_fields'])) {
+            if (!empty($entityChange['additional_fields'])) {
                 $audit->setAdditionalFields($entityChange['additional_fields']);
             }
 
@@ -250,7 +253,7 @@ class EntityChangesToAuditEntryConverter
      * @param string                 $auditEntryClass
      * @param string                 $transactionId
      * @param string                 $entityClass
-     * @param int                    $entityId
+     * @param string                 $entityId
      * @param \DateTime              $loggedAt
      * @param EntityReference        $user
      * @param EntityReference        $organization
@@ -279,27 +282,37 @@ class EntityChangesToAuditEntryConverter
             ->where('a.transactionId = :transactionId AND a.objectClass = :objectClass AND a.objectId = :objectId')
             ->setParameter('transactionId', $transactionId)
             ->setParameter('objectClass', $entityClass)
-            ->setParameter('objectId', $entityId)
+            ->setParameter('objectId', (string) $entityId)
+            ->orderBy('a.version', Criteria::DESC)
             ->getQuery()
             ->getOneOrNullResult();
 
         if (null === $auditEntry) {
-            /** @var AbstractAudit $auditEntry */
-            $auditEntry = $auditEntityManager->getClassMetadata($auditEntryClass)->newInstance();
-            $auditEntry->setTransactionId($transactionId);
-            $auditEntry->setObjectClass($entityClass);
-            $auditEntry->setObjectId($entityId);
-            $auditEntry->setLoggedAt($loggedAt);
-            $auditEntry->setUser($this->getEntityByReference($user));
-            $auditEntry->setOrganization($this->getEntityByReference($organization));
-            $auditEntry->setImpersonation($this->getEntityByReference($impersonation));
-            $auditEntry->setObjectName(
-                $this->entityNameProvider->getEntityName($auditEntryClass, $entityClass, $entityId)
-            );
-            $auditEntry->setAction($action);
+            try {
+                /** @var AbstractAudit $auditEntry */
+                $auditEntry = $auditEntityManager->getClassMetadata($auditEntryClass)->newInstance();
+                $auditEntry->setTransactionId($transactionId);
+                $auditEntry->setObjectClass($entityClass);
+                $auditEntry->setObjectId((string) $entityId);
+                $auditEntry->setLoggedAt($loggedAt);
+                $auditEntry->setUser($this->getEntityByReference($user));
+                $auditEntry->setOrganization($this->getEntityByReference($organization));
+                $auditEntry->setImpersonation($this->getEntityByReference($impersonation));
+                $auditEntry->setObjectName(
+                    $this->entityNameProvider->getEntityName($auditEntryClass, $entityClass, $entityId)
+                );
+                $auditEntry->setAction($action);
 
-            $auditEntityManager->persist($auditEntry);
-            $auditEntityManager->flush();
+                $auditEntityManager->persist($auditEntry);
+                $auditEntityManager->flush($auditEntry);
+            } catch (\Throwable $e) {
+                if ($this->isRetryableException($e)) {
+                    // We should stop the process when the same audit entry appears in DB during the save.
+                    throw new WrongDataAuditEntryStateException($auditEntry);
+                } else {
+                    throw $e;
+                }
+            }
 
             $this->setNewAuditVersionService->setVersion($auditEntry);
         }
@@ -332,5 +345,12 @@ class EntityChangesToAuditEntryConverter
         }
 
         return $this->entityMetadataCache[$entityClass];
+    }
+
+    private function isRetryableException(\Throwable $exception): bool
+    {
+        return $exception instanceof RetryableException
+            || $exception instanceof UniqueConstraintViolationException
+            || $exception instanceof ForeignKeyConstraintViolationException;
     }
 }

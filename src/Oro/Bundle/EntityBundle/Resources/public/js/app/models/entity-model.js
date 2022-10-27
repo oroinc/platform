@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var EntityModel;
-    var _ = require('underscore');
-    var Chaplin = require('chaplin');
-    var routing = require('routing');
+    const _ = require('underscore');
+    const Chaplin = require('chaplin');
+    const routing = require('routing');
     /** @type {Registry} */
-    var registry = require('oroui/js/app/services/registry');
-    var mediator = require('oroui/js/mediator');
-    var entitySync = require('oroentity/js/app/models/entity-sync');
-    var entitySerializer = require('oroentity/js/app/models/entity-serializer');
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const registry = require('oroui/js/app/services/registry');
+    const mediator = require('oroui/js/mediator');
+    const entitySync = require('oroentity/js/app/models/entity-sync');
+    const entitySerializer = require('oroentity/js/app/models/entity-serializer');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @class EntityModel
      * @extends BaseModel
      * @mixes {Chaplin.SyncMachine}
      */
-    EntityModel = BaseModel.extend(_.extend({}, Chaplin.SyncMachine, /** @lends EntityModel.prototype */ {
+    const EntityModel = BaseModel.extend(_.extend({}, Chaplin.SyncMachine, /** @lends EntityModel.prototype */ {
         ROUTE: {
             'create': 'oro_rest_api_list',
             'update': 'oro_rest_api_item',
@@ -39,7 +38,7 @@ define(function(require) {
         id: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         defaults: function() {
             return {
@@ -65,7 +64,7 @@ define(function(require) {
         _meta: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityModel(data, options) {
             options = options || {};
@@ -74,7 +73,7 @@ define(function(require) {
                 throw new TypeError('Entity type is required for EntityModel');
             }
             if (data && data.data) {
-                // assume it is raw data from JSON API and it need to be parsed
+                // assume it is raw data from JSON:API and it need to be parsed
                 options.parse = true;
             }
             this._relationships = {};
@@ -85,7 +84,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(data, options) {
             if (!_.isEmpty(_.omit(this.attributes, 'id'))) {
@@ -96,7 +95,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -126,7 +125,7 @@ define(function(require) {
          * }}
          */
         toJSON: function(options) {
-            var data = {
+            const data = {
                 id: this.id,
                 type: this.type,
                 attributes: this.getAttributes(),
@@ -184,7 +183,7 @@ define(function(require) {
          * @return {Object}
          */
         serialize: function() {
-            var proto = entitySerializer.serializeAttributes(this, this.getAttributesAndRelationships());
+            const proto = entitySerializer.serializeAttributes(this, this.getAttributesAndRelationships());
             proto.toString = this.toString.bind(this);
             return Object.create(proto);
         },
@@ -194,17 +193,16 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         url: function(method, params) {
             return routing.generate(this.ROUTE[method], _.defaults({entity: this.type, id: this.id}, params));
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         parse: function(resp, options) {
-            var attrs;
             if (this.type !== resp.data.type) {
                 throw new TypeError('Entity type mismatch, attempt to parse data of "' + resp.data.type +
                     '" type by "' + this.type + '" type entity');
@@ -217,7 +215,7 @@ define(function(require) {
                 // entity is just created and new ID is assigned
                 this.id = resp.data.id;
             }
-            attrs = _.clone(resp.data.attributes) || {};
+            const attrs = _.clone(resp.data.attributes) || {};
             _.extend(attrs, {id: this.id}, _.mapObject(resp.data.relationships, function(relation) {
                 return {data: _.clone(relation.data)};
             }));
@@ -240,7 +238,7 @@ define(function(require) {
         },
 
         reset: function(rawData, options) {
-            var attrs = this.parse(rawData, options);
+            const attrs = this.parse(rawData, options);
             this.set(attrs, options);
             if (!_.isEmpty(_.omit(this.attributes, 'id'))) {
                 this.markAsSynced();
@@ -248,17 +246,17 @@ define(function(require) {
         },
 
         trigger: function(eventName, model, value) {
-            var eventNameParts = eventName.split(':');
-            var eventType = eventNameParts[0];
-            var fieldName = eventNameParts[1];
+            const eventNameParts = eventName.split(':');
+            const eventType = eventNameParts[0];
+            const fieldName = eventNameParts[1];
             if (eventType === 'change' && !_.isUndefined(fieldName) && _.isObject(value) && 'data' in value) {
                 this._initRelationships(_.object([[fieldName, value]]));
             }
-            return EntityModel.__super__.trigger.apply(this, arguments);
+            return EntityModel.__super__.trigger.call(this, eventName, model, value);
         },
 
         _initRelationships: function(attrs) {
-            var findData = function(identifier) {
+            const findData = function(identifier) {
                 return _.findWhere(this, identifier) || identifier;
             }.bind(this._included);
 
@@ -266,9 +264,9 @@ define(function(require) {
                 if (!_.isObject(value) || !('data' in value)) {
                     return;
                 }
-                var params;
-                var relation;
-                var data = value.data;
+                let params;
+                let relation;
+                const data = value.data;
 
                 if (_.isArray(data)) {
                     params = _.extend({data: _.map(data, findData), association: name}, this.identifier);
@@ -290,7 +288,7 @@ define(function(require) {
         },
 
         getRelationship: function(name, applicant) {
-            var relation = this._relationships[name];
+            const relation = this._relationships[name];
             if (relation) {
                 registry.retain(relation, applicant);
             }
@@ -333,17 +331,17 @@ define(function(require) {
          * @return {EntityModel}
          */
         getEntityModel: function(params, applicant) {
-            var identifier = _.pick(params.data || params, 'type', 'id');
+            const identifier = _.pick(params.data || params, 'type', 'id');
             if (!EntityModel.isValidIdentifier(identifier)) {
                 throw new TypeError('params should contain valid type and id of entity');
             }
 
-            var globalId = EntityModel.globalId(identifier);
-            var model = registry.fetch(globalId, applicant);
+            const globalId = EntityModel.globalId(identifier);
+            let model = registry.fetch(globalId, applicant);
 
-            var options = _.extend(_.omit(params, 'data'), identifier);
+            const options = _.extend(_.omit(params, 'data'), identifier);
             // params.data might be a null, that's why it is checked over 'data' in params
-            var rawData = 'data' in params ? {data: params.data} : null;
+            const rawData = 'data' in params ? {data: params.data} : null;
             if (!model) {
                 model = new EntityModel(rawData, options);
                 try {

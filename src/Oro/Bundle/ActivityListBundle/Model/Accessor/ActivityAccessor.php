@@ -2,24 +2,23 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model\Accessor;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor;
 
+/**
+ * The entity data accessor for activity entities.
+ */
 class ActivityAccessor extends DefaultAccessor
 {
-    /** @var Registry */
-    protected $registry;
+    private ManagerRegistry $doctrine;
 
-    /**
-     * @param Registry $registry
-     */
-    public function __construct(Registry $registry)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -36,29 +35,19 @@ class ActivityAccessor extends DefaultAccessor
     public function getValue($entity, FieldMetadata $metadata)
     {
         if ($metadata->has('activity') && $metadata->has('type') && $metadata->get('activity') === true) {
-            return $this->getActivity($entity, $metadata->get('type'));
+            return $this->getRepository()->getRecordsCountForTargetClassAndId(
+                ClassUtils::getClass($entity),
+                $entity->getId(),
+                [$metadata->get('type')]
+            );
         }
 
         return parent::getValue($entity, $metadata);
     }
 
-    /**
-     * @param object $entity
-     * @param string $type
-     *
-     * @return string
-     */
-    protected function getActivity($entity, $type)
+    private function getRepository(): ActivityListRepository
     {
-        $em = $this->registry->getManagerForClass(ActivityList::ENTITY_NAME);
-        /** @var ActivityListRepository $repository */
-        $repository = $em->getRepository(ActivityList::ENTITY_NAME);
-        $count = $repository->getRecordsCountForTargetClassAndId(
-            ClassUtils::getClass($entity),
-            $entity->getId(),
-            [$type]
-        );
-
-        return $count;
+        return $this->doctrine->getManagerForClass(ActivityList::class)
+            ->getRepository(ActivityList::class);
     }
 }

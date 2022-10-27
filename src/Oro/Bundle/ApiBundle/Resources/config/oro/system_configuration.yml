@@ -1,0 +1,22 @@
+system_configuration:
+    groups:
+        web_api_settings:
+            title: oro.api.system_configuration.groups.web_api_settings.label
+    fields:
+        oro_api.web_api:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            priority: 10
+            options:
+                label: oro.api.system_configuration.fields.web_api.label
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            application_settings:
+                                children:
+                                    web_api_settings:
+                                        children:
+                                            - oro_api.web_api

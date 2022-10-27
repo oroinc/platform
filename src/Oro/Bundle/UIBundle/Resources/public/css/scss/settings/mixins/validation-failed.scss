@@ -1,0 +1,16 @@
+/* @theme: admin.oro; */
+
+@mixin validation-failed($color) {
+    color: $color;
+    display: block;
+    margin: 3px 0;
+    line-height: 1;
+    clear: both;
+
+    /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).
+     * `id` is used to cover only auto-generated jQuery.validate labels and leave posibility to show a few messages
+     * when it rendered intentionally */
+    & + &[id] {
+        display: none;
+    }
+}

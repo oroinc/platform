@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle;
 
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
-use Oro\Bundle\WorkflowBundle\Async\Topics;
 use Oro\Bundle\WorkflowBundle\DependencyInjection\Compiler;
+use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -16,31 +15,28 @@ class OroWorkflowBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
-        $container->addCompilerPass(new Compiler\AddAttributeNormalizerCompilerPass());
+        $container->addCompilerPass(new Compiler\DebugWorkflowItemSerializerPass());
         $container->addCompilerPass(new Compiler\AddWorkflowValidationLoaderCompilerPass());
         $container->addCompilerPass(new RegisterListenersPass(
             'oro_workflow.changes.event.dispatcher',
             'oro_workflow.changes.listener',
             'oro_workflow.changes.subscriber'
         ));
-        $container->addCompilerPass(new Compiler\EventTriggerExtensionCompilerPass());
-        $container->addCompilerPass(new Compiler\WorkflowConfigurationHandlerCompilerPass);
-        $container->addCompilerPass(new Compiler\WorkflowDefinitionBuilderExtensionCompilerPass);
+        $container->addCompilerPass(new LoadAndBuildProcessorsCompilerPass(
+            'oro_workflow.processor_bag_config_provider',
+            'oro_workflow.processor'
+        ));
         $container->addCompilerPass(
-            new LoadAndBuildProcessorsCompilerPass(
-                'oro_workflow.processor_bag_config_provider',
-                'oro_workflow.processor'
-            )
+            new CleanUpProcessorsCompilerPass(
+                'oro_workflow.simple_processor_registry',
+                'oro_workflow.processor',
+                'oro_workflow.simple_processor_registry.inner'
+            ),
+            PassConfig::TYPE_BEFORE_REMOVING
         );
-        $container->addCompilerPass(new Compiler\EventsCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
-
-        $addTopicMetaPass = AddTopicMetaPass::create();
-        $addTopicMetaPass->add(Topics::EXECUTE_PROCESS_JOB);
-
-        $container->addCompilerPass($addTopicMetaPass);
     }
 }

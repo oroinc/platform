@@ -1,0 +1,20 @@
+/* @theme: admin.oro; */
+
+.comments-block {
+    .comment-content {
+        max-width: calc(100% - 50px);
+    }
+
+    .comment-attachments {
+        @media only screen and (max-width: 500px) {
+            // hide thumbnails on mobile
+            display: none;
+        }
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .comments-block .comment-attachments .dropdown-menu .view-image {
+        display: block;
+    }
+}

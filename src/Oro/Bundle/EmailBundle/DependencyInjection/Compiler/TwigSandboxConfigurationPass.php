@@ -2,45 +2,52 @@
 
 namespace Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
-
-class TwigSandboxConfigurationPass implements CompilerPassInterface
+/**
+ * Registers the following Twig functions and filters for the email templates rendering sandbox:
+ * * oro_config_value
+ * * oro_get_absolute_url
+ * * oro_format
+ */
+class TwigSandboxConfigurationPass extends AbstractTwigSandboxConfigurationPass
 {
-    const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
-    const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY                = 'oro_email.email_renderer';
-    const CONFIG_EXTENSION_SERVICE_KEY                       = 'oro_config.twig.config_extension';
-
-    const FORMATTER_EXTENSION_SERVICE_KEY = 'oro_ui.twig.extension.formatter';
+    /**
+     * {@inheritDoc}
+     */
+    protected function getFunctions(): array
+    {
+        return [
+            'oro_config_value',
+            'oro_get_absolute_url'
+        ];
+    }
 
     /**
      * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    protected function getFilters(): array
     {
-        if ($container->hasDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY)
-            && $container->hasDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY)
-        ) {
-            // register 'oro_config_value' function
-            $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY);
-            $rendererDef       = $container->getDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY);
+        return [
+            'oro_format'
+        ];
+    }
 
-            if ($container->hasDefinition(self::CONFIG_EXTENSION_SERVICE_KEY)) {
-                $functions = $securityPolicyDef->getArgument(4);
-                $functions = array_merge($functions, ['oro_config_value']);
-                $securityPolicyDef->replaceArgument(4, $functions);
-                // register an twig extension implements this function
-                $rendererDef->addMethodCall('addExtension', [new Reference(self::CONFIG_EXTENSION_SERVICE_KEY)]);
-            }
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTags(): array
+    {
+        return [];
+    }
 
-            if ($container->hasDefinition(self::FORMATTER_EXTENSION_SERVICE_KEY)) {
-                $filters = $securityPolicyDef->getArgument(1);
-                $filters = array_merge($filters, ['oro_format']);
-                $securityPolicyDef->replaceArgument(1, $filters);
-                // register an twig extension implements this function
-                $rendererDef->addMethodCall('addExtension', [new Reference(self::FORMATTER_EXTENSION_SERVICE_KEY)]);
-            }
-        }
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
+    {
+        return [
+            'oro_config.twig.config_extension',
+            'oro_email.twig.extension.email',
+            'oro_ui.twig.extension.formatter'
+        ];
     }
 }

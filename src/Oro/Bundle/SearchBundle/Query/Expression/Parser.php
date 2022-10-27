@@ -10,6 +10,9 @@ use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 /**
+ * Converts a tokenized search query (TokenStream object) to Query object.
+ * To tokenize a search query use Lexer class.
+ * @see \Oro\Bundle\SearchBundle\Query\Expression\Lexer
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Parser
@@ -20,160 +23,64 @@ class Parser
     /** @var Query */
     protected $query;
 
-    /** @var array */
-    protected $keywords = [
-        Query::KEYWORD_SELECT,
-        Query::KEYWORD_FROM,
-        Query::KEYWORD_WHERE,
-        Query::KEYWORD_AGGREGATE,
-
-        Query::KEYWORD_AND,
-        Query::KEYWORD_OR,
-
-        Query::KEYWORD_OFFSET,
-        Query::KEYWORD_MAX_RESULTS,
-        Query::KEYWORD_ORDER_BY,
-
-        Query::KEYWORD_AS
-    ];
-
-    /** @var array */
-    protected $operators = [
-        Query::OPERATOR_GREATER_THAN,
-        Query::OPERATOR_GREATER_THAN_EQUALS,
-        Query::OPERATOR_LESS_THAN,
-        Query::OPERATOR_LESS_THAN_EQUALS,
-        Query::OPERATOR_EQUALS,
-        Query::OPERATOR_NOT_EQUALS,
-        Query::OPERATOR_IN,
-        Query::OPERATOR_NOT_IN,
-        Query::OPERATOR_CONTAINS,
-        Query::OPERATOR_NOT_CONTAINS,
-        Query::OPERATOR_STARTS_WITH,
-        Query::OPERATOR_LIKE,
-        Query::OPERATOR_NOT_LIKE,
-    ];
-
-    /** @var array */
-    protected $types = [
-        Query::TYPE_TEXT,
-        Query::TYPE_DATETIME,
-        Query::TYPE_DECIMAL,
-        Query::TYPE_INTEGER,
-    ];
-
-    /** @var array */
-    protected $typeOperators = [
-        Query::TYPE_TEXT     => [
-            Query::OPERATOR_CONTAINS,
-            Query::OPERATOR_NOT_CONTAINS,
-            Query::OPERATOR_EQUALS,
-            Query::OPERATOR_NOT_EQUALS,
-            Query::OPERATOR_IN,
-            Query::OPERATOR_NOT_IN,
-            Query::OPERATOR_STARTS_WITH,
-            Query::OPERATOR_EXISTS,
-            Query::OPERATOR_NOT_EXISTS,
-            Query::OPERATOR_LIKE,
-            Query::OPERATOR_NOT_LIKE,
-        ],
-        Query::TYPE_INTEGER  => [
-            Query::OPERATOR_GREATER_THAN,
-            Query::OPERATOR_GREATER_THAN_EQUALS,
-            Query::OPERATOR_LESS_THAN,
-            Query::OPERATOR_LESS_THAN_EQUALS,
-            Query::OPERATOR_EQUALS,
-            Query::OPERATOR_NOT_EQUALS,
-            Query::OPERATOR_IN,
-            Query::OPERATOR_NOT_IN,
-            Query::OPERATOR_EXISTS,
-            Query::OPERATOR_NOT_EXISTS,
-        ],
-        Query::TYPE_DECIMAL  => [
-            Query::OPERATOR_GREATER_THAN,
-            Query::OPERATOR_GREATER_THAN_EQUALS,
-            Query::OPERATOR_LESS_THAN,
-            Query::OPERATOR_LESS_THAN_EQUALS,
-            Query::OPERATOR_EQUALS,
-            Query::OPERATOR_NOT_EQUALS,
-            Query::OPERATOR_IN,
-            Query::OPERATOR_NOT_IN,
-            Query::OPERATOR_EXISTS,
-            Query::OPERATOR_NOT_EXISTS,
-        ],
-        Query::TYPE_DATETIME => [
-            Query::OPERATOR_GREATER_THAN,
-            Query::OPERATOR_GREATER_THAN_EQUALS,
-            Query::OPERATOR_LESS_THAN,
-            Query::OPERATOR_LESS_THAN_EQUALS,
-            Query::OPERATOR_EQUALS,
-            Query::OPERATOR_NOT_EQUALS,
-            Query::OPERATOR_IN,
-            Query::OPERATOR_NOT_IN,
-            Query::OPERATOR_EXISTS,
-            Query::OPERATOR_NOT_EXISTS,
-        ]
-    ];
-
-    /** @var array */
-    protected $aggregatingFunctions = [
-        Query::AGGREGATE_FUNCTION_COUNT,
-        Query::AGGREGATE_FUNCTION_SUM,
-        Query::AGGREGATE_FUNCTION_MAX,
-        Query::AGGREGATE_FUNCTION_MIN,
-        Query::AGGREGATE_FUNCTION_AVG,
-    ];
-
-    /** @var array */
-    protected $orderDirections = [
-        Query::ORDER_ASC,
-        Query::ORDER_DESC,
-    ];
+    /** @var FieldResolverInterface */
+    protected $fieldResolver;
 
     /**
-     * @param Query|null $query
-     */
-    public function __construct($query = null)
-    {
-        if (null === $query) {
-            $this->query = new Query();
-            $this->query->from(['*']);
-        } else {
-            $this->query = $query;
-        }
-    }
-
-    /**
-     * @param TokenStream $stream
+     * @param TokenStream                 $stream
+     * @param Query|null                  $query
+     * @param FieldResolverInterface|null $fieldResolver
+     * @param string|null                 $keyword
+     *
+     * @return Query
      *
      * @throws ExpressionSyntaxError
-     * @return Query
      */
-    public function parse(TokenStream $stream)
-    {
-        /** @var TokenStream stream */
+    public function parse(
+        TokenStream $stream,
+        Query $query = null,
+        FieldResolverInterface $fieldResolver = null,
+        $keyword = null
+    ) {
+        if (null === $query) {
+            $query = new Query();
+            $query->from(['*']);
+        }
         $this->stream = $stream;
-
-        while (!$this->stream->isEOF()
-            && $this->stream->current->test(Token::KEYWORD_TYPE)
-            && in_array($this->stream->current->value, $this->keywords)
-        ) {
-            $this->parseKeywords();
+        $this->query = $query;
+        $this->fieldResolver = $fieldResolver ?? new FieldResolver();
+        try {
+            if ($keyword) {
+                $this->parseExpression($keyword);
+            } else {
+                while (!$this->stream->isEOF()
+                    && $this->stream->current->test(Token::KEYWORD_TYPE)
+                    && in_array($this->stream->current->value, TokenInfo::getKeywords(), true)
+                ) {
+                    $this->parseExpression($this->stream->current->value);
+                }
+            }
+            if (!$stream->isEOF()) {
+                throw new ExpressionSyntaxError(
+                    sprintf('Unexpected token "%s", value "%s"', $stream->current->type, $stream->current->value),
+                    $stream->current->cursor
+                );
+            }
+        } finally {
+            $this->stream = null;
+            $this->query = null;
+            $this->fieldResolver = null;
         }
 
-        if (!$stream->isEOF()) {
-            throw new ExpressionSyntaxError(
-                sprintf('Unexpected token "%s", value "%s"', $stream->current->type, $stream->current->value),
-                $stream->current->cursor
-            );
-        }
-
-        return $this->query;
+        return $query;
     }
 
-    protected function parseKeywords()
+    /**
+     * @param string $keyword
+     */
+    protected function parseExpression($keyword)
     {
-        switch ($this->stream->current->value) {
+        switch ($keyword) {
             case Query::KEYWORD_SELECT:
                 $this->parseSelectExpression();
                 break;
@@ -221,9 +128,7 @@ class Parser
 
                 if ($this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_AS, null, false)) {
                     $aliasName = $this->stream->current->value;
-
-                    $fieldDeclaration .= ' '.Query::KEYWORD_AS.' '.$aliasName;
-
+                    $fieldDeclaration .= ' ' . Query::KEYWORD_AS . ' ' . $aliasName;
                     $this->stream->next();
                 }
 
@@ -237,7 +142,7 @@ class Parser
 
             default:
                 throw new ExpressionSyntaxError(
-                    sprintf('Wrong "select" statement of the expression.'),
+                    'Wrong "select" statement of the expression.',
                     $this->stream->current->cursor
                 );
         }
@@ -269,7 +174,7 @@ class Parser
 
             default:
                 throw new ExpressionSyntaxError(
-                    sprintf('Wrong "from" statement of the expression.'),
+                    'Wrong "from" statement of the expression.',
                     $this->stream->current->cursor
                 );
         }
@@ -284,10 +189,11 @@ class Parser
         $this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_WHERE, null, false);
 
         $exit = false;
+        $previousType = '';
         while (!$this->stream->isEOF() && !$exit) {
             /** @var Token $token */
             $token = $this->stream->current;
-            $exit = $this->parseToken($token);
+            list($exit, $previousType) = $this->parseToken($token, $previousType);
         }
     }
 
@@ -296,26 +202,32 @@ class Parser
      */
     protected function parseAggregateExpression()
     {
-        /** @var Criteria $criteria */
-        $criteria = $this->query->getCriteria();
-
         // skip AGGREGATE keyword
         $this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_AGGREGATE);
 
         // parse field name
-        $fieldTypeToken = $this->stream->expect(Token::STRING_TYPE, $this->types, null, false);
-        $field = $criteria->implodeFieldTypeName(
-            $fieldTypeToken ? $fieldTypeToken->value : Query::TYPE_TEXT,
-            $this->stream->expect(Token::STRING_TYPE, null, 'Aggregating field is expected')->value
+        $fieldTypeToken = $this->stream->expect(Token::STRING_TYPE, TokenInfo::getTypes(), null, false);
+        $fieldName = $this->stream->expect(Token::STRING_TYPE, null, 'Aggregating field is expected')->value;
+        $fieldType = $fieldTypeToken ? $fieldTypeToken->value : $this->fieldResolver->resolveFieldType($fieldName);
+        $fieldName = Criteria::implodeFieldTypeName(
+            $fieldType,
+            $this->fieldResolver->resolveFieldName($fieldName)
         );
 
         // parse function
         $functionToken = $this->stream->expect(
             Token::STRING_TYPE,
-            $this->aggregatingFunctions,
+            TokenInfo::getAggregatingFunctions(),
             'Aggregating function expected'
         );
         $function = $functionToken->value;
+
+        if (!in_array($function, TokenInfo::getAggregatingFunctionsForType($fieldType), true)) {
+            throw new ExpressionSyntaxError(
+                sprintf('Unsupported aggregating function "%s" for field type "%s"', $function, $fieldType),
+                $this->stream->current->cursor
+            );
+        }
 
         // skip optional AS keyword
         if ($this->stream->current->test(Token::KEYWORD_TYPE, Query::KEYWORD_AS)) {
@@ -326,7 +238,7 @@ class Parser
         $nameToken = $this->stream->expect(Token::STRING_TYPE, null, 'Aggregating name is expected');
         $name = $nameToken->value;
 
-        $this->query->addAggregate($name, $field, $function);
+        $this->query->addAggregate($name, $fieldName, $function);
     }
 
     /**
@@ -352,15 +264,21 @@ class Parser
             );
         }
 
-        $orderFieldType = $this->stream->expect(Token::STRING_TYPE, $this->types, null, false);
-        $orderFieldName = $criteria->implodeFieldTypeName(
-            $orderFieldType ? $orderFieldType->value : Query::TYPE_TEXT,
-            $this->stream->expect(Token::STRING_TYPE, null, 'Ordering field name is expected')->value
+        $orderFieldType = $this->stream->expect(Token::STRING_TYPE, TokenInfo::getTypes(), null, false);
+        $orderFieldName = $this->stream->expect(Token::STRING_TYPE, null, 'Ordering field name is expected')->value;
+        $orderFieldName = Criteria::implodeFieldTypeName(
+            $orderFieldType ? $orderFieldType->value : $this->fieldResolver->resolveFieldType($orderFieldName),
+            $this->fieldResolver->resolveFieldName($orderFieldName)
         );
 
         $orderDirection = Criteria::ASC;
         if (!$this->stream->isEOF() && $this->stream->current->test(Token::STRING_TYPE)) {
-            $orderDirectionToken = $this->stream->expect(Token::STRING_TYPE, $this->orderDirections, null, false);
+            $orderDirectionToken = $this->stream->expect(
+                Token::STRING_TYPE,
+                TokenInfo::getOrderDirections(),
+                null,
+                false
+            );
             if ($orderDirectionToken) {
                 $orderDirection = $orderDirectionToken->value;
             }
@@ -431,24 +349,30 @@ class Parser
             return [$whereType, $this->parseCompositeCondition()];
         }
 
-        /**
-         * We expecting that both field type and field name will be specified
-         */
         $fieldTypeToken = $this->stream->expect(Token::STRING_TYPE, null, null, false);
-        $fieldNameToken = $this->stream->expect(Token::STRING_TYPE, null, null, false);
+        $fieldNameToken = null;
+        if ($fieldTypeToken && Token::STRING_TYPE === $this->stream->current->type) {
+            $fieldNameToken = $this->stream->expect(Token::STRING_TYPE, null, null, false);
+        }
 
-        $fieldType = Query::TYPE_TEXT;
         if (!$fieldNameToken) {
             /**
              * If field type is not specified we got field name in first expect ($fieldTypeToken)
              */
-            $fieldName = Criteria::implodeFieldTypeName($fieldType, $fieldTypeToken->value);
+            $fieldType = $this->fieldResolver->resolveFieldType($fieldTypeToken->value);
+            $fieldName = Criteria::implodeFieldTypeName(
+                $fieldType,
+                $this->fieldResolver->resolveFieldName($fieldTypeToken->value)
+            );
         } else {
             $fieldType = $fieldTypeToken->value;
-            $fieldName = Criteria::implodeFieldTypeName($fieldType, $fieldNameToken->value);
+            $fieldName = Criteria::implodeFieldTypeName(
+                $fieldType,
+                $this->fieldResolver->resolveFieldName($fieldNameToken->value)
+            );
         }
 
-        if (!isset($this->typeOperators[$fieldType])) {
+        if (!in_array($fieldType, TokenInfo::getTypes(), true)) {
             throw new ExpressionSyntaxError(
                 sprintf('Unknown field type "%s"', $fieldType),
                 $this->stream->current->cursor
@@ -458,7 +382,7 @@ class Parser
         /** @var Token $operatorToken */
         $operatorToken = $this->stream->expect(
             Token::OPERATOR_TYPE,
-            $this->typeOperators[$fieldType],
+            TokenInfo::getOperatorsForType($fieldType),
             'Not allowed operator'
         );
 
@@ -501,9 +425,7 @@ class Parser
                 function ($item) use ($typeX, $expressions) {
                     if ($item['type'] !== $typeX && $item != end($expressions)) {
                         throw new ExpressionSyntaxError(
-                            sprintf(
-                                'Syntax error. Composite operators of different types are not allowed on single level.'
-                            ),
+                            'Syntax error. Composite operators of different types are not allowed on single level.',
                             $this->stream->current->cursor
                         );
                     }
@@ -515,7 +437,7 @@ class Parser
             $expr = call_user_func_array([$expr, str_replace('Where', 'X', $typeX)], $expressions);
         } else {
             throw new ExpressionSyntaxError(
-                sprintf('Syntax error in composite expression.'),
+                'Syntax error in composite expression.',
                 $this->stream->current->cursor
             );
         }
@@ -570,8 +492,7 @@ class Parser
 
             if ($this->stream->expect(Token::KEYWORD_TYPE, Query::KEYWORD_AS, null, false)) {
                 $aliasName = $this->stream->current->value;
-
-                $fieldDeclaration .= ' '.Query::KEYWORD_AS.' '.$aliasName;
+                $fieldDeclaration .= ' ' . Query::KEYWORD_AS . ' ' . $aliasName;
                 $this->stream->next();
             }
 
@@ -585,9 +506,11 @@ class Parser
 
     /**
      * @param Token $token
-     * @return bool
+     * @param string $previousType
+     *
+     * @return array [$exit, $tokenType]
      */
-    private function parseToken(Token $token)
+    private function parseToken(Token $token, string $previousType)
     {
         $exit = false;
         switch ($token->type) {
@@ -599,10 +522,16 @@ class Parser
                 }
                 break;
             case Token::STRING_TYPE:
+                if ($previousType === Token::STRING_TYPE) {
+                    throw new ExpressionSyntaxError(
+                        sprintf('Unexpected string "%s" in where statement', $this->stream->current->value),
+                        $this->stream->current->cursor
+                    );
+                }
                 list($type, $expr) = $this->parseSimpleCondition();
                 $this->query->getCriteria()->{$type}($expr);
                 break;
-            case Token::OPERATOR_TYPE && in_array($token->value, [Query::KEYWORD_AND, Query::KEYWORD_OR]):
+            case Token::OPERATOR_TYPE && in_array($token->value, TokenInfo::getLogicalOperators(), true):
                 list($type, $expr) = $this->parseSimpleCondition($token->value);
                 $this->query->getCriteria()->{$type}($expr);
                 break;
@@ -616,7 +545,7 @@ class Parser
                 );
         }
 
-        return $exit;
+        return [$exit, $token->type];
     }
 
     /**
@@ -624,6 +553,7 @@ class Parser
      * @param ExpressionBuilder $expr
      * @param string $fieldName
      * @return Comparison
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getComparisonForOtherOperators(Token $operatorToken, ExpressionBuilder $expr, $fieldName)
     {

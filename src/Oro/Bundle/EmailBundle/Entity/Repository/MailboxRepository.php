@@ -9,8 +9,10 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Doctrine repository for Mailbox entity
+ */
 class MailboxRepository extends EntityRepository
 {
     /**
@@ -151,7 +153,7 @@ class MailboxRepository extends EntityRepository
     protected function getUserRoleIds(User $user)
     {
         // Get ids of all user roles.
-        $roles = $user->getRoles();
+        $roles = $user->getUserRoles();
         $roleList = array_map(
             function ($value) {
                 return $value->getId();
@@ -177,8 +179,6 @@ class MailboxRepository extends EntityRepository
             ->getDQL();
 
         $qb = $this->createQueryBuilder('m');
-
-        QueryBuilderUtil::checkParameter($emailUsersDql);
 
         return $qb
             ->select('m')

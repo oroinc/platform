@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
@@ -10,43 +9,28 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTransitionTrigge
 
 class TransitionEventTriggerRepositoryTest extends WebTestCase
 {
-    /** @var TransitionEventTriggerRepository */
-    protected $repository;
-
-    /** @var EntityManager */
-    protected $entityManager;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
+        $this->loadFixtures([LoadTransitionTriggers::class]);
+    }
 
-        $doctrine = $this->getContainer()->get('doctrine');
-        $this->loadFixtures(
-            [
-                LoadTransitionTriggers::class
-            ]
-        );
-
-        $this->entityManager = $doctrine->getManager();
-        $this->repository = $doctrine->getRepository(TransitionEventTrigger::class);
+    private function getRepository(): TransitionEventTriggerRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(TransitionEventTrigger::class);
     }
 
     /**
      * @dataProvider findAllWithDefinitionsProvider
-     *
-     * @param bool|null $enabled
      */
-    public function testFindAllWithDefinitions($enabled)
+    public function testFindAllWithDefinitions(?bool $enabled)
     {
-        $triggers = $this->repository->findAllWithDefinitions($enabled);
+        $triggers = $this->getRepository()->findAllWithDefinitions($enabled);
 
         $this->assertCount($this->getTriggersCount($enabled), $triggers);
     }
 
-    /**
-     * @return array
-     */
-    public function findAllWithDefinitionsProvider()
+    public function findAllWithDefinitionsProvider(): array
     {
         return [
             'only active workflow definitions' => [
@@ -61,13 +45,9 @@ class TransitionEventTriggerRepositoryTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param bool|null $enabled
-     * @return int
-     */
-    protected function getTriggersCount($enabled = null)
+    private function getTriggersCount(?bool $enabled): int
     {
-        $queryBuilder = $this->repository->createQueryBuilder('t')->select('COUNT(t.id) as countT');
+        $queryBuilder = $this->getRepository()->createQueryBuilder('t')->select('COUNT(t.id) as countT');
 
         if (null !== $enabled) {
             $queryBuilder->innerJoin('t.workflowDefinition', 'd')

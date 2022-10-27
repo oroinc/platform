@@ -9,13 +9,13 @@ use Symfony\Component\Validator\ObjectInitializerInterface;
 
 class DoctrineInitializerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $innerInitializer;
+    /** @var ObjectInitializerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $innerInitializer;
 
     /** @var DoctrineInitializer */
-    protected $doctrineInitializer;
+    private $doctrineInitializer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->innerInitializer = $this->createMock(ObjectInitializerInterface::class);
 
@@ -25,7 +25,7 @@ class DoctrineInitializerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider predefinedNotManageableObjectsProvider
      */
-    public function testInitializeForPredefinedNotManageableObjects($object)
+    public function testInitializeForPredefinedNotManageableObjects(object $object)
     {
         $this->innerInitializer->expects(self::never())
             ->method('initialize');
@@ -33,11 +33,11 @@ class DoctrineInitializerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineInitializer->initialize($object);
     }
 
-    public function predefinedNotManageableObjectsProvider()
+    public function predefinedNotManageableObjectsProvider(): array
     {
         return [
-            [$this->getMockBuilder(FormInterface::class)->disableOriginalConstructor()->getMock()],
-            [$this->getMockBuilder(OrderedHashMap::class)->disableOriginalConstructor()->getMock()],
+            [$this->createMock(FormInterface::class)],
+            [$this->createMock(OrderedHashMap::class)],
         ];
     }
 

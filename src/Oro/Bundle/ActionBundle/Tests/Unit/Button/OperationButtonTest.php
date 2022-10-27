@@ -19,21 +19,18 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 class OperationButtonTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
-    protected $originOperationName;
+    private $originOperationName;
 
     /** @var Operation|\PHPUnit\Framework\MockObject\MockObject */
-    protected $operation;
+    private $operation;
 
     /** @var OperationDefinition|\PHPUnit\Framework\MockObject\MockObject */
-    protected $definition;
+    private $definition;
 
     /** @var OperationButton */
-    protected $button;
+    private $button;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->originOperationName = 'origin_name';
         $this->definition = $this->createMock(OperationDefinition::class);
@@ -47,14 +44,6 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->operation, $this->button);
-    }
-
     public function testGetName()
     {
         $this->assertEquals($this->originOperationName, $this->button->getName());
@@ -63,9 +52,21 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
     public function testGetLabel()
     {
         $label = 'test_label';
-        $this->definition->expects($this->once())->method('getLabel')->willReturn($label);
+        $this->definition->expects($this->once())
+            ->method('getLabel')
+            ->willReturn($label);
 
         $this->assertEquals($label, $this->button->getLabel());
+    }
+
+    public function testGetAriaLabel(): void
+    {
+        $label = 'test_label';
+        $this->definition->expects($this->once())
+            ->method('getDatagridOptions')
+            ->willReturn(['aria_label' => $label]);
+
+        $this->assertEquals($label, $this->button->getAriaLabel());
     }
 
     public function testGetIcon()
@@ -73,15 +74,19 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->button->getIcon());
 
         $icon = 'test-icon';
-        $this->definition->expects($this->once())->method('getButtonOptions')->willReturn(['icon' => $icon]);
+        $this->definition->expects($this->once())
+            ->method('getButtonOptions')
+            ->willReturn(['icon' => $icon]);
 
         $this->assertEquals($icon, $this->button->getIcon());
     }
 
     public function testGetOrder()
     {
-        $order = mt_rand(10, 100);
-        $this->definition->expects($this->once())->method('getOrder')->willReturn($order);
+        $order = 50;
+        $this->definition->expects($this->once())
+            ->method('getOrder')
+            ->willReturn($order);
 
         $this->assertEquals($order, $this->button->getOrder());
     }
@@ -128,9 +133,11 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
     public function testGetTemplateWithConfiguredFrontendOptions()
     {
         $templateName = uniqid('test_template', true);
-        $this->definition->expects($this->once())->method('getButtonOptions')->willReturn(
-            [OperationButton::BUTTON_TEMPLATE_KEY => $templateName]
-        );
+        $this->definition->expects($this->once())
+            ->method('getButtonOptions')
+            ->willReturn(
+                [OperationButton::BUTTON_TEMPLATE_KEY => $templateName]
+            );
 
         $this->assertEquals($templateName, $this->button->getTemplate());
     }
@@ -171,17 +178,13 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($newButton->getOperation(), $this->button->getOperation());
     }
 
-    /**
-     * @param OperationDefinition $definition
-     * @return Operation
-     */
-    private function getOperation(OperationDefinition $definition)
+    private function getOperation(OperationDefinition $definition): Operation
     {
         return new Operation(
             $this->createMock(ActionFactoryInterface::class),
-            $this->getMockBuilder(ExpressionFactory::class)->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder(AttributeAssembler::class)->disableOriginalConstructor()->getMock(),
-            $this->getMockBuilder(FormOptionsAssembler::class)->disableOriginalConstructor()->getMock(),
+            $this->createMock(ExpressionFactory::class),
+            $this->createMock(AttributeAssembler::class),
+            $this->createMock(FormOptionsAssembler::class),
             $definition
         );
     }

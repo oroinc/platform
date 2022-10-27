@@ -10,17 +10,15 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagHelper;
+    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $htmlTagHelper;
 
     /* @var HtmlTagExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->htmlTagHelper = $this->getMockBuilder(HtmlTagHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_ui.html_tag_helper', $this->htmlTagHelper)
@@ -29,17 +27,11 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new HtmlTagExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_ui.html_tag', $this->extension->getName());
-    }
-
     public function testHtmlSanitize()
     {
         $html = '<html>HTML</html>';
 
-        $this->htmlTagHelper
-            ->expects($this->once())
+        $this->htmlTagHelper->expects($this->once())
             ->method('sanitize')
             ->with($html)
             ->willReturn('HTML');
@@ -54,8 +46,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $html = '<html>HTML</html>';
 
-        $this->htmlTagHelper
-            ->expects($this->once())
+        $this->htmlTagHelper->expects($this->once())
             ->method('stripTags')
             ->with($html)
             ->willReturn('HTML');
@@ -70,8 +61,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $html = '<div>HTML</div><script type="text/javascript"></script>';
 
-        $this->htmlTagHelper
-            ->expects($this->once())
+        $this->htmlTagHelper->expects($this->once())
             ->method('escape')
             ->with($html)
             ->willReturn('<div>HTML</div>');
@@ -83,10 +73,8 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider attributeDataProvider
-     * @param string $string
-     * @param string $expected
      */
-    public function testAttributeNamePurify($string, $expected)
+    public function testAttributeNamePurify(string $string, string $expected)
     {
         $this->assertSame(
             $expected,
@@ -94,10 +82,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function attributeDataProvider()
+    public function attributeDataProvider(): array
     {
         return [
             [' onclick=alert(1)', 'onclickalert1'],

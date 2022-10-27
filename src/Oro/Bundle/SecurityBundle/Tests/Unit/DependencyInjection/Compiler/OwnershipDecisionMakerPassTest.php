@@ -8,91 +8,49 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder
-     */
-    protected $container;
+    /** @var OwnershipDecisionMakerPass */
+    private $compiler;
 
-    /**
-     * @var OwnershipDecisionMakerPass
-     */
-    protected $compilerPass;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $this->compilerPass = new OwnershipDecisionMakerPass();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->container, $this->compilerPass);
+        $this->compiler = new OwnershipDecisionMakerPass();
     }
 
     public function testProcessNotRegisterOwnershipDecisionMaker()
     {
-        $this->container->expects($this->once())
-            ->method('has')
-            ->with(OwnershipDecisionMakerPass::CHAIN_SERVICE_ID)
-            ->willReturn(false);
-        $this->container->expects($this->never())
-            ->method('getDefinition');
-        $this->container->expects($this->never())
-            ->method('findTaggedServiceIds');
+        $container = new ContainerBuilder();
 
-        $this->compilerPass->process($this->container);
+        $this->compiler->process($container);
     }
 
     public function testProcess()
     {
-        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
+        $container = new ContainerBuilder();
+        $chainOwnershipDecisionMakerDef = $container->register('oro_security.owner.ownership_decision_maker.chain');
 
-        $definition->expects($this->at(0))
-            ->method('addMethodCall')
-            ->with('addOwnershipDecisionMaker', [new Reference('ownershipDecisionMaker')]);
-        $definition->expects($this->at(1))
-            ->method('addMethodCall')
-            ->with('addOwnershipDecisionMaker', [new Reference('ownershipDecisionMaker2')]);
+        $container->register('ownership_decision_maker_1')
+            ->addTag('oro_security.owner.ownership_decision_maker', ['class' => 'Test\Class1']);
+        $container->register('ownership_decision_maker_2')
+            ->addTag('oro_security.owner.ownership_decision_maker', ['class' => 'Test\Class2']);
 
-        $this->container->expects($this->once())
-            ->method('has')
-            ->with(OwnershipDecisionMakerPass::CHAIN_SERVICE_ID)
-            ->willReturn(true);
-        $this->container->expects($this->once())
-            ->method('getDefinition')
-            ->with(OwnershipDecisionMakerPass::CHAIN_SERVICE_ID)
-            ->willReturn($definition);
-        $this->container->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with(OwnershipDecisionMakerPass::TAG_NAME)
-            ->willReturn([
-                'ownershipDecisionMaker' => [['class' => 'Test\Class1']],
-                'ownershipDecisionMaker2' => [['class' => 'Test\Class2']]
-            ]);
+        $this->compiler->process($container);
 
-        $this->compilerPass->process($this->container);
+        self::assertEquals(
+            [
+                ['addOwnershipDecisionMaker', [new Reference('ownership_decision_maker_1')]],
+                ['addOwnershipDecisionMaker', [new Reference('ownership_decision_maker_2')]]
+            ],
+            $chainOwnershipDecisionMakerDef->getMethodCalls()
+        );
     }
 
     public function testProcessEmptyOwnershipDecisionMakers()
     {
-        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
+        $container = new ContainerBuilder();
+        $chainOwnershipDecisionMakerDef = $container->register('oro_security.owner.ownership_decision_maker.chain');
 
-        $definition->expects($this->never())
-            ->method('addMethodCall');
-        $this->container->expects($this->once())
-            ->method('has')
-            ->with(OwnershipDecisionMakerPass::CHAIN_SERVICE_ID)
-            ->willReturn(true);
+        $this->compiler->process($container);
 
-        $this->container->expects($this->once())
-            ->method('getDefinition')
-            ->with(OwnershipDecisionMakerPass::CHAIN_SERVICE_ID)
-            ->willReturn($definition);
-        $this->container->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with(OwnershipDecisionMakerPass::TAG_NAME)
-            ->willReturn([]);
-
-        $this->compilerPass->process($this->container);
+        self::assertSame([], $chainOwnershipDecisionMakerDef->getMethodCalls());
     }
 }

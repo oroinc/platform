@@ -4,6 +4,9 @@ namespace Oro\Bundle\CurrencyBundle\Rounding;
 
 use Oro\Bundle\CurrencyBundle\Exception\InvalidRoundingTypeException;
 
+/**
+ * Represents a service that can perform number rounding.
+ */
 interface RoundingServiceInterface
 {
     const ROUND_CEILING = \NumberFormatter::ROUND_CEILING;
@@ -14,11 +17,10 @@ interface RoundingServiceInterface
     const ROUND_HALF_DOWN = \NumberFormatter::ROUND_HALFDOWN;
     const ROUND_HALF_UP = \NumberFormatter::ROUND_HALFUP;
 
-
     /**
-     * @param float|integer $value
-     * @param integer $precision
-     * @param integer $roundType
+     * @param float|int $value
+     * @param int $precision
+     * @param int|null $roundType
      * @return float|int
      * @throws InvalidRoundingTypeException
      */

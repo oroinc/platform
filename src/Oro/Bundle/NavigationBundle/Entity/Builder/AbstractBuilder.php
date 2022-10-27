@@ -48,7 +48,6 @@ abstract class AbstractBuilder
     abstract public function findItem($params);
 
     /**
-     *
      * @return EntityManager
      */
     public function getEntityManager()

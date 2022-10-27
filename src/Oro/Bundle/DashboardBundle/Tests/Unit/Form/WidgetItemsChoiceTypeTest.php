@@ -8,9 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class WidgetItemsChoiceTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetItemsChoiceType */
-    protected $formType;
+    private $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->formType = new WidgetItemsChoiceType();
     }

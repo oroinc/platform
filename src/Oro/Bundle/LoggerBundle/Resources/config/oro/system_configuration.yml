@@ -12,6 +12,10 @@ system_configuration:
                 required: false
                 label: oro.logger.system_configuration.fields.email_notification_recipients.label
                 tooltip: oro.logger.system_configuration.fields.email_notification_recipients.tooltip
+                constraints:
+                    - Oro\Bundle\LoggerBundle\Validator\Constraints\EmailRecipientsList: ~
+                attr:
+                    class: 'control-subgroup control-subgroup-container'
     tree:
         system_configuration:
             platform:

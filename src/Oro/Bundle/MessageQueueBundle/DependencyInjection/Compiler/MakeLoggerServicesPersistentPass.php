@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\CompilerPassProviderTrait;
 use Symfony\Bundle\MonologBundle\DependencyInjection\Compiler\LoggerChannelPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -10,6 +11,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class MakeLoggerServicesPersistentPass extends RegisterPersistentServicesPass
 {
+    use CompilerPassProviderTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -33,30 +36,12 @@ class MakeLoggerServicesPersistentPass extends RegisterPersistentServicesPass
             'monolog.logger.event'
         ];
 
-        $loggerChannelCompilerPass = $this->getLoggerChannelCompilerPass($container);
+        /** @var LoggerChannelPass $loggerChannelCompilerPass */
+        $loggerChannelCompilerPass = $this->findCompilerPassByClassName($container, LoggerChannelPass::class);
         if (null !== $loggerChannelCompilerPass) {
             $channels = $loggerChannelCompilerPass->getChannels();
             foreach ($channels as $channel) {
                 $result[] = sprintf('monolog.logger.%s', $channel);
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return LoggerChannelPass|null
-     */
-    private function getLoggerChannelCompilerPass(ContainerBuilder $container)
-    {
-        $result = null;
-        $passes = $container->getCompilerPassConfig()->getBeforeOptimizationPasses();
-        foreach ($passes as $pass) {
-            if ($pass instanceof LoggerChannelPass) {
-                $result = $pass;
-                break;
             }
         }
 

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\Indexer;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByIdTopic;
+use Oro\Bundle\SearchBundle\Async\Topic\ReindexTopic;
 use Oro\Bundle\SearchBundle\Transformer\MessageTransformer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -19,7 +19,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         new Indexer(
             $this->createMock(MessageProducerInterface::class),
             $doctrineHelper,
@@ -32,7 +32,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Method is not implemented');
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -47,7 +47,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Method is not implemented');
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -57,14 +57,11 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $indexer->getClassesForReindex();
     }
 
-
     public function testSaveShouldReturnFalseIfEntityIsNull()
     {
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->never())
-            ->method('getEntityIdentifier')
-        ;
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->never())
+            ->method($this->anything());
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -74,16 +71,14 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $result = $indexer->save(null);
 
         $this->assertFalse($result);
-        self::assertMessagesEmpty(Topics::INDEX_ENTITIES);
+        self::assertMessagesEmpty(IndexEntitiesByIdTopic::getName());
     }
 
     public function testDeleteShouldReturnFalseIfEntityIsNull()
     {
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->never())
-            ->method('getEntityIdentifier')
-        ;
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->never())
+            ->method($this->anything());
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -93,26 +88,22 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $result = $indexer->delete(null);
 
         $this->assertFalse($result);
-        self::assertMessagesEmpty(Topics::INDEX_ENTITIES);
+        self::assertMessagesEmpty(IndexEntitiesByIdTopic::getName());
     }
 
     public function testSaveShouldAcceptSingleEntityAndSendMessageToProducer()
     {
         $entity = new \stdClass();
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(35))
-        ;
-        $doctrineHelper
-            ->expects($this->once())
+            ->willReturn(35);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue('entity-name'))
-        ;
+            ->willReturn('entity-name');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -123,7 +114,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
+            IndexEntitiesByIdTopic::getName(),
             ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
@@ -132,19 +123,15 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $entities = [new \stdClass()];
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue(35))
-        ;
-        $doctrineHelper
-            ->expects($this->once())
+            ->willReturn(35);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue('entity-name'))
-        ;
+            ->willReturn('entity-name');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -155,7 +142,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
+            IndexEntitiesByIdTopic::getName(),
             ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
@@ -164,19 +151,15 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue(35))
-        ;
-        $doctrineHelper
-            ->expects($this->once())
+            ->willReturn(35);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($this->identicalTo($entity))
-            ->will($this->returnValue('entity-name'))
-        ;
+            ->willReturn('entity-name');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -187,7 +170,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
+            IndexEntitiesByIdTopic::getName(),
             ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
@@ -196,20 +179,15 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $entities = [new \stdClass()];
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue(35))
-        ;
-        $doctrineHelper
-            ->expects($this->once())
+            ->willReturn(35);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityClass')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->returnValue('entity-name'))
-        ;
-
+            ->willReturn('entity-name');
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -220,7 +198,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
+            IndexEntitiesByIdTopic::getName(),
             ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
@@ -229,7 +207,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $class = 'class-name';
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -237,14 +215,14 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
         $indexer->reindex($class);
 
-        self::assertMessageSent(Topics::REINDEX, ['class-name']);
+        self::assertMessageSent(ReindexTopic::getName(), ['class-name']);
     }
 
     public function testReindexShouldAcceptArrayOfEntityClassesAndSendMessageToProducer()
     {
         $classes = ['class-name'];
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -252,14 +230,14 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
         $indexer->reindex($classes);
 
-        self::assertMessageSent(Topics::REINDEX, ['class-name']);
+        self::assertMessageSent(ReindexTopic::getName(), ['class-name']);
     }
 
     public function testReindexShouldAcceptNullAndSendMessageToProducer()
     {
         $classes = null;
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $indexer = new Indexer(
             self::getMessageProducer(),
             $doctrineHelper,
@@ -267,23 +245,19 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
         $indexer->reindex($classes);
 
-        self::assertMessageSent(Topics::REINDEX, []);
+        self::assertMessageSent(ReindexTopic::getName(), []);
     }
 
-    /**
-     * @expectedException \ReflectionException
-     */
     public function testReindexShouldNotAcceptInvalidEntity()
     {
+        $this->expectException(\ReflectionException::class);
         $entities = [new \stdClass()];
 
-        $doctrineHelper = $this->createDoctrineHelperMock();
-        $doctrineHelper
-            ->expects($this->once())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->once())
             ->method('getEntityManagerForClass')
             ->with($this->identicalTo($entities[0]))
-            ->will($this->throwException(new \ReflectionException()))
-        ;
+            ->willThrowException(new \ReflectionException());
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -291,13 +265,5 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
             new MessageTransformer($doctrineHelper)
         );
         $indexer->reindex($entities);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
-    protected function createDoctrineHelperMock()
-    {
-        return $this->createMock(DoctrineHelper::class);
     }
 }

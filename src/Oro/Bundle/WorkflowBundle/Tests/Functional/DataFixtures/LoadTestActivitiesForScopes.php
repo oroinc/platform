@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
 class LoadTestActivitiesForScopes extends AbstractFixture
@@ -23,9 +23,6 @@ class LoadTestActivitiesForScopes extends AbstractFixture
         self::TEST_ACTIVITY_4 => ['message' => 'message 4'],
     ];
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         foreach (self::$activities as $name => $activity) {

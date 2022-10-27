@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Event;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class OrganizationSwitchAfter extends Event
 {
@@ -16,10 +16,6 @@ class OrganizationSwitchAfter extends Event
     /** @var Organization */
     protected $organization;
 
-    /**
-     * @param User         $user
-     * @param Organization $organization
-     */
     public function __construct(User $user, Organization $organization)
     {
         $this->user         = $user;

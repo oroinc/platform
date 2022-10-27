@@ -4,7 +4,7 @@
         <input type="hidden" name="{{ form.vars.full_name }}[part]" value="value"/>
     </div>
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set options = {
         _sourceElement: 'div.widget-configuration',

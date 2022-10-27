@@ -3,36 +3,35 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\DownloadLinksType;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
+    /** @var Packages|\PHPUnit\Framework\MockObject\MockObject */
+    private $assetHelper;
+
     /** @var DownloadLinksType */
-    protected $type;
+    private $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $assetHelper;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->type        = new DownloadLinksType($this->assetHelper);
+        $this->assetHelper = $this->createMock(Packages::class);
+
+        $this->type = new DownloadLinksType($this->assetHelper);
     }
 
-    protected function tearDown()
-    {
-        unset($this->type, $this->assetHelper);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage The required option "source" is missing.
-     */
     public function testConfigureOptionsWithoutSource()
     {
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage('The required option "source" is missing.');
+
         $resolver = new OptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([]);
@@ -55,55 +54,44 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $files
-     * @param array $options
-     * @param array $expected
-     *
      * @dataProvider optionsProvider
      */
     public function testFinishView(array $files, array $options, array $expected)
     {
-        $testDir = $this->getTestDir();
-        $this->removeTestDir($testDir);
-        mkdir($testDir);
+        $testDir = $this->getTempDir('download_dir');
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $view = new FormView();
 
         $valueMap = [];
         foreach ($files as $fileName) {
             file_put_contents($testDir . DIRECTORY_SEPARATOR . $fileName, '');
             if (isset($expected['files'][$fileName])) {
-                array_push(
-                    $valueMap,
-                    [
-                        $options['source']['url'] . '/' . $fileName,
-                        null,
-                        $expected['files'][$fileName]
-                    ]
-                );
+                $valueMap[] = [
+                    $options['source']['url'] . '/' . $fileName,
+                    null,
+                    $expected['files'][$fileName]
+                ];
             }
         }
-        $this->assetHelper->expects($this->exactly(count($files)))->method('getUrl')
+        $this->assetHelper->expects($this->exactly(count($files)))
+            ->method('getUrl')
             ->willReturnMap($valueMap);
 
         $this->type->finishView($view, $form, $options);
         $this->assertEquals($expected, $view->vars);
-
-        $this->removeTestDir($testDir);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsProvider()
+    public function optionsProvider(): array
     {
+        $downloadDir = $this->getTempDir('download_dir', null);
+
         return [
             'no files'       => [
                 'files'    => [],
                 'options'  => [
                     'source' => [
-                        'path' => $this->getTestDir() . '/*.download_file',
+                        'path' => $downloadDir . '/*.download_file',
                         'url'  => 'download/files'
                     ],
                     'class'  => ''
@@ -122,7 +110,7 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
                 ],
                 'options'  => [
                     'source' => [
-                        'path' => $this->getTestDir() . '/*.download_file',
+                        'path' => $downloadDir . '/*.download_file',
                         'url'  => 'download/files'
                     ],
                     'class'  => 'red'
@@ -138,37 +126,5 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-    }
-
-    /**
-     * Get test dir path
-     *
-     * @return string
-     */
-    protected function getTestDir()
-    {
-        $tmpDir = sys_get_temp_dir();
-        if (!($tmpDir && is_dir($tmpDir) && is_writable($tmpDir))) {
-            $this->markTestSkipped(sprintf('This test requires access on create dir in temp folder "%s"', $tmpDir));
-        }
-
-        return $tmpDir . DIRECTORY_SEPARATOR . 'oro_download_dir';
-    }
-
-    /**
-     * Remove test dir
-     *
-     * @param string $dir
-     */
-    protected function removeTestDir($dir)
-    {
-        if (is_dir($dir)) {
-            $files = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
-            foreach ($files as $fileInfo) {
-                unlink($fileInfo->getRealPath());
-            }
-
-            rmdir($dir);
-        }
     }
 }

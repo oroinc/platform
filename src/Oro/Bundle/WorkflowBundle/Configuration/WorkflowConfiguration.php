@@ -17,6 +17,9 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * Defines the configuration of workflows.
+ */
 class WorkflowConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {
     const NODE_STEPS = 'steps';
@@ -39,7 +42,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
     const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
-    const DEFAULT_FORM_CONFIGURATION_TEMPLATE = 'OroWorkflowBundle:actions:update.html.twig';
+    const DEFAULT_FORM_CONFIGURATION_TEMPLATE = '@OroWorkflow/actions/update.html.twig';
     const DEFAULT_FORM_CONFIGURATION_HANDLER = 'default';
 
     const NODE_FORM_OPTIONS_CONFIGURATION = 'configuration';
@@ -64,8 +67,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('configuration');
+        $treeBuilder = new TreeBuilder('configuration');
+        $rootNode = $treeBuilder->getRootNode();
         $this->addWorkflowNodes($rootNode->children());
 
         return $treeBuilder;
@@ -137,8 +140,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getDisableOperationsNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_DISABLE_OPERATIONS);
+        $treeBuilder = new TreeBuilder(self::NODE_DISABLE_OPERATIONS);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode->useAttributeAsKey('name')
             ->prototype('array')
                 ->prototype('scalar')->end()
@@ -152,8 +155,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getStepsNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_STEPS);
+        $treeBuilder = new TreeBuilder(self::NODE_STEPS);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->useAttributeAsKey('name')
             ->isRequired()
@@ -203,8 +206,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getAttributesNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_ATTRIBUTES);
+        $treeBuilder = new TreeBuilder(self::NODE_ATTRIBUTES);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->useAttributeAsKey('name')
             ->prototype('array')
@@ -232,11 +235,14 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->prototype('variable')
                         ->end()
                     ->end()
+                    ->variableNode('default')
+                        ->defaultNull()
+                    ->end()
                 ->end()
                 ->validate()
                     ->always(
                         function ($value) {
-                            if (array_key_exists('entity_acl', $value) && $value['type'] != 'entity') {
+                            if (array_key_exists('entity_acl', $value) && $value['type'] !== 'entity') {
                                 throw new WorkflowException(
                                     'Entity ACL only can be defined for attributes with type "entity"'
                                 );
@@ -244,6 +250,27 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                             return $value;
                         }
                     )
+                ->end()
+                ->beforeNormalization()
+                    ->always(function ($value) {
+                        // Native types supported by settype().
+                        $castedTypes = [
+                            'bool',
+                            'boolean',
+                            'int',
+                            'integer',
+                            'float',
+                            'double',
+                            'string',
+                            'array',
+                        ];
+
+                        if (!empty($value['type']) && in_array($value['type'], $castedTypes, true)) {
+                            settype($value['default'], $value['type']);
+                        }
+
+                        return $value;
+                    })
                 ->end()
             ->end();
 
@@ -257,8 +284,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getVariableDefinitionsNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_VARIABLE_DEFINITIONS);
+        $treeBuilder = new TreeBuilder(self::NODE_VARIABLE_DEFINITIONS);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->children()
                 ->arrayNode(self::NODE_VARIABLES)
@@ -307,8 +334,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getTransitionsNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_TRANSITIONS);
+        $treeBuilder = new TreeBuilder(self::NODE_TRANSITIONS);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->useAttributeAsKey('name')
             ->isRequired()
@@ -429,8 +456,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getTransitionTriggers()
     {
-        $builder = new TreeBuilder();
-        $triggersNode = $builder->root(self::NODE_TRANSITION_TRIGGERS);
+        $builder = new TreeBuilder(self::NODE_TRANSITION_TRIGGERS);
+        $triggersNode = $builder->getRootNode();
         $triggersNode
             ->prototype('array')
                 ->children()
@@ -525,8 +552,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getTransitionDefinitionsNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_TRANSITION_DEFINITIONS);
+        $treeBuilder = new TreeBuilder(self::NODE_TRANSITION_DEFINITIONS);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->useAttributeAsKey('name')
             ->prototype('array')
@@ -542,7 +569,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('pre_conditions')->end() // deprecated, use `preconditions` instead
                     ->arrayNode('conditions')
                         ->prototype('variable')
                         ->end()
@@ -551,15 +577,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('post_actions')->end() // deprecated, use `actions` instead
-                ->end()
-                ->beforeNormalization()
-                    ->always(function ($config) {
-                        return $this->mergeConfigs([
-                            'preconditions' => 'pre_conditions',
-                            'actions' => 'post_actions',
-                        ], $config);
-                    })
                 ->end()
             ->end();
 
@@ -571,8 +588,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getEntityRestrictionsNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode    = $treeBuilder->root(self::NODE_ENTITY_RESTRICTIONS);
+        $treeBuilder = new TreeBuilder(self::NODE_ENTITY_RESTRICTIONS);
+        $rootNode    = $treeBuilder->getRootNode();
         $rootNode
             ->useAttributeAsKey('name')
                 ->prototype('array')
@@ -609,8 +626,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getGroupsNode($nodeName)
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root($nodeName);
+        $treeBuilder = new TreeBuilder($nodeName);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->beforeNormalization()
                 ->always()
@@ -632,8 +649,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getTransitionFormOptionsConfiguration()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_FORM_OPTIONS_CONFIGURATION);
+        $treeBuilder = new TreeBuilder(self::NODE_FORM_OPTIONS_CONFIGURATION);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
                 ->children()
                     ->scalarNode('handler')
@@ -660,8 +677,8 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
      */
     protected function getApplicationsNode()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::NODE_APPLICATIONS);
+        $treeBuilder = new TreeBuilder(self::NODE_APPLICATIONS);
+        $rootNode = $treeBuilder->getRootNode();
         $rootNode
             ->beforeNormalization()
                 ->always()

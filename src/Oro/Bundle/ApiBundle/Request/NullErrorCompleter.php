@@ -13,7 +13,18 @@ class NullErrorCompleter implements ErrorCompleterInterface
     /**
      * {@inheritdoc}
      */
-    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null)
+    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
     {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fixIncludedEntityPath(
+        string $entityPath,
+        Error $error,
+        RequestType $requestType,
+        EntityMetadata $metadata = null
+    ): void {
     }
 }

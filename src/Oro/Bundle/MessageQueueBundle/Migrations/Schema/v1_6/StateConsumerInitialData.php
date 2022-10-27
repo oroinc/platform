@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\OroMessageQueueBundle\Migrations\Schema\v1_6;
+namespace Oro\Bundle\MessageQueueBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -22,7 +22,7 @@ class StateConsumerInitialData implements Migration
             new ParametrizedSqlMigrationQuery(
                 'INSERT INTO oro_message_queue_state (id, updated_at) VALUES (:id, :updated_at)',
                 ['id' => 'consumers', 'updated_at' => null],
-                ['id' => Type::STRING, 'updated_at' => Type::DATETIME]
+                ['id' => Types::STRING, 'updated_at' => Types::DATETIME_MUTABLE]
             )
         );
     }

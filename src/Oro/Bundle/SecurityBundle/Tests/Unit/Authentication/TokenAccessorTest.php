@@ -3,12 +3,15 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class TokenAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -17,7 +20,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var TokenAccessor */
     private $tokenAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
@@ -155,7 +158,6 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn($userId);
 
-
         self::assertSame($userId, $this->tokenAccessor->getUserId());
     }
 
@@ -184,14 +186,14 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOrganization()
     {
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $organization = $this->createMock(Organization::class);
 
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
         $token->expects(self::once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn($organization);
 
         self::assertSame($organization, $this->tokenAccessor->getOrganization());
@@ -199,13 +201,13 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOrganizationWhenTokenDoesNotContainOrganization()
     {
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
 
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
         $token->expects(self::once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn(null);
 
         self::assertNull($this->tokenAccessor->getOrganization());
@@ -233,7 +235,7 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOrganizationId()
     {
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
         $organization = $this->createMock(Organization::class);
         $organizationId = 123;
 
@@ -241,25 +243,24 @@ class TokenAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn($token);
         $token->expects(self::once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn($organization);
         $organization->expects(self::once())
             ->method('getId')
             ->willReturn($organizationId);
-
 
         self::assertSame($organizationId, $this->tokenAccessor->getOrganizationId());
     }
 
     public function testGetOrganizationIdWhenTokenDoesNotContainOrganization()
     {
-        $token = $this->createMock(OrganizationContextTokenInterface::class);
+        $token = $this->createMock(OrganizationAwareTokenInterface::class);
 
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
         $token->expects(self::once())
-            ->method('getOrganizationContext')
+            ->method('getOrganization')
             ->willReturn(null);
 
         self::assertNull($this->tokenAccessor->getOrganizationId());

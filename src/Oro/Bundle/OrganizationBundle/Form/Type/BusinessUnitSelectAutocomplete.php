@@ -37,10 +37,6 @@ class BusinessUnitSelectAutocomplete extends AbstractType
 
     /**
      * BusinessUnitSelectAutocomplete constructor.
-     *
-     * @param EntityManager $entityManager
-     * @param $entityClass
-     * @param BusinessUnitManager $businessUnitManager
      */
     public function __construct(
         EntityManager $entityManager,
@@ -78,7 +74,6 @@ class BusinessUnitSelectAutocomplete extends AbstractType
             [
                 'configs'            => [
                     'multiple'    => true,
-                    'width'       => '400px',
                     'component'   => 'tree-autocomplete',
                     'placeholder' => 'oro.dashboard.form.choose_business_unit',
                     'allowClear'  => true,

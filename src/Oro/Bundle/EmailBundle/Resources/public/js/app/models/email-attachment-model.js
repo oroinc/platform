@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var EmailAttachmentModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroemail/js/app/models/email-template-model
      */
-    EmailAttachmentModel = BaseModel.extend({
+    const EmailAttachmentModel = BaseModel.extend({
         defaults: {
             id: null,
             type: '',
@@ -18,14 +17,15 @@ define(function(require) {
             preview: '',
             icon: '',
             checked: false, // whether file is checked for attaching to an email
-            visible: true
+            visible: true,
+            errors: []
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailAttachmentModel() {
-            EmailAttachmentModel.__super__.constructor.apply(this, arguments);
+        constructor: function EmailAttachmentModel(...args) {
+            EmailAttachmentModel.__super__.constructor.apply(this, args);
         },
 
         toggleChecked: function() {

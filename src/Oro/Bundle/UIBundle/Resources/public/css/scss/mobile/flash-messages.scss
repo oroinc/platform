@@ -1,19 +1,10 @@
 /* @theme: admin.oro; */
 
-#flash-messages,
-.flash-messages {
-    .flash-messages-frame {
-        left: 50%;
-        min-width: 300px;
-    }
-
-    .flash-messages-holder {
-        position: absolute;
-        left: -50%;
-        width: 100%;
-    }
-
-    .alert .close {
-        font-size: 25px;
-    }
+.flash-messages-frame {
+    left: 0;
+    width: 100%;
+    right: $flash-messages-frame-right;
+    margin: $flash-messages-frame-margin;
+    min-width: $flash-messages-frame-min-width;
+    max-width: $flash-messages-frame-max-width;
 }

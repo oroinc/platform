@@ -19,10 +19,6 @@ class TestConfigBag implements ConfigBagInterface
     /** @var bool */
     private $hasChanges = false;
 
-    /**
-     * @param ConfigBagInterface $configBag
-     * @param EntityConfigMerger $entityConfigMerger
-     */
     public function __construct(
         ConfigBagInterface $configBag,
         EntityConfigMerger $entityConfigMerger
@@ -55,14 +51,6 @@ class TestConfigBag implements ConfigBagInterface
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRelationConfig(string $className, string $version): ?array
-    {
-        return $this->configBag->getRelationConfig($className, $version);
     }
 
     /**

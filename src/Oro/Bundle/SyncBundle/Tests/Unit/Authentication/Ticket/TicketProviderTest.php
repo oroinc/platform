@@ -10,22 +10,16 @@ class TicketProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const TICKET_DIGEST = 'sampleDigest';
 
-    /**
-     * @var TicketDigestGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TicketDigestGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ticketDigestGenerator;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $secret;
 
-    /**
-     * @var TicketProvider
-     */
+    /** @var TicketProvider */
     private $ticketProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->ticketDigestGenerator = $this->createMock(TicketDigestGeneratorInterface::class);
         $this->secret = 'sampleSecret';
@@ -38,8 +32,7 @@ class TicketProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGenerateTicketForAnonymous(): void
     {
-        $this->ticketDigestGenerator
-            ->expects(self::once())
+        $this->ticketDigestGenerator->expects(self::once())
             ->method('generateDigest')
             ->with($this->isType('string'), $this->isType('string'), $this->secret)
             ->willReturn(self::TICKET_DIGEST);
@@ -50,7 +43,7 @@ class TicketProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNotFalse($ticket);
 
         [$ticketDigest, $userName, $nonce, $created] = explode(';', $ticket);
-        self::assertEquals($ticketDigest, self::TICKET_DIGEST);
+        self::assertEquals(self::TICKET_DIGEST, $ticketDigest);
         self::assertEmpty($userName);
         self::assertNotEmpty($nonce);
         self::assertNotEmpty($created);
@@ -61,19 +54,16 @@ class TicketProviderTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(UserInterface::class);
 
         $username = 'sampleUsername';
-        $user
-            ->expects(self::once())
+        $user->expects(self::once())
             ->method('getUsername')
             ->willReturn($username);
 
         $password = 'samplePassword';
-        $user
-            ->expects(self::once())
+        $user->expects(self::once())
             ->method('getPassword')
             ->willReturn($password);
 
-        $this->ticketDigestGenerator
-            ->expects(self::once())
+        $this->ticketDigestGenerator->expects(self::once())
             ->method('generateDigest')
             ->with($this->isType('string'), $this->isType('string'), $password)
             ->willReturn(self::TICKET_DIGEST);
@@ -84,7 +74,7 @@ class TicketProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNotFalse($ticket);
 
         [$ticketDigest, $actualUsername, $nonce, $created] = explode(';', $ticket);
-        self::assertEquals($ticketDigest, self::TICKET_DIGEST);
+        self::assertEquals(self::TICKET_DIGEST, $ticketDigest);
         self::assertEquals($username, $actualUsername);
         self::assertNotEmpty($nonce);
         self::assertNotEmpty($created);

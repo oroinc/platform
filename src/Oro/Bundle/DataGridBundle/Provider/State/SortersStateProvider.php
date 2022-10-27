@@ -22,11 +22,6 @@ class SortersStateProvider extends AbstractStateProvider
     /** @var DatagridParametersHelper */
     private $datagridParametersHelper;
 
-    /**
-     * @param GridViewManager $gridViewManager
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param DatagridParametersHelper $datagridParametersHelper
-     */
     public function __construct(
         GridViewManager $gridViewManager,
         TokenAccessorInterface $tokenAccessor,
@@ -88,12 +83,6 @@ class SortersStateProvider extends AbstractStateProvider
         return $this->sanitizeState($state, $this->getSortersConfig($datagridConfiguration));
     }
 
-    /**
-     * @param array $state
-     * @param array $sortersConfig
-     *
-     * @return array
-     */
     private function sanitizeState(array $state, array $sortersConfig): array
     {
         // Remove sorters which are not in datagrid configuration.
@@ -121,11 +110,6 @@ class SortersStateProvider extends AbstractStateProvider
         return (array)$sortersState;
     }
 
-    /**
-     * @param DatagridConfiguration $datagridConfiguration
-     *
-     * @return array
-     */
     private function getSortersConfig(DatagridConfiguration $datagridConfiguration): array
     {
         return array_filter(
@@ -155,11 +139,6 @@ class SortersStateProvider extends AbstractStateProvider
         }
     }
 
-    /**
-     * @param DatagridConfiguration $datagridConfiguration
-     *
-     * @return array
-     */
     private function getDefaultSorters(DatagridConfiguration $datagridConfiguration): array
     {
         return $datagridConfiguration->offsetGetByPath(SorterConfiguration::DISABLE_DEFAULT_SORTING_PATH, false)

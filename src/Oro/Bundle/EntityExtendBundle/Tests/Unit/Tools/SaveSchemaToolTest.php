@@ -4,60 +4,83 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
+use Psr\Log\LoggerInterface;
 
 class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    protected $connection;
+    private $connection;
 
     /** @var Configuration|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configuration;
+    private $configuration;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     /** @var SaveSchemaTool|\PHPUnit\Framework\MockObject\MockObject */
-    protected $schemaTool;
+    private $schemaTool;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->connection    = $this->createMock('Doctrine\DBAL\Connection');
-        $this->configuration = $this->createMock('Doctrine\ORM\Configuration');
-        $this->em            = $this->createMock('Doctrine\ORM\EntityManagerInterface');
+        $this->connection = $this->createMock(Connection::class);
+        $this->configuration = $this->createMock(Configuration::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->em->expects($this->any())->method('getConnection')->willReturn($this->connection);
-        $this->em->expects($this->any())->method('getConfiguration')->willReturn($this->configuration);
+        $this->em->expects($this->any())
+            ->method('getConnection')
+            ->willReturn($this->connection);
+        $this->em->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn($this->configuration);
 
-        $this->connection->expects($this->any())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->managerRegistry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->em);
 
-        $this->schemaTool = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool')
-            ->setMethods(['getSchemaFromMetadata'])
-            ->setConstructorArgs([$this->em])
+        $this->connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn(new MySqlPlatform());
+
+        $this->schemaTool = $this->getMockBuilder(SaveSchemaTool::class)
+            ->onlyMethods(['getSchemaFromMetadata'])
+            ->setConstructorArgs([$this->managerRegistry, $this->logger])
             ->getMock();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->schemaTool, $this->em, $this->connection, $this->configuration);
     }
 
     public function testGetUpdateSchemaSqlShouldAffectOnlyKnownDBTableParts()
     {
-        list($fromSchema, $toSchema) = $this->prepareSchemas();
+        [$fromSchema, $toSchema] = $this->prepareSchemas();
 
         $meta = [new \stdClass()];
 
-        $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
-            ->setMethods(['createSchema'])->disableOriginalConstructor()->getMockForAbstractClass();
-        $schemaManager->expects($this->once())->method('createSchema')->willReturn($fromSchema);
+        $schemaManager = $this->createMock(AbstractSchemaManager::class);
+        $schemaManager->expects($this->once())
+            ->method('createSchema')
+            ->willReturn($fromSchema);
 
-        $this->connection->expects($this->once())->method('getSchemaManager')->willReturn($schemaManager);
-        $this->schemaTool->expects($this->once())->method('getSchemaFromMetadata')->with($meta)->willReturn($toSchema);
+        $this->connection->expects($this->once())
+            ->method('getSchemaManager')
+            ->willReturn($schemaManager);
+        $this->schemaTool->expects($this->once())
+            ->method('getSchemaFromMetadata')
+            ->with($meta)
+            ->willReturn($toSchema);
 
         $this->assertEquals(
             ['DROP INDEX oro_idx_index_name ON oro_entity_extend_test_relation'],
@@ -68,12 +91,12 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
     /**
      * @return Schema[]
      */
-    protected function prepareSchemas()
+    private function prepareSchemas(): array
     {
-        Type::addType('int', 'Doctrine\DBAL\Types\IntegerType');
+        Type::addType('int', IntegerType::class);
 
         $fromSchema = new Schema();
-        $table      = $fromSchema->createTable('oro_entity_extend_test_table');
+        $table = $fromSchema->createTable('oro_entity_extend_test_table');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('someExternalColumn', 'string');
         $table->addColumn('relation_id', 'int');
@@ -89,7 +112,7 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
         $table->addForeignKeyConstraint($tableRelation, ['relation_id'], ['id']);
 
         $toSchema = new Schema();
-        $table    = $toSchema->createTable('oro_entity_extend_test_table');
+        $table = $toSchema->createTable('oro_entity_extend_test_table');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->setPrimaryKey(['id']);
 

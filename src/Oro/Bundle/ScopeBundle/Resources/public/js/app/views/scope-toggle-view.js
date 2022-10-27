@@ -1,24 +1,23 @@
 define(function(require) {
     'use strict';
 
-    var ScopeToggleView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * @export oroscope/js/app/views/scope-toggle-view
      * @extends oroui.app.views.base.View
      * @class oroscope.app.views.ScopeToggleView
      */
-    ScopeToggleView = BaseView.extend({
+    const ScopeToggleView = BaseView.extend({
         /**
          * @property {Object}
          */
         options: {
             selectors: {
                 useParentScopeSelector: '.parent-scope-use',
-                scopesSelector: '.scopes'
+                scopesSelector: '.scopes',
+                containerSelector: null
             }
         },
 
@@ -33,10 +32,10 @@ define(function(require) {
         $scopeFields: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ScopeToggleView() {
-            ScopeToggleView.__super__.constructor.apply(this, arguments);
+        constructor: function ScopeToggleView(options) {
+            ScopeToggleView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -44,23 +43,18 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options || {});
-            this.initLayout().done(_.bind(this.handleLayoutInit, this));
+            this.initLayout().done(this.handleLayoutInit.bind(this));
         },
 
         handleLayoutInit: function() {
-            this.$useParentScope = this.$el.find(this.options.selectors.useParentScopeSelector);
-            this.$scopeFields = this.$el.find(this.options.selectors.scopesSelector);
+            const $el = this.options.selectors.containerSelector !== null
+                ? this.$el.closest(this.options.selectors.containerSelector)
+                : this.$el;
+            this.$useParentScope = $el.find(this.options.selectors.useParentScopeSelector);
+            this.$scopeFields = $el.find(this.options.selectors.scopesSelector);
 
-            this._initScopes();
-            this.$el.on('change', this.$useParentScope, _.bind(this._toggleScopes, this));
-        },
-
-        _initScopes: function() {
-            if (this.$useParentScope.is(':checked')) {
-                this.$scopeFields.hide();
-            } else {
-                this.$scopeFields.show();
-            }
+            this._toggleScopes();
+            $el.on('change', this.$useParentScope, this._toggleScopes.bind(this));
         },
 
         _toggleScopes: function() {

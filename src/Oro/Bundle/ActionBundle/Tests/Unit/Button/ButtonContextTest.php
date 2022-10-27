@@ -10,22 +10,11 @@ class ButtonContextTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
 
     /** @var ButtonContext */
-    protected $buttonContext;
+    private $buttonContext;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->buttonContext = new ButtonContext();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->buttonContext);
     }
 
     public function testGetSetButtonContext()
@@ -49,20 +38,15 @@ class ButtonContextTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getSetEntityDataProvider
-     *
-     * @param int|string|array|null $entityId
      */
-    public function testSetGetEntity($entityId)
+    public function testSetGetEntity(mixed $entityId)
     {
         $this->buttonContext->setEntity('Class', $entityId);
         $this->assertSame('Class', $this->buttonContext->getEntityClass());
         $this->assertSame($entityId, $this->buttonContext->getEntityId());
     }
 
-    /**
-     * @return array
-     */
-    public function getSetEntityDataProvider()
+    public function getSetEntityDataProvider(): array
     {
         return [
             [10],

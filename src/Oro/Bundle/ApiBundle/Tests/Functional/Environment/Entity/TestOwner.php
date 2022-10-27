@@ -66,9 +66,6 @@ class TestOwner extends ExtendTestOwner implements TestFrameworkEntityInterface
         return $this->target;
     }
 
-    /**
-     * @param TestTarget|null $target
-     */
     public function setTarget(TestTarget $target = null)
     {
         $this->target = $target;
@@ -82,9 +79,6 @@ class TestOwner extends ExtendTestOwner implements TestFrameworkEntityInterface
         return $this->targets;
     }
 
-    /**
-     * @param TestTarget $target
-     */
     public function addTarget(TestTarget $target)
     {
         if (!$this->targets->contains($target)) {
@@ -93,9 +87,6 @@ class TestOwner extends ExtendTestOwner implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestTarget $target
-     */
     public function removeTarget(TestTarget $target)
     {
         if ($this->targets->contains($target)) {

@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var CommentFormView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     require('jquery.validate');
 
@@ -17,7 +16,7 @@ define(function(require) {
         $elem.trigger('change');
     }
 
-    CommentFormView = BaseView.extend({
+    const CommentFormView = BaseView.extend({
         options: {
             messages: {
                 deleteConfirmation: __('oro.comment.attachment.delete_confirmation')
@@ -27,7 +26,7 @@ define(function(require) {
         events: {
             'submit': 'onSubmit',
             'reset': 'onReset',
-            'click .remove-attachment': 'onRemoveAttachment'
+            'click [data-role="remove"]': 'onRemoveAttachment'
         },
 
         listen: {
@@ -35,15 +34,15 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function CommentFormView() {
-            CommentFormView.__super__.constructor.apply(this, arguments);
+        constructor: function CommentFormView(options) {
+            CommentFormView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
             this.template = _.template($(options.template).html());
-            CommentFormView.__super__.initialize.apply(this, arguments);
+            CommentFormView.__super__.initialize.call(this, options);
         },
 
         render: function() {
@@ -52,19 +51,19 @@ define(function(require) {
 
             this.$('form')
                 .validate();
-            this.initLayout().then(_.bind(function() {
+            this.initLayout().then(() => {
                 this._resolveDeferredRender();
-            }, this));
+            });
             this.bindData();
 
             return this;
         },
 
         bindData: function() {
-            var formView = this;
-            var attrs = this.model.toJSON();
+            const formView = this;
+            const attrs = this.model.toJSON();
             _.each(attrs, function(value, name) {
-                var $elem = formView.$('[name="' + name + '"]');
+                const $elem = formView.$('[name="' + name + '"]');
                 if ($elem) {
                     setValue($elem, value);
                 }
@@ -90,7 +89,7 @@ define(function(require) {
          * @param {Object} jqxhr
          */
         onError: function(model, jqxhr) {
-            var validator;
+            let validator;
             if (jqxhr.status === 400 && jqxhr.responseJSON && jqxhr.responseJSON.errors) {
                 validator = this.$('form').data('validator');
                 if (validator) {
@@ -118,15 +117,15 @@ define(function(require) {
         },
 
         _confirmRemoveAttachment: function() {
-            var confirm = new DeleteConfirmation({
+            const confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
-            confirm.on('ok', _.bind(this._removeAttachment, this));
+            confirm.on('ok', this._removeAttachment.bind(this));
             confirm.open();
         },
 
         _removeAttachment: function() {
-            var itemView = this;
+            const itemView = this;
             this.model.removeAttachment().done(function() {
                 itemView.$('.attachment-item').remove();
                 mediator.execute('showFlashMessage', 'success', __('oro.comment.attachment.delete_message'));

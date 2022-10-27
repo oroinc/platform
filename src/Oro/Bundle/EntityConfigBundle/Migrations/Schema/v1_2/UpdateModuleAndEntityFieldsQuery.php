@@ -61,7 +61,7 @@ class UpdateModuleAndEntityFieldsQuery extends ParametrizedMigrationQuery
                 ];
                 $this->logQuery($logger, $insertSql, $params, $types);
                 if (!$dryRun) {
-                    $this->connection->executeUpdate($insertSql, $params, $types);
+                    $this->connection->executeStatement($insertSql, $params, $types);
                 }
             }
             if (!isset($indexes[$id]['entity_name'])) {
@@ -79,7 +79,7 @@ class UpdateModuleAndEntityFieldsQuery extends ParametrizedMigrationQuery
                 ];
                 $this->logQuery($logger, $insertSql, $params, $types);
                 if (!$dryRun) {
-                    $this->connection->executeUpdate($insertSql, $params, $types);
+                    $this->connection->executeStatement($insertSql, $params, $types);
                 }
             }
         }

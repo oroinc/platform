@@ -2,89 +2,68 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\SearchBundle\Controller\Api\SearchAdvancedController;
+use Oro\Bundle\SearchBundle\Controller\Api\SearchController;
 use Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\FirstEngineBundle\FirstEngineBundle;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Bundle\SecondEngineBundle\SecondEngineBundle;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
-use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroSearchExtensionTest extends ExtensionTestCase
+class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp()
+    public function testLoadDefaultConfig(): void
     {
-        $bundle1 = new FirstEngineBundle();
-        $bundle2 = new SecondEngineBundle();
-        CumulativeResourceManager::getInstance()
-            ->clear()
-            ->setBundles([
-                $bundle1->getName() => get_class($bundle1),
-                $bundle2->getName() => get_class($bundle2)
-            ]);
+        $container = new ContainerBuilder();
+
+        $extension = new OroSearchExtension();
+        $extension->load([], $container);
+
+        self::assertEquals(
+            'orm:',
+            $container->getParameter('oro_search.engine_dsn')
+        );
+        self::assertSame(
+            [],
+            $container->getParameter('oro_search.engine_parameters')
+        );
+        self::assertFalse(
+            $container->getParameter('oro_search.log_queries')
+        );
+        self::assertEquals(
+            '@OroSearch/Datagrid/itemContainer.html.twig',
+            $container->getParameter('oro_search.twig.item_container_template')
+        );
+
+        self::assertTrue($container->hasDefinition(SearchAdvancedController::class));
+        self::assertTrue($container->hasDefinition(SearchController::class));
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
-        $this->loadExtension(new OroSearchExtension(), ['oro_search' => [
-            'engine' => 'some-other-engine',
+        $container = new ContainerBuilder();
+
+        $config = [
+            'engine_dsn'        => 'some-other-engine:',
             'engine_parameters' => ['some-engine-parameters'],
-            'log_queries' => true,
-        ]]);
+            'log_queries'       => true
+        ];
 
-        $this->assertParametersLoaded([
-            'oro_search.engine',
-            'oro_search.engine_parameters',
-            'oro_search.log_queries',
-            'oro_search.entities_config',
-            'oro_search.twig.item_container_template',
-        ]);
+        $extension = new OroSearchExtension();
+        $extension->load(['oro_search' => $config], $container);
 
-        $this->assertEquals([
-            'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer' => [
-                'alias' => 'test_entity',
-                'search_template' => 'OroSearchBundle:Test:searchResult.html.twig',
-                'fields' => [
-                    'products' => [
-                        'name' => 'products',
-                        'relation_type' => 'one-to-many',
-                        'relation_fields' => [
-                            'name' => [
-                                'name' => 'name',
-                                'target_type' => 'integer',
-                                'target_fields' => [],
-                                'relation_fields' => [],
-                            ],
-                            'type' => [
-                                'name' => 'type',
-                                'target_type' => 'integer',
-                                'target_fields' => [],
-                                'relation_fields' => [],
-                            ],
-                        ],
-                        'target_fields' => [],
-                    ],
-                ],
-                'label' => null,
-                'title_fields' => [],
-                'mode' => 'normal',
-            ],
-        ], $this->actualParameters['oro_search.entities_config']);
-    }
-
-    public function testOrmSearchEngineLoad()
-    {
-        $this->loadExtension(new OroSearchExtension(), ['oro_search' => ['engine' => 'orm']]);
-        $this->assertDefinitionsLoaded([
-            'test_orm_service',
-        ]);
-    }
-
-    public function testOtherSearchEngineLoad()
-    {
-        $this->loadExtension(new OroSearchExtension(), ['oro_search' => ['engine' => 'other_engine']]);
-        $this->assertDefinitionsLoaded([
-            'test_engine_service',
-            'test_engine_first_bundle_service',
-            'test_engine_second_bundle_service'
-        ]);
+        self::assertEquals(
+            $config['engine_dsn'],
+            $container->getParameter('oro_search.engine_dsn')
+        );
+        self::assertEquals(
+            $config['engine_parameters'],
+            $container->getParameter('oro_search.engine_parameters')
+        );
+        self::assertEquals(
+            $config['log_queries'],
+            $container->getParameter('oro_search.log_queries')
+        );
+        self::assertEquals(
+            '@OroSearch/Datagrid/itemContainer.html.twig',
+            $container->getParameter('oro_search.twig.item_container_template')
+        );
     }
 }

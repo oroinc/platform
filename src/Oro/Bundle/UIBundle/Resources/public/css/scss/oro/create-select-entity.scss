@@ -8,15 +8,14 @@
         padding: 0;
         position: relative;
         text-align: left;
-        border-bottom: #e6e6e6 1px solid;
+        border-bottom: $primary-800 1px solid;
         overflow: visible;
         width: 90%;
     }
 
-
     .box-type1 .title .widget-title,
     h5 span {
-        background: #fff;
+        background: $primary-inverse;
         display: inline-block;
         line-height: 15px;
         padding-right: 15px;

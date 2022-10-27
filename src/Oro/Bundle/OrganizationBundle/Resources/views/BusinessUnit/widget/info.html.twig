@@ -1,13 +1,14 @@
-{% import 'OroUIBundle::macros.html.twig' as ui %}
-{% import 'OroEmailBundle::macros.html.twig' as email %}
-{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% import '@OroUI/macros.html.twig' as ui %}
+{% import '@OroEmail/macros.html.twig' as email %}
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
 
 <div class="widget-content">
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
             {{ ui.renderProperty('oro.organization.businessunit.name.label'|trans, entity.name) }}
             {{ ui.renderProperty('oro.organization.businessunit.organization.label'|trans, entity.organization) }}
-            {{ ui.renderHtmlProperty('oro.organization.businessunit.website.label'|trans, entity.website ? ui.renderUrl(entity.website) : null) }}
+            {% set website = entity.website ? ui.renderUrl(entity.website|strip_dangerous_protocols) : null %}
+            {{ ui.renderHtmlProperty('oro.organization.businessunit.website.label'|trans, website, null, null, {'dir': website ? 'ltr' : null}) }}
 
             {{ entityConfig.renderDynamicFields(entity) }}
         </div>
@@ -15,7 +16,8 @@
         <div class="responsive-block">
             {{ ui.renderHtmlProperty('oro.organization.businessunit.email.label'|trans, email.renderEmailWithActions(entity.email, entity)) }}
             {{ ui.renderHtmlProperty('oro.organization.businessunit.phone.label'|trans, entity.phone ? ui.renderPhoneWithActions(entity.phone, entity) : null) }}
-            {{ ui.renderHtmlProperty('oro.organization.businessunit.fax.label'|trans, entity.fax ? ui.renderPhone(entity.fax) : null) }}
+            {% set faxPhone = entity.fax ? ui.renderPhone(entity.fax) : null %}
+            {{ ui.renderHtmlProperty('oro.organization.businessunit.fax.label'|trans, faxPhone, null, null, {'dir': faxPhone ? 'ltr' : null}) }}
         </div>
     </div>
 </div>

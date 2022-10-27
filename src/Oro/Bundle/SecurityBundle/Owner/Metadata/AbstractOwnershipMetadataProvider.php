@@ -2,39 +2,30 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Util\ClassUtils;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Abstract class for providers which provide ownership metadata for entities
  */
 abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataProviderInterface
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    protected ConfigManager $configManager;
+    /** [class name => OwnershipMetadataInterface or true if an entity has no ownership config, ...] */
+    private array $localCache = [];
+    private ?OwnershipMetadataInterface $noOwnershipMetadata = null;
 
-    /** @var array [class name => OwnershipMetadataInterface or true if an entity has no ownership config, ...] */
-    private $localCache = [];
-
-    /** @var OwnershipMetadataInterface */
-    private $noOwnershipMetadata;
-
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getMetadata($className)
+    public function getMetadata($className): OwnershipMetadataInterface
     {
         if ($className === null) {
             return $this->getNoOwnershipMetadata();
@@ -51,10 +42,7 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function warmUpCache($className = null)
+    public function warmUpCache(?string $className = null): void
     {
         if ($className === null) {
             $configs = $this->getOwnershipConfigs();
@@ -66,43 +54,29 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function clearCache($className = null)
+    public function clearCache(?string $className = null): void
     {
         if ($this->getCache()) {
             if ($className !== null) {
-                $this->getCache()->delete(ClassUtils::getRealClass($className));
+                $this->getCache()->delete(
+                    UniversalCacheKeyGenerator::normalizeCacheKey(ClassUtils::getRealClass($className))
+                );
             } else {
-                $this->getCache()->deleteAll();
+                $this->getCache()->clear();
             }
         }
     }
 
-    /**
-     * @return CacheProvider
-     */
-    abstract protected function getCache();
+    abstract protected function getCache(): CacheInterface;
 
-    /**
-     * @param ConfigInterface $config
-     *
-     * @return OwnershipMetadataInterface
-     */
-    abstract protected function getOwnershipMetadata(ConfigInterface $config);
+    abstract protected function getOwnershipMetadata(ConfigInterface $config): OwnershipMetadataInterface;
 
-    /**
-     * @return OwnershipMetadataInterface
-     */
-    abstract protected function createNoOwnershipMetadata();
+    abstract protected function createNoOwnershipMetadata(): OwnershipMetadataInterface;
 
     /**
      * Gets an instance of OwnershipMetadataInterface that represents an entity that does not have an owner
-     *
-     * @return OwnershipMetadataInterface
      */
-    protected function getNoOwnershipMetadata()
+    protected function getNoOwnershipMetadata(): OwnershipMetadataInterface
     {
         if (!$this->noOwnershipMetadata) {
             $this->noOwnershipMetadata = $this->createNoOwnershipMetadata();
@@ -113,26 +87,18 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
 
     /**
      * Gets an instance of OwnershipMetadataInterface that represents a "root" ACL entry
-     *
-     * @return OwnershipMetadataInterface
      */
-    protected function getRootMetadata()
+    protected function getRootMetadata(): OwnershipMetadataInterface
     {
         return $this->createRootMetadata();
     }
 
-    /**
-     * @return OwnershipMetadataInterface
-     */
-    protected function createRootMetadata()
+    protected function createRootMetadata(): OwnershipMetadataInterface
     {
         return new RootOwnershipMetadata();
     }
 
-    /**
-     * @return ConfigInterface[]
-     */
-    protected function getOwnershipConfigs()
+    protected function getOwnershipConfigs(): array #ConfigInterface[]
     {
         return $this->configManager->getConfigs('ownership');
     }
@@ -140,24 +106,20 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
     /**
      * Makes sure that metadata for the given class are loaded
      *
-     * @param string $className
-     *
      * @throws InvalidConfigurationException
      */
-    protected function ensureMetadataLoaded($className)
+    protected function ensureMetadataLoaded(string $className): void
     {
         if (!isset($this->localCache[$className])) {
-            $data = null;
-            if ($this->getCache()) {
-                $data = $this->getCache()->fetch($className);
-            }
-            if (!$data) {
+            $cacheKey = UniversalCacheKeyGenerator::normalizeCacheKey($className);
+            $data = $this->getCache()->get($cacheKey, function () use ($className) {
+                $metadata = null;
                 if (ObjectIdentityFactory::ROOT_IDENTITY_TYPE === $className) {
-                    $data = $this->getRootMetadata();
+                    $metadata = $this->getRootMetadata();
                 } elseif ($this->configManager->hasConfig($className)) {
                     $config = $this->configManager->getEntityConfig('ownership', $className);
                     try {
-                        $data = $this->getOwnershipMetadata($config);
+                        $metadata = $this->getOwnershipMetadata($config);
                     } catch (\InvalidArgumentException $ex) {
                         throw new InvalidConfigurationException(
                             sprintf('Invalid entity ownership configuration for "%s".', $className),
@@ -166,15 +128,9 @@ abstract class AbstractOwnershipMetadataProvider implements OwnershipMetadataPro
                         );
                     }
                 }
-                if (!$data) {
-                    $data = true;
-                }
-
-                if ($this->getCache()) {
-                    $this->getCache()->save($className, $data);
-                }
-            }
-
+                $metadata ??= true;
+                return $metadata;
+            });
             $this->localCache[$className] = $data;
         }
     }

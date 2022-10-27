@@ -5,94 +5,137 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestBusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestUser;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OwnerTreeListenerTest extends OrmTestCase
 {
-    const ENTITY_NAMESPACE = 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity';
+    private const ENTITY_NAMESPACE = 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity';
 
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $conn;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $treeProvider;
+    /** @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownerTreeProvider;
 
     /** @var OwnerTreeListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver($reader, self::ENTITY_NAMESPACE);
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(['Test' => self::ENTITY_NAMESPACE]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            self::ENTITY_NAMESPACE
+        ));
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrine->expects($this->any())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+        $this->ownerTreeProvider = $this->createMock(OwnerTreeProviderInterface::class);
 
-        $this->conn = $this->getDriverConnectionMock($this->em);
-
-        $this->treeProvider = $this->createMock('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface');
-
-        $this->listener = new OwnerTreeListener($this->treeProvider);
+        $this->listener = new OwnerTreeListener($this->ownerTreeProvider);
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestOrganization');
         $this->em->getEventManager()->addEventListener('onFlush', $this->listener);
     }
 
-    protected function setInsertQueryExpectation()
+    private function addInsertUserExpectation(?string $userName, ?int $businessUnitId): void
     {
-        $this->conn->expects($this->once())
-            ->method('prepare')
-            ->will($this->returnValue($this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock')));
+        $this->addQueryExpectation(
+            'INSERT INTO tbl_user (username, owner_id) VALUES (?, ?)',
+            null,
+            [1 => $userName, 2 => $businessUnitId],
+            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_INT],
+            1
+        );
     }
 
-    /**
-     * @param int      $userId
-     * @param string   $userName
-     * @param int|null $ownerId
-     *
-     * @return TestUser
-     */
-    protected function findUser($userId, $userName, $ownerId)
+    private function addUpdateUserExpectation(int $userId, ?string $userName): void
     {
-        $this->setQueryExpectationAt(
-            $this->conn,
-            0,
+        $this->addQueryExpectation(
+            'UPDATE tbl_user SET username = ? WHERE id = ?',
+            null,
+            [1 => $userName, 2 => $userId],
+            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_INT],
+            1
+        );
+    }
+
+    private function addDeleteUserExpectation(int $userId): void
+    {
+        $this->addQueryExpectation(
+            'DELETE FROM tbl_user_to_business_unit WHERE user_id = ?',
+            null,
+            [1 => $userId],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->addQueryExpectation(
+            'DELETE FROM tbl_user_to_organization WHERE user_id = ?',
+            null,
+            [1 => $userId],
+            [1 => \PDO::PARAM_INT]
+        );
+        $this->addQueryExpectation(
+            'DELETE FROM tbl_user WHERE id = ?',
+            null,
+            [1 => $userId],
+            [1 => \PDO::PARAM_INT]
+        );
+    }
+
+    private function addDeleteUserToBusinessUnitAssociationExpectation(int $userId, int $businessUnitId): void
+    {
+        $this->addQueryExpectation(
+            'DELETE FROM tbl_user_to_business_unit WHERE user_id = ? AND business_unit_id = ?',
+            null,
+            [1 => $userId, 2 => $businessUnitId],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
+        );
+    }
+
+    private function addAssignUserToBusinessUnitExpectation(int $userId, int $businessUnitId): void
+    {
+        $this->addQueryExpectation(
+            'INSERT INTO tbl_user_to_business_unit (user_id, business_unit_id) VALUES (?, ?)',
+            null,
+            [1 => $userId, 2 => $businessUnitId],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT],
+            1
+        );
+    }
+
+    private function addUpdateUserOwnerExpectation(int $userId, ?int $businessUnitId): void
+    {
+        $this->addQueryExpectation(
+            'UPDATE tbl_user SET owner_id = ? WHERE id = ?',
+            null,
+            [1 => $businessUnitId, 2 => $userId],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT],
+            1
+        );
+    }
+
+    private function addFindUserExpectation(int $userId, string $userName, ?int $ownerId): void
+    {
+        $this->addQueryExpectation(
             'SELECT t0.id AS id_1, t0.username AS username_2, t0.owner_id AS owner_id_3'
             . ' FROM tbl_user t0 WHERE t0.id = ?',
             [['id_1' => $userId, 'username_2' => $userName, 'owner_id_3' => $ownerId]],
             [1 => $userId],
             [1 => \PDO::PARAM_INT]
         );
-
-        return $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
     }
 
-    /**
-     * @param int      $userId
-     * @param int|null $businessUnitId
-     */
-    protected function setLoadUserBusinessUnitsExpectation($userId, $businessUnitId)
+    private function addLoadUserBusinessUnitsExpectation(int $userId, ?int $businessUnitId): void
     {
         $rows = [];
         if (null !== $businessUnitId) {
             $rows[] = ['id_1' => $businessUnitId, 'parent_id_2' => null, 'organization_id_3' => null];
         }
-        $this->setQueryExpectationAt(
-            $this->conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT t0.id AS id_1, t0.parent_id AS parent_id_2, t0.organization_id AS organization_id_3'
             . ' FROM tbl_business_unit t0'
             . ' INNER JOIN tbl_user_to_business_unit ON t0.id = tbl_user_to_business_unit.business_unit_id'
@@ -103,12 +146,7 @@ class OwnerTreeListenerTest extends OrmTestCase
         );
     }
 
-    /**
-     * @param int $businessUnitId
-     *
-     * @return TestBusinessUnit
-     */
-    protected function getBusinessUnitReference($businessUnitId)
+    private function getBusinessUnitReference(int $businessUnitId): TestBusinessUnit
     {
         return $this->em->getReference(self::ENTITY_NAMESPACE . '\TestBusinessUnit', $businessUnitId);
     }
@@ -117,10 +155,11 @@ class OwnerTreeListenerTest extends OrmTestCase
     {
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
-        $this->treeProvider->expects($this->once())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->once())
+            ->method('clearCache');
 
-        $this->setInsertQueryExpectation();
+        $this->addInsertUserExpectation(null, null);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $user = new TestUser();
         $this->em->persist($user);
@@ -129,10 +168,11 @@ class OwnerTreeListenerTest extends OrmTestCase
 
     public function testNotMonitoredEntityIsCreated()
     {
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
 
-        $this->setInsertQueryExpectation();
+        $this->addInsertUserExpectation(null, null);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $user = new TestUser();
         $this->em->persist($user);
@@ -141,100 +181,157 @@ class OwnerTreeListenerTest extends OrmTestCase
 
     public function testMonitoredEntityIsDeleted()
     {
+        $userId = 1;
+
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
-        $this->treeProvider->expects($this->once())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->once())
+            ->method('clearCache');
 
-        $user = $this->findUser(1, 'test', 10);
+        $this->addFindUserExpectation($userId, 'test', 10);
+        $this->addDeleteUserExpectation($userId);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
         $this->em->remove($user);
         $this->em->flush();
     }
 
     public function testNotMonitoredEntityIsDeleted()
     {
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $userId = 1;
 
-        $user = $this->findUser(1, 'test', 10);
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
+
+        $this->addFindUserExpectation($userId, 'test', 10);
+        $this->addDeleteUserExpectation($userId);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
         $this->em->remove($user);
         $this->em->flush();
     }
 
     public function testMonitoredToOneAssociationIsChanged()
     {
+        $userId = 1;
+        $businessUnitId = 20;
+
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
-        $this->treeProvider->expects($this->once())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->once())
+            ->method('clearCache');
 
-        $user = $this->findUser(1, 'test', 10);
-        $user->setOwner($this->getBusinessUnitReference(20));
+        $this->addFindUserExpectation($userId, 'test', 10);
+        $this->addUpdateUserOwnerExpectation($userId, $businessUnitId);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
+        $user->setOwner($this->getBusinessUnitReference($businessUnitId));
         $this->em->flush();
     }
 
     public function testNotMonitoredToOneAssociationIsChanged()
     {
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $userId = 1;
+        $businessUnitId = 20;
 
-        $user = $this->findUser(1, 'test', 10);
-        $user->setOwner($this->getBusinessUnitReference(20));
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
+
+        $this->addFindUserExpectation($userId, 'test', 10);
+        $this->addUpdateUserOwnerExpectation($userId, $businessUnitId);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
+        $user->setOwner($this->getBusinessUnitReference($businessUnitId));
         $this->em->flush();
     }
 
     public function testNotMonitoredToOneAssociationIsChangedForMonitoredEntity()
     {
+        $userId = 1;
+        $businessUnitId = 20;
+
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', [], ['businessUnits']);
 
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
 
-        $user = $this->findUser(1, 'test', 10);
-        $user->setOwner($this->getBusinessUnitReference(20));
+        $this->addFindUserExpectation($userId, 'test', 10);
+        $this->addUpdateUserOwnerExpectation($userId, $businessUnitId);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
+        $user->setOwner($this->getBusinessUnitReference($businessUnitId));
         $this->em->flush();
     }
 
     public function testMonitoredToOneAssociationIsSet()
     {
+        $userId = 1;
+        $businessUnitId = 10;
+
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
-        $this->treeProvider->expects($this->once())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->once())
+            ->method('clearCache');
 
-        $user = $this->findUser(1, 'test', null);
-        $user->setOwner($this->getBusinessUnitReference(10));
+        $this->addFindUserExpectation($userId, 'test', null);
+        $this->addUpdateUserOwnerExpectation($userId, $businessUnitId);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
+        $user->setOwner($this->getBusinessUnitReference($businessUnitId));
         $this->em->flush();
     }
 
     public function testNotMonitoredToOneAssociationIsSet()
     {
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $userId = 1;
 
-        $user = $this->findUser(1, 'test', null);
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
+
+        $this->addFindUserExpectation($userId, 'test', 10);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
         $user->setOwner($this->getBusinessUnitReference(10));
         $this->em->flush();
     }
 
     public function testMonitoredToOneAssociationIsUnset()
     {
+        $userId = 1;
+
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
-        $this->treeProvider->expects($this->once())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->once())
+            ->method('clearCache');
 
-        $user = $this->findUser(1, 'test', 10);
+        $this->addFindUserExpectation($userId, 'test', 10);
+        $this->addUpdateUserOwnerExpectation($userId, null);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
         $user->setOwner(null);
         $this->em->flush();
     }
 
     public function testNotMonitoredToOneAssociationIsUnset()
     {
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $userId = 1;
 
-        $user = $this->findUser(1, 'test', 10);
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
+
+        $this->addFindUserExpectation($userId, 'test', 10);
+        $this->addUpdateUserOwnerExpectation($userId, null);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
         $user->setOwner(null);
         $this->em->flush();
     }
@@ -243,24 +340,30 @@ class OwnerTreeListenerTest extends OrmTestCase
     {
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
-        $this->treeProvider->expects($this->once())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->once())
+            ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addAssignUserToBusinessUnitExpectation(1, 20);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->addBusinessUnit($this->getBusinessUnitReference(20));
         $this->em->flush();
     }
 
     public function testNewItemIsAddedToNotMonitoredToManyAssociation()
     {
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addAssignUserToBusinessUnitExpectation(1, 20);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->addBusinessUnit($this->getBusinessUnitReference(20));
         $this->em->flush();
     }
@@ -269,12 +372,15 @@ class OwnerTreeListenerTest extends OrmTestCase
     {
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['organizations']);
 
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addAssignUserToBusinessUnitExpectation(1, 20);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->addBusinessUnit($this->getBusinessUnitReference(20));
         $this->em->flush();
     }
@@ -283,37 +389,50 @@ class OwnerTreeListenerTest extends OrmTestCase
     {
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
-        $this->treeProvider->expects($this->once())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->once())
+            ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addDeleteUserToBusinessUnitAssociationExpectation(1, 10);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->removeBusinessUnit($this->getBusinessUnitReference(10));
         $this->em->flush();
     }
 
     public function testItemRemovedFromNotMonitoredToManyAssociation()
     {
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addDeleteUserToBusinessUnitAssociationExpectation(1, 10);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->removeBusinessUnit($this->getBusinessUnitReference(10));
         $this->em->flush();
     }
 
     public function testNotMonitoredFieldIsChanged()
     {
+        $userId = 1;
+        $newUserName = 'new';
+
         $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser', ['owner'], ['businessUnits']);
 
-        $this->treeProvider->expects($this->never())
-            ->method('clear');
+        $this->ownerTreeProvider->expects($this->never())
+            ->method('clearCache');
 
-        $user = $this->findUser(1, 'test', 10);
-        $user->setUsername('new');
+        $this->addFindUserExpectation($userId, 'test', 10);
+        $this->addUpdateUserExpectation($userId, $newUserName);
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find($userId);
+        $user->setUsername($newUserName);
         $this->em->flush();
     }
 }

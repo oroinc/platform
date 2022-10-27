@@ -13,16 +13,13 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class SearchListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SearchListener */
-    protected $listener;
-
     /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataProvider;
+    private $metadataProvider;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    /** @var SearchListener */
+    private $listener;
+
+    protected function setUp(): void
     {
         $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
 
@@ -32,7 +29,9 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
     public function testCollectEntityMapEvent()
     {
         $metadata = new OwnershipMetadata('USER', 'owner', 'owner_id', 'organization', 'organization_id');
-        $this->metadataProvider->expects($this->once())->method('getMetadata')->willReturn($metadata);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn($metadata);
 
         $event = new SearchMappingCollectEvent([
             Item::class => [
@@ -77,7 +76,9 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $metadata = new OwnershipMetadata('USER', 'user', 'user_id', 'organization', 'organization_id');
-        $this->metadataProvider->expects($this->once())->method('getMetadata')->willReturn($metadata);
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->willReturn($metadata);
 
         $event = new PrepareEntityMapEvent($entity, get_class($entity), $data, ['alias' => 'test']);
         $this->listener->prepareEntityMapEvent($event);

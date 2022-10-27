@@ -4,8 +4,6 @@ define([
 ], function(AjaxAction, mediator) {
     'use strict';
 
-    var AjaxrestorefieldAction;
-
     /**
      * Ajax restore field action.
      * Triggers REST AJAX request and on success - refresh current page
@@ -14,7 +12,7 @@ define([
      * @class   oro.datagrid.action.AjaxrestorefieldAction
      * @extends oro.datagrid.action.AjaxAction
      */
-    AjaxrestorefieldAction = AjaxAction.extend({
+    const AjaxrestorefieldAction = AjaxAction.extend({
         _onAjaxSuccess: function() {
             mediator.execute('refreshPage');
         }

@@ -7,6 +7,9 @@ use Oro\Bundle\FormBundle\Config\FormConfig;
 use Oro\Bundle\FormBundle\Config\SubBlockConfig;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Builds blocks configuration for the given FormView instance.
+ */
 class DataBlockBuilder
 {
     /** @var TemplateRendererInterface */
@@ -41,18 +44,20 @@ class DataBlockBuilder
         return $this->formConfig;
     }
 
-    /**
-     * @param FormView $form
-     */
     public function doBuild(FormView $form)
     {
-        if (isset($form->vars['block_config'])) {
-            foreach ($form->vars['block_config'] as $code => $blockConfig) {
-                $this->addBlock($code, $blockConfig);
-            }
+        $this->addBlocks($form);
+
+        if ($form->isRendered()) {
+            // Child blocks are already rendered so there is no sense in going through them.
+            return;
         }
 
         foreach ($form->children as $name => $child) {
+            if ($child->isRendered()) {
+                continue;
+            }
+
             if (isset($child->vars['block']) || isset($child->vars['subblock'])) {
                 $block = null;
                 if ($this->formConfig->hasBlock($child->vars['block'])) {
@@ -65,23 +70,36 @@ class DataBlockBuilder
 
                 $subBlock = $this->getSubBlock($name, $child, $block);
 
-                $tmpChild = $child;
-                $formPath = '';
-
-                while ($tmpChild->parent) {
-                    $formPath = sprintf('.children[\'%s\']', $tmpChild->vars['name']) . $formPath;
-                    $tmpChild = $tmpChild->parent;
-                }
-
-                $subBlock->addData(
-                    $this->templateRenderer->render(
-                        '{{ form_row(' . $this->formVariableName . $formPath . ') }}'
-                    )
+                $html = $this->templateRenderer->render(
+                    '{{ form_row(' . $this->formVariableName . $this->getFullPath($child) . ') }}'
                 );
+
+                $subBlock->setData(array_merge($subBlock->getData(), [$child->vars['name'] => $html]));
             }
 
             $this->doBuild($child);
         }
+    }
+
+    private function addBlocks(FormView $form): void
+    {
+        if (isset($form->vars['block_config'])) {
+            foreach ($form->vars['block_config'] as $code => $blockConfig) {
+                $this->addBlock($code, $blockConfig);
+            }
+        }
+    }
+
+    private function getFullPath(FormView $formView): string
+    {
+        $formPath = '';
+        $tmpFormView = $formView;
+        while ($tmpFormView->parent) {
+            $formPath = sprintf('.children[\'%s\']', $tmpFormView->vars['name']) . $formPath;
+            $tmpFormView = $tmpFormView->parent;
+        }
+
+        return $formPath;
     }
 
     /**
@@ -176,6 +194,9 @@ class DataBlockBuilder
         }
         if ($this->hasValue($config, 'tooltip')) {
             $subBlock->setTooltip($config['tooltip']);
+        }
+        if ($this->hasValue($config, 'description_style')) {
+            $subBlock->setDescriptionStyle($config['description_style']);
         }
         if ($this->hasValue($config, 'priority')) {
             $subBlock->setPriority($config['priority']);

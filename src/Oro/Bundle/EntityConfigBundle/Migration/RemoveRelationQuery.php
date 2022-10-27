@@ -3,13 +3,16 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Abstract implementation of config removal for an relation of entity.
+ */
 abstract class RemoveRelationQuery extends RemoveFieldQuery
 {
     /**
@@ -38,7 +41,7 @@ abstract class RemoveRelationQuery extends RemoveFieldQuery
 
             return;
         }
-        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Type::TARRAY);
+        $entityData = $this->connection->convertToPHPValue($entityRow['data'], Types::ARRAY);
 
         $fieldRow = $this->getFieldRow($this->entityClass, $this->entityField);
         if (!$fieldRow) {
@@ -46,7 +49,7 @@ abstract class RemoveRelationQuery extends RemoveFieldQuery
 
             return;
         }
-        $fieldData = $this->connection->convertToPHPValue($fieldRow['data'], Type::TARRAY);
+        $fieldData = $this->connection->convertToPHPValue($fieldRow['data'], Types::ARRAY);
 
         $isSystemRelation = $this->isSystemRelation($fieldData);
         if (!$isSystemRelation && !$this->isOwningSide($entityData, $fieldData)) {
@@ -90,7 +93,7 @@ abstract class RemoveRelationQuery extends RemoveFieldQuery
             // update target side entity config
             $targetEntityRow = $this->getEntityRow($fieldData['extend']['target_entity']);
             if ($targetEntityRow) {
-                $targetEntityData = $this->connection->convertToPHPValue($targetEntityRow['data'], Type::TARRAY);
+                $targetEntityData = $this->connection->convertToPHPValue($targetEntityRow['data'], Types::ARRAY);
                 $this->updateEntityData(
                     $logger,
                     $targetEntityData,
@@ -175,7 +178,7 @@ abstract class RemoveRelationQuery extends RemoveFieldQuery
             unset($entityData['extend']['schema']['default'][$defaultRelationFieldName]);
         }
 
-        $data = $this->connection->convertToDatabaseValue($entityData, Type::TARRAY);
+        $data = $this->connection->convertToDatabaseValue($entityData, Types::ARRAY);
 
         $this->executeQuery(
             $logger,

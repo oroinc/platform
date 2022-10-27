@@ -2,56 +2,56 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfig;
+use Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActions;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * Provides an information about all registered Data API resources.
+ * Provides an information about all registered API resources.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class ResourcesProvider
+class ResourcesProvider implements ResetInterface
 {
-    /** @var ActionProcessorInterface */
-    private $processor;
+    private const NOT_ACCESSIBLE = 0;
+    private const ACCESSIBLE = 1;
+    private const ACCESSIBLE_AS_ASSOCIATION = 2;
 
-    /** @var ResourcesCache */
-    private $resourcesCache;
-
-    /** @var ResourcesWithoutIdentifierLoader */
-    private $resourcesWithoutIdentifierLoader;
-
+    private ActionProcessorInterface $processor;
+    private ResourcesCache $resourcesCache;
+    private ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader;
+    private ResourceCheckerInterface $resourceChecker;
     /** @var array [request cache key => [ApiResource, ...], ...] */
-    private $resources = [];
-
+    private array $resources = [];
     /** @var array [request cache key => [entity class => accessible flag, ...], ...] */
-    private $accessibleResources = [];
-
+    private array $accessibleResources = [];
+    /** @var array [request cache key => [entity class => enable flag, ...], ...] */
+    private array $enabledResources = [];
     /** @var array [request cache key => [entity class => [action name, ...], ...], ...] */
-    private $excludedActions = [];
-
+    private array $excludedActions = [];
     /** @var array [request cache key => [entity class, ...], ...] */
-    private $resourcesWithoutIdentifier = [];
+    private array $resourcesWithoutIdentifier = [];
 
-    /**
-     * @param ActionProcessorInterface         $processor
-     * @param ResourcesCache                   $resourcesCache
-     * @param ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader
-     */
     public function __construct(
         ActionProcessorInterface $processor,
         ResourcesCache $resourcesCache,
-        ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader
+        ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader,
+        ResourceCheckerInterface $resourceChecker
     ) {
         $this->processor = $processor;
         $this->resourcesCache = $resourcesCache;
         $this->resourcesWithoutIdentifierLoader = $resourcesWithoutIdentifierLoader;
+        $this->resourceChecker = $resourceChecker;
     }
 
     /**
-     * Gets a configuration of all resources for a given Data API version.
+     * Gets a configuration of all resources for a given API version.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return ApiResource[]
@@ -66,9 +66,9 @@ class ResourcesProvider
     }
 
     /**
-     * Gets a list of resources accessible through Data API.
+     * Gets a list of resources accessible through API.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return string[] The list of class names
@@ -79,8 +79,8 @@ class ResourcesProvider
         $cacheKey = $this->getCacheKey($version, $requestType);
         $accessibleResources = $this->loadAccessibleResources($version, $requestType, $cacheKey);
         $resourcesWithoutIdentifier = $this->loadResourcesWithoutIdentifier($version, $requestType, $cacheKey);
-        foreach ($accessibleResources as $entityClass => $isAccessible) {
-            if ($isAccessible || in_array($entityClass, $resourcesWithoutIdentifier, true)) {
+        foreach ($accessibleResources as $entityClass => $accessibleFlag) {
+            if (($accessibleFlag & self::ACCESSIBLE) || \in_array($entityClass, $resourcesWithoutIdentifier, true)) {
                 $result[] = $entityClass;
             }
         }
@@ -89,10 +89,10 @@ class ResourcesProvider
     }
 
     /**
-     * Checks whether a given entity is accessible through Data API.
+     * Checks whether a given entity is accessible through API.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return bool
@@ -105,22 +105,41 @@ class ResourcesProvider
             $this->getCacheKey($version, $requestType)
         );
 
-        if (!array_key_exists($entityClass, $accessibleResources)) {
-            return false;
-        }
-
         return
-            $accessibleResources[$entityClass]
+            (($accessibleResources[$entityClass] ?? self::NOT_ACCESSIBLE) & self::ACCESSIBLE)
             || $this->isResourceWithoutIdentifier($entityClass, $version, $requestType);
     }
 
     /**
-     * Checks whether a given entity is configured to be used in Data API.
-     * A known resource can be accessible or not via Data API.
-     * To check whether a resource is accessible via Data API use isResourceAccessible() method.
+     * Checks whether a given entity is accessible as an association in API.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return bool
+     */
+    public function isResourceAccessibleAsAssociation(
+        string $entityClass,
+        string $version,
+        RequestType $requestType
+    ): bool {
+        $accessibleResources = $this->loadAccessibleResources(
+            $version,
+            $requestType,
+            $this->getCacheKey($version, $requestType)
+        );
+
+        return (($accessibleResources[$entityClass] ?? self::NOT_ACCESSIBLE) & self::ACCESSIBLE_AS_ASSOCIATION);
+    }
+
+    /**
+     * Checks whether a given entity is configured to be used in API.
+     * A known resource can be accessible or not via API.
+     * To check whether a resource is accessible via API use isResourceAccessible() method.
+     *
+     * @param string      $entityClass The FQCN of an entity
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return bool
@@ -133,14 +152,41 @@ class ResourcesProvider
             $this->getCacheKey($version, $requestType)
         );
 
-        return array_key_exists($entityClass, $accessibleResources);
+        return \array_key_exists($entityClass, $accessibleResources);
     }
 
     /**
-     * Gets a list of actions that cannot be used in Data API from for a given entity.
+     * Checks whether a given entity is enabled for API.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $action      The API action, {@see \Oro\Bundle\ApiBundle\Request\ApiAction}
+     * @param string      $version     The API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return bool
+     */
+    public function isResourceEnabled(
+        string $entityClass,
+        string $action,
+        string $version,
+        RequestType $requestType
+    ): bool {
+        $cacheKey = $action . $version . $requestType;
+        if (isset($this->enabledResources[$cacheKey][$entityClass])) {
+            return $this->enabledResources[$cacheKey][$entityClass];
+        }
+
+        $enabled = $this->resourceChecker->isResourceEnabled($entityClass, $action, $version, $requestType);
+        $this->enabledResources[$cacheKey][$entityClass] = $enabled;
+
+        return $enabled;
+    }
+
+    /**
+     * Gets a list of actions that cannot be used in API from for a given entity.
+     *
+     * @param string      $entityClass The FQCN of an entity
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return string[]
@@ -153,15 +199,37 @@ class ResourcesProvider
             $this->getCacheKey($version, $requestType)
         );
 
-        return array_key_exists($entityClass, $excludedActions)
+        return \array_key_exists($entityClass, $excludedActions)
             ? $excludedActions[$entityClass]
             : [];
     }
 
     /**
+     * Checks if the given entity has API resources to read data,
+     * but does not have API resources to create and update data.
+     *
+     * @param string      $entityClass The FQCN of an entity
+     * @param string      $version     The API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return bool
+     */
+    public function isReadOnlyResource(string $entityClass, string $version, RequestType $requestType): bool
+    {
+        $excludeMap = array_fill_keys(
+            $this->getResourceExcludeActions($entityClass, $version, $requestType),
+            true
+        );
+
+        return
+            isset($excludeMap[ApiAction::UPDATE], $excludeMap[ApiAction::CREATE])
+            && !isset($excludeMap[ApiAction::GET], $excludeMap[ApiAction::GET_LIST]);
+    }
+
+    /**
      * Gets a list of resources that do not have an identifier field.
      *
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return string[] The list of class names
@@ -179,7 +247,7 @@ class ResourcesProvider
      * Checks whether a given entity does not have an identifier field.
      *
      * @param string      $entityClass The FQCN of an entity
-     * @param string      $version     The Data API version
+     * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return bool
@@ -192,7 +260,7 @@ class ResourcesProvider
             $this->getCacheKey($version, $requestType)
         );
 
-        return in_array($entityClass, $resourcesWithoutIdentifier, true);
+        return \in_array($entityClass, $resourcesWithoutIdentifier, true);
     }
 
     /**
@@ -200,21 +268,25 @@ class ResourcesProvider
      */
     public function clearCache(): void
     {
-        $this->resources = [];
-        $this->accessibleResources = [];
-        $this->excludedActions = [];
-        $this->resourcesWithoutIdentifier = [];
+        $this->reset();
         $this->resourcesCache->clear();
     }
 
     /**
-     * @param string $cacheKey
-     *
-     * @return bool
+     * {@inheritdoc}
      */
+    public function reset(): void
+    {
+        $this->resources = [];
+        $this->accessibleResources = [];
+        $this->enabledResources = [];
+        $this->excludedActions = [];
+        $this->resourcesWithoutIdentifier = [];
+    }
+
     private function hasResourcesInMemoryCache(string $cacheKey): bool
     {
-        return array_key_exists($cacheKey, $this->resources);
+        return \array_key_exists($cacheKey, $this->resources);
     }
 
     /**
@@ -240,6 +312,9 @@ class ResourcesProvider
      * @param string      $cacheKey
      *
      * @return ApiResource[]
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function loadResources(string $version, RequestType $requestType, string $cacheKey): array
     {
@@ -265,20 +340,32 @@ class ResourcesProvider
             }
         }
         if (!$isResourcesMemoryCacheInitialized) {
+            // load data
             /** @var CollectResourcesContext $context */
             $context = $this->processor->createContext();
             $context->setVersion($version);
             $context->getRequestType()->set($requestType);
             $this->processor->process($context);
 
-            /** @var ApiResource[] $resources */
+            // prepare loaded data
             $resources = array_values($context->getResult()->toArray());
-            $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
+            $accessibleResources = array_fill_keys(
+                $context->getAccessibleAsAssociationResources(),
+                self::ACCESSIBLE_AS_ASSOCIATION
+            );
+            $accessibleEntityClasses = $context->getAccessibleResources();
+            foreach ($accessibleEntityClasses as $entityClass) {
+                if (isset($accessibleResources[$entityClass])) {
+                    $accessibleResources[$entityClass] |= self::ACCESSIBLE;
+                } else {
+                    $accessibleResources[$entityClass] = self::ACCESSIBLE;
+                }
+            }
             $excludedActions = [];
             foreach ($resources as $resource) {
                 $entityClass = $resource->getEntityClass();
                 if (!isset($accessibleResources[$entityClass])) {
-                    $accessibleResources[$entityClass] = false;
+                    $accessibleResources[$entityClass] = self::NOT_ACCESSIBLE;
                 }
                 $resourceExcludedActions = $resource->getExcludedActions();
                 if (!empty($resourceExcludedActions)) {
@@ -286,15 +373,64 @@ class ResourcesProvider
                 }
             }
 
-            $this->resourcesCache->saveResources(
-                $version,
-                $requestType,
+            // add data to memory cache here because they can be requested by isResourceWithoutIdentifier method
+            $this->addResourcesToMemoryCache(
+                $cacheKey,
                 $resources,
                 $accessibleResources,
                 $excludedActions
             );
+
+            // 1) exclude "create", "update" and "delete" actions for resources with identifier
+            //    when "get" action is excluded
+            // 2) exclude "delete_list" action for resources with identifier
+            //    when both "get" and "get_list" actions are excluded
+            // 3) exclude "update_list" action for resources without identifier
+            // 4) exclude "update_list" action for resources with identifier
+            //    when both "create" and "update" actions are excluded
+            $actionsDependOnGetAction = [ApiAction::CREATE, ApiAction::UPDATE, ApiAction::DELETE];
+            $actionsConfig = $context->get(AddExcludedActions::ACTIONS_CONFIG_KEY);
+            foreach ($resources as $resource) {
+                $entityClass = $resource->getEntityClass();
+                if (\in_array(ApiAction::GET, $resource->getExcludedActions(), true)
+                    && !$this->isResourceWithoutIdentifier($entityClass, $version, $requestType)
+                ) {
+                    foreach ($actionsDependOnGetAction as $actionName) {
+                        if (!\in_array($actionName, $resource->getExcludedActions(), true)
+                            && !$this->isActionEnabledInConfig($actionsConfig, $entityClass, $actionName)
+                        ) {
+                            $resource->addExcludedAction($actionName);
+                            $excludedActions[$entityClass] = $resource->getExcludedActions();
+                        }
+                    }
+                    if (\in_array(ApiAction::GET_LIST, $resource->getExcludedActions(), true)
+                        && !\in_array(ApiAction::DELETE_LIST, $resource->getExcludedActions(), true)
+                        && !$this->isActionEnabledInConfig($actionsConfig, $entityClass, ApiAction::DELETE_LIST)
+                    ) {
+                        $resource->addExcludedAction(ApiAction::DELETE_LIST);
+                        $excludedActions[$entityClass] = $resource->getExcludedActions();
+                    }
+                }
+                if (!\in_array(ApiAction::UPDATE_LIST, $resource->getExcludedActions(), true)
+                    && $this->isExcludeUpdateList($resource, $actionsConfig, $entityClass, $version, $requestType)
+                ) {
+                    $resource->addExcludedAction(ApiAction::UPDATE_LIST);
+                    $excludedActions[$entityClass] = $resource->getExcludedActions();
+                }
+            }
+
+            // add data to memory cache
             $this->addResourcesToMemoryCache(
                 $cacheKey,
+                $resources,
+                $accessibleResources,
+                $excludedActions
+            );
+
+            // save data to the cache
+            $this->resourcesCache->saveResources(
+                $version,
+                $requestType,
                 $resources,
                 $accessibleResources,
                 $excludedActions
@@ -304,23 +440,42 @@ class ResourcesProvider
         return $resources;
     }
 
+    private function isExcludeUpdateList(
+        ApiResource $resource,
+        array $actionsConfig,
+        string $entityClass,
+        string $version,
+        RequestType $requestType
+    ): bool {
+        if ($this->isResourceWithoutIdentifier($entityClass, $version, $requestType)) {
+            return !$this->isActionEnabledInConfig($actionsConfig, $entityClass, ApiAction::UPDATE_LIST);
+        }
+
+        return
+            \in_array(ApiAction::CREATE, $resource->getExcludedActions(), true)
+            && \in_array(ApiAction::UPDATE, $resource->getExcludedActions(), true);
+    }
+
     /**
      * @param string      $version
      * @param RequestType $requestType
      * @param string      $cacheKey
      *
-     * @return array [entity class => accessible flag]
+     * @return array [entity class => accessible flag, ...]
+     *               where the accessible flag is:
+     *               - self::NOT_ACCESSIBLE when a resource is known but not accessible through API
+     *               - self::ACCESSIBLE when a resource is accessible through API
+     *               - self::ACCESSIBLE_AS_ASSOCIATION when a resource is accessible as an association in API
+     *               - self::ACCESSIBLE | self::ACCESSIBLE_AS_ASSOCIATION when a resource is accessible through API
+     *                                                                    and accessible as an association in API
      */
     private function loadAccessibleResources(string $version, RequestType $requestType, string $cacheKey): array
     {
-        if ($this->hasResourcesInMemoryCache($cacheKey)) {
-            $accessibleResourcesForRequest = $this->accessibleResources[$cacheKey];
-        } else {
+        if (!$this->hasResourcesInMemoryCache($cacheKey)) {
             $this->loadResources($version, $requestType, $cacheKey);
-            $accessibleResourcesForRequest = $this->accessibleResources[$cacheKey];
         }
 
-        return $accessibleResourcesForRequest;
+        return $this->accessibleResources[$cacheKey];
     }
 
     /**
@@ -332,14 +487,11 @@ class ResourcesProvider
      */
     private function loadExcludedActions(string $version, RequestType $requestType, string $cacheKey): array
     {
-        if ($this->hasResourcesInMemoryCache($cacheKey)) {
-            $excludedActionsForRequest = $this->excludedActions[$cacheKey];
-        } else {
+        if (!$this->hasResourcesInMemoryCache($cacheKey)) {
             $this->loadResources($version, $requestType, $cacheKey);
-            $excludedActionsForRequest = $this->excludedActions[$cacheKey];
         }
 
-        return $excludedActionsForRequest;
+        return $this->excludedActions[$cacheKey];
     }
 
     /**
@@ -351,7 +503,7 @@ class ResourcesProvider
      */
     private function loadResourcesWithoutIdentifier(string $version, RequestType $requestType, string $cacheKey): array
     {
-        if (array_key_exists($cacheKey, $this->resourcesWithoutIdentifier)) {
+        if (\array_key_exists($cacheKey, $this->resourcesWithoutIdentifier)) {
             $resourcesWithoutId = $this->resourcesWithoutIdentifier[$cacheKey];
         } else {
             $resourcesWithoutId = $this->resourcesCache->getResourcesWithoutIdentifier($version, $requestType);
@@ -370,14 +522,29 @@ class ResourcesProvider
         return $resourcesWithoutId;
     }
 
-    /**
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return string
-     */
     private function getCacheKey(string $version, RequestType $requestType): string
     {
-        return $version . (string)$requestType;
+        return $version . $requestType;
+    }
+
+    /**
+     * @param ActionsConfig[] $actionsConfig
+     * @param string          $entityClass
+     * @param string          $action
+     *
+     * @return bool
+     */
+    private function isActionEnabledInConfig(array $actionsConfig, string $entityClass, string $action): bool
+    {
+        if (!isset($actionsConfig[$entityClass])) {
+            return false;
+        }
+
+        $actionConfig = $actionsConfig[$entityClass]->getAction($action);
+        if (null === $actionConfig || !$actionConfig->hasExcluded()) {
+            return false;
+        }
+
+        return !$actionConfig->isExcluded();
     }
 }

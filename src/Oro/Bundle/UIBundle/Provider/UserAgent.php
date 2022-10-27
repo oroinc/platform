@@ -62,7 +62,7 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($name)
+    public function offsetExists($name): bool
     {
         return
             isset($this->data[$name])
@@ -75,7 +75,7 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
      *
      * @throws \OutOfBoundsException if it is requested unknown property
      */
-    public function offsetGet($name)
+    public function offsetGet($name): mixed
     {
         if (isset($this->data[$name])) {
             return $this->data[$name];
@@ -96,7 +96,7 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
      *
      * @throws \BadMethodCallException always as changing data is not allowed
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         throw new \BadMethodCallException('Not supported');
     }
@@ -106,7 +106,7 @@ class UserAgent implements UserAgentInterface, \ArrayAccess
      *
      * @throws \BadMethodCallException always as changing data is not allowed
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         throw new \BadMethodCallException('Not supported');
     }

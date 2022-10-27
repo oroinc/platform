@@ -7,12 +7,9 @@ define([
 ], function($, _, __, tools, MultiSelect) {
     'use strict';
 
-    var MultiSelectOriginFolder;
+    const FILTER_EMPTY_VALUE = '';
 
-    // @const
-    var FILTER_EMPTY_VALUE = '';
-
-    MultiSelectOriginFolder = MultiSelect.extend({
+    const MultiSelectOriginFolder = MultiSelect.extend({
         /**
          * Template selector for filter criteria
          *
@@ -47,10 +44,10 @@ define([
         emptyValue: {value: [FILTER_EMPTY_VALUE]},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function MultiSelectOriginFolder() {
-            MultiSelectOriginFolder.__super__.constructor.apply(this, arguments);
+        constructor: function MultiSelectOriginFolder(options) {
+            MultiSelectOriginFolder.__super__.constructor.call(this, options);
         },
 
         /**
@@ -62,9 +59,9 @@ define([
             if (_.isUndefined(this.choices)) {
                 this.choices = [];
             }
-            var choices = this.choices;
+            const choices = this.choices;
 
-            MultiSelect.__super__.initialize.apply(this, arguments);
+            MultiSelect.__super__.initialize.call(this, options);
             this.choices = choices;
         },
 
@@ -74,7 +71,7 @@ define([
          * @return {*}
          */
         render: function() {
-            var options = this.choices;
+            const options = this.choices;
             if (this.populateDefault) {
                 options.unshift({value: '', label: this.placeholder});
             }
@@ -85,7 +82,6 @@ define([
                     showLabel: this.showLabel,
                     options: options,
                     placeholder: this.placeholder,
-                    canDisable: this.canDisable,
                     selected: _.extend({}, this.emptyValue, this.value),
                     isEmpty: this.isEmpty()
                 })

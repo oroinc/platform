@@ -2,17 +2,25 @@
 
 namespace Oro\Bundle\FormBundle\Autocomplete;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-class SearchHandler implements SearchHandlerInterface
+/**
+ * The main implementation of SearchHandlerInterface.
+ * Search entities by given string.
+ */
+class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var Indexer
      */
@@ -54,7 +62,7 @@ class SearchHandler implements SearchHandlerInterface
     protected $aclHelper;
 
     /**
-     * @var PropertyAccessor
+     * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
 
@@ -66,7 +74,6 @@ class SearchHandler implements SearchHandlerInterface
     {
         $this->entityName = $entityName;
         $this->properties = $properties;
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -78,21 +85,19 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param Indexer $indexer
-     * @param array   $config
      * @throws \RuntimeException
      */
-    public function initSearchIndexer(Indexer $indexer, array $config)
+    public function initSearchIndexer(Indexer $indexer, SearchMappingProvider $mappingProvider)
     {
         $this->indexer = $indexer;
-        if (empty($config[$this->entityName]['alias'])) {
+        $entityAlias = $mappingProvider->getEntityAlias($this->entityName);
+        if (!$entityAlias) {
             throw new \RuntimeException(sprintf('Cannot init search alias for entity "%s".', $this->entityName));
         }
-        $this->entitySearchAlias = $config[$this->entityName]['alias'];
+        $this->entitySearchAlias = $entityAlias;
     }
 
     /**
-     * @param ManagerRegistry $managerRegistry
      * @throws \RuntimeException
      */
     public function initDoctrinePropertiesByManagerRegistry(ManagerRegistry $managerRegistry)
@@ -110,9 +115,6 @@ class SearchHandler implements SearchHandlerInterface
         $this->initDoctrinePropertiesByEntityManager($objectManager);
     }
 
-    /**
-     * @param ObjectManager $objectManager
-     */
     public function initDoctrinePropertiesByEntityManager(ObjectManager $objectManager)
     {
         /** @var $metadata \Doctrine\ORM\Mapping\ClassMetadata */
@@ -178,12 +180,14 @@ class SearchHandler implements SearchHandlerInterface
         return $this->entityName;
     }
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function setAclHelper(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
+    }
+
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
+    {
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -215,7 +219,7 @@ class SearchHandler implements SearchHandlerInterface
             /**
              * We need to sort entities in the same order given by method searchIds.
              *
-             * @todo Should be not necessary after implementation of BAP-5691.
+             * Should be not necessary after implementation of BAP-5691.
              */
             $entityByIdHash = [];
 
@@ -248,8 +252,19 @@ class SearchHandler implements SearchHandlerInterface
         if ($entityIds) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $this->entityRepository->createQueryBuilder('e');
-            $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
-            return $queryBuilder->getQuery()->getResult();
+            $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, ':entityIds'));
+            $queryBuilder->setParameter('entityIds', $entityIds);
+
+            try {
+                $query = $queryBuilder->getQuery();
+                return null !== $this->aclHelper
+                    ? $this->aclHelper->apply($query)->getResult()
+                    : $query->getResult();
+            } catch (\Exception $exception) {
+                if ($this->logger) {
+                    $this->logger->critical($exception->getMessage());
+                }
+            }
         }
 
         return [];

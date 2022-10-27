@@ -15,7 +15,6 @@ oro_behat_extension:
 
     Close Large Image Preview:
       selector: 'span.lg-close.lg-icon'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     AttachmentItem:
       selector: '.attachment-item'
@@ -23,4 +22,98 @@ oro_behat_extension:
 
     AttachmentListRow:
       selector: '.attachment-list-row'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    Allowed MIME Types:
+      selector:
+        type: 'xpath'
+        locator: '//select[contains(@name, "oro_entity_config_type[attachment][mimetypes]")]'
+
+    File MIME Types:
+      selector:
+        type: 'xpath'
+        locator: '//select[contains(@name, "oro_attachment___upload_file_mime_types")]'
+
+    Image MIME Types:
+      selector:
+        type: 'xpath'
+        locator: '//select[contains(@name, "oro_attachment___upload_image_mime_types")]'
+
+    JPEG resize quality (%):
+      selector:
+        type: 'xpath'
+        locator: '//input[contains(@name, "attachment_settings[oro_attachment___jpeg_quality][value]")]'
+
+    PNG resize quality (%):
+      selector:
+        type: 'xpath'
+        locator: '//select[contains(@name, "oro_attachment___png_quality")]'
+
+    User Form With Multiple Files:
+      selector: 'form[id^="oro_user_user"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Custom File 1: 'oro_user_user_form[custom_files][0][file][file]'
+          Custom File 2: 'oro_user_user_form[custom_files][1][file][file]'
+          Custom File 3: 'oro_user_user_form[custom_files][2][file][file]'
+          Custom File Sort Order 1: 'oro_user_user_form[custom_files][0][sortOrder]'
+          Custom File Sort Order 2: 'oro_user_user_form[custom_files][1][sortOrder]'
+
+    User Form With Multiple Images:
+      selector: 'form[id^="oro_user_user"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Custom Image 1: 'oro_user_user_form[custom_images][0][file][file]'
+          Custom Image 2: 'oro_user_user_form[custom_images][1][file][file]'
+          Custom Image 3: 'oro_user_user_form[custom_images][2][file][file]'
+          Custom Image Sort Order 1: 'oro_user_user_form[custom_images][0][sortOrder]'
+          Custom Image Sort Order 2: 'oro_user_user_form[custom_images][1][sortOrder]'
+
+    Choose File 1:
+        selector:
+          type: 'xpath'
+          locator: '//div[contains(@id, "_custom_files")]//tr[contains(@data-content, "[0]")]//a[contains(text(), "Choose File")]'
+
+    Choose File 2:
+        selector:
+          type: 'xpath'
+          locator: '//div[contains(@id, "_custom_files")]//tr[contains(@data-content, "[1]")]//a[contains(text(), "Choose File")]'
+
+    Choose File 3:
+        selector:
+          type: 'xpath'
+          locator: '//div[contains(@id, "_custom_files")]//tr[contains(@data-content, "[2]")]//a[contains(text(), "Choose File")]'
+
+    Choose Image 1:
+        selector:
+          type: 'xpath'
+          locator: '//div[contains(@id, "_custom_images")]//tr[contains(@data-content, "[0]")]//a[contains(text(), "Choose Image")]'
+
+    Choose Image 2:
+        selector:
+          type: 'xpath'
+          locator: '//div[contains(@id, "_custom_images")]//tr[contains(@data-content, "[1]")]//a[contains(text(), "Choose Image")]'
+
+    Choose Image 3:
+        selector:
+          type: 'xpath'
+          locator: '//div[contains(@id, "_custom_images")]//tr[contains(@data-content, "[2]")]//a[contains(text(), "Choose Image")]'
+
+    Add Custom Image:
+        selector:
+          type: 'xpath'
+          locator: '//div[contains(@id, "_custom_images")]//a[contains(text(), "Add Image")]'
+
+  suites:
+    OroAttachmentBundle:
+      contexts:
+        - Oro\Bundle\AttachmentBundle\Tests\Behat\Context\AttachmentImageContext
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+      paths:
+        - '@OroAttachmentBundle/Tests/Behat/Features'

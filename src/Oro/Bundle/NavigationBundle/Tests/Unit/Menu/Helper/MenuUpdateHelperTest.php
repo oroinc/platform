@@ -9,27 +9,21 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationHelper;
+    private $localizationHelper;
 
     /** @var MenuUpdateHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
@@ -37,31 +31,34 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new MenuUpdateHelper($this->translator, $this->localizationHelper);
     }
 
+    private function getLanguage(string $code): Language
+    {
+        $language = new Language();
+        $language->setCode($code);
+
+        return $language;
+    }
+
     public function testApplyLocalizedFallbackValue()
     {
         $update = new MenuUpdateStub();
 
-        $this->translator
-            ->expects($this->exactly(3))
+        $this->translator->expects($this->exactly(3))
             ->method('trans')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['test.title', [], null, 'en', 'EN Test Title'],
                 ['test.title', [], null, 'de', 'DE Test Title'],
-            ]));
+            ]);
 
         $enLocalization = new Localization();
-        $enLocalization->setLanguage($this->getEntity(Language::class, ['code' => 'en']));
+        $enLocalization->setLanguage($this->getLanguage('en'));
 
         $deLocalization = new Localization();
-        $deLocalization->setLanguage($this->getEntity(Language::class, ['code' => 'de']));
+        $deLocalization->setLanguage($this->getLanguage('de'));
 
-        $this->localizationHelper
-            ->expects($this->once())
+        $this->localizationHelper->expects($this->once())
             ->method('getLocalizations')
-            ->will($this->returnValue([
-                $enLocalization,
-                $deLocalization
-            ]));
+            ->willReturn([$enLocalization, $deLocalization]);
 
         $this->helper->applyLocalizedFallbackValue($update, 'test.title', 'title', 'string');
 
@@ -86,12 +83,10 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         $update = new MenuUpdateStub();
         $update->setDefaultTitle('Test Title');
 
-        $this->translator
-            ->expects($this->never())
+        $this->translator->expects($this->never())
             ->method('trans');
 
-        $this->localizationHelper
-            ->expects($this->never())
+        $this->localizationHelper->expects($this->never())
             ->method('getLocalizations');
 
         $this->helper->applyLocalizedFallbackValue($update, 'test.title', 'title', 'string');
@@ -101,17 +96,13 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
     {
         $update = new MenuUpdateStub();
 
-        $this->translator
-            ->expects($this->never())
+        $this->translator->expects($this->never())
             ->method('trans');
 
-        $this->localizationHelper
-            ->expects($this->never())
+        $this->localizationHelper->expects($this->never())
             ->method('getLocalizations');
 
-        $message = 'Neither the property "undefined_names" nor one of the methods "getUndefinedNames()",';
-        $message .= ' "undefinedNames()", "isUndefinedNames()", "hasUndefinedNames()", "__get()" exist and have public';
-        $message .= ' access in class "Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub".';
+        $message = 'Can\'t get a way to read the property "undefined_names" in class "' . MenuUpdateStub::class . '".';
 
         $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage($message);

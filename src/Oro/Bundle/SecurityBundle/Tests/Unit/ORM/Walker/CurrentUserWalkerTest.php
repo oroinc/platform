@@ -12,23 +12,18 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 class CurrentUserWalkerTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
+        ]);
     }
 
     public function testWalkerWithoutParameters()
@@ -39,7 +34,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
 
         $this->assertEquals(
@@ -57,7 +52,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
         $query->setHint(
             CurrentUserWalker::HINT_SECURITY_CONTEXT,
@@ -67,7 +62,7 @@ class CurrentUserWalkerTest extends OrmTestCase
         $this->assertEquals(
             'SELECT c0_.id AS id_0'
             . ' FROM cms_addresses c0_'
-            . ' WHERE c0_.user_id = 123 AND c0_.organization = 456',
+            . ' WHERE c0_.user_id = 123 AND c0_.organization_id = 456',
             $query->getSQL()
         );
     }
@@ -81,7 +76,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
         $query->setHint(
             CurrentUserWalker::HINT_SECURITY_CONTEXT,
@@ -91,7 +86,7 @@ class CurrentUserWalkerTest extends OrmTestCase
         $this->assertEquals(
             'SELECT c0_.id AS id_0'
             . ' FROM cms_addresses c0_'
-            . ' WHERE c0_.id = 1 AND c0_.user_id = 123 AND c0_.organization = 456',
+            . ' WHERE c0_.id = 1 AND c0_.user_id = 123 AND c0_.organization_id = 456',
             $query->getSQL()
         );
     }
@@ -105,7 +100,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
         $query->setHint(
             CurrentUserWalker::HINT_SECURITY_CONTEXT,
@@ -116,7 +111,7 @@ class CurrentUserWalkerTest extends OrmTestCase
             'SELECT c0_.id AS id_0'
             . ' FROM cms_addresses c0_'
             . ' WHERE (c0_.id = 1 OR c0_.country = \'us\')'
-            . ' AND c0_.user_id = 123 AND c0_.organization = 456',
+            . ' AND c0_.user_id = 123 AND c0_.organization_id = 456',
             $query->getSQL()
         );
     }
@@ -130,7 +125,7 @@ class CurrentUserWalkerTest extends OrmTestCase
 
         $query->setHint(
             Query::HINT_CUSTOM_TREE_WALKERS,
-            ['Oro\Bundle\SecurityBundle\ORM\Walker\CurrentUserWalker']
+            [CurrentUserWalker::class]
         );
         $query->setHint(
             CurrentUserWalker::HINT_SECURITY_CONTEXT,
@@ -141,7 +136,7 @@ class CurrentUserWalkerTest extends OrmTestCase
             'SELECT c0_.id AS id_0'
             . ' FROM cms_addresses c0_'
             . ' WHERE c0_.id = 1 AND c0_.country = \'us\''
-            . ' AND c0_.user_id = 123 AND c0_.organization = 456',
+            . ' AND c0_.user_id = 123 AND c0_.organization_id = 456',
             $query->getSQL()
         );
     }

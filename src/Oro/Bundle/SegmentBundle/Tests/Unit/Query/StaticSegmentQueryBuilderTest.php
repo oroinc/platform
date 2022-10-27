@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
+use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Query\StaticSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
@@ -13,32 +17,32 @@ class StaticSegmentQueryBuilderTest extends SegmentDefinitionTestCase
     {
         $segment = $this->getSegment();
 
-        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configuration->expects($this->once())
+        $configuration = $this->createMock(Configuration::class);
+        $configuration->expects(self::once())
             ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
-        $configuration->expects($this->once())
+            ->willReturn([]);
+        $configuration->expects(self::once())
             ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $em->expects($this->exactly(2))
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::exactly(2))
             ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
-        $repo = $this->getMockBuilder('Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository')
-            ->disableOriginalConstructor()->getMock();
-        $repo->expects($this->once())->method('getIdentifiersSelectQueryBuilder')
+        $repo = $this->createMock(SegmentSnapshotRepository::class);
+        $repo->expects(self::once())
+            ->method('getIdentifiersSelectQueryBuilder')
             ->with($segment)
-            ->will($this->returnValue(new QueryBuilder($em)));
+            ->willReturn(new QueryBuilder($em));
 
-        $em->expects($this->once())->method('getRepository')->with('OroSegmentBundle:SegmentSnapshot')
-            ->will($this->returnValue($repo));
-        $em->expects($this->any())->method('createQuery')
-            ->will($this->returnValue(new Query($em)));
+        $em->expects(self::once())
+            ->method('getRepository')
+            ->with(SegmentSnapshot::class)
+            ->willReturn($repo);
+        $em->expects(self::any())
+            ->method('createQuery')
+            ->willReturn(new Query($em));
 
         $staticSegmentQB = new StaticSegmentQueryBuilder($em);
         $staticSegmentQB->build($segment);

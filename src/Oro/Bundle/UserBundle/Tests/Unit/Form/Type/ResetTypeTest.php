@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
@@ -14,37 +14,29 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ResetTypeTest extends FormIntegrationTestCase
 {
     /** @var ResetType */
-    protected $type;
+    private $type;
 
     /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $optionsProvider;
+    private $optionsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->optionsProvider = $this->getMockBuilder(PasswordFieldOptionsProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->optionsProvider = $this->createMock(PasswordFieldOptionsProvider::class);
 
         $this->type = new ResetType(User::class, $this->optionsProvider);
     }
 
-    protected function tearDown()
-    {
-        unset($this->type);
-    }
-
     public function testBuildForm()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FormBuilderInterface $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
 
         $this->optionsProvider->expects($this->once())
             ->method('getTooltip')
             ->willReturn('tooltip');
 
-        $builder->expects($this->exactly(1))
+        $builder->expects($this->once())
             ->method('add')
             ->with('plainPassword', RepeatedType::class, [
                 'type'            => PasswordType::class,
@@ -61,14 +53,13 @@ class ResetTypeTest extends FormIntegrationTestCase
                     '.' => 'second',
                 ]
             ])
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $this->type->buildForm($builder, []);
     }
 
     public function testConfigureOptions()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OptionsResolver $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
 
         $resolver->expects($this->once())

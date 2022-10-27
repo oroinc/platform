@@ -8,9 +8,9 @@ use Oro\Component\Layout\LayoutContext;
 class ExpressionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionContextConfigurator */
-    protected $contextConfigurator;
+    private $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->contextConfigurator = new ExpressionContextConfigurator();
     }

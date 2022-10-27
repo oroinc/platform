@@ -1,0 +1,6 @@
+aliases:
+    orosidebar/widget/sticky-note$: orosidebar/sidebar_widgets/sticky_note/js/widget
+dynamic-imports:
+    commons:
+        - orosidebar/js/app/components/sidebar-component
+        - orosidebar/widget/sticky-note

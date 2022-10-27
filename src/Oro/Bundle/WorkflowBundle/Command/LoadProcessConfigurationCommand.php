@@ -1,72 +1,100 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Psr\Log\LogLevel;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class LoadProcessConfigurationCommand extends ContainerAwareCommand
+/**
+ * Loads process definitions to the database.
+ */
+class LoadProcessConfigurationCommand extends Command
 {
-    const NAME = 'oro:process:configuration:load';
+    /** @var string */
+    protected static $defaultName = 'oro:process:configuration:load';
 
-    /**
-     * {@inheritdoc}
-     */
+    private ProcessConfigurationProvider $configurationProvider;
+    private ProcessConfigurator $processConfigurator;
+    private EventTriggerCache $eventTriggerCache;
+
+    public function __construct(
+        ProcessConfigurationProvider $configurationProvider,
+        ProcessConfigurator $processConfigurator,
+        EventTriggerCache $eventTriggerCache
+    ) {
+        parent::__construct();
+
+        $this->configurationProvider = $configurationProvider;
+        $this->processConfigurator = $processConfigurator;
+        $this->eventTriggerCache = $eventTriggerCache;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Load process configuration from configuration files to the database')
+        $this
             ->addOption(
                 'directories',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Directories used to find configuration files'
+                'Directories with process configurations'
             )
             ->addOption(
                 'definitions',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Names of the process definitions that should be loaded'
-            );
+                'Process names'
+            )
+            ->setDescription('Loads process definitions to the database.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command loads process definitions
+from configuration files to the database.
+
+  <info>php %command.full_name%</info>
+
+The <info>--directories</info> option can be used to specify custom location(s)
+of the process configuration files:
+
+  <info>php %command.full_name% --directories=<path1> --directories=<path2></info>
+
+The <info>--definitions</info> option can be used to load only the specified processes:
+
+  <info>php %command.full_name% --definitions=<definition1> --definitions=<definition2></info>
+
+HELP
+            )
+            ->addUsage('--directories=<path1> --directories=<path2>')
+            ->addUsage('--definitions=<definition1> --definitions=<definition2>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $usedDirectories = $input->getOption('directories');
-        $usedDirectories = $usedDirectories ?: null;
-
-        $usedDefinitions = $input->getOption('definitions');
-        $usedDefinitions = $usedDefinitions ?: null;
-
-        /** @var ProcessConfigurationProvider $configurationProvider */
-        $configurationProvider = $this->getContainer()->get('oro_workflow.configuration.provider.process_config');
-        $processConfiguration = $configurationProvider->getProcessConfiguration(
-            $usedDirectories,
-            $usedDefinitions
+        $processConfiguration = $this->configurationProvider->getProcessConfiguration(
+            $input->getOption('directories') ?: null,
+            $input->getOption('definitions') ?: null
         );
 
-        $processConfigurator = $this->getContainer()->get('oro_workflow.process.configurator');
-        $processConfigurator->setLogger($this->createConsoleLogger($output));
-        $processConfigurator->configureProcesses($processConfiguration);
-        
+        $this->processConfigurator->setLogger($this->createConsoleLogger($output));
+        $this->processConfigurator->configureProcesses($processConfiguration);
+
         // update triggers cache
-        $this->getContainer()->get('oro_workflow.cache.process_trigger')->build();
+        $this->eventTriggerCache->build();
+
+        return 0;
     }
 
-    /**
-     * @param OutputInterface $output
-     *
-     * @return ConsoleLogger
-     */
-    protected function createConsoleLogger(OutputInterface $output)
+    protected function createConsoleLogger(OutputInterface $output): ConsoleLogger
     {
         return new ConsoleLogger($output, [
             LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,

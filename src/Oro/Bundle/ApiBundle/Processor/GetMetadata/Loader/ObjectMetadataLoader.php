@@ -12,20 +12,10 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class ObjectMetadataLoader
 {
-    /** @var ObjectMetadataFactory */
-    protected $objectMetadataFactory;
+    private ObjectMetadataFactory $objectMetadataFactory;
+    private ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory;
+    private ObjectNestedAssociationMetadataFactory $nestedAssociationMetadataFactory;
 
-    /** @var ObjectNestedObjectMetadataFactory */
-    protected $nestedObjectMetadataFactory;
-
-    /** @var ObjectNestedAssociationMetadataFactory */
-    protected $nestedAssociationMetadataFactory;
-
-    /**
-     * @param ObjectMetadataFactory                  $objectMetadataFactory
-     * @param ObjectNestedObjectMetadataFactory      $nestedObjectMetadataFactory
-     * @param ObjectNestedAssociationMetadataFactory $nestedAssociationMetadataFactory
-     */
     public function __construct(
         ObjectMetadataFactory $objectMetadataFactory,
         ObjectNestedObjectMetadataFactory $nestedObjectMetadataFactory,
@@ -37,19 +27,14 @@ class ObjectMetadataLoader
     }
 
     /**
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $config
-     * @param bool                   $withExcludedProperties
-     * @param string                 $targetAction
-     *
-     * @return EntityMetadata
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function loadObjectMetadata(
-        $entityClass,
+        string $entityClass,
         EntityDefinitionConfig $config,
-        $withExcludedProperties,
-        $targetAction
-    ) {
+        bool $withExcludedProperties,
+        ?string $targetAction
+    ): EntityMetadata {
         $entityMetadata = $this->objectMetadataFactory->createObjectMetadata($entityClass, $config);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {

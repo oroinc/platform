@@ -6,31 +6,31 @@ use Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\SearchBundle\EventListener\Command\PlatformUpdateCommandListener;
-use Oro\Bundle\SearchBundle\Provider\Console\SearchReindexationGlobalOptionsProvider;
+use Oro\Bundle\SearchBundle\EventListener\Command\ReindexationOptionsCommandListener;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const COMMAND_NAME = 'test:command';
+    private const COMMAND_NAME = 'test:command';
 
     /** @var Command|\PHPUnit\Framework\MockObject\MockObject */
-    protected $command;
+    private $command;
 
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $input;
+    private $input;
 
     /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $output;
+    private $output;
 
     /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $commandExecutor;
+    private $commandExecutor;
 
     /** @var InstallerEvent */
-    protected $event;
+    private $event;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->command = $this->createMock(Command::class);
         $this->input = $this->createMock(InputInterface::class);
@@ -61,16 +61,12 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider onAfterDatabasePreparationProvider
-     *
-     * @param bool $isSkip
-     * @param bool $isScheduled
-     * @param string $expectedMessage
      */
     public function testOnAfterDatabasePreparation(bool $isSkip, bool $isScheduled, string $expectedMessage)
     {
         $this->command->expects($this->once())
             ->method('getName')
-            ->willReturn(PlatformUpdateCommand::NAME);
+            ->willReturn(PlatformUpdateCommand::getDefaultName());
 
         $this->input->expects($this->any())
             ->method('hasOption')
@@ -80,8 +76,9 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getOption')
             ->willReturnMap(
                 [
-                    [SearchReindexationGlobalOptionsProvider::SKIP_REINDEXATION_OPTION_NAME, $isSkip],
-                    [SearchReindexationGlobalOptionsProvider::SCHEDULE_REINDEXATION_OPTION_NAME, $isScheduled],
+                    ['timeout', 500],
+                    [ReindexationOptionsCommandListener::SKIP_REINDEXATION_OPTION_NAME, $isSkip],
+                    [ReindexationOptionsCommandListener::SCHEDULE_REINDEXATION_OPTION_NAME, $isScheduled],
                 ]
             );
 
@@ -89,7 +86,7 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
             ->method('writeln')
             ->with([$expectedMessage, '']);
 
-        $expectedParams = ['--scheduled' => true, '--process-isolation' => true];
+        $expectedParams = ['--scheduled' => true, '--process-isolation' => true, '--process-timeout' => 500];
         if (!$isScheduled) {
             unset($expectedParams['--scheduled']);
         }
@@ -102,9 +99,6 @@ class PlatformUpdateCommandListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onAfterDatabasePreparation($this->event);
     }
 
-    /**
-     * @return array
-     */
     public function onAfterDatabasePreparationProvider(): array
     {
         return [

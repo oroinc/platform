@@ -1,93 +1,66 @@
-parameters:
-    # Entity classes
-    oro_notification.event_entity.class: Oro\Bundle\NotificationBundle\Entity\Event
-    oro_notification.emailnotification.entity.class: Oro\Bundle\NotificationBundle\Entity\EmailNotification
-    oro_notification.massnotification.entity.class: Oro\Bundle\NotificationBundle\Entity\MassNotification
-
-    # Entity spool
-    oro_notification.entity_spool.class: Oro\Bundle\NotificationBundle\Doctrine\EntityPool
-
-    # Event manager and event handler classes
-    oro_notification.manager.class: Oro\Bundle\NotificationBundle\Provider\NotificationManager
-    oro_notification.email_handler.class: Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler
-
-    # Listener classes
-    oro_notification.doctrine_listener.class: Oro\Bundle\NotificationBundle\Provider\DoctrineListener
-    oro_notification.event_listener.mass_notification.class: Oro\Bundle\NotificationBundle\EventListener\MassNotificationListener
-
-    # Email notification form services
-    oro_notification.form.type.email_notification.class: Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType
-    oro_notification.form.type.recipient_list.class: Oro\Bundle\NotificationBundle\Form\Type\RecipientListType
-    oro_notification.form.handler.email_notification.class: Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler
-    oro_notification.form.type.email_notification_entity_choice.class: Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationEntityChoiceType
-
-    # Email notification API
-    oro_notification.email_notification.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-
-    # Email notification services
-    oro_notification.mailer.transport.spool_db.class: Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool
-    oro_notification.mailer.transport.spool_entity.class: Oro\Bundle\NotificationBundle\Entity\SpoolItem
-
-    swiftmailer.mailer.db_spool_mailer.spool.enabled: true
-
-    oro_notification.event_listener.email_notification_service.class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationGridHelper
-
-    oro_notification.email_notification_entity_provider.class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider
-
-    oro_notification.mass_notification_sender.class: Oro\Bundle\NotificationBundle\Model\MassNotificationSender
-
 services:
-    # Entity spool
     oro_notification.entity_spool:
-        class: '%oro_notification.entity_spool.class%'
+        class: Oro\Bundle\NotificationBundle\Doctrine\EntityPool
 
     oro_notification.form.type.email_notification:
-        class: '%oro_notification.form.type.email_notification.class%'
+        class: Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType
         arguments:
             - '@oro_email.form.subscriber.emailtemplate'
             - '@oro_notification.form.subscriber.additional_emails'
             - '@router'
             - '@oro_notification.form.subscriber.contact_information_emails'
+            - '%oro_notification.events%'
         tags:
             - { name: form.type, alias: emailnotification }
 
     oro_notification.form.type.recipient_list:
-        class: '%oro_notification.form.type.recipient_list.class%'
+        class: Oro\Bundle\NotificationBundle\Form\Type\RecipientListType
         tags:
             - { name: form.type, alias: oro_notification_recipient_list }
 
     oro_notification.form.handler.email_notification:
-        class: '%oro_notification.form.handler.email_notification.class%'
+        class: Oro\Bundle\NotificationBundle\Form\Handler\EmailNotificationHandler
         arguments:
             - '@doctrine'
         tags:
             - { name: oro_form.form.handler, alias: oro_notification.form.handler.email_notification }
 
     oro_notification.form.type.email_notification_entity_choice:
-        class: '%oro_notification.form.type.email_notification_entity_choice.class%'
+        class: Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationEntityChoiceType
         arguments:
             - '@oro_notification.email_notification_entity_provider'
         tags:
             - { name: form.type, alias: oro_email_notification_entity_choice }
 
     oro_notification.form.subscriber.additional_emails:
-        class: 'Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber'
+        class: Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber
+        arguments:
+            - '@oro_notification.additional_email_association_provider'
+
+    oro_notification.additional_email_association_provider:
+        class: Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider
+        arguments:
+            - !tagged_iterator oro_notification.additional_email_association_provider
+
+    oro_notification.additional_email_association_provider.default:
+        class: Oro\Bundle\NotificationBundle\Provider\AdditionalEmailAssociationProvider
         arguments:
             - '@doctrine'
+            - '@oro_entity_config.provider.entity'
             - '@translator'
-            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro_notification.additional_email_association_provider, priority: -100 }
 
-    # Email notification API
     oro_notification.email_notification.manager.api:
-        class: '%oro_notification.email_notification.manager.api.class%'
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_notification.emailnotification.entity.class%'
+            - 'Oro\Bundle\NotificationBundle\Entity\EmailNotification'
             - '@doctrine.orm.entity_manager'
 
-    # Event listeners
     oro_notification.doctrine.event.listener:
-        class: '%oro_notification.doctrine_listener.class%'
+        class: Oro\Bundle\NotificationBundle\Provider\DoctrineListener
         arguments:
             - '@oro_notification.entity_spool'
             - '@event_dispatcher'
@@ -97,22 +70,33 @@ services:
             - { name: doctrine.event_listener, event: postRemove }
             - { name: doctrine.event_listener, event: postFlush }
 
-    # notification services
     oro_notification.manager:
-        class: '%oro_notification.manager.class%'
+        class: Oro\Bundle\NotificationBundle\Provider\NotificationManager
         arguments:
-            - '@doctrine.orm.entity_manager'
-            - '%oro_notification.emailnotification.entity.class%'
-        lazy: true
+            - !tagged_iterator notification.handler
+            - '@oro_notification.cache'
+            - '@doctrine'
+
+    oro_notification.cache:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_notification' }
+
+    oro_notification.event_listener.invalidate_cache_listener:
+        class: Oro\Bundle\NotificationBundle\EventListener\InvalidateCacheListener
+        arguments:
+            - '@oro_notification.manager'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, priority: -255 }
+            - { name: doctrine.event_listener, event: postFlush, priority: -255 }
 
     oro_notification.mass_notification_sender:
-        class: '%oro_notification.mass_notification_sender.class%'
+        class: Oro\Bundle\NotificationBundle\Model\MassNotificationSender
         arguments:
             - '@oro_notification.manager.email_notification'
             - '@oro_notification.model.notification_settings'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_notification.entity_spool'
-            - '@oro_locale.dql.formatter.name'
 
     oro_notification.model.notification_settings:
         class: Oro\Bundle\NotificationBundle\Model\NotificationSettings
@@ -120,146 +104,106 @@ services:
             - '@oro_config.manager'
 
     oro_notification.email_handler:
-        class: '%oro_notification.email_handler.class%'
+        class: Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler
         arguments:
             - '@oro_notification.manager.email_notification'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@property_accessor'
             - '@event_dispatcher'
+            - '@oro_notification.additional_email_association_provider'
         tags:
             - { name: notification.handler, alias: email_notification_handler }
 
-    # email notification Swift mailer with DB spool configured
-    oro_notification.mailer.spool_db:
-        class: '%oro_notification.mailer.transport.spool_db.class%'
+    oro_notification.grid_helper:
+        class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationGridHelper
+        public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
-            - '@oro_notification.entity_spool'
-            - '%oro_notification.mailer.transport.spool_entity.class%'
-            - '@event_dispatcher'
-
-    oro_notification.mailer.transport.eventdispatcher:
-        parent: swiftmailer.transport.eventdispatcher.abstract
-
-    oro_notification.mailer.transport:
-        parent: swiftmailer.transport.spool.abstract
-        arguments:
-            - '@oro_notification.mailer.transport.eventdispatcher'
-            - '@oro_notification.mailer.spool_db'
-
-    # notification mailer instance
-    swiftmailer.mailer.db_spool_mailer:
-        class: '%swiftmailer.class%'
-        arguments:
-            - '@oro_notification.mailer.transport'
-
-    swiftmailer.mailer.db_spool_mailer.transport.real:
-        alias: swiftmailer.transport.real
-
-    oro_notification.event_listener.email_notification_service:
-        class: '%oro_notification.event_listener.email_notification_service.class%'
-        arguments:
-            - '@doctrine.orm.entity_manager'
-        lazy: true
+            - '@doctrine'
+            - '%oro_notification.events%'
 
     oro_notification.email_notification_entity_provider:
-        class: '%oro_notification.email_notification_entity_provider.class%'
+        class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider
         parent: oro_entity.entity_provider.abstract
-        arguments:
-            - '@doctrine.orm.entity_manager'
         lazy: true
+        arguments:
+            - '@doctrine'
 
     oro_notification.event_listener.mass_notification_log:
-        class: '%oro_notification.event_listener.mass_notification.class%'
+        class: Oro\Bundle\NotificationBundle\EventListener\MassNotificationListener
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
         tags:
-            - { name: kernel.event_listener, event: oro.notification.event.notification_send_after, method: logMassNotification}
+            - { name: kernel.event_listener, event: Oro\Bundle\NotificationBundle\Event\NotificationSentEvent, method: logMassNotification}
 
-    oro_notification.mailer.mass_email_direct_mailer:
-        class: Oro\Bundle\NotificationBundle\Mailer\MassEmailDirectMailer
-        public: false
+    oro_notification.mailer.mass_notifications:
+        class: Oro\Bundle\NotificationBundle\Mailer\MassNotificationsMailer
         arguments:
-            - '@oro_email.direct_mailer'
+            - '@mailer.transports'
             - '@event_dispatcher'
 
-    oro_notification.manager.template_email.mass:
-        class: Oro\Bundle\EmailBundle\Manager\TemplateEmailManager
-        public: false
+    oro_notification.async.send_email_notification_template_processor:
+        class: Oro\Bundle\NotificationBundle\Async\SendEmailNotificationTemplateProcessor
         arguments:
-            - '@oro_notification.mailer.mass_email_direct_mailer'
-            - '@oro_locale.provider.chain_preferred_language_provider'
-            - '@oro_email.mailer.processor'
-            - '@oro_email.provider.email_template_content_provider'
-
-    oro_notification.async.template_email_message_sender.mass:
-        class: Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender
-        public: false
-        arguments:
-            - '@oro_notification.manager.template_email.mass'
-            - '@oro_entity.doctrine_helper'
-
-    # message queue
-    oro_notification.async.send_email_message_processor:
-        class: 'Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor'
-        arguments:
-            - '@oro_email.direct_mailer'
-            - '@oro_email.mailer.processor'
             - '@doctrine'
-            - '@oro_email.email_renderer'
-            - '@logger'
+            - '@oro_email.manager.template_email'
         calls:
-            - [setTemplateEmailMessageSender, ['@oro_email.async.template_email_message_sender']]
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: 'oro_message_queue.client.message_processor', topicName: oro.notification.send_notification_email_template }
+
+    oro_notification.async.send_email_notification_processor:
+        class: Oro\Bundle\NotificationBundle\Async\SendEmailNotificationProcessor
+        arguments:
+            - '@mailer'
+            - '@oro_email.embedded_images.handler.symfony_email'
+        calls:
+            - [setLogger, ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: oro.notification.send_notification_email }
 
-    oro_notification.async.send_mass_email_message_processor:
-        class: 'Oro\Bundle\NotificationBundle\Async\SendMassEmailMessageProcessor'
+    oro_notification.async.send_mass_email_notification_processor:
+        class: Oro\Bundle\NotificationBundle\Async\SendEmailNotificationProcessor
         arguments:
-            - '@oro_email.direct_mailer'
-            - '@oro_email.mailer.processor'
-            - '@doctrine'
-            - '@oro_email.email_renderer'
-            - '@logger'
-            - '@event_dispatcher'
+            - '@oro_notification.mailer.mass_notifications'
+            - '@oro_email.embedded_images.handler.symfony_email'
         calls:
-            - [setTemplateEmailMessageSender, ['@oro_notification.async.template_email_message_sender.mass']]
+            - [setLogger, ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: oro.notification.send_mass_notification_email }
 
-    # manager
     oro_notification.manager.email_notification:
-        class: 'Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager'
-        # used in PasswordExpirationNotificationCommand
-        public: true
+        class: Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager
         arguments:
             - '@oro_notification.manager.email_notification_sender'
             - '@logger'
-            - '@oro_email.provider.email_template_content_provider'
-            - '@oro_locale.provider.chain_preferred_language_provider'
+            - '@oro_email.provider.localized_template'
 
     oro_notification.manager.email_notification_sender:
-        class: 'Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender'
-        public: false
+        class: Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender
         arguments:
             - '@oro_notification.model.notification_settings'
             - '@oro_message_queue.client.message_producer'
 
     oro_notification.provider.contact_information_emails:
-        class: 'Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider'
-        public: false
-        lazy: true
+        class: Oro\Bundle\NotificationBundle\Provider\ContactInformationEmailsProvider
         arguments:
             - '@oro_entity_config.config_manager'
             - '@translator'
 
     oro_notification.form.subscriber.contact_information_emails:
-        class: 'Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber'
+        class: Oro\Bundle\NotificationBundle\Form\EventListener\ContactInformationEmailsSubscriber
         arguments:
             - '@oro_notification.provider.contact_information_emails'
 
-    oro_notification.provider.email_address_with_context_preferred_language_provider:
-        class: Oro\Bundle\NotificationBundle\Provider\EmailAddressWithContextPreferredLanguageProvider
-        arguments: ['@oro_locale.provider.chain_preferred_language_provider']
+    oro_notification.provider.email_address_with_context_preferred_localization_provider:
+        class: Oro\Bundle\NotificationBundle\Provider\EmailAddressWithContextPreferredLocalizationProvider
+        arguments:
+            - '@oro_locale.provider.preferred_localization_provider'
         tags:
-            - { name: oro_locale.preferred_language_provider, priority: -255  }
+            - { name: oro_locale.preferred_localization_provider }
+
+    oro_notification.notification_alert.datagrid_view_list:
+        class: Oro\Bundle\NotificationBundle\Datagrid\NotificationAlertViewList
+        public: true
+        arguments:
+            - '@translator'

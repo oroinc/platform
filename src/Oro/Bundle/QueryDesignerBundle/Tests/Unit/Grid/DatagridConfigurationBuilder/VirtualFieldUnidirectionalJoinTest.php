@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Doctrine\ORM\Query;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTestCase
 {
@@ -12,15 +12,15 @@ class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTes
      */
     public function testVirtualColumns()
     {
-        $en                    = 'Acme\Entity\TestEntity';
-        $definition            = [
+        $en = 'Acme\Entity\TestEntity';
+        $definition = [
             'columns' => [
                 ['name' => 'vc1', 'label' => 'lbl1'],
                 ['name' => 'vc2', 'label' => 'lbl2'],
             ],
             'filters' => []
         ];
-        $doctrine              = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en  => [
                     'column1' => 'string',
@@ -69,11 +69,9 @@ class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTes
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, null, $virtualColumnProvider);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'name'    => 'test_grid',
@@ -126,13 +124,7 @@ class VirtualFieldUnidirectionalJoinTest extends DatagridConfigurationBuilderTes
                         'vc2' => 'c2',
                     ],
                 ],
-                'type'         => 'orm',
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
-                ]
+                'type'         => 'orm'
             ],
             'fields_acl' => [
                 'columns' => [

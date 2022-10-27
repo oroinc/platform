@@ -21,10 +21,6 @@ class EntityTitleProvider
     /** @var EntityNameResolver */
     private $entityNameResolver;
 
-    /**
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityNameResolver $entityNameResolver

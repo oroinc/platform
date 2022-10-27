@@ -19,8 +19,6 @@ class OroIntegrationBundle implements Migration
 
     /**
      * Create oro_integration_change_set table
-     *
-     * @param Schema $schema
      */
     protected function createOroIntegrationFieldsChangesTable(Schema $schema)
     {

@@ -2,52 +2,88 @@
 
 namespace Oro\Bundle\LocaleBundle\Converter;
 
-use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class DateTimeFormatConverterRegistry
+/**
+ * The registry of datetime format converters.
+ */
+class DateTimeFormatConverterRegistry implements ResetInterface
 {
-    /**
-     * @var DateTimeFormatConverterInterface[]
-     */
-    protected $converters = array();
+    /** @var string[] */
+    private array $converterNames;
+    private ContainerInterface $converterContainer;
+    /** @var DateTimeFormatConverterInterface[]|null [name => converter, ...] */
+    private ?array $converters = null;
+    private bool $allConvertersLoaded = false;
 
     /**
-     * @param string $name
-     * @param DateTimeFormatConverterInterface $converter
-     * @throws \LogicException
+     * @param string[]           $converterNames
+     * @param ContainerInterface $converterContainer
      */
-    public function addFormatConverter($name, DateTimeFormatConverterInterface $converter)
+    public function __construct(array $converterNames, ContainerInterface $converterContainer)
     {
-        if (isset($this->converters[$name])) {
-            throw new \LogicException(
-                sprintf('Format converter with name "%s" already registered', $name)
-            );
-        }
-
-        $this->converters[$name] = $converter;
+        $this->converterNames = $converterNames;
+        $this->converterContainer = $converterContainer;
     }
 
     /**
-     * @param string $name
-     * @return DateTimeFormatConverterInterface
-     * @throws \LogicException
+     * Gets a format converter by its name.
+     *
+     * @throws \LogicException if a format converter for the given name was not found
      */
-    public function getFormatConverter($name)
+    public function getFormatConverter(string $name): DateTimeFormatConverterInterface
     {
-        if (!isset($this->converters[$name])) {
-            throw new \LogicException(
-                sprintf('Format converter with name "%s" is not exist', $name)
-            );
+        $this->ensureConvertersInitialized();
+
+        if (!\array_key_exists($name, $this->converters)) {
+            throw new \LogicException(sprintf('Format converter with name "%s" is not exist', $name));
         }
 
-        return $this->converters[$name];
+        $converter = $this->converters[$name];
+        if (null === $converter) {
+            $converter = $this->converterContainer->get($name);
+            $this->converters[$name] = $converter;
+        }
+
+        return $converter;
     }
 
     /**
-     * @return DateTimeFormatConverterInterface[]
+     * Gets all format converters.
+     *
+     * @return DateTimeFormatConverterInterface[] [name => converter, ...]
      */
-    public function getFormatConverters()
+    public function getFormatConverters(): array
     {
+        if (!$this->allConvertersLoaded) {
+            $this->ensureConvertersInitialized();
+            foreach ($this->converters as $name => $converter) {
+                if (null === $converter) {
+                    $this->converters[$name] = $this->converterContainer->get($name);
+                }
+            }
+            $this->allConvertersLoaded = true;
+        }
+
         return $this->converters;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->converters = null;
+    }
+
+    private function ensureConvertersInitialized(): void
+    {
+        if (null === $this->converters) {
+            $this->converters = [];
+            foreach ($this->converterNames as $name) {
+                $this->converters[$name] = null;
+            }
+        }
     }
 }

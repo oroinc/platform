@@ -8,19 +8,17 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SessionIdProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_SESSION_FIELD_NAME = 'test_session_field';
+    private const TEST_SESSION_FIELD_NAME = 'test_session_field';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
     /** @var SessionIdProvider */
-    protected $sessionIdProvider;
+    private $sessionIdProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->sessionIdProvider = new SessionIdProvider(
             $this->requestStack,
@@ -28,55 +26,55 @@ class SessionIdProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnNullIfNoRequestsInStack()
+    public function testShouldReturnNullIfNoRequestsInStack(): void
     {
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn(null);
 
         self::assertNull($this->sessionIdProvider->getSessionId());
     }
 
-    public function testShouldReturnNullIfNoSessionIdInPost()
+    public function testShouldReturnNullIfNoSessionIdInPost(): void
     {
         $request = Request::create('http://test', 'POST');
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         self::assertNull($this->sessionIdProvider->getSessionId());
     }
 
-    public function testShouldReturnSessionIdFromPostField()
+    public function testShouldReturnSessionIdFromPostField(): void
     {
         $request = Request::create('http://test', 'POST');
         $request->request->set(self::TEST_SESSION_FIELD_NAME, 'test_sid');
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         self::assertEquals('test_sid', $this->sessionIdProvider->getSessionId());
     }
 
-    public function testShouldGenerateSessionIdForGetMethod()
+    public function testShouldGenerateSessionIdForGetMethod(): void
     {
-        $request = Request::create('http://test', 'GET');
+        $request = Request::create('http://test');
 
         $this->requestStack->expects(self::once())
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         self::assertNotEmpty($this->sessionIdProvider->getSessionId());
     }
 
-    public function testShouldRememberGeneratedSessionIdForGetMethod()
+    public function testShouldRememberGeneratedSessionIdForGetMethod(): void
     {
-        $request = Request::create('http://test', 'GET');
+        $request = Request::create('http://test');
 
         $this->requestStack->expects(self::exactly(2))
-            ->method('getMasterRequest')
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $sessionId = $this->sessionIdProvider->getSessionId();

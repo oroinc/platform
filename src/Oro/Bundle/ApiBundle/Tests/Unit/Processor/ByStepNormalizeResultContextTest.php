@@ -9,9 +9,26 @@ class ByStepNormalizeResultContextTest extends \PHPUnit\Framework\TestCase
     /** @var ByStepNormalizeResultContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = new ByStepNormalizeResultContext();
+    }
+
+    public function testSourceGroup()
+    {
+        self::assertNull($this->context->getSourceGroup());
+
+        $this->context->setSourceGroup('test');
+        self::assertEquals('test', $this->context->getSourceGroup());
+        self::assertEquals('test', $this->context->get('sourceGroup'));
+
+        $this->context->setSourceGroup('');
+        self::assertSame('', $this->context->getSourceGroup());
+        self::assertSame('', $this->context->get('sourceGroup'));
+
+        $this->context->setSourceGroup(null);
+        self::assertNull($this->context->getSourceGroup());
+        self::assertFalse($this->context->has('sourceGroup'));
     }
 
     public function testFailedGroup()
@@ -21,6 +38,10 @@ class ByStepNormalizeResultContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setFailedGroup('test');
         self::assertEquals('test', $this->context->getFailedGroup());
         self::assertEquals('test', $this->context->get('failedGroup'));
+
+        $this->context->setFailedGroup('');
+        self::assertSame('', $this->context->getFailedGroup());
+        self::assertSame('', $this->context->get('failedGroup'));
 
         $this->context->setFailedGroup(null);
         self::assertNull($this->context->getFailedGroup());

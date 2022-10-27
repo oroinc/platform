@@ -3,22 +3,25 @@
 namespace Oro\Bundle\ReportBundle\Entity\Manager;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Repository\CalendarDateRepository;
 
+/**
+ * Inserts calendar dates since the beginning of the year till current date or appends dates from the last one.
+ */
 class CalendarDateManager
 {
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
+    public function __construct(DoctrineHelper $doctrineHelper, LocaleSettings $localeSettings)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -44,12 +47,13 @@ class CalendarDateManager
      */
     protected function getDatesFromInterval($append = false)
     {
-        $timeZone = new \DateTimeZone('UTC');
+        $timeZone = new \DateTimeZone($this->localeSettings->getTimeZone());
         $startDate = new \DateTime('now midnight', $timeZone);
         $startDate->setDate($startDate->format('Y'), 1, 1);
 
         if ($append) {
-            $startDate = $this->getLastDate() ?: $startDate;
+            $lastDate = $this->getLastDate();
+            $startDate = $lastDate ? $lastDate->add(new \DateInterval('P1D')) : $startDate;
         }
 
         $period = new \DatePeriod($startDate, new \DateInterval('P1D'), new \DateTime('tomorrow midnight', $timeZone));
@@ -67,7 +71,7 @@ class CalendarDateManager
 
         $calendarDate = $dateRepository->getDate();
         if ($calendarDate) {
-            return $calendarDate->getDate();
+            return clone $calendarDate->getDate();
         }
 
         return null;

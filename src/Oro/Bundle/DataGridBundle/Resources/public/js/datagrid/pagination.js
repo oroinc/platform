@@ -1,12 +1,10 @@
 define([
-    'tpl!orodatagrid/templates/datagrid/pagination.html',
+    'tpl-loader!orodatagrid/templates/datagrid/pagination.html',
     'jquery',
     'underscore',
     'oroui/js/app/views/base/view'
 ], function(template, $, _, BaseView) {
     'use strict';
-
-    var Pagination;
 
     /**
      * Datagrid pagination widget
@@ -15,7 +13,7 @@ define([
      * @class   orodatagrid.datagrid.Pagination
      * @extends BaseView
      */
-    Pagination = BaseView.extend({
+    const Pagination = BaseView.extend({
         /** @property */
         windowSize: 10,
 
@@ -50,10 +48,10 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function Pagination() {
-            Pagination.__super__.constructor.apply(this, arguments);
+        constructor: function Pagination(options) {
+            Pagination.__super__.constructor.call(this, options);
         },
 
         /**
@@ -122,20 +120,25 @@ define([
                 return;
             }
 
-            var direction = $.trim($(e.target).closest('[data-grid-pagination-trigger]')
-                .data('grid-pagination-direction'));
-            var ffConfig = this.fastForwardHandleConfig;
+            let direction = $(e.target).closest('[data-grid-pagination-trigger]')
+                .data('grid-pagination-direction');
 
-            var collection = this.collection;
-            var state = collection.state;
+            if (typeof direction === 'string') {
+                direction = direction.trim();
+            }
+
+            const ffConfig = this.fastForwardHandleConfig;
+
+            const collection = this.collection;
+            const state = collection.state;
 
             if (this.scrollToPosition) {
                 $('body,html').stop().animate({scrollTop: this.scrollToPosition.top}, '500', 'swing');
             }
 
             if (ffConfig) {
-                var prevDirection = _.has(ffConfig.prev, 'direction') ? ffConfig.prev.direction : undefined;
-                var nextDirection = _.has(ffConfig.next, 'direction') ? ffConfig.next.direction : undefined;
+                const prevDirection = _.has(ffConfig.prev, 'direction') ? ffConfig.prev.direction : undefined;
+                const nextDirection = _.has(ffConfig.next, 'direction') ? ffConfig.next.direction : undefined;
                 switch (direction) {
                     case prevDirection:
                         if (collection.hasPrevious()) {
@@ -150,7 +153,7 @@ define([
                 }
             }
 
-            var pageIndex = $(e.target).text() * 1 - state.firstPage;
+            const pageIndex = $(e.target).text() * 1 - state.firstPage;
             collection.getPage(state.firstPage === 0 ? pageIndex : pageIndex + 1);
         },
 
@@ -163,19 +166,19 @@ define([
         makeHandles: function(handles) {
             handles = handles || [];
 
-            var collection = this.collection;
-            var state = collection.state;
+            const collection = this.collection;
+            const state = collection.state;
 
             // convert all indices to 0-based here
-            var lastPage = state.lastPage ? state.lastPage : state.firstPage;
+            let lastPage = state.lastPage ? state.lastPage : state.firstPage;
             lastPage = state.firstPage === 0 ? lastPage : lastPage - 1;
-            var currentPage = state.firstPage === 0 ? state.currentPage : state.currentPage - 1;
-            var windowStart = Math.floor(currentPage / this.windowSize) * this.windowSize;
-            var windowEnd = windowStart + this.windowSize;
+            const currentPage = state.firstPage === 0 ? state.currentPage : state.currentPage - 1;
+            const windowStart = Math.floor(currentPage / this.windowSize) * this.windowSize;
+            let windowEnd = windowStart + this.windowSize;
             windowEnd = windowEnd <= lastPage ? windowEnd : lastPage + 1;
 
             if (collection.mode !== 'infinite') {
-                for (var i = windowStart; i < windowEnd; i++) {
+                for (let i = windowStart; i < windowEnd; i++) {
                     handles.push({
                         label: i + 1,
                         title: 'No. ' + (i + 1),
@@ -184,7 +187,7 @@ define([
                 }
             }
 
-            var ffConfig = this.fastForwardHandleConfig;
+            const ffConfig = this.fastForwardHandleConfig;
 
             if (ffConfig.prev) {
                 handles.unshift({
@@ -215,7 +218,7 @@ define([
          * @return {*}
          */
         render: function() {
-            var state = this.collection.state;
+            const state = this.collection.state;
 
             // prevent render if data is not loaded yet
             if (state.totalRecords === null) {

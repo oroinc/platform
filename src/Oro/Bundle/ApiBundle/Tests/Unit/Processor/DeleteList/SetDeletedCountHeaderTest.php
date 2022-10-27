@@ -6,14 +6,14 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeletedCountHeader;
 
 class SetDeletedCountHeaderTest extends DeleteListProcessorTestCase
 {
-    private const REQUEST_INCLUDE_HEADER_NAME        = 'X-Include';
+    private const REQUEST_INCLUDE_HEADER_NAME = 'X-Include';
     private const REQUEST_DELETED_COUNT_HEADER_VALUE = 'deletedCount';
     private const RESPONSE_DELETED_COUNT_HEADER_NAME = 'X-Include-Deleted-Count';
 
     /** @var SetDeletedCountHeader */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -1,0 +1,58 @@
+/* @theme: admin.oro; */
+
+.attachment-file {
+    max-width: 100%;
+
+    .uploader {
+        display: flex;
+        height: auto;
+        max-width: $attachment-file-uploader-width;
+
+        align-items: center;
+        border: none;
+
+        .action {
+            width: auto;
+            border: none;
+            background: none;
+            color: $link-color;
+            cursor: pointer;
+            text-overflow: clip;
+            overflow: visible;
+        }
+
+        .active .action {
+            background: none;
+        }
+
+        &.focus {
+            border: none;
+            box-shadow: none;
+
+            .action {
+                color: $link-color;
+            }
+        }
+
+        input {
+            cursor: pointer;
+
+            &:hover ~ .action {
+                color: $link-color-hover;
+            }
+        }
+
+        .filename {
+            padding: 0;
+            flex-shrink: 1;
+            flex-grow: 0;
+
+            @include text-line-truncate(auto);
+        }
+
+        .focus {
+            border: none;
+            box-shadow: none;
+        }
+    }
+}

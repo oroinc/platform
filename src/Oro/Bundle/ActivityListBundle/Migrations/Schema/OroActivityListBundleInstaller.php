@@ -35,8 +35,6 @@ class OroActivityListBundleInstaller implements Installation
 
     /**
      * Create oro_activity_list table
-     *
-     * @param Schema $schema
      */
     protected function createOroActivityListTable(Schema $schema)
     {
@@ -63,8 +61,6 @@ class OroActivityListBundleInstaller implements Installation
 
     /**
      * Create oro_activity_owner table
-     *
-     * @param Schema $schema
      */
     protected function createOroActivityOwnerTable(Schema $schema)
     {
@@ -82,8 +78,6 @@ class OroActivityListBundleInstaller implements Installation
 
     /**
      * Add oro_activity_list foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroActivityListForeignKeys(Schema $schema)
     {
@@ -110,8 +104,6 @@ class OroActivityListBundleInstaller implements Installation
 
     /**
      * Add oro_activity_owner foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroActivityOwnerForeignKeys(Schema $schema)
     {

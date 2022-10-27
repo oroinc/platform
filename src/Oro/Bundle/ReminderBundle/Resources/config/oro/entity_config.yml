@@ -1,6 +1,6 @@
 entity_config:
     reminder:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#reminder
         entity:
             items:
-                # reminder email template name
                 reminder_template_name: ~

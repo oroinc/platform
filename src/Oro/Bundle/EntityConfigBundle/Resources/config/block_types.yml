@@ -6,6 +6,14 @@ services:
         tags:
              - { name: layout.block_type, alias: attribute_text }
 
+    oro_entity_config.block_type.attribute_collection:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_collection']]
+            - [setParent, ['attribute_text']]
+        tags:
+             - { name: layout.block_type, alias: attribute_collection }
+
     oro_entity_config.block_type.attribute_percent:
         parent: oro_layout.block_type.abstract_configurable
         calls:
@@ -46,8 +54,16 @@ services:
         tags:
              - { name: layout.block_type, alias: attribute_decimal }
 
-    oro_entity_config.block_type.attribute_file:
+    oro_entity_config.block_type.attribute_float:
         parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['attribute_float']]
+            - [setParent, ['attribute_decimal']]
+        tags:
+            - { name: layout.block_type, alias: attribute_float }
+
+    oro_entity_config.block_type.attribute_file:
+        class: Oro\Bundle\EntityConfigBundle\Layout\Block\Type\AttributeFileType
         calls:
             - [setName, ['attribute_file']]
             - [setParent, ['attribute_text']]
@@ -55,7 +71,7 @@ services:
              - { name: layout.block_type, alias: attribute_file }
 
     oro_entity_config.block_type.attribute_image:
-        parent: oro_layout.block_type.abstract_configurable
+        parent: oro_entity_config.block_type.attribute_file
         calls:
             - [setName, ['attribute_image']]
             - [setParent, ['attribute_text']]
@@ -83,6 +99,28 @@ services:
             - [setParent, ['attribute_text']]
         tags:
              - { name: layout.block_type, alias: attribute_multiselect }
+
+    oro_entity_config.block_type.attribute_multifiles:
+        parent: oro_entity_config.block_type.attribute_file
+        calls:
+            - [setName, ['attribute_multifiles']]
+            - [setParent, ['attribute_collection']]
+        tags:
+             - { name: layout.block_type, alias: attribute_multifiles }
+
+    oro_entity_config.block_type.attribute_multiimages:
+        parent: oro_entity_config.block_type.attribute_file
+        calls:
+            - [setName, ['attribute_multiimages']]
+            - [setParent, ['attribute_collection']]
+            -
+                - setOptionsConfig
+                -
+                    -
+                        width: {default: '=data["attachment_config"].getConfig(className, fieldName).get("width")'}
+                        height: {default: '=data["attachment_config"].getConfig(className, fieldName).get("height")'}
+        tags:
+             - { name: layout.block_type, alias: attribute_multiimages }
 
     oro_entity_config.block_type.attribute_localized_fallback:
         parent: oro_layout.block_type.abstract_configurable
@@ -117,11 +155,3 @@ services:
             - '@oro_locale.helper.localization'
         tags:
             - { name: layout.block_type, alias: attribute_group_rest }
-
-    oro_entity_config.block_type.attribute_html_escaped:
-        parent: oro_layout.block_type.abstract_configurable
-        calls:
-            - [setName, ['attribute_html_escaped']]
-            - [setParent, ['attribute_text']]
-        tags:
-             - { name: layout.block_type, alias: attribute_html_escaped }

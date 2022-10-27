@@ -3,129 +3,102 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\AssignUrl;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
 
 class AssignUrlTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|RouterInterface
-     */
-    protected $router;
+    /** @var AssignUrl */
+    private $action;
 
-    /**
-     * @var AssignUrl
-     */
-    protected $action;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->router->expects($this->any())
+        $router = $this->createMock(RouterInterface::class);
+        $router->expects(self::any())
             ->method('generate')
-            ->will($this->returnCallback(array($this, 'generateTestUrl')));
+            ->willReturnCallback(function (string $routeName, array $routeParameters = []): string {
+                return $this->generateTestUrl($routeName, $routeParameters);
+            });
 
-        $this->action = new AssignUrl(new ContextAccessor(), $this->router);
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->router, $this->action);
+        $this->action = new AssignUrl(new ContextAccessor(), $router);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
-     * @param array $options
      * @dataProvider optionsDataProvider
      */
     public function testInitialize(array $options)
     {
         $this->action->initialize($options);
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
-        return array(
-            'route' => array(
-                'options' => array(
+        return [
+            'route' => [
+                'options' => [
                     'route' => 'test_route_name',
                     'attribute' => 'test'
-                ),
+                ],
                 'expectedUrl' => $this->generateTestUrl('test_route_name'),
-            ),
-            'route with parameters' => array(
-                'options' => array(
+            ],
+            'route with parameters' => [
+                'options' => [
                     'route' => 'test_route_name',
-                    'route_parameters' => array('id' => 1),
+                    'route_parameters' => ['id' => 1],
                     'attribute' => 'test'
-                ),
-                'expectedUrl' => $this->generateTestUrl('test_route_name', array('id' => 1)),
-            )
-        );
+                ],
+                'expectedUrl' => $this->generateTestUrl('test_route_name', ['id' => 1]),
+            ]
+        ];
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
-        return array(
-            'no name' => array(
-                'options' => array(),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+        return [
+            'no name' => [
+                'options' => [],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Route parameter must be specified',
-            ),
-            'invalid route parameters' => array(
-                'options' => array(
+            ],
+            'invalid route parameters' => [
+                'options' => [
                     'route' => 'test_route_name',
                     'route_parameters' => 'stringData',
                     'attribute' => 'test'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
+                ],
+                'exceptionName' => InvalidParameterException::class,
                 'exceptionMessage' => 'Route parameters must be an array',
-            ),
-            'no attribute' => array(
-                'options' => array(
+            ],
+            'no attribute' => [
+                'options' => [
                     'route' => 'test_route_name'
-                ),
-                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
-                'exceptionMessage' => 'Attribiute parameters is required',
-            ),
-        );
+                ],
+                'exceptionName' => InvalidParameterException::class,
+                'exceptionMessage' => 'Attribute parameters is required',
+            ],
+        ];
     }
 
     /**
-     * @param array $options
-     * @param string $expectedUrl
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options, $expectedUrl)
+    public function testExecute(array $options, string $expectedUrl)
     {
         $context = new ItemStub();
 
@@ -133,19 +106,14 @@ class AssignUrlTest extends \PHPUnit\Framework\TestCase
         $this->action->execute($context);
 
         $urlProperty = $options['attribute'];
-        $this->assertEquals($expectedUrl, $context->$urlProperty);
+        self::assertEquals($expectedUrl, $context->{$urlProperty});
     }
 
-    /**
-     * @param string $routeName
-     * @param array $routeParameters
-     * @return string
-     */
-    public function generateTestUrl($routeName, array $routeParameters = array())
+    private function generateTestUrl(string $routeName, array $routeParameters = []): string
     {
         $url = 'url:' . $routeName;
         if ($routeParameters) {
-            $url .= ':' . serialize($routeParameters);
+            $url .= ':' . \serialize($routeParameters);
         }
 
         return $url;

@@ -3,23 +3,21 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Transformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 
 class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var BusinessUnitTreeTransformer
-     */
-    protected $transformer;
+    /** @var BusinessUnitTreeTransformer */
+    private $transformer;
 
-    protected $buManager;
+    private $buManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->buManager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->buManager = $this->createMock(BusinessUnitManager::class);
 
         $this->transformer = new BusinessUnitTreeTransformer($this->buManager);
     }
@@ -31,7 +29,7 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
         $bu1->setId(1);
         $bu2 = new BusinessUnit();
         $bu1->setId(2);
-        $this->assertTrue(in_array(2, $this->transformer->transform([$bu1, $bu2])));
+        $this->assertContains(2, $this->transformer->transform([$bu1, $bu2]));
     }
 
     public function testTransformNullValue()
@@ -66,17 +64,15 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
         $bu1->setId(2);
         $testResult->add($bu2);
 
-        $buRepo = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $buRepo = $this->createMock(BusinessUnitRepository::class);
         $this->buManager->expects($this->any())
             ->method('getBusinessUnitRepo')
-            ->will($this->returnValue($buRepo));
+            ->willReturn($buRepo);
 
         $buRepo->expects($this->once())
             ->method('findBy')
             ->with(['id' => [1, 2]])
-            ->will($this->returnValue($testResult));
+            ->willReturn($testResult);
         $this->assertSame($testResult, $this->transformer->reverseTransform([1, 2]));
 
         $bu = new BusinessUnit();
@@ -84,7 +80,7 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
         $buRepo->expects($this->once())
             ->method('find')
             ->with(1)
-            ->will($this->returnValue($bu));
+            ->willReturn($bu);
         $this->assertSame($bu, $this->transformer->reverseTransform(1));
     }
 
@@ -92,7 +88,6 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNull($this->transformer->reverseTransform(0));
     }
-
 
     public function testReverseTransformNullValue()
     {
@@ -106,12 +101,10 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformEmptyInArray()
     {
-        $buRepo = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $buRepo = $this->createMock(BusinessUnitRepository::class);
         $this->buManager->expects($this->any())
             ->method('getBusinessUnitRepo')
-            ->will($this->returnValue($buRepo));
+            ->willReturn($buRepo);
 
         $buRepo->expects($this->once())
             ->method('findBy')

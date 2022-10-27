@@ -13,7 +13,7 @@ class OroAddressBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_6';
     }
 
     /**
@@ -37,8 +37,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_address table
-     *
-     * @param Schema $schema
      */
     protected function createOroAddressTable(Schema $schema)
     {
@@ -67,8 +65,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_address_type table
-     *
-     * @param Schema $schema
      */
     protected function createOroAddressTypeTable(Schema $schema)
     {
@@ -81,8 +77,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_address_type_translation table
-     *
-     * @param Schema $schema
      */
     protected function createOroAddressTypeTranslationTable(Schema $schema)
     {
@@ -90,8 +84,8 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('foreign_key', 'string', ['length' => 16]);
         $table->addColumn('content', 'string', ['length' => 255]);
-        $table->addColumn('locale', 'string', ['length' => 8]);
-        $table->addColumn('object_class', 'string', ['length' => 255]);
+        $table->addColumn('locale', 'string', ['length' => 16]);
+        $table->addColumn('object_class', 'string', ['length' => 191]);
         $table->addColumn('field', 'string', ['length' => 32]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'address_type_translation_idx', []);
@@ -99,8 +93,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_dictionary_country table
-     *
-     * @param Schema $schema
      */
     protected function createOroDictionaryCountryTable(Schema $schema)
     {
@@ -114,8 +106,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_dictionary_country_trans table
-     *
-     * @param Schema $schema
      */
     protected function createOroDictionaryCountryTransTable(Schema $schema)
     {
@@ -123,8 +113,8 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('foreign_key', 'string', ['length' => 2]);
         $table->addColumn('content', 'string', ['length' => 255]);
-        $table->addColumn('locale', 'string', ['length' => 8]);
-        $table->addColumn('object_class', 'string', ['length' => 255]);
+        $table->addColumn('locale', 'string', ['length' => 16]);
+        $table->addColumn('object_class', 'string', ['length' => 191]);
         $table->addColumn('field', 'string', ['length' => 32]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'country_translation_idx', []);
@@ -132,8 +122,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_dictionary_region table
-     *
-     * @param Schema $schema
      */
     protected function createOroDictionaryRegionTable(Schema $schema)
     {
@@ -149,8 +137,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_dictionary_region_trans table
-     *
-     * @param Schema $schema
      */
     protected function createOroDictionaryRegionTransTable(Schema $schema)
     {
@@ -158,8 +144,8 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('foreign_key', 'string', ['length' => 16]);
         $table->addColumn('content', 'string', ['length' => 255]);
-        $table->addColumn('locale', 'string', ['length' => 8]);
-        $table->addColumn('object_class', 'string', ['length' => 255]);
+        $table->addColumn('locale', 'string', ['length' => 16]);
+        $table->addColumn('object_class', 'string', ['length' => 191]);
         $table->addColumn('field', 'string', ['length' => 32]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'region_translation_idx', []);
@@ -167,8 +153,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Add oro_address foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAddressForeignKeys(Schema $schema)
     {
@@ -189,8 +173,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Add oro_dictionary_region foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroDictionaryRegionForeignKeys(Schema $schema)
     {

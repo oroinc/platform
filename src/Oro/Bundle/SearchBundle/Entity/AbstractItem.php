@@ -12,6 +12,7 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
  *
  * @ORM\MappedSuperclass
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 abstract class AbstractItem
 {
@@ -46,14 +47,8 @@ abstract class AbstractItem
     protected $recordId;
 
     /**
-     * @var string $title
-     * @ORM\Column(name="title", type="string", length=255, nullable=true)
-     */
-    protected $title;
-
-    /**
      * @var float
-     * @ORM\Column(name="weight", type="decimal", precision=21, scale=8, nullable=false, options={"default"=1.0}))
+     * @ORM\Column(name="weight", type="decimal", precision=8, scale=4, nullable=false, options={"default"=1.0}))
      */
     protected $weight = 1.0;
 
@@ -191,9 +186,6 @@ abstract class AbstractItem
         return $this->changed;
     }
 
-    /**
-     * @return float
-     */
     public function getWeight(): float
     {
         return $this->weight;
@@ -383,25 +375,6 @@ abstract class AbstractItem
     }
 
     /**
-     * @param string $title
-     * @return AbstractItem
-     */
-    public function setTitle($title)
-    {
-        $this->title = mb_substr($title, 0, 255, mb_detect_encoding($title));
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
      * @return string
      */
     public function getRecordText()
@@ -421,6 +394,7 @@ abstract class AbstractItem
      * @param Collection $fields
      * @param ItemFieldInterface $newRecord
      * @param string $type
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function saveData($objectData, Collection $fields, ItemFieldInterface $newRecord, $type)
     {

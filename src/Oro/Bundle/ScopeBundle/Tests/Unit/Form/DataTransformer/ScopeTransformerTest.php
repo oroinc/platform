@@ -4,57 +4,47 @@ namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ScopeBundle\Form\DataTransformer\ScopeTransformer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const SCOPE_TYPE = 'test_scope_type';
+    private const SCOPE_TYPE = 'test_scope_type';
 
-    /**
-     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $scopeManager;
+    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $scopeManager;
 
-    /**
-     * @var ScopeTransformer
-     */
-    protected $transformer;
+    /** @var ScopeTransformer */
+    private $transformer;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->scopeManager = $this->getMockBuilder(ScopeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->scopeManager = $this->createMock(ScopeManager::class);
 
         $this->transformer = new ScopeTransformer($this->scopeManager, self::SCOPE_TYPE);
     }
 
     public function testTransform()
     {
-        $accountId = 42;
+        $scopeValue = new \stdClass();
+        $scope = new StubScope();
+        $scope->setScopeField($scopeValue);
 
-        $scope = new \stdClass();
-        $scope->account = $accountId;
-
-        $this->scopeManager
-            ->expects($this->once())
+        $this->scopeManager->expects($this->once())
             ->method('getScopeEntities')
             ->with(self::SCOPE_TYPE)
-            ->willReturn([
-                'account' => new \stdClass()
-            ]);
+            ->willReturn(['scopeField' => \stdClass::class]);
 
         $result = $this->transformer->transform($scope);
 
-        $this->assertEquals(['account' => $accountId], $result);
+        $this->assertEquals(['scopeField' => $scopeValue], $result);
     }
 
     public function testTransformForNull()
     {
-        $this->scopeManager
-            ->expects($this->never())
+        $this->scopeManager->expects($this->never())
             ->method('getScopeEntities');
 
         $this->assertNull($this->transformer->transform(null));
@@ -62,14 +52,13 @@ class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransform()
     {
-        $accountId = 42;
-        $scope = new \stdClass();
-        $scope->account = $accountId;
+        $scopeValue = new \stdClass();
+        $scope = new StubScope();
+        $scope->setScopeField($scopeValue);
 
-        $value = ['account' => $accountId];
+        $value = ['scopeField' => $scopeValue];
 
-        $this->scopeManager
-            ->expects($this->once())
+        $this->scopeManager->expects($this->once())
             ->method('findOrCreate')
             ->with(self::SCOPE_TYPE, $value, false)
             ->willReturn($scope);
@@ -83,8 +72,7 @@ class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformForNull()
     {
-        $this->scopeManager
-            ->expects($this->never())
+        $this->scopeManager->expects($this->never())
             ->method('findOrCreate');
 
         $this->assertNull($this->transformer->reverseTransform(null));

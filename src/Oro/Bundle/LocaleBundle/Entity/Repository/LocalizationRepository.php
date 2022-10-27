@@ -8,12 +8,14 @@ use Oro\Bundle\EntityBundle\ORM\Repository\BatchIteratorTrait;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
+ * Doctrine repository for Localization entity
+ *
  * @method Localization|null findOneByName($name)
  */
 class LocalizationRepository extends EntityRepository implements BatchIteratorInterface
 {
     use BatchIteratorTrait;
-    
+
     /**
      * @return array
      */
@@ -28,22 +30,6 @@ class LocalizationRepository extends EntityRepository implements BatchIteratorIn
     }
 
     /**
-     * @return array
-     */
-    public function findRootsWithChildren()
-    {
-        $localizations = $this->createQueryBuilder('l')
-            ->addSelect('children')
-            ->leftJoin('l.childLocalizations', 'children')
-            ->getQuery()
-            ->execute();
-
-        return array_filter($localizations, function (Localization $localization) {
-            return !$localization->getParentLocalization();
-        });
-    }
-
-    /**
      * @return int
      */
     public function getLocalizationsCount()
@@ -52,5 +38,30 @@ class LocalizationRepository extends EntityRepository implements BatchIteratorIn
             ->select('COUNT(l.id) as localizationsCount')
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function findOneByLanguageCodeAndFormattingCode(string $languageCode, string $formattingCode): ?Localization
+    {
+        $qb = $this->createQueryBuilder('localization');
+
+        return $qb->innerJoin('localization.language', 'language')
+            ->where(
+                $qb->expr()->eq('localization.formattingCode', ':formattingCode'),
+                $qb->expr()->eq('language.code', ':languageCode')
+            )
+            ->setParameter('formattingCode', $formattingCode)
+            ->setParameter('languageCode', $languageCode)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findAllIndexedById(): array
+    {
+        return $this
+            ->createQueryBuilder('localization', 'localization.id')
+            ->orderBy('localization.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

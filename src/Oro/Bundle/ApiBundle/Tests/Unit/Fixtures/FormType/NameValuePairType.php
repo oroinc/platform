@@ -32,7 +32,6 @@ class NameValuePairType extends AbstractType
         );
     }
 
-
     /**
      * {@inheritdoc}
      */

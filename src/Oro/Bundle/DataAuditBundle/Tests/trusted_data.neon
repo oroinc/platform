@@ -1,0 +1,14 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\DataAuditBundle\Filter\AuditFilter:
+            apply:
+                objectAlias: true
+                dql: true
+    properties:
+        Oro\Bundle\DataAuditBundle\Filter\AuditFilter:
+            apply:
+                auditAlias: true
+                auditFieldAlias: true
+                objectClassParam: true
+                fieldParam: true

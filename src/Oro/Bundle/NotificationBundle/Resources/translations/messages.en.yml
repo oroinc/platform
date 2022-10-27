@@ -2,6 +2,7 @@ oro:
     notification:
         menu:
             emailnotification_list.description: List of email notifications
+            notification_alerts.label: Alerts
 
         controller:
             emailnotification:
@@ -29,12 +30,13 @@ oro:
         emailnotification:
             entity_label:                        Notification Rule
             entity_plural_label:                 Notification Rules
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:                  Represent email notification
             edit_entity:                         Edit notification rule %name%
             id.label:                            Id
             entity_name.label:                   Entity name
             entity_name.tooltip:                 Only entities that have templates available are listed. If you don't see an entity you want in this list, please create <a href="url" target="_blank">a notification template</a> for it first.
-            event.label:                         Event name
+            event_name.label:                    Event name
             template.label:                      Template
             recipient_list.label:                Recipient list
             email.label:                         Email
@@ -43,9 +45,17 @@ oro:
             additional_associations.tooltip: "<b>Additional Associations</b>: Additional notification may be sent to the emails available in the associated entities records, if selected."
             additional_emails.tooltip: "<b>Contact Emails</b>: A list of the selected entity fields marked as email contact information."
 
+            datagrid:
+                entity_hint: transactional emails
+
+            feature:
+                label: Email Notification Rules
+                description: Enables setting the rules, such as a sender name and email, to be applied to notifications generated in the application.
+
         massnotification:
             entity_label:         Maintenance Notification
             entity_plural_label:  Maintenance Notifications
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:   Represent maintenance email notifications
             id.label:             Id
             subject.label:        Subject
@@ -60,6 +70,33 @@ oro:
             action:               View Maintenance Notifications
             block.info:           Notification Details
 
+            feature:
+                label: Maintenance Notifications
+                description: Enables setting and managing maintenance notifications, selecting email templates and recipients.
+
+        notificationalert:
+            entity_label:                   Notification Alert
+            entity_plural_label:            Notification Alerts
+            entity_description:             Represents a storage of a notification alerts
+            entity_grid_all_view_label:     'All %entity_plural_label%'
+            entity_grid_unresolved_view_label: 'Unresolved %entity_plural_label%'
+            id.label:                       ID
+            source_type.label:              Source
+            resource_type.label:            Resource
+            alert_type.label:               Alert Type
+            operation.label:                Operation
+            step.label:                     Step
+            item_id.label:                  Item ID
+            external_id.label:              External ID
+            resolved.label:                 Resolved
+            user.label:                     User
+            message.label:                  Message
+            organization.label:             Organization
+            additional_info.label:          Additional information
+            feature:
+                label: Notification Alerts
+                description: Enables access to view notification alerts generated to report system and data synchronization errors.
+
         system_configuration:
             email_notification_sender_email: Sender Email
             email_notification_sender_name: Sender Name
@@ -67,7 +104,7 @@ oro:
             mass_notification:
               title: Maintenance Notifications
               template: Email Template
-              template.tooltip: The template to be used by default for maintenance notifications.<br />{{ maintenance_message|nl2br }} variable is used as a placeholder for message coming from maintenance-notification command.
+              template.tooltip: The template to be used by default for maintenance notifications.<br>{{ maintenance_message|nl2br }} variable is used as a placeholder for message coming from maintenance-notification command.
               recipients: Recipients
               recipients.tooltip: Leave this field empty to send maintenance notification emails to all active users. To send notifications only to specific users, write in their email addresses separated by semicolon (;).
 

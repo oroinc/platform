@@ -3,25 +3,28 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber;
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetItemsFormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    protected $widgetConfigs;
-    protected $widgetItemsFormSubscriber;
+    /** @var WidgetConfigs|\PHPUnit\Framework\MockObject\MockObject */
+    private $widgetConfigs;
 
-    public function setUp()
+    /** @var WidgetItemsFormSubscriber */
+    private $widgetItemsFormSubscriber;
+
+    protected function setUp(): void
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnCallback(function ($id) {
-                return $id;
-            }));
+            ->willReturnArgument(0);
 
-        $this->widgetConfigs = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetConfigs')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->widgetConfigs = $this->createMock(WidgetConfigs::class);
 
         $this->widgetItemsFormSubscriber = new WidgetItemsFormSubscriber($this->widgetConfigs, $translator);
     }
@@ -61,18 +64,18 @@ class WidgetItemsFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->widgetConfigs->expects($this->once())
             ->method('getWidgetAttributesForTwig')
             ->with('big_numbers_widget')
-            ->will($this->returnValue($twigVariables));
+            ->willReturn($twigVariables);
 
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getOption')
             ->with('widget_name')
-            ->will($this->returnValue('big_numbers_widget'));
+            ->willReturn('big_numbers_widget');
 
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
 
         $event = new FormEvent($form, $eventData);
         $this->widgetItemsFormSubscriber->preSet($event);
@@ -130,18 +133,18 @@ class WidgetItemsFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->widgetConfigs->expects($this->once())
             ->method('getWidgetAttributesForTwig')
             ->with('big_numbers_widget')
-            ->will($this->returnValue($twigVariables));
+            ->willReturn($twigVariables);
 
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $formConfig->expects($this->once())
             ->method('getOption')
             ->with('widget_name')
-            ->will($this->returnValue('big_numbers_widget'));
+            ->willReturn('big_numbers_widget');
 
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
 
         $event = new FormEvent($form, $eventData);
         $this->widgetItemsFormSubscriber->preSet($event);

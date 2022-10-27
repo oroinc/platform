@@ -28,9 +28,6 @@ class CreateAutoResponse implements Migration, OrderedMigrationInterface
         static::oroEmailTable($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroEmailAutoResponseRuleTable(Schema $schema)
     {
         $table = $schema->createTable('oro_email_auto_response_rule');
@@ -58,9 +55,6 @@ class CreateAutoResponse implements Migration, OrderedMigrationInterface
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroEmailAutoResponseRuleConditionTable(Schema $schema)
     {
         $table = $schema->createTable('oro_email_response_rule_cond');
@@ -81,18 +75,12 @@ class CreateAutoResponse implements Migration, OrderedMigrationInterface
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroEmailTemplateTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_template');
         $table->addColumn('visible', 'boolean', ['default' => '1']);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroEmailTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email');

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -19,7 +19,6 @@ class ApiConfiguration implements ConfigurationInterface
     public const FIELD_ATTRIBUTE        = 'field';
     public const ENTITY_ALIASES_SECTION = 'entity_aliases';
     public const ENTITIES_SECTION       = 'entities';
-    public const RELATIONS_SECTION      = 'relations';
 
     public const ROOT_NODE = 'api';
 
@@ -29,10 +28,6 @@ class ApiConfiguration implements ConfigurationInterface
     /** @var int */
     protected $maxNestingLevel;
 
-    /**
-     * @param ConfigExtensionRegistry $extensionRegistry
-     * @param int|null                $maxNestingLevel
-     */
     public function __construct(ConfigExtensionRegistry $extensionRegistry, ?int $maxNestingLevel = null)
     {
         $this->settings = $extensionRegistry->getConfigurationSettings();
@@ -44,8 +39,8 @@ class ApiConfiguration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root(self::ROOT_NODE);
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE);
+        $rootNode = $treeBuilder->getRootNode();
         $children = $rootNode->children();
 
         $this->addEntityAliasesSection($children);
@@ -55,11 +50,6 @@ class ApiConfiguration implements ConfigurationInterface
             $this->createEntityConfiguration(self::ENTITIES_SECTION, new EntityDefinitionConfiguration())
         );
         $entityNode->booleanNode(ConfigUtil::EXCLUDE);
-
-        $this->addEntitySection(
-            $children,
-            $this->createEntityConfiguration(self::RELATIONS_SECTION, new RelationDefinitionConfiguration())
-        );
 
         $rootNode
             ->validate()
@@ -72,12 +62,6 @@ class ApiConfiguration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @param string                              $sectionName
-     * @param TargetEntityDefinitionConfiguration $definitionSection
-     *
-     * @return EntityConfiguration
-     */
     protected function createEntityConfiguration(
         string $sectionName,
         TargetEntityDefinitionConfiguration $definitionSection
@@ -90,16 +74,11 @@ class ApiConfiguration implements ConfigurationInterface
         );
     }
 
-    /**
-     * @param NodeBuilder $parentNode
-     *
-     * @return NodeBuilder
-     */
     protected function addEntityAliasesSection(NodeBuilder $parentNode): NodeBuilder
     {
         $node = $parentNode
             ->arrayNode(self::ENTITY_ALIASES_SECTION)
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->prototype('array')
                 ->children();
         $configuration = new EntityAliasesConfiguration();
@@ -108,17 +87,11 @@ class ApiConfiguration implements ConfigurationInterface
         return $node;
     }
 
-    /**
-     * @param NodeBuilder         $parentNode
-     * @param EntityConfiguration $configuration
-     *
-     * @return NodeBuilder
-     */
     protected function addEntitySection(NodeBuilder $parentNode, EntityConfiguration $configuration): NodeBuilder
     {
         $node = $parentNode
             ->arrayNode($configuration->getSectionName())
-                ->useAttributeAsKey('name')
+                ->useAttributeAsKey('')
                 ->prototype('array')
                 ->children();
         $configuration->configure($node);
@@ -127,9 +100,7 @@ class ApiConfiguration implements ConfigurationInterface
     }
 
     /**
-     * @param array $config
-     *
-     * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function postProcessConfig(array $config): array
     {

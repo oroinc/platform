@@ -1,23 +1,40 @@
 Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
+    constraints:
+        - Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfiguration: { groups: [SmtpConnection] }
+        - Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration: { groups: [ImapConnection] }
     properties:
         imapHost:
             - NotBlank:     { groups: [Imap] }
             - Length:
-                min:        3
-                max:        255
+                min: 3
+                max: 255
+                allowEmptyString: false
+                groups: [Imap]
         imapPort:
-            - NotBlank:     { groups: [Imap] }
+            - NotBlank: { groups: [Imap] }
             - Type:
                 type: integer
+                groups: [Imap]
+            - Range:
+                min: 0
+                max: 65535
+                groups: [Imap]
         smtpHost:
             - NotBlank: { groups: [Smtp] }
             - Length:
-                min:        3
-                max:        255
+                min: 3
+                max: 255
+                allowEmptyString: false
+                groups: [Smtp]
         smtpPort:
             - NotBlank: { groups: [Smtp] }
             - Type:
                 type: integer
+                groups: [Smtp]
+            - Range:
+                min: 0
+                max: 65535
+                groups: [Smtp]
         imapEncryption:
             - Choice:
                 choices:  [ssl, tls]
@@ -28,5 +45,6 @@ Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
             - NotBlank:     { groups: [Imap, Smtp] }
             - Type:
                 type: string
+                groups: [Imap, Smtp]
         folders:
             - Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders: { groups: [CheckFolderSelection] }

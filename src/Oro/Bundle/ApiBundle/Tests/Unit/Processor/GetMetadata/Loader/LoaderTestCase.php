@@ -9,13 +9,9 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 
 class LoaderTestCase extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param string|null $className
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
-     */
-    protected function getClassMetadataMock($className = null)
-    {
+    protected function getClassMetadataMock(
+        string $className = null
+    ): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject {
         if ($className) {
             $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])
@@ -24,17 +20,16 @@ class LoaderTestCase extends \PHPUnit\Framework\TestCase
             $classMetadata = $this->createMock(ClassMetadata::class);
         }
         $classMetadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_NONE;
+        $classMetadata->expects(self::any())
+            ->method('isInheritanceTypeNone')
+            ->willReturnCallback(function () use ($classMetadata) {
+                return ClassMetadata::INHERITANCE_TYPE_NONE === $classMetadata->inheritanceType;
+            });
 
         return $classMetadata;
     }
 
-    /**
-     * @param string $fieldName
-     * @param string $dataType
-     *
-     * @return MetaPropertyMetadata
-     */
-    protected function createMetaPropertyMetadata($fieldName, $dataType)
+    protected function createMetaPropertyMetadata(string $fieldName, string $dataType): MetaPropertyMetadata
     {
         $metaPropertyMetadata = new MetaPropertyMetadata();
         $metaPropertyMetadata->setName($fieldName);
@@ -43,13 +38,7 @@ class LoaderTestCase extends \PHPUnit\Framework\TestCase
         return $metaPropertyMetadata;
     }
 
-    /**
-     * @param string $fieldName
-     * @param string $dataType
-     *
-     * @return FieldMetadata
-     */
-    protected function createFieldMetadata($fieldName, $dataType)
+    protected function createFieldMetadata(string $fieldName, string $dataType): FieldMetadata
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
@@ -59,26 +48,15 @@ class LoaderTestCase extends \PHPUnit\Framework\TestCase
         return $fieldMetadata;
     }
 
-    /**
-     * @param string   $associationName
-     * @param string   $targetClass
-     * @param string   $associationType
-     * @param bool     $isCollection
-     * @param string   $dataType
-     * @param string[] $acceptableTargetClasses
-     * @param bool     $collapsed
-     *
-     * @return AssociationMetadata
-     */
     protected function createAssociationMetadata(
-        $associationName,
-        $targetClass,
-        $associationType,
-        $isCollection,
-        $dataType,
+        string $associationName,
+        string $targetClass,
+        string $associationType,
+        bool $isCollection,
+        ?string $dataType,
         array $acceptableTargetClasses,
-        $collapsed = false
-    ) {
+        bool $collapsed = false
+    ): AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);

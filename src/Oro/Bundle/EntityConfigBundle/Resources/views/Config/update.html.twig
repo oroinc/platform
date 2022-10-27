@@ -1,17 +1,19 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% form_theme form with '@OroForm/Form/fields.html.twig' %}
 {% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A')|trans }}) %}
 
 {% set formAction = path('oro_entityconfig_update', {id: entity.id}) %}
 
-{% set audit_entity_class = entity.classname|replace('\\', '_') %}
+{% set audit_entity_class = entity.classname|replace({'\\':'_'}) %}
 {% set audit_title = entity_config.get('label')|default('N/A')|trans %}
 {% set audit_path = 'oro_entityconfig_audit' %}
 {% set audit_entity_id = entity.id %}
 {% set audit_show_change_history = true %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_entityconfig_manage') %}
         {{ UI.cancelButton(path('oro_entityconfig_view', {id: entity.id})) }}
         {% set html = UI.saveAndCloseButton({
@@ -43,6 +45,8 @@
 {% endblock pageHeader %}
 
 {% block stats %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.created|oro_format_datetime }}</li>
     <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updated|oro_format_datetime }}</li>
     {% if link is defined and link %}

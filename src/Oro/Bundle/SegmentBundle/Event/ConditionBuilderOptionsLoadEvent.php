@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ConditionBuilderOptionsLoadEvent extends Event
 {
@@ -11,9 +11,6 @@ class ConditionBuilderOptionsLoadEvent extends Event
     /** @var array */
     protected $options;
 
-    /**
-     * @param array $options
-     */
     public function __construct(array $options)
     {
         $this->options = $options;
@@ -27,9 +24,6 @@ class ConditionBuilderOptionsLoadEvent extends Event
         return $this->options;
     }
 
-    /**
-     * @param array $options
-     */
     public function setOptions(array $options)
     {
         $this->options = $options;

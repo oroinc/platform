@@ -21,10 +21,6 @@ class ChangePasswordType extends AbstractType
     /** @var PasswordFieldOptionsProvider */
     protected $optionsProvider;
 
-    /**
-     * @param ChangePasswordSubscriber $subscriber
-     * @param PasswordFieldOptionsProvider $optionsProvider
-     */
     public function __construct(ChangePasswordSubscriber $subscriber, PasswordFieldOptionsProvider $optionsProvider)
     {
         $this->subscriber = $subscriber;

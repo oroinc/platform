@@ -1,2 +1,2 @@
 <% if (text.indexOf('fa') !== -1) { text = text.replace('fa-', '').replace(/-/g, ' '); } %>
-<i class="<%= id %> hide-text"></i>&nbsp;<%= highlight(text) %>
+<i class="<%- id %> icon hide-text" aria-hidden="true"></i><%= highlight(_.escape(text)) %>

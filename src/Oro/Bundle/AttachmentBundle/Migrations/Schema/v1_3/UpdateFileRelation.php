@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Migrations\Schema\v1_3;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -32,6 +32,7 @@ class UpdateFileRelation extends ParametrizedMigrationQuery
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
@@ -56,7 +57,7 @@ class UpdateFileRelation extends ParametrizedMigrationQuery
         }
 
         $query = 'UPDATE oro_entity_config SET data = :data WHERE id = :id';
-        $types = ['id' => Type::INTEGER, 'data' => Type::TARRAY];
+        $types = ['id' => Types::INTEGER, 'data' => Types::ARRAY];
 
         foreach ($requireUpdate as $params) {
             $this->logQuery($logger, $query, $params, $types);

@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 class GetRelationshipContext extends SubresourceContext
 {
     /** a callback that can be used to calculate the total number of related records */
-    const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
+    private const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
 
     /**
      * Gets a callback that can be used to calculate the total number of related records

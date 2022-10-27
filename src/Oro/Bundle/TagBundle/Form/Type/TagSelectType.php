@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Form type for Tag select.
+ */
 class TagSelectType extends AbstractType
 {
     /** @var TagSubscriber */
@@ -22,11 +25,6 @@ class TagSelectType extends AbstractType
     /** @var TagTransformer */
     protected $tagTransformer;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TagTransformer                $tagTransformer
-     * @param TagSubscriber                 $subscriber
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TagTransformer $tagTransformer,
@@ -68,8 +66,8 @@ class TagSelectType extends AbstractType
                     'placeholder'             => 'oro.tag.form.choose_or_create_tag',
                     'component'               => 'multi-autocomplete',
                     'multiple'                => true,
-                    'result_template_twig'    => 'OroTagBundle:Tag:Autocomplete/result.html.twig',
-                    'selection_template_twig' => 'OroTagBundle:Tag:Autocomplete/selection.html.twig',
+                    'result_template_twig'    => '@OroTag/Tag/Autocomplete/result.html.twig',
+                    'selection_template_twig' => '@OroTag/Tag/Autocomplete/selection.html.twig',
                     'properties'              => ['id', 'name'],
                     'separator'               => ';;',
                 ],

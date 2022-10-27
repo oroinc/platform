@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\ActivityListBundle\Model\ExtendActivityList;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
@@ -32,9 +33,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "owner_field_name"="organization",
  *              "owner_column_name"="organization_id"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },
@@ -54,9 +52,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ActivityList extends ExtendActivityList implements DatesAwareInterface, UpdatedByAwareInterface
 {
-    const ENTITY_NAME  = 'OroActivityListBundle:ActivityList';
-    const ENTITY_CLASS = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
-
     const VERB_CREATE = 'create';
     const VERB_UPDATE = 'update';
 
@@ -79,10 +74,11 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
 
     /**
      * @var User
-     * @deprecated 1.8.0:1.10.0 Will be renamed to updatedBy
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
+     *
+     * This field should be renamed to updatedBy as a part of BAP-9004
      */
     protected $editor;
 
@@ -122,7 +118,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     protected $relatedActivityId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      *
      * @ORM\Column(name="created_at", type="datetime")
      * @ConfigField(
@@ -136,7 +132,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     protected $createdAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      *
      * @ORM\Column(name="updated_at", type="datetime")
      * @ConfigField(
@@ -158,6 +154,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     protected $organization;
 
     /**
+     * @var Collection
      *
      * @ORM\OneToMany(targetEntity="ActivityOwner", mappedBy="activity",
      *      cascade={"persist", "remove"}, orphanRemoval=true)
@@ -311,7 +308,9 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
      */
     public function setSubject($subject)
     {
-        $this->subject = mb_substr($subject, 0, 250, mb_detect_encoding($subject));
+        $this->subject = $subject
+            ? mb_substr($subject, 0, 250, mb_detect_encoding($subject))
+            : $subject;
 
         return $this;
     }
@@ -393,32 +392,6 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @param User $editor
-     * @deprecated 1.8.0:1.10.0 Use $this->setUpdatedBy() instead
-     *
-     * @return self
-     */
-    public function setEditor(User $editor = null)
-    {
-        if ($editor !== null) {
-            $this->updatedBySet = true;
-        }
-
-        $this->editor = $editor;
-
-        return $this;
-    }
-
-    /**
-     * @deprecated since 1.8. Use $this->getUpdatedBy() instead
-     * @return User
-     */
-    public function getEditor()
-    {
-        return $this->editor;
-    }
-
-    /**
      * @param User|null $updatedBy
      *
      * @return self
@@ -430,9 +403,6 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
             $this->updatedBySet = true;
         }
 
-        /**
-         * @TODO will be renamed after BAP-9004
-         */
         $this->editor = $updatedBy;
 
         return $this;
@@ -487,7 +457,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getCreatedAt()
     {
@@ -495,10 +465,10 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @param \DateTime $createdAt
+     * @param \DateTimeInterface|null $createdAt
      * @return $this
      */
-    public function setCreatedAt(\DateTime $createdAt = null)
+    public function setCreatedAt(\DateTimeInterface $createdAt = null)
     {
         $this->createdAt = $createdAt;
 
@@ -506,7 +476,7 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getUpdatedAt()
     {
@@ -514,11 +484,11 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
     }
 
     /**
-     * @param \DateTime $updatedAt
+     * @param \DateTimeInterface|null $updatedAt
      *
      * @return $this
      */
-    public function setUpdatedAt(\DateTime $updatedAt = null)
+    public function setUpdatedAt(\DateTimeInterface $updatedAt = null)
     {
         $this->updatedAtSet = false;
         if ($updatedAt !== null) {

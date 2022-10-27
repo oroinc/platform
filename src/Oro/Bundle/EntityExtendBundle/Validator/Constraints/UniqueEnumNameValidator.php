@@ -10,6 +10,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * Checks that enum has a unique name.
+ */
 class UniqueEnumNameValidator extends ConstraintValidator
 {
     const ALIAS = 'oro_entity_extend.validator.unique_enum_name';
@@ -19,9 +22,6 @@ class UniqueEnumNameValidator extends ConstraintValidator
      */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -62,6 +62,7 @@ class UniqueEnumNameValidator extends ConstraintValidator
      * @return bool
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function isExistingEnum($enumCode, $entityClassName, $fieldName)
     {

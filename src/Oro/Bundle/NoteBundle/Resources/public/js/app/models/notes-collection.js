@@ -4,9 +4,7 @@ define([
 ], function(BaseCollection, NoteModel) {
     'use strict';
 
-    var NotesCollection;
-
-    NotesCollection = BaseCollection.extend({
+    const NotesCollection = BaseCollection.extend({
         model: NoteModel,
 
         baseUrl: '',
@@ -14,10 +12,10 @@ define([
         sorting: 'DESC',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function NotesCollection() {
-            NotesCollection.__super__.constructor.apply(this, arguments);
+        constructor: function NotesCollection(...args) {
+            NotesCollection.__super__.constructor.apply(this, args);
         },
 
         url: function() {

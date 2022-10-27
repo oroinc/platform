@@ -2,24 +2,21 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Delete;
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
+use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 /**
- * @RouteResource("emailtemplate")
- * @NamePrefix("oro_api_")
+ * REST API controller for email templates.
  */
 class EmailTemplateController extends RestController
 {
@@ -38,7 +35,6 @@ class EmailTemplateController extends RestController
      *      class="OroEmailBundle:EmailTemplate",
      *      permission="DELETE"
      * )
-     * @Delete(requirements={"id"="\d+"})
      *
      * @return Response
      */
@@ -47,21 +43,21 @@ class EmailTemplateController extends RestController
         /** @var EmailTemplate $entity */
         $entity = $this->getManager()->find($id);
         if (!$entity) {
-            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
         /**
          * Deny to remove system templates
          */
         if ($entity->getIsSystem()) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view(null, Response::HTTP_FORBIDDEN));
         }
 
         $em = $this->getManager()->getObjectManager();
         $em->remove($entity);
         $em->flush();
 
-        return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view(null, Response::HTTP_NO_CONTENT));
     }
 
     /**
@@ -76,36 +72,35 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_index")
-     * @Get("/emailtemplates/list/{entityName}/{includeNonEntity}/{includeSystemTemplates}",
-     *      requirements={"entityName"="\w+", "includeNonEntity"="\d+", "includeSystemTemplates"="\d+"},
-     *      defaults={"entityName"=null, "includeNonEntity"=false, "includeSystemTemplates"=true}
-     * )
      *
      * @return Response
      */
     public function cgetAction($entityName = null, $includeNonEntity = false, $includeSystemTemplates = true)
     {
         if (!$entityName) {
-            return $this->handleView(
-                $this->view(null, Codes::HTTP_NOT_FOUND)
-            );
+            return $this->handleView($this->view(null, Response::HTTP_NOT_FOUND));
         }
 
         $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
-        /** @var $emailTemplateRepository EmailTemplateRepository */
+        /** @var EmailTemplateRepository $emailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
+
         $templates = $emailTemplateRepository
             ->getTemplateByEntityName(
+                $this->get('oro_security.acl_helper'),
                 $entityName,
                 $this->get('oro_security.token_accessor')->getOrganization(),
                 (bool)$includeNonEntity,
                 (bool)$includeSystemTemplates
             );
 
-        return $this->handleView(
-            $this->view($templates, Codes::HTTP_OK)
-        );
+        $serializedTemplates = [];
+        foreach ($templates as $template) {
+            $serializedTemplates[] = $this->serializeEmailTemplate($template);
+        }
+
+        return $this->handleView($this->view($serializedTemplates, Response::HTTP_OK));
     }
 
     /**
@@ -116,7 +111,6 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
-     * @Get("/emailtemplates/variables")
      *
      * @return Response
      */
@@ -130,9 +124,7 @@ class EmailTemplateController extends RestController
             'entity' => $provider->getEntityVariableDefinitions()
         ];
 
-        return $this->handleView(
-            $this->view($data, Codes::HTTP_OK)
-        );
+        return $this->handleView($this->view($data, Response::HTTP_OK));
     }
 
     /**
@@ -147,9 +139,6 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
-     * @Get("/emailtemplates/compiled/{id}/{entityId}",
-     *      requirements={"id"="\d+", "entityId"="\d*"}
-     * )
      * @ParamConverter("emailTemplate", class="OroEmailBundle:EmailTemplate")
      *
      * @return Response
@@ -178,23 +167,32 @@ class EmailTemplateController extends RestController
                             $entityId
                         )
                     ],
-                    Codes::HTTP_NOT_FOUND
+                    Response::HTTP_NOT_FOUND
                 )
             );
         }
 
-        list($subject, $body) = $this->get('oro_email.email_renderer')
-            ->compileMessage($emailTemplate, $templateParams);
+        try {
+            [$subject, $body] = $this->get('oro_email.email_renderer')->compileMessage($emailTemplate, $templateParams);
 
-        $data = [
-            'subject' => $subject,
-            'body'    => $body,
-            'type'    => $emailTemplate->getType(),
-        ];
+            $view = $this->view(
+                [
+                    'subject' => $subject,
+                    'body' => $body,
+                    'type' => $emailTemplate->getType(),
+                ],
+                Response::HTTP_OK
+            );
+        } catch (SyntaxError|LoaderError|RuntimeError $e) {
+            $view = $this->view(
+                [
+                    'reason' => $this->get('translator')->trans('oro.email.emailtemplate.failed_to_compile'),
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
 
-        return $this->handleView(
-            $this->view($data, Codes::HTTP_OK)
-        );
+        return $this->handleView($view);
     }
 
     /**
@@ -219,5 +217,20 @@ class EmailTemplateController extends RestController
     public function getFormHandler()
     {
         throw new \BadMethodCallException('FormHandler is not available.');
+    }
+
+    protected function serializeEmailTemplate(EmailTemplate $template): array
+    {
+        return [
+            'id'          => $template->getId(),
+            'name'        => $template->getName(),
+            'is_system'   => $template->getIsSystem(),
+            'is_editable' => $template->getIsEditable(),
+            'parent'      => $template->getParent(),
+            'subject'     => $template->getSubject(),
+            'content'     => $template->getContent(),
+            'entity_name' => $template->getEntityName(),
+            'type'        => $template->getType()
+        ];
     }
 }

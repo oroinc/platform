@@ -1,60 +1,53 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer;
 
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\AbstractContextModeAwareNormalizer;
+use Symfony\Component\Serializer\Exception\RuntimeException;
 
 class AbstractContextModeAwareNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AbstractContextModeAwareNormalizer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $normalizer;
+    /** @var AbstractContextModeAwareNormalizer */
+    private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->normalizer = $this
-            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\AbstractContextModeAwareNormalizer')
-            ->setConstructorArgs(array(array('import', 'export'), 'import'))
+        $this->normalizer = $this->getMockBuilder(AbstractContextModeAwareNormalizer::class)
+            ->setConstructorArgs([['import', 'export'], 'import'])
             ->getMockForAbstractClass();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
-     * @expectedExceptionMessage Normalization with mode "import" is not supported
-     */
     public function testNormalizeException()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Normalization with mode "import" is not supported');
+
         $this->normalizer->normalize(new \stdClass());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
-     * @expectedExceptionMessage Mode "unknown" is not supported
-     */
     public function testNormalizeUnsupportedMode()
     {
-        $this->normalizer->normalize(new \stdClass(), null, array('mode' => 'unknown'));
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Mode "unknown" is not supported');
+
+        $this->normalizer->normalize(new \stdClass(), null, ['mode' => 'unknown']);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
-     * @expectedExceptionMessage Mode "unknown" is not supported, available modes are "import", export"
-     */
     public function testConstructorException()
     {
-        $this->normalizer = $this
-            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Serializer\Normalizer\AbstractContextModeAwareNormalizer')
-            ->setConstructorArgs(array(array('import', 'export'), 'unknown'))
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Mode "unknown" is not supported, available modes are "import", export"');
+
+        $this->normalizer = $this->getMockBuilder(AbstractContextModeAwareNormalizer::class)
+            ->setConstructorArgs([['import', 'export'], 'unknown'])
             ->getMockForAbstractClass();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Serializer\Exception\RuntimeException
-     * @expectedExceptionMessage Denormalization with mode "import" is not supported
-     */
     public function testDenormalizeUnsupportedMode()
     {
-        $this->normalizer->denormalize('test', '\stdClass');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Denormalization with mode "import" is not supported');
+
+        $this->normalizer->denormalize('test', \stdClass::class);
     }
 }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -12,26 +13,12 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 class ImapEmailFolderRepositoryTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            [
-                'Oro\Bundle\ImapBundle\Entity',
-                'Oro\Bundle\EmailBundle\Entity',
-            ]
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'OroImapBundle' => 'Oro\Bundle\ImapBundle\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
     }
 
     public function testGetFoldersByOriginQueryBuilder()
@@ -39,10 +26,8 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
         $origin = new UserEmailOrigin();
 
         /** @var ImapEmailFolderRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-
-        $qb    = $repo->getFoldersByOriginQueryBuilder($origin);
-        $query = $qb->getQuery();
+        $repo = $this->em->getRepository(ImapEmailFolder::class);
+        $query = $repo->getFoldersByOriginQueryBuilder($origin)->getQuery();
 
         $this->assertEquals(
             'SELECT imap_folder'
@@ -60,10 +45,8 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
         $origin = new UserEmailOrigin();
 
         /** @var ImapEmailFolderRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-
-        $qb    = $repo->getFoldersByOriginQueryBuilder($origin, true);
-        $query = $qb->getQuery();
+        $repo = $this->em->getRepository(ImapEmailFolder::class);
+        $query = $repo->getFoldersByOriginQueryBuilder($origin, true)->getQuery();
 
         $this->assertEquals(
             'SELECT imap_folder'
@@ -81,10 +64,8 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
         $origin = new UserEmailOrigin();
 
         /** @var ImapEmailFolderRepository $repo */
-        $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
-
-        $qb    = $repo->getEmptyOutdatedFoldersByOriginQueryBuilder($origin);
-        $query = $qb->getQuery();
+        $repo = $this->em->getRepository(ImapEmailFolder::class);
+        $query = $repo->getEmptyOutdatedFoldersByOriginQueryBuilder($origin)->getQuery();
 
         $this->assertEquals(
             'SELECT imap_folder'

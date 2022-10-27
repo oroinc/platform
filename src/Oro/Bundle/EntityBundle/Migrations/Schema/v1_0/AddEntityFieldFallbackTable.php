@@ -18,8 +18,6 @@ class AddEntityFieldFallbackTable
 
     /**
      * Create oro_entity_fallback_value table
-     *
-     * @param Schema $schema
      */
     protected function createOroEntityFallbackValueTable(Schema $schema)
     {

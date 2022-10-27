@@ -2,68 +2,75 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\UrlProvider;
+use Symfony\Component\Routing\RouterInterface;
 
 class UrlProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var UrlProvider
-     */
-    protected $urlProvider;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $router;
+    /** @var UrlProvider */
+    private $urlProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
-            ->getMockForAbstractClass();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->router = $this->createMock(RouterInterface::class);
 
         $this->urlProvider = new UrlProvider($this->configManager, $this->router);
     }
 
     public function testGetUrlReturnEmptyStringIfMetadataNotExist()
     {
-        $reminder = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
+        $reminder = $this->createMock(Reminder::class);
         $expected = '';
-        $this->configManager->expects($this->once())->method('getEntityMetadata')->will($this->returnValue(null));
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->willReturn(null);
         $actual = $this->urlProvider->getUrl($reminder);
         $this->assertEquals($expected, $actual);
     }
 
     public function testGetUrlForView()
     {
-        $reminder            = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $expected            = '/fake/path/for/view';
-        $expectedId          = 42;
-        $metadata            = new \StdClass();
+        $reminder = $this->createMock(Reminder::class);
+        $expected = '/fake/path/for/view';
+        $expectedId = 42;
+        $metadata = new \stdClass();
         $metadata->routeView = $expected;
-        $this->configManager->expects($this->once())->method('getEntityMetadata')->will($this->returnValue($metadata));
-        $expectedParams = array('id' => $expectedId);
-        $reminder->expects($this->once())->method('getRelatedEntityId')->will($this->returnValue($expectedId));
-        $this->router->expects($this->once())->method('generate')->with($expected, $this->equalTo($expectedParams));
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->willReturn($metadata);
+        $expectedParams = ['id' => $expectedId];
+        $reminder->expects($this->once())
+            ->method('getRelatedEntityId')
+            ->willReturn($expectedId);
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with($expected, $expectedParams);
+
         $this->urlProvider->getUrl($reminder);
     }
 
     public function testGetUrlForIndex()
     {
-        $reminder            = $this->createMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $expected            = '/fake/path/for/view';
-        $metadata            = new \StdClass();
+        $reminder = $this->createMock(Reminder::class);
+        $expected = '/fake/path/for/view';
+        $metadata = new \stdClass();
         $metadata->routeName = $expected;
-        $this->configManager->expects($this->once())->method('getEntityMetadata')->will($this->returnValue($metadata));
-        $this->router->expects($this->once())->method('generate')->with($expected);
+        $this->configManager->expects($this->once())
+            ->method('getEntityMetadata')
+            ->willReturn($metadata);
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with($expected);
+
         $this->urlProvider->getUrl($reminder);
     }
 }

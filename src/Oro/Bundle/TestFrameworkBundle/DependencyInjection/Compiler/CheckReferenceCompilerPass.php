@@ -2,38 +2,30 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
+use Doctrine\Bundle\DoctrineBundle\Dbal\ManagerRegistryAwareConnectionProvider;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
- * This compiler pass for testing that arguments and calls parameters
- * setted in another compiler passes are References instead of Definition
+ * This compiler pass tests that services are injected into other services via a reference.
  */
 class CheckReferenceCompilerPass implements CompilerPassInterface
 {
     /**
-     * @var array
-     */
-    private $entityConfigProviders = null;
-
-    /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $definition) {
             $arguments = $definition->getArguments();
-            $calls = $definition->getMethodCalls();
-
             if ($arguments) {
-                foreach ($arguments as $argument) {
-                    $this->checkIsReference($container, $definition, '__construct', $argument);
-                }
+                $this->checkArguments($container, $definition, '__construct', $arguments);
             }
 
+            $calls = $definition->getMethodCalls();
             if ($calls) {
                 foreach ($calls as $call) {
                     $this->checkCall($container, $definition, $call);
@@ -42,81 +34,60 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition $definition
-     * @param array $call
-     * @throws \Exception
-     */
-    private function checkCall(ContainerBuilder $container, Definition $definition, array $call)
+    private function checkArguments(
+        ContainerBuilder $container,
+        Definition $definition,
+        string $method,
+        array $arguments
+    ): void {
+        foreach ($arguments as $argument) {
+            if ($argument instanceof Definition) {
+                $this->assertDefinitionIsAllowedAsArgument($container, $definition, $method, $argument);
+            }
+        }
+    }
+
+    private function checkCall(ContainerBuilder $container, Definition $definition, array $call): void
     {
         if (count($call[1]) === 1) {
-            $parameters = $call[1];
-            $method = $call[0];
-            foreach ($parameters as $parameter) {
-                $this->checkIsReference($container, $definition, $method, $parameter);
+            [$method, $arguments] = $call;
+            if ($arguments) {
+                $this->checkArguments($container, $definition, $method, $arguments);
             }
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition $definition
-     * @param $method
-     * @param $parameter
-     * @throws \Exception
-     */
-    private function checkIsReference(ContainerBuilder $container, Definition $definition, $method, $parameter)
-    {
-        if ($parameter instanceof Definition) {
-            if ($this->isEntityConfigProviderService($container, $parameter)) {
-                return;
-            }
-            if ($definition->getClass() === MemoryCacheChain::class) {
-                return;
-            }
-
-            throw new \Exception(sprintf(
-                'Service %s has definition of service %s as parameter in method %s. Should be %s instead of %s',
-                $definition->getClass(),
-                $parameter->getClass(),
-                $method,
-                Reference::class,
-                Definition::class
-            ));
+    private function assertDefinitionIsAllowedAsArgument(
+        ContainerBuilder $container,
+        Definition $definition,
+        string $method,
+        Definition $argument
+    ): void {
+        if (in_array(
+            $definition->getClass(),
+            [
+                MimeTypes::class,
+                ManagerRegistryAwareConnectionProvider::class,
+            ]
+        )) {
+            return;
         }
-    }
-
-    /**
-     * Check that definition has appropriate id in service container or is in allowed definitions
-     * @param ContainerBuilder $container
-     * @param Definition $definition
-     * @return bool
-     */
-    private function isEntityConfigProviderService(ContainerBuilder $container, Definition $definition)
-    {
-        $definitionId = array_search($definition, $container->getDefinitions());
-
-        return !$definitionId || in_array($definitionId, $this->getEntityConfigProviders($container));
-    }
-
-    /**
-     * All oro_entity_config.provider. services should be pass because this definition created dynamically
-     * @param ContainerBuilder $container
-     * @return array
-     */
-    private function getEntityConfigProviders(ContainerBuilder $container)
-    {
-        if ($this->entityConfigProviders === null) {
-            $serviceIds = array_keys($container->getDefinitions());
-            $this->entityConfigProviders = array_filter(
-                $serviceIds,
-                function ($id) {
-                    return strpos($id, 'oro_entity_config.provider.') === 0;
-                }
-            );
+        if ($argument->getClass() === MimeTypes::class) {
+            return;
         }
 
-        return $this->entityConfigProviders;
+        $argumentServiceId = array_search($argument, $container->getDefinitions());
+        if (!$argumentServiceId) {
+            return;
+        }
+
+        throw new \RuntimeException(sprintf(
+            'Service %s has definition of service %s as parameter in method %s. Should be %s instead of %s',
+            $definition->getClass(),
+            $argument->getClass(),
+            $method,
+            Reference::class,
+            Definition::class
+        ));
     }
 }

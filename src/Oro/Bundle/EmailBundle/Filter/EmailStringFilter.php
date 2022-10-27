@@ -2,68 +2,59 @@
 
 namespace Oro\Bundle\EmailBundle\Filter;
 
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
+/**
+ * Fictive string filter which is used in email grids. Has dummy ::apply() method because of performance issues of
+ * regular string filter on email grids. Method ::applyAndGetExpression() is explicitly used in
+ * Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory to apply filter to the datagrid query.
+ */
 class EmailStringFilter extends StringFilter
 {
-    /** @var Expr\Comparison|Expr\Comparison[]|null */
-    protected $expression = null;
-
-    /** @var Parameter[]|null */
-    protected $parameters = null;
-
-    /**
-     * @return Expr\Comparison|Expr\Comparison[]|null
-     */
-    public function getExpression()
-    {
-        return $this->expression;
-    }
-
-    /**
-     * @return Parameter[]|null
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         /** @var $ds OrmFilterDatasourceAdapter $data */
-
         $data = $this->parseData($data);
         if (!$data) {
             return false;
         }
 
-        $sourceParametersCollection = clone $ds->getQueryBuilder()->getParameters();
-        $sourceParameters = $sourceParametersCollection->toArray();
-
-        $this->expression = $this->buildExpr($ds, $data['type'], $this->getDataFieldName(), $data);
-        $this->parameters = array_diff(
-            $ds->getQueryBuilder()->getParameters()->toArray(),
-            $sourceParameters
-        );
-
-        $ds->getQueryBuilder()->setParameters($sourceParametersCollection);
-
         return true;
     }
 
     /**
-     * {@inheritdoc}
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param array $data
+     *
+     * @return array|null Returns the filter query expression and its parameters. Returns null if data cannot be parsed.
      */
-    protected function getFormType()
+    public function applyAndGetExpression(FilterDatasourceAdapterInterface $ds, $data): ?array
     {
-        return TextFilterType::class;
+        $parsedData = $this->parseData($data);
+        if (!$parsedData) {
+            return null;
+        }
+
+        $sourceParametersCollection = clone $ds->getQueryBuilder()->getParameters();
+        $sourceParameters = $sourceParametersCollection->toArray();
+
+        $expression = $this->buildExpr($ds, $parsedData['type'], $this->getDataFieldName(), $parsedData);
+        $parameters = array_udiff(
+            $ds->getQueryBuilder()->getParameters()->toArray(),
+            $sourceParameters,
+            function (Parameter $a, Parameter $b) {
+                return $a <=> $b;
+            }
+        );
+
+        $ds->getQueryBuilder()->setParameters($sourceParametersCollection);
+
+        return [$expression, $parameters];
     }
 }

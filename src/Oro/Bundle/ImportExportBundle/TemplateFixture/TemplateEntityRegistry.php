@@ -20,9 +20,6 @@ class TemplateEntityRegistry
     /** @var array */
     private $entities = [];
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -115,8 +112,6 @@ class TemplateEntityRegistry
     /**
      * Makes sure all entities in this registry are ready to work.
      * It means that all properties of these entities are filled.
-     *
-     * @param TemplateManager $templateManager
      */
     protected function ensureReadyToWork(TemplateManager $templateManager)
     {
@@ -134,7 +129,7 @@ class TemplateEntityRegistry
 
             if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_LOAD_TEMPLATE_FIXTURES)) {
                 $event = new LoadTemplateFixturesEvent($this->entities);
-                $this->dispatcher->dispatch(Events::AFTER_LOAD_TEMPLATE_FIXTURES, $event);
+                $this->dispatcher->dispatch($event, Events::AFTER_LOAD_TEMPLATE_FIXTURES);
                 $this->entities = $event->getEntities();
             }
         }

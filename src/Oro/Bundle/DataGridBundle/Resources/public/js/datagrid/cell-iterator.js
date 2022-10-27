@@ -6,23 +6,22 @@ define(function(require) {
      * @class
      * @augments [BaseClass](../../../../UIBundle/Resources/doc/reference/client-side/base-class.md)
      */
-    var CellIterator;
-    var BaseClass = require('oroui/js/base-class');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const BaseClass = require('oroui/js/base-class');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    CellIterator = BaseClass.extend({
+    const CellIterator = BaseClass.extend({
         constructor: function CellIterator(grid, cell) {
             this.current = cell;
             this.grid = grid;
             this.columns = grid.columns;
             this.rows = grid.collection;
 
-            CellIterator.__super__.constructor.apply(this, arguments);
+            CellIterator.__super__.constructor.call(this, grid, cell);
         },
 
         toResolvedPromise: function(result) {
-            var deferred = $.Deferred();
+            const deferred = $.Deferred();
             deferred.resolve(result);
             return deferred.promise();
         },
@@ -32,12 +31,12 @@ define(function(require) {
         },
 
         getCurrentCellInfo: function() {
-            var rowI = this.rows.indexOf(this.current.model);
-            var isFirstRow = rowI === 0;
-            var isLastRow = rowI >= this.rows.length - 1;
-            var columnI = this.columns.indexOf(this.current.column);
-            var isFirstColumn = columnI <= _.findIndex(this.columns.models, this.isColumnVisible);
-            var isLastColumn = columnI >= _.findLastIndex(this.columns.models, this.isColumnVisible);
+            const rowI = this.rows.indexOf(this.current.model);
+            const isFirstRow = rowI === 0;
+            const isLastRow = rowI >= this.rows.length - 1;
+            const columnI = this.columns.indexOf(this.current.column);
+            const isFirstColumn = columnI <= _.findIndex(this.columns.models, this.isColumnVisible);
+            const isLastColumn = columnI >= _.findLastIndex(this.columns.models, this.isColumnVisible);
             return {
                 row: {
                     i: rowI,
@@ -72,17 +71,16 @@ define(function(require) {
         },
 
         next: function() {
-            var info = this.getCurrentCellInfo();
-            var columnI;
-            var rowI;
-            var _this = this;
+            const info = this.getCurrentCellInfo();
+            let columnI;
+            let rowI;
 
             if (info.column.last) {
                 if (info.row.last) {
                     // navigate to next page
-                    return this.getNextPage().then(function() {
-                        _this.current = _this.findCellByIndexOrNext(0, 0, 1);
-                        return _this.current;
+                    return this.getNextPage().then(() => {
+                        this.current = this.findCellByIndexOrNext(0, 0, 1);
+                        return this.current;
                     });
                 }
                 rowI = info.row.i + 1;
@@ -98,18 +96,15 @@ define(function(require) {
         },
 
         nextRow: function() {
-            var info = this.getCurrentCellInfo();
-            var columnI;
-            var rowI;
-            var _this = this;
-            rowI = info.row.i + 1;
-            columnI = info.column.i;
+            const info = this.getCurrentCellInfo();
+            const rowI = info.row.i + 1;
+            const columnI = info.column.i;
 
             if (info.row.last) {
                 // navigate to next page
-                return this.getNextPage().then(function() {
-                    _this.current = _this.findCellByIndexOrNext(0, columnI, 1);
-                    return _this.current;
+                return this.getNextPage().then(() => {
+                    this.current = this.findCellByIndexOrNext(0, columnI, 1);
+                    return this.current;
                 });
             }
 
@@ -119,18 +114,17 @@ define(function(require) {
         },
 
         prev: function() {
-            var info = this.getCurrentCellInfo();
-            var columnI;
-            var rowI;
-            var _this = this;
+            const info = this.getCurrentCellInfo();
+            let columnI;
+            let rowI;
 
             if (info.column.first) {
                 if (info.row.first) {
                     // navigate to prev page
-                    return this.getPreviousPage().then(function() {
-                        _this.current =
-                            _this.findCellByIndexOrNext(_this.rows.length - 1, _this.columns.length - 1, -1);
-                        return _this.current;
+                    return this.getPreviousPage().then(() => {
+                        this.current =
+                            this.findCellByIndexOrNext(this.rows.length - 1, this.columns.length - 1, -1);
+                        return this.current;
                     });
                 }
                 rowI = info.row.i - 1;
@@ -146,19 +140,16 @@ define(function(require) {
         },
 
         prevRow: function() {
-            var info = this.getCurrentCellInfo();
-            var columnI;
-            var rowI;
-            var _this = this;
+            const info = this.getCurrentCellInfo();
 
-            rowI = info.row.i - 1;
-            columnI = info.column.i;
+            const rowI = info.row.i - 1;
+            const columnI = info.column.i;
 
             if (info.row.first) {
                 // navigate to prev page
-                return this.getPreviousPage().then(function() {
-                    _this.current = _this.findCellByIndexOrNext(_this.rows.length - 1, columnI, -1);
-                    return _this.current;
+                return this.getPreviousPage().then(() => {
+                    this.current = this.findCellByIndexOrNext(this.rows.length - 1, columnI, -1);
+                    return this.current;
                 });
             }
 
@@ -168,7 +159,7 @@ define(function(require) {
         },
 
         findCellByIndexOrNext: function(rowI, columnI, direction) {
-            var current;
+            let current;
             while (!current && columnI >= 0 && columnI < this.columns.length) {
                 current = this.grid.findCellByIndex(rowI, columnI);
                 columnI += direction;

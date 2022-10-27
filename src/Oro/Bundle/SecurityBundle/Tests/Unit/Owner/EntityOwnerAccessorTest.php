@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntity;
@@ -10,10 +13,17 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 
 class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
 {
+    private Inflector $inflector;
+
+    protected function setUp(): void
+    {
+        $this->inflector = (new InflectorFactory())->build();
+    }
+
     public function testGetOwner()
     {
         $metadataProvider = new OwnershipMetadataProviderStub($this);
-        $accessor = new EntityOwnerAccessor($metadataProvider);
+        $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
 
         $obj1 = new TestEntity('testId1');
         $obj1->setOwner('testOwner1');
@@ -35,29 +45,30 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOwnerNoMetadata()
     {
-        $accessor = new EntityOwnerAccessor(new OwnershipMetadataProviderStub($this));
+        $metadataProvider = new OwnershipMetadataProviderStub($this);
+        $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
+        $metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
         $obj = new TestEntity('testId');
         $obj->setOwner('testOwner');
         $this->assertNull($accessor->getOwner($obj));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
-     */
     public function testGetOwnerNull()
     {
-        $accessor = new EntityOwnerAccessor(new OwnershipMetadataProviderStub($this));
+        $this->expectException(InvalidEntityException::class);
+        $accessor = new EntityOwnerAccessor(new OwnershipMetadataProviderStub($this), $this->inflector);
         $accessor->getOwner(null);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
-     */
     public function testGetOwnerNoGetOwnerAndNoOwnerField()
     {
+        $this->expectException(InvalidEntityException::class);
         $metadataProvider = new OwnershipMetadataProviderStub($this);
-        $accessor = new EntityOwnerAccessor($metadataProvider);
+        $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
 
         $obj = new \stdClass();
         $metadataProvider->setMetadata(get_class($obj), new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id'));
@@ -65,23 +76,21 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getOwner($obj);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
-     */
     public function testGetOrganizationWrongObject()
     {
+        $this->expectException(InvalidEntityException::class);
         $metadataProvider = new OwnershipMetadataProviderStub($this);
-        $accessor = new EntityOwnerAccessor($metadataProvider);
+        $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
         $accessor->getOrganization('not_an_object');
     }
 
     public function testGetOrganization()
     {
         $metadataProvider = new OwnershipMetadataProviderStub($this);
-        $accessor = new EntityOwnerAccessor($metadataProvider);
+        $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
         $org = new \stdClass();
         $obj = new TestEntity(1, null, $org);
-        $metadataProvider->setMetadata(get_class($obj), new OwnershipMetadata(null, null, null, 'organization'));
+        $metadataProvider->setMetadata(get_class($obj), new OwnershipMetadata('', '', '', 'organization'));
         $this->assertSame($org, $accessor->getOrganization($obj));
     }
 }

@@ -13,7 +13,7 @@ class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityOverrideProvider */
     private $entityOverrideProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configCache = $this->createMock(ConfigCache::class);
         $this->configCache->expects(self::once())
@@ -45,6 +45,30 @@ class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         // test that data is cached in memory
         self::assertNull(
             $this->entityOverrideProvider->getSubstituteEntityClass('Test\Entity3')
+        );
+    }
+
+    public function testGetEntityClass()
+    {
+        self::assertEquals(
+            'Test\Entity1',
+            $this->entityOverrideProvider->getEntityClass('Test\Entity2')
+        );
+        // test that data is cached in memory
+        self::assertEquals(
+            'Test\Entity1',
+            $this->entityOverrideProvider->getEntityClass('Test\Entity2')
+        );
+    }
+
+    public function testGetEntityClassWhenSubstitutionDoesNotExist()
+    {
+        self::assertNull(
+            $this->entityOverrideProvider->getEntityClass('Test\Entity3')
+        );
+        // test that data is cached in memory
+        self::assertNull(
+            $this->entityOverrideProvider->getEntityClass('Test\Entity3')
         );
     }
 }

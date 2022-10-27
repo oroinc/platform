@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 
 class EmailRecipientTest extends \PHPUnit\Framework\TestCase
 {
@@ -30,21 +32,21 @@ class EmailRecipientTest extends \PHPUnit\Framework\TestCase
 
     public function testEmailAddressGetterAndSetter()
     {
-        $emailAddress = $this->createMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+        $emailAddress = $this->createMock(EmailAddress::class);
 
         $entity = new EmailRecipient();
         $entity->setEmailAddress($emailAddress);
 
-        $this->assertTrue($emailAddress === $entity->getEmailAddress());
+        $this->assertSame($emailAddress, $entity->getEmailAddress());
     }
 
     public function testEmailGetterAndSetter()
     {
-        $email = $this->createMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email = $this->createMock(Email::class);
 
         $entity = new EmailRecipient();
         $entity->setEmail($email);
 
-        $this->assertTrue($email === $entity->getEmail());
+        $this->assertSame($email, $entity->getEmail());
     }
 }

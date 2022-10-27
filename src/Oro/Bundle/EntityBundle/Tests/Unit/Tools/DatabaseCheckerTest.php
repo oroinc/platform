@@ -2,109 +2,100 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 
 class DatabaseCheckerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    private ApplicationState $applicationState;
+
+    protected function setUp(): void
+    {
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->applicationState = $this->createMock(ApplicationState::class);
+    }
+
     public function testCheckDatabaseForInstalledApplication()
     {
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->applicationState->method('isInstalled')->willReturn(true);
+        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
 
-        $databaseChecker = new DatabaseChecker($doctrine, ['test_table'], '2017-01-01');
+        // test that the result is cached
+        $this->doctrine->expects(self::never())
+            ->method('getConnection');
+
         self::assertTrue($databaseChecker->checkDatabase());
-        self::assertAttributeSame(null, 'dbCheck', $databaseChecker);
     }
 
     public function testCheckDatabaseForInstalledApplicationAfterCallClearCheckDatabase()
     {
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $connection = $this->setTablesExistExpectation(['test_table'], true);
-        $doctrine->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
 
-        $databaseChecker = new DatabaseChecker($doctrine, ['test_table'], '2017-01-01');
+        $this->applicationState->method('isInstalled')->willReturn(true);
+        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
         $databaseChecker->clearCheckDatabase();
         self::assertTrue($databaseChecker->checkDatabase());
         // test that the result is cached
-        self::assertAttributeSame(true, 'dbCheck', $databaseChecker);
+        $this->doctrine->expects(self::never())
+            ->method('getConnection');
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
     public function testCheckDatabaseForNotInstalledApplication()
     {
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $connection = $this->setTablesExistExpectation(['test_table'], true);
-        $doctrine->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
 
-        $databaseChecker = new DatabaseChecker($doctrine, ['test_table'], null);
+        $this->applicationState->method('isInstalled')->willReturn(false);
+        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
         self::assertTrue($databaseChecker->checkDatabase());
         // test that the result is cached
-        self::assertAttributeSame(true, 'dbCheck', $databaseChecker);
+        $this->doctrine->expects(self::never())
+            ->method('getConnection');
         self::assertTrue($databaseChecker->checkDatabase());
     }
 
     public function testCheckDatabaseForNotInstalledApplicationAndTablesDoNotExist()
     {
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
         $connection = $this->setTablesExistExpectation(['test_table'], false);
-        $doctrine->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
 
-        $databaseChecker = new DatabaseChecker($doctrine, ['test_table'], null);
+        $this->applicationState->method('isInstalled')->willReturn(false);
+
+        $databaseChecker = new DatabaseChecker($this->doctrine, ['test_table'], $this->applicationState);
         self::assertFalse($databaseChecker->checkDatabase());
         // test that the result is cached
-        self::assertAttributeSame(false, 'dbCheck', $databaseChecker);
+        $this->doctrine->expects(self::never())
+            ->method('getConnection');
         self::assertFalse($databaseChecker->checkDatabase());
     }
 
-    public function testClearCheckDatabase()
+    private function setTablesExistExpectation(array $tables, bool $result): Connection
     {
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $databaseChecker = new DatabaseChecker($doctrine, ['test_table'], '2017-01-01');
-        $databaseChecker->clearCheckDatabase();
-        self::assertAttributeSame(null, 'dbCheck', $databaseChecker);
-        self::assertAttributeSame(false, 'installed', $databaseChecker);
-    }
-
-    /**
-     * @param string[] $tables
-     * @param bool     $result
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
-     */
-    protected function setTablesExistExpectation($tables, $result)
-    {
-        $connection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $connection = $this->createMock(Connection::class);
         $schemaManager = $this->getMockBuilder(AbstractSchemaManager::class)
             ->disableOriginalConstructor()
-            ->setMethods(['tablesExist'])
+            ->onlyMethods(['tablesExist'])
             ->getMockForAbstractClass();
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('connect');
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('getSchemaManager')
             ->willReturn($schemaManager);
-        $schemaManager->expects($this->once())
+        $schemaManager->expects(self::once())
             ->method('tablesExist')
             ->with($tables)
             ->willReturn($result);

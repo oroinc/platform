@@ -1,66 +1,43 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Model\Action;
 
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\ImportExportBundle\Model\Action\ExecuteJobAction;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
-    protected $contextAccessor;
+    /** @var JobExecutor|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobExecutor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|JobExecutor
-     */
-    protected $jobExecutor;
+    /** @var ExecuteJobAction */
+    private $action;
 
-    /**
-     * @var ExecuteJobAction
-     */
-    protected $action;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
-        $this->jobExecutor = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Job\JobExecutor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->jobExecutor = $this->createMock(JobExecutor::class);
 
-        $this->action = new ExecuteJobAction($this->contextAccessor, $this->jobExecutor);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->contextAccessor, $this->jobExecutor, $this->action);
+        $this->action = new ExecuteJobAction(new ContextAccessor(), $this->jobExecutor);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
      * @dataProvider invalidOptionsDataProvider
-     * @param array $options
-     * @param string $expectedExceptionMessage
      */
-    public function testInitializeErrors(array $options, $expectedExceptionMessage)
+    public function testInitializeErrors(array $options, string $expectedExceptionMessage)
     {
-        $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
+
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
         return [
             [[], 'Parameter "jobType" is required.'],
@@ -102,22 +79,17 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidExecuteOptionsDataProvider
-     * @param array $options
-     * @param mixed $context
-     * @param string $expectedExceptionMessage
      */
-    public function testExecuteExceptions(array $options, $context, $expectedExceptionMessage)
+    public function testExecuteExceptions(array $options, array $context, string $expectedExceptionMessage)
     {
-        $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+        $this->expectException(InvalidParameterException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
+
         $this->action->initialize($options);
         $this->action->execute($context);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidExecuteOptionsDataProvider()
+    public function invalidExecuteOptionsDataProvider(): array
     {
         return [
             'invalid jobType' => [
@@ -202,13 +174,11 @@ class ExecuteJobActionTest extends \PHPUnit\Framework\TestCase
         $context->a = 'name';
         $context->c = 'test';
         $context->attr = null;
-        $jobResult = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Job\JobResult')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $jobResult = $this->createMock(JobResult::class);
         $this->jobExecutor->expects($this->once())
             ->method('executeJob')
             ->with('type', 'name', ['c' => 'test', 'd' => 'e'])
-            ->will($this->returnValue($jobResult));
+            ->willReturn($jobResult);
         $this->action->initialize($options);
         $this->action->execute($context);
         $expectedContext = new \stdClass();

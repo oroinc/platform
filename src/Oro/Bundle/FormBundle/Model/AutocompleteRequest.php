@@ -31,17 +31,11 @@ class AutocompleteRequest
      */
     protected $searchById;
 
-    /**
-     * @param Request $request
-     */
     public function __construct(Request $request)
     {
         $this->createFromRequest($request);
     }
 
-    /**
-     * @param Request $request
-     */
     public function createFromRequest(Request $request)
     {
         $this->name       = $request->get('name');

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Authentication;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -16,9 +16,6 @@ class TokenAccessor implements TokenAccessorInterface
     /** @var TokenStorageInterface */
     private $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
@@ -85,8 +82,8 @@ class TokenAccessor implements TokenAccessorInterface
     {
         $result = null;
         $token = $this->tokenStorage->getToken();
-        if ($token instanceof OrganizationContextTokenInterface) {
-            $organization = $token->getOrganizationContext();
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            $organization = $token->getOrganization();
             if ($organization instanceof Organization) {
                 $result = $organization;
             }

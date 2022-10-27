@@ -1,0 +1,4 @@
+services:
+    oro_segment.tests.provider.segment_snapshot_delta_provider:
+        alias: oro_segment.provider.segment_snapshot_delta_provider
+        public: true

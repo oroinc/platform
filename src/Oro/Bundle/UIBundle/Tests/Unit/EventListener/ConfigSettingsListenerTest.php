@@ -8,25 +8,18 @@ use Oro\Bundle\UIBundle\EventListener\ConfigSettingsListener;
 
 class ConfigSettingsListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigSettingsListener
-     */
-    protected $configSettingsListener;
+    /** @var ConfigSettingsListener */
+    private $configSettingsListener;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configSettingsListener = new ConfigSettingsListener();
     }
 
     /**
-     * @param string $given
-     * @param string $expected
      * @dataProvider onBeforeDataProvider
      */
-    public function testOnBeforeMethod($given, $expected)
+    public function testOnBeforeMethod(string $given, string $expected)
     {
         /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManagerMock */
         $configManagerMock = $this->createMock(ConfigManager::class);
@@ -37,10 +30,7 @@ class ConfigSettingsListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $event->getSettings()['value']);
     }
 
-    /**
-     * @return array
-     */
-    public function onBeforeDataProvider()
+    public function onBeforeDataProvider(): array
     {
         return [
             ['http://localhost', 'http://localhost'],

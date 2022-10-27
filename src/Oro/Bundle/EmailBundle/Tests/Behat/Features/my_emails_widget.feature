@@ -29,7 +29,7 @@ Feature: My emails widget
     Then 4 emails in email list must be new
 
   Scenario: Click action link
-    Given follow "Reply All"
+    Given I follow "Reply All" on "Merry Christmas" email notification
     Then I should see an "Email Form" element
     And "Email Form" must contains values:
       | From    | "John Doe" <admin@example.com>        |

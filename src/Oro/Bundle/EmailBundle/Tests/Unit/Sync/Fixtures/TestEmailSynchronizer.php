@@ -2,28 +2,33 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
+use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationBag;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
+use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 
 class TestEmailSynchronizer extends AbstractEmailSynchronizer
 {
-    const EMAIL_ORIGIN_ENTITY = 'AcmeBundle:EmailOrigin';
+    public const EMAIL_ORIGIN_ENTITY = 'AcmeBundle:EmailOrigin';
 
     /** @var EmailEntityBuilder */
-    protected $emailEntityBuilder;
+    private $emailEntityBuilder;
 
+    /** @var \DateTime|null */
     private $now;
 
     public function __construct(
         ManagerRegistry $doctrine,
         KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
-        EmailEntityBuilder $emailEntityBuilder
+        EmailEntityBuilder $emailEntityBuilder,
+        NotificationAlertManager $notificationAlertManager
     ) {
-        parent::__construct($doctrine, $knownEmailAddressCheckerFactory);
+        parent::__construct($doctrine, $knownEmailAddressCheckerFactory, $notificationAlertManager);
+        $this->notificationsBag = new EmailSyncNotificationBag();
         $this->emailEntityBuilder = $emailEntityBuilder;
     }
 

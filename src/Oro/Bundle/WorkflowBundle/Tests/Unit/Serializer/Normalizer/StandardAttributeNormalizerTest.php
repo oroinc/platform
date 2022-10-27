@@ -2,310 +2,289 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer;
 
 class StandardAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflow;
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflow;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attribute;
+    /** @var Attribute|\PHPUnit\Framework\MockObject\MockObject */
+    private $attribute;
 
-    /**
-     * @var StandardAttributeNormalizer
-     */
-    protected $normalizer;
+    /** @var StandardAttributeNormalizer */
+    private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setMethods(array('getAttribute', 'getName'))
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attribute = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->setMethods(array('getType', 'getOption'))
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflow = $this->createMock(Workflow::class);
+        $this->attribute = $this->createMock(Attribute::class);
 
         $this->normalizer = new StandardAttributeNormalizer();
     }
 
     /**
      * @dataProvider normalizeScalarsAndArrayDataProvider
-     *
-     * @param string $type
-     * @param mixed $value
-     * @param mixed $expected
      */
-    public function testNormalizeScalarsAndArray($type, $value, $expected)
+    public function testNormalizeScalarsAndArray(string $type, mixed $value, mixed $expected)
     {
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
-        $this->attribute->expects($this->once())->method('getType')->will($this->returnValue($type));
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn($type);
 
         $this->assertEquals($expected, $this->normalizer->normalize($this->workflow, $this->attribute, $value));
     }
 
-    public function normalizeScalarsAndArrayDataProvider()
+    public function normalizeScalarsAndArrayDataProvider(): array
     {
-        return array(
-            'string' => array(
+        return [
+            'string' => [
                 'type' => 'string',
                 'value' => '000',
                 'expected' => '000',
-            ),
-            'string_object' => array(
+            ],
+            'string_object' => [
                 'type' => 'string',
                 'value' => new \stdClass(),
                 'expected' => null,
-            ),
-            'int' => array(
+            ],
+            'int' => [
                 'type' => 'int',
                 'value' => '01.1',
                 'expected' => 1,
-            ),
-            'integer' => array(
+            ],
+            'integer' => [
                 'type' => 'integer',
                 'value' => '-12345.67',
                 'expected' => -12345,
-            ),
-            'bool' => array(
+            ],
+            'bool' => [
                 'type' => 'bool',
                 'value' => '',
                 'expected' => false,
-            ),
-            'boolean' => array(
+            ],
+            'boolean' => [
                 'type' => 'boolean',
                 'value' => 'false',
                 'expected' => true,
-            ),
-            'float' => array(
+            ],
+            'float' => [
                 'type' => 'float',
                 'value' => '-12345.67',
                 'expected' => -12345.67,
-            ),
-            'not_array' => array(
+            ],
+            'not_array' => [
                 'type' => 'array',
                 'value' => '-12345.67',
-                'expected' => $this->serializeBase64(array()),
-            ),
-            'array' => array(
+                'expected' => $this->serializeBase64([]),
+            ],
+            'array' => [
                 'type' => 'array',
-                'value' => array(1, 2, 3),
-                'expected' => $this->serializeBase64(array(1, 2, 3)),
-            ),
-        );
+                'value' => [1, 2, 3],
+                'expected' => $this->serializeBase64([1, 2, 3]),
+            ],
+        ];
     }
 
     /**
      * @dataProvider normalizeObjectDataProvider
-     *
-     * @param mixed $value
-     * @param mixed $class
-     * @param mixed $expected
      */
-    public function testNormalizeObject($value, $class, $expected)
+    public function testNormalizeObject(mixed $value, string $class, ?string $expected)
     {
         $type = 'object';
 
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
-        $this->attribute->expects($this->once())->method('getType')->will($this->returnValue($type));
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn($type);
         $this->attribute->expects($this->once())
             ->method('getOption')->with('class')
-            ->will($this->returnValue($class));
+            ->willReturn($class);
 
         $this->assertEquals($expected, $this->normalizer->normalize($this->workflow, $this->attribute, $value));
     }
 
-    public function normalizeObjectDataProvider()
+    public function normalizeObjectDataProvider(): array
     {
-        return array(
-            'not_object' => array(
+        return [
+            'not_object' => [
                 'value' => '01.1',
                 'class' => 'stdClass',
                 'expected' => null,
-            ),
-            'not_instance_of_class' => array(
+            ],
+            'not_instance_of_class' => [
                 'value' => new \DateTime(),
                 'class' => 'stdClass',
                 'expected' => null,
-            ),
-            'object' => array(
+            ],
+            'object' => [
                 'value' => new \stdClass(),
                 'class' => 'stdClass',
                 'expected' => $this->serializeBase64(new \stdClass()),
-            ),
-        );
+            ],
+        ];
     }
 
     /**
      * @dataProvider denormalizeScalarsAndArrayDataProvider
-     *
-     * @param string $type
-     * @param mixed $value
-     * @param mixed $expected
      */
-    public function testDenormalizeScalarsAndArray($type, $value, $expected)
+    public function testDenormalizeScalarsAndArray(string $type, mixed $value, mixed $expected)
     {
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
-        $this->attribute->expects($this->once())->method('getType')->will($this->returnValue($type));
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn($type);
 
         $this->assertEquals($expected, $this->normalizer->denormalize($this->workflow, $this->attribute, $value));
     }
 
-    public function denormalizeScalarsAndArrayDataProvider()
+    public function denormalizeScalarsAndArrayDataProvider(): array
     {
-        return array(
-            'string' => array(
+        return [
+            'string' => [
                 'type' => 'string',
                 'value' => '000',
                 'expected' => '000',
-            ),
-            'string_object' => array(
+            ],
+            'string_object' => [
                 'type' => 'string',
                 'value' => new \stdClass(),
                 'expected' => null,
-            ),
-            'int' => array(
+            ],
+            'int' => [
                 'type' => 'int',
                 'value' => '01.1',
                 'expected' => 1,
-            ),
-            'integer' => array(
+            ],
+            'integer' => [
                 'type' => 'integer',
                 'value' => '-12345.67',
                 'expected' => -12345,
-            ),
-            'bool' => array(
+            ],
+            'bool' => [
                 'type' => 'bool',
                 'value' => '',
                 'expected' => false,
-            ),
-            'boolean' => array(
+            ],
+            'boolean' => [
                 'type' => 'boolean',
                 'value' => 'false',
                 'expected' => true,
-            ),
-            'float' => array(
+            ],
+            'float' => [
                 'type' => 'float',
                 'value' => '-12345.67',
                 'expected' => -12345.67,
-            ),
-            'not_array' => array(
+            ],
+            'not_array' => [
                 'type' => 'array',
                 'value' => false,
-                'expected' => array(),
-            ),
-            'not_array_after_unserialized' => array(
+                'expected' => [],
+            ],
+            'not_array_after_unserialized' => [
                 'type' => 'array',
                 'value' => $this->serializeBase64('somestring'),
-                'expected' => array(),
-            ),
-            'array' => array(
+                'expected' => [],
+            ],
+            'array' => [
                 'type' => 'array',
-                'value' => $this->serializeBase64(array(1, 2, 3)),
-                'expected' => array(1, 2, 3),
-            ),
-        );
+                'value' => $this->serializeBase64([1, 2, 3]),
+                'expected' => [1, 2, 3],
+            ],
+        ];
     }
 
     /**
      * @dataProvider denormalizeObjectDataProvider
-     *
-     * @param mixed $value
-     * @param mixed $class
-     * @param mixed $expected
      */
-    public function testDenormalizeObject($value, $class, $expected)
+    public function testDenormalizeObject(string $value, string $class, ?object $expected)
     {
         $type = 'object';
 
-        $this->workflow->expects($this->never())->method($this->anything());
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
 
-        $this->attribute->expects($this->once())->method('getType')->will($this->returnValue($type));
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn($type);
         $this->attribute->expects($this->once())
             ->method('getOption')->with('class')
-            ->will($this->returnValue($class));
+            ->willReturn($class);
 
         $this->assertEquals($expected, $this->normalizer->denormalize($this->workflow, $this->attribute, $value));
     }
 
-    public function denormalizeObjectDataProvider()
+    public function denormalizeObjectDataProvider(): array
     {
-        return array(
-            'not_object' => array(
+        return [
+            'not_object' => [
                 'value' => $this->serializeBase64('01.1'),
                 'class' => 'stdClass',
                 'expected' => null,
-            ),
-            'not_instance_of_class' => array(
+            ],
+            'not_instance_of_class' => [
                 'value' => $this->serializeBase64(new \DateTime()),
                 'class' => 'stdClass',
                 'expected' => null,
-            ),
-            'object' => array(
+            ],
+            'object' => [
                 'value' => $this->serializeBase64(new \stdClass()),
                 'class' => 'stdClass',
                 'expected' => new \stdClass(),
-            ),
-        );
+            ],
+        ];
     }
 
     /**
      * @dataProvider supportsNormalizeAndDenormalizeDataProvider
-     *
-     * @param string $direction
-     * @param string $type
-     * @param bool $expected
      */
-    public function testSupportsNormalizeAndDenormalize($direction, $type, $expected)
+    public function testSupportsNormalizeAndDenormalize(string $direction, string $type, bool $expected)
     {
         $attributeValue = 'bar';
 
-        $this->workflow->expects($this->never())->method($this->anything());
-        $this->attribute->expects($this->once())->method('getType')->will($this->returnValue($type));
+        $this->workflow->expects($this->never())
+            ->method($this->anything());
+        $this->attribute->expects($this->once())
+            ->method('getType')
+            ->willReturn($type);
 
         $method = 'supports' . ucfirst($direction);
         $this->assertEquals($expected, $this->normalizer->$method($this->workflow, $this->attribute, $attributeValue));
     }
 
-    public function supportsNormalizeAndDenormalizeDataProvider()
+    public function supportsNormalizeAndDenormalizeDataProvider(): array
     {
-        return array(
-            array('normalization', 'int', true),
-            array('normalization', 'integer', true),
-            array('normalization', 'bool', true),
-            array('normalization', 'boolean', true),
-            array('normalization', 'float', true),
-            array('normalization', 'array', true),
-            array('normalization', 'object', true),
-            array('normalization', 'entity', false),
-            array('denormalization', 'int', true),
-            array('denormalization', 'integer', true),
-            array('denormalization', 'bool', true),
-            array('denormalization', 'boolean', true),
-            array('denormalization', 'float', true),
-            array('denormalization', 'array', true),
-            array('denormalization', 'object', true),
-            array('denormalization', 'entity', false),
-        );
+        return [
+            ['normalization', 'int', true],
+            ['normalization', 'integer', true],
+            ['normalization', 'bool', true],
+            ['normalization', 'boolean', true],
+            ['normalization', 'float', true],
+            ['normalization', 'array', true],
+            ['normalization', 'object', true],
+            ['normalization', 'entity', false],
+            ['denormalization', 'int', true],
+            ['denormalization', 'integer', true],
+            ['denormalization', 'bool', true],
+            ['denormalization', 'boolean', true],
+            ['denormalization', 'float', true],
+            ['denormalization', 'array', true],
+            ['denormalization', 'object', true],
+            ['denormalization', 'entity', false],
+        ];
     }
 
-    protected function serializeBase64($value)
+    private function serializeBase64($value): string
     {
         return base64_encode(serialize($value));
-    }
-
-    protected function unserializeBase64($value)
-    {
-        return unserialize(base64_decode($value));
     }
 }

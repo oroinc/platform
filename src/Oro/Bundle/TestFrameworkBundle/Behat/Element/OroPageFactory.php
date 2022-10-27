@@ -21,10 +21,6 @@ class OroPageFactory
      */
     protected $pageAliases = [];
 
-    /**
-     * @param OroElementFactory $elementFactory
-     * @param array $config
-     */
     public function __construct(OroElementFactory $elementFactory, array $config)
     {
         $this->elementFactory = $elementFactory;

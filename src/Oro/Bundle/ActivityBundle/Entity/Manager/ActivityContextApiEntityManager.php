@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -15,12 +13,13 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provide API resources for activity context
+ */
 class ActivityContextApiEntityManager extends ApiEntityManager
 {
-    /** @var ActivityManager */
-    protected $activityManager;
-
     /** @var ConfigManager */
     protected $configManager;
 
@@ -33,41 +32,29 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param ObjectManager                 $om
-     * @param ActivityManager               $activityManager
-     * @param ConfigManager                 $configManager
-     * @param RouterInterface               $router
-     * @param EntityAliasResolver           $entityAliasResolver
-     * @param EntityNameResolver            $entityNameResolver
-     * @param DoctrineHelper                $doctrineHelper
-     * @param FeatureChecker                $featureChecker
-     */
+    /** @var AuthorizationCheckerInterface */
+    protected $authorizationChecker;
+
     public function __construct(
         ObjectManager $om,
-        ActivityManager $activityManager,
         ConfigManager $configManager,
         RouterInterface $router,
         EntityAliasResolver $entityAliasResolver,
         EntityNameResolver $entityNameResolver,
-        DoctrineHelper $doctrineHelper,
-        FeatureChecker $featureChecker
+        FeatureChecker $featureChecker,
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         parent::__construct(null, $om);
 
-        $this->activityManager      = $activityManager;
         $this->configManager        = $configManager;
         $this->router               = $router;
         $this->entityAliasResolver  = $entityAliasResolver;
         $this->entityNameResolver   = $entityNameResolver;
-        $this->doctrineHelper       = $doctrineHelper;
         $this->featureChecker       = $featureChecker;
+        $this->authorizationChecker = $authorizationChecker;
     }
 
     /**
@@ -91,6 +78,10 @@ class ActivityContextApiEntityManager extends ApiEntityManager
         $entityProvider = $this->configManager->getProvider('entity');
 
         foreach ($targets as $target) {
+            if (!$this->authorizationChecker->isGranted('VIEW', $target)) {
+                continue;
+            }
+
             $targetClass = ClassUtils::getClass($target);
             $targetId = $target->getId();
 
@@ -176,7 +167,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     {
         if ($this->eventDispatcher) {
             $event = new PrepareContextTitleEvent($item, $targetClass);
-            $this->eventDispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, PrepareContextTitleEvent::EVENT_NAME);
             $item = $event->getItem();
         }
 

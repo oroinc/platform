@@ -1,0 +1,106 @@
+/* @theme: admin.oro; */
+
+.widget-picker {
+    &__description-toggler {
+        height: $widget-picker-icon-height;
+        width: $widget-picker-icon-width;
+
+        .collapse-action-icon {
+            height: $btn-mobile-font-size;
+        }
+    }
+}
+
+@media only screen and (max-width: $medium-devices-media-breakpoint) {
+    .widget-picker {
+        &__modal .modal-body {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 0;
+        }
+
+        &__filter {
+            display: block;
+            flex-grow: 0;
+            flex-shrink: 0;
+        }
+
+        &__container {
+            max-height: none;
+            overflow: auto;
+        }
+
+        &__filter.empty::after,
+        &__filter-clear {
+            margin: 4px;
+        }
+
+        &__item {
+            flex-wrap: wrap;
+            position: relative;
+            padding-bottom: $widget-picker-mobile-item-padding-bottom;
+        }
+
+        &__summary-row {
+            margin-bottom: $widget-picker-mobile-summary-row-margin-bottom;
+        }
+
+        &__item.loading .widget-picker__actions-column::after {
+            margin-right: $content-padding;
+        }
+
+        &__toggler-column {
+            width: auto;
+            padding-right: $content-padding;
+            padding-bottom: 0;
+            border-bottom: 0 none;
+        }
+
+        &__icon-column {
+            display: none;
+        }
+
+        &__description-toggler {
+            width: $widget-picker-description-collapse-font-size;
+            height: auto;
+
+            .collapse-action-icon {
+                height: auto;
+            }
+        }
+
+        &__info-column {
+            flex-grow: 1;
+            flex-basis: 0;
+            padding-right: 0;
+            padding-bottom: 0;
+            border-bottom: 0 none;
+        }
+
+        &__title-cell {
+            display: flex;
+            align-items: center;
+        }
+
+        &__title-text {
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+
+        &__description-cell {
+            margin: $widget-picker-mobile-description-cell-margin;
+        }
+
+        &__added-badge {
+            white-space: nowrap;
+        }
+
+        &__actions-column {
+            padding-right: 0;
+            position: absolute;
+            bottom: $widget-picker-mobile-actions-column-bottom;
+            width: 100%;
+            text-align: right;
+        }
+    }
+}

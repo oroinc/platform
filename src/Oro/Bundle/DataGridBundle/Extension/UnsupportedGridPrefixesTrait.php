@@ -5,9 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Extension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * The trait for data grid extensions that provide a possibility to configure a list of name prefixes
+ * for data grids for which the extension should be disabled.
+ */
 trait UnsupportedGridPrefixesTrait
 {
-    /** @var string */
+    /** @var string[] */
     protected $unsupportedGridPrefixes = [];
 
     /**
@@ -31,7 +35,7 @@ trait UnsupportedGridPrefixesTrait
 
         return ArrayUtil::some(
             function ($prefix) use ($gridName) {
-                return strpos($gridName, $prefix) === 0;
+                return str_starts_with($gridName, $prefix);
             },
             $this->unsupportedGridPrefixes
         );

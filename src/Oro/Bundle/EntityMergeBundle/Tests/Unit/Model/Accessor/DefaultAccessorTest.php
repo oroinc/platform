@@ -8,12 +8,10 @@ use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class DefaultAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DefaultAccessor $fieldAccessor;
-     */
-    protected $accessor;
+    /** @var DefaultAccessor */
+    private $accessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->accessor = new DefaultAccessor();
     }
@@ -26,100 +24,83 @@ class DefaultAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getValueDataProvider
      */
-    public function testGetValue($entity, FieldMetadata $metadata, $expectedValue)
+    public function testGetValue(object $entity, FieldMetadata $metadata, mixed $expectedValue)
     {
-        $this->assertEquals($expectedValue, $this->accessor->getValue($entity, $metadata));
+        $this->assertSame($expectedValue, $this->accessor->getValue($entity, $metadata));
     }
 
-    public function getValueDataProvider()
+    public function getValueDataProvider(): array
     {
         return [
             'default' => [
-                'entity' => $this->createEntity('foo'),
+                'entity' => new EntityStub('foo'),
                 'metadata' => $this->getFieldMetadata('id'),
                 'expected' => 'foo',
             ],
             'getter' => [
-                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
+                'entity' => new EntityStub('foo', new EntityStub('bar')),
                 'metadata' => $this->getFieldMetadata('id', ['getter' => 'getParentId']),
                 'expected' => 'bar',
             ],
-            'property_path' => array(
-                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
-                'metadata' => $this->getFieldMetadata('id', array('property_path' => 'parent.id')),
+            'property_path' => [
+                'entity' => new EntityStub('foo', new EntityStub('bar')),
+                'metadata' => $this->getFieldMetadata('id', ['property_path' => 'parent.id']),
                 'expected' => 'bar',
-            ),
+            ],
         ];
     }
 
     /**
      * @dataProvider setValueDataProvider
      */
-    public function testSetValue($entity, FieldMetadata $metadata, $value, $expectedEntity)
+    public function testSetValue(object $entity, FieldMetadata $metadata, mixed $value, object $expectedEntity)
     {
         $this->accessor->setValue($entity, $metadata, $value);
         $this->assertEquals($expectedEntity, $entity);
     }
 
-    public function setValueDataProvider()
+    public function setValueDataProvider(): array
     {
         return [
             'default' => [
-                'entity' => $this->createEntity(),
+                'entity' => new EntityStub(),
                 'metadata' => $this->getFieldMetadata('id'),
                 'value' => 'foo',
-                'expected' => $this->createEntity('foo'),
+                'expected' => new EntityStub('foo'),
             ],
             'setter' => [
-                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
+                'entity' => new EntityStub('foo', new EntityStub('bar')),
                 'metadata' => $this->getFieldMetadata('id', ['setter' => 'setParentId']),
                 'value' => 'baz',
-                'expected' => $this->createEntity('foo', $this->createEntity('baz')),
+                'expected' => new EntityStub('foo', new EntityStub('baz')),
             ],
-            'property_path' => array(
-                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
-                'metadata' => $this->getFieldMetadata('id', array('property_path' => 'parent.id')),
+            'property_path' => [
+                'entity' => new EntityStub('foo', new EntityStub('bar')),
+                'metadata' => $this->getFieldMetadata('id', ['property_path' => 'parent.id']),
                 'value' => 'baz',
-                'expected' => $this->createEntity('foo', $this->createEntity('baz')),
-            ),
+                'expected' => new EntityStub('foo', new EntityStub('baz')),
+            ],
         ];
     }
 
-    protected function createEntity($id = null, $parent = null)
+    private function getFieldMetadata(string $fieldName = null, array $options = []): FieldMetadata
     {
-        return new EntityStub($id, $parent);
-    }
-
-    protected function getFieldMetadata($fieldName = null, array $options = [])
-    {
-        $result = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $result = $this->createMock(FieldMetadata::class);
         $result->expects($this->any())
             ->method('getFieldName')
-            ->will($this->returnValue($fieldName));
-
+            ->willReturn($fieldName);
         $result->expects($this->any())
             ->method('get')
-            ->will(
-                $this->returnCallback(
-                    function ($code) use ($options) {
-                        $this->assertArrayHasKey($code, $options);
-                        return $options[$code];
-                    }
-                )
-            );
+            ->willReturnCallback(function ($code) use ($options) {
+                $this->assertArrayHasKey($code, $options);
 
+                return $options[$code];
+            });
         $result->expects($this->any())
             ->method('has')
-            ->will(
-                $this->returnCallback(
-                    function ($code) use ($options) {
-                        return isset($options[$code]);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($code) use ($options) {
+                return isset($options[$code]);
+            });
 
         return $result;
     }

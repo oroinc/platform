@@ -1,7 +1,7 @@
 define(function() {
     'use strict';
     return function(child, _super) {
-        for (var p in _super) {
+        for (const p in _super) {
             if (_super.hasOwnProperty(p)) {
                 child[p] = _super[p];
             }

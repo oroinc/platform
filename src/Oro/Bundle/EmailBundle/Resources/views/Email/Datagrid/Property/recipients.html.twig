@@ -1,4 +1,4 @@
-{% import 'OroEmailBundle::macros.html.twig' as EA %}
+{% import '@OroEmail/macros.html.twig' as EA %}
 {% set recipients = record.getValue('recipients') %}
 {% if (recipients|length > 0) %}
     {{ EA.recipient_email_addresses(recipients, false, true) }}

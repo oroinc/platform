@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Contains all providers of mandatory fields and delegates retrieving of such fields

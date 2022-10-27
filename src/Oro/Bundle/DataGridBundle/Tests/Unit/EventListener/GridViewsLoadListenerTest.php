@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
@@ -14,11 +15,14 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTrait;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $gridViewRepository;
 
@@ -37,7 +41,7 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
     /** @var GridViewsLoadListener */
     private $gridViewsLoadListener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->gridViewRepository = $this->createMock(GridViewRepository::class);
         $this->registry = $this->createMock(ManagerRegistry::class);
@@ -51,11 +55,11 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->any())
             ->method('getRepository')
             ->with('OroDataGridBundle:GridView')
-            ->will($this->returnValue($this->gridViewRepository));
+            ->willReturn($this->gridViewRepository);
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->gridViewsLoadListener = new GridViewsLoadListener(
             $this->registry,
@@ -70,11 +74,12 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testListenerShouldAddViewsIntoEvent()
     {
-        $currentUser = new User();
+        /** @var User $currentUser */
+        $currentUser = $this->getEntity(User::class, ['id' => 42]);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($currentUser));
+            ->willReturn($currentUser);
 
         $systemView = new View('first');
         $view1 = new GridView();
@@ -94,7 +99,7 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
             'user' => [$view1, $view2]
         ];
 
-        $event = new GridViewsLoadEvent('grid', $gridViews);
+        $event = new GridViewsLoadEvent('grid', $this->createMock(DatagridConfiguration::class), $gridViews);
 
         $expectedViews = [
             [
@@ -151,10 +156,9 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
     public function testListenerShouldNotAddViewsIntoIfUserIsNotLoggedIn()
     {
         $originalView = new View('view');
-        $event = new GridViewsLoadEvent('grid', [$originalView]);
+        $event = new GridViewsLoadEvent('grid', $this->createMock(DatagridConfiguration::class), [$originalView]);
 
-        $this->gridViewRepository
-            ->expects($this->never())
+        $this->gridViewRepository->expects($this->never())
             ->method('findGridViews');
 
         $this->gridViewsLoadListener->onViewsLoad($event);

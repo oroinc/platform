@@ -1,61 +1,51 @@
 <?php
-namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserMultiSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var UserMultiSelectType
-     */
-    protected $type;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $em;
+    /** @var UserMultiSelectType */
+    private $type;
 
-    /**
-     * Setup test env
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManager::class);
 
         $this->type = new UserMultiSelectType($this->em);
     }
 
     public function testBuildView()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $builder = $this->createMock(FormBuilder::class);
+        $metadata = $this->createMock(ClassMetadata::class);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
-            ->will($this->returnValue($metadata));
-
+            ->willReturn($metadata);
         $metadata->expects($this->once())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue('id'));
+            ->willReturn('id');
 
         $builder->expects($this->once())
             ->method('addModelTransformer')
-            ->with($this->isInstanceOf('Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer'));
+            ->with($this->isInstanceOf(EntitiesToIdsTransformer::class));
 
-        $this->type->buildForm($builder, array('entity_class' => 'Oro\Bundle\UserBundle\Entity\User'));
+        $this->type->buildForm($builder, ['entity_class' => User::class]);
     }
 
     public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));

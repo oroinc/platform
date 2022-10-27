@@ -2,46 +2,42 @@
 
 namespace Oro\Bundle\FormBundle;
 
-use Oro\Bundle\FormBundle\DependencyInjection\Compiler\AutocompleteCompilerPass;
-use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormGuesserCompilerPass;
+use Oro\Bundle\FormBundle\DependencyInjection\Compiler;
 use Oro\Bundle\FormBundle\Validator\HtmlPurifierTelValidator;
-use Oro\Component\DependencyInjection\Compiler\TaggedServiceLinkRegistryCompilerPass;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroFormBundle extends Bundle
 {
-    const FORM_TEMPLATE_DATA_PROVIDER_TAG = 'oro_form.form_template_data_provider';
-    const FORM_HANDLER_TAG = 'oro_form.form.handler';
-
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function boot(): void
     {
-        parent::build($container);
+        parent::boot();
 
-        $container->addCompilerPass(new AutocompleteCompilerPass());
-        $container->addCompilerPass(new FormGuesserCompilerPass());
-        $container->addCompilerPass(
-            new TaggedServiceLinkRegistryCompilerPass(
-                self::FORM_TEMPLATE_DATA_PROVIDER_TAG,
-                'oro_form.registry.form_template_data_provider'
-            )
-        );
-        $container->addCompilerPass(
-            new TaggedServiceLinkRegistryCompilerPass(
-                self::FORM_HANDLER_TAG,
-                'oro_form.registry.form_handler'
-            )
-        );
+        \HTMLPurifier_URISchemeRegistry::instance()->register('tel', new HtmlPurifierTelValidator());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function boot()
+    public function build(ContainerBuilder $container): void
     {
-        \HTMLPurifier_URISchemeRegistry::instance()->register('tel', new HtmlPurifierTelValidator());
+        parent::build($container);
+
+        $container->addCompilerPass(new Compiler\AutocompleteCompilerPass());
+        $container->addCompilerPass(new Compiler\FormGuesserCompilerPass());
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_form.registry.form_template_data_provider',
+            'oro_form.form_template_data_provider',
+            'alias'
+        ));
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_form.registry.form_handler',
+            'oro_form.form.handler',
+            'alias'
+        ));
     }
 }

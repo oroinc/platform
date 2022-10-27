@@ -3,92 +3,69 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ActionFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**#@+
-     * Test parameters
-     */
-    const TEST_NAME          = 'test_name';
-    const TEST_TYPE          = 'test_type';
-    const TEST_TYPE_SERVICE  = 'test_type_service';
-    /**#@-*/
-
-    /**
-     * @var array
-     */
-    protected $allowedTypes = [
+    private const TEST_TYPE = 'test_type';
+    private const TEST_TYPE_SERVICE = 'test_type_service';
+    private const ALLOWED_TYPES = [
         self::TEST_TYPE => self::TEST_TYPE_SERVICE
     ];
 
-    /**
-     * @param array $arguments
-     * @return ActionFactory
-     */
-    protected function buildActionFactory($arguments = [])
+    private function getActionFactory(array $arguments = []): ActionFactory
     {
         $defaultArguments = [
-            'container' => $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface'),
-            'types'     => $this->allowedTypes
+            'container' => $this->createMock(ContainerInterface::class),
+            'types'     => self::ALLOWED_TYPES
         ];
         $arguments = array_merge($defaultArguments, $arguments);
 
         return new ActionFactory($arguments['container'], $arguments['types']);
     }
 
-    /**
-     * @expectedException \RunTimeException
-     * @expectedExceptionMessage The action type must be defined
-     */
     public function testCreateNoType()
     {
-        $factory = $this->buildActionFactory();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The action type must be defined');
+
+        $factory = $this->getActionFactory();
         $factory->create(null);
     }
 
-    /**
-     * @expectedException \RunTimeException
-     * @expectedExceptionMessage No attached service to action type named `unknown_type`
-     */
     public function testCreateIncorrectType()
     {
-        $factory = $this->buildActionFactory();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('No attached service to action type named `unknown_type`');
+
+        $factory = $this->getActionFactory();
         $factory->create('unknown_type');
     }
 
-    /**
-     * @expectedException \RunTimeException
-     * @expectedExceptionMessage The service `test_type_service` must implement `ActionInterface`
-     */
     public function testCreateIncorrectInterface()
     {
-        $factory = $this->buildActionFactory();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The service `test_type_service` must implement `ActionInterface`');
+
+        $factory = $this->getActionFactory();
         $factory->create(self::TEST_TYPE);
     }
 
     /**
-     * @param string $type
-     * @param string $id
-     * @param array $options
-     * @param boolean $isCondition
      * @dataProvider createDataProvider
      */
-    public function testCreate($type, $id, $options = array(), $isCondition = false)
+    public function testCreate(string $type, string $id, array $options = [], bool $isCondition = false)
     {
-        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $action = $this->createMock(ActionInterface::class);
         $action->expects($this->once())
             ->method('initialize')
             ->with($options);
 
         $condition = null;
         if ($isCondition) {
-            /** @var ExpressionInterface $condition */
-            $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
-                ->disableOriginalConstructor()
-                ->getMockForAbstractClass();
+            $condition = $this->createMock(ExpressionInterface::class);
             $action->expects($this->once())
                 ->method('setCondition')
                 ->with($condition);
@@ -97,50 +74,44 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
                 ->method('setCondition');
         }
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('get'))
-            ->getMockForAbstractClass();
+        $container = $this->createMock(ContainerInterface::class);
         $container->expects($this->once())
             ->method('get')
             ->with($id)
-            ->will($this->returnValue($action));
+            ->willReturn($action);
 
-        $factory = $this->buildActionFactory(array('container' => $container));
+        $factory = $this->getActionFactory(['container' => $container]);
 
         $this->assertEquals($action, $factory->create($type, $options, $condition));
     }
 
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
-        return array(
-            'empty condition' => array(
+        return [
+            'empty condition' => [
                 'type' => self::TEST_TYPE,
                 'id'   => self::TEST_TYPE_SERVICE,
-            ),
-            'existing condition' => array(
+            ],
+            'existing condition' => [
                 'type'        => self::TEST_TYPE,
                 'id'          => self::TEST_TYPE_SERVICE,
-                'options'     => array('key' => 'value'),
+                'options'     => ['key' => 'value'],
                 'isCondition' => true,
-            ),
-        );
+            ],
+        ];
     }
 
     public function testGetTypes()
     {
         $types = ['type1' => 'val1', 'type2' => 'val2'];
-        $factory = $this->buildActionFactory(['types' => $types]);
+        $factory = $this->getActionFactory(['types' => $types]);
 
         $this->assertEquals($types, $factory->getTypes());
     }
 
     public function testIsTypeExists()
     {
-        $factory = $this->buildActionFactory();
+        $factory = $this->getActionFactory();
 
         $this->assertFalse($factory->isTypeExists('unknown'));
         $this->assertTrue($factory->isTypeExists(self::TEST_TYPE));

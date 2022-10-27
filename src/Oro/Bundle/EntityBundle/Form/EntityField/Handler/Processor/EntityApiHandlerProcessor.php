@@ -11,9 +11,6 @@ class EntityApiHandlerProcessor
      */
     protected $handlers = [];
 
-    /**
-     * @param EntityApiHandlerInterface $handler
-     */
     public function addHandler(EntityApiHandlerInterface $handler)
     {
         $this->handlers[] = $handler;
@@ -46,9 +43,6 @@ class EntityApiHandlerProcessor
         return null;
     }
 
-    /**
-     * @param $entity
-     */
     public function preProcess($entity)
     {
         $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));
@@ -58,9 +52,6 @@ class EntityApiHandlerProcessor
         }
     }
 
-    /**
-     * @param $entity
-     */
     public function beforeProcess($entity)
     {
         $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));
@@ -70,9 +61,6 @@ class EntityApiHandlerProcessor
         }
     }
 
-    /**
-     * @param $entity
-     */
     public function afterProcess($entity)
     {
         $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));
@@ -84,9 +72,6 @@ class EntityApiHandlerProcessor
         return false;
     }
 
-    /**
-     * @param $entity
-     */
     public function invalidateProcess($entity)
     {
         $handler = $this->getHandlerByClass(ClassUtils::getClass($entity));

@@ -1,19 +1,27 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 
 class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    private JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject $jobManager;
+
+    private DependentJobService $dependentJobService;
+
+    protected function setUp(): void
     {
-        new DependentJobService($this->createJobStorageMock());
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
+        $this->dependentJobService = new DependentJobService($this->jobManager);
     }
 
-    public function testShouldThrowIfJobIsNotRootJob()
+    public function testSaveDependentJobLogicException(): void
     {
         $job = new Job();
         $job->setId(12345);
@@ -21,35 +29,25 @@ class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
 
         $context = new DependentJobContext($job);
 
-        $service = new DependentJobService($this->createJobStorageMock());
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Only root jobs allowed but got child. jobId: "12345"');
-        $service->saveDependentJob($context);
+        $this->dependentJobService->saveDependentJob($context);
     }
 
-    public function testShouldSaveDependentJobs()
+    public function testSaveDependentJob(): void
     {
         $job = new Job();
         $job->setId(12345);
 
-        $storage = $this->createJobStorageMock();
-        $storage
-            ->expects($this->once())
-            ->method('saveJob')
-            ->will($this->returnCallback(function (Job $job, $callback) {
-                $callback($job);
-
-                return true;
-            }))
-        ;
+        $this->jobManager
+            ->expects(self::once())
+            ->method('saveJobWithLock')
+            ->willReturnCallback(static fn (Job $job, $callback) => $callback($job));
 
         $context = new DependentJobContext($job);
         $context->addDependentJob('job-topic', 'job-message', 'job-priority');
 
-        $service = new DependentJobService($storage);
-
-        $service->saveDependentJob($context);
+        $this->dependentJobService->saveDependentJob($context);
 
         $expectedDependentJobs = [
             'dependentJobs' => [
@@ -57,19 +55,44 @@ class DependentJobServiceTest extends \PHPUnit\Framework\TestCase
                     'topic' => 'job-topic',
                     'message' => 'job-message',
                     'priority' => 'job-priority',
-                ]
-            ]
+                ],
+            ],
         ];
 
-        $this->assertEquals($expectedDependentJobs, $job->getData());
+        self::assertEquals($expectedDependentJobs, $job->getData());
     }
 
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobStorage
-     */
-    private function createJobStorageMock()
+    public function testAddDependentMessages(): void
     {
-        return $this->createMock(JobStorage::class);
+        $job = new Job();
+        $job->setId(12345);
+
+        $this->jobManager
+            ->expects(self::once())
+            ->method('saveJobWithLock')
+            ->willReturnCallback(static fn (Job $job, $callback) => $callback($job));
+
+        $messages = [
+            'topic1' => new Message(['sample-key1' => 'sample-value1'], MessagePriority::HIGH),
+            'topic2' => new Message(['sample-key2' => 'sample-value2'], MessagePriority::LOW),
+        ];
+        $this->dependentJobService->addDependentMessages($job, $messages);
+
+        $expectedDependentJobs = [
+            'dependentJobs' => [
+                [
+                    'topic' => 'topic1',
+                    'message' => $messages['topic1'],
+                    'priority' => null,
+                ],
+                [
+                    'topic' => 'topic2',
+                    'message' => $messages['topic2'],
+                    'priority' => null,
+                ],
+            ],
+        ];
+
+        self::assertEquals($expectedDependentJobs, $job->getData());
     }
 }

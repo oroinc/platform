@@ -31,8 +31,6 @@ class OroDashboardBundle implements Migration
 
     /**
      * Adds organization_id into oro_dashboard
-     *
-     * @param Schema $schema
      */
     public static function addOrganizationDashboardTable(Schema $schema)
     {
@@ -49,8 +47,6 @@ class OroDashboardBundle implements Migration
 
     /**
      * Drop oro_dashboard_active table indexes
-     *
-     * @param Schema $schema
      */
     protected function dropOroDashboardActiveTableIndexes(Schema $schema)
     {

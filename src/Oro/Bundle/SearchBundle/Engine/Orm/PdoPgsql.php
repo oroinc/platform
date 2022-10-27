@@ -25,9 +25,6 @@ class PdoPgsql extends BaseDriver
 
     /**
      * Init additional doctrine functions
-     *
-     * @param EntityManagerInterface $em
-     * @param ClassMetadata $class
      */
     public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {
@@ -63,6 +60,7 @@ class PdoPgsql extends BaseDriver
      * @param boolean                    $setOrderBy
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
@@ -109,7 +107,8 @@ class PdoPgsql extends BaseDriver
             $qb->setParameter('field' . $index, $searchCondition['fieldName']);
         }
 
-        if ($setOrderBy) {
+        // contains is the only operator that calculates relevance in postgresql
+        if ($setOrderBy && $condition === Query::OPERATOR_CONTAINS) {
             $this->setTextOrderBy($qb, $index);
         }
 
@@ -238,7 +237,7 @@ class PdoPgsql extends BaseDriver
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
         if (in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_NOT_CONTAINS], true) && $fieldValue) {
-            $searchArray = explode(Query::DELIMITER, $fieldValue);
+            $searchArray = array_filter(explode(Query::DELIMITER, $fieldValue), 'strlen');
 
             foreach ($searchArray as $key => $string) {
                 $searchArray[$key] = $string . ':*';
@@ -277,9 +276,8 @@ class PdoPgsql extends BaseDriver
            ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
 
         $parameter = $qb->getParameter(sprintf('value%s', $index));
-        $quotedValue = sprintf('\'%s\'', $parameter->getValue());
 
-        $qb->setParameter(sprintf('quotedValue%s', $index), $quotedValue);
+        $qb->setParameter(sprintf('quotedValue%s', $index), $parameter->getValue());
     }
 
     /**
@@ -290,7 +288,7 @@ class PdoPgsql extends BaseDriver
         $query = parent::getTruncateQuery($dbPlatform, $tableName);
 
         // cascade required to perform truncate of related entities
-        if (strpos($query, ' CASCADE') === false) {
+        if (!str_contains($query, ' CASCADE')) {
             $query .= ' CASCADE';
         }
 

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 
-use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
@@ -62,7 +61,7 @@ class ContainerResetExtension extends AbstractExtension implements ChainExtensio
      */
     public function onPostReceived(Context $context)
     {
-        $processorName = $context->getMessage()->getProperty(Config::PARAMETER_PROCESSOR_NAME);
+        $processorName = $context->getMessageProcessorName();
         if (!isset($this->persistentProcessors[$processorName])) {
             // delegate the container reset to clearers
             $logger = $context->getLogger();

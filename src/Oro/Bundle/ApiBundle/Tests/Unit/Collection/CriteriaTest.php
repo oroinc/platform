@@ -16,14 +16,14 @@ class CriteriaTest extends OrmRelatedTestCase
     /** @var Criteria */
     private $criteria;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->criteria = new Criteria(new EntityClassResolver($this->doctrine));
     }
 
-    public function joinTypeDataProvider()
+    public function joinTypeDataProvider(): array
     {
         return [
             [Join::INNER_JOIN, 'addInnerJoin'],
@@ -39,7 +39,7 @@ class CriteriaTest extends OrmRelatedTestCase
     /**
      * @dataProvider joinTypeDataProvider
      */
-    public function testAddJoin($joinType, $addMethodName)
+    public function testAddJoin(string $joinType, string $addMethodName)
     {
         $this->criteria->{$addMethodName}('products', '{root}.products');
 
@@ -52,7 +52,7 @@ class CriteriaTest extends OrmRelatedTestCase
     /**
      * @dataProvider joinTypeDataProvider
      */
-    public function testAddJoinWithCondition($joinType, $addMethodName)
+    public function testAddJoinWithCondition(string $joinType, string $addMethodName)
     {
         $this->criteria->{$addMethodName}(
             'products',
@@ -77,7 +77,7 @@ class CriteriaTest extends OrmRelatedTestCase
     /**
      * @dataProvider joinTypeDataProvider
      */
-    public function testAddJoinWithConditionAndEntityName($joinType, $addMethodName)
+    public function testAddJoinWithConditionAndEntityName(string $joinType, string $addMethodName)
     {
         $this->criteria->{$addMethodName}('products', 'Test:Product', Join::WITH, '{entity}.name IS NOT NULL');
 
@@ -146,48 +146,54 @@ class CriteriaTest extends OrmRelatedTestCase
 
     /**
      * @dataProvider joinTypeDataProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The property path must be not empty.
      */
-    public function testAddJoinWithEmptyPropertyPath($joinType, $addMethodName)
+    public function testAddJoinWithEmptyPropertyPath(string $joinType, string $addMethodName)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The property path must be not empty.');
+
         $this->criteria->{$addMethodName}('', 'Test:Product');
     }
 
     /**
      * @dataProvider joinTypeDataProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The join must be be not empty. Join path: "products".
      */
-    public function testAddJoinWithEmptyJoinExpr($joinType, $addMethodName)
+    public function testAddJoinWithEmptyJoinExpr(string $joinType, string $addMethodName)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The join must be be not empty. Join path: "products".');
+
         $this->criteria->{$addMethodName}('products', '');
     }
 
     /**
      * @dataProvider joinTypeDataProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage "Test1:Product" is not valid entity name. Join path: "products".
      */
-    public function testAddJoinWithInvalidEntity($joinType, $addMethodName)
+    public function testAddJoinWithInvalidEntity(string $joinType, string $addMethodName)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"Test1:Product" is not valid entity name. Join path: "products".');
+
         $this->criteria->{$addMethodName}('products', 'Test1:Product');
     }
 
     /**
      * @dataProvider joinTypeDataProvider
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The condition type must be specified if the condition exists. Join path: "products".
      */
-    public function testAddJoinWithConditionButWithoutConditionType($joinType, $addMethodName)
+    public function testAddJoinWithConditionButWithoutConditionType(string $joinType, string $addMethodName)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The condition type must be specified if the condition exists. Join path: "products".'
+        );
+
         $this->criteria->{$addMethodName}('products', 'Test:Product', '', '{entity}.name IS NOT NULL');
     }
 
     /**
      * @dataProvider joinTypeDataProvider
      */
-    public function testAddJoinConflictsWithExistingJoin($joinType, $addMethodName)
+    public function testAddJoinConflictsWithExistingJoin(string $joinType, string $addMethodName)
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -202,7 +208,7 @@ class CriteriaTest extends OrmRelatedTestCase
     /**
      * @dataProvider joinTypeDataProvider
      */
-    public function testAddSameJoinTwice($joinType, $addMethodName)
+    public function testAddSameJoinTwice(string $joinType, string $addMethodName)
     {
         $this->criteria->{$addMethodName}('products', '{root}.products');
         $this->criteria->{$addMethodName}('products', '{root}.products');

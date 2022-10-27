@@ -4,32 +4,24 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 class NumberTypeFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var NumberTypeFormatter
-     */
-    protected $formatter;
+    /** @var NumberTypeFormatter */
+    private $formatter;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $numberFormatter */
-        $numberFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $numberFormatter = $this->createMock(NumberFormatter::class);
 
         $this->formatter = new NumberTypeFormatter($numberFormatter);
     }
 
     /**
      * @dataProvider formatTypeProvider
-     * @param string          $value
-     * @param string          $type
-     * @param \Exception|null $exception
      */
-    public function testFormatType($value, $type, \Exception $exception = null)
+    public function testFormatType(int $value, string $type, \Exception $exception = null)
     {
         if (null !== $exception) {
             $this->expectException(get_class($exception));
@@ -38,10 +30,7 @@ class NumberTypeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter->formatType($value, $type);
     }
 
-    /**
-     * @return array
-     */
-    public function formatTypeProvider()
+    public function formatTypeProvider(): array
     {
         $value = 1;
 

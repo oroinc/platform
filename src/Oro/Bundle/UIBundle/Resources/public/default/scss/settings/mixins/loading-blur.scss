@@ -1,0 +1,7 @@
+/* @theme: default; */
+
+@mixin loading-blur {
+    filter: blur(2px);
+    // Fix issue with blur artefacts on safari
+    transform: translate3d(0, 0, 0);
+}

@@ -7,6 +7,9 @@ use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\QueryException;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException;
 
+/**
+ * DQL expression verifier in workflow definitions
+ */
 class DQLExpressionVerifier implements ExpressionVerifierInterface
 {
     /**
@@ -32,6 +35,8 @@ class DQLExpressionVerifier implements ExpressionVerifierInterface
             return true;
         } catch (QueryException $e) {
             throw new ExpressionException($e->getMessage());
+        } catch (\Throwable $e) {
+            throw new ExpressionException('Unexpected query syntax error', 0, $e);
         }
     }
 }

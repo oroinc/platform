@@ -1,0 +1,14 @@
+services:
+    oro_importexport.test.cache:
+        parent: oro.data.cache
+        public: true
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_importexport_test_cache' }
+
+    oro_importexport.test.async.pre_export:
+        class: 'Oro\Bundle\ImportExportBundle\Tests\Behat\Services\PreExportMessageProcessor'
+        decorates: oro_importexport.async.pre_export
+        parent: oro_importexport.async.pre_export
+        public: true
+        calls:
+            - [setCache, ['@oro_importexport.test.cache']]

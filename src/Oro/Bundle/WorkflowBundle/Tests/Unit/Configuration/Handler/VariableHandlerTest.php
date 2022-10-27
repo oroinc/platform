@@ -7,19 +7,15 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 class VariableHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var VariableHandler
-     */
-    protected $handler;
+    /** @var VariableHandler */
+    private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler = new VariableHandler();
     }
 
     /**
-     * @param array $expected
-     * @param array $input
      * @dataProvider handleDataProvider
      */
     public function testHandle(array $expected, array $input)
@@ -31,9 +27,8 @@ class VariableHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function handleDataProvider()
+    public function handleDataProvider(): array
     {
         return [
             'no configuration' => [

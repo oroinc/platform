@@ -23,10 +23,6 @@ class UniteStrategy implements StrategyInterface
     /** @var DoctrineHelper  */
     protected $doctrineHelper;
 
-    /**
-     * @param ActivityListManager $activityListManager
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(ActivityListManager $activityListManager, DoctrineHelper $doctrineHelper)
     {
         $this->activityListManager = $activityListManager;
@@ -48,7 +44,7 @@ class UniteStrategy implements StrategyInterface
                 $entityClass = ClassUtils::getRealClass($masterEntity);
                 $activityClass = $fieldMetadata->get('type');
                 $queryBuilder = $this->doctrineHelper
-                    ->getEntityRepository(ActivityList::ENTITY_NAME)
+                    ->getEntityRepository(ActivityList::class)
                     ->getActivityListQueryBuilderByActivityClass($entityClass, $sourceEntity->getId(), $activityClass);
 
                 $activityListItems = $queryBuilder->getQuery()->getResult();

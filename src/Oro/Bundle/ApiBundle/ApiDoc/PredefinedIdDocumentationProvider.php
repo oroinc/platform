@@ -6,16 +6,13 @@ use Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * Builds documentation for predefined identifiers of Data API resources.
+ * Builds a documentation for predefined identifiers of API resources.
  */
 class PredefinedIdDocumentationProvider implements DocumentationProviderInterface
 {
     /** @var EntityIdResolverRegistry */
     private $entityIdResolverRegistry;
 
-    /**
-     * @param EntityIdResolverRegistry $entityIdResolverRegistry
-     */
     public function __construct(EntityIdResolverRegistry $entityIdResolverRegistry)
     {
         $this->entityIdResolverRegistry = $entityIdResolverRegistry;
@@ -39,9 +36,6 @@ class PredefinedIdDocumentationProvider implements DocumentationProviderInterfac
         return \sprintf($this->getTemplate(), \implode("\n", $items));
     }
 
-    /**
-     * @return string
-     */
     private function getTemplate(): string
     {
         return <<<MARKDOWN

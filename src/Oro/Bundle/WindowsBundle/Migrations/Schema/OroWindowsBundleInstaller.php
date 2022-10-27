@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WindowsBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -19,11 +19,11 @@ class OroWindowsBundleInstaller implements Installation
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('oro_windows_state');
-        $table->addColumn('id', Type::INTEGER, ['autoincrement' => true]);
-        $table->addColumn('user_id', Type::INTEGER, []);
-        $table->addColumn('data', Type::JSON_ARRAY, ['comment' => '(DC2Type:json_array)']);
-        $table->addColumn('created_at', Type::DATETIME, []);
-        $table->addColumn('updated_at', Type::DATETIME, []);
+        $table->addColumn('id', Types::INTEGER, ['autoincrement' => true]);
+        $table->addColumn('user_id', Types::INTEGER, []);
+        $table->addColumn('data', Types::JSON_ARRAY, ['comment' => '(DC2Type:json_array)']);
+        $table->addColumn('created_at', Types::DATETIME_MUTABLE, []);
+        $table->addColumn('updated_at', Types::DATETIME_MUTABLE, []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_8B134CF6A76ED395', []);
 

@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\SoapBundle\Request\Parameters\Filter;
 
+/**
+ * Applies filters chain to a parameter
+ */
 class ChainParameterFilter implements ParameterFilterInterface
 {
     /** @var ParameterFilterInterface[] */
     protected $filters;
 
     /**
-     * @param array ParameterFilterInterface[] $filters
+     * @param array|ParameterFilterInterface[] $filters
      */
     public function __construct(array $filters = [])
     {

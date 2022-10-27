@@ -2,60 +2,64 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig\Fixture;
 
-class EnvironmentExtension extends \Twig_Extension
+use Twig\Extension\AbstractExtension;
+use Twig\Extension\GlobalsInterface;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
+use Twig\TwigTest;
+
+/**
+ * A test stub
+ */
+class EnvironmentExtension extends AbstractExtension implements GlobalsInterface
 {
     public function getTokenParsers()
     {
-        return array(
+        return [
             new EnvironmentTokenParser(),
-        );
+        ];
     }
 
     public function getNodeVisitors()
     {
-        return array(
+        return [
             new EnvironmentNodeVisitor(),
-        );
+        ];
     }
 
     public function getFilters()
     {
-        return array(
-            new \Twig_SimpleFilter('foo_filter', 'foo_filter'),
-        );
+        return [
+            new TwigFilter('foo_filter', 'foo_filter'),
+        ];
     }
 
     public function getTests()
     {
-        return array(
-            new \Twig_SimpleTest('foo_test', 'foo_test'),
-        );
+        return [
+            new TwigTest('foo_test', 'foo_test'),
+        ];
     }
 
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('foo_function', 'foo_function'),
-        );
+        return [
+            new TwigFunction('foo_function', 'foo_function'),
+        ];
     }
 
     public function getOperators()
     {
-        return array(
-            array('foo_unary' => array()),
-            array('foo_binary' => array()),
-        );
+        return [
+            ['foo_unary' => []],
+            ['foo_binary' => []],
+        ];
     }
 
-    public function getGlobals()
+    public function getGlobals(): array
     {
-        return array(
+        return [
             'foo_global' => 'foo_global',
-        );
-    }
-
-    public function getName()
-    {
-        return 'environment_test';
+        ];
     }
 }

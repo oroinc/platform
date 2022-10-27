@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Route;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Route;
 
 use Oro\Bundle\UIBundle\Route\Router;
-use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -16,175 +17,38 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class RouterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    protected $request;
+    private $request;
 
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestQuery;
+    private $requestQuery;
 
-    /** @var SymfonyRouter|\PHPUnit\Framework\MockObject\MockObject */
-    protected $symfonyRouter;
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlGenerator;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var Router */
-    protected $router;
+    private $router;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestQuery = $this->createMock(ParameterBag::class);
         $this->request = $this->createMock(Request::class);
         $this->request->query = $this->requestQuery;
 
-        /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack */
         $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
+        $requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
 
-        $this->symfonyRouter = $this->createMock(SymfonyRouter::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->router = new Router($requestStack, $this->symfonyRouter, $this->authorizationChecker);
+
+        $this->router = new Router($requestStack, $this->urlGenerator, $this->authorizationChecker);
     }
 
-    public function testSaveAndStayRedirectAfterSave()
-    {
-        $testUrl = 'test\\url\\index.html';
-
-        $this->request->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue(Router::ACTION_SAVE_AND_STAY));
-
-        $this->symfonyRouter->expects($this->once())
-            ->method('generate')
-            ->will($this->returnValue($testUrl));
-
-        $this->authorizationChecker->expects($this->never())
-            ->method('isGranted');
-
-        $redirect = $this->router->redirectAfterSave(
-            array(
-                'route'      => 'test_route',
-                'parameters' => array('id' => 1),
-            ),
-            array()
-        );
-
-        $this->assertEquals($testUrl, $redirect->getTargetUrl());
-    }
-
-    public function testSaveAndStayWithAccessGrantedRedirectAfterSave()
-    {
-        $testUrl = 'test\\url\\index.html';
-
-        $this->request->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue(Router::ACTION_SAVE_AND_STAY));
-
-        $this->symfonyRouter->expects($this->once())
-            ->method('generate')
-            ->will($this->returnValue($testUrl));
-
-        $entity = new \stdClass();
-
-        $this->authorizationChecker->expects($this->once())
-            ->method('isGranted')
-            ->with('EDIT', $this->identicalTo($entity))
-            ->will($this->returnValue(true));
-
-        $redirect = $this->router->redirectAfterSave(
-            array(
-                'route'      => 'test_route',
-                'parameters' => array('id' => 1),
-            ),
-            array(),
-            $entity
-        );
-
-        $this->assertEquals($testUrl, $redirect->getTargetUrl());
-    }
-
-    public function testSaveAndStayWithAccessDeniedRedirectAfterSave()
-    {
-        $testUrl1 = 'test\\url\\index1.html';
-        $testUrl2 = 'test\\url\\index2.html';
-
-        $this->request->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue(Router::ACTION_SAVE_AND_STAY));
-
-        $this->symfonyRouter->expects($this->once())
-            ->method('generate')
-            ->will(
-                $this->returnCallback(
-                    function ($name, $parameters) use (&$testUrl1, &$testUrl2) {
-                        if ($name === 'test_route1') {
-                            return $testUrl1;
-                        } elseif ($name === 'test_route2') {
-                            return $testUrl2;
-                        } else {
-                            return '';
-                        }
-                    }
-                )
-            );
-
-        $entity = new \stdClass();
-
-        $this->authorizationChecker->expects($this->once())
-            ->method('isGranted')
-            ->with('EDIT', $this->identicalTo($entity))
-            ->will($this->returnValue(false));
-
-        $redirect = $this->router->redirectAfterSave(
-            array(
-                'route'      => 'test_route1',
-                'parameters' => array('id' => 1),
-            ),
-            array(
-                'route'      => 'test_route2',
-                'parameters' => array('id' => 1),
-            ),
-            $entity
-        );
-
-        $this->assertEquals($testUrl2, $redirect->getTargetUrl());
-    }
-
-    public function testSaveAndCloseRedirectAfterSave()
-    {
-        $testUrl = 'save_and_close.html';
-
-        $this->request->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue(Router::ACTION_SAVE_CLOSE));
-
-        $this->symfonyRouter->expects($this->once())
-            ->method('generate')
-            ->will($this->returnValue($testUrl));
-
-        $this->authorizationChecker->expects($this->never())
-            ->method('isGranted');
-
-        $redirect = $this->router->redirectAfterSave(
-            array(),
-            array(
-                'route'      => 'test_route',
-                'parameters' => array('id' => 1),
-            )
-        );
-
-        $this->assertEquals($testUrl, $redirect->getTargetUrl());
-    }
-
-    public function testWrongParametersRedirectAfterSave()
-    {
-        $this->expectException('\InvalidArgumentException');
-        $this->router->redirectAfterSave(
-            array(),
-            array()
-        );
-    }
-
-    public function testRedirectWillBeToTheSamePageIfInputActionIsEmpty()
+    public function testRedirectWillBeToTheSamePageIfInputActionIsEmpty(): void
     {
         $expectedUrl = '/example/view/1';
         $this->request->expects($this->once())
@@ -195,12 +59,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($response->getTargetUrl(), $expectedUrl);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Request parameter "input_action" must be string, array is given.
-     */
-    public function testRedirectFailsWhenInputActionNotString()
+    public function testRedirectFailsWhenInputActionNotString(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Request parameter "input_action" must be string, array is given.');
+
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
@@ -209,72 +72,70 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router->redirect([]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot parse route name from request parameter "input_action". Value of key "route" cannot be empty: {"route":""}
-     */
-    // @codingStandardsIgnoreEnd
-    public function testRedirectFailsWhenRouteIsEmpty()
+    public function testRedirectFailsWhenRouteIsEmpty(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot parse route name from request parameter "input_action".'
+            . ' Value of key "route" cannot be empty: {"route":""}'
+        );
+
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
-            ->willReturn(json_encode(['route' => '']));
+            ->willReturn(json_encode(['route' => ''], JSON_THROW_ON_ERROR));
 
         $this->router->redirect([]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot parse route name from request parameter "input_action". Value of key "route" must be string: {"route":{"foo":"bar"}}
-     */
-    // @codingStandardsIgnoreEnd
-    public function testRedirectFailsWhenRouteIsNotString()
+    public function testRedirectFailsWhenRouteIsNotString(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot parse route name from request parameter "input_action".'
+            . ' Value of key "route" must be string: {"route":{"foo":"bar"}}'
+        );
+
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
-            ->willReturn(json_encode(['route' => ['foo' => 'bar']]));
+            ->willReturn(json_encode(['route' => ['foo' => 'bar']], JSON_THROW_ON_ERROR));
 
         $this->router->redirect([]);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Cannot parse route name from request parameter "input_action". Value of key "params" must be array: {"route":"foo","params":"bar"}
-     */
-    // @codingStandardsIgnoreEnd
-    public function testRedirectFailsWhenRouteParamsIsNotArray()
+    public function testRedirectFailsWhenRouteParamsIsNotArray(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot parse route name from request parameter "input_action".'
+            . ' Value of key "params" must be array: {"route":"foo","params":"bar"}'
+        );
+
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
-            ->willReturn(json_encode(['route' => 'foo', 'params' => 'bar']));
+            ->willReturn(json_encode(['route' => 'foo', 'params' => 'bar'], JSON_THROW_ON_ERROR));
 
         $this->router->redirect([]);
     }
 
     /**
      * @dataProvider redirectDataProvider
-     * @param array $expected
-     * @param array $data
      */
-    public function testRedirectWorks(array $expected, array $data)
+    public function testRedirectWorks(array $expected, array $data): void
     {
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
-            ->willReturn(json_encode($data['actionParameters']));
+            ->willReturn(json_encode($data['actionParameters'], JSON_THROW_ON_ERROR));
 
         $this->requestQuery->expects($this->once())
             ->method('all')
-            ->will($this->returnValue($data['queryParameters']));
+            ->willReturn($data['queryParameters']);
 
         $expectedUrl = 'http://expected.com';
-        $this->symfonyRouter->expects($this->once())
+        $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->with($expected['route'], $expected['parameters'])
             ->willReturn($expectedUrl);
@@ -285,14 +146,10 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function redirectDataProvider()
+    public function redirectDataProvider(): array
     {
         $expectedId = 42;
-        $entity = $this->getEntityStub($expectedId);
-
         $expectedSecondEntityId = 21;
 
         return [
@@ -300,7 +157,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => User::class,
                         'id' => $expectedId,
                         'testQueryParameter' => 'foo'
                     ]
@@ -309,11 +166,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => User::class,
                             'id' => '$id'
                         ]
                     ],
-                    'context' => $entity,
+                    'context' => $this->getEntityStub($expectedId),
                     'queryParameters' => [
                         'testQueryParameter' => 'foo'
                     ],
@@ -323,7 +180,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => User::class,
                         'id' => $expectedId,
                     ]
                 ],
@@ -331,11 +188,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => User::class,
                             'id' => '$id'
                         ]
                     ],
-                    'context' => $entity,
+                    'context' => $this->getEntityStub($expectedId),
                     'queryParameters' => [
                         'testStaticParameter' => 'foo'
                     ],
@@ -345,7 +202,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => User::class,
                         'id' => $expectedId
                     ]
                 ],
@@ -353,11 +210,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => User::class,
                             'id' => '$id'
                         ]
                     ],
-                    'context' => $entity,
+                    'context' => $this->getEntityStub($expectedId),
                     'queryParameters' => [],
                 ]
             ],
@@ -365,7 +222,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                        'testStaticParameter' => User::class,
                         'id' => $expectedId,
                         'secondId' => $expectedSecondEntityId
                     ]
@@ -374,13 +231,13 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => 'Oro\Bundle\CallBundle\Entity\Call',
+                            'testStaticParameter' => User::class,
                             'id' => '$firstEntity.id',
                             'secondId' => '$secondEntity.id'
                         ]
                     ],
                     'context' => [
-                        'firstEntity' => $entity,
+                        'firstEntity' => $this->getEntityStub($expectedId),
                         'secondEntity' => $this->getEntityStub($expectedSecondEntityId)
                     ],
                     'queryParameters' => [],
@@ -389,14 +246,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param int $id
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getEntityStub($id)
+    private function getEntityStub(int $id): \stdClass
     {
-        $entity = $this->createPartialMock('StdClass', ['getId']);
+        $entity = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $entity->expects($this->any())
             ->method('getId')
             ->willReturn($id);

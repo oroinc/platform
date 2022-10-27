@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\UserBundle\Model\ExtendRole;
 
@@ -24,9 +23,6 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  *              "group_name"="",
  *              "category"="account_management"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "activity"={
  *              "immutable"=true
  *          },
@@ -35,9 +31,8 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  *          }
  *      }
  * )
- * @JMS\ExclusionPolicy("ALL")
  */
-class Role extends ExtendRole implements \Serializable
+class Role extends ExtendRole
 {
     const PREFIX_ROLE = 'ROLE_';
 
@@ -47,8 +42,6 @@ class Role extends ExtendRole implements \Serializable
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $id;
 
@@ -56,8 +49,6 @@ class Role extends ExtendRole implements \Serializable
      * @var string
      *
      * @ORM\Column(type="string", unique=true, length=30, nullable=false)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $role;
 
@@ -65,15 +56,13 @@ class Role extends ExtendRole implements \Serializable
      * @var string
      *
      * @ORM\Column(type="string", length=30)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $label;
 
     /**
      * @var User[]|Collection
      *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="roles")
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="userRoles")
      */
     protected $users;
 
@@ -82,7 +71,7 @@ class Role extends ExtendRole implements \Serializable
      *
      * @param string $role ROLE_FOO etc
      */
-    public function __construct($role = '')
+    public function __construct(string $role = '')
     {
         parent::__construct($role);
 
@@ -183,28 +172,22 @@ class Role extends ExtendRole implements \Serializable
         return $this->users;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
         $dataForSerialization = [$this->id, $this->role, $this->label];
         if (property_exists($this, 'organization')) {
             $dataForSerialization[] =  is_object($this->organization) ? clone $this->organization : $this->organization;
         }
 
-        return serialize($dataForSerialization);
+        return $dataForSerialization;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         if (property_exists($this, 'organization')) {
-            list($this->id, $this->role, $this->label, $this->organization) = unserialize($serialized);
+            [$this->id, $this->role, $this->label, $this->organization] = $serialized;
         } else {
-            list($this->id, $this->role, $this->label) = unserialize($serialized);
+            [$this->id, $this->role, $this->label] = $serialized;
         }
     }
 }

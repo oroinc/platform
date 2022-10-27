@@ -1,15 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var ActionPermissionsReadonlyCell;
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const Backgrid = require('backgrid');
 
-    ActionPermissionsReadonlyCell = BaseView.extend({
+    const ActionPermissionsReadonlyCell = BaseView.extend({
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ActionPermissionsReadonlyCell() {
-            ActionPermissionsReadonlyCell.__super__.constructor.apply(this, arguments);
+        constructor: function ActionPermissionsReadonlyCell(options) {
+            ActionPermissionsReadonlyCell.__super__.constructor.call(this, options);
         }
     });
 

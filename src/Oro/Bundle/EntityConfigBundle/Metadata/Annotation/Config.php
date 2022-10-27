@@ -7,32 +7,21 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Exception\AnnotationException;
 
 /**
+ * The annotation that is used to provide configuration of configurable entity.
  * @Annotation
  * @Target("CLASS")
  */
-class Config
+final class Config
 {
-    /** @var string */
-    public $mode = ConfigModel::MODE_DEFAULT;
+    private const MODES = [ConfigModel::MODE_DEFAULT, ConfigModel::MODE_HIDDEN, ConfigModel::MODE_READONLY];
 
-    /** @var string */
-    public $routeName = '';
+    public string $mode = ConfigModel::MODE_DEFAULT;
+    public string $routeName = '';
+    public string $routeView = '';
+    public string $routeCreate = '';
+    public array $defaultValues = [];
+    public array $routes = [];
 
-    /** @var string */
-    public $routeView = '';
-
-    /** @var string */
-    public $routeCreate = '';
-
-    /** @var array */
-    public $defaultValues = array();
-
-    /** @var array */
-    public $routes = [];
-
-    /**
-     * @param array $data
-     */
     public function __construct(array $data)
     {
         if (isset($data['mode'])) {
@@ -57,44 +46,24 @@ class Config
             $this->defaultValues = $data['defaultValues'];
         }
 
-        if (!is_array($this->defaultValues)) {
-            throw new AnnotationException(
-                sprintf(
-                    'Annotation "Config" parameter "defaultValues" expect "array" but "%s" given',
-                    gettype($this->defaultValues)
-                )
-            );
-        }
-
-        $availableMode = array(
-            ConfigModel::MODE_DEFAULT,
-            ConfigModel::MODE_HIDDEN,
-            ConfigModel::MODE_READONLY
-        );
-
-        if (!in_array($this->mode, $availableMode, true)) {
-            throw new AnnotationException(
-                sprintf('Annotation "Config" give invalid parameter "mode" : "%s"', $this->mode)
-            );
+        if (!\in_array($this->mode, self::MODES, true)) {
+            throw new AnnotationException(sprintf(
+                'Annotation "Config" give invalid parameter "mode" : "%s"',
+                $this->mode
+            ));
         }
 
         $this->collectRoutes($data);
     }
 
-    /**
-     * @param array $data
-     */
-    protected function collectRoutes(array $data)
+    private function collectRoutes(array $data): void
     {
         foreach ($data as $name => $value) {
-            if (strpos($name, 'route') !== 0 || property_exists($this, $name)) {
-                continue;
-            }
-
-            $routeName = lcfirst(str_replace('route', '', $name));
-
-            if (!array_key_exists($routeName, $this->routes) && strlen($routeName) > 0) {
-                $this->routes[$routeName] = $value;
+            if (str_starts_with($name, 'route') && !property_exists($this, $name)) {
+                $routeName = lcfirst(str_replace('route', '', $name));
+                if (!\array_key_exists($routeName, $this->routes) && strlen($routeName) > 0) {
+                    $this->routes[$routeName] = $value;
+                }
             }
         }
     }

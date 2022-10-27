@@ -8,13 +8,13 @@ use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
 class DemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $listenerManager;
+    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $listenerManager;
 
     /** @var DemoDataFixturesListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);
 

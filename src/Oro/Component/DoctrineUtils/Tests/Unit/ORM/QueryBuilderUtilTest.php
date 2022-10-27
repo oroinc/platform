@@ -6,59 +6,46 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class QueryBuilderUtilTest extends OrmTestCase
 {
     /** @var EntityManager */
-    protected $em;
+    private $em;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    protected function getQueryBuilder()
+    private function getQueryBuilder(): QueryBuilder
     {
         return new QueryBuilder($this->createMock(EntityManager::class));
     }
 
-    /**
-     * @param string $name
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getParameterMock($name)
+    private function getParameter(string|int $name): Parameter
     {
-        $parameter = $this->getMockBuilder('\Doctrine\ORM\Query\Parameter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameter = $this->createMock(Parameter::class);
         $parameter->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
         $parameter->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue($name . '_value'));
+            ->willReturn($name . '_value');
 
         return $parameter;
     }
@@ -74,10 +61,7 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertSame($expectedOffset, QueryBuilderUtil::getPageOffset($page, $limit));
     }
 
-    /**
-     * @return array
-     */
-    public function getPageOffsetProvider()
+    public function getPageOffsetProvider(): array
     {
         return [
             [0, null, null],
@@ -128,21 +112,60 @@ class QueryBuilderUtilTest extends OrmTestCase
     }
 
     /**
-     * @dataProvider getSelectExprByAliasProvider
-     *
-     * @param QueryBuilder $qb
-     * @param string       $alias
-     * @param string       $expectedExpr
+     * @dataProvider getSelectExprProvider
      */
-    public function testGetSelectExprByAlias($qb, $alias, $expectedExpr)
+    public function testGetSelectExpr(QueryBuilder $qb, string $expectedExpr)
+    {
+        $this->assertEquals($expectedExpr, QueryBuilderUtil::getSelectExpr($qb));
+    }
+
+    public function getSelectExprProvider(): array
+    {
+        return [
+            [
+                $this->getQueryBuilder()->select('e'),
+                'e'
+            ],
+            [
+                $this->getQueryBuilder()->select('e, a'),
+                'e, a'
+            ],
+            [
+                $this->getQueryBuilder()->addSelect('e')->addSelect('a'),
+                'e, a'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id'),
+                'e.id'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id as id'),
+                'e.id as id'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id as id, e.name AS name1'),
+                'e.id as id, e.name AS name1'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id as id, e.name AS name1')->addSelect('e.lbl AS name2'),
+                'e.id as id, e.name AS name1, e.lbl AS name2'
+            ],
+            [
+                $this->getQueryBuilder()->select('e.id, CONCAT(e.name1, e.name2) AS name'),
+                'e.id, CONCAT(e.name1, e.name2) AS name'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider getSelectExprByAliasProvider
+     */
+    public function testGetSelectExprByAlias(QueryBuilder $qb, string $alias, ?string $expectedExpr)
     {
         $this->assertEquals($expectedExpr, QueryBuilderUtil::getSelectExprByAlias($qb, $alias));
     }
 
-    /**
-     * @return array
-     */
-    public function getSelectExprByAliasProvider()
+    public function getSelectExprByAliasProvider(): array
     {
         return [
             [
@@ -180,9 +203,7 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     public function testGetSingleRootAlias()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
             ->method('getRootAliases')
@@ -194,17 +215,15 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has several root aliases. "root_alias1, root_alias1".
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetSingleRootAliasWhenQueryHasSeveralRootAliases()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage(
+            'Can\'t get single root alias for the given query.'
+            . ' Reason: the query has several root aliases: root_alias1, root_alias1.'
+        );
+
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
             ->method('getRootAliases')
@@ -213,17 +232,14 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::getSingleRootAlias($qb);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Can't get single root alias for the given query. Reason: the query has no any root aliases.
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetSingleRootAliasWhenQueryHasNoRootAlias()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage(
+            'Can\'t get single root alias for the given query. Reason: the query has no any root aliases.'
+        );
+
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
             ->method('getRootAliases')
@@ -234,9 +250,7 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     public function testGetSingleRootAliasWhenQueryHasNoRootAliasAndNoExceptionRequested()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->once())
             ->method('getRootAliases')
@@ -245,11 +259,67 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertNull(QueryBuilderUtil::getSingleRootAlias($qb, false));
     }
 
+    public function testGetSingleRootEntity()
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $qb->expects($this->once())
+            ->method('getRootEntities')
+            ->willReturn(['Test\Entity']);
+
+        $this->assertEquals(
+            'Test\Entity',
+            QueryBuilderUtil::getSingleRootEntity($qb)
+        );
+    }
+
+    public function testGetSingleRootEntityWhenQueryHasSeveralRootEntities()
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage(
+            'Can\'t get single root entity for the given query.'
+            . ' Reason: the query has several root entities: Test\Entity1, Test\Entity1.'
+        );
+
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $qb->expects($this->once())
+            ->method('getRootEntities')
+            ->willReturn(['Test\Entity1', 'Test\Entity1']);
+
+        QueryBuilderUtil::getSingleRootEntity($qb);
+    }
+
+    public function testGetSingleRootEntityWhenQueryHasNoRootEntity()
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage(
+            'Can\'t get single root entity for the given query. Reason: the query has no any root entities.'
+        );
+
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $qb->expects($this->once())
+            ->method('getRootEntities')
+            ->willReturn([]);
+
+        QueryBuilderUtil::getSingleRootEntity($qb);
+    }
+
+    public function testGetSingleRootEntityWhenQueryHasNoRootEntityAndNoExceptionRequested()
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $qb->expects($this->once())
+            ->method('getRootEntities')
+            ->willReturn([]);
+
+        $this->assertNull(QueryBuilderUtil::getSingleRootEntity($qb, false));
+    }
+
     public function testApplyEmptyJoins()
     {
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $qb->expects($this->never())
             ->method('distinct');
@@ -278,43 +348,22 @@ class QueryBuilderUtilTest extends OrmTestCase
             ]
         ];
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('distinct')
             ->with(true);
         $qb->expects($this->once())
             ->method('getRootAliases')
             ->willReturn(['root_alias']);
-        $qb->expects($this->at(2))
+        $qb->expects($this->exactly(6))
             ->method('leftJoin')
-            ->with('root_alias.emails', 'emails');
-        $qb->expects($this->at(3))
-            ->method('leftJoin')
-            ->with('root_alias.phones', 'phones');
-        $qb->expects($this->at(4))
-            ->method('leftJoin')
-            ->with('root_alias.contacts', 'contacts');
-        $qb->expects($this->at(5))
-            ->method('leftJoin')
-            ->with('root_alias.accounts_field', 'accounts');
-        $qb->expects($this->at(6))
-            ->method('leftJoin')
-            ->with(
-                'accounts.users_field',
-                'users',
-                'WITH',
-                'users.active = true'
-            );
-        $qb->expects($this->at(7))
-            ->method('leftJoin')
-            ->with(
-                'root_alias.products',
-                'products',
-                'WITH',
-                'products.active = true'
+            ->withConsecutive(
+                ['root_alias.emails', 'emails'],
+                ['root_alias.phones', 'phones'],
+                ['root_alias.contacts', 'contacts'],
+                ['root_alias.accounts_field', 'accounts'],
+                ['accounts.users_field', 'users', 'WITH', 'users.active = true'],
+                ['root_alias.products', 'products', 'WITH', 'products.active = true']
             );
 
         QueryBuilderUtil::applyJoins($qb, $joins);
@@ -325,11 +374,11 @@ class QueryBuilderUtilTest extends OrmTestCase
         $dql = 'SELECT a.name FROM Some:Other as a WHERE a.name = :param1
                 AND a.name != :param2 AND a.status = ?1';
         $parameters = [
-            $this->getParameterMock(0),
-            $this->getParameterMock(1),
-            $this->getParameterMock('param1'),
-            $this->getParameterMock('param2'),
-            $this->getParameterMock('param3'),
+            $this->getParameter(0),
+            $this->getParameter(1),
+            $this->getParameter('param1'),
+            $this->getParameter('param2'),
+            $this->getParameter('param3'),
         ];
         $expectedParameters = [
             1 => '1_value',
@@ -337,15 +386,13 @@ class QueryBuilderUtilTest extends OrmTestCase
             'param2' => 'param2_value',
         ];
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('getDql')
-            ->will($this->returnValue($dql));
+            ->willReturn($dql);
         $qb->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue($parameters));
+            ->willReturn($parameters);
         $qb->expects($this->once())
             ->method('setParameters')
             ->with($expectedParameters);
@@ -355,11 +402,8 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider getJoinClassDataProvider
-     * @param callable $qbFactory
-     * @param array $joinPath
-     * @param string $expectedClass
      */
-    public function testGetJoinClass(callable $qbFactory, $joinPath, $expectedClass)
+    public function testGetJoinClass(callable $qbFactory, array $joinPath, string $expectedClass)
     {
         $qb = $qbFactory($this->em);
 
@@ -369,73 +413,70 @@ class QueryBuilderUtilTest extends OrmTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getJoinClassDataProvider()
+    public function getJoinClassDataProvider(): array
     {
         return [
             'field:manyToOne' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->from(Person::class, 'p')
                         ->join('p.bestItem', 'i');
                 },
                 ['p', 0],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+                Item::class,
             ],
             'field:manyToMany' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->from(Person::class, 'p')
                         ->join('p.groups', 'g');
                 },
                 ['p', 0],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group',
+                Group::class,
             ],
             'field:manyToMany.field:manyToMany' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+                        ->from(Person::class, 'p')
                         ->join('p.groups', 'g')
                         ->join('g.items', 'i');
                 },
                 ['p', 1],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+                Item::class,
             ],
             'class:manyToOne' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
-                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+                        ->from(Person::class, 'p')
+                        ->join(Item::class, 'i');
                 },
                 ['p', 0],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+                Item::class,
             ],
             'class:manyToMany' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
-                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g');
+                        ->from(Person::class, 'p')
+                        ->join(Group::class, 'g');
                 },
                 ['p', 0],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group',
+                Group::class,
             ],
             'class:manyToMany.class:manyToMany' => [
                 function (EntityManager $em) {
                     return $em->createQueryBuilder()
                         ->select('p')
-                        ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
-                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g')
-                        ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+                        ->from(Person::class, 'p')
+                        ->join(Group::class, 'g')
+                        ->join(Item::class, 'i');
                 },
                 ['p', 1],
-                'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item',
+                Item::class,
             ],
         ];
     }
@@ -444,9 +485,9 @@ class QueryBuilderUtilTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('p')
-            ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
-            ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Group', 'g')
-            ->join('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item', 'i');
+            ->from(Person::class, 'p')
+            ->join(Group::class, 'g')
+            ->join(Item::class, 'i');
 
         $this->assertNull(QueryBuilderUtil::findJoinByAlias($qb, 'p'));
         $this->assertEquals('g', QueryBuilderUtil::findJoinByAlias($qb, 'g')->getAlias());
@@ -458,7 +499,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('p')
-            ->from('Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Person', 'p')
+            ->from(Person::class, 'p')
             ->join('p.bestItem', 'i')
             ->join('i.owner', 'o')
             ->join('i.persons', 'persons')
@@ -478,9 +519,8 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider invalidDataProvider
-     * @param string $invalid
      */
-    public function testSprintfInvalid($invalid)
+    public function testSprintfInvalid(string $invalid)
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::sprintf('%s.%s > 0', $invalid, 'id');
@@ -493,9 +533,8 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider invalidDataProvider
-     * @param string $invalid
      */
-    public function testCheckStringInvalid($invalid)
+    public function testCheckStringInvalid(string $invalid)
     {
         $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkIdentifier($invalid);
@@ -511,27 +550,21 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::checkField('tEs_T_01a.tEs_T_01a');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckFieldForInvalidFieldWithoutAlias()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkField('0_some//');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckFieldForInvalidAliasPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkField('0_some//.field');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckFieldForInvalidFieldPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkField('alias.0_some//');
     }
 
@@ -550,35 +583,27 @@ class QueryBuilderUtilTest extends OrmTestCase
         QueryBuilderUtil::checkPath('tEs_T_01a.tEs_T_01a.tEs_T_01a');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckPathForInvalidFieldWithoutAlias()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('0_some//');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckPathForInvalidAliasPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('0_some//.field');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckPathForInvalidFieldPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('alias.0_some//');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCheckPathForInvalidNestedFieldPart()
     {
+        $this->expectException(\InvalidArgumentException::class);
         QueryBuilderUtil::checkPath('alias.field.0_some//');
     }
 
@@ -589,17 +614,13 @@ class QueryBuilderUtilTest extends OrmTestCase
 
     /**
      * @dataProvider invalidDataProvider
-     * @param string $invalid
      */
-    public function testGetFieldInvalid($invalid)
+    public function testGetFieldInvalid(string $invalid)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', $invalid));
     }
 
-    /**
-     * @return array
-     */
     public function invalidDataProvider(): array
     {
         return [

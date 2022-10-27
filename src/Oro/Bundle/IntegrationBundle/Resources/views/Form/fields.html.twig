@@ -20,25 +20,25 @@
     {{ form_row(form.transportType) }}
 
     {% if (form.transport is defined) %}
-        {{ form_widget(form.transport) }}
+        {{ form_widget(form.transport, {'attr': {'class': 'control-group-container'}}) }}
     {% endif %}
 
-    {% if (form.synchronizationSettings is defined) %}
+    {% if (form.synchronizationSettings is defined and not form.synchronizationSettings.rendered) %}
         {{ form_widget(form.synchronizationSettings) }}
     {% endif %}
 
-    {% if (form.mappingSettings is defined) %}
+    {% if (form.mappingSettings is defined and not form.mappingSettings.rendered) %}
         {{ form_widget(form.mappingSettings) }}
     {% endif %}
 
     {% if (form.connectors is defined) %}
-        <div {% if form.connectors.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
+        <div class="control-group-container {% if form.connectors.vars.choices is empty %}{{ 'hide' }}{% endif %}">
             {{ form_row(form.connectors) }}
         </div>
     {% endif %}
 
     {{ form_rest(form) }}
 
-    {% import 'OroIntegrationBundle:Form:javascript.html.twig' as jsRenderer %}
+    {% import '@OroIntegration/Form/javascript.html.twig' as jsRenderer %}
     {{ jsRenderer.renderIntegrationFormJS(form) }}
 {% endblock %}

@@ -1,8 +1,10 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% extends '@OroUI/actions/view.html.twig' %}
 
 {% oro_title_set({params : {"%process_definition.label%": entity.label} }) %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_process_definition_update') %}
         {% set idButton = entity.name ~ '-process-deactivate-btn' %}
         {% set options = {
@@ -37,15 +39,16 @@
 {% endblock navButtons %}
 
 {% block breadcrumbs %}
-    {{ parent() }}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
-    <div class="pull-left">
+    {{ parent() }}
+    <span class="page-title__status">
         {% if entity.enabled %}
-            <div class="badge badge-pill badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
+            {{ UI.badge('Active'|trans, 'enabled') }}
         {% else %}
-            <div class="badge badge-pill badge-disabled status-disabled"><i class="icon-status-disabled fa-circle"></i>{{ 'Inactive'|trans }}</div>
+            {{ UI.badge('Inactive'|trans, 'disabled') }}
         {% endif %}
-    </div>
+    </span>
 {% endblock breadcrumbs %}
 
 {% block stats %}
@@ -64,6 +67,8 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {%- set processDefinitionInfo -%}
         {% set entityConfig = oro_entity_config(entity.relatedEntity) %}
         {% set relatedEntityLabel = entityConfig.label|default('')|trans %}
@@ -93,7 +98,7 @@
                     <br />
                 {% elseif trigger.cron %}
                     {{ 'oro.workflow.block.view.process.trigger.cron.description'|trans({
-                        '{{ cron }}': '<b>' ~ trigger.cron ~ '</b>'
+                        '{{ cron }}': '<b>' ~ trigger.cron|oro_html_sanitize ~ '</b>'
                     })|raw }}
                     <br />
                 {% endif %}

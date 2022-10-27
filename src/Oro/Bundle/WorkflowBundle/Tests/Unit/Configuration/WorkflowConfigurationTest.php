@@ -7,7 +7,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class WorkflowConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessConfiguration()
+    public function testProcessConfiguration(): void
     {
         $workflowConfiguration = new WorkflowConfiguration();
 
@@ -21,10 +21,7 @@ class WorkflowConfigurationTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    protected function getInputConfiguration()
+    private function getInputConfiguration(): array
     {
         $fileName = __DIR__ . '/Stub/CorrectConfiguration/Resources/config/oro/workflows.yml';
         $this->assertFileExists($fileName);
@@ -33,10 +30,7 @@ class WorkflowConfigurationTest extends \PHPUnit\Framework\TestCase
         return current($data);
     }
 
-    /**
-     * @return array
-     */
-    protected function getExpectedConfiguration()
+    private function getExpectedConfiguration(): array
     {
         $fileName = __DIR__ . '/Stub/CorrectConfiguration/Resources/config/oro/workflows.php';
         $this->assertFileExists($fileName);

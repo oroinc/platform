@@ -1,32 +1,31 @@
 define(function(require) {
     'use strict';
 
-    var DatagridSettingsView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var TabCollectionView = require('oroui/js/app/views/tab-collection-view');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var template = require('tpl!orodatagrid/templates/datagrid/grid-settings.html');
-    var mediator = require('oroui/js/mediator');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const TabCollectionView = require('oroui/js/app/views/tab-collection-view');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid/grid-settings.html');
+    const mediator = require('oroui/js/mediator');
 
     /**
      * @class DatagridSettingsView
      * @extends BaseView
      */
-    DatagridSettingsView = BaseView.extend({
+    const DatagridSettingsView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         optionNames: ['viewConstructors', 'title', 'template'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
@@ -56,19 +55,19 @@ define(function(require) {
         uniqueId: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DatagridSettingsView() {
-            DatagridSettingsView.__super__.constructor.apply(this, arguments);
+        constructor: function DatagridSettingsView(options) {
+            DatagridSettingsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @param options
          */
         initialize: function(options) {
             this.options = options;
-            DatagridSettingsView.__super__.initialize.apply(this, arguments);
+            DatagridSettingsView.__super__.initialize.call(this, options);
 
             this.uniqueId = _.uniqueId(this.cid);
             this.views = new BaseCollection(
@@ -87,7 +86,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -124,7 +123,7 @@ define(function(require) {
 
         /**
          * Render array of views, create tabs view
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             DatagridSettingsView.__super__.render.call(this);
@@ -146,8 +145,8 @@ define(function(require) {
          * @param view
          */
         renderSubview: function(view) {
-            var id = view.get('id');
-            var constructor = view.get('view');
+            const id = view.get('id');
+            const constructor = view.get('view');
 
             this.subview(id, new constructor(_.extend({
                 _sourceElement: this.$('#' + id),

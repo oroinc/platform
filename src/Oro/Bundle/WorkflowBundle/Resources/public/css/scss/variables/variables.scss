@@ -1,0 +1,56 @@
+/* @theme: admin.oro; */
+
+@import 'permissions-variables';
+@import 'workflow';
+
+$flowchart-bg-color: $primary-inverse !default;
+
+$flowchart-controls-padding: 10px 10px 0 !default;
+$flowchart-controls-min-height: 32px !default;
+$flowchart-controls-z-index: 600 !default;
+$flowchart-checkbox-group-bg-color: rgba($flowchart-bg-color, .7) !default;
+$flowchart-checkbox-group-padding: 5px 7px 2px !default;
+$flowchart-alert-margin-top: 30px !default;
+
+$flowchart-wrapper-height: 700px !default;
+$flowchart-wrapper-border: 1px solid $additional-ultra-light !default;
+$jsplumb-endpoint-z-index: 100 !default;
+$jsplumb-source-radius: 7px !default;
+$jsplumb-source-border: 3px solid $primary-inverse !default;
+$jsplumb-source-bg-color: $extra !default;
+$jsplumb-start-source-radius: 8px !default;
+$jsplumb-start-source-offset: 5px !default;
+
+$flowchart-step-font-size: 14px !default;
+$flowchart-step-height: 32px !default;
+$flowchart-step-border-radius: $flowchart-step-height*.5 !default;
+$flowchart-step-v-padding: 5px !default;
+$flowchart-step-h-padding: 16px !default;
+$flowchart-step-max-width: 180px !default;
+$flowchart-step-z-index: 100 !default;
+$flowchart-step-color: $primary-inverse !default;
+$flowchart-step-bg-color: map-get($btn-theme-primary, 'background') !default;
+$flowchart-step-hover-bg-color: darken($flowchart-step-bg-color, 8%) !default;
+$flowchart-start-step-width: 88px !default;
+$flowchart-start-step-height: 88px !default;
+$flowchart-start-step-border-radius: $flowchart-start-step-height * .5 !default;
+$flowchart-start-step-bg-color: map-get($btn-theme-success, 'background') !default;
+$flowchart-start-step-hover-bg-color: darken($flowchart-start-step-bg-color, 8%) !default;
+$flowchart-final-step-bg-color: $flowchart-start-step-bg-color !default;
+$flowchart-final-step-hover-bg-color: $flowchart-start-step-hover-bg-color !default;
+
+$flowchart-transition-font-size: 13px !default;
+$flowchart-transition-height: 24px !default;
+$flowchart-transition-v-padding: 2px !default;
+$flowchart-transition-h-padding: 8px !default;
+$flowchart-transition-border-radius: 4px !default;
+$flowchart-transition-label-max-width: 100px !default;
+$flowchart-transition-color: $primary-200 !default;
+$flowchart-transition-hover-color: $warning-darken !default;
+$flowchart-transition-bg-color: $primary-830 !default;
+$flowchart-transition-hover-bg-color: $extra-300 !default;
+$flowchart-transition-hover-z-index: 200 !default;
+$flowchart-transition-opacity: .8 !default;
+$flowchart-transition-open-dropdown-z-index: 101 !default;
+$flowchart-transition-endpoint-box-shadow: 0 0 0 2px $primary-inverse !default;
+$flowchart-transition-endpoint-border-radius: 6px !default;

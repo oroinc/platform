@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Form\Extension;
 use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -15,6 +16,10 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
 /**
+ * Form extension that check access to fields.
+ * It cannot be registered with form.type_extension tag because
+ * this extension should be registered as first extension for all forms.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
@@ -28,13 +33,9 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     /** @var bool */
     protected $showRestricted = true;
 
-    /** @var array List of non accessable fields with commited data */
+    /** @var array List of non accessible fields with committed data */
     protected $disabledFields = [];
 
-    /**
-     * @param FieldAclHelper  $fieldAclHelper
-     * @param LoggerInterface $logger
-     */
     public function __construct(FieldAclHelper $fieldAclHelper, LoggerInterface $logger)
     {
         $this->fieldAclHelper = $fieldAclHelper;
@@ -44,11 +45,9 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return method_exists('Symfony\Component\Form\AbstractType', 'getBlockPrefix')
-            ? 'Symfony\Component\Form\Extension\Core\Type\FormType'
-            : 'form';
+        return [FormType::class];
     }
 
     /**
@@ -67,11 +66,19 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!$this->isApplicable($options)) {
             return;
+        }
+
+        // removes 'trash' view fields that can be added to removed fields in finishView method of the form
+        foreach (array_keys($view->children) as $fieldName) {
+            if (!$form->has($fieldName) && !$view->children[$fieldName] instanceof FormView) {
+                unset($view->children[$fieldName]);
+            }
         }
 
         $entity = $this->getEntityByForm($form);
@@ -90,7 +97,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                     }
                 }
             } else {
-                $view->children[$childName]->setRendered();
+                $view->offsetUnset($childName);
                 if ($childForm->getErrors()->count()) {
                     $hiddenFieldsWithErrors[$childName] = (string)$childForm->getErrors();
                 }
@@ -102,8 +109,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
     /**
      * Used on post submit to add validation errors
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
@@ -121,7 +126,7 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      * Validate input data. If form data contain data for forbidden fields - set the original data for such fields and
      * collect this fields to add validation error.
      *
-     * @param FormEvent $event
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preSubmit(FormEvent $event)
     {
@@ -162,6 +167,8 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                         }
                     }
                 }
+            } else {
+                $form->remove($fieldName);
             }
         }
 
@@ -267,10 +274,6 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 
     /**
      * in case if we have error in the non accessible fields - add validation error.
-     *
-     * @param array         $hiddenFieldsWithErrors
-     * @param FormView      $view
-     * @param FormInterface $form
      */
     protected function processHiddenFieldsWithErrors(array $hiddenFieldsWithErrors, FormView $view, FormInterface $form)
     {

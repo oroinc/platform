@@ -1,32 +1,17 @@
-parameters:
-    oro_form.validator.constraint_factory.class: Oro\Bundle\FormBundle\Validator\ConstraintFactory
-    oro_form.provider.html_tag_provider.class:   Oro\Bundle\FormBundle\Provider\HtmlTagProvider
-    oro_form.event.event_dispatcher.class:       Oro\Bundle\FormBundle\Event\EventDispatcher
-
 services:
     oro_form.validator.constraint_factory:
-        class: '%oro_form.validator.constraint_factory.class%'
+        class: Oro\Bundle\FormBundle\Validator\ConstraintFactory
 
     oro_form.twig.form_extension:
         class: Oro\Bundle\FormBundle\Twig\FormExtension
         arguments:
-            - '@twig.form.renderer'
+            - '@oro_platform.twig.service_locator'
         public: false
         tags:
             - { name: twig.extension }
 
-    oro_form.model.update_handler:
-        deprecated: The "%service_id%" service is deprecated since v2.1.0 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade (oro_form.update_handler) instead
-        class: 'Oro\Bundle\FormBundle\Model\UpdateHandler'
-        arguments:
-            - '@request_stack'
-            - '@session'
-            - '@oro_ui.router'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_form.form.handler.default'
-
     oro_form.provider.html_tag_provider:
-        class: '%oro_form.provider.html_tag_provider.class%'
+        class: Oro\Bundle\FormBundle\Provider\HtmlTagProvider
         arguments:
             - []
 
@@ -36,7 +21,7 @@ services:
             - { name: kernel.event_listener, event: oro.entity.count_query.optimize, method: onOptimize }
 
     oro_form.event.event_dispatcher:
-        class: '%oro_form.event.event_dispatcher.class%'
+        class: Oro\Bundle\FormBundle\Event\EventDispatcher
         arguments:
             - '@event_dispatcher'
 
@@ -45,7 +30,7 @@ services:
         public: false
         decorates: doctrine.orm.validator_initializer
         arguments:
-            - '@oro_form.doctrine.orm.validator_initializer.inner'
+            - '@.inner'
 
     oro_form.update_factory:
         class: Oro\Bundle\FormBundle\Model\UpdateFactory
@@ -56,6 +41,7 @@ services:
 
     oro_form.update_handler:
         class: Oro\Bundle\FormBundle\Model\UpdateHandlerFacade
+        public: true
         arguments:
             - '@request_stack'
             - '@session'
@@ -63,21 +49,31 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_form.update_factory'
 
+    Oro\Bundle\FormBundle\Model\UpdateHandlerFacade:
+        alias: oro_form.update_handler
+
+    oro_form.registry.form_template_data_provider:
+        class: Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry
+        public: false
+        arguments:
+            - ~ # service locator
+
     oro_form.provider.from_template_data.default:
         class: Oro\Bundle\FormBundle\Provider\FromTemplateDataProvider
+        public: false
         tags:
             - { name: oro_form.form_template_data_provider, alias: default }
 
-    oro_form.registry.form_template_data_provider:
-        class: 'Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry'
-        public: false
-
     oro_form.registry.form_handler:
-        public: false
-        class: 'Oro\Bundle\FormBundle\Model\FormHandlerRegistry'
+        class: Oro\Bundle\FormBundle\Model\FormHandlerRegistry
+        arguments:
+            - ~ # service locator
+
+    Oro\Bundle\FormBundle\Model\FormHandlerRegistry:
+        alias: oro_form.registry.form_handler
 
     oro_form.form.handler.default:
-        class: 'Oro\Bundle\FormBundle\Form\Handler\FormHandler'
+        class: Oro\Bundle\FormBundle\Form\Handler\FormHandler
         arguments:
             - '@oro_form.event.event_dispatcher'
             - '@oro_entity.doctrine_helper'

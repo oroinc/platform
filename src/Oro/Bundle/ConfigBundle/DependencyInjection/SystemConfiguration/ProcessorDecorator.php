@@ -8,6 +8,11 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * Define configuration tree for system configuration.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ProcessorDecorator
 {
     const ROOT          = 'system_configuration';
@@ -61,8 +66,8 @@ class ProcessorDecorator
 
         // validate API tree
         if (isset($result[self::API_TREE_ROOT])) {
-            foreach ($result[self::API_TREE_ROOT] as $key => &$data) {
-                $this->validateApiTreeItem(self::ROOT, $key, $data, $result[self::FIELDS_ROOT]);
+            foreach ($result[self::API_TREE_ROOT] as $key => &$resultData) {
+                $this->validateApiTreeItem(self::ROOT, $key, $resultData, $result[self::FIELDS_ROOT]);
             }
         }
 
@@ -178,9 +183,9 @@ class ProcessorDecorator
      */
     protected function getConfigurationTree()
     {
-        $tree = new TreeBuilder();
+        $tree = new TreeBuilder(self::ROOT);
 
-        $tree->root(self::ROOT)
+        $tree->getRootNode()
             ->children()
                 ->append($this->getGroupsNode())
                 ->append($this->getFieldsNode())
@@ -196,14 +201,15 @@ class ProcessorDecorator
      */
     protected function getGroupsNode()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder(self::GROUPS_NODE);
 
-        $node = $builder->root(self::GROUPS_NODE)
+        $node = $builder->getRootNode()
             ->prototype('array')
                 ->children()
                     ->scalarNode('title')->isRequired()->end()
                     ->scalarNode('icon')->end()
                     ->scalarNode('description')->end()
+                    ->scalarNode('description_style')->end()
                     ->arrayNode('configurator')
                         ->beforeNormalization()
                             ->ifString()
@@ -234,19 +240,31 @@ class ProcessorDecorator
     }
 
     /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @return NodeDefinition
      */
     protected function getFieldsNode()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder(self::FIELDS_ROOT);
 
-        $node = $builder->root(self::FIELDS_ROOT)
+        $node = $builder->getRootNode()
             ->prototype('array')
                 ->children()
                     ->scalarNode('data_type')->end()
                     ->scalarNode('type')->end()
                     ->scalarNode('search_type')->end()
                     ->arrayNode('options')
+                        // If required option is not defined set it to false by default
+                        ->beforeNormalization()
+                            ->ifTrue(function ($options) {
+                                return is_array($options) && !isset($options['required']);
+                            })
+                            ->then(function ($options) {
+                                $options['required'] = false;
+
+                                return $options;
+                            })
+                        ->end()
                         ->prototype('variable')->end()
                     ->end()
                     ->scalarNode('data_transformer')->end()
@@ -267,6 +285,38 @@ class ProcessorDecorator
                     )
                     ->thenInvalid('The "data_type" is required except "ui_only" is defined. %s')
                 ->end()
+                ->validate()
+                    // required: true must have constraints defined
+                    ->ifTrue(
+                        function ($v) {
+                            if (empty($v['type'])) {
+                                return false;
+                            }
+
+                            return !empty($v['options']['required']) && empty($v['options']['constraints']);
+                        }
+                    )
+                    ->thenInvalid('The "constraints" option is required when field is required.')
+                ->end()
+                ->validate()
+                    // if NotBlank constraint is configured - field must be set as required
+                    ->ifTrue(
+                        function ($v) {
+                            $hasNotNull = false;
+                            if (!empty($v['options']['constraints'])) {
+                                foreach ($v['options']['constraints'] as $constraint) {
+                                    if (array_key_exists('NotBlank', $constraint)) {
+                                        $hasNotNull = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            return $hasNotNull && empty($v['options']['required']);
+                        }
+                    )
+                    ->thenInvalid('Field must be required when field has NotBlank constraint.')
+                ->end()
             ->end();
 
         return $node;
@@ -277,9 +327,9 @@ class ProcessorDecorator
      */
     protected function getTreeNode()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder(self::TREE_ROOT);
 
-        $node = $builder->root(self::TREE_ROOT)
+        $node = $builder->getRootNode()
             ->prototype('array')
                 ->prototype('array')
                     ->children()
@@ -365,7 +415,6 @@ class ProcessorDecorator
      * @param string $fieldName
      * @param $filedOptions
      * @return bool
-     *
      */
     protected function isVariableNameValid($fieldName, $filedOptions)
     {

@@ -8,35 +8,23 @@ use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 
 class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WebSocketSendProcessor
-     */
-    protected $processor;
+    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $websocketClient;
 
-    /**
-     * @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $websocketClient;
+    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $connectionChecker;
 
-    /**
-     * @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $connectionChecker;
+    /** @var MessageParamsProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $messageParamsProvider;
 
-    /**
-     * @var MessageParamsProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $messageParamsProvider;
+    /** @var WebSocketSendProcessor */
+    private $processor;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $reminder;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);
         $this->connectionChecker = $this->createMock(ConnectionChecker::class);
@@ -64,13 +52,12 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->push($barReminder);
         $this->processor->push($bazReminder);
 
-        $this->assertAttributeEquals(
+        self::assertEquals(
             [
                 $fooUserId => [$fooReminder],
                 $barUserId => [$barReminder, $bazReminder],
             ],
-            'remindersByRecipient',
-            $this->processor
+            ReflectionUtil::getPropertyValue($this->processor, 'remindersByRecipient')
         );
     }
 
@@ -94,28 +81,22 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->messageParamsProvider->expects($this->exactly(3))
             ->method('getMessageParams')
-            ->willReturnMap(
-                [
-                    [$fooReminder, $fooMessage],
-                    [$barReminder, $barMessage],
-                    [$bazReminder, $bazMessage]
-                ]
-            );
+            ->willReturnMap([
+                [$fooReminder, $fooMessage],
+                [$barReminder, $barMessage],
+                [$bazReminder, $bazMessage]
+            ]);
 
-        $this->connectionChecker
-            ->expects($this->exactly(2))
+        $this->connectionChecker->expects($this->exactly(2))
             ->method('checkConnection')
             ->willReturn(true);
 
-        $this->websocketClient
-            ->expects($this->at(0))
+        $this->websocketClient->expects($this->exactly(2))
             ->method('publish')
-            ->with("oro/reminder_remind/{$fooUserId}", [$fooMessage]);
-
-        $this->websocketClient
-            ->expects($this->at(1))
-            ->method('publish')
-            ->with("oro/reminder_remind/{$barUserId}", [$barMessage, $bazMessage]);
+            ->withConsecutive(
+                ["oro/reminder_remind/{$fooUserId}", [$fooMessage]],
+                ["oro/reminder_remind/{$barUserId}", [$barMessage, $bazMessage]]
+            );
 
         $fooReminder->expects($this->once())
             ->method('setState')
@@ -147,27 +128,21 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->messageParamsProvider->expects($this->exactly(2))
             ->method('getMessageParams')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$fooReminder, $fooMessage],
-                        [$barReminder, $barMessage]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$fooReminder, $fooMessage],
+                [$barReminder, $barMessage]
+            ]);
 
         $exception = new \Exception();
 
-        $this->connectionChecker
-            ->expects($this->once())
+        $this->connectionChecker->expects($this->once())
             ->method('checkConnection')
             ->willReturn(true);
 
-        $this->websocketClient
-            ->expects($this->once())
+        $this->websocketClient->expects($this->once())
             ->method('publish')
             ->with("oro/reminder_remind/{$fooUserId}", [$fooMessage, $barMessage])
-            ->will($this->throwException($exception));
+            ->willThrowException($exception);
 
         $fooReminder->expects($this->once())
             ->method('setState')
@@ -203,13 +178,11 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($fooReminder)
             ->willReturn($fooMessage);
 
-        $this->connectionChecker
-            ->expects($this->once())
+        $this->connectionChecker->expects($this->once())
             ->method('checkConnection')
             ->willReturn(false);
 
-        $this->websocketClient
-            ->expects($this->never())
+        $this->websocketClient->expects($this->never())
             ->method($this->anything());
 
         $fooReminder->expects($this->once())
@@ -217,14 +190,6 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
             ->with(Reminder::STATE_REQUESTED);
 
         $this->processor->process();
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(
-            WebSocketSendProcessor::NAME,
-            $this->processor->getName()
-        );
     }
 
     public function testGetLabel()
@@ -236,26 +201,28 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $recipient
      * @return Reminder|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function createReminder(User $recipient)
+    private function createReminder(User $recipient)
     {
         $result = $this->createMock(Reminder::class);
         $result->expects($this->atLeastOnce())
             ->method('getRecipient')
             ->willReturn($recipient);
+
         return $result;
     }
 
     /**
-     * @param int $userId
      * @return User|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function createUser($userId)
+    private function createUser(int $userId)
     {
         $result = $this->createMock(User::class);
-        $result->expects($this->atLeastOnce())->method('getId')->willReturn($userId);
+        $result->expects($this->atLeastOnce())
+            ->method('getId')
+            ->willReturn($userId);
+
         return $result;
     }
 }

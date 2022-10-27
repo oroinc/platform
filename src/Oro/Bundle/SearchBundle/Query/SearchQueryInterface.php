@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\Expr\Expression;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 
+/**
+ * Represents a search query.
+ */
 interface SearchQueryInterface
 {
     /**
@@ -81,9 +84,16 @@ interface SearchQueryInterface
     public function getCriteria();
 
     /**
-     * Same as from(). Added for clarity.
+     * Gets FROM part.
      *
-     * @param array|string $entities
+     * @return string[]|string|null
+     */
+    public function getFrom();
+
+    /**
+     * Sets FROM part.
+     *
+     * @param string[]|string $entities
      * @return SearchQueryInterface
      */
     public function setFrom($entities);

@@ -7,6 +7,9 @@ use Symfony\Component\Security\Acl\Domain\ObjectIdentity as OID;
 use Symfony\Component\Security\Acl\Model\MutableAclInterface as ACL;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 
+/**
+ * Represent a single change in ACL.
+ */
 class BatchItem
 {
     const STATE_NONE = 0;
@@ -137,6 +140,7 @@ class BatchItem
      * @param bool      $granting
      * @param int       $mask
      * @param bool|null $strategy
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function removeAce($type, $field, SID $sid, $granting, $mask, $strategy)
     {

@@ -16,9 +16,6 @@ class OroUserBundle implements Migration
         self::addPasswordChangedColumn($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function addPasswordChangedColumn(Schema $schema)
     {
         $userTable = $schema->getTable('oro_user');

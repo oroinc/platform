@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\PrePersist;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -14,6 +13,8 @@ use Oro\Bundle\EntityConfigBundle\Model\ExtendAttributeGroup;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 /**
+ * Represents group of attributes.
+ *
  * @ORM\Table(name="oro_attribute_group")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository")
  * @ORM\HasLifecycleCallbacks
@@ -164,6 +165,18 @@ class AttributeGroup extends ExtendAttributeGroup implements DatesAwareInterface
     public function getAttributeRelations()
     {
         return $this->attributeRelations;
+    }
+
+    /**
+     * @param ArrayCollection $collection
+     *
+     * @return $this
+     */
+    public function setAttributeRelations(ArrayCollection $collection)
+    {
+        $this->attributeRelations = $collection;
+
+        return $this;
     }
 
     /**

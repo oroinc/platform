@@ -1,32 +1,14 @@
 /* @theme: admin.oro; */
 
-.inline-editable-wrapper:not(:hover) {
-    &.save-success .inline-actions-element {
-        background: $cell-success-background;
-
-        .inline-actions-element_actions {
-            display: none;
-        }
-    }
-
-    &.save-fail .inline-actions-element {
-        background: $cell-error-background;
-
-        .inline-actions-element_actions {
-            display: none;
-        }
-    }
-}
-
 .inline-editable-wrapper {
     &.loading {
-        .inline-actions-element {
-            background: $cell-loading-background;
+        min-height: auto;
 
-            &:before {
+        .inline-actions-element {
+            &::before {
                 position: absolute;
                 top: $inline-editable-wrapper-loading-top;
-                #{$end}: $inline-editable-wrapper-loading-end;
+                right: $inline-editable-wrapper-loading-end;
 
                 display: block;
 
@@ -42,11 +24,31 @@
     }
 }
 
+.inline-editable-wrapper:not(:hover) {
+    &.save-success .inline-actions-element {
+        &_wrapper {
+            background: $cell-success-background;
+        }
+    }
+
+    &.save-fail .inline-actions-element {
+        &_wrapper {
+            background: $cell-error-background;
+        }
+    }
+
+    &.loading .inline-actions-element {
+        &_wrapper {
+            background: $cell-loading-background;
+        }
+    }
+}
+
 .inline-actions-btn {
     padding: $inline-actions-btn-offset;
 
     font-size: $base-font-size--m;
-    line-height: 1;
+    line-height: inherit;
 
     border-width: 0;
     background-color: transparent;
@@ -59,10 +61,11 @@
     }
 
     &--size-s {
+        line-height: $inline-actions-btn-s-line-height;
         padding: $inline-actions-btn-s-offset;
     }
 
-    @at-root .has-error .inline-actions-btn  {
+    @at-root .has-error .inline-actions-btn {
         color: $inline-actions-btn-color-error;
 
         &:hover {

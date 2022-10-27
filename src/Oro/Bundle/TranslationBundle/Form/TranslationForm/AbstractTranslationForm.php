@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Form\TranslationForm;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 
@@ -27,10 +27,6 @@ abstract class AbstractTranslationForm implements TranslationFormInterface
      */
     abstract protected function getTranslatableFields($class);
 
-    /**
-     * @param FormRegistry $formRegistry
-     * @param ManagerRegistry $managerRegistry
-     */
     public function __construct(FormRegistry $formRegistry, ManagerRegistry $managerRegistry)
     {
         $this->typeGuesser = $formRegistry->getTypeGuesser();

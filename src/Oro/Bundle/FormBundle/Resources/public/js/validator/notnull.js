@@ -1,8 +1,11 @@
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
-], function($, _, __) {
+define(function(require) {
     'use strict';
 
-    var defaultParam = {
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    require('jquery.validate');
+
+    const defaultParam = {
         message: 'This value should not be null.'
     };
 
@@ -11,11 +14,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
      */
     return [
         'NotNull',
-        function() {
-            return $.validator.methods.required.apply(this, arguments);
+        function(...args) {
+            return $.validator.methods.required.apply(this, args);
         },
         function(param) {
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             return __(param.message);
         }
     ];

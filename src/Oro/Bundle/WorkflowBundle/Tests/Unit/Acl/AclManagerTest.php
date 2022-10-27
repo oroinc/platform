@@ -11,34 +11,25 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class AclManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AclManager
-     */
-    protected $manager;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
-    protected $doctrineHelper;
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflowRegistry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry
-     */
-    protected $workflowRegistry;
+    /** @var AclManager */
+    private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
 
         $this->manager = new AclManager($this->doctrineHelper, $this->workflowRegistry);
     }
@@ -68,15 +59,15 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
         $definition = new WorkflowDefinition();
         $definition->setName($workflowName)
-            ->setSteps(array($firstStep, $secondStep))
-            ->setEntityAcls(array($firstEntityAcl, $secondEntityAcl, $thirdEntityAcl));
+            ->setSteps([$firstStep, $secondStep])
+            ->setEntityAcls([$firstEntityAcl, $secondEntityAcl, $thirdEntityAcl]);
 
-        $this->setWorkflow($workflowName, array($firstAttribute, $secondAttribute));
+        $this->setWorkflow($workflowName, [$firstAttribute, $secondAttribute]);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
             ->with($entity)
-            ->will($this->returnValue($entityIdentifier));
+            ->willReturn($entityIdentifier);
 
         $workflowItem = new WorkflowItem();
         $workflowItem->setWorkflowName($workflowName)->setDefinition($definition)->setCurrentStep($secondStep);
@@ -94,12 +85,11 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($workflowItem, $aclIdentity->getWorkflowItem());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Value of attribute "attribute" must be an object
-     */
     public function testUpdateAclIdentitiesNotAnObjectException()
     {
+        $this->expectException(WorkflowException::class);
+        $this->expectExceptionMessage('Value of attribute "attribute" must be an object');
+
         $workflowName = 'test_workflow';
 
         $step = new WorkflowStep();
@@ -112,9 +102,9 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $entityAcl->setStep($step)->setAttribute($attribute->getName());
 
         $definition = new WorkflowDefinition();
-        $definition->setName($workflowName)->setSteps(array($step))->setEntityAcls(array($entityAcl));
+        $definition->setName($workflowName)->setSteps([$step])->setEntityAcls([$entityAcl]);
 
-        $this->setWorkflow($workflowName, array($attribute));
+        $this->setWorkflow($workflowName, [$attribute]);
 
         $workflowItem = new WorkflowItem();
         $workflowItem->setWorkflowName($workflowName)->setDefinition($definition)->setCurrentStep($step);
@@ -123,22 +113,16 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->updateAclIdentities($workflowItem);
     }
 
-    /**
-     * @param string $workflowName
-     * @param array $attributes
-     */
-    protected function setWorkflow($workflowName, array $attributes)
+    private function setWorkflow(string $workflowName, array $attributes): void
     {
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $workflow = $this->createMock(Workflow::class);
         $workflow->expects($this->any())
             ->method('getAttributeManager')
-            ->will($this->returnValue(new AttributeManager($attributes)));
+            ->willReturn(new AttributeManager($attributes));
 
         $this->workflowRegistry->expects($this->any())
             ->method('getWorkflow')
             ->with($workflowName)
-            ->will($this->returnValue($workflow));
+            ->willReturn($workflow);
     }
 }

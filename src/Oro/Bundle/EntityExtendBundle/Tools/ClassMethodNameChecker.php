@@ -30,7 +30,6 @@ class ClassMethodNameChecker
     }
 
     /**
-     *
      * @param string $string Some string
      *
      * @return string

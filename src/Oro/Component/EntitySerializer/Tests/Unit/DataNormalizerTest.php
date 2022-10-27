@@ -29,7 +29,7 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
     public function normalizeDataProvider()
     {
         return [
-            'excluded fields should be removed' => [
+            'excluded fields should be removed'      => [
                 'config'       => [
                     '_excluded_fields' => ['name'],
                     'fields'           => [
@@ -65,7 +65,7 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            'collapsed to-one association'      => [
+            'collapsed to-one association'           => [
                 'config'       => [
                     'fields' => [
                         'id'       => null,
@@ -95,7 +95,7 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            'collapsed to-many association'     => [
+            'collapsed to-many association'          => [
                 'config'       => [
                     'fields' => [
                         'id'         => null,
@@ -125,7 +125,7 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            'to-one association'                => [
+            'to-one association'                     => [
                 'config'       => [
                     'fields' => [
                         'id'       => null,
@@ -168,7 +168,7 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            'to-many association'               => [
+            'to-many association'                    => [
                 'config'       => [
                     'fields' => [
                         'id'       => null,
@@ -206,6 +206,85 @@ class DataNormalizerTest extends \PHPUnit\Framework\TestCase
                                 ['id' => 3, 'additionalField' => 'value1'],
                                 ['id' => 4, 'additionalField' => 'value2']
                             ]
+                        ]
+                    ]
+                ]
+            ],
+            'association with info record'           => [
+                'config'       => [
+                    'fields' => [
+                        'id'       => null,
+                        'category' => [
+                            'fields' => [
+                                'id'     => null,
+                                'titles' => [
+                                    '_excluded_fields' => ['excludedField'],
+                                    'fields'           => [
+                                        'id' => null
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'       => 1,
+                        'category' => [
+                            'id'     => 2,
+                            'titles' => [
+                                0   => ['id' => 3, 'additionalField' => 'value1', 'excludedField' => 'value1'],
+                                1   => ['id' => 4, 'additionalField' => 'value2', 'excludedField' => 'value2'],
+                                '_' => ['has_more' => true, 'excludedField' => 'value1']
+                            ]
+                        ]
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'       => 1,
+                        'category' => [
+                            'id'     => 2,
+                            'titles' => [
+                                0   => ['id' => 3, 'additionalField' => 'value1'],
+                                1   => ['id' => 4, 'additionalField' => 'value2'],
+                                '_' => ['has_more' => true, 'excludedField' => 'value1']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'collapsed association with info record' => [
+                'config'       => [
+                    'fields' => [
+                        'id'         => null,
+                        'categories' => [
+                            'collapse'        => true,
+                            '_collapse_field' => 'id',
+                            'fields'          => [
+                                'id'    => null,
+                                'title' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'data'         => [
+                    [
+                        'id'         => 1,
+                        'categories' => [
+                            0   => ['id' => 2, 'title' => 'category 1'],
+                            1   => ['id' => 3, 'title' => 'category 2'],
+                            '_' => ['has_more' => true, 'id' => 3]
+                        ]
+                    ]
+                ],
+                'expectedData' => [
+                    [
+                        'id'         => 1,
+                        'categories' => [
+                            0   => 2,
+                            1   => 3,
+                            '_' => ['has_more' => true, 'id' => 3]
                         ]
                     ]
                 ]

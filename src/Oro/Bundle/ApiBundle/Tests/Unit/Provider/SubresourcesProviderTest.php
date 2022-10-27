@@ -25,7 +25,7 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SubresourcesProvider */
     private $subresourcesProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = $this->createMock(CollectSubresourcesProcessor::class);
         $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
@@ -182,6 +182,103 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             $expectedSubresources,
             $this->subresourcesProvider->getSubresources($entityClass, $version, $requestType)
+        );
+    }
+
+    public function testGetSubresourceForKnownAssociation()
+    {
+        $entityClass = 'Test\Entity';
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $expectedSubresources = new ApiResourceSubresources($entityClass);
+        $expectedSubresource = $expectedSubresources->addSubresource('test');
+
+        $this->resourcesCache->expects(self::once())
+            ->method('getSubresources')
+            ->with($entityClass, $version, self::identicalTo($requestType))
+            ->willReturn($expectedSubresources);
+
+        self::assertEquals(
+            $expectedSubresource,
+            $this->subresourcesProvider->getSubresource($entityClass, 'test', $version, $requestType)
+        );
+    }
+
+    public function testGetSubresourceForUnknownAssociation()
+    {
+        $entityClass = 'Test\Entity';
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $expectedSubresources = new ApiResourceSubresources($entityClass);
+
+        $this->resourcesCache->expects(self::once())
+            ->method('getSubresources')
+            ->with($entityClass, $version, self::identicalTo($requestType))
+            ->willReturn($expectedSubresources);
+
+        self::assertNull(
+            $this->subresourcesProvider->getSubresource($entityClass, 'test', $version, $requestType)
+        );
+    }
+
+    public function testGetSubresourceForForUnknownEntity()
+    {
+        $entityClass = 'Test\Entity1';
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $resources = [
+            new ApiResource('Test\Entity1'),
+            new ApiResource('Test\Entity3')
+        ];
+        $accessibleResources = ['Test\Entity1'];
+        $subresources = new ApiResourceSubresources('Test\Entity2');
+        $subresources->addSubresource('test');
+
+        $this->processor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback(
+                function (CollectSubresourcesContext $context) use (
+                    $version,
+                    $requestType,
+                    $accessibleResources
+                ) {
+                    self::assertEquals($version, $context->getVersion());
+                    self::assertEquals($requestType, $context->getRequestType());
+                    self::assertEquals(
+                        [
+                            'Test\Entity1' => new ApiResource('Test\Entity1'),
+                            'Test\Entity3' => new ApiResource('Test\Entity3')
+                        ],
+                        $context->getResources()
+                    );
+                    self::assertEquals($accessibleResources, $context->getAccessibleResources());
+
+                    $subresources2 = new ApiResourceSubresources('Test\Entity2');
+                    $subresources2->addSubresource('test');
+                    $context->getResult()->add($subresources2);
+                }
+            );
+        $this->resourcesProvider->expects(self::once())
+            ->method('getResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn($resources);
+        $this->resourcesProvider->expects(self::once())
+            ->method('getAccessibleResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn($accessibleResources);
+        $this->resourcesCache->expects(self::once())
+            ->method('getSubresources')
+            ->with($entityClass, $version, self::identicalTo($requestType))
+            ->willReturn(null);
+        $this->resourcesCache->expects(self::once())
+            ->method('saveSubresources')
+            ->with($version, self::identicalTo($requestType), [$subresources]);
+
+        self::assertNull(
+            $this->subresourcesProvider->getSubresource($entityClass, 'test', $version, $requestType)
         );
     }
 }

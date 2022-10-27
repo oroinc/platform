@@ -4,45 +4,32 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBag;
+use Oro\Component\ChainProcessor\ToArrayInterface;
 
 /**
  * The base class for classes represents metadata for different kind of entity properties.
  */
-abstract class PropertyMetadata extends ParameterBag
+abstract class PropertyMetadata extends ParameterBag implements ToArrayInterface
 {
-    private const MASK_DIRECTION_INPUT         = 1;
-    private const MASK_DIRECTION_OUTPUT        = 2;
+    private const MASK_DIRECTION_INPUT = 1;
+    private const MASK_DIRECTION_OUTPUT = 2;
     private const MASK_DIRECTION_BIDIRECTIONAL = 3;
 
-    /** @var string */
-    private $name;
+    private ?string $name;
+    private ?string $propertyPath = null;
+    private ?string $dataType = null;
+    private int $flags;
 
-    /** @var string */
-    private $propertyPath;
-
-    /** @var string */
-    private $dataType;
-
-    /** @var integer */
-    private $flags;
-
-    /**
-     * PropertyMetadata constructor.
-     *
-     * @param string|null $name
-     */
-    public function __construct($name = null)
+    public function __construct(string $name = null)
     {
         $this->name = $name;
         $this->flags = self::MASK_DIRECTION_BIDIRECTIONAL;
     }
 
     /**
-     * Gets a native PHP array representation of the object.
-     *
-     * @return array [key => value, ...]
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = ['name' => $this->name];
         if ($this->propertyPath) {
@@ -56,36 +43,34 @@ abstract class PropertyMetadata extends ParameterBag
         } elseif ($this->isOutput() && !$this->isInput()) {
             $result['direction'] = 'output-only';
         }
+        if ($this->isHidden()) {
+            $result['hidden'] = true;
+        }
 
         return $result;
     }
 
     /**
      * Gets the name of a property.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
      * Sets the name of a property.
-     *
-     * @param string $name
      */
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->name = $name;
     }
 
     /**
      * Gets the name of a property in the source entity.
-     *
-     * @return string The property path or NULL if the property is not mapped.
+     * Returns NULL if the property is not mapped.
      */
-    public function getPropertyPath()
+    public function getPropertyPath(): ?string
     {
         if (null === $this->propertyPath) {
             return $this->name;
@@ -103,78 +88,74 @@ abstract class PropertyMetadata extends ParameterBag
      *                                  NULL if the property path equals to name
      *                                  or "_" (ConfigUtil::IGNORE_PROPERTY_PATH) if the property is not mapped.
      */
-    public function setPropertyPath($propertyPath)
+    public function setPropertyPath(?string $propertyPath): void
     {
         $this->propertyPath = $propertyPath;
     }
 
     /**
      * Gets the data-type of a property.
-     *
-     * @return string
      */
-    public function getDataType()
+    public function getDataType(): ?string
     {
         return $this->dataType;
     }
 
     /**
      * Sets the data-type of a property.
-     *
-     * @param string $dataType
      */
-    public function setDataType($dataType)
+    public function setDataType(?string $dataType): void
     {
         $this->dataType = $dataType;
     }
 
     /**
      * Indicates whether the request data can contain this property.
-     *
-     * @return bool
      */
-    public function isInput()
+    public function isInput(): bool
     {
         return $this->hasFlag(self::MASK_DIRECTION_INPUT);
     }
 
     /**
      * Indicates whether the response data can contain this property.
-     *
-     * @return bool
      */
-    public function isOutput()
+    public function isOutput(): bool
     {
         return $this->hasFlag(self::MASK_DIRECTION_OUTPUT);
     }
 
     /**
      * Sets a value indicates whether the request data and the response data can contain this property.
-     *
-     * @param bool $input
-     * @param bool $output
      */
-    public function setDirection($input, $output)
+    public function setDirection(bool $input, bool $output): void
     {
         $this->setFlag($input, self::MASK_DIRECTION_INPUT);
         $this->setFlag($output, self::MASK_DIRECTION_OUTPUT);
     }
 
     /**
-     * @param int $valueMask
-     *
-     * @return bool
+     * Indicates whether the request data and response data cannot contain this property.
      */
-    protected function hasFlag($valueMask)
+    public function isHidden(): bool
+    {
+        return !$this->isOutput() && !$this->isInput();
+    }
+
+    /**
+     * Sets a flag indicates that the request data and response data cannot contain this property.
+     */
+    public function setHidden(): void
+    {
+        $this->setDirection(false, false);
+    }
+
+    protected function hasFlag(int $valueMask): bool
     {
         return $valueMask === ($this->flags & $valueMask);
     }
 
-    /**
-     * @param bool $value
-     * @param int  $valueMask
-     */
-    protected function setFlag($value, $valueMask)
+    protected function setFlag(bool $value, int $valueMask): void
     {
         if ($value) {
             $this->flags |= $valueMask;

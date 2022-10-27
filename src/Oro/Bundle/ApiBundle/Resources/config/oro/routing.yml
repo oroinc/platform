@@ -1,19 +1,25 @@
 nelmio_api_doc_index:
     path: '%oro_api.rest.prefix%doc/{view}'
-    methods: [GET]
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiDocController::indexAction
+    requirements:
+        view: '[\w-]+'
     defaults:
-        _controller: NelmioApiDocBundle:ApiDoc:index
         view: rest_json_api
+
+oro_rest_api_doc_resource:
+    path: '%oro_api.rest.prefix%doc/{view}/{resource}'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiDocController::resourceAction
+    requirements:
+        view: '[\w-]+'
 
 # * GET method: returns an entity of the given type by its identifier
 # * DELETE method: deletes an entity of the given type by its identifier
 # * PATCH method: updates the specified fields of the given entity
 oro_rest_api_item:
     path: '%oro_api.rest.prefix%{entity}/{id}'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiController::itemAction
     requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:item
+        entity: (?:(?!(rest)(/|$))[^/]+)
     options:
         group: rest_api
         priority: -10
@@ -21,12 +27,12 @@ oro_rest_api_item:
 # * GET method: returns a list of entities of the given type
 # * DELETE method: deletes a list of entities of the given type by the given filters
 # * POST method: creates an entity of the given type
+# * PATCH method: updates or creates a list of entities of the given type
 oro_rest_api_list:
     path: '%oro_api.rest.prefix%{entity}'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiController::listAction
     requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:list
+        entity: (?:(?!(rest)(/|$))[^/]+)
     options:
         group: rest_api
         priority: -10
@@ -48,10 +54,9 @@ oro_rest_api_list:
 #   additional processors should be added for each association requires it.
 oro_rest_api_subresource:
     path: '%oro_api.rest.prefix%{entity}/{id}/{association}'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiController::subresourceAction
     requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:subresource
+        entity: (?:(?!(rest)(/|$))[^/]+)
     options:
         group: rest_api
         priority: -10
@@ -66,10 +71,9 @@ oro_rest_api_subresource:
 # * DELETE method: deletes the specified entities from the relationship represented by the given to-many association
 oro_rest_api_relationship:
     path: '%oro_api.rest.prefix%{entity}/{id}/relationships/{association}'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiController::relationshipAction
     requirements:
-        entity: (?:(?!(soap|rest)(/|$))[^/]+)
-    defaults:
-        _controller: OroApiBundle:RestApi:relationship
+        entity: (?:(?!(rest)(/|$))[^/]+)
     options:
         group: rest_api
         priority: -10

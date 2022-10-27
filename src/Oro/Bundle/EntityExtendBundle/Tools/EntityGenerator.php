@@ -1,138 +1,203 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use CG\Core\DefaultGeneratorStrategy;
-use CG\Generator\PhpClass;
-use Oro\Bundle\EntityExtendBundle\Tools\Generator\Visitor;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
+use Oro\Component\PhpUtils\ClassGenerator;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Builds proxy classes and ORM mapping for extended entities.
+ */
 class EntityGenerator
 {
-    /** @var string */
-    protected $cacheDir;
-
-    /** @var string */
-    protected $entityCacheDir;
-
-    /** @var array */
-    protected $extensions = [];
-
-    /** @var AbstractEntityGeneratorExtension[]|null */
-    protected $sortedExtensions;
+    private string $cacheDir;
+    private string $entityCacheDir;
+    private string $entityClassesPath;
+    /** @var iterable|AbstractEntityGeneratorExtension[] */
+    private $extensions;
 
     /**
-     * @param string $cacheDir
+     * @param string                                      $cacheDir
+     * @param iterable|AbstractEntityGeneratorExtension[] $extensions
      */
-    public function __construct($cacheDir)
+    public function __construct(string $cacheDir, iterable $extensions)
     {
         $this->setCacheDir($cacheDir);
+        $this->extensions = $extensions;
     }
 
-    /**
-     * Gets the cache directory
-     *
-     * @return string
-     */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return $this->cacheDir;
     }
 
-    /**
-     * Sets the cache directory
-     *
-     * @param string $cacheDir
-     */
-    public function setCacheDir($cacheDir)
+    public function setCacheDir(string $cacheDir): void
     {
-        $this->cacheDir       = $cacheDir;
+        $this->cacheDir = $cacheDir;
         $this->entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($cacheDir);
-    }
-
-    /**
-     * @param AbstractEntityGeneratorExtension $extension
-     * @param int                              $priority
-     */
-    public function addExtension(AbstractEntityGeneratorExtension $extension, $priority = 0)
-    {
-        if (!isset($this->extensions[$priority])) {
-            $this->extensions[$priority] = [];
-        }
-        $this->extensions[$priority][] = $extension;
+        $this->entityClassesPath = ExtendClassLoadingUtils::getEntityClassesPath($cacheDir);
     }
 
     /**
      * Generates extended entities
-     *
-     * @param array $schemas
      */
-    public function generate(array $schemas)
+    public function generate(array $schemas): void
     {
-        ExtendClassLoadingUtils::ensureDirExists($this->entityCacheDir);
+        $this->ensureEntityCacheDirExistsAndEmpty();
 
         $aliases = [];
+        $classes = '';
         foreach ($schemas as $schema) {
-            $this->generateSchemaFiles($schema);
-            if ($schema['type'] === 'Extend') {
+            if ('Extend' === $schema['type']) {
                 $aliases[$schema['entity']] = $schema['parent'];
             }
+            $classes .= $this->buildPhpClass($schema);
+            $this->writeOrmMapping($schema);
         }
+        // writes PHP classes for extended entity proxy to PHP file contains all such classes
+        $this->writePhpFile($this->entityClassesPath, $this->buildPhpFileHeader() . $classes);
 
         // write PHP class aliases to the file
-        file_put_contents(
+        $this->writePhpFile(
             ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
-            serialize($aliases)
+            sprintf('<?php return %s;', var_export($aliases, true))
         );
     }
 
     /**
-     * Generate php and yml files for schema
-     *
-     * @param array $schema
+     * Generates PHP class for extended entity proxy and YAML file with ORM mapping.
      */
-    public function generateSchemaFiles(array $schema)
+    public function generateSchemaFiles(array $schema): void
     {
-        // generate PHP code
-        $class = PhpClass::create($schema['entity']);
-        if ($schema['doctrine'][$schema['entity']]['type'] === 'mappedSuperclass') {
-            $class->setAbstract(true);
+        $class = $this->buildPhpClass($schema);
+        $classes = '';
+        if (file_exists($this->entityClassesPath)) {
+            $classes = file_get_contents($this->entityClassesPath);
+        }
+        if ($classes) {
+            $classes = $this->replacePhpClass($classes, $class, ExtendHelper::getShortClassName($schema['entity']));
+        } else {
+            $classes = $this->buildPhpFileHeader() . $class;
+        }
+        $this->writePhpFile($this->entityClassesPath, $classes);
+        $this->writeOrmMapping($schema);
+    }
+
+    private function ensureEntityCacheDirExistsAndEmpty(): void
+    {
+        ExtendClassLoadingUtils::ensureDirExists($this->entityCacheDir);
+        $iterator = new \DirectoryIterator($this->entityCacheDir);
+        $allowedFileExtension = $this->getClearableFileExtensions();
+
+        /** @var \DirectoryIterator $file */
+        foreach ($iterator as $file) {
+            if ($file->isFile() && in_array($file->getExtension(), $allowedFileExtension)) {
+                @unlink($file->getPathname());
+            }
+        }
+    }
+
+    /**
+     * @return array
+     */
+    private function getClearableFileExtensions(): array
+    {
+        return ['yml'];
+    }
+
+    /**
+     * Builds a header for a file contains all PHP classes for all extended entity proxies.
+     */
+    private function buildPhpFileHeader(): string
+    {
+        return sprintf("<?php\n\nnamespace %s;\n", ExtendClassLoadingUtils::getEntityNamespace());
+    }
+
+    /**
+     * Builds a header for extended entity proxy PHP class.
+     */
+    private function buildPhpClassHeader(string $shortClassName): string
+    {
+        return "\n" . sprintf('/** Start: %s */', $shortClassName) . "\n";
+    }
+
+    /**
+     * Builds a footer for extended entity proxy PHP class.
+     */
+    private function buildPhpClassFooter(string $shortClassName): string
+    {
+        return sprintf('/** End: %s */', $shortClassName) . "\n";
+    }
+
+    /**
+     * Builds PHP class for extended entity proxy.
+     */
+    private function buildPhpClass(array $schema): string
+    {
+        $class = new ClassGenerator($schema['entity']);
+        if ('mappedSuperclass' === $schema['doctrine'][$schema['entity']]['type']) {
+            $class->setAbstract();
         }
 
-        $extensions = $this->getExtensions();
-        foreach ($extensions as $extension) {
+        foreach ($this->extensions as $extension) {
             if ($extension->supports($schema)) {
                 $extension->generate($schema, $class);
             }
         }
 
-        $className = ExtendHelper::getShortClassName($schema['entity']);
+        $shortClassName = ExtendHelper::getShortClassName($schema['entity']);
 
-        // write PHP class to the file
-        $strategy = new DefaultGeneratorStrategy(new Visitor());
-        $fileName = $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.php';
-        file_put_contents($fileName, "<?php\n\n" . $strategy->generate($class));
-        clearstatcache(true, $fileName);
-        // write doctrine metadata in separate yaml file
-        file_put_contents(
-            $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.orm.yml',
-            Yaml::dump($schema['doctrine'], 5)
-        );
+        return
+            $this->buildPhpClassHeader($shortClassName)
+            . $class->print(true)
+            . $this->buildPhpClassFooter($shortClassName);
     }
 
     /**
-     * Return sorted extensions
-     *
-     * @return AbstractEntityGeneratorExtension[]
+     * Replaces an old definition of the PHP class with the new definition.
      */
-    protected function getExtensions()
+    private function replacePhpClass(string $classes, string $class, string $shortClassName): string
     {
-        if (null === $this->sortedExtensions) {
-            krsort($this->extensions);
-            $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
+        // remove old definition of the class
+        $classHeader = $this->buildPhpClassHeader($shortClassName);
+        $startPos = strpos($classes, $classHeader);
+        if (false !== $startPos) {
+            $classFooter = $this->buildPhpClassFooter($shortClassName);
+            $endPos = strpos($classes, $classFooter, $startPos);
+            if (false !== $endPos) {
+                $classes = substr($classes, 0, $startPos) . substr($classes, $endPos + \strlen($classFooter));
+            }
         }
 
-        return $this->sortedExtensions;
+        return $classes . $class;
+    }
+
+    /**
+     * Writes the given content into the given PHP file.
+     */
+    private function writePhpFile(string $path, string $content): void
+    {
+        $oldContentCrc = sprintf("%u", crc32((string)@file_get_contents($path)));
+        $contentCrc = sprintf("%u", crc32($content));
+        if ($oldContentCrc === $contentCrc) {
+            return;
+        }
+        file_put_contents($path, $content);
+
+        clearstatcache(true, $path);
+    }
+
+    /**
+     * Writes ORM mapping in separate YAML file.
+     */
+    private function writeOrmMapping(array $schema): void
+    {
+        $shortClassName = ExtendHelper::getShortClassName($schema['entity']);
+        file_put_contents(
+            $this->entityCacheDir . DIRECTORY_SEPARATOR . $shortClassName . '.orm.yml',
+            Yaml::dump($schema['doctrine'], 5)
+        );
     }
 }

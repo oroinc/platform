@@ -1,12 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var UniformFileInputWidgetView;
-    var AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
-    var __ = require('orotranslation/js/translator');
+    const AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
+    const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const clearButtonTemplate = require('tpl-loader!oroui/templates/clear_button.html');
     require('jquery.uniform');
 
-    UniformFileInputWidgetView = AbstractInputWidgetView.extend({
+    const UniformFileInputWidgetView = AbstractInputWidgetView.extend({
         widgetFunctionName: 'uniform',
 
         initializeOptions: {
@@ -18,34 +19,78 @@ define(function(require) {
 
         containerClassSuffix: 'file',
 
+        /** @property {jQuery} */
+        $clearButton: null,
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function UniformFileInputWidgetView() {
-            UniformFileInputWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function UniformFileInputWidgetView(options) {
+            UniformFileInputWidgetView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        initializeWidget: function() {
-            UniformFileInputWidgetView.__super__.initializeWidget.apply(this, arguments);
+        initializeWidget: function(options) {
+            UniformFileInputWidgetView.__super__.initializeWidget.call(this, options);
             if (this.$el.is('.error')) {
                 this.$el.removeClass('error');
-                this.container().addClass('error');
+                this.getContainer().addClass('error');
             }
+
+            this.getContainer().append(this.getClearButton());
+
+            this.toggleEmptyState();
+
+            this.$el.on(`change${this.eventNamespace()}`, () => this.toggleEmptyState());
+
+            this.getClearButton().on(`click${this.eventNamespace()}`, () => {
+                this.$el.val('').trigger('change').trigger('focus');
+            });
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         disposeWidget: function() {
+            this.getClearButton().off(this.eventNamespace());
+            this.$el.off(this.eventNamespace());
             this.$el.uniform.restore(this.$el);
-            UniformFileInputWidgetView.__super__.disposeWidget.apply(this, arguments);
+            UniformFileInputWidgetView.__super__.disposeWidget.call(this);
         },
 
         /**
-         * @inheritDoc
+         * Get widget root element
+         *
+         * @returns {jQuery}
+         */
+        getClearButton: function() {
+            if (this.$clearButton) {
+                return this.$clearButton;
+            }
+
+            this.$clearButton = $(clearButtonTemplate({
+                ariaLabel: __('Clear')
+            }));
+
+            return this.$clearButton;
+        },
+
+        toggleEmptyState: function() {
+            this.getContainer().toggleClass('empty', this.isEmpty());
+        },
+
+        isEmpty: function() {
+            return !this.$el.val().length;
+        },
+
+        getFilenameButton: function() {
+            return this.getContainer().find('.filename');
+        },
+
+        /**
+         * @inheritdoc
          */
         findContainer: function() {
             return this.$el.parent('.uploader');

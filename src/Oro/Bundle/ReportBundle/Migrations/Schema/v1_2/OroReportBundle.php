@@ -5,7 +5,6 @@ namespace Oro\Bundle\ReportBundle\Migrations\Schema\v1_2;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\ReportBundle\Migrations\Schema\v1_0\OroReportBundle as OroReportSchemaMigration1_0;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 
 class OroReportBundle implements Migration
@@ -31,8 +30,6 @@ class OroReportBundle implements Migration
 
     /**
      * Adds organization_id field
-     *
-     * @param Schema $schema
      */
     public static function addOrganization(Schema $schema)
     {

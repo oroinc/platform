@@ -17,7 +17,7 @@ class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var ContextMetadataAccessor */
     private $metadataAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->context = $this->createMock(Context::class);
 
@@ -27,7 +27,7 @@ class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
     public function testGetMetadataForContextClass()
     {
         $className = User::class;
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->expects(self::once())
             ->method('getClassName')
@@ -42,7 +42,7 @@ class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
     public function testGetMetadataForContextClassForCaseWhenApiResourceIsBasedOnManageableEntity()
     {
         $className = User::class;
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->expects(self::once())
             ->method('getClassName')

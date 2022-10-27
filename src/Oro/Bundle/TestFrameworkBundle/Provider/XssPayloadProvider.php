@@ -39,9 +39,6 @@ class XssPayloadProvider
         return sprintf($payload, $elementId, $jsPayload);
     }
 
-    /**
-     * @return array
-     */
     protected function getPayloads(): array
     {
         if (!$this->payloads) {
@@ -53,13 +50,13 @@ class XssPayloadProvider
     }
 
     /**
-     * @param string $type
+     * @param string|null $type
      * @return string
      */
     protected function getPayloadString($type)
     {
         $payload = getenv('XSS_PAYLOAD');
-        if ($payload) {
+        if (!$type && $payload) {
             return $payload;
         }
 
@@ -78,9 +75,9 @@ class XssPayloadProvider
      */
     protected function getPayloadType($type)
     {
-        $payloadType = getenv('XSS_PAYLOAD_TYPE');
+        $payloadType = $type;
         if (!$payloadType) {
-            $payloadType = $type;
+            $payloadType = getenv('XSS_PAYLOAD_TYPE');
         }
         if (!$payloadType) {
             $payloadType = self::DEFAULT_PAYLOAD_TYPE;

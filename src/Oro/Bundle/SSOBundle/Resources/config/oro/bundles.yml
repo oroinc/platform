@@ -1,3 +1,4 @@
 bundles:
     - { name: Oro\Bundle\SSOBundle\OroSSOBundle, priority: -75 }
     - { name: HWI\Bundle\OAuthBundle\HWIOAuthBundle, priority: -76 }
+    - { name: Http\HttplugBundle\HttplugBundle, priority: -77 }

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 
+use Oro\Bundle\MessageQueueBundle\Consumption\Exception\InvalidSecurityTokenException;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareConsumptionExtension;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
-use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\Context;
-use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -16,19 +15,15 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    private $tokenStorage;
+    private TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenSerializerInterface */
-    private $tokenSerializer;
+    private TokenSerializerInterface|\PHPUnit\Framework\MockObject\MockObject $tokenSerializer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var SecurityAwareConsumptionExtension */
-    private $extension;
+    private SecurityAwareConsumptionExtension $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->tokenSerializer = $this->createMock(TokenSerializerInterface::class);
@@ -37,20 +32,21 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new SecurityAwareConsumptionExtension(
             ['security_agnostic_processor'],
             $this->tokenStorage,
-            $this->tokenSerializer,
-            $this->logger
+            $this->tokenSerializer
         );
     }
 
-    public function testOnPreReceivedShouldNotSetSecurityTokenForSecurityAgnosticProcessor()
+    public function testOnPreReceivedShouldNotSetSecurityTokenForSecurityAgnosticProcessor(): void
     {
-        $message = new NullMessage();
-        $message->setProperties([
-            Config::PARAMETER_PROCESSOR_NAME              => 'security_agnostic_processor',
-            SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => 'serialized'
-        ]);
+        $message = new Message();
+        $message->setProperties(
+            [
+                SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => 'serialized',
+            ]
+        );
 
         $context = new Context($this->createMock(SessionInterface::class));
+        $context->setMessageProcessorName('security_agnostic_processor');
         $context->setMessage($message);
 
         $this->tokenSerializer->expects(self::never())
@@ -61,16 +57,17 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onPreReceived($context);
     }
 
-    public function testOnPreReceivedShouldSetSecurityToken()
+    public function testOnPreReceivedShouldSetSecurityToken(): void
     {
         $token = $this->createMock(TokenInterface::class);
         $serializedToken = 'serialized';
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setProperties([SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => $serializedToken]);
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessage($message);
+        $context->setLogger($this->logger);
 
         $this->tokenSerializer->expects(self::once())
             ->method('deserialize')
@@ -86,15 +83,17 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onPreReceived($context);
     }
 
-    public function testOnPreReceivedShouldRejectMessageIfSecurityTokenCannotBeDeserialized()
+    public function testOnPreReceivedShouldRejectMessageIfSecurityTokenCannotBeDeserialized(): void
     {
+        $this->expectException(InvalidSecurityTokenException::class);
         $serializedToken = 'serialized';
 
-        $message = new NullMessage();
+        $message = new Message();
         $message->setProperties([SecurityAwareDriver::PARAMETER_SECURITY_TOKEN => $serializedToken]);
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessage($message);
+        $context->setLogger($this->logger);
 
         $this->tokenSerializer->expects(self::once())
             ->method('deserialize')
@@ -104,16 +103,14 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('setToken');
         $this->logger->expects(self::once())
             ->method('error')
-            ->with('Cannot deserialize security token');
+            ->with('Security token is invalid');
 
         $this->extension->onPreReceived($context);
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $context->getStatus());
     }
 
-    public function testOnPreReceivedShouldDoNothingIdMessageDoesNotContainSecurityToken()
+    public function testOnPreReceivedShouldDoNothingIdMessageDoesNotContainSecurityToken(): void
     {
-        $message = new NullMessage();
+        $message = new Message();
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessage($message);
@@ -126,7 +123,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->onPreReceived($context);
     }
 
-    public function testOnPostReceivedShouldSetSecurityTokenToNull()
+    public function testOnPostReceivedShouldSetSecurityTokenToNull(): void
     {
         $context = new Context($this->createMock(SessionInterface::class));
 

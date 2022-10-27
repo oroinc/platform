@@ -10,8 +10,7 @@ use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 
 /**
- * Applies filters to search datasource.
- * {@inheritDoc}
+ * Applies filters to a search datasource.
  */
 class SearchFilterExtension extends AbstractFilterExtension
 {
@@ -35,20 +34,27 @@ class SearchFilterExtension extends AbstractFilterExtension
             throw new \InvalidArgumentException('Datasource should be an instance of SearchDatasource.');
         }
 
-        $datasourceAdapter = new SearchFilterDatasourceAdapter($datasource->getSearchQuery());
+        $ds = new SearchFilterDatasourceAdapter($datasource->getSearchQuery());
         $filters = $this->getFiltersToApply($config);
         $filtersState = $this->filtersStateProvider->getStateFromParameters($config, $this->getParameters());
 
-        foreach ($filters as $filter) {
-            $value = $filtersState[$filter->getName()] ?? null;
-            if ($value === null) {
-                continue;
-            }
+        $this->filterExecutionContext->enableValidation();
+        try {
+            foreach ($filters as $filter) {
+                $data = $filtersState[$filter->getName()] ?? null;
+                if (null === $data) {
+                    continue;
+                }
 
-            $filterForm = $this->submitFilter($filter, $value);
-            if ($filterForm->isValid()) {
-                $filter->apply($datasourceAdapter, $filterForm->getData());
+                $filterForm = $this->submitFilter($filter, $data);
+                if (!$filterForm->isValid()) {
+                    continue;
+                }
+
+                $filter->apply($ds, $filterForm->getData());
             }
+        } finally {
+            $this->filterExecutionContext->disableValidation();
         }
     }
 }

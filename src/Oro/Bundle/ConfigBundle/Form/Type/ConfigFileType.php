@@ -17,9 +17,6 @@ class ConfigFileType extends AbstractType
      */
     private $transformer;
 
-    /**
-     * @param ConfigFileDataTransformer $transformer
-     */
     public function __construct(ConfigFileDataTransformer $transformer)
     {
         $this->transformer = $transformer;

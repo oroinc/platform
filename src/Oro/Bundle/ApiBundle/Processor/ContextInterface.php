@@ -2,48 +2,26 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Bundle\ApiBundle\Collection\Criteria;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
+use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
-use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 
 /**
- * Represents an execution context for Data API processors.
+ * Represents an execution context for API processors for public actions.
  */
-interface ContextInterface extends ComponentContextInterface
+interface ContextInterface extends SharedDataAwareContextInterface
 {
-    /**
-     * Gets the current request type.
-     * A request can belong to several types, e.g. "rest" and "json_api".
-     *
-     * @return RequestType
-     */
-    public function getRequestType();
-
-    /**
-     * Gets API version
-     *
-     * @return string
-     */
-    public function getVersion();
-
-    /**
-     * Sets API version
-     *
-     * @param string $version
-     */
-    public function setVersion($version);
-
     /**
      * Gets FQCN of an entity.
      *
@@ -57,6 +35,18 @@ interface ContextInterface extends ComponentContextInterface
      * @param string $className
      */
     public function setClassName($className);
+
+    /**
+     * Returns the API resource class if it is a manageable entity;
+     * otherwise, checks if the API resource is based on a manageable entity, and if so,
+     * returns the class name of this entity.
+     * If both the API resource class and its parent are not manageable entities, returns NULL.
+     *
+     * @param DoctrineHelper $doctrineHelper
+     *
+     * @return string|null
+     */
+    public function getManageableEntityClass(DoctrineHelper $doctrineHelper);
 
     /**
      * Checks whether metadata of an entity has at least one identifier field.
@@ -74,8 +64,6 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Sets an object that will be used to accessing request headers.
-     *
-     * @param ParameterBagInterface $parameterBag
      */
     public function setRequestHeaders(ParameterBagInterface $parameterBag);
 
@@ -88,8 +76,6 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Sets an object that will be used to accessing response headers.
-     *
-     * @param ParameterBagInterface $parameterBag
      */
     public function setResponseHeaders(ParameterBagInterface $parameterBag);
 
@@ -123,8 +109,6 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Sets the response document builder.
-     *
-     * @param DocumentBuilderInterface|null $documentBuilder
      */
     public function setResponseDocumentBuilder(?DocumentBuilderInterface $documentBuilder);
 
@@ -144,10 +128,103 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Sets an object that will be used to accessing incoming filters.
-     *
-     * @param FilterValueAccessorInterface $accessor
      */
     public function setFilterValues(FilterValueAccessorInterface $accessor);
+
+    /**
+     * Indicates whether the current action processes a master API request
+     * or it is executed as part of another action.
+     */
+    public function isMasterRequest(): bool;
+
+    /**
+     * Sets a flag indicates whether the current action processes a master API request
+     * or it is executed as part of another action.
+     */
+    public function setMasterRequest(bool $master): void;
+
+    /**
+     * Indicates whether the current request is CORS request.
+     * @link https://www.w3.org/TR/cors/
+     */
+    public function isCorsRequest(): bool;
+
+    /**
+     * Sets a flag indicates whether the current request is CORS request.
+     * @link https://www.w3.org/TR/cors/
+     */
+    public function setCorsRequest(bool $cors): void;
+
+    /**
+     * Indicates whether HATEOAS is enabled.
+     */
+    public function isHateoasEnabled(): bool;
+
+    /**
+     * Sets a flag indicates whether HATEOAS is enabled.
+     */
+    public function setHateoas(bool $flag);
+
+    /**
+     * Gets a context for response data normalization.
+     */
+    public function getNormalizationContext(): array;
+
+    /**
+     * Gets a list of records contains an additional information about collections,
+     * e.g. "has_more" flag in such record indicates whether a collection has more records than it was requested.
+     *
+     * @return array|null [property path => info record, ...]
+     */
+    public function getInfoRecords(): ?array;
+
+    /**
+     * Sets a list of records contains an additional information about collections,
+     * e.g. "has_more" flag in such record indicates whether a collection has more records than it was requested.
+     *
+     * Important: do not use array_merge() function to merge existing records with new ones
+     * because the array of records can contain an element with empty string as the key
+     * and it will be lost by array_merge() function.
+     * Use addInfoRecord() method to add new records instead.
+     *
+     * @param array|null $infoRecords [property path => info record, ...]
+     */
+    public function setInfoRecords(?array $infoRecords): void;
+
+    /**
+     * Adds a record that contains an additional information about collections.
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function addInfoRecord(string $key, $value): void;
+
+    /**
+     * Adds records that contain an additional information about a collection valued association.
+     */
+    public function addAssociationInfoRecords(string $propertyPath, array $infoRecords): void;
+
+    /**
+     * Gets all not resolved identifiers.
+     *
+     * @return NotResolvedIdentifier[] [path => identifier, ...]
+     */
+    public function getNotResolvedIdentifiers(): array;
+
+    /**
+     * Adds an identifier that cannot be resolved.
+     *
+     * @param string $path          The path, e.g. "entityId", "filters.owner", "requestData.data.id"
+     * @param NotResolvedIdentifier $identifier The submitted identifier
+     */
+    public function addNotResolvedIdentifier(string $path, NotResolvedIdentifier $identifier): void;
+
+    /**
+     * Removes an identifier that cannot be resolved.
+     *
+     * @param string $path The path, e.g. "entityId", "filters.owner", "requestData.data.id"
+     */
+    public function removeNotResolvedIdentifier(string $path): void;
 
     /**
      * Checks whether a query is used to get result data exists.
@@ -179,20 +256,18 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Sets the Criteria object is used to add additional restrictions to a query is used to get result data.
-     *
-     * @param Criteria $criteria
      */
-    public function setCriteria($criteria);
+    public function setCriteria(Criteria $criteria = null);
 
     /**
-     * Whether any error happened during the processing of an action.
+     * Whether any error occurred when processing an action.
      *
      * @return bool
      */
     public function hasErrors();
 
     /**
-     * Gets all errors happened during the processing of an action.
+     * Gets all errors occurred when processing an action.
      *
      * @return Error[]
      */
@@ -200,8 +275,6 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Registers an error.
-     *
-     * @param Error $error
      */
     public function addError(Error $error);
 
@@ -290,8 +363,6 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Adds a request for some configuration data.
      *
-     * @param ConfigExtraInterface $extra
-     *
      * @throws \InvalidArgumentException if a config extra with the same name already exists
      */
     public function addConfigExtra(ConfigExtraInterface $extra);
@@ -326,8 +397,6 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Sets a configuration of an entity.
-     *
-     * @param EntityDefinitionConfig|null $definition
      */
     public function setConfig(?EntityDefinitionConfig $definition);
 
@@ -347,8 +416,6 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Sets a configuration of filters for an entity.
-     *
-     * @param FiltersConfig|null $config
      */
     public function setConfigOfFilters(?FiltersConfig $config);
 
@@ -368,8 +435,6 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Sets a configuration of sorters for an entity.
-     *
-     * @param SortersConfig|null $config
      */
     public function setConfigOfSorters(?SortersConfig $config);
 
@@ -442,8 +507,6 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Adds a request for some additional metadata info.
      *
-     * @param MetadataExtraInterface $extra
-     *
      * @throws \InvalidArgumentException if a metadata extra with the same name already exists
      */
     public function addMetadataExtra(MetadataExtraInterface $extra);
@@ -471,8 +534,6 @@ interface ContextInterface extends ComponentContextInterface
 
     /**
      * Sets metadata of an entity.
-     *
-     * @param EntityMetadata|null $metadata
      */
     public function setMetadata(?EntityMetadata $metadata);
 }

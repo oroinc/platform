@@ -2,114 +2,80 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntityType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
 {
-    const TEST_ENTITY = 'Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity';
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
-    /**
-     * @var OroEntityCreateOrSelectType
-     */
-    protected $formType;
+    /** @var OroEntityCreateOrSelectType */
+    private $formType;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $managerRegistry;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityManager;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $metadata;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $repository;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->metadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadata->expects($this->any())
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue('id'));
-        $this->metadata->expects($this->any())
+            ->willReturn('id');
+        $metadata->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue(self::TEST_ENTITY));
+            ->willReturn(TestEntity::class);
 
-        $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->repository->expects($this->any())
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->any())
             ->method('find')
-            ->will(
-                $this->returnCallback(
-                    function ($id) {
-                        return new TestEntity($id);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($id) {
+                return new TestEntity($id);
+            });
 
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityManager->expects($this->any())
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->any())
             ->method('getClassMetadata')
-            ->with(self::TEST_ENTITY)
-            ->will($this->returnValue($this->metadata));
-        $this->entityManager->expects($this->any())
+            ->with(TestEntity::class)
+            ->willReturn($metadata);
+        $entityManager->expects($this->any())
             ->method('getRepository')
-            ->with(self::TEST_ENTITY)
-            ->will($this->returnValue($this->repository));
+            ->with(TestEntity::class)
+            ->willReturn($repository);
 
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->getMockForAbstractClass();
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')
-            ->with(self::TEST_ENTITY)
-            ->will($this->returnValue($this->entityManager));
+            ->with(TestEntity::class)
+            ->willReturn($entityManager);
         $this->managerRegistry->expects($this->any())
             ->method('getRepository')
-            ->with(self::TEST_ENTITY)
-            ->will($this->returnValue($this->repository));
+            ->with(TestEntity::class)
+            ->willReturn($repository);
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
-            ->with($this->isInstanceOf(self::TEST_ENTITY))
-            ->will(
-                $this->returnCallback(
-                    function (TestEntity $entity) {
-                        return $entity->getId();
-                    }
-                )
-            );
+            ->with($this->isInstanceOf(TestEntity::class))
+            ->willReturnCallback(function (TestEntity $entity) {
+                return $entity->getId();
+            });
 
-        $this->formType = new OroEntityCreateOrSelectType($this->doctrineHelper);
+        $this->formType = new OroEntityCreateOrSelectType($doctrineHelper);
         parent::setUp();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getExtensions()
     {
         return [
@@ -123,32 +89,16 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    protected function tearDown()
-    {
-        unset($this->formType);
-        unset($this->managerRegistry);
-        unset($this->entityManager);
-        unset($this->metadata);
-        unset($this->repository);
-        unset($this->doctrineHelper);
-    }
-
     /**
-     * @param object|null $inputEntity
-     * @param array|null $submitData
-     * @param object|null $expectedEntity
-     * @param array $inputOptions
-     * @param array $expectedOptions
-     * @param array $expectedViewVars
      * @dataProvider executeDataProvider
      */
     public function testExecute(
-        $inputEntity,
-        $submitData,
-        $expectedEntity,
+        ?object $inputEntity,
+        ?array $submitData,
+        ?object $expectedEntity,
         array $inputOptions,
         array $expectedOptions,
-        array $expectedViewVars = array()
+        array $expectedViewVars = []
     ) {
         $form = $this->factory->create(OroEntityCreateOrSelectType::class, $inputEntity, $inputOptions);
         foreach ($expectedOptions as $name => $expectedValue) {
@@ -167,275 +117,271 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
-        return array(
-            'default without entity' => array(
+        return [
+            'default without entity' => [
                 'inputEntity' => null,
                 'submitData' => null,
                 'expectedEntity' => null,
-                'inputOptions' => array(
-                    'class' => self::TEST_ENTITY,
+                'inputOptions' => [
+                    'class' => TestEntity::class,
                     'create_entity_form_type' => TextType::class,
                     'grid_name' => 'test-grid-name',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                        )
-                    ),
-                ),
-                'expectedOptions' => array(
-                    'class' => self::TEST_ENTITY,
+                        ]
+                    ],
+                ],
+                'expectedOptions' => [
+                    'class' => TestEntity::class,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
                     'create_entity_form_type' => TextType::class,
-                    'create_entity_form_options' => array(),
+                    'create_entity_form_options' => [],
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('id' => new PropertyPath('id')),
-                            'grid_row_to_route' => array('id' => 'id'),
-                        )
-                    ),
-                ),
-                'expectedViewVars' => array(
+                            'route_parameters' => ['id' => new PropertyPath('id')],
+                            'grid_row_to_route' => ['id' => 'id'],
+                        ]
+                    ],
+                ],
+                'expectedViewVars' => [
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('id' => null),
-                            'grid_row_to_route' => array('id' => 'id'),
+                            'route_parameters' => ['id' => null],
+                            'grid_row_to_route' => ['id' => 'id'],
                             'widget_alias' => 'oro_entity_create_or_select_test_route',
-                        )
-                    ),
-                    'value' => array(
+                        ]
+                    ],
+                    'value' => [
                         'new_entity' => null,
                         'existing_entity' => null,
                         'mode' => OroEntityCreateOrSelectType::MODE_CREATE
-                    ),
-                )
-            ),
-            'default with entity' => array(
+                    ],
+                ]
+            ],
+            'default with entity' => [
                 'inputEntity' => new TestEntity(1),
                 'submitData' => null,
                 'expectedEntity' => null,
-                'inputOptions' => array(
-                    'class' => self::TEST_ENTITY,
+                'inputOptions' => [
+                    'class' => TestEntity::class,
                     'create_entity_form_type' => TextType::class,
                     'grid_name' => 'test-grid-name',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                        )
-                    ),
-                ),
-                'expectedOptions' => array(
+                        ]
+                    ],
+                ],
+                'expectedOptions' => [
                     'data_class' => null,
-                    'class' => self::TEST_ENTITY,
+                    'class' => TestEntity::class,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
                     'create_entity_form_type' => TextType::class,
-                    'create_entity_form_options' => array(),
+                    'create_entity_form_options' => [],
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('id' => new PropertyPath('id')),
-                            'grid_row_to_route' => array('id' => 'id'),
-                        )
-                    ),
-                ),
-                'expectedViewVars' => array(
+                            'route_parameters' => ['id' => new PropertyPath('id')],
+                            'grid_row_to_route' => ['id' => 'id'],
+                        ]
+                    ],
+                ],
+                'expectedViewVars' => [
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('id' => null),
-                            'grid_row_to_route' => array('id' => 'id'),
+                            'route_parameters' => ['id' => null],
+                            'grid_row_to_route' => ['id' => 'id'],
                             'widget_alias' => 'oro_entity_create_or_select_test_route',
-                        )
-                    ),
-                    'value' => array(
+                        ]
+                    ],
+                    'value' => [
                         'new_entity' => null,
                         'existing_entity' => null,
                         'mode' => OroEntityCreateOrSelectType::MODE_CREATE
-                    ),
-                )
-            ),
-            'create mode' => array(
+                    ],
+                ]
+            ],
+            'create mode' => [
                 'inputEntity' => null,
-                'submitData' => array(
+                'submitData' => [
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
-                    'new_entity' => array('id' => null),
-                ),
+                    'new_entity' => ['id' => null],
+                ],
                 'expectedEntity' => new TestEntity(),
-                'inputOptions' => array(
-                    'class' => self::TEST_ENTITY,
+                'inputOptions' => [
+                    'class' => TestEntity::class,
                     'create_entity_form_type' => TestEntityType::class,
-                    'create_entity_form_options' => array(
+                    'create_entity_form_options' => [
                         'test_option' => 'default_value'
-                    ),
+                    ],
                     'grid_name' => 'test-grid-name',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                        )
-                    ),
-                ),
-                'expectedOptions' => array(
-                    'class' => self::TEST_ENTITY,
+                        ]
+                    ],
+                ],
+                'expectedOptions' => [
+                    'class' => TestEntity::class,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
                     'create_entity_form_type' => TestEntityType::class,
-                    'create_entity_form_options' => array(
+                    'create_entity_form_options' => [
                         'test_option' => 'default_value'
-                    ),
+                    ],
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('id' => new PropertyPath('id')),
-                            'grid_row_to_route' => array('id' => 'id'),
-                        )
-                    ),
-                ),
-                'expectedViewVars' => array(
+                            'route_parameters' => ['id' => new PropertyPath('id')],
+                            'grid_row_to_route' => ['id' => 'id'],
+                        ]
+                    ],
+                ],
+                'expectedViewVars' => [
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('id' => null),
-                            'grid_row_to_route' => array('id' => 'id'),
+                            'route_parameters' => ['id' => null],
+                            'grid_row_to_route' => ['id' => 'id'],
                             'widget_alias' => 'oro_entity_create_or_select_test_route',
-                        )
-                    ),
-                    'value' => array(
+                        ]
+                    ],
+                    'value' => [
                         'new_entity' => new TestEntity(),
                         'existing_entity' => null,
                         'mode' => OroEntityCreateOrSelectType::MODE_CREATE
-                    ),
-                )
-            ),
-            'grid mode' => array(
+                    ],
+                ]
+            ],
+            'grid mode' => [
                 'inputEntity' => null,
-                'submitData' => array(
+                'submitData' => [
                     'mode' => OroEntityCreateOrSelectType::MODE_GRID,
-                ),
+                ],
                 'expectedEntity' => null,
-                'inputOptions' => array(
-                    'class' => self::TEST_ENTITY,
+                'inputOptions' => [
+                    'class' => TestEntity::class,
                     'mode' => OroEntityCreateOrSelectType::MODE_GRID,
                     'create_entity_form_type' => TestEntityType::class,
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'key',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                        )
-                    ),
-                ),
-                'expectedOptions' => array(
-                    'class' => self::TEST_ENTITY,
+                        ]
+                    ],
+                ],
+                'expectedOptions' => [
+                    'class' => TestEntity::class,
                     'mode' => OroEntityCreateOrSelectType::MODE_GRID,
                     'create_entity_form_type' => TestEntityType::class,
-                    'create_entity_form_options' => array(),
+                    'create_entity_form_options' => [],
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'key',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('id' => new PropertyPath('id')),
-                            'grid_row_to_route' => array('id' => 'id'),
-                        )
-                    ),
-                ),
-                'expectedViewVars' => array(
+                            'route_parameters' => ['id' => new PropertyPath('id')],
+                            'grid_row_to_route' => ['id' => 'id'],
+                        ]
+                    ],
+                ],
+                'expectedViewVars' => [
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'key',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('id' => null),
-                            'grid_row_to_route' => array('id' => 'id'),
+                            'route_parameters' => ['id' => null],
+                            'grid_row_to_route' => ['id' => 'id'],
                             'widget_alias' => 'oro_entity_create_or_select_test_route',
-                        )
-                    ),
-                    'value' => array(
+                        ]
+                    ],
+                    'value' => [
                         'new_entity' => null,
                         'existing_entity' => null,
                         'mode' => OroEntityCreateOrSelectType::MODE_GRID
-                    ),
-                )
-            ),
-            'view mode' => array(
+                    ],
+                ]
+            ],
+            'view mode' => [
                 'inputEntity' => null,
-                'submitData' => array(
+                'submitData' => [
                     'mode' => OroEntityCreateOrSelectType::MODE_VIEW,
                     'existing_entity' => 1
-                ),
+                ],
                 'expectedEntity' => new TestEntity(1),
-                'inputOptions' => array(
-                    'class' => self::TEST_ENTITY,
+                'inputOptions' => [
+                    'class' => TestEntity::class,
                     'create_entity_form_type' => TestEntityType::class,
                     'grid_name' => 'test-grid-name',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('key' => new PropertyPath('id'), 'static' => 'data'),
-                            'grid_row_to_route' => array('key' => 'value'),
-                        )
-                    ),
-                ),
-                'expectedOptions' => array(
-                    'class' => self::TEST_ENTITY,
+                            'route_parameters' => ['key' => new PropertyPath('id'), 'static' => 'data'],
+                            'grid_row_to_route' => ['key' => 'value'],
+                        ]
+                    ],
+                ],
+                'expectedOptions' => [
+                    'class' => TestEntity::class,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
                     'create_entity_form_type' => TestEntityType::class,
-                    'create_entity_form_options' => array(),
+                    'create_entity_form_options' => [],
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('key' => new PropertyPath('id'), 'static' => 'data'),
-                            'grid_row_to_route' => array('key' => 'value'),
-                        )
-                    ),
-                ),
-                'expectedViewVars' => array(
+                            'route_parameters' => ['key' => new PropertyPath('id'), 'static' => 'data'],
+                            'grid_row_to_route' => ['key' => 'value'],
+                        ]
+                    ],
+                ],
+                'expectedViewVars' => [
                     'grid_name' => 'test-grid-name',
                     'existing_entity_grid_id' => 'id',
-                    'view_widgets' => array(
-                        array(
+                    'view_widgets' => [
+                        [
                             'route_name' => 'test_route',
-                            'route_parameters' => array('key' => 1, 'static' => 'data'),
-                            'grid_row_to_route' => array('key' => 'value'),
+                            'route_parameters' => ['key' => 1, 'static' => 'data'],
+                            'grid_row_to_route' => ['key' => 'value'],
                             'widget_alias' => 'oro_entity_create_or_select_test_route',
-                        )
-                    ),
-                    'value' => array(
+                        ]
+                    ],
+                    'value' => [
                         'new_entity' => null,
                         'existing_entity' => new TestEntity(1),
                         'mode' => OroEntityCreateOrSelectType::MODE_VIEW
-                    ),
-                )
-            ),
-        );
+                    ],
+                ]
+            ],
+        ];
     }
 
     /**
-     * @param array $options
-     * @param string $exception
-     * @param string $message
      * @dataProvider executeExceptionDataProvider
      */
-    public function testExecuteException(array $options, $exception, $message)
+    public function testExecuteException(array $options, string $exception, string $message)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
@@ -443,24 +389,21 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
         $this->factory->create(OroEntityCreateOrSelectType::class, null, $options);
     }
 
-    /**
-     * @return array
-     */
-    public function executeExceptionDataProvider()
+    public function executeExceptionDataProvider(): array
     {
-        return array(
-            'no widget route' => array(
-                'options' => array(
-                    'class' => self::TEST_ENTITY,
+        return [
+            'no widget route' => [
+                'options' => [
+                    'class' => TestEntity::class,
                     'create_entity_form_type' => 'text',
                     'grid_name' => 'test-grid-name',
-                    'view_widgets' => array(
-                        array()
-                    ),
-                ),
-                'exception' => '\Symfony\Component\Form\Exception\InvalidConfigurationException',
+                    'view_widgets' => [
+                        []
+                    ],
+                ],
+                'exception' => InvalidConfigurationException::class,
                 'message' => 'Widget route name is not defined',
-            )
-        );
+            ]
+        ];
     }
 }

@@ -1,5 +1,22 @@
 oro:
+    calendardate:
+        entity_plural_label: Calendar Dates
+        entity_grid_all_view_label: All %entity_plural_label%
     query_designer:
+        converters:
+            date:
+                Month:
+                    name: Month
+                    hint: Month
+                Year:
+                    name: Year
+                    hint: Year
+                Day:
+                    name: Day
+                    hint: Day
+                Day of year:
+                    name: Day of year
+                    hint: Day of year
         aggregates:
             identifier:
                 Count:
@@ -25,6 +42,10 @@ oro:
                 Max:
                     name: Max
                     hint: Maximum value
+            money:
+                Avg:
+                    name: Average
+                    hint: Average of values
             date:
                 Count:
                     name: Count
@@ -35,18 +56,6 @@ oro:
                 Max:
                     name: Max
                     hint: Maximum value
-                Month:
-                    name: Month
-                    hint: Month
-                Year:
-                    name: Year
-                    hint: Year
-                Day:
-                    name: Day
-                    hint: Day
-                Day of year:
-                    name: Day of year
-                    hint: Day of year
         filter:
             boolean.select_value.label: Select Value
 
@@ -64,17 +73,17 @@ oro:
             row:
                 action:
                     view:           View
+        feature:
+            label: Reports
+            description: Enables building custom reports on any metric and entity available in the system to suit the exact needs of the organization.
+
         form:
             designer:               Designer
             chart_designer:         Chart Designer
-            date_grouping:          Date grouping
             columns:                Columns
             grouping:               Grouping
             filters:                Filters
             choose_report_type:     Choose a report type...
-            use_skip_empty_periods.label:  Allow to skip empty time periods
-            use_date_grouping_filter.label: Enable grouping by date
-            date_grouping_field.label: Date field
             date_group_section.label: Grouping by date
 
         chart_options.label: Chart Options
@@ -84,6 +93,7 @@ oro:
         entity_label:        Report
         entity_description:  Represent Report
         entity_plural_label: Reports
+        entity_grid_all_view_label: All %entity_plural_label%
         id.label:            Id
         name.label:          Name
         owner.label:         Owner
@@ -93,6 +103,7 @@ oro:
         reporttype:
             entity_label:        Report Type
             entity_plural_label: Report Types
+            entity_grid_all_view_label: All %entity_plural_label%
             entity_description:  Represent Report Type
             name.label:          Name
             label.label:         Label
@@ -103,12 +114,17 @@ oro:
 
         action:
             view_sql.label: View SQL query of a report/segment
+            clone:
+                button:
+                    label: Clone
+                    title: Clone Report
+                name_format: Copy of {name}
         system_configuration:
             groups:
                 report_settings.title: Reports settings
             fields:
                 display_sql_query.label: Display SQL in Reports and Segments
-                display_sql_query.tooltip: Displays SQL query of a report or segment on its view page
+                display_sql_query.tooltip: Select this option to display the SQL query of a report or a segment on its view page.
         filter:
             grouping.label: Grouping
             skip_empty_periods.label: Skip Empty Periods

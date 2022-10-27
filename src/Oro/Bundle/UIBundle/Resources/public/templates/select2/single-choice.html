@@ -1,0 +1,52 @@
+<% var resultsId = _.uniqueId('select2-results-'); %>
+<% var chosenId = _.uniqueId('select2-chosen-'); %>
+
+<div class="select2-container select2-container-single">
+    <a class="select2-choice"
+       href="#"
+       onclick="return false"
+       tabindex="-1"
+       role="combobox"
+       aria-owns="<%- resultsId %>"
+       aria-labelledby="<%- chosenId %>"
+       aria-haspopup="listbox"
+       aria-expanded="false"
+    >
+        <span id="<%- chosenId %>"
+              class="select2-chosen"
+              role="textbox"
+              aria-readonly="true"
+        >&nbsp</span>
+        <abbr class="select2-search-choice-close"
+              aria-label="<%- _.__('oro.ui.select2.clear.aria_label') %>"
+        ></abbr>
+        <span class="select2-arrow" aria-hidden="true"><b></b></span>
+    </a>
+    <input class="select2-focusser select2-offscreen"
+           type="text"
+           role="combobox"
+           aria-haspopup="true"
+           aria-expanded="false"
+           aria-owns="<%- resultsId %>"
+           aria-autocomplete="list"
+    >
+    <div class="select2-drop select2-display-none">
+        <div class="select2-search">
+            <input type="text"
+                   autocomplete="off"
+                   class="select2-input"
+                   role="searchbox"
+                   aria-autocomplete="list"
+                   aria-controls="<%- resultsId %>"
+                   aria-label="<%- _.__('oro.ui.select2.search.aria_label') %>"
+            >
+        </div>
+        <ul class="select2-results"
+            id="<%- resultsId %>"
+            role="listbox"
+            tabindex="-1"
+            aria-hidden="true"
+            aria-expanded="false"
+        ></ul>
+    </div>
+</div>

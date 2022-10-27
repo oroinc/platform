@@ -3,23 +3,28 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\Group;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\UserBundle\Form\Handler\GroupHandler;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * CRUD for user groups.
+ *
  * @Route("/group")
  */
-class GroupController extends Controller
+class GroupController extends AbstractController
 {
     /**
      * Create group form
      *
      * @Route("/create", name="oro_user_group_create")
-     * @Template("OroUserBundle:Group:update.html.twig")
+     * @Template("@OroUser/Group/update.html.twig")
      * @Acl(
      *      id="oro_user_group_create",
      *      type="entity",
@@ -70,9 +75,9 @@ class GroupController extends Controller
      */
     public function indexAction(Request $request)
     {
-        return array(
-            'entity_class' => $this->container->getParameter('oro_user.group.entity.class')
-        );
+        return [
+            'entity_class' => Group::class
+        ];
     }
 
     /**
@@ -82,20 +87,36 @@ class GroupController extends Controller
      */
     protected function update(Request $request, Group $entity)
     {
-        if ($this->get('oro_user.form.handler.group')->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+        if ($this->get(GroupHandler::class)->process($entity)) {
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.user.controller.group.message.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.user.controller.group.message.saved')
             );
 
             if (!$request->get('_widgetContainer')) {
-                return $this->get('oro_ui.router')->redirect($entity);
+                return $this->get(Router::class)->redirect($entity);
             }
         }
 
-        return array(
+        return [
             'entity'   => $entity,
             'form'     => $this->get('oro_user.form.group')->createView(),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                GroupHandler::class,
+                Router::class,
+                'oro_user.form.group' => Form::class,
+            ]
         );
     }
 }

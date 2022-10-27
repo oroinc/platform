@@ -1,8 +1,6 @@
 /* @theme: admin.oro; */
 
-@import "./variables";
-
-@import "./fallback";
+@import 'fallback';
 
 // Mobile
-@import "./mobile/main";
+@import 'mobile/main';

@@ -1,8 +1,8 @@
-{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
+{% extends '@OroNavigation/Menu/menu.html.twig' %}
 
 {% block root %}
-    {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroNavigation/Menu/menu.html.twig' as oro_menu %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div class="tab-content">
         {% set items = item %}

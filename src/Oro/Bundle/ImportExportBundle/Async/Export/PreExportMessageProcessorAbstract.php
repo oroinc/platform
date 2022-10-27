@@ -1,8 +1,10 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
-use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic;
+use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -13,7 +15,6 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * A base class for entities related and grid related PreExportMessageProcessors.
@@ -46,24 +47,22 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     protected $logger;
 
     /**
+     * @var ExportHandler
+     */
+    protected $exportHandler;
+
+    /**
      * @var int
      */
     protected $batchSize;
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     * @param TokenStorageInterface $tokenStorage
-     * @param DependentJobService $dependentJob
-     * @param LoggerInterface $logger
-     * @param int $sizeOfBatch
-     */
     public function __construct(
         JobRunner $jobRunner,
         MessageProducerInterface $producer,
         TokenStorageInterface $tokenStorage,
         DependentJobService $dependentJob,
         LoggerInterface $logger,
+        ExportHandler $exportHandler,
         $sizeOfBatch
     ) {
         $this->jobRunner = $jobRunner;
@@ -71,6 +70,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
         $this->tokenStorage = $tokenStorage;
         $this->logger = $logger;
         $this->dependentJob = $dependentJob;
+        $this->exportHandler = $exportHandler;
         $this->batchSize = $sizeOfBatch;
     }
 
@@ -79,19 +79,25 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        if (! ($body = $this->getMessageBody($message))) {
+        $messageBody = $this->getMessageBody($message);
+        if (!$messageBody) {
             return self::REJECT;
         }
 
-        $jobUniqueName = $this->getJobUniqueName($body);
+        $jobUniqueName = $this->getJobUniqueName($messageBody);
 
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
             $jobUniqueName,
-            $this->getRunUniqueJobCallback($jobUniqueName, $body)
+            $this->getRunUniqueJobCallback($jobUniqueName, $messageBody)
         );
 
         return $result ? self::ACK : self::REJECT;
+    }
+
+    protected function getBatchSize(): int
+    {
+        return $this->batchSize;
     }
 
     /**
@@ -103,10 +109,10 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     protected function getRunUniqueJobCallback($jobUniqueName, array $body)
     {
         return function (JobRunner $jobRunner, Job $job) use ($jobUniqueName, $body) {
+            $this->addDependentJob($job->getRootJob(), $body);
             $exportingEntityIds = $this->getExportingEntityIds($body);
 
             $ids = $this->splitOnBatch($exportingEntityIds);
-
             if (empty($ids)) {
                 $jobRunner->createDelayed(
                     sprintf('%s.chunk.%s', $jobUniqueName, 1),
@@ -120,8 +126,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
                     $this->getDelayedJobCallback($body, $batchData)
                 );
             }
-
-            $this->addDependentJob($job->getRootJob(), $body);
 
             return true;
         };
@@ -142,9 +146,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
 
         $user = $token->getUser();
 
-        if (! is_object($user) || ! $user instanceof UserInterface
-            || ! method_exists($user, 'getId') || ! method_exists($user, 'getEmail')
-        ) {
+        if (!is_object($user) || !$user instanceof UserInterface || !method_exists($user, 'getId')) {
             throw new \RuntimeException('Not supported user type');
         }
 
@@ -158,26 +160,20 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
      */
     protected function splitOnBatch(array $ids)
     {
-        return array_chunk($ids, $this->batchSize);
+        return array_chunk($ids, $this->getBatchSize());
     }
 
-    /**
-     * @param Job   $rootJob
-     * @param array $body
-     */
     protected function addDependentJob(Job $rootJob, array $body)
     {
         $context = $this->dependentJob->createDependentJobContext($rootJob);
 
-        $context->addDependentJob(Topics::POST_EXPORT, [
+        $context->addDependentJob(PostExportTopic::getName(), [
             'jobId' => $rootJob->getId(),
-            'email' => $this->getUser()->getEmail(),
             'recipientUserId' => $this->getUser()->getId(),
             'jobName' => $body['jobName'],
             'exportType' => $body['exportType'],
             'outputFormat' => $body['outputFormat'],
-            'notificationTemplate' =>
-                $body['notificationTemplate'] ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+            'entity' => $body['entity'],
         ]);
 
         $this->dependentJob->saveDependentJob($context);

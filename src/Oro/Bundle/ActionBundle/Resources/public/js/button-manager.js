@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var $ = require('jquery');
-    var mediator = require('oroui/js/mediator');
-    var messenger = require('oroui/js/messenger');
-    var widgetManager = require('oroui/js/widget-manager');
-    var Backbone = require('backbone');
-    var tools = require('oroui/js/tools');
-    require('oroui/js/standart-confirmation'); // preload default confirmation dialog module
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const messenger = require('oroui/js/messenger');
+    const widgetManager = require('oroui/js/widget-manager');
+    const Backbone = require('backbone');
+    const loadModules = require('oroui/js/app/services/load-modules');
 
-    var ButtonManager = function(options) {
+    const ButtonManager = function(options) {
         this.initialize(options);
     };
 
@@ -25,7 +24,13 @@ define(function(require) {
             fullRedirect: false,
             redirectUrl: '',
             dialogUrl: '',
+            /**
+             *  Receives callback function that will be resolved with event object {result: <result>},
+             *  where result * is a sign that was done changes through dialog or no
+             */
+            onDialogResult: null,
             executionUrl: '',
+            requestMethod: 'GET',
             confirmation: {},
             message: {},
             showDialog: false,
@@ -50,21 +55,27 @@ define(function(require) {
         confirmModal: null,
 
         /**
-         * @type {String}
+         * @type {boolean}
          */
-        confirmComponent: 'oroui/js/standart-confirmation',
+        isFormSaveInProgress: false,
 
         /**
          * @type {Function}
          */
-        confirmModalConstructor: null,
+        confirmModalConstructor: require('oroui/js/standart-confirmation'),
+
+        confirmModalModulePromise: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(_.pick(options, _.identity) || {}, this.options);
-            this.confirmModalConstructor = require(this.options.confirmation.component || this.confirmComponent);
+
+            if (this.options.confirmation.component) {
+                this.confirmModalConstructor = null;
+                this.confirmModalModulePromise = loadModules(this.options.confirmation.component);
+            }
         },
 
         /**
@@ -72,7 +83,19 @@ define(function(require) {
          */
         execute: function(e) {
             if (this.hasConfirmDialog()) {
-                this.showConfirmDialog(_.bind(this.doExecute, this, e));
+                if (this.confirmModalModulePromise) {
+                    this.confirmModalModulePromise.then(function(confirmModalConstructor) {
+                        if (this.disposed) {
+                            return;
+                        }
+
+                        this.confirmModalConstructor = confirmModalConstructor;
+                        this.showConfirmDialog(this.doExecute.bind(this, e));
+                        this.confirmModalModulePromise = null;
+                    }.bind(this));
+                } else {
+                    this.showConfirmDialog(this.doExecute.bind(this, e));
+                }
             } else {
                 this.doExecute(e);
             }
@@ -86,39 +109,49 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doExecute: function(e) {
-            var self = this;
             if (this.options.hasDialog) {
-                var options = this._getDialogOptions();
+                const options = this._getDialogOptions();
                 if (this.options.showDialog) {
-                    tools.loadModules(this.options.jsDialogWidget, function(Widget) {
-                        var _widget = new Widget(options);
-                        Backbone.listenTo(_widget, 'formSave', _.bind(function(response) {
+                    loadModules(this.options.jsDialogWidget, function(Widget) {
+                        const _widget = new Widget(options);
+                        Backbone.listenTo(_widget, 'formSave', response => {
+                            this.isFormSaveInProgress = true;
                             _widget.hide();
-                            self.doResponse(response, e);
-                        }, this));
-
+                            this.doResponse(response, e);
+                            this.isFormSaveInProgress = false;
+                        });
                         _widget.render();
-                    });
+                    }, this);
                 } else {
                     this.doRedirect(options.url);
                 }
             } else if (this.options.redirectUrl) {
-                this.doRedirect(this.options.redirectUrl);
+                const {redirectUrlOptions: redirectOptions = {redirect: true}} = this.options;
+                if (redirectOptions.newTab === true) {
+                    redirectOptions.target = '_blank';
+                }
+                this.doRedirect(this.options.redirectUrl, redirectOptions);
             } else {
                 mediator.execute('showLoading');
                 if (this.isTokenProtected()) {
-                    var ajaxOptions = {
+                    const ajaxOptions = {
                         type: 'POST',
                         data: this.options.executionTokenData,
                         dataType: 'json'
                     };
                     $.ajax(this.options.executionUrl, ajaxOptions)
-                        .done(_.bind(this.ajaxDone, this))
-                        .fail(_.bind(this.ajaxFail, this));
+                        .done(this.ajaxDone.bind(this))
+                        .fail(this.ajaxFail.bind(this));
                 } else {
-                    $.getJSON(this.options.executionUrl)
-                        .done(_.bind(this.ajaxDone, this))
-                        .fail(_.bind(this.ajaxFail, this));
+                    if (this.options.requestMethod === 'POST') {
+                        $.post(this.options.executionUrl, null, 'json')
+                            .done(this.ajaxDone.bind(this))
+                            .fail(this.ajaxFail.bind(this));
+                    } else {
+                        $.getJSON(this.options.executionUrl)
+                            .done(this.ajaxDone.bind(this))
+                            .fail(this.ajaxFail.bind(this));
+                    }
                 }
             }
         },
@@ -139,7 +172,7 @@ define(function(require) {
          * @param jqXHR
          */
         ajaxFail: function(jqXHR) {
-            var response = _.defaults(jqXHR.responseJSON || {}, {
+            const response = _.defaults(jqXHR.responseJSON || {}, {
                 success: false,
                 message: this.options.action ? this.options.action.label : ''
             });
@@ -162,13 +195,18 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doResponse: function(response, e) {
-            var callback = _.bind(function() {
+            const callback = () => {
                 this._showFlashMessages(response);
-            }, this);
+            };
 
             if (response.redirectUrl) {
+                const redirectOptions = {redirect: true};
+                if (response.newTab === true) {
+                    redirectOptions.target = '_blank';
+                }
+
                 mediator.once('page:afterChange', callback);
-                this.doRedirect(response.redirectUrl);
+                this.doRedirect(response.redirectUrl, redirectOptions);
             } else if (response.refreshGrid) {
                 mediator.execute('hideLoading');
                 _.each(response.refreshGrid, function(gridname) {
@@ -180,6 +218,10 @@ define(function(require) {
                 mediator.once('page:afterChange', callback);
 
                 this.doPageReload(response);
+            }
+
+            if (_.isFunction(this.options.onDialogResult)) {
+                this.options.onDialogResult({result: response.success || false});
             }
         },
 
@@ -197,7 +239,7 @@ define(function(require) {
 
             if (!response.success) {
                 mediator.execute('hideLoading');
-                var messages = response.messages || {};
+                const messages = response.messages || {};
 
                 if (_.isEmpty(messages) && response.message) {
                     messenger.notificationFlashMessage('error', response.message);
@@ -211,16 +253,22 @@ define(function(require) {
 
         /**
          * @param {String} redirectUrl
+         * @param {Object=} options
          */
-        doRedirect: function(redirectUrl) {
-            mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
+        doRedirect: function(redirectUrl, options = {}) {
+            mediator.execute('redirectTo', {url: redirectUrl}, options)
+                // in case redirect action was canceled -- remove loading mask
+                .fail(() => mediator.execute('hideLoading'));
+            if (options.target === '_blank') {
+                mediator.execute('hideLoading');
+            }
         },
 
         /**
          * @param {Object} response
          */
         doPageReload: function(response) {
-            var pageReload = true;
+            let pageReload = true;
             if (response.pageReload !== undefined) {
                 pageReload = Boolean(response.pageReload);
             }
@@ -242,15 +290,18 @@ define(function(require) {
          * @param {function} callback
          */
         showConfirmDialog: function(callback) {
-            var options = {};
+            let options = {};
+
             if (!_.isEmpty(this.options.confirmation)) {
-                var placeholders = this.options.confirmation.message_parameters || {};
+                const placeholders = _.mapObject(this.options.confirmation.message_parameters || {}, function(item) {
+                    return _.isString(item) ? _.escape(item) : item;
+                });
 
                 options = _.defaults(_.omit(this.options.confirmation, 'component', 'message'), {
-                    title: this.messages.confirm_title,
+                    title: (this.options.confirmation.title || this.messages.confirm_title),
                     content: (this.options.confirmation.message || this.messages.confirm_content),
-                    okText: this.messages.confirm_ok,
-                    cancelText: this.messages.confirm_cancel
+                    okText: (this.options.confirmation.ok || this.messages.confirm_ok),
+                    cancelText: (this.options.confirmation.cancel || this.messages.confirm_cancel)
                 });
 
                 _.each(options, function(item, key, list) {
@@ -265,8 +316,13 @@ define(function(require) {
                 };
             }
 
-            this.confirmModal = (new this.confirmModalConstructor(options));
-            Backbone.listenTo(this.confirmModal, 'ok', callback);
+            this.confirmModal = new this.confirmModalConstructor(options);
+
+            this.confirmModal
+                .on('ok', callback)
+                .on('hidden', function() {
+                    delete this.confirmModal;
+                }.bind(this));
 
             this.confirmModal.open();
         },
@@ -276,7 +332,7 @@ define(function(require) {
          * @private
          */
         _getDialogOptions: function() {
-            var options = {
+            let options = {
                 title: 'action',
                 url: this.options.dialogUrl,
                 stateEnabled: false,
@@ -290,7 +346,7 @@ define(function(require) {
                 }
             };
 
-            var additionalOptions = this.options.dialogOptions;
+            const additionalOptions = this.options.dialogOptions;
             if (additionalOptions) {
                 if (additionalOptions.dialogOptions !== undefined) {
                     additionalOptions.dialogOptions = _.extend(
@@ -302,7 +358,26 @@ define(function(require) {
                 options = _.extend(options, additionalOptions);
             }
 
+            options.dialogOptions.close = _.wrap(
+                options.dialogOptions.close,
+                this.onDialogClose.bind(this)
+            );
+
             return options;
+        },
+
+        /**
+         *
+         * @param {function} wrappedOnCloseDialogCallback
+         */
+        onDialogClose: function(wrappedOnCloseDialogCallback) {
+            if (_.isFunction(wrappedOnCloseDialogCallback)) {
+                wrappedOnCloseDialogCallback();
+            }
+
+            if (_.isFunction(this.options.onDialogResult) && false === this.isFormSaveInProgress) {
+                this.options.onDialogResult({result: false});
+            }
         },
 
         dispose: function() {
@@ -310,7 +385,12 @@ define(function(require) {
                 return;
             }
 
-            delete this.confirmModal;
+            if (this.confirmModal) {
+                this.confirmModal.dispose();
+                delete this.confirmModal;
+            }
+
+            this.disposed = true;
         }
     });
 

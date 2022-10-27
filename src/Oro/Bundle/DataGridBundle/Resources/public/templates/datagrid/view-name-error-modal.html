@@ -1,1 +1,1 @@
-<span class="validation-failed"><%= error %></span>
+<span class="validation-failed" <% if (obj.id) { %> id="<%- id %>" <% } %> role="alert" ><%- error %></span>

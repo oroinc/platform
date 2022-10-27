@@ -8,15 +8,11 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CalendarDateCommandTest extends WebTestCase
 {
-    const DATE_FORMAT = 'Y-m-d';
+    private const DATE_FORMAT = 'Y-m-d';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->loadFixtures([]);
     }
 
     public function testGenerateDates()
@@ -32,21 +28,25 @@ class CalendarDateCommandTest extends WebTestCase
         }
         $manager->flush();
 
-        $this->runCommand(CalendarDateCommand::COMMAND_NAME);
+        $this->runCommand(CalendarDateCommand::getDefaultName());
+        // Check that another command execution does not add duplicate dates
+        $this->runCommand(CalendarDateCommand::getDefaultName());
+
         $results = $repository->findAll();
         $this->assertNotEmpty($results);
         $this->assertCalendarDates($results);
     }
 
-    /**
-     * @param array $calendarDates
-     */
-    protected function assertCalendarDates(array $calendarDates)
+    private function assertCalendarDates(array $calendarDates): void
     {
         $generatedDates = [];
         foreach ($calendarDates as $calendarDate) {
+            $formattedDate = $calendarDate->getDate()->format(self::DATE_FORMAT);
+            // Assert that no duplicate dates present
+            $this->assertArrayNotHasKey($formattedDate, $generatedDates);
+
             /** @var CalendarDate $calendarDate */
-            $generatedDates[$calendarDate->getDate()->format(self::DATE_FORMAT)] = $calendarDate->getDate();
+            $generatedDates[$formattedDate] = $calendarDate->getDate();
         }
 
         $requiredDates = $this->getGeneratedDates();
@@ -56,10 +56,7 @@ class CalendarDateCommandTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    private function getGeneratedDates()
+    private function getGeneratedDates(): array
     {
         $dates = [];
         $period = new \DatePeriod(

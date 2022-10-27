@@ -2,26 +2,19 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\Process;
 
-class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implements IsolatorInterface
+/**
+ * Manages actualization of cache during tests.
+ */
+class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
 {
-    /** @var array */
-    protected $cacheDirectories = [
-        'doctrine',
-        'oro_data',
-        'oro_entities',
-    ];
-
-    /** {@inheritdoc} */
-    public function isApplicable(ContainerInterface $container)
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
     {
-        if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
-            $this->cacheDirectories['oro'] = 'oro';
-        }
-
-        return $this->isApplicableOS();
+        return 'Cache';
     }
 
     /** {@inheritdoc} */
@@ -36,18 +29,26 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
     protected function replaceCache()
     {
         $commands = [];
-
         foreach ($this->cacheDirectories as $directory) {
             $cacheTempDirPath = $this->cacheTempDir.DIRECTORY_SEPARATOR.$directory;
-
             if (!is_dir($cacheTempDirPath)) {
                 continue;
             }
-
             $commands[] = sprintf(
-                "mv %s %s",
+                'mv %s %s',
                 $cacheTempDirPath,
                 $this->cacheDir.DIRECTORY_SEPARATOR.$directory
+            );
+        }
+        foreach ($this->cacheFiles as $file) {
+            $cacheTempFilePath = $this->cacheTempDir.DIRECTORY_SEPARATOR.$file;
+            if (!is_file($cacheTempFilePath)) {
+                continue;
+            }
+            $commands[] = sprintf(
+                'mv %s %s',
+                $cacheTempFilePath,
+                $this->cacheDir.DIRECTORY_SEPARATOR.$file
             );
         }
 
@@ -56,11 +57,12 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
 
     protected function startCopyDumpToTempDir()
     {
-        $this->copyDumpToTempDirProcess = new Process(sprintf(
-            "exec cp -rp %s %s",
+        $command = sprintf(
+            'exec cp -rp %s %s',
             $this->cacheDumpDir.'/*',
             $this->cacheTempDir.DIRECTORY_SEPARATOR
-        ));
+        );
+        $this->copyDumpToTempDirProcess = Process::fromShellCommandline($command);
 
         $this->copyDumpToTempDirProcess
             ->setTimeout(self::TIMEOUT)
@@ -70,21 +72,28 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
     protected function dumpCache()
     {
         $commands = [];
-
         foreach ($this->cacheDirectories as $directory) {
             $cacheDirPath = $this->cacheDir.DIRECTORY_SEPARATOR.$directory;
-
             if (!is_dir($cacheDirPath)) {
                 continue;
             }
-
             $commands[] = sprintf(
                 'cp -rp %s %s',
                 $cacheDirPath,
                 $this->cacheDumpDir.DIRECTORY_SEPARATOR.$directory
             );
         }
-
+        foreach ($this->cacheFiles as $file) {
+            $cacheFilePath = $this->cacheDir.DIRECTORY_SEPARATOR.$file;
+            if (!is_file($cacheFilePath)) {
+                continue;
+            }
+            $commands[] = sprintf(
+                'cp -p %s %s',
+                $cacheFilePath,
+                $this->cacheDumpDir.DIRECTORY_SEPARATOR.$file
+            );
+        }
 
         $this->runProcess(implode(' && ', $commands));
     }
@@ -106,25 +115,21 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator implement
     protected function removeCacheDirs()
     {
         $commands = [];
-
         foreach ($this->cacheDirectories as $directory) {
             $cacheDirPath = $this->cacheDir.DIRECTORY_SEPARATOR.$directory;
-
             if (!is_dir($cacheDirPath)) {
                 continue;
             }
-
             $commands[] = sprintf('rm -rf %s', $cacheDirPath);
+        }
+        foreach ($this->cacheFiles as $file) {
+            $cacheFilePath = $this->cacheDir.DIRECTORY_SEPARATOR.$file;
+            if (!is_file($cacheFilePath)) {
+                continue;
+            }
+            $commands[] = sprintf('rm -f %s', $cacheFilePath);
         }
 
         $this->runProcess(implode(' && ', $commands));
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'Cache';
     }
 }

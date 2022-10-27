@@ -3,14 +3,16 @@
 namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * The AJAX controller for the user menu.
  * @Route("/menu/user")
+ * @CsrfProtection()
  */
 class UserAjaxMenuController extends AbstractAjaxMenuController
 {
@@ -19,7 +21,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
      */
     protected function getAllowedContextKeys()
     {
-        return [ScopeUserCriteriaProvider::SCOPE_KEY];
+        return [ScopeUserCriteriaProvider::USER];
     }
 
     /**
@@ -29,7 +31,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
     {
         if (!$this->isGranted(
             'oro_user_user_update',
-            $context[ScopeUserCriteriaProvider::SCOPE_KEY]
+            $context[ScopeUserCriteriaProvider::USER]
         )
         ) {
             throw $this->createAccessDeniedException();
@@ -42,18 +44,17 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
      */
     protected function getMenu($menuName, array $context)
     {
-        if (array_key_exists(ScopeUserCriteriaProvider::SCOPE_KEY, $context)) {
+        if (array_key_exists(ScopeUserCriteriaProvider::USER, $context)) {
             /** @var User $user */
-            $user = $context[ScopeUserCriteriaProvider::SCOPE_KEY];
-            $context[ScopeOrganizationCriteriaProvider::SCOPE_KEY] = $user->getOrganization();
+            $user = $context[ScopeUserCriteriaProvider::USER];
+            $context[ScopeOrganizationCriteriaProvider::ORGANIZATION] = $user->getOrganization();
         }
 
         return parent::getMenu($menuName, $context);
     }
 
     /**
-     * @Route("/reset/{menuName}", name="oro_navigation_user_menu_ajax_reset")
-     * @Method({"DELETE"})
+     * @Route("/reset/{menuName}", name="oro_navigation_user_menu_ajax_reset", methods={"DELETE"})
      *
      * {@inheritdoc}
      */
@@ -63,8 +64,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
     }
 
     /**
-     * @Route("/create/{menuName}/{parentKey}", name="oro_navigation_user_menu_ajax_create")
-     * @Method({"POST"})
+     * @Route("/create/{menuName}/{parentKey}", name="oro_navigation_user_menu_ajax_create", methods={"POST"})
      *
      * {@inheritdoc}
      */
@@ -74,8 +74,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
     }
 
     /**
-     * @Route("/delete/{menuName}/{key}", name="oro_navigation_user_menu_ajax_delete")
-     * @Method({"DELETE"})
+     * @Route("/delete/{menuName}/{key}", name="oro_navigation_user_menu_ajax_delete", methods={"DELETE"})
      *
      * {@inheritdoc}
      */
@@ -85,8 +84,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
     }
 
     /**
-     * @Route("/show/{menuName}/{key}", name="oro_navigation_user_menu_ajax_show")
-     * @Method({"PUT"})
+     * @Route("/show/{menuName}/{key}", name="oro_navigation_user_menu_ajax_show", methods={"PUT"})
      *
      * {@inheritdoc}
      */
@@ -96,8 +94,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
     }
 
     /**
-     * @Route("/hide/{menuName}/{key}", name="oro_navigation_user_menu_ajax_hide")
-     * @Method({"PUT"})
+     * @Route("/hide/{menuName}/{key}", name="oro_navigation_user_menu_ajax_hide", methods={"PUT"})
      *
      * {@inheritdoc}
      */
@@ -107,8 +104,7 @@ class UserAjaxMenuController extends AbstractAjaxMenuController
     }
 
     /**
-     * @Route("/move/{menuName}", name="oro_navigation_user_menu_ajax_move")
-     * @Method({"PUT"})
+     * @Route("/move/{menuName}", name="oro_navigation_user_menu_ajax_move", methods={"PUT"})
      *
      * {@inheritdoc}
      */

@@ -5,8 +5,11 @@ namespace Oro\Bundle\SoapBundle\Provider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides metadata for EntityManagerAwareInterface objects.
+ */
 class EntityMetadataProvider implements MetadataProviderInterface
 {
     /** @var ConfigManager */
@@ -15,10 +18,6 @@ class EntityMetadataProvider implements MetadataProviderInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param ConfigManager       $cm
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ConfigManager $cm, TranslatorInterface $translator)
     {
         $this->cm         = $cm;
@@ -42,9 +41,11 @@ class EntityMetadataProvider implements MetadataProviderInterface
                 if ($this->cm->hasConfig($entityFQCN)) {
                     $config = $this->cm->getConfig(new EntityConfigId('entity', $entityFQCN));
 
-                    $metadata['entity']['label']       = $this->translator->trans($config->get('label'));
-                    $metadata['entity']['pluralLabel'] = $this->translator->trans($config->get('plural_label'));
-                    $metadata['entity']['description'] = $this->translator->trans($config->get('description'));
+                    $metadata['entity']['label']       = $this->translator->trans((string) $config->get('label'));
+                    $metadata['entity']['pluralLabel'] = $this->translator->trans(
+                        (string) $config->get('plural_label')
+                    );
+                    $metadata['entity']['description'] = $this->translator->trans((string) $config->get('description'));
                 }
             }
         }

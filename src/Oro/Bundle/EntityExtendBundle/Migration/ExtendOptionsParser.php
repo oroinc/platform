@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
+/**
+ * Extend options parser
+ */
 class ExtendOptionsParser
 {
     /** @var EntityMetadataHelper */
@@ -16,11 +19,9 @@ class ExtendOptionsParser
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param EntityMetadataHelper $entityMetadataHelper
-     * @param FieldTypeHelper      $fieldTypeHelper
-     * @param ConfigManager        $configManager
-     */
+    /** @var bool */
+    protected $isDryRunMode = false;
+
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
         FieldTypeHelper $fieldTypeHelper,
@@ -32,6 +33,14 @@ class ExtendOptionsParser
     }
 
     /**
+     * @param bool $isDryRunMode
+     */
+    public function setDryRunMode($isDryRunMode = false)
+    {
+        $this->isDryRunMode = $isDryRunMode;
+    }
+
+    /**
      * Gets all options
      *
      * @param array $options
@@ -39,12 +48,17 @@ class ExtendOptionsParser
      */
     public function parseOptions(array $options)
     {
-        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper, $this->fieldTypeHelper, $this->configManager);
+        $builder = new ExtendOptionsBuilder(
+            $this->entityMetadataHelper,
+            $this->fieldTypeHelper,
+            $this->configManager,
+            $this->isDryRunMode
+        );
 
         $objectKeys = array_filter(
             array_keys($options),
             function ($key) {
-                return strpos($key, '_') !== 0;
+                return !str_starts_with($key, '_');
             }
         );
 
@@ -68,7 +82,7 @@ class ExtendOptionsParser
         $auxiliarySections = array_filter(
             array_keys($options),
             function ($key) {
-                return strpos($key, '_') === 0;
+                return str_starts_with($key, '_');
             }
         );
         foreach ($auxiliarySections as $sectionName) {

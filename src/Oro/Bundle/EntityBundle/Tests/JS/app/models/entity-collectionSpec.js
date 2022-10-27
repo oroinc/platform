@@ -1,22 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var exposure = require('requirejs-exposure')
-        .disclose('oroentity/js/app/models/entity-collection');
-    var RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
-    var EntityModel = require('oroentity/js/app/models/entity-model');
-    var EntityCollection = require('oroentity/js/app/models/entity-collection');
+    const RegistryMock = require('../../Fixture/app/services/registry/registry-mock');
+    const EntityModel = require('oroentity/js/app/models/entity-model');
+    const entityCollectionModuleInjector = require('inject-loader!oroentity/js/app/models/entity-collection');
 
     describe('oroentity/js/app/models/entity-collection', function() {
-        var registryMock;
+        let registryMock;
+        let EntityCollection;
 
         beforeEach(function() {
             registryMock = new RegistryMock();
-            exposure.substitute('registry').by(registryMock);
-        });
-
-        afterEach(function() {
-            exposure.recover('registry');
+            EntityCollection = entityCollectionModuleInjector({
+                'oroui/js/app/services/registry': registryMock
+            });
         });
 
         describe('create collection', function() {
@@ -34,20 +31,20 @@ define(function(require) {
             });
 
             it('get unsynced collection', function() {
-                var collection = new EntityCollection([], {type: 'users'});
+                const collection = new EntityCollection([], {type: 'users'});
                 expect(collection.isSynced()).toBe(false);
                 expect(collection.syncState()).toBe('unsynced');
             });
 
             it('get synced empty collection', function() {
-                var collection = new EntityCollection({data: []}, {type: 'users'});
+                const collection = new EntityCollection({data: []}, {type: 'users'});
                 expect(collection.isSynced()).toBe(true);
                 expect(collection.syncState()).toBe('synced');
             });
         });
 
         describe('collection manipulation', function() {
-            var collection;
+            let collection;
 
             beforeEach(function() {
                 spyOn(EntityModel, 'getEntityModel').and.callThrough();
@@ -75,13 +72,13 @@ define(function(require) {
             });
 
             it('remove model', function() {
-                var model1 = collection.get('1');
+                const model1 = collection.get('1');
                 collection.remove(model1);
                 expect(registryMock.relieve).toHaveBeenCalledWith(model1, collection);
             });
 
             it('relieve models on reset collections', function() {
-                var model2 = collection.get('2');
+                const model2 = collection.get('2');
                 collection.reset({data: [
                     {type: 'users', id: '1'},
                     {type: 'users', id: '3'}
@@ -99,7 +96,7 @@ define(function(require) {
             });
 
             it('serialize collection', function() {
-                var data = collection.serialize();
+                const data = collection.serialize();
                 expect(data).toEqual([{}, {}]);
                 expect(Object.getPrototypeOf(data[0])).toEqual({
                     type: 'users', id: '1', name: 'John', toString: jasmine.any(Function)

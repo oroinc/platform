@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
@@ -24,23 +24,19 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $scheduleClass;
 
-    /** @var DeferredScheduler */
-    private $deferredScheduler;
-
     /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $objectManager;
 
     /** @var SchedulesByArgumentsFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $schedulesByArgumentsFilter;
 
-    protected function setUp()
+    /** @var DeferredScheduler */
+    private $deferredScheduler;
+
+    protected function setUp(): void
     {
-        $this->scheduleManager = $this->getMockBuilder(ScheduleManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->scheduleManager = $this->createMock(ScheduleManager::class);
         $this->registry = $this->createMock(ManagerRegistry::class);
-
         $this->scheduleClass = Schedule::class;
         $this->objectManager = $this->createMock(ObjectManager::class);
         $this->schedulesByArgumentsFilter = $this->createMock(SchedulesByArgumentsFilterInterface::class);
@@ -72,10 +68,15 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
             ->with($command, $arguments, $cronExpression)
             ->willReturn($scheduleEntity);
 
-        $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->objectManager);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->willReturn($this->objectManager);
 
-        $this->objectManager->expects($this->once())->method('persist')->with($scheduleEntity);
-        $this->objectManager->expects($this->once())->method('flush');
+        $this->objectManager->expects($this->once())
+            ->method('persist')
+            ->with($scheduleEntity);
+        $this->objectManager->expects($this->once())
+            ->method('flush');
 
         $this->deferredScheduler->addSchedule($command, $arguments, $cronExpression);
         $this->deferredScheduler->flush();
@@ -106,10 +107,15 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
             ->with($command, $arguments, $cronExpression)
             ->willReturn($scheduleEntity);
 
-        $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->objectManager);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->willReturn($this->objectManager);
 
-        $this->objectManager->expects($this->once())->method('persist')->with($scheduleEntity);
-        $this->objectManager->expects($this->once())->method('flush');
+        $this->objectManager->expects($this->once())
+            ->method('persist')
+            ->with($scheduleEntity);
+        $this->objectManager->expects($this->once())
+            ->method('flush');
 
         //will cause to defer arguments for resolving on flush call
         $this->deferredScheduler->addSchedule($command, $argumentsCallback, $cronExpression);
@@ -123,7 +129,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
         $foundMatchedSchedule = (new Schedule())->setArguments(['--arg1=string', '--arg2=42']);
         $foundNonMatchedSchedule = (new Schedule())->setArguments(['--arg2=string', '--arg2=41']);
 
-        $this->schedulesByArgumentsFilter->expects(static::once())
+        $this->schedulesByArgumentsFilter->expects(self::once())
             ->method('filter')
             ->willReturn([$foundMatchedSchedule]);
 
@@ -142,9 +148,13 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
             ->with($foundMatchedSchedule)
             ->willReturn(true);
 
-        $this->registry->expects($this->any())->method('getManagerForClass')->willReturn($this->objectManager);
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->objectManager);
 
-        $this->objectManager->expects($this->once())->method('remove')->with($foundMatchedSchedule);
+        $this->objectManager->expects($this->once())
+            ->method('remove')
+            ->with($foundMatchedSchedule);
 
         $this->deferredScheduler->removeSchedule('oro:test:command', ['--arg1=string', '--arg2=42'], '* * * * *');
         $this->deferredScheduler->flush();
@@ -161,7 +171,7 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
             ->with($this->scheduleClass)
             ->willReturn(null);
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Please provide manageable schedule entity class');
 
         $this->deferredScheduler->flush();
@@ -173,17 +183,17 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
         $matchedSchedule = (new Schedule())->setArguments($matchedArguments);
         $nonMatchedSchedule = (new Schedule())->setArguments(['--arg2=string', '--arg2=41']);
 
-        $this->schedulesByArgumentsFilter->expects(static::once())
+        $this->schedulesByArgumentsFilter->expects(self::once())
             ->method('filter')
             ->willReturn([$matchedSchedule]);
 
         $repository = $this->createMock(ObjectRepository::class);
-        $repository->expects(static::once())
+        $repository->expects(self::once())
             ->method('findBy')
             ->with(['command' => 'oro:test:command'])
             ->willReturn([$matchedSchedule, $nonMatchedSchedule]);
 
-        $this->objectManager->expects(static::once())
+        $this->objectManager->expects(self::once())
             ->method('getRepository')
             ->with($this->scheduleClass)
             ->willReturn($repository);
@@ -191,11 +201,11 @@ class DeferredSchedulerTest extends \PHPUnit\Framework\TestCase
             ->method('contains')
             ->with($matchedSchedule)
             ->willReturn(true);
-        $this->objectManager->expects(static::once())
+        $this->objectManager->expects(self::once())
             ->method('remove')
             ->with($matchedSchedule);
 
-        $this->registry->expects(static::any())
+        $this->registry->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($this->objectManager);
 

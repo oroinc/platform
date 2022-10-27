@@ -6,10 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 
 class AdditionalAssociationsSection extends Form
 {
-    /**
-     * @param string $name
-     * @param bool $check
-     */
     public function setCheckBoxByName(string $name, bool $check = true): void
     {
         $label = $this->find('xpath', sprintf("//label[text()='%s']", $name));

@@ -2,25 +2,28 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * The normalizer for variables in workflow data.
+ */
 class WorkflowVariableNormalizer extends WorkflowDataNormalizer
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $managerRegistry;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param iterable|AttributeNormalizer[] $attributeNormalizers
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(ManagerRegistry $managerRegistry)
+    public function __construct(iterable $attributeNormalizers, ManagerRegistry $doctrine)
     {
-        $this->managerRegistry = $managerRegistry;
+        parent::__construct($attributeNormalizers);
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -70,12 +73,12 @@ class WorkflowVariableNormalizer extends WorkflowDataNormalizer
     /**
      * @param string $class
      *
-     * @return \Doctrine\Common\Persistence\ObjectManager|null
+     * @return \Doctrine\Persistence\ObjectManager|null
      * @throws SerializerException
      */
     protected function getManagerForClass($class)
     {
-        $entityManager = $this->managerRegistry->getManagerForClass($class);
+        $entityManager = $this->doctrine->getManagerForClass($class);
         if (!$entityManager) {
             throw new SerializerException(sprintf('Can\'t get entity manager for class %s', $class));
         }

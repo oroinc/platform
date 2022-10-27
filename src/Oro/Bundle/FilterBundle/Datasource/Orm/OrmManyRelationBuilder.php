@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\FilterBundle\Datasource\Orm;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilderInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Filter expression builder for ORM to-many relations.
+ */
 class OrmManyRelationBuilder implements ManyRelationBuilderInterface
 {
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
@@ -41,7 +41,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         $inverse = false
     ) {
         QueryBuilderUtil::checkIdentifier($parameterName);
-        list($entity, $alias, $field) = $this->getFilterParts($ds, $fieldName);
+        [$entity, $alias, $field] = $this->getFilterParts($ds, $fieldName);
 
         $rootAlias = sprintf('filter_%s', $ds->generateParameterName($filterName));
         $relAlias  = sprintf('filter_%s_rel', $ds->generateParameterName($filterName));
@@ -64,7 +64,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         $inverse = false
     ) {
         QueryBuilderUtil::checkIdentifier($filterName);
-        list($entity, $alias, $field) = $this->getFilterParts($ds, $fieldName);
+        [$entity, $alias, $field] = $this->getFilterParts($ds, $fieldName);
 
         $rootAlias = sprintf('null_filter_%s', $filterName);
         $relAlias  = sprintf('null_filter_%s_rel', $filterName);
@@ -98,7 +98,7 @@ class OrmManyRelationBuilder implements ManyRelationBuilderInterface
         if (empty($entity)) {
             $associations = [];
             $entity       = $this->findEntityByAlias($qb, $fieldParts[0]);
-            while (!empty($entity) && strpos($entity, ':') === false && strpos($entity, '\\') === false) {
+            while (!empty($entity) && !str_contains($entity, ':') && !str_contains($entity, '\\')) {
                 $parts = explode('.', $entity);
                 array_unshift($associations, $parts[1]);
                 $entity = $this->findEntityByAlias($qb, $parts[0]);

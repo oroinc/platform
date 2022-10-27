@@ -2,18 +2,21 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller;
 
+use Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController as RestActivityListController;
 use Oro\Bundle\ActivityListBundle\Event\ActivityConditionOptionsLoadEvent;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Provide functionality to manage activity conditions
+ *
  * @Route("/activity-list/segment")
  */
-class SegmentController extends Controller
+class SegmentController extends AbstractController
 {
     /**
      * @Route("/activity-condition")
@@ -24,11 +27,13 @@ class SegmentController extends Controller
         $params = $request->attributes->get('params', []);
         $conditionOptions = [
             'activityConditionOptions' => [
-                'listOptions'     => json_decode($this->forward(
-                    'OroActivityListBundle:Api/Rest/ActivityList:getActivityListOption',
-                    [],
-                    ['_format' => 'json']
-                )->getContent()),
+                'listOptions' => json_decode(
+                    $this->forward(
+                        RestActivityListController::class . '::getActivityListOptionAction',
+                        [],
+                        ['_format' => 'json']
+                    )->getContent()
+                ),
                 'fieldChoice' => [
                     'select2' => [
                         'placeholder' => $this->getTranslator()->trans(
@@ -46,7 +51,7 @@ class SegmentController extends Controller
         }
 
         $event = new ActivityConditionOptionsLoadEvent($conditionOptions['activityConditionOptions']);
-        $dispatcher->dispatch(ActivityConditionOptionsLoadEvent::EVENT_NAME, $event);
+        $dispatcher->dispatch($event, ActivityConditionOptionsLoadEvent::EVENT_NAME);
 
         return [
             'activityConditionOptions' => $event->getOptions(),
@@ -54,19 +59,27 @@ class SegmentController extends Controller
         ];
     }
 
-    /**
-     * @return EventDispatcherInterface
-     */
-    protected function getEventDispatcher()
+    protected function getEventDispatcher(): EventDispatcherInterface
     {
-        return $this->get('event_dispatcher');
+        return $this->get(EventDispatcherInterface::class);
+    }
+
+    protected function getTranslator(): TranslatorInterface
+    {
+        return $this->get(TranslatorInterface::class);
     }
 
     /**
-     * @return TranslatorInterface
+     * {@inheritdoc}
      */
-    protected function getTranslator()
+    public static function getSubscribedServices()
     {
-        return $this->get('translator');
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                EventDispatcherInterface::class,
+            ]
+        );
     }
 }

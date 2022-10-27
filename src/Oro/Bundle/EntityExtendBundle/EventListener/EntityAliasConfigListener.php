@@ -11,17 +11,11 @@ class EntityAliasConfigListener
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
-    /**
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(EntityAliasResolver $entityAliasResolver)
     {
         $this->entityAliasResolver = $entityAliasResolver;
     }
 
-    /**
-     * @param PreFlushConfigEvent $event
-     */
     public function preFlush(PreFlushConfigEvent $event)
     {
         $config = $event->getConfig('extend');

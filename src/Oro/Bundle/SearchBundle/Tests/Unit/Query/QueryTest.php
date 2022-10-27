@@ -2,54 +2,57 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
-use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class QueryTest extends \PHPUnit\Framework\TestCase
 {
-    private $config = array(
-        'Oro\Bundle\DataBundle\Entity\Product' => array(
-            'alias' => 'test_alias',
-            'fields' => array(
-                array(
-                    'name' => 'name',
-                    'target_type' => 'string',
-                    'target_fields' => array('name', 'all_data')
-                ),
-                array(
-                    'name' => 'description',
-                    'target_type' => 'string',
-                    'target_fields' => array('description', 'all_data')
-                ),
-                array(
-                    'name' => 'price',
-                    'target_type' => 'decimal',
-                    'target_fields' => array('price')
-                ),
-                array(
-                    'name' => 'count',
-                    'target_type' => 'integer',
-                    'target_fields' => array('count')
-                ),
-                array(
-                    'name' => 'createDate',
-                    'target_type' => 'datetime',
-                    'target_fields' => array('create_date')
-                ),
-                array(
-                    'name' => 'manufacturer',
-                    'relation_type' => 'to',
-                    'relation_fields' => array(
-                        array(
-                            'name' => 'name',
-                            'target_type' => 'string',
-                            'target_fields' => array('manufacturer', 'all_data')
-                        )
-                    )
-                ),
-            )
-        )
-    );
+    private $config = [
+        'Oro\Bundle\DataBundle\Entity\Product' => [
+            'alias'  => 'test_alias',
+            'fields' => [
+                [
+                    'name'          => 'name',
+                    'target_type'   => 'string',
+                    'target_fields' => ['name', 'all_data']
+                ],
+                [
+                    'name'          => 'description',
+                    'target_type'   => 'string',
+                    'target_fields' => ['description', 'all_data']
+                ],
+                [
+                    'name'          => 'price',
+                    'target_type'   => 'decimal',
+                    'target_fields' => ['price']
+                ],
+                [
+                    'name'          => 'count',
+                    'target_type'   => 'integer',
+                    'target_fields' => ['count']
+                ],
+                [
+                    'name'          => 'createDate',
+                    'target_type'   => 'datetime',
+                    'target_fields' => ['create_date']
+                ],
+                [
+                    'name'            => 'manufacturer',
+                    'relation_type'   => 'to',
+                    'relation_fields' => [
+                        [
+                            'name'          => 'name',
+                            'target_type'   => 'string',
+                            'target_fields' => ['manufacturer', 'all_data']
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ];
 
     /**
      * Set mapping config parameters
@@ -61,74 +64,6 @@ class QueryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertArrayHasKey('Oro\Bundle\DataBundle\Entity\Product', $query->getMappingConfig());
         $this->assertArrayHasKey('all_data', $query->getFields());
-    }
-
-    public function testAndWhere()
-    {
-        $query = new Query();
-        $query->setMappingConfig($this->config);
-        $query->from('Oro\Bundle\DataBundle\Entity\Product');
-        $query->andWhere('all_data', '=', 'test', 'string');
-
-        $whereExpression = $query->getCriteria()->getWhereExpression();
-        $this->assertEquals('string.all_data', $whereExpression->getField());
-        $this->assertEquals(Comparison::EQ, $whereExpression->getOperator());
-        $this->assertEquals('test', $whereExpression->getValue()->getValue());
-    }
-
-    public function testWhereLike()
-    {
-        $query = new Query();
-        $query->setMappingConfig($this->config);
-        $query->from('Oro\Bundle\DataBundle\Entity\Product');
-        $query->andWhere('all_data', Query::OPERATOR_LIKE, 'test', 'string');
-
-        $whereExpression = $query->getCriteria()->getWhereExpression();
-        $this->assertEquals(Comparison::LIKE, $whereExpression->getOperator());
-    }
-
-    public function testWhereNotLike()
-    {
-        $query = new Query();
-        $query->setMappingConfig($this->config);
-        $query->from('Oro\Bundle\DataBundle\Entity\Product');
-        $query->andWhere('all_data', Query::OPERATOR_NOT_LIKE, 'test', 'string');
-
-        $whereExpression = $query->getCriteria()->getWhereExpression();
-        $this->assertEquals(Comparison::NOT_LIKE, $whereExpression->getOperator());
-    }
-
-    public function testGetMaxResults()
-    {
-        $query = new Query();
-        $query->setMaxResults(10);
-        $this->assertEquals(10, $query->getMaxResults());
-    }
-
-    public function testOrWhere()
-    {
-        $query = new Query();
-        $query->setMappingConfig($this->config);
-        $query->from('Oro\Bundle\DataBundle\Entity\Product');
-        $query->orWhere('all_data', '=', 'test', 'string');
-
-        $whereExpression = $query->getCriteria()->getWhereExpression();
-        $this->assertEquals('string.all_data', $whereExpression->getField());
-        $this->assertEquals(Comparison::EQ, $whereExpression->getOperator());
-        $this->assertEquals('test', $whereExpression->getValue()->getValue());
-    }
-
-    public function testWhere()
-    {
-        $query = new Query();
-        $query->setMappingConfig($this->config);
-        $query->from('Oro\Bundle\DataBundle\Entity\Product');
-        $query->where('or', 'all_data', '=', 'test', 'string');
-
-        $whereExpression = $query->getCriteria()->getWhereExpression();
-        $this->assertEquals('string.all_data', $whereExpression->getField());
-        $this->assertEquals(Comparison::EQ, $whereExpression->getOperator());
-        $this->assertEquals('test', $whereExpression->getValue()->getValue());
     }
 
     public function testGetEntityByAlias()
@@ -145,7 +80,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
     {
         $testString = 'Re: FW: Test Sample - One äöü ßü abc 3 – Testing again RE FW Re';
 
-        $clearedValue     = Query::clearString($testString);
+        $clearedValue = Query::clearString($testString);
         $textAllDataField = sprintf('%s %s', $testString, $clearedValue);
 
         $result = implode(
@@ -180,7 +115,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         return [
             ['Re: FW: Test - One äöü ßü abc 3 – again', 'Re FW Test One äöü ßü abc 3 again'],
             ['text with ___ \' special chars \/ "', 'text with special chars'],
-            ['at @ * . test', 'at test'],
+            ['at @ * . test', 'at test']
         ];
     }
 
@@ -251,29 +186,25 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $query->addSelect('text.foo bar as  ');
         $query->addSelect('  as bar');
 
-        $reflectionObject = new \ReflectionObject($query);
-
-        $selectFieldsProperty = $reflectionObject->getProperty('select');
-        $selectFieldsProperty->setAccessible(true);
-
-        $aliasesProperty = $reflectionObject->getProperty('selectAliases');
-        $aliasesProperty->setAccessible(true);
-
-        $fields = $selectFieldsProperty->getValue($query);
-        $aliases = $aliasesProperty->getValue($query);
-
-        $this->assertContains('text.foo', $fields);
-        $this->assertContains('text.fooNoAlias', $fields);
-        $this->assertContains('bar', $aliases);
-
-        $this->assertTrue(count($aliases) < 2);
-
-        foreach ($selectFieldsProperty as $field) {
-            $this->assertNotTrue(strpos($field, ' ') > 0);
-        }
+        $this->assertEquals(
+            ['text.foo', 'text.fooNoAlias', 'text.foo bar as  ', 'text.  as bar'],
+            $query->getSelect()
+        );
+        $this->assertEquals(
+            [
+                'text.foo' => 'bar',
+                'text.fooNoAlias' => 'fooNoAlias',
+                'text.foo bar as  ' => 'foo bar as  ',
+                'text.  as bar' => '  as bar'
+            ],
+            $query->getSelectDataFields()
+        );
+        $this->assertEquals(['text.foo' => 'bar'], $query->getSelectAliases());
 
         $query->select('newField');
-        $this->assertEmpty($query->getSelectAliases());
+        $this->assertSame(['text.newField'], $query->getSelect());
+        $this->assertSame(['text.newField' => 'newField'], $query->getSelectDataFields());
+        $this->assertSame([], $query->getSelectAliases());
     }
 
     public function testGetSelectWithAliases()
@@ -294,9 +225,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $query->addSelect('faa as bor');
         $query->addSelect('text.bar');
 
-        $aliases = $query->getSelectAliases();
-
-        $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $aliases);
+        $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $query->getSelectAliases());
     }
 
     public function testGetSelectDataFields()
@@ -310,9 +239,10 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $query->addSelect('text.foo as name');
         $query->addSelect('text.faa as surname');
 
-        $fields = $query->getSelectDataFields();
-
-        $this->assertSame(['text.notes' => 'notes', 'text.foo' => 'name', 'text.faa' => 'surname'], $fields);
+        $this->assertSame(
+            ['text.notes' => 'notes', 'text.foo' => 'name', 'text.faa' => 'surname'],
+            $query->getSelectDataFields()
+        );
     }
 
     public function testAggregateAccessors()
@@ -327,5 +257,16 @@ class QueryTest extends \PHPUnit\Framework\TestCase
             ['test_name' => ['field' => 'test_field', 'function' => 'test_function']],
             $query->getAggregations()
         );
+    }
+
+    public function testClone()
+    {
+        $criteria = new Criteria();
+        $query = new Query();
+        $query->setCriteria($criteria);
+
+        $cloneQuery = clone $query;
+
+        self::assertNotSame($criteria, $cloneQuery->getCriteria());
     }
 }

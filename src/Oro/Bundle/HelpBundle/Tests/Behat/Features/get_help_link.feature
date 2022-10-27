@@ -10,4 +10,4 @@ Feature: Get help link
     Given I login as administrator
     When I click on "Help Icon"
     Then a new browser tab is opened and I switch to it
-    And I should see "Welcome to OroCRM Documentation"
+    And I should see "Welcome to Oro Documentation"

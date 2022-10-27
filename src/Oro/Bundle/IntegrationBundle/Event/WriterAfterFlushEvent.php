@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Event;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class WriterAfterFlushEvent extends Event
 {
@@ -14,9 +14,6 @@ class WriterAfterFlushEvent extends Event
      */
     protected $entityManager;
 
-    /**
-     * @param EntityManager $entityManager
-     */
     public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;

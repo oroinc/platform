@@ -6,112 +6,87 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Statement;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageInterface;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalSessionInterface;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
-use Oro\Component\MessageQueue\Util\JSON;
+use Oro\Component\MessageQueue\Transport\Exception\RuntimeException;
+use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\Queue;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DbalSession|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
+    private DbalSessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
 
-    /** @var DbalDestination|\PHPUnit\Framework\MockObject\MockObject */
-    private $queue;
+    private DbalConnection|\PHPUnit\Framework\MockObject\MockObject $connection;
 
-    /** @var DbalConnection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
+    private Connection|\PHPUnit\Framework\MockObject\MockObject $dbal;
 
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $dbal;
+    private DbalMessageConsumer $consumer;
 
-    /** @var DbalMessageConsumer */
-    private $consumer;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dbal = $this->createMock(Connection::class);
+
         $this->connection = $this->createMock(DbalConnection::class);
-        $this->connection->expects($this->any())
-            ->method('getDBALConnection')
-            ->willReturn($this->dbal);
-        $this->session = $this->createMock(DbalSession::class);
-        $this->session->expects($this->any())
-            ->method('getConnection')
-            ->willReturn($this->connection);
-        $this->queue = $this->createMock(DbalDestination::class);
+        $this->connection->method('getDBALConnection')->willReturn($this->dbal);
 
-        $this->consumer = new DbalMessageConsumer($this->session, $this->queue);
+        $this->session = $this->createMock(DbalSessionInterface::class);
+        $this->session->method('getConnection')->willReturn($this->connection);
+
+        $this->consumer = new DbalMessageConsumer($this->session, new Queue('test_queue'));
     }
 
-    public function testGetConsumerId()
+    public function testGetConsumerId(): void
     {
-        $consumer = new DbalMessageConsumer($this->session, $this->queue);
-        $this->assertNotEquals($consumer->getConsumerId(), $this->consumer->getConsumerId());
+        $consumer = new DbalMessageConsumer($this->session, new Queue('test_queue'));
+
+        self::assertNotEquals($consumer->getConsumerId(), $this->consumer->getConsumerId());
     }
 
-    public function testPollingInterval()
+    public function testPollingInterval(): void
     {
-        $this->assertEquals(1000, $this->consumer->getPollingInterval());
+        self::assertEquals(1000, $this->consumer->getPollingInterval());
 
         $this->consumer->setPollingInterval(5);
-        $this->assertEquals(5, $this->consumer->getPollingInterval());
 
-        $this->consumer->setPollingInterval(1.55556);
-        $this->assertEquals(1.555, $this->consumer->getPollingInterval());
+        self::assertEquals(5, $this->consumer->getPollingInterval());
     }
 
-    public function testGetQueue()
+    public function testReceiveWithMessage(): void
     {
-        $this->queue
-            ->expects($this->once())
-            ->method('getQueueName')
-            ->willReturn('test');
-
-        $this->assertEquals('test', $this->consumer->getQueue()->getQueueName());
-    }
-
-    public function testReceiveWithMessage()
-    {
-        $this->queue->expects($this->exactly(2))
-            ->method('getQueueName')
-            ->willReturn('test_queue');
-
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
+        /** @var Statement|MockObject $statement */
         $updateStatement = $this->createMock(Statement::class);
-        $updateStatement->expects($this->once())
+        $updateStatement->expects(self::once())
             ->method('execute')
-            ->with($this->logicalAnd(
-                $this->contains('test_queue'),
-                $this->contains($this->consumer->getConsumerId())
-            ));
-        $updateStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(1);
+            ->with(
+                self::logicalAnd(
+                    self::containsEqual('test_queue'),
+                    self::containsEqual($this->consumer->getConsumerId())
+                )
+            );
+        $updateStatement->expects(self::once())->method('rowCount')->willReturn(1);
 
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
+        /** @var Statement|MockObject $statement */
         $selectStatement = $this->createMock(Statement::class);
-        $selectStatement->expects($this->once())
+        $selectStatement->expects(self::once())
             ->method('execute')
             ->with([
                 'consumerId' => $this->consumer->getConsumerId(),
                 'queue' => 'test_queue',
             ]);
-        $selectStatement->expects($this->once())
+        $selectStatement->expects(self::once())
             ->method('fetch')
             ->with(2)
             ->willReturn([
-                'id' => 'message.id',
+                'id' => 25,
                 'body' => 'message.body',
                 'priority' => 1,
                 'redelivered' => false,
@@ -119,127 +94,91 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
                 'properties' => '{"property.key":"property.value"}',
             ]);
 
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::exactly(2))->method('prepare')->willReturn($updateStatement, $selectStatement);
 
-        $this->dbal->expects($this->exactly(2))
-            ->method('prepare')
-            ->willReturn($updateStatement, $selectStatement);
+        $this->connection->expects(self::exactly(2))->method('getTableName')->willReturn('oro_message_queue');
 
-        $this->connection->expects($this->exactly(2))
-            ->method('getTableName')
-            ->willReturn('oro_message_queue');
-
-        $this->session->expects($this->once())
-            ->method('createMessage')
-            ->willReturn(new DbalMessage());
+        $this->session->expects(self::once())->method('createMessage')->willReturn(new DbalMessage());
 
         $expectedMessage = new DbalMessage();
-        $expectedMessage->setId('message.id');
+        $expectedMessage->setId(25);
         $expectedMessage->setBody('message.body');
         $expectedMessage->setPriority(1);
         $expectedMessage->setHeaders(['header.key' => 'header.value']);
         $expectedMessage->setProperties(['property.key' => 'property.value']);
 
-        $this->assertEquals($expectedMessage, $this->consumer->receive(1));
+        self::assertEquals($expectedMessage, $this->consumer->receive(1));
     }
 
-    public function testReceiveWithMessageLogicException()
+    public function testReceiveWithMessageLogicException(): void
     {
-        $this->queue->expects($this->exactly(2))
-            ->method('getQueueName')
-            ->willReturn('test_queue');
-
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
+        /** @var Statement|MockObject $statement */
         $updateStatement = $this->createMock(Statement::class);
-        $updateStatement->expects($this->once())
+        $updateStatement->expects(self::once())
             ->method('execute')
-            ->with($this->logicalAnd(
-                $this->contains('test_queue'),
-                $this->contains($this->consumer->getConsumerId())
-            ));
-        $updateStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(1);
+            ->with(
+                self::logicalAnd(
+                    self::containsEqual('test_queue'),
+                    self::containsEqual($this->consumer->getConsumerId())
+                )
+            );
+        $updateStatement->expects(self::once())->method('rowCount')->willReturn(1);
 
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
+        /** @var Statement|MockObject $statement */
         $selectStatement = $this->createMock(Statement::class);
-        $selectStatement->expects($this->once())
+        $selectStatement->expects(self::once())
             ->method('execute')
             ->with([
                 'consumerId' => $this->consumer->getConsumerId(),
                 'queue' => 'test_queue',
             ]);
-        $selectStatement->expects($this->once())
-            ->method('fetch')
-            ->with(2)
-            ->willReturn(false);
+        $selectStatement->expects(self::once())->method('fetch')->with(2)->willReturn(false);
 
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::exactly(2))->method('prepare')->willReturn($updateStatement, $selectStatement);
 
-        $this->dbal->expects($this->exactly(2))
-            ->method('prepare')
-            ->willReturn($updateStatement, $selectStatement);
+        $this->connection->expects(self::exactly(2))->method('getTableName')->willReturn('oro_message_queue');
 
-        $this->connection->expects($this->exactly(2))
-            ->method('getTableName')
-            ->willReturn('oro_message_queue');
-
-        $this->session->expects($this->never())
-            ->method('createMessage');
+        $this->session->expects(self::never())->method('createMessage');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
-            sprintf('Expected one record but got nothing. consumer_id: "%s"', $this->consumer->getConsumerId())
+            \sprintf('Expected one record but got nothing. consumer_id: "%s"', $this->consumer->getConsumerId())
         );
 
         $this->consumer->receive(1);
     }
 
-    public function testReceiveWithoutMessage()
+    public function testReceiveWithoutMessage(): void
     {
-        $this->queue->expects($this->once())
-            ->method('getQueueName')
-            ->willReturn('test_queue');
-
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
+        /** @var Statement|MockObject $statement */
         $updateStatement = $this->createMock(Statement::class);
-        $updateStatement->expects($this->once())
+        $updateStatement->expects(self::once())
             ->method('execute')
-            ->with($this->logicalAnd(
-                $this->contains('test_queue'),
-                $this->contains($this->consumer->getConsumerId())
-            ));
-        $updateStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(0);
+            ->with(
+                self::logicalAnd(
+                    self::containsEqual('test_queue'),
+                    self::containsEqual($this->consumer->getConsumerId())
+                )
+            );
+        $updateStatement->expects(self::once())->method('rowCount')->willReturn(0);
 
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('prepare')->willReturn($updateStatement);
 
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($updateStatement);
+        $this->connection->expects(self::once())->method('getTableName')->willReturn('oro_message_queue');
 
-        $this->connection->expects($this->once())
-            ->method('getTableName')
-            ->willReturn('oro_message_queue');
+        $this->session->expects(self::never())->method('createMessage');
 
-        $this->session->expects($this->never())
-            ->method('createMessage');
+        $this->consumer->setPollingInterval(100);
 
-        $this->assertNull($this->consumer->receive(1));
+        self::assertNull($this->consumer->receive(0.1));
     }
 
-    public function testReceiveThrowLogicException()
+    public function testReceiveThrowLogicException(): void
     {
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new \stdClass());
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new \stdClass());
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Unsupported database driver');
@@ -247,494 +186,209 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
         $this->consumer->receive(1);
     }
 
-    public function testReceiveNoWaitWithMessage()
+    public function testAcknowledge(): void
     {
-        $this->queue->expects($this->exactly(2))
-            ->method('getQueueName')
-            ->willReturn('test_queue');
+        /** @var Statement|MockObject $statement */
+        $deleteStatement = $this->createMock(Statement::class);
+        $deleteStatement->expects(self::once())->method('execute')->with(['messageId' => 25]);
 
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $updateStatement = $this->createMock(Statement::class);
-        $updateStatement->expects($this->once())
-            ->method('execute')
-            ->with($this->logicalAnd(
-                $this->contains('test_queue'),
-                $this->contains($this->consumer->getConsumerId())
-            ));
-        $updateStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(1);
+        $deleteStatement->expects(self::once())->method('rowCount')->willReturn(1);
 
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $selectStatement = $this->createMock(Statement::class);
-        $selectStatement->expects($this->once())
-            ->method('execute')
-            ->with([
-                'consumerId' => $this->consumer->getConsumerId(),
-                'queue' => 'test_queue',
-            ]);
-        $selectStatement->expects($this->once())
-            ->method('fetch')
-            ->with(2)
-            ->willReturn([
-                'id' => 'message.id',
-                'body' => 'message.body',
-                'priority' => 1,
-                'redelivered' => false,
-                'headers' => '{"header.key":"header.value"}',
-                'properties' => '{"property.key":"property.value"}',
-            ]);
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('prepare')->willReturn($deleteStatement);
 
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+        $message = new DbalMessage();
+        $message->setId(25);
 
-        $this->dbal->expects($this->exactly(2))
-            ->method('prepare')
-            ->willReturn($updateStatement, $selectStatement);
-
-        $this->connection->expects($this->exactly(2))
-            ->method('getTableName')
-            ->willReturn('oro_message_queue');
-
-        $this->session->expects($this->once())
-            ->method('createMessage')
-            ->willReturn(new DbalMessage());
-
-        $expectedMessage = new DbalMessage();
-        $expectedMessage->setId('message.id');
-        $expectedMessage->setBody('message.body');
-        $expectedMessage->setPriority(1);
-        $expectedMessage->setHeaders(['header.key' => 'header.value']);
-        $expectedMessage->setProperties(['property.key' => 'property.value']);
-
-        $this->assertEquals($expectedMessage, $this->consumer->receiveNoWait());
+        $this->consumer->acknowledge($message);
     }
 
-    public function testReceiveNoWaitWithMessageLogicException()
+    public function testAcknowledgeWithRetry(): void
     {
-        $this->queue->expects($this->exactly(2))
-            ->method('getQueueName')
-            ->willReturn('test_queue');
+        /** @var Statement|MockObject $statement */
+        $deleteStatement = $this->createMock(Statement::class);
+        $deleteStatement->expects(self::exactly(2))->method('execute')->with(['messageId' => 25]);
 
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $updateStatement = $this->createMock(Statement::class);
-        $updateStatement->expects($this->once())
-            ->method('execute')
-            ->with($this->logicalAnd(
-                $this->contains('test_queue'),
-                $this->contains($this->consumer->getConsumerId())
-            ));
-        $updateStatement->expects($this->once())
+        $deleteStatement->expects(self::exactly(2))
             ->method('rowCount')
-            ->willReturn(1);
+            ->willReturn(
+                self::returnCallback(function () {
+                    throw new PDOException(new \PDOException());
+                }),
+                1
+            );
 
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $selectStatement = $this->createMock(Statement::class);
-        $selectStatement->expects($this->once())
-            ->method('execute')
-            ->with([
-                'consumerId' => $this->consumer->getConsumerId(),
-                'queue' => 'test_queue',
-            ]);
-        $selectStatement->expects($this->once())
-            ->method('fetch')
-            ->with(2)
-            ->willReturn(false);
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('prepare')->willReturn($deleteStatement);
 
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
+        $message = new DbalMessage();
+        $message->setId(25);
 
-        $this->dbal->expects($this->exactly(2))
-            ->method('prepare')
-            ->willReturn($updateStatement, $selectStatement);
+        $this->consumer->acknowledge($message);
+    }
 
-        $this->connection->expects($this->exactly(2))
-            ->method('getTableName')
-            ->willReturn('oro_message_queue');
+    public function testAcknowledgeLogicException(): void
+    {
+        /** @var Statement|MockObject $statement */
+        $deleteStatement = $this->createMock(Statement::class);
+        $deleteStatement->expects(self::once())->method('execute')->with(['messageId' => 25]);
 
-        $this->session->expects($this->never())
-            ->method('createMessage');
+        $deleteStatement->expects(self::once())->method('rowCount')->willReturn(0);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            sprintf('Expected one record but got nothing. consumer_id: "%s"', $this->consumer->getConsumerId())
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('prepare')->willReturn($deleteStatement);
+
+        $message = new DbalMessage();
+        $message->setId(25);
+
+        $this->expectExceptionObject(
+            new RuntimeException('Failed to delete a message with id "25". Expected 1 affected row, got 0.')
         );
 
-        $this->consumer->receiveNoWait();
-    }
-
-    public function testReceiveNoWaitWithoutMessage()
-    {
-        $this->queue->expects($this->once())
-            ->method('getQueueName')
-            ->willReturn('test_queue');
-
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $updateStatement = $this->createMock(Statement::class);
-        $updateStatement->expects($this->once())
-            ->method('execute')
-            ->with($this->logicalAnd(
-                $this->contains('test_queue'),
-                $this->contains($this->consumer->getConsumerId())
-            ));
-        $updateStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(0);
-
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
-
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($updateStatement);
-
-        $this->connection->expects($this->once())
-            ->method('getTableName')
-            ->willReturn('oro_message_queue');
-
-        $this->session->expects($this->never())
-            ->method('createMessage');
-
-        $this->assertNull($this->consumer->receiveNoWait());
-    }
-
-    public function testReceiveNoWaitThrowLogicException()
-    {
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new \stdClass());
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Unsupported database driver');
-
-        $this->consumer->receiveNoWait();
-    }
-
-    public function testAcknowledge()
-    {
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects($this->once())
-            ->method('execute')
-            ->with([
-                'messageId' => 'message.id'
-            ]);
-
-        $deleteStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(1);
-
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
-
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($deleteStatement);
-
-        $message = new DbalMessage();
-        $message->setId('message.id');
-
         $this->consumer->acknowledge($message);
     }
 
-    public function testAcknowledgeWithRetry()
-    {
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects($this->exactly(2))
-            ->method('execute')
-            ->with([
-                'messageId' => 'message.id'
-            ]);
-
-        $deleteStatement->expects($this->exactly(2))
-            ->method('rowCount')
-            ->willReturn($this->returnCallback(function () {
-                throw new PDOException(new \PDOException());
-            }), 1);
-
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
-
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($deleteStatement);
-
-        $message = new DbalMessage();
-        $message->setId('message.id');
-
-        $this->consumer->acknowledge($message);
-    }
-
-    public function testAcknowledgeLogicException()
-    {
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects($this->once())
-            ->method('execute')
-            ->with([
-                'messageId' => 'message.id'
-            ]);
-
-        $deleteStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(0);
-
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
-
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($deleteStatement);
-
-        $message = new DbalMessage();
-        $message->setId('message.id');
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Expected record was removed but it is not. id: "message.id"');
-
-        $this->consumer->acknowledge($message);
-    }
-
-    public function testAcknowledgeInvalidMessageException()
+    public function testAcknowledgeInvalidMessageException(): void
     {
         $this->expectException(InvalidMessageException::class);
         $this->expectExceptionMessage(
-            sprintf('The message must be an instance of %s but it is %s.', DbalMessage::class, NullMessage::class)
+            sprintf('The transport message must be instance of "%s".', DbalMessageInterface::class)
         );
 
-        $this->consumer->acknowledge(new NullMessage());
+        $this->consumer->acknowledge(new Message());
     }
 
-    public function testReject()
+    public function testReject(): void
     {
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
+        /** @var Statement|MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects($this->once())
-            ->method('execute')
-            ->with([
-                'messageId' => 'message.id'
-            ]);
+        $deleteStatement->expects(self::once())->method('execute')->with(['messageId' => 25]);
+        $deleteStatement->expects(self::once())->method('rowCount')->willReturn(1);
 
-        $deleteStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(1);
-
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
-
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($deleteStatement);
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('prepare')->willReturn($deleteStatement);
 
         $message = new DbalMessage();
-        $message->setId('message.id');
+        $message->setId(25);
 
         $this->consumer->reject($message);
     }
 
-    public function testRejectWithRetry()
+    public function testRejectWithRetry(): void
     {
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
+        /** @var Statement|MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects($this->exactly(2))
-            ->method('execute')
-            ->with([
-                'messageId' => 'message.id'
-            ]);
+        $deleteStatement->expects(self::exactly(2))->method('execute')->with(['messageId' => 25]);
 
-        $deleteStatement->expects($this->exactly(2))
+        $deleteStatement->expects(self::exactly(2))
             ->method('rowCount')
-            ->willReturn($this->returnCallback(function () {
-                throw new PDOException(new \PDOException());
-            }), 1);
+            ->willReturn(
+                self::returnCallback(function () {
+                    throw new PDOException(new \PDOException());
+                }),
+                1
+            );
 
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
-
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($deleteStatement);
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('prepare')->willReturn($deleteStatement);
 
         $message = new DbalMessage();
-        $message->setId('message.id');
+        $message->setId(25);
 
         $this->consumer->reject($message);
     }
 
-    public function testRejectRequeue()
+    public function testRejectRequeue(): void
     {
-        $this->queue->expects($this->once())
-            ->method('getQueueName')
-            ->willReturn('test_queue');
-
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects($this->once())
-            ->method('execute')
-            ->with([
-                'messageId' => 'message.id'
-            ]);
-
-        $deleteStatement->expects($this->once())
-            ->method('rowCount')
+        $this->dbal
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'oro_message_queue',
+                [
+                    'consumer_id' => null,
+                    'redelivered' => true,
+                ],
+                ['id' => 25],
+                [
+                    'id' => Types::INTEGER,
+                    'redelivered' => Types::BOOLEAN,
+                ]
+            )
             ->willReturn(1);
 
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
-
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($deleteStatement);
-
-        $this->dbal->expects($this->once())
-            ->method('insert')
-            ->with('oro_message_queue', [
-                'body' => 'message.body',
-                'headers' => '{"header.key":"header.value"}',
-                'properties' => '{"property.key":"property.value"}',
-                'priority' => 1,
-                'queue' => 'test_queue',
-                'redelivered' => true,
-            ], [
-                'body' => 'text',
-                'headers' => 'text',
-                'properties' => 'text',
-                'priority' => 'smallint',
-                'queue' => 'string',
-                'redelivered' => 'boolean',
-            ])
-            ->willReturn(1);
-
-        $this->connection->expects($this->exactly(2))
+        $this->connection
+            ->expects(self::once())
             ->method('getTableName')
             ->willReturn('oro_message_queue');
 
         $message = new DbalMessage();
-        $message->setId('message.id');
-        $message->setBody('message.body');
-        $message->setHeaders(['header.key' => 'header.value']);
-        $message->setProperties(['property.key' => 'property.value']);
-        $message->setPriority(1);
-        $message->setRedelivered(true);
+        $message->setId(25);
 
         $this->consumer->reject($message, true);
     }
 
-    public function testRejectLogicException()
+    public function testRejectThrowsExceptionWhenNoAffectedRows(): void
     {
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
+        /** @var Statement|MockObject $statement */
         $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects($this->once())
-            ->method('execute')
-            ->with([
-                'messageId' => 'message.id'
-            ]);
+        $deleteStatement->expects(self::once())->method('execute')->with(['messageId' => 25]);
+        $deleteStatement->expects(self::once())->method('rowCount')->willReturn(0);
 
-        $deleteStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(0);
-
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
-
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($deleteStatement);
+        $this->dbal->expects(self::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
+        $this->dbal->expects(self::once())->method('prepare')->willReturn($deleteStatement);
 
         $message = new DbalMessage();
-        $message->setId('message.id');
+        $message->setId(25);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Expected record was removed but it is not. id: "message.id"');
+        $this->expectExceptionObject(
+            new RuntimeException('Failed to delete a message with id "25". Expected 1 affected row, got 0.')
+        );
 
         $this->consumer->reject($message);
     }
 
-    public function testRejectRequeueLogicException()
+    public function testRejectRequeueThrowsExceptionWhenNoAffectedRows(): void
     {
-        $this->queue->expects($this->once())
-            ->method('getQueueName')
-            ->willReturn('test_queue');
-
-        /** @var Statement|\PHPUnit\Framework\MockObject\MockObject $statement */
-        $deleteStatement = $this->createMock(Statement::class);
-        $deleteStatement->expects($this->once())
-            ->method('execute')
-            ->with([
-                'messageId' => 'message.id'
-            ]);
-
-        $deleteStatement->expects($this->once())
-            ->method('rowCount')
-            ->willReturn(1);
-
-        $this->dbal->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn(new MySqlPlatform());
-
-        $this->dbal->expects($this->once())
-            ->method('prepare')
-            ->willReturn($deleteStatement);
-
-        $dbalMessage = [
-            'body' => 'message.body',
-            'headers' => '{"header.key":"header.value"}',
-            'properties' => '{"property.key":"property.value"}',
-            'priority' => 1,
-            'queue' => 'test_queue',
-            'redelivered' => true,
-        ];
-
-        $this->dbal->expects($this->once())
-            ->method('insert')
-            ->with('oro_message_queue', $dbalMessage, [
-                'body' => 'text',
-                'headers' => 'text',
-                'properties' => 'text',
-                'priority' => 'smallint',
-                'queue' => 'string',
-                'redelivered' => 'boolean',
-            ])
+        $this->dbal
+            ->expects(self::once())
+            ->method('update')
+            ->with(
+                'oro_message_queue',
+                [
+                    'consumer_id' => null,
+                    'redelivered' => true,
+                ],
+                ['id' => 25],
+                [
+                    'id' => Types::INTEGER,
+                    'redelivered' => Types::BOOLEAN,
+                ]
+            )
             ->willReturn(0);
 
-        $this->connection->expects($this->exactly(2))
+        $this->connection
+            ->expects(self::once())
             ->method('getTableName')
             ->willReturn('oro_message_queue');
 
         $message = new DbalMessage();
-        $message->setId('message.id');
-        $message->setBody('message.body');
-        $message->setHeaders(['header.key' => 'header.value']);
-        $message->setProperties(['property.key' => 'property.value']);
-        $message->setPriority(1);
-        $message->setRedelivered(true);
+        $message->setId(25);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            sprintf('Expected record was inserted but it is not. message: "%s"', JSON::encode($dbalMessage))
+        $this->expectExceptionObject(
+            new RuntimeException('Failed to requeue a message with id "25". Expected 1 affected row, got 0.')
         );
 
         $this->consumer->reject($message, true);
     }
 
-    public function testRejectInvalidMessageException()
+    public function testRejectInvalidMessageException(): void
     {
         $this->expectException(InvalidMessageException::class);
         $this->expectExceptionMessage(
-            sprintf('The message must be an instance of %s but it is %s.', DbalMessage::class, NullMessage::class)
+            sprintf('The transport message must be instance of "%s".', DbalMessageInterface::class)
         );
 
-        $this->consumer->reject(new NullMessage());
+        $this->consumer->reject(new Message());
     }
 }

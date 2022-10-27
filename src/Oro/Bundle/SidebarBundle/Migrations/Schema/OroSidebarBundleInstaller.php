@@ -32,8 +32,6 @@ class OroSidebarBundleInstaller implements Installation
 
     /**
      * Create oro_sidebar_state table
-     *
-     * @param Schema $schema
      */
     protected function createOroSidebarStateTable(Schema $schema)
     {
@@ -49,8 +47,6 @@ class OroSidebarBundleInstaller implements Installation
 
     /**
      * Create oro_sidebar_widget table
-     *
-     * @param Schema $schema
      */
     protected function createOroSidebarWidgetTable(Schema $schema)
     {
@@ -72,8 +68,6 @@ class OroSidebarBundleInstaller implements Installation
 
     /**
      * Add oro_sidebar_state foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSidebarStateForeignKeys(Schema $schema)
     {
@@ -88,8 +82,6 @@ class OroSidebarBundleInstaller implements Installation
 
     /**
      * Add oro_sidebar_widget foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroSidebarWidgetForeignKeys(Schema $schema)
     {

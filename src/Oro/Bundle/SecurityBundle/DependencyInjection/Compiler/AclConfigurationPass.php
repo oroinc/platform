@@ -2,106 +2,90 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
+use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityRetrievalStrategy;
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Configures ACL related services.
+ */
 class AclConfigurationPass implements CompilerPassInterface
 {
-    const DEFAULT_ACL_DBAL_PROVIDER = 'security.acl.dbal.provider';
-    const NEW_ACL_PROVIDER = 'oro_security.acl.provider';
-
-    const DEFAULT_ACL_VOTER = 'security.acl.voter.basic_permissions';
-
-    const ACL_EXTENSION_SELECTOR = 'oro_security.acl.extension_selector';
-    const ACL_EXTENSION_TAG = 'oro_security.acl.extension';
+    use TaggedServiceTrait;
 
     /**
      * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
+        $this->substituteSecurityIdentityStrategy($container);
         $this->configureAclExtensionSelector($container);
         $this->configureDefaultAclProvider($container);
         $this->configureDefaultAclVoter($container);
+        $this->configureAclCache($container);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function configureAclExtensionSelector(ContainerBuilder $container)
+    private function substituteSecurityIdentityStrategy(ContainerBuilder $container): void
     {
-        if ($container->hasDefinition(self::ACL_EXTENSION_SELECTOR)) {
-            $selectorDef = $container->getDefinition(self::ACL_EXTENSION_SELECTOR);
-            $extensions = $this->loadAclExtensions($container);
-            foreach ($extensions as $extensionServiceId) {
-                $selectorDef->addMethodCall('addAclExtension', array(new Reference($extensionServiceId)));
-            }
-        }
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function configureDefaultAclProvider(ContainerBuilder $container)
-    {
-        if ($container->hasDefinition(self::DEFAULT_ACL_DBAL_PROVIDER)) {
-            $container->getDefinition(self::DEFAULT_ACL_DBAL_PROVIDER)->setClass(MutableAclProvider::class);
-        }
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
-    protected function configureDefaultAclVoter(ContainerBuilder $container)
-    {
-        if ($container->hasDefinition(self::DEFAULT_ACL_VOTER)) {
-            $voterDef = $container->getDefinition(self::DEFAULT_ACL_VOTER);
-            // substitute the ACL Provider and set the default ACL Provider as a base provider for new ACL Provider
-            if ($container->hasDefinition(self::NEW_ACL_PROVIDER)) {
-                $newProviderDef = $container->getDefinition(self::NEW_ACL_PROVIDER);
-                $newProviderDef->addMethodCall('setBaseAclProvider', array($voterDef->getArgument(0)));
-                $voterDef->replaceArgument(0, new Reference(self::NEW_ACL_PROVIDER));
-            }
-        }
-    }
-
-    /**
-     * Load ACL extensions and sort them by priority.
-     *
-     * @param  ContainerBuilder $container
-     * @return array
-     */
-    protected function loadAclExtensions(ContainerBuilder $container)
-    {
-        $extensions = array();
-        foreach ($container->findTaggedServiceIds(self::ACL_EXTENSION_TAG) as $id => $attributes) {
-            $priority = 0;
-            foreach ($attributes as $attr) {
-                if (isset($attr['priority'])) {
-                    $priority = (int) $attr['priority'];
-                    break;
-                }
-            }
-
-            $extensions[] = array('id' => $id, 'priority' => $priority);
-        }
-        usort(
-            $extensions,
-            function ($a, $b) {
-                return $a['priority'] == $b['priority']
-                    ? 0
-                    : ($a['priority'] < $b['priority']) ? -1 : 1;
-            }
+        $container->setDefinition(
+            'security.acl.security_identity_retrieval_strategy',
+            new Definition(SecurityIdentityRetrievalStrategy::class)
         );
+    }
 
-        return array_map(
-            function ($el) {
-                return $el['id'];
-            },
-            $extensions
-        );
+    private function configureAclExtensionSelector(ContainerBuilder $container): void
+    {
+        $extensions = [];
+        $taggedServices = $container->findTaggedServiceIds('oro_security.acl.extension');
+        foreach ($taggedServices as $id => $tags) {
+            $extensions[$this->getPriorityAttribute($tags[0])][$id] = new Reference($id);
+        }
+        if ($extensions) {
+            ksort($extensions);
+            $extensions = array_merge(...array_values($extensions));
+        }
+
+        $container->getDefinition('oro_security.acl.extension_selector')
+            ->setArgument('$extensionNames', array_keys($extensions))
+            ->setArgument('$extensionContainer', ServiceLocatorTagPass::register($container, $extensions));
+    }
+
+    private function configureDefaultAclProvider(ContainerBuilder $container): void
+    {
+        $container->getDefinition('security.acl.dbal.provider')
+            ->setClass(MutableAclProvider::class)
+            ->addMethodCall(
+                'setSecurityIdentityToStringConverter',
+                [new Reference('oro_security.acl.security_identity_to_string_converter')]
+            );
+    }
+
+    private function configureDefaultAclVoter(ContainerBuilder $container): void
+    {
+        $voterDef = $container->getDefinition('security.acl.voter.basic_permissions');
+        // substitute the ACL Provider and set the default ACL Provider as a base provider for new ACL Provider
+        $newProviderId = 'oro_security.acl.provider';
+        $newProviderDef = $container->getDefinition($newProviderId);
+        $newProviderDef->addMethodCall('setBaseAclProvider', [$voterDef->getArgument(0)]);
+        $voterDef->replaceArgument(0, new Reference($newProviderId));
+    }
+
+    private function configureAclCache(ContainerBuilder $container): void
+    {
+        $container->getDefinition('security.acl.cache.doctrine')
+            ->setClass(AclCache::class)
+            ->setArguments([
+                new Reference('security.acl.cache.doctrine.cache_impl'),
+                new Reference('oro_security.acl.permission_granting_strategy'),
+                new Reference('security.acl.underlying.cache'),
+                new Reference('event_dispatcher'),
+                new Reference('oro_security.acl.security_identity_to_string_converter')
+            ]);
     }
 }

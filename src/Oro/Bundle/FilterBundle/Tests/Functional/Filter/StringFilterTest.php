@@ -17,119 +17,142 @@ use Oro\Bundle\UserBundle\Entity\User;
 class StringFilterTest extends WebTestCase
 {
     /** @var StringFilter */
-    protected $filter;
+    private $filter;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadUserData::class]);
-        $this->filter = $this->getContainer()->get('oro_filter.string_filter');
+        $this->filter = self::getContainer()->get('oro_filter.string_filter');
+    }
+
+    private function createQueryBuilder(string $alias): QueryBuilder
+    {
+        $doctrine = self::getContainer()->get('doctrine');
+
+        return $doctrine->getRepository(User::class)->createQueryBuilder($alias);
     }
 
     /**
      * @dataProvider filterProvider
-     *
-     * @param string $filterName
-     * @param array $filterFormData
-     * @param array $expectedResult
      */
-    public function testFilter($filterName, array $filterFormData, array $expectedResult)
+    public function testFilterWithForm(string $filterName, array $filterData, array $expectedResult)
     {
         $qb = $this->createQueryBuilder('u');
         $qb->select('u.username')
             ->orderBy('u.username')
             ->andWhere($qb->expr()->in('u.username', ['u1', 'u2', 'u3']));
 
-        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->init($filterName, ['enabled' => true, 'type' => 'string', 'data_name' => $filterName]);
 
         $filterForm = $this->filter->getForm();
-        $filterForm->submit($filterFormData);
+        $filterForm->submit($filterData);
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
+        $data = $filterForm->getData();
 
-        $this->assertTrue($filterForm->isValid());
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->apply($ds, $data);
 
-        $this->filter->init($filterName, ['enabled' => true, 'type' => 'string', 'data_name' => $filterName]);
-        $this->filter->apply($ds, $filterForm->getData());
-
-        $this->assertSame($expectedResult, $ds->getQueryBuilder()->getQuery()->getResult());
+        $result = $ds->getQueryBuilder()->getQuery()->getResult();
+        self::assertSame($expectedResult, $result);
     }
 
     /**
-     * @return array
+     * @dataProvider filterProvider
      */
+    public function testFilterWithoutForm(string $filterName, array $filterData, array $expectedResult)
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u.username')
+            ->orderBy('u.username')
+            ->andWhere($qb->expr()->in('u.username', ['u1', 'u2', 'u3']));
+
+        $this->filter->init($filterName, ['enabled' => true, 'type' => 'string', 'data_name' => $filterName]);
+
+        $data = $this->filter->prepareData($filterData);
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->apply($ds, $data);
+
+        $result = $ds->getQueryBuilder()->getQuery()->getResult();
+        self::assertSame($expectedResult, $result);
+    }
+
     public function filterProvider()
     {
         return [
-            'Filter "not empty"' => [
-                'filterName' => 'u.username',
-                'filterFormData' => [
-                    'type' => FilterUtility::TYPE_NOT_EMPTY,
-                    'value' => FilterUtility::TYPE_NOT_EMPTY,
+            'Filter "not empty"'        => [
+                'filterName'     => 'u.username',
+                'filterData'     => [
+                    'type'  => FilterUtility::TYPE_NOT_EMPTY,
+                    'value' => FilterUtility::TYPE_NOT_EMPTY
                 ],
                 'expectedResult' => [
                     ['username' => 'u1'],
                     ['username' => 'u2'],
                     ['username' => 'u3']
-                ],
+                ]
             ],
-            'Filter "empty"' => [
-                'filterName' => 'u.username',
-                'filterFormData' => [
-                    'type' => FilterUtility::TYPE_EMPTY,
-                    'value' => FilterUtility::TYPE_EMPTY,
+            'Filter "empty"'            => [
+                'filterName'     => 'u.username',
+                'filterData'     => [
+                    'type'  => FilterUtility::TYPE_EMPTY,
+                    'value' => FilterUtility::TYPE_EMPTY
                 ],
-                'expectedResult' => [ ],
+                'expectedResult' => []
             ],
-            'Filter "equal"' => [
-                'filterName' => 'u.username',
-                'filterFormData' => [
-                    'type' => TextFilterType::TYPE_EQUAL,
-                    'value' => 'u1',
+            'Filter "equal"'            => [
+                'filterName'     => 'u.username',
+                'filterData'     => [
+                    'type'  => TextFilterType::TYPE_EQUAL,
+                    'value' => 'u1'
                 ],
                 'expectedResult' => [
                     ['username' => 'u1']
-                ],
+                ]
             ],
-            'Filter "contains"' => [
-                'filterName' => 'u.username',
-                'filterFormData' => [
-                    'type' => TextFilterType::TYPE_CONTAINS,
-                    'value' => 'u',
+            'Filter "contains"'         => [
+                'filterName'     => 'u.username',
+                'filterData'     => [
+                    'type'  => TextFilterType::TYPE_CONTAINS,
+                    'value' => 'u'
                 ],
                 'expectedResult' => [
                     ['username' => 'u1'],
                     ['username' => 'u2'],
                     ['username' => 'u3']
-                ],
+                ]
             ],
             'Filter "does not contain"' => [
-                'filterName' => 'u.username',
-                'filterFormData' => [
-                    'type' => TextFilterType::TYPE_NOT_CONTAINS,
-                    'value' => 'u',
+                'filterName'     => 'u.username',
+                'filterData'     => [
+                    'type'  => TextFilterType::TYPE_NOT_CONTAINS,
+                    'value' => 'u'
                 ],
-                'expectedResult' => [],
+                'expectedResult' => []
             ],
-            'Filter "starts with"' => [
-                'filterName' => 'u.username',
-                'filterFormData' => [
-                    'type' => TextFilterType::TYPE_STARTS_WITH,
-                    'value' => 'u',
+            'Filter "starts with"'      => [
+                'filterName'     => 'u.username',
+                'filterData'     => [
+                    'type'  => TextFilterType::TYPE_STARTS_WITH,
+                    'value' => 'u'
                 ],
                 'expectedResult' => [
                     ['username' => 'u1'],
                     ['username' => 'u2'],
                     ['username' => 'u3']
-                ],
+                ]
             ],
-            'Filter "ends with"' => [
-                'filterName' => 'u.username',
-                'filterFormData' => [
-                    'type' => TextFilterType::TYPE_ENDS_WITH,
-                    'value' => '3',
+            'Filter "ends with"'        => [
+                'filterName'     => 'u.username',
+                'filterData'     => [
+                    'type'  => TextFilterType::TYPE_ENDS_WITH,
+                    'value' => '3'
                 ],
                 'expectedResult' => [
                     ['username' => 'u3']
-                ],
+                ]
             ]
         ];
     }
@@ -141,26 +164,26 @@ class StringFilterTest extends WebTestCase
             ->join('u.emails', 'e')
             ->orderBy('u.username');
 
-        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->init('string', ['data_name' => 'e.email']);
 
         $filterForm = $this->filter->getForm();
         $filterForm->submit(['type' => TextFilterType::TYPE_CONTAINS, 'value' => 'test2']);
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
-        $this->assertTrue($filterForm->isValid());
-
-        $this->filter->init('string', ['data_name' => 'e.email']);
+        $ds = new OrmFilterDatasourceAdapter($qb);
         $this->filter->apply($ds, $filterForm->getData());
 
         $qb = $ds->getQueryBuilder();
 
         $actualData = $qb->getQuery()->getResult();
-        $this->assertCount(1, $actualData);
-        $this->assertEquals(['username' => 'u2', 'email' => 'test2@example.com'], $actualData[0]);
+        self::assertCount(1, $actualData);
+        self::assertEquals(['username' => 'u2', 'email' => 'test2@example.com'], $actualData[0]);
 
         $whereParts = $qb->getDQLPart('where')->getParts();
-        $this->assertCount(1, $whereParts);
-        $this->assertContains('EXISTS(SELECT', $whereParts[0]);
-        $this->assertNotContains('GROUP BY ', $whereParts[0]);
+        self::assertCount(1, $whereParts);
+        self::assertStringContainsString('EXISTS(SELECT', $whereParts[0]);
+        self::assertStringNotContainsString('GROUP BY ', $whereParts[0]);
     }
 
     public function testStringInHasGroupBy()
@@ -172,26 +195,58 @@ class StringFilterTest extends WebTestCase
             ->andWhere($qb->expr()->in('u.username', ['u1', 'u2']))
             ->addGroupBy('u.id, e.id');
 
-        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->init('string', ['data_name' => 'e.email']);
 
         $filterForm = $this->filter->getForm();
         $filterForm->submit(['type' => TextFilterType::TYPE_IN, 'value' => 'test2@example.com']);
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
-        $this->assertTrue($filterForm->isValid());
-
-        $this->filter->init('string', ['data_name' => 'e.email']);
+        $ds = new OrmFilterDatasourceAdapter($qb);
         $this->filter->apply($ds, $filterForm->getData());
 
         $qb = $ds->getQueryBuilder();
 
         $actualData = $qb->getQuery()->getResult();
-        $this->assertCount(1, $actualData);
-        $this->assertEquals(['username' => 'u2', 'email' => 'test2@example.com'], $actualData[0]);
+        self::assertCount(1, $actualData);
+        self::assertEquals(['username' => 'u2', 'email' => 'test2@example.com'], $actualData[0]);
 
         $whereParts = $qb->getDQLPart('where')->getParts();
-        $this->assertCount(2, $whereParts);
-        $this->assertContains('EXISTS(SELECT', $whereParts[1]);
-        $this->assertContains('GROUP BY ', $whereParts[1]);
+        self::assertCount(2, $whereParts);
+        self::assertStringContainsString('EXISTS(SELECT', $whereParts[1]);
+        self::assertStringNotContainsString('GROUP BY ', $whereParts[1]);
+    }
+
+    public function testStringInHasGroupByAndHaving()
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u.username, e.email')
+            ->join('u.emails', 'e')
+            ->orderBy('u.username')
+            ->andWhere($qb->expr()->in('u.username', ['u1', 'u2']))
+            ->addGroupBy('u.id, e.id')
+            ->having('MIN(u.id) > 0');
+
+        $this->filter->init('string', ['data_name' => 'e.email']);
+
+        $filterForm = $this->filter->getForm();
+        $filterForm->submit(['type' => TextFilterType::TYPE_IN, 'value' => 'test2@example.com']);
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->apply($ds, $filterForm->getData());
+
+        $qb = $ds->getQueryBuilder();
+
+        $actualData = $qb->getQuery()->getResult();
+        self::assertCount(1, $actualData);
+        self::assertEquals(['username' => 'u2', 'email' => 'test2@example.com'], $actualData[0]);
+
+        $whereParts = $qb->getDQLPart('where')->getParts();
+        self::assertCount(2, $whereParts);
+        self::assertStringContainsString('EXISTS(SELECT', $whereParts[1]);
+        self::assertStringContainsString('GROUP BY ', $whereParts[1]);
     }
 
     public function testStringNotInHasRelatedJoinWithWhere()
@@ -202,37 +257,24 @@ class StringFilterTest extends WebTestCase
             ->orderBy('u.username')
             ->andWhere($qb->expr()->in('u.username', ['u1', 'u2']));
 
-        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->init('string', ['data_name' => 'e.email']);
 
         $filterForm = $this->filter->getForm();
         $filterForm->submit(['type' => TextFilterType::TYPE_NOT_IN, 'value' => 'test1@example.com']);
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
 
-        $this->assertTrue($filterForm->isValid());
-
-        $this->filter->init('string', ['data_name' => 'e.email']);
+        $ds = new OrmFilterDatasourceAdapter($qb);
         $this->filter->apply($ds, $filterForm->getData());
 
         $qb = $ds->getQueryBuilder();
         $actualData = $qb->getQuery()->getResult();
-        $this->assertCount(1, $actualData);
+        self::assertCount(1, $actualData);
 
-        $this->assertEquals(['username' => 'u2', 'email' => 'test2@example.com'], $actualData[0]);
+        self::assertEquals(['username' => 'u2', 'email' => 'test2@example.com'], $actualData[0]);
         $whereParts = $qb->getDQLPart('where')->getParts();
-        $this->assertCount(2, $whereParts);
-        $this->assertContains('EXISTS(SELECT', $whereParts[1]);
-        $this->assertNotContains('GROUP BY ', $whereParts[1]);
-    }
-
-    /**
-     * @param string $alias
-     * @return QueryBuilder
-     */
-    protected function createQueryBuilder($alias)
-    {
-        $doctrine = $this->getContainer()->get('doctrine');
-        $objectManager = $doctrine->getManagerForClass(User::class);
-        $repository = $objectManager->getRepository(User::class);
-
-        return $repository->createQueryBuilder($alias);
+        self::assertCount(2, $whereParts);
+        self::assertStringContainsString('EXISTS(SELECT', $whereParts[1]);
+        self::assertStringNotContainsString('GROUP BY ', $whereParts[1]);
     }
 }

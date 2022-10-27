@@ -2,39 +2,36 @@
 
 namespace Oro\Bundle\ImapBundle\Sync;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManagerFactory;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Psr\Log\LoggerAwareTrait;
 
+/**
+ * The factory that creates ImapEmailSynchronizationProcessor.
+ */
 class ImapEmailSynchronizationProcessorFactory
 {
     use LoggerAwareTrait;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    protected ManagerRegistry $doctrine;
+    protected EmailEntityBuilder $emailEntityBuilder;
+    protected ImapEmailRemoveManager $removeManager;
+    private ImapEmailFolderManagerFactory $imapEmailFolderManagerFactory;
 
-    /** @var EmailEntityBuilder */
-    protected $emailEntityBuilder;
-
-    /** @var ImapEmailRemoveManager */
-    protected $removeManager;
-
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param ImapEmailRemoveManager $removeManager
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         EmailEntityBuilder $emailEntityBuilder,
-        ImapEmailRemoveManager $removeManager
+        ImapEmailRemoveManager $removeManager,
+        ImapEmailFolderManagerFactory $imapEmailFolderManagerFactory
     ) {
         $this->doctrine = $doctrine;
         $this->emailEntityBuilder = $emailEntityBuilder;
         $this->removeManager = $removeManager;
+        $this->imapEmailFolderManagerFactory = $imapEmailFolderManagerFactory;
     }
 
     /**
@@ -54,7 +51,8 @@ class ImapEmailSynchronizationProcessorFactory
             $this->emailEntityBuilder,
             $knownEmailAddressChecker,
             $emailManager,
-            $this->removeManager
+            $this->removeManager,
+            $this->imapEmailFolderManagerFactory
         );
         $processor->setEmailErrorsLogger($this->logger);
 

@@ -3,30 +3,34 @@
 namespace Oro\Component\Routing\Tests\Unit\Loader;
 
 use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
+use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderResolverInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $kernel;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var RouteOptionsResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $routeOptionsResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoaderResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $loaderResolver;
 
     /** @var CumulativeRoutingFileLoader */
     private $loader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-
-        $this->routeOptionsResolver = $this->createMock('Oro\Component\Routing\Resolver\RouteOptionsResolverInterface');
-
-        $this->loaderResolver = $this->createMock('Symfony\Component\Config\Loader\LoaderResolverInterface');
+        $this->kernel = $this->createMock(KernelInterface::class);
+        $this->routeOptionsResolver = $this->createMock(RouteOptionsResolverInterface::class);
+        $this->loaderResolver = $this->createMock(LoaderResolverInterface::class);
 
         $this->loader = new CumulativeRoutingFileLoader(
             $this->kernel,
@@ -37,13 +41,13 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
         $this->loader->setResolver($this->loaderResolver);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
-        $this->assertTrue($this->loader->supports(null, 'auto'));
-        $this->assertFalse($this->loader->supports(null, 'another'));
+        self::assertTrue($this->loader->supports(null, 'auto'));
+        self::assertFalse($this->loader->supports(null, 'another'));
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $rootDir = str_replace('\\', '/', realpath(__DIR__ . '/../Fixtures/Bundles'));
 
@@ -53,28 +57,28 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
 
         /** @var \PHPUnit\Framework\MockObject\MockObject[] $bundles */
         $bundles = [
-            'bundle1' => $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface'),
-            'bundle2' => $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface'),
-            'bundle3' => $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface')
+            'bundle1' => $this->createMock(BundleInterface::class),
+            'bundle2' => $this->createMock(BundleInterface::class),
+            'bundle3' => $this->createMock(BundleInterface::class)
         ];
 
-        $bundles['bundle1']->expects($this->any())
+        $bundles['bundle1']->expects(self::any())
             ->method('getPath')
             ->willReturn($rootDir . '/Bundle1');
-        $bundles['bundle2']->expects($this->any())
+        $bundles['bundle2']->expects(self::any())
             ->method('getPath')
             ->willReturn($rootDir . '/Bundle2');
-        $bundles['bundle3']->expects($this->any())
+        $bundles['bundle3']->expects(self::any())
             ->method('getPath')
             ->willReturn($rootDir . '/Bundle3');
 
-        $this->kernel->expects($this->once())
+        $this->kernel->expects(self::once())
             ->method('getBundles')
             ->willReturn($bundles);
 
-        $yamlLoader = $this->createMock('Symfony\Component\Config\Loader\LoaderInterface');
+        $yamlLoader = $this->createMock(LoaderInterface::class);
 
-        $this->loaderResolver->expects($this->exactly(2))
+        $this->loaderResolver->expects(self::exactly(2))
             ->method('resolve')
             ->willReturnCallback(
                 function ($resource) use ($rootDir, $yamlLoader) {
@@ -90,7 +94,7 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $yamlLoader->expects($this->exactly(2))
+        $yamlLoader->expects(self::exactly(2))
             ->method('load')
             ->willReturnCallback(
                 function ($resource) use ($rootDir, $loadedRoutes) {
@@ -106,22 +110,22 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->routeOptionsResolver->expects($this->at(0))
+        $this->routeOptionsResolver->expects(self::exactly(2))
             ->method('resolve')
-            ->with(
-                $this->identicalTo($loadedRoutes->get('route1')),
-                $this->isInstanceOf('Oro\Component\Routing\Resolver\RouteCollectionAccessor')
-            );
-        $this->routeOptionsResolver->expects($this->at(1))
-            ->method('resolve')
-            ->with(
-                $this->identicalTo($loadedRoutes->get('route2')),
-                $this->isInstanceOf('Oro\Component\Routing\Resolver\RouteCollectionAccessor')
+            ->withConsecutive(
+                [
+                    $this->identicalTo($loadedRoutes->get('route2')),
+                    $this->isInstanceOf(RouteCollectionAccessor::class)
+                ],
+                [
+                    $this->identicalTo($loadedRoutes->get('route1')),
+                    $this->isInstanceOf(RouteCollectionAccessor::class)
+                ]
             );
 
         $routes = $this->loader->load(null, 'auto');
 
-        $this->assertEquals(
+        self::assertEquals(
             ['route2', 'route1'],
             array_keys($routes->all())
         );

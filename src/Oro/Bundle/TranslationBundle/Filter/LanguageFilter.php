@@ -7,6 +7,9 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
 
+/**
+ * The filter by a language.
+ */
 class LanguageFilter extends EntityFilter
 {
     /**

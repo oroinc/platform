@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\EmailBundle\Builder;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;

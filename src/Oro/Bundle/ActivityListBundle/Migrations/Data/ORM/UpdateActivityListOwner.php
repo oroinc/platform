@@ -4,16 +4,20 @@ namespace Oro\Bundle\ActivityListBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Adds owners to the activity lists
+ */
 class UpdateActivityListOwner extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
     const BATCH_SIZE = 200;
@@ -52,18 +56,16 @@ class UpdateActivityListOwner extends AbstractFixture implements DependentFixtur
 
     /**
      * Update ActivityList Owner
-     *
-     * @param ObjectManager $manager
      */
     public function updateActivityListOwner(ObjectManager $manager)
     {
-        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
+        if ($this->container->get(ApplicationState::class)->isInstalled()) {
             /** @var ActivityListChainProvider $activitiesProvider */
             $activitiesProvider = $this->container->get('oro_activity_list.provider.chain');
 
             /** @var QueryBuilder $activityListBuilder */
             $queryBuilder = $manager
-                ->getRepository('OroActivityListBundle:ActivityList')
+                ->getRepository(ActivityList::class)
                 ->createQueryBuilder('e');
 
             $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);

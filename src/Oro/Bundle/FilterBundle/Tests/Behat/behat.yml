@@ -5,7 +5,11 @@ oro_behat_extension:
     FilterConditionDropdown:
       selector:
         type: xpath
-        locator: "(//div[contains(@class, 'condition-container')]//a[contains(@class, 'dropdown-toggle')] | //div[contains(@class, 'condition-container')]//div/div/button)[last()]"
+        locator: "(//div[contains(@class, 'condition-container')]//a[contains(@class, 'dropdown-toggle')])[last()]"
+    FilterConditionDropdownButton:
+      selector:
+        type: xpath
+        locator: "(//div[contains(@class, 'condition-container')]//div/div/button)[last()]"
     RemoveCondition:
         selector: ".condition .btn-close"
     LastConditionItem:
@@ -16,9 +20,9 @@ oro_behat_extension:
     OroFilterBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
-        - OroSecurityBundle::ACLContext
-        - OroFilterBundle::FilterContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
+        - Oro\Bundle\FilterBundle\Tests\Behat\Context\FilterContext
       paths:
         - '@OroFilterBundle/Tests/Behat/Features'

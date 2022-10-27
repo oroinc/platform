@@ -2,14 +2,18 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\TemplateFixture;
 
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface;
+use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TemplateEntityRegistry */
-    protected $entityRegistry;
+    private $entityRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityRegistry = new TemplateEntityRegistry();
     }
@@ -44,7 +48,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(
             $this->entityRegistry->hasEntity('Test\Entity', 'test3')
         );
-        $this->expectException('Oro\Bundle\ImportExportBundle\Exception\LogicException');
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The entity "Test\Entity" with key "test3" does not exist.');
         $this->entityRegistry->getEntity('Test\Entity', 'test3');
     }
@@ -56,7 +60,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 
         $this->entityRegistry->addEntity('Test\Entity', 'test1', $entity1);
 
-        $this->expectException('Oro\Bundle\ImportExportBundle\Exception\LogicException');
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The entity "Test\Entity" with key "test1" is already exist.');
         $this->entityRegistry->addEntity('Test\Entity', 'test1', $entity2);
     }
@@ -68,38 +72,27 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 
         $this->entityRegistry->addEntity('Test\Entity1', 'test1', $entity1);
 
-        $repository1 = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
-        );
-        $repository2 = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
-        );
+        $repository1 = $this->createMock(TemplateEntityRepositoryInterface::class);
+        $repository2 = $this->createMock(TemplateEntityRepositoryInterface::class);
 
-        $templateManager = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $templateManager = $this->createMock(TemplateManager::class);
 
-        $templateManager->expects($this->at(0))
-            ->method('getEntityRepository')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($repository1));
         $repository1->expects($this->once())
             ->method('fillEntityData')
             ->with('test1', $this->identicalTo($entity1))
-            ->will(
-                $this->returnCallback(
-                    function ($key, $entity) use ($entity2) {
-                        $this->entityRegistry->addEntity('Test\Entity2', 'test2', $entity2);
-                    }
-                )
-            );
-        $templateManager->expects($this->at(1))
-            ->method('getEntityRepository')
-            ->with('Test\Entity2')
-            ->will($this->returnValue($repository2));
+            ->willReturnCallback(function () use ($entity2) {
+                $this->entityRegistry->addEntity('Test\Entity2', 'test2', $entity2);
+            });
         $repository2->expects($this->once())
             ->method('fillEntityData')
             ->with('test2', $this->identicalTo($entity2));
+
+        $templateManager->expects($this->exactly(2))
+            ->method('getEntityRepository')
+            ->willReturnMap([
+                ['Test\Entity1', $repository1],
+                ['Test\Entity2', $repository2]
+            ]);
 
         $data = $this->entityRegistry->getData($templateManager, 'Test\Entity1', 'test1');
         $data = iterator_to_array($data);
@@ -116,52 +109,34 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 
         $this->entityRegistry->addEntity('Test\Entity1', 'test1', $entity1);
 
-        $repository1 = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
-        );
-        $repository2 = $this->createMock(
-            'Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface'
-        );
+        $repository1 = $this->createMock(TemplateEntityRepositoryInterface::class);
+        $repository2 = $this->createMock(TemplateEntityRepositoryInterface::class);
 
-        $templateManager = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $templateManager = $this->createMock(TemplateManager::class);
 
-        $templateManager->expects($this->at(0))
-            ->method('getEntityRepository')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($repository1));
-        $repository1->expects($this->at(0))
+        $repository1->expects($this->exactly(2))
             ->method('fillEntityData')
-            ->with('test1', $this->identicalTo($entity1))
-            ->will(
-                $this->returnCallback(
-                    function ($key, $entity) use ($entity2) {
-                        $this->entityRegistry->addEntity('Test\Entity2', 'test2', $entity2);
-                    }
-                )
+            ->withConsecutive(['test1', $this->identicalTo($entity1)], ['test3', $this->identicalTo($entity3)])
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function () use ($entity2) {
+                    $this->entityRegistry->addEntity('Test\Entity2', 'test2', $entity2);
+                }),
+                new ReturnCallback(function () {
+                })
             );
-        $templateManager->expects($this->at(1))
-            ->method('getEntityRepository')
-            ->with('Test\Entity2')
-            ->will($this->returnValue($repository2));
         $repository2->expects($this->once())
             ->method('fillEntityData')
             ->with('test2', $this->identicalTo($entity2))
-            ->will(
-                $this->returnCallback(
-                    function ($key, $entity) use ($entity3) {
-                        $this->entityRegistry->addEntity('Test\Entity1', 'test3', $entity3);
-                    }
-                )
-            );
-        $templateManager->expects($this->at(2))
+            ->willReturnCallback(function () use ($entity3) {
+                $this->entityRegistry->addEntity('Test\Entity1', 'test3', $entity3);
+            });
+
+        $templateManager->expects($this->exactly(3))
             ->method('getEntityRepository')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($repository1));
-        $repository1->expects($this->at(1))
-            ->method('fillEntityData')
-            ->with('test3', $this->identicalTo($entity3));
+            ->willReturnMap([
+                ['Test\Entity1', $repository1],
+                ['Test\Entity2', $repository2]
+            ]);
 
         $data = $this->entityRegistry->getData($templateManager, 'Test\Entity1');
         $data = iterator_to_array($data);

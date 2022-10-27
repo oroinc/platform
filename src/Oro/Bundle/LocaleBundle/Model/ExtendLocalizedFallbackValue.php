@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Model;
 
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
+
 /**
- * @deprecated since 2.1 and will be removed in 2.3 release
+ * Extend class for LocalizedFallbackValue Entity
  */
-class ExtendLocalizedFallbackValue
+class ExtendLocalizedFallbackValue extends AbstractLocalizedFallbackValue
 {
     /**
      * Constructor

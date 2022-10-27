@@ -9,8 +9,12 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Migration\ResetContainerMigration;
 
-class UpdateExtendConfigMigration implements Migration, DataStorageExtensionAwareInterface
+/**
+ * Update Extend Config Migration
+ */
+class UpdateExtendConfigMigration implements Migration, ResetContainerMigration, DataStorageExtensionAwareInterface
 {
     /** @var CommandExecutor */
     protected $commandExecutor;

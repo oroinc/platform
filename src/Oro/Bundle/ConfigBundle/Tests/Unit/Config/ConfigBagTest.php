@@ -3,186 +3,178 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
+use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigBagTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    protected function tearDown()
+    private function createConfigBag(array $config): ConfigBag
     {
-        parent::tearDown();
-        unset($this->container);
+        return new ConfigBag($config, $this->container);
     }
 
     public function testGetConfig()
     {
         $config = ['key' => 'value'];
 
-        $configBag = new ConfigBag($config, $this->container);
+        $configBag = $this->createConfigBag($config);
 
         $this->assertEquals($config, $configBag->getConfig());
     }
 
-    public function testGetNullDataTransformer()
+    public function testGetDataTransformerWhenContainerReturnsNull()
     {
-        $config    = [
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('test.service')
+            ->willReturn(null);
+
+        $config = [
             'fields' => [
                 'test_key' => [
                     'data_transformer' => 'test.service'
                 ]
             ]
         ];
-        $configBag = new ConfigBag($config, $this->container);
+        $configBag = $this->createConfigBag($config);
+
+        $this->assertEquals(null, $configBag->getDataTransformer('test_key'));
+    }
+
+    public function testGetDataTransformerWhenServiceNotFound()
+    {
+        $this->expectException(ServiceNotFoundException::class);
+
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('test.service')
+            ->willThrowException(new ServiceNotFoundException('test.service'));
+
+        $config = [
+            'fields' => [
+                'test_key' => [
+                    'data_transformer' => 'test.service'
+                ]
+            ]
+        ];
+        $configBag = $this->createConfigBag($config);
 
         $this->assertEquals(null, $configBag->getDataTransformer('test_key'));
     }
 
     public function testGetDataTransformer()
     {
-        $transformer = $this->createMock('Oro\Bundle\ConfigBundle\Config\DataTransformerInterface');
+        $transformer = $this->createMock(DataTransformerInterface::class);
         $this->container->expects($this->once())
             ->method('get')
             ->with('test.service')
-            ->will($this->returnValue($transformer));
+            ->willReturn($transformer);
 
-        $config    = [
+        $config = [
             'fields' => [
                 'test_key' => [
                     'data_transformer' => 'test.service'
                 ]
             ]
         ];
-        $configBag = new ConfigBag($config, $this->container);
+        $configBag = $this->createConfigBag($config);
 
         $this->assertSame($transformer, $configBag->getDataTransformer('test_key'));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\ConfigBundle\Config\DataTransformerInterface"
-     */
     public function testGetDataTransformerWithUnexpectedType()
     {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage(sprintf('Expected argument of type "%s"', DataTransformerInterface::class));
+
         $this->container->expects($this->once())
             ->method('get')
             ->with('test.service')
-            ->will($this->returnValue(new \stdClass()));
-        $config    = [
+            ->willReturn(new \stdClass());
+
+        $config = [
             'fields' => [
                 'test_key' => [
                     'data_transformer' => 'test.service'
                 ]
             ]
         ];
-        $configBag = new ConfigBag($config, $this->container);
+        $configBag = $this->createConfigBag($config);
 
         $configBag->getDataTransformer('test_key');
     }
 
-    /**
-     * @dataProvider fieldsRootDataProvider
-     *
-     * @param array  $config
-     * @param string $node
-     * @param mixed  $expectedResult
-     */
-    public function testGetFieldsRoot($config, $node, $expectedResult)
+    public function testGetFieldsRootWhenFieldsRootDoesNotExist()
     {
-        $configBag = new ConfigBag($config, $this->container);
-        $this->assertEquals($expectedResult, $configBag->getFieldsRoot($node));
+        $config = [];
+        $configBag = $this->createConfigBag($config);
+
+        $this->assertFalse($configBag->getFieldsRoot('test'));
     }
 
-    public function fieldsRootDataProvider()
+    public function testGetFieldsRootWhenFieldsRootExists()
     {
-        return [
-            'fields root does not exists' => [
-                'config'         => [],
-                'node'           => 'test',
-                'expectedResult' => false
-            ],
-            'fields root exists'          => [
-                'config'         => [
-                    ProcessorDecorator::FIELDS_ROOT => [
-                        'test' => 'value'
-                    ]
-                ],
-                'node'           => 'test',
-                'expectedResult' => 'value'
+        $config = [
+            ProcessorDecorator::FIELDS_ROOT => [
+                'test' => 'value'
             ]
         ];
+        $configBag = $this->createConfigBag($config);
+
+        $this->assertEquals('value', $configBag->getFieldsRoot('test'));
     }
 
-    /**
-     * @dataProvider treeRootDataProvider
-     *
-     * @param array  $config
-     * @param string $treeName
-     * @param mixed  $expectedResult
-     */
-    public function testGetTreeRoot($config, $treeName, $expectedResult)
+    public function testGetTreeRootWhenTreeRootDoesNotExist()
     {
-        $configBag = new ConfigBag($config, $this->container);
+        $config = [];
+        $configBag = $this->createConfigBag($config);
 
-        $this->assertEquals($expectedResult, $configBag->getTreeRoot($treeName));
+        $this->assertFalse($configBag->getTreeRoot('test'));
     }
 
-    public function treeRootDataProvider()
+    public function testGetTreeRootWhenTreeRootExists()
     {
-        return [
-            'tree root does not exists' => [
-                'config'         => [],
-                'treeName'       => 'test',
-                'expectedResult' => false
-            ],
-            'tree root exists'          => [
-                'config'         => [
-                    ProcessorDecorator::TREE_ROOT => [
-                        'test' => 'value'
-                    ]
-                ],
-                'treeName'       => 'test',
-                'expectedResult' => 'value'
+        $config = [
+            ProcessorDecorator::TREE_ROOT => [
+                'test' => 'value'
             ]
         ];
+        $configBag = $this->createConfigBag($config);
+
+        $this->assertEquals('value', $configBag->getTreeRoot('test'));
     }
 
-    /**
-     * @dataProvider groupsNodeDataProvider
-     *
-     * @param array  $config
-     * @param string $name
-     * @param mixed  $expectedResult
-     */
-    public function testGetGroupsNode($config, $name, $expectedResult)
+    public function testGetGroupsNodeWhenGroupsNodeDoesNotExist()
     {
-        $configBag = new ConfigBag($config, $this->container);
-        $this->assertEquals($expectedResult, $configBag->getGroupsNode($name));
+        $config = [];
+        $configBag = $this->createConfigBag($config);
+
+        $this->assertFalse($configBag->getGroupsNode('test'));
     }
 
-    public function groupsNodeDataProvider()
+    public function testGetGroupsNodeWhenGroupsNodeExists()
     {
-        return [
-            'groups node does not exists' => [
-                'config'         => [],
-                'name'           => 'test',
-                'expectedResult' => false
-            ],
-            'groups node exists'          => [
-                'config'         => [
-                    ProcessorDecorator::GROUPS_NODE => [
-                        'test' => 'value'
-                    ]
-                ],
-                'name'           => 'test',
-                'expectedResult' => 'value'
+        $config = [
+            ProcessorDecorator::GROUPS_NODE => [
+                'test' => 'value'
             ]
         ];
+        $configBag = $this->createConfigBag($config);
+
+        $this->assertEquals('value', $configBag->getGroupsNode('test'));
     }
 }

@@ -17,10 +17,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, UnidirectionalFieldHelper::isFieldUnidirectional($fieldName));
     }
 
-    /**
-     * @return array
-     */
-    public function isFieldUnidirectionalDataProvider()
+    public function isFieldUnidirectionalDataProvider(): array
     {
         return [
             'unidirectional' => [
@@ -32,7 +29,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
                 'expected' => false,
             ],
             'null' => [
-                'fieldName' => null,
+                'fieldName' => '',
                 'expected' => false,
             ],
             '2 delimiters' => [
@@ -53,10 +50,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, UnidirectionalFieldHelper::getRealFieldName($fieldName));
     }
 
-    /**
-     * @return array
-     */
-    public function getRealFieldNameDataProvider()
+    public function getRealFieldNameDataProvider(): array
     {
         return [
             'unidirectional' => [
@@ -68,8 +62,8 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
                 'expected' => 'not_unidirectional_field',
             ],
             'null' => [
-                'fieldName' => null,
-                'expected' => null,
+                'fieldName' => '',
+                'expected' => '',
             ],
             '2 delimiters' => [
                 'fieldName' => implode(UnidirectionalFieldHelper::DELIMITER, ['some', 'test', 'field']),
@@ -89,10 +83,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, UnidirectionalFieldHelper::getRealFieldClass($fieldName));
     }
 
-    /**
-     * @return array
-     */
-    public function getRealFieldClassDataProvider()
+    public function getRealFieldClassDataProvider(): array
     {
         return [
             'unidirectional' => [
@@ -101,15 +92,15 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
             ],
             'not unidirectional' => [
                 'fieldName' => 'not_unidirectional_field',
-                'expected' => null,
+                'expected' => '',
             ],
             'null' => [
-                'fieldName' => null,
-                'expected' => null,
+                'fieldName' => '',
+                'expected' => '',
             ],
             '2 delimiters' => [
                 'fieldName' => implode(UnidirectionalFieldHelper::DELIMITER, ['some', 'test', 'field']),
-                'expected' => null,
+                'expected' => '',
             ],
         ];
     }

@@ -1,19 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var RolePermissionsActionView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var DropdownMenuCollectionView = require('oroui/js/app/views/dropdown-menu-collection-view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const DropdownMenuCollectionView = require('oroui/js/app/views/dropdown-menu-collection-view');
 
-    RolePermissionsActionView = BaseView.extend({
+    const RolePermissionsActionView = BaseView.extend({
         className: 'dropleft',
 
         icon: '',
 
         autoRender: true,
 
-        template: require('tpl!orouser/templates/datagrid/role-permissions-action-view.html'),
+        template: require('tpl-loader!orouser/templates/datagrid/role-permissions-action-view.html'),
 
         /**
          * @type {AccessLevelsCollection}
@@ -27,20 +26,19 @@ define(function(require) {
 
         events: {
             'shown.bs.dropdown': 'onDropdownOpen',
-            'click': '_showDropdown',
             'mouseover .dropdown-toggle': '_showDropdown',
             'mouseleave': '_hideDropdown'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function RolePermissionsActionView() {
-            RolePermissionsActionView.__super__.constructor.apply(this, arguments);
+        constructor: function RolePermissionsActionView(options) {
+            RolePermissionsActionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['accessLevels', 'action']));
@@ -64,23 +62,23 @@ define(function(require) {
         },
 
         render: function() {
-            var dropdown = this.subview('dropdown');
+            const dropdown = this.subview('dropdown');
             if (dropdown) {
                 this.$('[data-toggle="dropdown"]').dropdown('dispose');
                 dropdown.$el.detach();
             }
             RolePermissionsActionView.__super__.render.call(this);
             if (dropdown) {
-                this.$('.dropdown-menu').replaceWith(dropdown.$el);
+                this.$('[data-role="dropdown-menu-content"]').replaceWith(dropdown.$el);
             }
         },
 
         onDropdownOpen: function(e) {
-            var dropdown = this.subview('dropdown');
-            var accessLevels = this.accessLevels;
+            let dropdown = this.subview('dropdown');
+            const accessLevels = this.accessLevels;
             if (!dropdown) {
                 dropdown = new DropdownMenuCollectionView({
-                    el: this.$('.dropdown-menu'),
+                    el: this.$('[data-role="dropdown-menu-content"]'),
                     collection: accessLevels,
                     keysMap: {
                         id: 'access_level',

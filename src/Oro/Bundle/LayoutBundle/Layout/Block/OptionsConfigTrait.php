@@ -54,9 +54,6 @@ trait OptionsConfigTrait
         }
     }
 
-    /**
-     * @param array $options
-     */
     public function setOptionsConfig(array $options)
     {
         foreach ($options as $optionName => $optionSettings) {

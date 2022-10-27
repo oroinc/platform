@@ -1,0 +1,7 @@
+services:
+    oro_cron.tests.cron_helper:
+        class: Oro\Bundle\CronBundle\Tests\Functional\Stub\CronHelperStub
+        public: true
+        decorates: oro_cron.cron_helper
+        arguments:
+            - '@.inner'

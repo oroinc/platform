@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider;
 
-use Doctrine\Common\Persistence\ObjectRepository;
-
 final class FeatureAvgTimeRegistry implements AvgTimeProviderInterface
 {
     /**
@@ -58,9 +56,6 @@ final class FeatureAvgTimeRegistry implements AvgTimeProviderInterface
         return $this->averageTime;
     }
 
-    /**
-     * @param AvgTimeProviderInterface $provider
-     */
     public function addProvider(AvgTimeProviderInterface $provider)
     {
         $this->providers[] = $provider;

@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ApiBundle\Model\Label;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LabelTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
     }
@@ -32,7 +32,7 @@ class LabelTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->expects(self::once())
             ->method('trans')
-            ->with('test')
+            ->with('test', [], null)
             ->willReturn('translated');
 
         self::assertEquals('translated', $label->trans($this->translator));
@@ -44,22 +44,21 @@ class LabelTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->expects(self::once())
             ->method('trans')
-            ->with('test')
+            ->with('test', [], null)
             ->willReturn('test');
 
-        self::assertEquals('', $label->trans($this->translator));
+        self::assertSame('', $label->trans($this->translator));
     }
 
-    public function testReturnsResultEvenWhenNoTranslationExistIfTranslateDirectlyOptionIsSetToTrue()
+    public function testTransWithDomain()
     {
-        $label = new Label('test');
-        $label->setTranslateDirectly(true);
+        $label = new Label('test', 'test_domain');
 
         $this->translator->expects(self::once())
             ->method('trans')
-            ->with('test')
-            ->willReturn('test');
+            ->with('test', [], 'test_domain')
+            ->willReturn('translated');
 
-        self::assertEquals('test', $label->trans($this->translator));
+        self::assertEquals('translated', $label->trans($this->translator));
     }
 }

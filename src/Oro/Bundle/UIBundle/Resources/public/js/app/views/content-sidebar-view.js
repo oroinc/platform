@@ -1,32 +1,34 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var ContentSidebarView;
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var layoutHelper = require('oroui/js/tools/layout-helper');
-    var mediator = require('oroui/js/mediator');
-    var ResizableAreaPlugin = require('oroui/js/app/plugins/plugin-resizable-area');
-    var PluginManager = require('oroui/js/app/plugins/plugin-manager');
-    var config = require('module').config();
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const layoutHelper = require('oroui/js/tools/layout-helper');
+    const mediator = require('oroui/js/mediator');
+    const ResizableAreaPlugin = require('oroui/js/app/plugins/plugin-resizable-area');
+    const PluginManager = require('oroui/js/app/plugins/plugin-manager');
+    let config = require('module-config').default(module.id);
 
     config = _.extend({
         autoRender: true,
         fixSidebarHeight: true,
         sidebar: '[data-role="sidebar"]',
-        scrollbar: '[data-role="sidebar"]',
+        scrollbar: '[data-role="sidebar-content"]',
         content: '[data-role="content"]',
+        controls: '[data-role="sidebar-controls"]',
         resizableSidebar: !tools.isMobile()
     }, config);
 
-    ContentSidebarView = BaseView.extend({
+    const ContentSidebarView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'autoRender',
             'fixSidebarHeight',
             'sidebar',
             'scrollbar',
             'content',
+            'controls',
             'resizableSidebar'
         ]),
 
@@ -40,44 +42,86 @@ define(function(require) {
 
         content: config.content,
 
+        controls: config.controls,
+
         resizableSidebar: config.resizableSidebar,
 
-        events: {
-            'click [data-role="sidebar-minimize"]': 'minimize',
-            'click [data-role="sidebar-maximize"]': 'maximize'
+        events() {
+            return {
+                'click [data-role="sidebar-minimize"]': 'minimize',
+                'click [data-role="sidebar-maximize"]': 'maximize',
+                'swipeleft': 'minimize',
+                'swiperight': 'maximize',
+                [`transitionend ${this.sidebar}`]: '_calculateContentWidth'
+            };
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ContentSidebarView() {
-            ContentSidebarView.__super__.constructor.apply(this, arguments);
+        constructor: function ContentSidebarView(options) {
+            ContentSidebarView.__super__.constructor.call(this, options);
         },
 
         /**
-         * {@inheritDoc}
+         * @inheritdoc
          */
         initialize: function(options) {
             if (this.resizableSidebar) {
                 this.initResizableSidebar();
             }
-            ContentSidebarView.__super__.initialize.call(this, arguments);
-
-            mediator.on('swipe-action-left', this.minimize, this);
-            mediator.on('swipe-action-right', this.maximize, this);
+            ContentSidebarView.__super__.initialize.call(this, options);
         },
 
         /**
-         * {@inheritDoc}
+         * @inheritdoc
+         */
+        delegateEvents: function(events) {
+            ContentSidebarView.__super__.delegateEvents.call(this, events);
+            $(window).on(`scroll${this.eventNamespace()}`, this.onScroll.bind(this));
+            return this;
+        },
+
+        /**
+         * @inheritdoc
+         */
+        undelegateEvents: function() {
+            $(window).off(`scroll${this.eventNamespace()}`);
+            return ContentSidebarView.__super__.undelegateEvents.call(this);
+        },
+
+        /**
+         * @param {Object} e
+         */
+        onScroll(e) {
+            if (this.$linePattern) {
+                const bottom = $(this.controls)[0].getBoundingClientRect().bottom;
+                const scrollY = window.scrollY;
+                let position = bottom;
+
+                if (scrollY === 0) {
+                // Property will be removed;
+                    position = '';
+                // Element out of screen;
+                } else if (bottom <= 0) {
+                    position = 0;
+                }
+
+                this.$linePattern.css('top', position);
+            }
+        },
+
+        /**
+         * @inheritdoc
          */
         render: function() {
             if (this.fixSidebarHeight && !tools.isMobile()) {
-                layoutHelper.setAvailableHeight(this.scrollbar, this.$el);
+                layoutHelper.setAvailableHeight(this.scrollbar, this.sidebar);
             }
 
             this._toggle(this.getSidebarState());
 
-            ContentSidebarView.__super__.render.apply(this, arguments);
+            ContentSidebarView.__super__.render.call(this);
         },
 
         initResizableSidebar: function() {
@@ -85,8 +129,8 @@ define(function(require) {
             this.pluginManager.create(ResizableAreaPlugin, {
                 $resizableEl: this.sidebar,
                 resizableOptions: {
-                    resize: _.bind(this._resize, this),
-                    create: _.bind(this._create, this)
+                    resize: this._resize.bind(this),
+                    create: this._calculateContentWidth.bind(this)
                 }
             });
         },
@@ -95,18 +139,24 @@ define(function(require) {
             return tools.unpackFromQueryString(location.search).sidebar || 'on';
         },
 
-        minimize: function() {
-            this._toggle('off');
+        minimize: function(coords, eventTarget, event) {
+            if (!event || event.pageX <= this.$(this.sidebar).width()) {
+                this._toggle('off');
+            }
         },
 
-        maximize: function() {
-            this._toggle('on');
+        maximize: function(coords, eventTarget, event) {
+            if (!event || event.pageX <= this.$(this.sidebar).width()) {
+                this._toggle('on');
+            }
         },
 
-        _create: function() {
-            this.$(this.content).css({
-                width: 'calc(100% - ' + this.$(this.sidebar).outerWidth() + 'px)'
-            });
+        _calculateContentWidth: function() {
+            if (!_.isMobile()) {
+                this.resizableSidebar && this.$(this.content).css({
+                    width: 'calc(100% - ' + this.$(this.sidebar).outerWidth() + 'px)'
+                });
+            }
         },
 
         _resize: function(event, ui) {
@@ -120,7 +170,7 @@ define(function(require) {
          * @param {String} state
          */
         _toggle: function(state) {
-            var show = state === 'on';
+            const show = state === 'on';
 
             if (this.resizableSidebar) {
                 if (!show) {
@@ -139,17 +189,41 @@ define(function(require) {
             }
 
             this.$(this.sidebar).toggleClass('content-sidebar-minimized', !show);
+            this._calculateContentWidth();
+            this.toggleLinePattern(!show);
+
             mediator.execute('changeUrlParam', 'sidebar', show ? null : state);
         },
 
         /**
-         * @inheritDoc
+         * Add or remove sticked block
+         * @param [add]
+         */
+        toggleLinePattern(add) {
+            if (!_.isMobile()) {
+                return;
+            }
+
+            const className = 'line-pattern';
+
+            $(this.controls).find(`.${className}`).remove();
+            delete this.$linePattern;
+
+            if (add) {
+                this.$linePattern = $(`<div class="${className}"></div>`);
+                $(this.controls).append(this.$linePattern);
+            }
+        },
+
+        /**
+         * @inheritdoc
          */
         dispose: function() {
             if (this.pluginManager) {
                 this.pluginManager.dispose();
             }
 
+            this.toggleLinePattern();
             ContentSidebarView.__super__.dispose.call(this);
         }
     });

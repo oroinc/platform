@@ -2,11 +2,19 @@ services:
     Oro\Bundle\ImportExportBundle\Command\ImportCommand:
         public: false
         class: Oro\Bundle\ImportExportBundle\Command\ImportCommand
+        arguments:
+            - '@oro_importexport.processor.registry'
+            - '@oro_batch.connector.registry'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_importexport.file.file_manager'
+            - '@oro_user.manager'
         tags:
             - { name: console.command }
 
-    Oro\Bundle\ImportExportBundle\Command\ImportCommand\Cron\CleanupStorageCommand:
+    Oro\Bundle\ImportExportBundle\Command\Cron\CleanupStorageCommand:
         public: false
-        class: Oro\Bundle\ImportExportBundle\Command\Cron\CleanupStorageCommand
+        arguments:
+            - '@oro_importexport.file.file_manager'
+            - '@oro_importexport.manager.import_export_result_manager'
         tags:
             - { name: console.command }

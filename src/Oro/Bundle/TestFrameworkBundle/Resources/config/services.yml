@@ -1,38 +1,59 @@
 parameters:
-    search_item_entity_class:  Oro\Bundle\TestFrameworkBundle\Entity\Item
-    oro_test.entity.item.class: Oro\Bundle\TestFrameworkBundle\Entity\Item
-    oro_test.entity.item_value.class: Oro\Bundle\TestFrameworkBundle\Entity\ItemValue
-    oro_test.provider.exclusion_provider.class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
-    oro_test.test_activity_activity_list.provider.class: Oro\Bundle\TestFrameworkBundle\Provider\TestActivityActivityListProvider
+    optional_search_listeners:
+        - 'oro_search.index_listener'
 
 services:
+    _defaults:
+        public: true
+
+    fidry_alice_data_fixtures.persistence.persister.doctrine.object_manager_persister:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Persister\ObjectManagerPersister
+        lazy: true
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
+    nelmio_alice.fixture_builder.expression_language.lexer.sub_patterns_lexer:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Lexer\SubPatternsLexer
+        arguments:
+            - '@nelmio_alice.fixture_builder.expression_language.lexer.reference_lexer'
+
+    oro_test.fixtures.reflection_property_accessor:
+        class: Nelmio\Alice\PropertyAccess\ReflectionPropertyAccessor
+        public: false
+        decorates: nelmio_alice.property_accessor
+        decoration_priority: -10
+        arguments:
+            - '@.inner'
+
     oro_test.provider.exclusion_provider:
-        class: '%oro_test.provider.exclusion_provider.class%'
+        class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
 
     oro_test.entity_field_list_provider:
-        class: '%oro_entity.entity_field_list_provider.class%'
+        class: Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
         arguments:
             - '@oro_test.entity_field_provider'
             - '@oro_test.entity_provider'
-            - '@oro_entity_config.helper.entity_config'
+            - '@oro_entity_config.config_manager'
 
     oro_test.entity_field_provider:
         parent: oro_entity.entity_field_provider
+        public: true
         calls:
             - [setExclusionProvider, ['@oro_test.provider.exclusion_provider']]
 
     oro_test.entity_provider:
         parent: oro_entity.entity_provider
+        public: true
         calls:
             - [setExclusionProvider, ['@oro_test.provider.exclusion_provider']]
 
     oro_test.test_activity_activity_list.provider:
-        class: '%oro_test.test_activity_activity_list.provider.class%'
+        class: Oro\Bundle\TestFrameworkBundle\Provider\TestActivityActivityListProvider
         arguments:
            - '@oro_entity.doctrine_helper'
            - '@oro_activity.association_helper'
         tags:
-           - {name: oro_activity_list.provider}
+           - { name: oro_activity_list.provider, class: Oro\Bundle\TestFrameworkBundle\Entity\TestActivity }
 
     oro_test.entity_alias_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\EntityAliasProvider
@@ -47,35 +68,71 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
 
-    oro_test.alice_reference_processor:
-        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceReferenceProcessor
+    oro_test.alice_file_parser.yaml:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceYamlParser
+        decorates: nelmio_alice.file_parser.chainable.yaml
+        arguments:
+            - '@.inner'
+
+    oro_test.reference_resolver:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceReferenceResolver
+        public: false
         arguments:
             - '@doctrine'
 
-    oro_test.alice_to_string_processor:
-        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceToStringProcessor
+    oro_test.value_resolver:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceToStringResolver
+        arguments:
+            - '@oro_test.reference_resolver'
+
+    oro_test.fixture_loader.alice_combined_loader:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Loader\AliceCombinedLoader
+        lazy: true
+        arguments:
+            - '@nelmio_alice.files_loader.simple'
+            - '@nelmio_alice.data_loader.simple'
+
+    oro_test.fixture_loader.doctrine.persister_loader:
+        class: Fidry\AliceDataFixtures\Loader\PersisterLoader
+        lazy: true
+        arguments:
+            - '@oro_test.fixture_loader.alice_combined_loader'
+            - '@fidry_alice_data_fixtures.persistence.persister.doctrine'
+
+    oro_test.fixture_loader.doctrine.purger_loader:
+        class: Fidry\AliceDataFixtures\Loader\PurgerLoader
+        lazy: true
+        arguments:
+            - '@oro_test.fixture_loader.doctrine.persister_loader'
+            - '@fidry_alice_data_fixtures.persistence.purger_factory.doctrine'
+            - 'no_purge'
 
     oro_test.alice_fixture_loader:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader
-        calls:
-            - [setFileLocator, ['@file_locator']]
-            - [addProcessor, ['@oro_test.alice_reference_processor']]
-            - [addProcessor, ['@oro_test.alice_to_string_processor']]
+        arguments:
+            - '@oro_test.fixture_loader.doctrine.purger_loader'
+            - '@file_locator'
+
+    oro_test.reference_repository:
+        class: Doctrine\Common\Collections\ArrayCollection
+        factory: ['@oro_test.alice_fixture_loader', getReferenceRepository]
 
     oro_config.cache:
-        parent: doctrine_cache.abstract.array
-        calls:
-            - [setNamespace, [ 'oro_config' ] ]
+        parent: oro.cache.adapter.array
+        public: true
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_config' }
 
     oro_embedded_form.csrf_token_cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_csrf_cache' ] ]
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
+        arguments:
+            - '%oro_embedded_form.csrf_token_lifetime%'
 
-    oro_security.wsse_nonce_cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_nonces_cache' ] ]
+    oro_wsse_authentication.nonce_cache:
+        abstract: true
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
+        arguments:
+            - '<lifetime>' # set in WsseNonceCachePass
 
     oro_test.transport_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\TestTransportProvider
@@ -99,58 +156,11 @@ services:
     twig.form.renderer.alias:
         alias: twig.form.renderer
 
-    # Consumer services
-    oro_test.async.change_config:
-        class: 'Oro\Bundle\TestFrameworkBundle\Async\ChangeConfigProcessor'
-        arguments:
-            - '@oro_config.manager'
+    oro_test.layout.data_provider.test:
+        class: 'Oro\Bundle\TestFrameworkBundle\Layout\TestProvider'
         tags:
-            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: layout.data_provider, alias: test }
 
-    oro_test.consumption.queue_consumer:
-        class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
-        arguments:
-            - '@oro_message_queue.transport.dbal.connection'
-            - '@oro_message_queue.consumption.extensions'
-            - '@oro_message_queue.log.consumer_state'
-
-    oro_test.client.message_producer:
-        class: 'Oro\Component\MessageQueue\Client\MessageProducer'
-        arguments: ['@oro_test.client.driver']
-
-    oro_test.client.driver:
-        class: 'Oro\Component\MessageQueue\Client\DriverInterface'
-        factory: ['@oro_message_queue.client.driver_factory', 'create']
-        arguments:
-            - '@oro_message_queue.transport.dbal.connection'
-            - '@oro_test.client.config'
-
-    oro_test.client.route_message_processor:
-        class: 'Oro\Component\MessageQueue\Router\RouteRecipientListProcessor'
-        arguments:
-            - '@oro_test.client.router'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_message_queue.route_message' }
-
-    oro_test.client.router:
-        class: 'Oro\Component\MessageQueue\Client\Router'
-        public: false
-        arguments:
-            - '@oro_test.client.driver'
-            - '@oro_message_queue.client.meta.destination_meta_registry'
-            -
-              oro.test.change_config:
-                - ['oro_test.async.change_config', 'default']
-
-    oro_test.client.config:
-        class: 'Oro\Component\MessageQueue\Client\Config'
-        public: false
-        arguments:
-            - oro
-            - oro_test.client.route_message_processor
-            - default
-            - default
-            - default
-
-    oro_test.router.default.alias:
-        alias: router.default
+    oro_test.mailer.message_logger_listener:
+        decorates: mailer.message_logger_listener
+        class: Oro\Bundle\TestFrameworkBundle\Mailer\EventListener\MessageLoggerListener

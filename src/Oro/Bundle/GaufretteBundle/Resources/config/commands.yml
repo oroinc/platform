@@ -1,0 +1,7 @@
+services:
+    Oro\Bundle\GaufretteBundle\Command\MigrateFileStorageCommand:
+        class: Oro\Bundle\GaufretteBundle\Command\MigrateFileStorageCommand
+        arguments:
+            - '%kernel.project_dir%'
+        tags:
+            - { name: console.command }

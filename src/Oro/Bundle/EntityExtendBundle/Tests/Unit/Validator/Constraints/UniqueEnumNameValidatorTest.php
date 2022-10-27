@@ -3,40 +3,36 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumName;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueEnumNameValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class UniqueEnumNameValidatorTest extends \PHPUnit\Framework\TestCase
+class UniqueEnumNameValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
-
-    /** @var UniqueEnumNameValidator */
-    protected $validator;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->context       = $this->createMock(ExecutionContextInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        parent::setUp();
+    }
 
-        $this->validator = new UniqueEnumNameValidator($this->configManager);
-        $this->validator->initialize($this->context);
+    protected function createValidator()
+    {
+        return new UniqueEnumNameValidator($this->configManager);
     }
 
     public function testValidateForEmptyEnumName()
     {
         $entityClassName = 'Test\Entity1';
-        $fieldName       = 'field1';
+        $fieldName = 'field1';
 
         $constraint = new UniqueEnumName(
             [
@@ -45,16 +41,15 @@ class UniqueEnumNameValidatorTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('', $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValidateForInvalidEnumName()
     {
         $entityClassName = 'Test\Entity1';
-        $fieldName       = 'field1';
+        $fieldName = 'field1';
 
         $constraint = new UniqueEnumName(
             [
@@ -63,16 +58,15 @@ class UniqueEnumNameValidatorTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
-
         $this->validator->validate('!@#$', $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
      * @dataProvider validateDataProvider
      */
-    public function testValidate($enumName, $entityClassName, $fieldName, $violation)
+    public function testValidate(string $enumName, string $entityClassName, string $fieldName, bool $violation)
     {
         $config1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $config1->set('is_extend', true);
@@ -110,41 +104,29 @@ class UniqueEnumNameValidatorTest extends \PHPUnit\Framework\TestCase
         $enumValueEnumConfig = new Config(new EntityConfigId('enum', 'Test\EnumValue'));
         $enumValueEnumConfig->set('code', 'existing_enum');
 
-        $enumConfigProvider   = $this->getConfigProviderMock();
-        $extendConfigProvider = $this->getConfigProviderMock();
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['enum', $enumConfigProvider]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['enum', $enumConfigProvider]
+            ]);
         $extendConfigProvider->expects($this->any())
             ->method('getConfigs')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [null, false, $configs],
-                        [null, true, array_merge([$enumValueConfig], $configs)],
-                        ['Test\Entity1', false, $fieldConfigs1],
-                        ['Test\Entity2', false, $fieldConfigs2],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [null, false, $configs],
+                [null, true, array_merge([$enumValueConfig], $configs)],
+                ['Test\Entity1', false, $fieldConfigs1],
+                ['Test\Entity2', false, $fieldConfigs2],
+            ]);
         $enumConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Test\EnumValue', null, $enumValueEnumConfig],
-                        ['Test\Entity1', 'field1', $enumFieldConfigs11],
-                        ['Test\Entity2', 'field1', $enumFieldConfigs21],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['Test\EnumValue', null, $enumValueEnumConfig],
+                ['Test\Entity1', 'field1', $enumFieldConfigs11],
+                ['Test\Entity2', 'field1', $enumFieldConfigs21],
+            ]);
 
         $constraint = new UniqueEnumName(
             [
@@ -153,19 +135,18 @@ class UniqueEnumNameValidatorTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        if ($violation) {
-            $this->context->expects($this->once())
-                ->method('addViolation')
-                ->with($constraint->message);
-        } else {
-            $this->context->expects($this->never())
-                ->method('addViolation');
-        }
-
         $this->validator->validate($enumName, $constraint);
+
+        if ($violation) {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $enumName)
+                ->assertRaised();
+        } else {
+            $this->assertNoViolation();
+        }
     }
 
-    public function validateDataProvider()
+    public function validateDataProvider(): array
     {
         return [
             ['Existing Enum', 'Test\Entity1', 'field1', true],
@@ -173,15 +154,5 @@ class UniqueEnumNameValidatorTest extends \PHPUnit\Framework\TestCase
             ['Enum 2', 'Test\Entity1', 'field1', true],
             ['Enum 3', 'Test\Entity1', 'field1', false],
         ];
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

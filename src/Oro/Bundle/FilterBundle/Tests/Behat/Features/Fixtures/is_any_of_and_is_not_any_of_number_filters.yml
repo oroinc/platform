@@ -1,9 +1,9 @@
 Oro\Bundle\SegmentBundle\Entity\Segment:
     someSegment:
         name: 'Some segment name'
-        type: 'dynamic'
-        entity: 'Oro\Bundle\UserBundle\Entity\User'
-        definition: '{"columns":[{"name":"id","label":"Id","sorting":"ASC","func":null}],"filters":[]}'
+        type: '@segment_dynamic_type'
+        entity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
+        definition: <('{"columns":[{"name":"id","label":"Id","sorting":"ASC","func":null},{"name":"username","label":"Username","sorting":null,"func":null}],"filters":[]}')>
         organization: '@organization'
         owner: '@business_unit'
 
@@ -17,6 +17,7 @@ Oro\Bundle\UserBundle\Entity\User:
         salt: salt
         organization: '@organization'
         owner: '@business_unit'
+        userRoles: ['@adminRole']
     seoncdUser:
         username: second-user
         email: user2@example.com
@@ -26,3 +27,4 @@ Oro\Bundle\UserBundle\Entity\User:
         salt: salt
         organization: '@organization'
         owner: '@business_unit'
+        userRoles: ['@adminRole']

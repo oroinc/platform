@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\EmbeddedFormBundle\DependencyInjection\OroEmbeddedFormExtension;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -21,18 +22,6 @@ class OroEmbeddedFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             3600,
             $container->getParameter(OroEmbeddedFormExtension::CSRF_TOKEN_LIFETIME_PARAM)
-        );
-        $csrfTokenCacheDef = $container->getDefinition(OroEmbeddedFormExtension::DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID);
-        $this->assertNotNull($csrfTokenCacheDef);
-        $this->assertEquals(
-            OroEmbeddedFormExtension::DEFAULT_CSRF_TOKEN_CACHE_CLASS,
-            $csrfTokenCacheDef->getClass()
-        );
-        $this->assertEquals(
-            [
-                ['setNonceLifeTime', [3600]]
-            ],
-            $csrfTokenCacheDef->getMethodCalls()
         );
 
         $this->assertEquals(
@@ -74,13 +63,6 @@ class OroEmbeddedFormExtensionTest extends \PHPUnit\Framework\TestCase
             123,
             $container->getParameter(OroEmbeddedFormExtension::CSRF_TOKEN_LIFETIME_PARAM)
         );
-        $this->assertEquals(
-            [
-                ['setNonceLifeTime', [123]]
-            ],
-            $container->getDefinition(OroEmbeddedFormExtension::DEFAULT_CSRF_TOKEN_CACHE_SERVICE_ID)
-                ->getMethodCalls()
-        );
     }
 
     public function testShouldOverrideCsrfTokenCacheService()
@@ -99,5 +81,38 @@ class OroEmbeddedFormExtensionTest extends \PHPUnit\Framework\TestCase
             $container->getDefinition(OroEmbeddedFormExtension::CSRF_TOKEN_STORAGE_SERVICE_ID)
                 ->getArgument(0)
         );
+    }
+
+    public function testPrepend()
+    {
+        $securityConfig = [
+            'clickjacking' => [
+                'paths' => [
+                    '^/.*' => 'DENY'
+                ]
+            ]
+        ];
+
+        $expectedConfig = [
+            'clickjacking' => [
+                'paths' => [
+                    '/embedded-form/submit' => 'ALLOW',
+                    '/embedded-form/success' => 'ALLOW',
+                    '^/.*' => 'DENY'
+                ]
+            ]
+        ];
+
+        $container = $this->createMock(ExtendedContainerBuilder::class);
+        $container->expects($this->once())
+            ->method('getExtensionConfig')
+            ->with('nelmio_security')
+            ->willReturn([$securityConfig]);
+        $container->expects($this->once())
+            ->method('setExtensionConfig')
+            ->with('nelmio_security', [$expectedConfig]);
+
+        $extension = new OroEmbeddedFormExtension();
+        $extension->prepend($container);
     }
 }

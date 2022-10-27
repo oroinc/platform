@@ -1,3 +1,7 @@
-<a href="{{ url }}" class="no-hash" title="{{ fileName }}">
-    <img src="{{ imagePath }}" alt="{{ fileName }}" />
+{%- set title = oro_file_title(file) -%}
+<a href="{{ file_url(file) }}" class="no-hash" title="{{ title }}">
+    {% include '@OroAttachment/Twig/picture.html.twig' with {
+        sources: oro_resized_picture_sources(file, width, height),
+        img_attrs: { alt: title, 'width': width, 'height': height }
+    } %}
 </a>

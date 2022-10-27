@@ -1,17 +1,18 @@
 define(function(require) {
     'use strict';
 
-    var AbstractWidgetView;
-    var document = window.document;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var mediator = require('oroui/js/mediator');
-    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
-    var __ = require('orotranslation/js/translator');
-    var errorHandler = require('oroui/js/error');
-    var messenger = require('oroui/js/messenger');
+    const document = window.document;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const mediator = require('oroui/js/mediator');
+    const LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    const __ = require('orotranslation/js/translator');
+    const errorHandler = require('oroui/js/error');
+    const messenger = require('oroui/js/messenger');
+    const systemAccessModeOrganizationProvider =
+        require('oroorganization/js/app/tools/system-access-mode-organization-provider');
     require('jquery.form');
 
     /**
@@ -19,17 +20,18 @@ define(function(require) {
      * @class   oroui.widget.AbstractWidgetView
      * @extends oroui.app.views.BaseView
      */
-    AbstractWidgetView = BaseView.extend({
+    const AbstractWidgetView = BaseView.extend({
         options: {
             type: 'widget',
             actionsEl: '.widget-actions',
             moveAdoptedActions: true,
             url: false,
+            method: 'GET',
             elementFirst: true,
             title: '',
             alias: null,
             wid: null,
-            actionSectionTemplate: _.template('<div data-section="<%= section %>" class="widget-actions-section"/>'),
+            actionSectionTemplate: _.template('<div data-section="<%- section %>" class="widget-actions-section"/>'),
             actionWrapperTemplate: _.template('<span class="action-wrapper"/>'),
             loadingMaskEnabled: true,
             loadingElement: null,
@@ -56,10 +58,15 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * Collection of GET parameters which must remain in action url.
          */
-        constructor: function AbstractWidgetView() {
-            AbstractWidgetView.__super__.constructor.apply(this, arguments);
+        contextParameters: ['entityClass', 'entityId[id]', 'entityId', 'route', 'datagrid', 'group', 'fromUrl'],
+
+        /**
+         * @inheritdoc
+         */
+        constructor: function AbstractWidgetView(options) {
+            AbstractWidgetView.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
@@ -158,15 +165,15 @@ define(function(require) {
                 this._wid = this.options.wid;
             }
 
-            this.on('adoptedFormSubmitClick', _.bind(this._onAdoptedFormSubmitClick, this));
-            this.on('adoptedFormResetClick', _.bind(this._onAdoptedFormResetClick, this));
-            this.on('adoptedFormSubmit', _.bind(this._onAdoptedFormSubmit, this));
+            this.on('adoptedFormSubmitClick', this._onAdoptedFormSubmitClick.bind(this));
+            this.on('adoptedFormResetClick', this._onAdoptedFormResetClick.bind(this));
+            this.on('adoptedFormSubmit', this._onAdoptedFormSubmit.bind(this));
             if (this.options.loadingMaskEnabled) {
-                this.on('beforeContentLoad', _.bind(this._showLoading, this));
-                this.on('contentLoad', _.bind(this._hideLoading, this));
-                this.on('renderStart', _.bind(function(el) {
+                this.on('beforeContentLoad', this._showLoading.bind(this));
+                this.on('contentLoad', this._hideLoading.bind(this));
+                this.on('renderStart', el => {
                     this.loadingElement = el;
-                }, this));
+                });
             }
 
             this.actions = {};
@@ -185,7 +192,7 @@ define(function(require) {
          * @private
          */
         _getLoadingElement: function() {
-            var loadingElement = this.options.loadingElement || this.loadingElement;
+            const loadingElement = this.options.loadingElement || this.loadingElement;
             return $(loadingElement);
         },
 
@@ -248,12 +255,12 @@ define(function(require) {
          * @private
          */
         _initSectionActions: function() {
-            var widget = this;
-            var sections = this.widget.find('[data-section]');
+            const widget = this;
+            const sections = this.widget.find('[data-section]');
             sections.each(function(i, sectionEl) {
-                var $sectionEl = $(sectionEl);
-                var sectionName = $sectionEl.attr('data-section');
-                var actions = $sectionEl.find('[action-name], [data-action-name]');
+                const $sectionEl = $(sectionEl);
+                const sectionName = $sectionEl.attr('data-section');
+                const actions = $sectionEl.find('[action-name], [data-action-name]');
                 if ($sectionEl.attr('action-name') || $sectionEl.attr('data-action-name')) {
                     actions.push($sectionEl);
                 }
@@ -261,8 +268,8 @@ define(function(require) {
                     widget.actions[sectionName] = {};
                 }
                 actions.each(function(i, actionEl) {
-                    var $actionEl = $(actionEl);
-                    var actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
+                    const $actionEl = $(actionEl);
+                    const actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
                     widget.actions[sectionName][actionName] = $actionEl;
                     widget.trigger('widget:add:action:' + sectionName + ':' + actionName, $actionEl);
                 });
@@ -277,25 +284,25 @@ define(function(require) {
         _adoptWidgetActions: function() {
             this.actions.adopted = {};
             this.form = null;
-            var adoptedActionsContainer = this._getAdoptedActionsContainer();
+            const adoptedActionsContainer = this._getAdoptedActionsContainer();
             if (adoptedActionsContainer.length > 0) {
-                var self = this;
-                var form = adoptedActionsContainer.closest('form');
-                var actions = adoptedActionsContainer.find('button, input, a, [data-action-name]');
+                const self = this;
+                const form = adoptedActionsContainer.closest('form');
+                const actions = adoptedActionsContainer.find('button, input, a, [data-action-name]');
 
                 if (form.length > 0) {
                     this.form = form;
                 }
 
                 _.each(actions, function(action, idx) {
-                    var $action = $(action);
-                    var actionId = $action.data('action-name') || 'adopted_action_' + idx;
+                    const $action = $(action);
+                    let actionId = $action.data('action-name') || 'adopted_action_' + idx;
                     switch (action.type && action.type.toLowerCase()) {
                         case 'submit':
-                            var submitReplacement = $('<input type="submit"/>');
+                            const submitReplacement = $('<input type="submit" tabindex="-1" aria-hidden="true"/>');
                             submitReplacement.css({
                                 position: 'absolute',
-                                left: '-9999px',
+                                [_.isRTL() ? 'right' : 'left']: '-9999px',
                                 top: '-9999px',
                                 width: '1px',
                                 height: '1px'
@@ -356,18 +363,18 @@ define(function(require) {
                 this.trigger('beforeContentLoad', this);
                 form.ajaxSubmit({
                     data: this._getWidgetData(),
-                    success: _.bind(this._onContentLoad, this),
+                    success: this._onContentLoad.bind(this),
                     errorHandlerMessage: false,
-                    error: _.bind(this._onContentLoadFail, this)
+                    error: this._onContentLoadFail.bind(this)
                 });
                 this.loading = form.data('jqxhr');
             } else {
-                var formAction = this.form.attr('action');
+                let formAction = this.form.attr('action');
                 formAction = formAction.length > 0 && formAction[0] !== '#' ? formAction : null;
                 if (!this.options.url && formAction) {
                     this.options.url = formAction;
                 }
-                var url = formAction ? formAction : this.options.url;
+                const url = formAction ? formAction : this.options.url;
                 this.loadContent(form.serialize(), form.attr('method'), url);
             }
         },
@@ -424,7 +431,7 @@ define(function(require) {
                     this.actions[section] = {};
                 }
                 this.actions[section][key] = actionElement;
-                var sectionContainer = this.getActionsElement().find('[data-section="' + section + '"]');
+                let sectionContainer = this.getActionsElement().find('[data-section="' + section + '"]');
                 if (!sectionContainer.length) {
                     sectionContainer = this._createWidgetActionsSection(section);
                     sectionContainer.appendTo(this.getActionsElement());
@@ -459,7 +466,7 @@ define(function(require) {
          * @param {string} section section name
          */
         removeAction: function(key, section) {
-            var self = this;
+            const self = this;
             function remove(actions, key) {
                 if (_.isElement(self.actions[key])) {
                     self.actions[key].remove();
@@ -490,7 +497,7 @@ define(function(require) {
             if (section !== undefined) {
                 return this.actions.hasOwnProperty(section) && this.actions[section].hasOwnProperty(key);
             } else {
-                var hasAction = false;
+                let hasAction = false;
                 _.each(this.actions, function(actions) {
                     if (actions.hasOwnProperty(key)) {
                         hasAction = true;
@@ -510,7 +517,7 @@ define(function(require) {
             if (section !== undefined) {
                 return this.actions.hasOwnProperty(section) && !_.isEmpty(this.actions[section]);
             } else {
-                var hasActions = false;
+                let hasActions = false;
                 _.each(this.actions, function(actions) {
                     if (!_.isEmpty(actions)) {
                         hasActions = true;
@@ -529,7 +536,7 @@ define(function(require) {
          */
         getAction: function(key, section, callback) {
             if (this.hasAction(key, section)) {
-                var action = null;
+                let action = null;
                 if (section !== undefined) {
                     action = this.actions[section][key];
                 } else {
@@ -552,12 +559,12 @@ define(function(require) {
          */
         _renderActions: function() {
             this._clearActionsContainer();
-            var container = this.getActionsElement();
+            const container = this.getActionsElement();
 
             if (container) {
                 _.each(this.actions, function(actions, section) {
-                    var sectionContainer = this._createWidgetActionsSection(section);
-                    var move = section === 'adopted' ? this.options.moveAdoptedActions : true;
+                    const sectionContainer = this._createWidgetActionsSection(section);
+                    const move = section === 'adopted' ? this.options.moveAdoptedActions : true;
                     _.each(actions, function(action, key) {
                         this._initActionEvents(action);
                         if (move) {
@@ -576,12 +583,12 @@ define(function(require) {
          * @private
          */
         _bindSubmitHandler: function() {
-            this.$el.parent().on('submit', _.bind(function(e) {
+            this.$el.parent().on('submit', e => {
                 if (!e.isDefaultPrevented()) {
                     this.options.submitHandler.call(this);
                 }
                 e.preventDefault();
-            }, this));
+            });
         },
 
         /**
@@ -591,8 +598,8 @@ define(function(require) {
          * @private
          */
         _initActionEvents: function(action) {
-            var self = this;
-            var type = $(action).attr('type');
+            const self = this;
+            const type = $(action).attr('type');
             if (!type) {
                 return;
             }
@@ -618,7 +625,7 @@ define(function(require) {
          * @private
          */
         _clearActionsContainer: function() {
-            var actionsEl = this.getActionsElement();
+            const actionsEl = this.getActionsElement();
             if (actionsEl) {
                 actionsEl.empty();
             }
@@ -629,7 +636,7 @@ define(function(require) {
          */
         render: function() {
             this._deferredRender();
-            var loadAllowed = !this.options.elementFirst ||
+            const loadAllowed = !this.options.elementFirst ||
                     (this.options.elementFirst && !this.firstRun) ||
                         (this.$el && this.$el.length && this.$el.html().length === 0);
             if (loadAllowed && this.options.url !== false) {
@@ -646,7 +653,7 @@ define(function(require) {
          * @param {String} content
          */
         setContent: function(content) {
-            var widgetContent = $(content).filter('.widget-content:first');
+            const widgetContent = $(content).filter('.widget-content:first');
 
             this.actionsEl = null;
             this.actions = {};
@@ -673,21 +680,36 @@ define(function(require) {
                 url = window.location.href;
             }
             if (this.firstRun || method === undefined || !method) {
-                method = 'get';
+                method = this.options.method;
             }
-            var options = this.prepareContentRequestOptions(data, method, url);
+            const options = this.prepareContentRequestOptions(data, method, url);
 
             this.trigger('beforeContentLoad', this);
             this.loading = $.ajax(options)
-                .done(_.bind(this._onContentLoad, this))
-                .fail(_.bind(this._onContentLoadFail, this));
+                .done(this._onContentLoad.bind(this))
+                .fail(this._onContentLoadFail.bind(this));
         },
 
         prepareContentRequestOptions: function(data, method, url) {
-            var options = {
+            let query = '';
+
+            if (method.toUpperCase() === 'POST') {
+                const urlParts = url.split('?');
+
+                query = typeof urlParts[1] === 'undefined' ? '' : urlParts[1] + '&';
+                url = urlParts[0] + '?' + query.split('&').filter((function(item) {
+                    if (!item) {
+                        return false;
+                    }
+
+                    return _.contains(this.contextParameters, decodeURIComponent(item.split('=')[0]));
+                }).bind(this)).join('&');
+            }
+
+            const options = {
                 url: url,
                 type: method,
-                data: data === void 0 ? '' : data + '&',
+                data: query + (data === void 0 ? '' : data + '&'),
                 errorHandlerMessage: false
             };
 
@@ -697,13 +719,20 @@ define(function(require) {
         },
 
         _getWidgetData: function() {
-            var data = {
+            const data = {
                 _widgetContainer: this.options.type,
-                _wid: this.getWid()
+                _wid: this.getWid(),
+                _widgetInit: this.firstRun ? 1 : 0
             };
 
             if (this.options.widgetTemplate) {
                 data._widgetContainerTemplate = this.options.widgetTemplate;
+            }
+
+            const organizationId = systemAccessModeOrganizationProvider.getOrganizationId();
+
+            if (organizationId) {
+                data._sa_org_id = organizationId;
             }
 
             return data;
@@ -720,7 +749,12 @@ define(function(require) {
                 return;
             }
 
-            var message = __('oro.ui.widget_loading_failed');
+            if (jqxhr.status === 401) {
+                this.remove();
+                return;
+            }
+
+            let message = __('oro.ui.widget_loading_failed');
 
             if (jqxhr.status === 403) {
                 message = __('oro.ui.forbidden_error');
@@ -730,7 +764,7 @@ define(function(require) {
                 return;
             }
 
-            var failContent = '<div class="widget-content">' +
+            const failContent = '<div class="widget-content">' +
                 '<div class="alert alert-error" role="alert">' + message + '</div>' +
                 '</div>';
 
@@ -744,7 +778,7 @@ define(function(require) {
          * @private
          */
         _onContentLoad: function(content) {
-            var json = this._getJson(content);
+            const json = this._getJson(content);
 
             if (json) {
                 content = '<div class="widget-content"></div>'; // set empty response to cover base functionality
@@ -755,13 +789,15 @@ define(function(require) {
             this.setContent(content, true);
             if (this.deferredRender) {
                 this.deferredRender
-                    .done(_.bind(this._triggerContentLoadEvents, this, content))
-                    .fail(_.bind(function(error) {
+                    .done(this._triggerContentLoadEvents.bind(this, content))
+                    .fail(error => {
                         if (!this.disposing && !this.disposed) {
-                            errorHandler.showErrorInConsole(error || new Error('Widget rendering failed'));
+                            if (error) {
+                                errorHandler.showErrorInConsole(error);
+                            }
                             this._triggerContentLoadEvents();
                         }
-                    }, this));
+                    });
             } else {
                 this._triggerContentLoadEvents();
             }
@@ -795,10 +831,11 @@ define(function(require) {
          * @private
          */
         _onJsonContentResponse: function(content) {
-            var widgetResponse = content.widget || {};
+            const widgetResponse = content.widget || {};
 
             if (_.has(widgetResponse, 'message')) {
-                var message = widgetResponse.message;
+                let message = widgetResponse.message;
+                const messageOptions = widgetResponse.messageOptions || {};
 
                 if (_.isString(message)) {
                     message = {type: 'success', text: message};
@@ -806,27 +843,27 @@ define(function(require) {
 
                 if (_.has(widgetResponse, 'messageAfterPageChange') && widgetResponse.messageAfterPageChange === true) {
                     mediator.once('page:afterChange', function() {
-                        messenger.notificationFlashMessage(message.type, message.text);
+                        messenger.notificationFlashMessage(message.type, message.text, messageOptions);
                     });
                 } else {
-                    messenger.notificationFlashMessage(message.type, message.text);
+                    messenger.notificationFlashMessage(message.type, message.text, messageOptions);
                 }
             }
 
             if (_.has(widgetResponse, 'trigger')) {
-                var events = widgetResponse.trigger;
+                let events = widgetResponse.trigger;
 
                 if (!_.isObject(events)) {
                     events = [events];
                 }
 
                 _.each(events, function(event) {
-                    var eventBroker = this._getEventBroker(event);
-                    var eventFunction = this._getEventFunction(event);
+                    const eventBroker = this._getEventBroker(event);
+                    const eventFunction = this._getEventFunction(event);
 
                     if (_.isObject(event)) {
-                        var args = [event.name].concat(event.args);
-                        eventBroker[eventFunction].apply(eventBroker, args);
+                        const args = [event.name].concat(event.args);
+                        eventBroker[eventFunction](...args);
                     } else {
                         eventBroker[eventFunction](event);
                     }
@@ -854,11 +891,11 @@ define(function(require) {
         _triggerContentLoadEvents: function(content) {
             this.trigger('contentLoad', content, this);
             mediator.trigger('widget:contentLoad', this.widget);
-            mediator.trigger('layout:adjustHeight');
+            mediator.trigger('layout:adjustHeight', this.el);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getLayoutElement: function() {
             return this.widget;
@@ -877,7 +914,7 @@ define(function(require) {
             this.trigger('renderComplete', this.$el, this);
             this.getLayoutElement().attr('data-layout', 'separate');
             this.initLayout(this.options.initLayoutOptions || {})
-                .done(_.bind(this._afterLayoutInit, this));
+                .done(this._afterLayoutInit.bind(this));
         },
 
         _afterLayoutInit: function() {
@@ -885,7 +922,7 @@ define(function(require) {
                 return;
             }
             if (this.deferredRender) {
-                this.deferredRender.done(_.bind(this._renderHandler, this));
+                this.deferredRender.done(this._renderHandler.bind(this));
                 this._resolveDeferredRender();
             } else {
                 this._renderHandler();

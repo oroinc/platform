@@ -1,24 +1,29 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\DurationToStringTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider transformDataProvider
-     *
-     * @param mixed $value
-     * @param mixed $expectedValue
-     */
-    public function testTransform($value, $expectedValue)
+    private DurationToStringTransformer $transformer;
+
+    protected function setUp(): void
     {
-        $transformer = $this->createTestTransformer();
-        $this->assertEquals($expectedValue, $transformer->transform($value));
+        $this->transformer = new DurationToStringTransformer();
     }
 
-    public function transformDataProvider()
+    /**
+     * @dataProvider transformDataProvider
+     */
+    public function testTransform(int|float $value, string $expectedValue)
+    {
+        $this->assertEquals($expectedValue, $this->transformer->transform($value));
+    }
+
+    public function transformDataProvider(): array
     {
         return [
             '120 seconds' => [
@@ -36,40 +41,31 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "scalar", "array" given
-     */
     public function testTransformFailsWhenUnexpectedType()
     {
-        $transformer = $this->createTestTransformer();
-        $transformer->transform([]);
+        $this->expectException(UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "scalar", "array" given');
+
+        $this->transformer->transform([]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     * @expectedExceptionMessage Duration too long to convert.
-     */
     public function testTransformFailsWithBigNumbers()
     {
-        $transformer = $this->createTestTransformer();
-        $transformer->transform(PHP_INT_MAX);
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Duration too long to convert.');
+
+        $this->transformer->transform(PHP_INT_MAX);
     }
 
     /**
      * @dataProvider reverseTransformDataProvider
-     *
-     * @param mixed $value
-     * @param mixed $expectedValue
      */
-    public function testReverseTransform($value, $expectedValue)
+    public function testReverseTransform(string $value, int $expectedValue)
     {
-        $transformer = $this->createTestTransformer();
-        $transformed = $transformer->reverseTransform($value);
-        $this->assertEquals($expectedValue, $transformed);
+        $this->assertEquals($expectedValue, $this->transformer->reverseTransform($value));
     }
 
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
         return [
             'default' => [
@@ -165,16 +161,13 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider reverseTransformEmptyDataProvider
-     *
-     * @param mixed $value
      */
-    public function testReverseTransformReturnsNullWhenEmpty($value)
+    public function testReverseTransformReturnsNullWhenEmpty(?string $value)
     {
-        $transform = $this->createTestTransformer()->reverseTransform($value);
-        $this->assertNull($transform);
+        $this->assertNull($this->transformer->reverseTransform($value));
     }
 
-    public function reverseTransformEmptyDataProvider()
+    public function reverseTransformEmptyDataProvider(): array
     {
         return [
             'empty string' => [''],
@@ -183,16 +176,9 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     */
     public function testReverseTransformFailsWhenUnexpectedType()
     {
-        $this->createTestTransformer()->reverseTransform(array());
-    }
-
-    private function createTestTransformer()
-    {
-        return new DurationToStringTransformer();
+        $this->expectException(UnexpectedTypeException::class);
+        $this->transformer->reverseTransform([]);
     }
 }

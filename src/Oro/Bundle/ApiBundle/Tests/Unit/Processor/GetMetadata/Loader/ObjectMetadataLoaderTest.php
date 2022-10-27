@@ -12,6 +12,9 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedAssociationMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ObjectMetadataLoaderTest extends LoaderTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
@@ -26,7 +29,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
     /** @var ObjectMetadataLoader */
     private $objectMetadataLoader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);
         $this->nestedObjectMetadataFactory = $this->createMock(ObjectNestedObjectMetadataFactory::class);
@@ -46,7 +49,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $withExcludedProperties = false;
         $targetAction = 'testAction';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
@@ -75,7 +78,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $withExcludedProperties = true;
         $targetAction = 'testAction';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
@@ -111,7 +114,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $withExcludedProperties = false;
         $targetAction = 'testAction';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
@@ -146,7 +149,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $withExcludedProperties = false;
         $targetAction = 'testAction';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
@@ -183,7 +186,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $withExcludedProperties = false;
         $targetAction = 'testAction';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $fieldName = '__class__';
         $field = $config->addField($fieldName);
@@ -220,7 +223,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $withExcludedProperties = false;
         $targetAction = 'testAction';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
@@ -257,7 +260,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $withExcludedProperties = false;
         $targetAction = 'testAction';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
@@ -295,7 +298,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $withExcludedProperties = false;
         $targetAction = 'testAction';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
@@ -333,7 +336,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $withExcludedProperties = false;
         $targetAction = 'testAction';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $fieldMetadata = new FieldMetadata($fieldName);
 
         $field = $config->addField($fieldName);
@@ -373,7 +376,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $targetAction = 'testAction';
         $fieldName = 'testField';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $propertyMetadata = new MetaPropertyMetadata($fieldName);
 
         $field = $config->addField($fieldName);
@@ -415,7 +418,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $targetAction = 'testAction';
         $fieldName = 'testField';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata($fieldName);
 
         $field = $config->addField($fieldName);
@@ -457,7 +460,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $targetAction = 'testAction';
         $fieldName = 'testField';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata($fieldName);
 
         $field = $config->addField($fieldName);
@@ -500,7 +503,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         $targetAction = 'testAction';
         $fieldName = 'testField';
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata($fieldName);
 
         $field = $config->addField($fieldName);

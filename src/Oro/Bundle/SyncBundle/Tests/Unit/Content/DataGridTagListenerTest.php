@@ -3,67 +3,68 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
 use Doctrine\ORM\Query\Expr\From;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\SyncBundle\Content\DataGridTagListener;
-use Oro\Bundle\SyncBundle\Content\TagGeneratorChain;
+use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 
 class DataGridTagListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_GRID_NAME   = 'gridName';
-    const TEST_ENTITY_NAME = 'someEntity';
+    private const TEST_GRID_NAME   = 'gridName';
+    private const TEST_ENTITY_NAME = 'someEntity';
 
-    /** @var TagGeneratorChain|\PHPUnit\Framework\MockObject\MockObject */
-    protected $generator;
+    /** @var TagGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $generator;
 
     /** @var DataGridTagListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->generator = $this->createMock('Oro\Bundle\SyncBundle\Content\TagGeneratorChain');
-        $this->listener  = new DataGridTagListener($this->generator);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->generator, $this->listener);
+        $this->generator = $this->createMock(TagGeneratorInterface::class);
+        $this->listener = new DataGridTagListener($this->generator);
     }
 
     public function testBuildAfter()
     {
-        $config     = DatagridConfiguration::createNamed(self::TEST_GRID_NAME, []);
-        $acceptor   = new Acceptor();
+        $config = DatagridConfiguration::createNamed(self::TEST_GRID_NAME, []);
+        $acceptor = new Acceptor();
         $acceptor->setConfig($config);
-        $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
-        $grid       = new Datagrid(self::TEST_GRID_NAME, $config, $parameters);
+        $parameters = $this->createMock(ParameterBag::class);
+        $grid = new Datagrid(self::TEST_GRID_NAME, $config, $parameters);
         $grid->setAcceptor($acceptor);
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
-        $qb->expects($this->once())->method('getDQLPart')->with($this->equalTo('from'))
-            ->will($this->returnValue([new From(self::TEST_ENTITY_NAME, 'alias')]));
-        $datasourceMock = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
-            ->disableOriginalConstructor()->getMock();
-        $datasourceMock->expects($this->any())->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
-        $this->generator->expects($this->once())->method('generate')->with(self::TEST_ENTITY_NAME)
-            ->will($this->returnValue([]));
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects($this->once())
+            ->method('getDQLPart')
+            ->with('from')
+            ->willReturn([new From(self::TEST_ENTITY_NAME, 'alias')]);
+        $datasourceMock = $this->createMock(OrmDatasource::class);
+        $datasourceMock->expects($this->any())
+            ->method('getQueryBuilder')
+            ->willReturn($qb);
+        $this->generator->expects($this->once())
+            ->method('generate')
+            ->with(self::TEST_ENTITY_NAME)
+            ->willReturn([]);
 
         $grid->setDatasource($datasourceMock);
-        $event = new BuildAfter($grid);
 
-        $this->listener->buildAfter($event);
+        $this->listener->buildAfter(new BuildAfter($grid));
 
         $this->assertContains(
             'orosync/js/content/grid-builder',
             $config->offsetGetByPath(
                 sprintf('%s[%s]', ToolbarExtension::OPTIONS_PATH, MetadataObject::REQUIRED_MODULES_KEY)
             ),
-            'Should add require js module'
+            'Should add js module'
         );
     }
 }

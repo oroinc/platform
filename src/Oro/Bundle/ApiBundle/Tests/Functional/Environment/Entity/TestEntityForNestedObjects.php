@@ -44,6 +44,34 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     /**
      * @var string
      *
+     * @ORM\Column(name="middle_name", type="string", nullable=true)
+     */
+    protected $middleName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name_prefix", type="string", nullable=true)
+     */
+    protected $namePrefix;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name_suffix", type="string", nullable=true)
+     */
+    protected $nameSuffix;
+
+    /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="contacted_at", type="datetime", nullable=true)
+     */
+    protected $contactedAt;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="related_class", type="string", nullable=true)
      */
     protected $relatedClass;
@@ -73,7 +101,7 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     /**
      * @var Collection
      *
-     * @ORM\ManyToMany(targetEntity="TestCustomIdentifier", cascade="ALL")
+     * @ORM\ManyToMany(targetEntity="TestCustomIdentifier", cascade={"all"})
      * @ORM\JoinTable(name="test_api_nested_objects_links",
      *      joinColumns={@ORM\JoinColumn(name="owner_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="link_id", referencedColumnName="id")}
@@ -113,7 +141,7 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     public function getName()
     {
         if (!$this->name) {
-            $this->name = new TestNestedName($this->firstName, $this->lastName);
+            $this->name = new TestNestedName($this->firstName, $this->lastName, $this->contactedAt);
         }
 
         return $this->name;
@@ -129,6 +157,7 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         $this->name = $name;
         $this->firstName = $this->name->getFirstName();
         $this->lastName = $this->name->getLastName();
+        $this->contactedAt = $this->name->getContactedAt();
 
         return $this;
     }
@@ -169,6 +198,86 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMiddleName()
+    {
+        return $this->middleName;
+    }
+
+    /**
+     * @param string $middleName
+     *
+     * @return self
+     */
+    public function setMiddleName($middleName)
+    {
+        $this->middleName = $middleName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNamePrefix()
+    {
+        return $this->namePrefix;
+    }
+
+    /**
+     * @param string $namePrefix
+     *
+     * @return self
+     */
+    public function setNamePrefix($namePrefix)
+    {
+        $this->namePrefix = $namePrefix;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNameSuffix()
+    {
+        return $this->nameSuffix;
+    }
+
+    /**
+     * @param string $nameSuffix
+     *
+     * @return self
+     */
+    public function setNameSuffix($nameSuffix)
+    {
+        $this->nameSuffix = $nameSuffix;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getContactedAt()
+    {
+        return $this->contactedAt;
+    }
+
+    /**
+     * @param \DateTime|null $contactedAt
+     *
+     * @return self
+     */
+    public function setContactedAt($contactedAt)
+    {
+        $this->contactedAt = $contactedAt;
 
         return $this;
     }
@@ -237,9 +346,6 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         return $this->children;
     }
 
-    /**
-     * @param TestEntityForNestedObjects $item
-     */
     public function addChild(TestEntityForNestedObjects $item)
     {
         if (!$this->children->contains($item)) {
@@ -247,9 +353,6 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         }
     }
 
-    /**
-     * @param TestEntityForNestedObjects $item
-     */
     public function removeChild(TestEntityForNestedObjects $item)
     {
         if ($this->children->contains($item)) {
@@ -265,17 +368,11 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         return $this->links;
     }
 
-    /**
-     * @param TestCustomIdentifier $link
-     */
     public function addLink(TestCustomIdentifier $link)
     {
         $this->links->add($link);
     }
 
-    /**
-     * @param TestCustomIdentifier $link
-     */
     public function removeLink(TestCustomIdentifier $link)
     {
         $this->links->removeElement($link);

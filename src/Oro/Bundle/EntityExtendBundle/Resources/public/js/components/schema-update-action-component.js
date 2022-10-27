@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var ShemaUpdateActionComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var Modal = require('oroui/js/modal');
-    var routing = require('routing');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const Modal = require('oroui/js/modal');
+    const routing = require('routing');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    ShemaUpdateActionComponent = BaseComponent.extend({
+    const ShemaUpdateActionComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -19,27 +18,27 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ShemaUpdateActionComponent() {
-            ShemaUpdateActionComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ShemaUpdateActionComponent(options) {
+            ShemaUpdateActionComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
-            var el = this.options._sourceElement;
-            var self = this;
+            const el = this.options._sourceElement;
+            const self = this;
 
             $(el).on('click', function(e) {
-                var title = __('Schema update confirmation');
-                var content = '<p>' + __('Your config changes will be applied to schema.') + '</p>' +
-                    '<p>' + __('It may take few minutes...') + '</p>';
+                const title = __('Schema update confirmation');
+                const content = '<p>' + __('Your config changes will be applied to schema.') + '<br/>' +
+                    __('It may take few minutes...') + '</p>';
                 /** @type oro.Modal */
-                var confirmUpdate = new Modal({
+                const confirmUpdate = new Modal({
                     className: 'modal modal-primary',
                     cancelText: __('Cancel'),
                     okText: __('Yes, Proceed'),
@@ -48,23 +47,35 @@ define(function(require) {
                 });
 
                 function execute() {
-                    var url = routing.generate(self.options.route);
-                    var progress = $('#progressbar').clone();
-                    progress.removeAttr('id').find('h3').remove();
+                    const url = routing.generate(self.options.route);
+                    const progress = $('#progressbar').clone();
+                    progress
+                        .removeAttr('id')
+                        .find('h3').remove()
+                        .end()
+                        .find('[role="progressbar"]')
+                        .attr('aria-valuetext', __('oro.entity_extend.schema_updating'));
 
-                    var modal = new Modal({
+                    const modal = new Modal({
                         allowCancel: false,
                         className: 'modal modal-primary',
                         title: title,
                         content: content
                     });
                     modal.open();
-                    modal.$el.find('.modal-footer').html(progress);
+                    modal.$el.find('.modal-body').append(progress);
+                    modal.$el.find('.modal-footer').html('');
                     progress.show();
 
                     $.post({
                         url: url,
-                        errorHandlerMessage: __('oro.entity_extend.schema_update_failed')
+                        errorHandlerMessage: function(event, xhr) {
+                            let message = __('oro.entity_extend.schema_update_failed');
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                message += ' ' + xhr.responseJSON.message;
+                            }
+                            return message;
+                        }
                     }).done(function() {
                         modal.close();
                         mediator.execute(

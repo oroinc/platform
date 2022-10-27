@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli;
 use Behat\Testwork\Cli\Controller;
 use Behat\Testwork\Suite\Suite;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatisticManager;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
@@ -12,6 +13,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Used to print all available suite sets.
+ */
 class AvailableSuiteSetsController implements Controller
 {
     /**
@@ -30,18 +34,20 @@ class AvailableSuiteSetsController implements Controller
     private $featurePathLocator;
 
     /**
-     * @param SuiteConfigurationRegistry $suiteConfigRegistry
-     * @param FeatureAvgTimeRegistry $featureAvgTimeProvider
-     * @param FeaturePathLocator $featurePathLocator
+     * @var FeatureStatisticManager
      */
+    private $featureStatisticManager;
+
     public function __construct(
         SuiteConfigurationRegistry $suiteConfigRegistry,
         FeatureAvgTimeRegistry $featureAvgTimeProvider,
-        FeaturePathLocator $featurePathLocator
+        FeaturePathLocator $featurePathLocator,
+        FeatureStatisticManager $featureStatisticManager
     ) {
         $this->suiteConfigRegistry = $suiteConfigRegistry;
         $this->featureAvgTimeRegistry = $featureAvgTimeProvider;
         $this->featurePathLocator = $featurePathLocator;
+        $this->featureStatisticManager = $featureStatisticManager;
     }
 
     /**
@@ -106,6 +112,8 @@ class AvailableSuiteSetsController implements Controller
             }
         }
 
+        $this->featureStatisticManager->cleanOldStatistics();
+
         return 0;
     }
 
@@ -152,10 +160,6 @@ class AvailableSuiteSetsController implements Controller
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param array $paths
-     */
     private function printFeatures(OutputInterface $output, array $paths)
     {
         foreach ($paths as $path) {

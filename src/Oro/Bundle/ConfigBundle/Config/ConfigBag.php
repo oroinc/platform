@@ -14,10 +14,6 @@ class ConfigBag
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param array              $config
-     * @param ContainerInterface $container
-     */
     public function __construct(array $config, ContainerInterface $container)
     {
         $this->config    = $config;

@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
-use \Zend\Mail\Storage\Part;
-use \Zend\Mime\Decode;
-use Zend\Mail\Headers;
+use Laminas\Mail\Header\ContentType;
+use Laminas\Mail\Headers;
+use Laminas\Mail\Storage\Part;
+use Laminas\Mime\Decode;
 
+/**
+ * Represent email attachment
+ */
 class Attachment
 {
     /**
@@ -58,7 +62,7 @@ class Attachment
             $encoding           = $contentDisposition->getEncoding();
         }
         if (empty($value) && $headers->has('Content-Type')) {
-            /** @var \Zend\Mail\Header\ContentType $contentType */
+            /** @var ContentType $contentType */
             $contentType = $this->part->getHeader('Content-Type');
             $value       = $contentType->getParameter('name');
             $encoding    = $contentType->getEncoding();
@@ -67,10 +71,7 @@ class Attachment
             $encoding = 'ASCII';
         }
 
-        // Extract name from quoted text.
-        // zend mail library bug (incorrect header decode).
-        // Zend\Mail\Headers line 82 ($currentLine .= ' ' . trim($line);)
-        // Fixed in zend-mail 2.4
+        // Extract name from quoted text. {@see \Oro\Bundle\ImapBundle\Mail\Headers::fromString}
         if (preg_match('"([^\\"]+)"', $value, $result)) {
             $value = $result[0];
         }
@@ -96,7 +97,7 @@ class Attachment
     public function getContent()
     {
         if ($this->part->getHeaders()->has('Content-Type')) {
-            /** @var \Zend\Mail\Header\ContentType $contentTypeHeader */
+            /** @var ContentType $contentTypeHeader */
             $contentTypeHeader = $this->part->getHeader('Content-Type');
             $contentType       = $contentTypeHeader->getType();
             $charset           = $contentTypeHeader->getParameter('charset');
@@ -106,12 +107,7 @@ class Attachment
             $encoding    = 'ASCII';
         }
 
-        $contentTransferEncoding = 'BINARY';
-        if ($this->part->getHeaders()->has('Content-Transfer-Encoding')) {
-            $contentTransferEncoding = $this->part->getHeader('Content-Transfer-Encoding')->getFieldValue();
-        }
-
-        return new Content($this->part->getContent(), $contentType, $contentTransferEncoding, $encoding);
+        return new Content($this->part->getContent(), $contentType, $this->getContentTransferEncoding(), $encoding);
     }
 
     /**
@@ -148,5 +144,16 @@ class Attachment
         return $this->part->getHeaders()->has('Content-Disposition')
             ? $this->part->getHeader('Content-Disposition')->getFieldValue()
             : null;
+    }
+
+    protected function getContentTransferEncoding(): string
+    {
+        if ($this->part->getHeaders()->has('Content-Transfer-Encoding')) {
+            $contentTransferEncodings = $this->part->getHeader('Content-Transfer-Encoding', 'array');
+
+            return end($contentTransferEncodings);
+        }
+
+        return 'BINARY';
     }
 }

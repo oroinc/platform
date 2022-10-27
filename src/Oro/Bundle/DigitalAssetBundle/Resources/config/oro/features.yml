@@ -1,0 +1,17 @@
+features:
+    digital_assets:
+        label: oro.digitalasset.feature.label
+        description: oro.digitalasset.feature.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_digital_asset_index
+            - oro_digital_asset_create
+            - oro_digital_asset_update
+            - oro_digital_asset_widget_choose
+            - oro_digital_asset_widget_choose_image
+            - oro_digital_asset_widget_choose_file
+        operations:
+            - digital_asset_delete
+        navigation_items:
+            - application_menu.marketing_tab.digital_asset_list
+            - application_menu.system_tab.digital_asset_list

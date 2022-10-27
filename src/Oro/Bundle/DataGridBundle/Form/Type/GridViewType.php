@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DataGridBundle\Form\Type;
 
 use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\FormBundle\Form\Type\OroUnstructuredHiddenType;
+use Oro\Bundle\FormBundle\Form\Type\OroUnstructuredTextType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -12,6 +14,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for old REST API of datagrid views.
+ */
 class GridViewType extends AbstractType
 {
     /**
@@ -47,12 +52,12 @@ class GridViewType extends AbstractType
                     'required' => false,
                 ]
             )
-            ->add('appearanceData', TextType::class, [
+            ->add('appearanceData', OroUnstructuredTextType::class, [
                 'property_path' => 'appearanceData',
                 'empty_data'    => [],
                 'required' => false,
             ])
-            ->add('filters', null, [
+            ->add('filters', OroUnstructuredHiddenType::class, [
                 'property_path' => 'filtersData',
                 'empty_data'    => [],
             ])
@@ -69,7 +74,7 @@ class GridViewType extends AbstractType
                     ],
                 ],
             ])
-            ->add('columns', null, [
+            ->add('columns', OroUnstructuredHiddenType::class, [
                 'property_path' => 'columns_data',
                 'empty_data'    => []
             ]);

@@ -2,140 +2,104 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Container\ContainerInterface;
 
+/**
+ * This provider uses configured builders to build menus.
+ */
 class BuilderChainProvider implements MenuProviderInterface
 {
-    const COMMON_BUILDER_ALIAS = '_common_builder';
-    const MENU_LOCAL_CACHE_PREFIX = 'menuLocalCachePrefix';
-    const IGNORE_CACHE_OPTION = 'ignoreCache';
+    public const COMMON_BUILDER_ALIAS = '_common_builder';
+    public const MENU_LOCAL_CACHE_PREFIX = 'menuLocalCachePrefix';
+    public const IGNORE_CACHE_OPTION = 'ignoreCache';
 
-    /**
-     * Collection of builders grouped by alias.
-     *
-     * @var array[]
-     */
-    protected $builders = [];
+    /** @var array [menu name => [builder id, ...], ...] */
+    private array $builders;
+    private ContainerInterface $builderContainer;
+    private FactoryInterface $factory;
+    private ArrayLoader $loader;
+    private MenuManipulator $manipulator;
+    private ?CacheItemPoolInterface $cache = null;
+    /** @var BuilderInterface[] */
+    private array $loadedBuilders = [];
+    /** @var ItemInterface[] */
+    private array $menus = [];
 
-    /**
-     * Collection of menus.
-     *
-     * @var ItemInterface[]
-     */
-    protected $menus = [];
-
-    /**
-     * @var FactoryInterface
-     */
-    private $factory;
-
-    /**
-     * @var ArrayLoader
-     */
-    private $loader;
-
-    /**
-     * @var MenuManipulator
-     */
-    private $manipulator;
-
-    /**
-     * @var CacheProvider
-     */
-    private $cache;
-
-    /**
-     * @param FactoryInterface $factory
-     * @param ArrayLoader $loader
-     * @param MenuManipulator $manipulator
-     */
     public function __construct(
+        array $builders,
+        ContainerInterface $builderContainer,
         FactoryInterface $factory,
         ArrayLoader $loader,
         MenuManipulator $manipulator
     ) {
+        $this->builders = $builders;
+        $this->builderContainer = $builderContainer;
         $this->factory = $factory;
         $this->loader = $loader;
         $this->manipulator = $manipulator;
     }
 
-    /**
-     * Set cache instance
-     *
-     * @param CacheProvider $cache
-     */
-    public function setCache(CacheProvider $cache)
+    public function setCache(CacheItemPoolInterface $cache): void
     {
         $this->cache = $cache;
-        $this->cache->setNamespace('oro_menu_instance');
     }
 
-    /**
-     * Add builder to chain.
-     *
-     * @param BuilderInterface $builder
-     * @param string           $alias
-     */
-    public function addBuilder(BuilderInterface $builder, $alias = self::COMMON_BUILDER_ALIAS)
+    public function get(string $name, array $options = []): ItemInterface
     {
-        $this->assertAlias($alias);
+        self::assertAliasNotEmpty($name);
 
-        if (!array_key_exists($alias, $this->builders)) {
-            $this->builders[$alias] = [];
-        }
-
-        $this->builders[$alias][] = $builder;
-    }
-
-    /**
-     * Build menu.
-     *
-     * @param string $alias
-     * @param array $options
-     * @return ItemInterface
-     */
-    public function get($alias, array $options = [])
-    {
-        $this->assertAlias($alias);
-        $ignoreCache = array_key_exists(self::IGNORE_CACHE_OPTION, $options);
-        $cacheAlias = $alias;
+        $cacheKey = $name;
         if (!empty($options)) {
-            $cacheAlias = $cacheAlias . md5(serialize($options));
+            $cacheKey .= md5(serialize($options));
         }
 
-        if (!array_key_exists($cacheAlias, $this->menus)) {
-            if (!$ignoreCache && $this->cache && $this->cache->contains($alias)) {
-                $menuData = $this->cache->fetch($alias);
-                $menu = $this->loader->load($menuData);
-            } else {
-                $menu = $this->buildMenu($alias, $options);
-            }
-            $this->menus[$cacheAlias] = $menu;
-        } else {
-            $menu = $this->menus[$cacheAlias];
+        if (\array_key_exists($cacheKey, $this->menus)) {
+            return $this->menus[$cacheKey];
         }
+
+        $ignoreCache = \array_key_exists(self::IGNORE_CACHE_OPTION, $options);
+        if (!$ignoreCache && $this->cache) {
+            $cacheItem = $this->cache->getItem($name);
+            $menu = $cacheItem->isHit() ? $this->loader->load($cacheItem->get()) : $this->buildMenu($name, $options);
+        } else {
+            $menu = $this->buildMenu($name, $options);
+        }
+        $this->menus[$cacheKey] = $menu;
+
         return $menu;
     }
 
+    public function has(string $name, array $options = []): bool
+    {
+        self::assertAliasNotEmpty($name);
+
+        if (\array_key_exists($name, $this->builders)) {
+            return true;
+        }
+
+        $this->buildMenu($name, $options);
+
+        return \array_key_exists($name, $this->builders);
+    }
+
     /**
-     * Reorder menu based on position attribute
-     *
-     * @param ItemInterface $menu
+     * Reorders menu based on position attribute.
      */
-    protected function sort(ItemInterface $menu)
+    private function sort(ItemInterface $menu): void
     {
         if ($menu->hasChildren() && $menu->getDisplayChildren()) {
             $orderedChildren = [];
             $unorderedChildren = [];
             $hasOrdering = false;
             $children = $menu->getChildren();
-            foreach ($children as &$child) {
+            foreach ($children as $child) {
                 if ($child->hasChildren() && $child->getDisplayChildren()) {
                     $this->sort($child);
                 }
@@ -154,69 +118,51 @@ class BuilderChainProvider implements MenuProviderInterface
         }
     }
 
-    /**
-     * Checks whether a menu exists in this provider
-     *
-     * @param  string  $alias
-     * @param  array   $options
-     * @return boolean
-     */
-    public function has($alias, array $options = [])
-    {
-        $this->assertAlias($alias);
-
-        if (array_key_exists($alias, $this->builders)) {
-            return true;
-        }
-
-        $this->buildMenu($alias, $options);
-
-        return array_key_exists($alias, $this->builders);
-    }
-
-    /**
-     * Assert alias not empty
-     *
-     * @param string $alias
-     * @throws \InvalidArgumentException
-     */
-    protected function assertAlias($alias)
+    private static function assertAliasNotEmpty(string $alias): void
     {
         if (empty($alias)) {
             throw new \InvalidArgumentException('Menu alias was not set.');
         }
     }
 
-    /**
-     * @param string $alias
-     * @param array $options
-     * @return ItemInterface
-     */
-    protected function buildMenu($alias, array $options)
+    private function buildMenu(string $name, array $options): ItemInterface
     {
-        $menu = $this->factory->createItem($alias);
+        $menu = $this->factory->createItem($name, $options);
 
-        /** @var BuilderInterface $builder */
         // try to find builder for the specified menu alias
-        if (array_key_exists($alias, $this->builders)) {
-            foreach ($this->builders[$alias] as $builder) {
-                $builder->build($menu, $options, $alias);
+        if (\array_key_exists($name, $this->builders)) {
+            foreach ($this->builders[$name] as $builderId) {
+                $this->getBuilder($builderId)->build($menu, $options, $name);
             }
         }
 
-        // In any case we must run common builder
-        if (array_key_exists(self::COMMON_BUILDER_ALIAS, $this->builders)) {
-            foreach ($this->builders[self::COMMON_BUILDER_ALIAS] as $builder) {
-                $builder->build($menu, $options, $alias);
+        // in any case we must run common builder
+        if (\array_key_exists(self::COMMON_BUILDER_ALIAS, $this->builders)) {
+            foreach ($this->builders[self::COMMON_BUILDER_ALIAS] as $builderId) {
+                $this->getBuilder($builderId)->build($menu, $options, $name);
             }
         }
 
         $this->sort($menu);
 
-        if ($this->cache) {
-            $this->cache->save($alias, $this->manipulator->toArray($menu));
+        if (null !== $this->cache) {
+            $cacheItem = $this->cache->getItem($name);
+            $cacheItem->set($this->manipulator->toArray($menu));
+            $this->cache->save($cacheItem);
         }
 
         return $menu;
+    }
+
+    private function getBuilder(string $builderId): BuilderInterface
+    {
+        if (isset($this->loadedBuilders[$builderId])) {
+            return $this->loadedBuilders[$builderId];
+        }
+
+        $builder = $this->builderContainer->get($builderId);
+        $this->loadedBuilders[$builderId] = $builder;
+
+        return $builder;
     }
 }

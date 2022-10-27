@@ -2,31 +2,25 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Entity\Repository;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\ConfigBundle\Entity\Config;
+use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;
 
 class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigValueRepository
-     */
-    protected $repository;
+    /** @var ConfigValueRepository */
+    private $repository;
 
-    /**
-     * @var EntityManager
-     */
-    protected $om;
+    /** @var EntityManager */
+    private $om;
 
-    /**
-     * prepare mocks
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->om = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('createQueryBuilder', 'beginTransaction', 'commit'))
-            ->getMock();
+        $this->om = $this->createMock(EntityManager::class);
 
         $this->repository = new ConfigValueRepository(
             $this->om,
@@ -39,38 +33,32 @@ class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testRemoveValues()
     {
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(array('delete', 'andWhere', 'where', 'setParameter', 'getQuery'))
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(array('execute'))
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())
             ->method('execute');
 
         $queryBuilder->expects($this->once())
             ->method('delete')
-            ->with('Oro\Bundle\ConfigBundle\Entity\ConfigValue', 'cv')
-            ->will($this->returnSelf());
+            ->with(ConfigValue::class, 'cv')
+            ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('where')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $queryBuilder->expects($this->exactly(2))
             ->method('andWhere')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $queryBuilder->expects($this->exactly(3))
             ->method('setParameter')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
         $this->om->expects($this->once())
             ->method('createQueryBuilder')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
         $this->om->expects($this->once())
             ->method('beginTransaction');
@@ -78,11 +66,11 @@ class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->om->expects($this->once())
             ->method('commit');
 
-        $removed = array(
-            array('oro_user', 'level')
-        );
+        $removed = [
+            ['oro_user', 'level']
+        ];
 
-        $configMock = $this->createMock('Oro\Bundle\ConfigBundle\Entity\Config');
+        $configMock = $this->createMock(Config::class);
 
         $this->repository->removeValues($configMock, $removed);
     }

@@ -1,7 +1,7 @@
 datagrids:
     process-definitions-grid:
         options:
-            entityHint: processes
+            entityHint: oro.workflow.processdefinition.entity_plural_label
             export:     false
         acl_resource: oro_process_definition_view
         source:
@@ -16,7 +16,7 @@ datagrids:
                     - process.createdAt
                     - process.name as processDefinition
                 from:
-                    - { table: '%oro_workflow.entity.process_definition.class%', alias: process }
+                    - { table: 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition', alias: process }
         columns:
             label:
                 label: oro.workflow.processdefinition.label.label
@@ -58,7 +58,7 @@ datagrids:
                 createdAt:
                     data_name: process.createdAt
             default:
-                label: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                label: ASC
         actions:
             view:
                 type:         navigate
@@ -98,11 +98,11 @@ datagrids:
 
     workflow-definitions-grid:
         options:
-            entityHint: workflows
+            entityHint: oro.workflow.workflowdefinition.entity_plural_label
             export:     false
-            mass_actions:
-                delete:
-                    enabled: false
+        mass_actions:
+            delete:
+                disabled: true
         acl_resource: oro_workflow_definition_view
         source:
             type: orm
@@ -123,7 +123,7 @@ datagrids:
                     - w.createdAt
                     - w.configuration
                 from:
-                    - { table: '%oro_workflow.entity.workflow_definition.class%', alias: w }
+                    - { table: 'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition', alias: w }
         columns:
             label:
                 label:         oro.workflow.workflowdefinition.label.label
@@ -148,17 +148,17 @@ datagrids:
             applications:
                 label:         oro.workflow.workflowdefinition.applications.label
                 type:          twig
-                template:      OroWorkflowBundle:Datagrid:Column/applications.html.twig
+                template:      '@OroWorkflow/Datagrid/Column/applications.html.twig'
                 frontend_type: html
             exclusiveActiveGroups:
                 label:         oro.workflow.workflowdefinition.exclusive_active_groups.label
                 type:          twig
-                template:      OroWorkflowBundle:Datagrid:Column/exclusiveGroups.html.twig
+                template:      '@OroWorkflow/Datagrid/Column/exclusiveGroups.html.twig'
                 frontend_type: html
             exclusiveRecordGroups:
                 label:         oro.workflow.workflowdefinition.exclusive_record_groups.label
                 type:          twig
-                template:      OroWorkflowBundle:Datagrid:Column/exclusiveGroups.html.twig
+                template:      '@OroWorkflow/Datagrid/Column/exclusiveGroups.html.twig'
                 frontend_type: html
             createdAt:
                 label:         oro.ui.created_at
@@ -270,12 +270,12 @@ datagrids:
             type: workflow-permission-provider
         columns:
             label:
-                label: "Workflow name"
+                label: oro.workflow.datagrid.workflow_permission.columns.label
                 data_name: label
                 frontend_type: string
                 translatable: true
             permissions:
-                label: "Permissions"
+                label: oro.workflow.datagrid.workflow_permission.columns.permissions
                 data_name: permissions
                 frontend_type: action-permissions
             identity:
@@ -293,7 +293,7 @@ datagrids:
         filters: ~
         sorters: ~
         options:
-            requireJSModules:
+            jsmodules:
                 - oroworkflow/js/datagrid/workflow-datagrid-builder
             toolbarOptions:
                 placement:

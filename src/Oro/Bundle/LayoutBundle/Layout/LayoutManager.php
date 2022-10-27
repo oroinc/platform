@@ -17,11 +17,6 @@ class LayoutManager extends BaseLayoutManager
     /** @var LayoutDataCollector */
     protected $layoutDataCollector;
 
-    /**
-     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     * @param LayoutContextHolder $contextHolder
-     * @param LayoutDataCollector $layoutDataCollector
-     */
     public function __construct(
         LayoutFactoryBuilderInterface $layoutFactoryBuilder,
         LayoutContextHolder $contextHolder,

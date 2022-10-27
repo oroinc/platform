@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var entityStructureErrorHandler;
-    var _ = require('underscore');
-    var errorHelper = require('oroui/js/error');
-    var mediator = require('oroui/js/mediator');
-    var __ = require('orotranslation/js/translator');
+    const _ = require('underscore');
+    const errorHelper = require('oroui/js/error');
+    const mediator = require('oroui/js/mediator');
+    const __ = require('orotranslation/js/translator');
 
-    entityStructureErrorHandler = {
+    const entityStructureErrorHandler = {
         _showErrorMessage: _.throttle(function() {
             errorHelper.showErrorInUI(__('oro.entity.not_exist'));
         }, 100, {trailing: false}),

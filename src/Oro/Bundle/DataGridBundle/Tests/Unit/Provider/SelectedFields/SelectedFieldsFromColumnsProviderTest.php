@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 
 class SelectedFieldsFromColumnsProviderTest extends AbstractSelectedFieldsProviderTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,8 +53,7 @@ class SelectedFieldsFromColumnsProviderTest extends AbstractSelectedFieldsProvid
      */
     protected function mockGetConfiguration(array $configuration): void
     {
-        $this->datagridConfiguration
-            ->expects(self::once())
+        $this->datagridConfiguration->expects(self::once())
             ->method('offsetGet')
             ->with(Configuration::COLUMNS_KEY)
             ->willReturn($configuration);

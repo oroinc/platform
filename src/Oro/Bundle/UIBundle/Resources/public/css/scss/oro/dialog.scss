@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-/* dialog jQuery ui  start */
+/* dialog jQuery ui start */
 .ui-dialog {
     background: $dialog-background;
     box-shadow: $dialog-box-shadow;
@@ -13,21 +13,21 @@
     flex-direction: $dialog-flex-direction;
 
     &-titlebar {
-        background: $primary-300;
+        background: $primary-200;
         border-radius: $dialog-border-radius $dialog-border-radius 0 0;
 
         padding: $dialog-titlebar-inner-offset;
         width: $dialog-titlebar-width;
         top: $dialog-titlebar-top;
-        #{$start}: $dialog-titlebar-start;
+        left: $dialog-titlebar-start;
         flex-shrink: $dialog-titlebar-flex-shrink;
         align-items: $dialog-titlebar-falign-items;
         display: $dialog-titlebar-display;
 
         cursor: $dialog-titlebar-cursor;
 
-        &:before,
-        &:after {
+        &::before,
+        &::after {
             content: none;
         }
 
@@ -37,12 +37,13 @@
 
         .ui-dialog-titlebar-close {
             position: $dialog-titlebar-close-position;
-            #{$end}: $dialog-titlebar-close-end;
+            right: $dialog-titlebar-close-end;
             top: $dialog-titlebar-close-top;
         }
     }
 
     &-title {
+        position: relative;
         color: $primary-inverse;
         font-weight: $dialog-title-font-weight;
         font-size: $base-font-size--l;
@@ -52,40 +53,86 @@
         text-overflow: $dialog-title-text-overflow;
         flex-grow: 1;
         flex-shrink: 1;
+        text-align: left;
+        margin-right: $content-padding-medium;
 
         .lang-en & {
             text-transform: capitalize;
         }
+
+        &::after {
+            display: inline-block;
+            content: '';
+        }
+
+        &__inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     }
 
     &-content {
-        padding: $dialog-content-inner-offset;
         margin: $dialog-content-outer-offset;
         background: $primary-inverse;
         position: $dialog-content-position;
         min-width: $dialog-content-min-width;
         width: $dialog-content-width;
-        min-height: $dialog-content-min-height; // since minHeight of dialog is 199px (clientHeight 197px - header 30px - ActionPanel 49px)
+        max-width: 100%;
+        // since minHeight of dialog is 199px (clientHeight 197px - header 30px - ActionPanel 49px)
+        min-height: $dialog-content-min-height;
         overflow: $dialog-content-overflow;
         flex-shrink: $dialog-content-flex-shrink;
         flex-grow: $dialog-content-flex-grow;
+
+        &:focus {
+            outline: none;
+        }
 
         .ui-resizable-handle {
             cursor: $dialog-resizable-handle-cursor;
         }
 
         .widget-content {
-            position: relative;
+            position: $dialog-content-widget-content-position;
+            margin: $dialog-content-inner-offset;
+
+            .flash-messages {
+                max-width: $dialog-content-flash-messages-max-width;
+                min-width: $dialog-content-flash-messages-min-width;
+            }
+        }
+    }
+
+    .ui-dialog-messages {
+        padding: $dialog-ui-dialog-messages-inner-offset;
+        background: $primary-inverse;
+
+        &:empty {
+            display: none;
         }
     }
 
     .ui-widget-content {
         border: $dialog-widget-content-border;
+        color: $dialog-widget-content-color;
     }
 
     &-titlebar-min {
         border-radius: $dialog-border-radius;
         cursor: $dialog-titlebar-min-cursor;
+    }
+
+    // Reset offset for layout content into dialog
+    .ui-dialog-content {
+        form > .layout-content {
+            padding: 0;
+        }
     }
 
     &.ui-resizable {
@@ -120,13 +167,18 @@
     }
 
     .ui-dialog-titlebar-buttonpane {
-        #{$end}: $dialog-titlebar-buttonpane-end;
-
-        /* iOS 11 */
-        #{$end}: $dialog-titlebar-buttonpane-end-ios11 !important;
+        right: $dialog-titlebar-buttonpane-end;
 
         /* iOS 11.2+ */
-        #{$end}: $dialog-titlebar-buttonpane-end-ios11-2 !important;
+
+        /* rtl:ignore */
+        right: calc(env(safe-area-inset-right) + 16px);
+
+        /* rtl:ignore */
+
+        /* rtl:raw:
+        left: calc(env(safe-area-inset-left) + 16px);
+        */
         top: $dialog-titlebar-buttonpane-top;
         margin: $dialog-titlebar-buttonpane-outer-offset;
         height: $dialog-titlebar-buttonpane-height;
@@ -135,8 +187,8 @@
         position: static;
 
         [class*='ui-dialog-titlebar-'] {
-            margin-#{$end}: 13px;
-            margin-#{$start}: 0;
+            margin-right: 13px;
+            margin-left: 0;
             padding: 0;
 
             .ui-icon {
@@ -147,11 +199,11 @@
                 display: none;
             }
 
-            &:before {
+            &::before {
                 display: inline-block;
                 color: $primary-inverse;
                 font-size: $base-font-size--l;
-                font-family: FontAwesome;
+                font-family: $fa-font-family;
                 text-align: center;
                 line-height: 1;
 
@@ -161,19 +213,23 @@
             }
         }
 
-        .ui-dialog-titlebar-close:before {
+        .close-dialog {
+            margin-right: 0;
+        }
+
+        .ui-dialog-titlebar-close::before {
             content: $dialog-titlebar-close-icon;
         }
 
-        .ui-dialog-titlebar-maximize:before {
+        .ui-dialog-titlebar-maximize::before {
             content: $dialog-titlebar-maximize-icon;
         }
 
-        .ui-dialog-titlebar-minimize:before {
+        .ui-dialog-titlebar-minimize::before {
             content: $dialog-titlebar-minimize-icon;
         }
 
-        .ui-dialog-titlebar-restore:before {
+        .ui-dialog-titlebar-restore::before {
             content: $dialog-titlebar-restore-icon;
         }
 
@@ -201,21 +257,21 @@
             .ui-dialog-titlebar-buttonpane {
                 background: $dialog-titlebar-min-background;
                 border: $dialog-titlebar-min-border;
-                #{$end}: $dialog-titlebar-min-end;
+                right: $dialog-titlebar-min-end;
                 top: $dialog-titlebar-min-top;
 
                 [class*='ui-dialog-titlebar-'] {
-                    margin-#{$end}: $dialog-titlebar-min-button-outer-offset;
+                    margin-right: $dialog-titlebar-min-button-outer-offset;
 
-                    &:before {
-                        border-#{$end}: none;
+                    &::before {
+                        border-right: none;
                         color: $primary-700;
                         font-size: $base-font-size;
                     }
 
-                    &:hover:before,
-                    &:active:before,
-                    &:focus:before {
+                    &:hover::before,
+                    &:active::before,
+                    &:focus::before {
                         color: $primary-200;
                     }
                 }
@@ -235,11 +291,11 @@
         flex-shrink: $dialog-buttonpane-flex-shrink;
 
         .widget-actions-section {
-            margin-#{$start}: $dialog-buttonpane-widget-actions-section-offset-left;
+            margin-left: $dialog-buttonpane-widget-actions-section-offset-left;
         }
 
         .action-wrapper {
-            margin-#{$start}: $dialog-buttonpane-action-wrapper-offset-left;
+            margin-left: $dialog-buttonpane-action-wrapper-offset-left;
         }
     }
 }
@@ -250,25 +306,25 @@
     margin: $dialog-resizable-se-outer-offset;
     position: $dialog-resizable-se-position;
     bottom: $dialog-resizable-se-bottom;
-    #{$end}: $dialog-resizable-se-end;
+    right: $dialog-resizable-se-end;
     cursor: $dialog-resizable-se-cursor;
 
-    &:before,
-    &:after {
-        content: "";
+    &::before,
+    &::after {
+        content: '';
         border-top: $dialog-resizable-se-presudo-border-top;
         display: $dialog-resizable-se-presudo-display;
         position: $dialog-resizable-se-presudo-position;
         top: $dialog-resizable-se-presudo-top;
-        #{$end}: $dialog-resizable-se-presudo-end;
+        right: $dialog-resizable-se-presudo-end;
         bottom: $dialog-resizable-se-presudo-bottom;
-        #{$start}: $dialog-resizable-se-presudo-start;
+        left: $dialog-resizable-se-presudo-start;
         height: $dialog-resizable-se-presudo-height;
         margin: $dialog-resizable-se-presudo-margin;
         transform: $dialog-resizable-se-presudo-transform;
     }
 
-    &:after {
+    &::after {
         top: $dialog-resizable-se-presudo-db-top;
     }
 }
@@ -292,4 +348,3 @@
     z-index: $ui-widget-overlay-z-index;
     background-color: $ui-widget-overlay-background-color;
 }
-

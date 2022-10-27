@@ -9,38 +9,33 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class GlobalOptionsProviderRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var GlobalOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var GlobalOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $firstProvider;
 
-    /**
-     * @var GlobalOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var GlobalOptionsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $secondProvider;
 
-    /**
-     * @var GlobalOptionsProviderRegistry
-     */
+    /** @var GlobalOptionsProviderRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->firstProvider = $this->createMock(GlobalOptionsProviderInterface::class);
         $this->secondProvider = $this->createMock(GlobalOptionsProviderInterface::class);
-        $this->registry = new GlobalOptionsProviderRegistry();
-        $this->registry->registerProvider($this->firstProvider);
-        $this->registry->registerProvider($this->secondProvider);
+
+        $this->registry = new GlobalOptionsProviderRegistry(
+            [$this->firstProvider, $this->secondProvider]
+        );
     }
 
     public function testAddGlobalOptions()
     {
-        /** @var Command $command */
         $command = $this->createMock(Command::class);
-        $this->firstProvider->expects($this->once())
+
+        $this->firstProvider->expects(self::once())
             ->method('addGlobalOptions')
             ->with($command);
-        $this->secondProvider->expects($this->once())
+        $this->secondProvider->expects(self::once())
             ->method('addGlobalOptions')
             ->with($command);
 
@@ -49,12 +44,12 @@ class GlobalOptionsProviderRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveGlobalOptions()
     {
-        /** @var InputInterface $input */
         $input = $this->createMock(InputInterface::class);
-        $this->firstProvider->expects($this->once())
+
+        $this->firstProvider->expects(self::once())
             ->method('resolveGlobalOptions')
             ->with($input);
-        $this->secondProvider->expects($this->once())
+        $this->secondProvider->expects(self::once())
             ->method('resolveGlobalOptions')
             ->with($input);
 

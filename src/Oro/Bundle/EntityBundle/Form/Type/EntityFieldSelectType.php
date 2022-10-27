@@ -8,8 +8,11 @@ use Oro\Bundle\FormBundle\Form\Type\Select2HiddenType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for entity select.
+ */
 class EntityFieldSelectType extends AbstractType
 {
     const NAME = 'oro_entity_field_select';
@@ -31,10 +34,6 @@ class EntityFieldSelectType extends AbstractType
 
     /**
      * Constructor
-     *
-     * @param EntityProvider      $entityProvider
-     * @param EntityFieldProvider $entityFieldProvider
-     * @param TranslatorInterface $translator
      */
     public function __construct(
         EntityProvider $entityProvider,
@@ -55,8 +54,8 @@ class EntityFieldSelectType extends AbstractType
 
         $defaultConfigs = [
             'placeholder'             => 'oro.entity.form.choose_entity_field',
-            'result_template_twig'    => 'OroEntityBundle:Select:entity_field/result.html.twig',
-            'selection_template_twig' => 'OroEntityBundle:Select:entity_field/selection%s.html.twig',
+            'result_template_twig'    => '@OroEntity/Select/entity_field/result.html.twig',
+            'selection_template_twig' => '@OroEntity/Select/entity_field/selection%s.html.twig',
             'component'               => 'entity-field-select'
         ];
 
@@ -149,13 +148,13 @@ class EntityFieldSelectType extends AbstractType
      */
     protected function getData($entityName, $withRelations, $withVirtualFields, $withUnidirectional)
     {
-        $fields = $this->entityFieldProvider->getFields(
-            $entityName,
-            $withRelations,
-            $withVirtualFields,
-            true,
-            $withUnidirectional
-        );
+        $options = EntityFieldProvider::OPTION_WITH_ENTITY_DETAILS
+            | EntityFieldProvider::OPTION_APPLY_EXCLUSIONS
+            | EntityFieldProvider::OPTION_TRANSLATE;
+        $options |= $withRelations ? EntityFieldProvider::OPTION_WITH_RELATIONS : 0;
+        $options |= $withVirtualFields ? EntityFieldProvider::OPTION_WITH_VIRTUAL_FIELDS : 0;
+        $options |= $withUnidirectional ? EntityFieldProvider::OPTION_WITH_UNIDIRECTIONAL : 0;
+        $fields = $this->entityFieldProvider->getEntityFields($entityName, $options);
 
         return $this->convertData($fields, $entityName, null);
     }

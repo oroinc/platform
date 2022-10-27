@@ -41,7 +41,7 @@ class EntitiesToIdsTransformer extends EntityToIdTransformer
         if (!$value) {
             return array();
         }
-        
+
         if (!is_array($value) && !$value instanceof \Traversable) {
             throw new UnexpectedTypeException($value, 'array');
         }

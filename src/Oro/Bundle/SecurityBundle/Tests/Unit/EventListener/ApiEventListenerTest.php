@@ -8,25 +8,26 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ApiEventListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ApiEventListener */
-    protected $listener;
+    /** @var RequestAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestAuthorizationChecker;
+
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
 
     /** @var Request */
-    protected $request;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $requestAuthorizationChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclHelper;
+    private $request;
 
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
-    public function setUp()
+    /** @var ApiEventListener */
+    private $listener;
+
+    protected function setUp(): void
     {
         $this->requestAuthorizationChecker = $this->createMock(RequestAuthorizationChecker::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
@@ -43,23 +44,23 @@ class ApiEventListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onFindAfterProvider
      */
-    public function testOnFindAfter($isGranted, $throwException)
+    public function testOnFindAfter(int $isGranted, bool $throwException)
     {
         $this->requestStack->push($this->request);
         $object = new \stdClass();
         $this->requestAuthorizationChecker->expects($this->once())
             ->method('isRequestObjectIsGranted')
             ->with($this->request, $object)
-            ->will($this->returnValue($isGranted));
+            ->willReturn($isGranted);
 
         if ($throwException) {
-            $this->expectException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
+            $this->expectException(AccessDeniedException::class);
         }
         $event = new FindAfter($object);
         $this->listener->onFindAfter($event);
     }
 
-    public function onFindAfterProvider()
+    public function onFindAfterProvider(): array
     {
         return [
             [-1, true],

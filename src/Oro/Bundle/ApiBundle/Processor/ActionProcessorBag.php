@@ -4,23 +4,30 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
+/**
+ * The storage for processors for all public API actions.
+ */
 class ActionProcessorBag implements ActionProcessorBagInterface
 {
-    /** @var ActionProcessorInterface[] */
-    protected $processors = [];
+    /** @var ActionProcessorInterface[] [action => processor, ...] */
+    private array $processors = [];
+
+    /** @var string[]|null */
+    private ?array $publicActions = null;
 
     /**
      * {@inheritdoc}
      */
-    public function addProcessor(ActionProcessorInterface $processor)
+    public function addProcessor(ActionProcessorInterface $processor): void
     {
         $this->processors[$processor->getAction()] = $processor;
+        $this->publicActions = null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getProcessor($action)
+    public function getProcessor(string $action): ActionProcessorInterface
     {
         if (!isset($this->processors[$action])) {
             throw new \InvalidArgumentException(sprintf('A processor for "%s" action was not found.', $action));
@@ -32,8 +39,24 @@ class ActionProcessorBag implements ActionProcessorBagInterface
     /**
      * {@inheritdoc}
      */
-    public function getActions()
+    public function getActions(): array
     {
-        return array_keys($this->processors);
+        if (null === $this->publicActions) {
+            $publicActions = array_keys($this->processors);
+            /**
+             * The "unhandled_error" action is a special case.
+             * This action is not a public action, but it is stored in this bag to be able get it
+             * by RequestActionHandler.
+             * @see \Oro\Bundle\ApiBundle\Request\RequestActionHandler::handleUnhandledError
+             */
+            $key = array_search('unhandled_error', $publicActions, true);
+            if (false !== $key) {
+                unset($publicActions[$key]);
+                $publicActions = array_values($publicActions);
+            }
+            $this->publicActions = $publicActions;
+        }
+
+        return $this->publicActions;
     }
 }

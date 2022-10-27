@@ -15,9 +15,6 @@ class Configuration implements ConfigurationInterface
     /** @var int */
     private $defaultPerPage;
 
-    /**
-     * @param ConfigManager $cm
-     */
     public function __construct(ConfigManager $cm)
     {
         $this->defaultPerPage = $cm->get('oro_data_grid.default_per_page');
@@ -28,9 +25,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('toolbarOptions');
 
-        $builder->root('toolbarOptions')
+        $builder->getRootNode()
             ->children()
                 ->booleanNode('hide')->defaultFalse()->end()
                 ->booleanNode('addResetAction')->defaultTrue()->end()

@@ -22,8 +22,10 @@ oro:
                 cancel:         Cancel
             grouping_columns:   Grouping Columns
             date_grouping:
-                field_name: Date grouping field
-                not_nullable_field: Not nullable field
+                date_field.label: Date field
+                use_date_grouping_filter.label: Enable grouping by date
+                use_skip_empty_periods.label: Allow to skip empty time periods
+
             column:             Column
             label:              Label
             function:           Function
@@ -40,6 +42,11 @@ oro:
                 aggregated_field_condition:   Aggregation column
                 conditions_group:  Conditions Group
             choose_entity_field: Choose a field...
-        validation:
-            grouping: "%columns% must appear in grouping."
-            query: Invalid query
+        system_configuration:
+            fields:
+                conditions_group_merge_same_entity_conditions:
+                    label: 'Group same-entity conditions within condition groups'
+                    tooltip: >
+                        If enabled, the conditions defined for the same entity within a condition group will be
+                        applied together in the same sub-query. Using multiple condition groups or disabling this
+                        option will result in multiple sub-queries.

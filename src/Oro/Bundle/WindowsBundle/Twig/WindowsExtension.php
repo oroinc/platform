@@ -5,28 +5,25 @@ namespace Oro\Bundle\WindowsBundle\Twig;
 use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class WindowsExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to display restored state of dialog window(s):
+ *   - oro_windows_restore
+ *   - oro_window_render_fragment
+ */
+class WindowsExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXTENSION_NAME = 'oro_windows';
+    protected ContainerInterface $container;
+    /** Protect extension from infinite loop */
+    private bool $rendered = false;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * Protect extension from infinite loop
-     *
-     * @var bool
-     */
-    protected $rendered = false;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -49,20 +46,28 @@ class WindowsExtension extends \Twig_Extension
     }
 
     /**
+     * @return FragmentHandler
+     */
+    protected function getFragmentHandler()
+    {
+        return $this->container->get('fragment.handler');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_windows_restore',
                 [$this, 'render'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_window_render_fragment',
                 [$this, 'renderFragment'],
-                ['needs_environment' => true, 'is_safe' => ['html']]
+                ['is_safe' => ['html']]
             ),
         ];
     }
@@ -70,11 +75,11 @@ class WindowsExtension extends \Twig_Extension
     /**
      * Renders windows restore html block
      *
-     * @param \Twig_Environment $environment
+     * @param Environment $environment
      *
      * @return string
      */
-    public function render(\Twig_Environment $environment)
+    public function render(Environment $environment)
     {
         if ($this->rendered) {
             return '';
@@ -82,14 +87,13 @@ class WindowsExtension extends \Twig_Extension
 
         $this->rendered = true;
 
-        try {
-            $windowsStates = $this->getWindowsStateManagerRegistry()->getManager()->getWindowsStates();
-        } catch (AccessDeniedException $e) {
-            $windowsStates = [];
-        }
+        $manager = $this->getWindowsStateManagerRegistry()->getManager();
+        $windowsStates = null !== $manager
+            ? $manager->getWindowsStates()
+            : [];
 
         return $environment->render(
-            'OroWindowsBundle::states.html.twig',
+            '@OroWindows/states.html.twig',
             ['windowStates' => $windowsStates]
         );
     }
@@ -97,48 +101,41 @@ class WindowsExtension extends \Twig_Extension
     /**
      * Renders fragment by window state.
      *
-     * @param \Twig_Environment $environment
      * @param AbstractWindowsState $windowState
      *
      * @return string
      */
-    public function renderFragment(\Twig_Environment $environment, AbstractWindowsState $windowState)
+    public function renderFragment(AbstractWindowsState $windowState)
     {
-        $result = '';
-        $scheduleDelete = false;
         $windowState->setRenderedSuccessfully(false);
-
         try {
             $uri = $this->getWindowsStateRequestManager()->getUri($windowState->getData());
 
-            /** @var FragmentHandler $fragmentHandler */
-            $fragmentHandler = $this->container->get('fragment.handler');
-            $result = $fragmentHandler->render($uri);
+            $result = $this->getFragmentHandler()->render($uri);
             $windowState->setRenderedSuccessfully(true);
 
             return $result;
         } catch (NotFoundHttpException $e) {
-            $scheduleDelete = true;
         } catch (\InvalidArgumentException $e) {
-            $scheduleDelete = true;
         }
 
-        if ($scheduleDelete) {
-            try {
-                $this->getWindowsStateManagerRegistry()->getManager()->deleteWindowsState($windowState->getId());
-            } catch (AccessDeniedException $e) {
-                return $result;
-            }
+        $manager = $this->getWindowsStateManagerRegistry()->getManager();
+        if (null !== $manager) {
+            $manager->deleteWindowsState($windowState->getId());
         }
 
-        return $result;
+        return '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::EXTENSION_NAME;
+        return [
+            'oro_windows.manager.windows_state_registry' => WindowsStateManagerRegistry::class,
+            'oro_windows.manager.windows_state_request' => WindowsStateRequestManager::class,
+            'fragment.handler' => FragmentHandler::class,
+        ];
     }
 }

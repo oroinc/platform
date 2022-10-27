@@ -1,165 +1,133 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ArrayToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider transformDataProvider
-     * @param string $delimiter
-     * @param boolean $filterUinqueValues
-     * @param mixed $value
-     * @param mixed $expectedValue
-     */
-    public function testTransform($delimiter, $filterUinqueValues, $value, $expectedValue)
-    {
-        $transformer = $this->createTestTransfomer($delimiter, $filterUinqueValues);
-        $this->assertEquals($expectedValue, $transformer->transform($value));
+    private function getTestTransformer(
+        bool $allowNull = false,
+        string $delimiter = ',',
+        bool $filterUniqueValues = false
+    ): ArrayToStringTransformer {
+        return new ArrayToStringTransformer($delimiter, $filterUniqueValues, $allowNull);
     }
 
-    public function transformDataProvider()
+    public function testTransformForNullValue(): void
     {
-        return array(
-            'default' => array(
-                ',',
-                false,
-                array(1, 2, 3, 4),
-                '1,2,3,4',
-            ),
-            'null' => array(
-                ',',
-                false,
-                null,
-                ''
-            ),
-            'empty array' => array(
-                ',',
-                false,
-                array(),
-                ''
-            ),
-            'trim delimiter' => array(
-                ' , ',
-                false,
-                array(1, 2, 3, 4),
-                '1,2,3,4'
-            ),
-            'filter unique values on' => array(
-                ',',
-                true,
-                array(1, 1, 2, 2, 3, 3, 4, 4),
-                '1,2,3,4'
-            ),
-            'filter unique values off' => array(
-                ',',
-                false,
-                array(1, 1, 2, 2, 3, 3, 4, 4),
-                '1,1,2,2,3,3,4,4'
-            ),
-            'space delimiter' => array(
-                ' ',
-                false,
-                array(1, 2, 3, 4),
-                '1 2 3 4'
-            ),
+        self::assertSame('', $this->getTestTransformer()->transform(null));
+        self::assertSame('', $this->getTestTransformer(true)->transform(null));
+    }
+
+    public function testTransformForEmptyArrayValue(): void
+    {
+        self::assertSame('', $this->getTestTransformer()->transform([]));
+        self::assertSame('', $this->getTestTransformer(true)->transform([]));
+    }
+
+    public function testTransformForNotArrayValue(): void
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected an array.');
+
+        $this->getTestTransformer()->transform(123);
+    }
+
+    public function testTransformForDefaultOptions(): void
+    {
+        self::assertSame('1,2,3', $this->getTestTransformer()->transform(['1', '2', '3']));
+    }
+
+    public function testTransformForDelimiterThatShouldBeTrimmed(): void
+    {
+        self::assertSame('1,2,3', $this->getTestTransformer(false, ' , ')->transform(['1', '2', '3']));
+    }
+
+    public function testTransformForSpaceDelimiter(): void
+    {
+        self::assertSame('1 2 3', $this->getTestTransformer(false, ' ')->transform(['1', '2', '3']));
+    }
+
+    public function testTransformForNotUniqueElementsInArrayAndWithoutFilterUniqueValuesOption(): void
+    {
+        self::assertSame(
+            '1,1,2,2,3,3,4,4',
+            $this->getTestTransformer()->transform(['1', '1', '2', '2', '3', '3', '4', '4'])
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "string" given
-     */
-    public function testTransformFailsWhenUnexpectedType()
+    public function testTransformForNotUniqueElementsInArrayAndWithFilterUniqueValuesOption(): void
     {
-        $transformer = $this->createTestTransfomer();
-        $transformer->transform('');
-    }
-
-    /**
-     * @dataProvider reverseTransformDataProvider
-     * @param string $delimiter
-     * @param boolean $filterUinqueValues
-     * @param mixed $value
-     * @param mixed $expectedValue
-     */
-    public function testReverseTransform($delimiter, $filterUinqueValues, $value, $expectedValue)
-    {
-        $transformer = $this->createTestTransfomer($delimiter, $filterUinqueValues);
-        $this->assertEquals($expectedValue, $transformer->reverseTransform($value));
-    }
-
-    public function reverseTransformDataProvider()
-    {
-        return array(
-            'default' => array(
-                ',',
-                false,
-                '1,2,3,4',
-                array('1', '2', '3', '4')
-            ),
-            'null' => array(
-                ',',
-                false,
-                null,
-                array()
-            ),
-            'empty string' => array(
-                ',',
-                false,
-                '',
-                array()
-            ),
-            'trim and empty values' => array(
-                ',',
-                false,
-                ' , 1 , 2 , , 3 , 4,  ',
-                array('1', '2', '3', '4')
-            ),
-            'trim delimiter' => array(
-                ' , ',
-                false,
-                '1,2,3,4',
-                array('1', '2', '3', '4')
-            ),
-            'filter unique values on' => array(
-                ',',
-                true,
-                '1,1,2,2,3,3,4,4',
-                array('1', '2', '3', '4')
-            ),
-            'filter unique values off' => array(
-                ',',
-                false,
-                '1,1,2,2,3,3,4,4',
-                array('1', '1', '2', '2', '3', '3', '4', '4')
-            ),
-            'space delimiter' => array(
-                ' ',
-                false,
-                ' 1  2  3  4 ',
-                array('1', '2', '3', '4')
-            ),
+        self::assertSame(
+            '1,2,3,4',
+            $this->getTestTransformer(false, ',', true)->transform(['1', '1', '2', '2', '3', '3', '4', '4'])
         );
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "array" given
-     */
-    public function testReverseTransformFailsWhenUnexpectedType()
+    public function testReverseTransformForNullValue(): void
     {
-        $this->createTestTransfomer()->reverseTransform(array());
+        self::assertSame([], $this->getTestTransformer()->reverseTransform(null));
+        self::assertNull($this->getTestTransformer(true)->reverseTransform(null));
     }
 
-    /**
-     * @param string $delimiter
-     * @param boolean $filterUinqueValues
-     * @return ArrayToStringTransformer
-     */
-    private function createTestTransfomer($delimiter = ',', $filterUinqueValues = false)
+    public function testReverseTransformForEmptyStringValue(): void
     {
-        return new ArrayToStringTransformer($delimiter, $filterUinqueValues);
+        self::assertSame([], $this->getTestTransformer()->reverseTransform(''));
+        self::assertNull($this->getTestTransformer(true)->reverseTransform(''));
+    }
+
+    public function testReverseTransformForEmptyJsonArrayStringValue(): void
+    {
+        self::assertSame([], $this->getTestTransformer()->reverseTransform('[]'));
+        self::assertNull($this->getTestTransformer(true)->reverseTransform('[]'));
+    }
+
+    public function testReverseTransformForNotStringValue(): void
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a string.');
+
+        $this->getTestTransformer()->reverseTransform(123);
+    }
+
+    public function testReverseTransformForDefaultOptions(): void
+    {
+        self::assertSame(['1', '2', '3'], $this->getTestTransformer()->reverseTransform('1,2,3'));
+    }
+
+    public function testReverseTransformForElementsThatShouldBeTrimmed(): void
+    {
+        self::assertSame(['1', '2', '3', '4'], $this->getTestTransformer()->reverseTransform(' , 1 , 2 , , 3 , 4,  '));
+    }
+
+    public function testReverseTransformForDelimiterThatShouldBeTrimmed(): void
+    {
+        self::assertSame(['1', '2', '3'], $this->getTestTransformer(false, ' , ')->reverseTransform('1,2,3'));
+    }
+
+    public function testReverseTransformForSpaceDelimiter(): void
+    {
+        self::assertSame(['1', '2', '3'], $this->getTestTransformer(false, ' ')->reverseTransform('1 2 3'));
+    }
+
+    public function testReverseTransformForNotUniqueElementsInArrayAndWithoutFilterUniqueValuesOption(): void
+    {
+        self::assertSame(
+            ['1', '1', '2', '2', '3', '3', '4', '4'],
+            $this->getTestTransformer()->reverseTransform('1,1,2,2,3,3,4,4')
+        );
+    }
+
+    public function testReverseTransformForNotUniqueElementsInArrayAndWithFilterUniqueValuesOption(): void
+    {
+        self::assertSame(
+            ['1', '2', '3', '4'],
+            $this->getTestTransformer(false, ',', true)->reverseTransform('1,1,2,2,3,3,4,4')
+        );
     }
 }

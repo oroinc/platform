@@ -2,65 +2,53 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
+use Oro\Bundle\WorkflowBundle\Acl\Extension\TransitionLabel;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadata;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadataProvider;
+use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowLabel;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
     /** @var WorkflowAclMetadataProvider */
-    protected $workflowAclMetadataProvider;
+    private $workflowAclMetadataProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->workflowAclMetadataProvider = new WorkflowAclMetadataProvider(
             $this->doctrine,
-            $this->translator,
             $this->featureChecker
         );
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function loadWorkflowExpectations()
+    private function loadWorkflowExpectations()
     {
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $qb = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $query = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getArrayResult'])
-            ->getMockForAbstractClass();
+        $em = $this->createMock(EntityManager::class);
+        $repo = $this->createMock(EntityRepository::class);
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(WorkflowDefinition::class)
@@ -113,31 +101,15 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->willReturnCallback(function ($label, $parameters, $domain) {
-                $result = 'translated: ' . $label;
-                if (!empty($parameters)) {
-                    foreach ($parameters as $key => $val) {
-                        $result .= ' ' . $key . ': (' . $val . ')';
-                    }
-                }
-                if (!empty($domain)) {
-                    $result .= ' [domain: ' . $domain . ']';
-                }
-
-                return $result;
-            });
 
         $expectedTransition = new FieldSecurityMetadata(
             'transition1|step1|next_step',
-            'translated: transition 1 [domain: workflows] '
-            . "(translated: step 1 [domain: workflows] \u{2192} translated: next step [domain: workflows])"
+            new TransitionLabel('transition 1', 'next step', 'step 1')
         );
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
-            'translated: workflow 1 [domain: workflows]',
-            '',
+            new WorkflowLabel('workflow 1'),
+            null,
             [$expectedTransition]
         );
         self::assertEquals(
@@ -180,26 +152,11 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->willReturnCallback(function ($label, $parameters, $domain) {
-                $result = 'translated: ' . $label;
-                if (!empty($parameters)) {
-                    foreach ($parameters as $key => $val) {
-                        $result .= ' ' . $key . ': (' . $val . ')';
-                    }
-                }
-                if (!empty($domain)) {
-                    $result .= ' [domain: ' . $domain . ']';
-                }
-
-                return $result;
-            });
 
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
-            'translated: workflow 1 [domain: workflows]',
-            '',
+            new WorkflowLabel('workflow 1'),
+            null,
             []
         );
         self::assertEquals(
@@ -237,31 +194,15 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->willReturnCallback(function ($label, $parameters, $domain) {
-                $result = 'translated: ' . $label;
-                if (!empty($parameters)) {
-                    foreach ($parameters as $key => $val) {
-                        $result .= ' ' . $key . ': (' . $val . ')';
-                    }
-                }
-                if (!empty($domain)) {
-                    $result .= ' [domain: ' . $domain . ']';
-                }
-
-                return $result;
-            });
 
         $expectedTransition = new FieldSecurityMetadata(
             'transition1||next_step',
-            'translated: transition 1 [domain: workflows] '
-            . "(translated: (Start) [domain: jsmessages] \u{2192} translated: next step [domain: workflows])"
+            new TransitionLabel('transition 1', 'next step')
         );
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
-            'translated: workflow 1 [domain: workflows]',
-            '',
+            new WorkflowLabel('workflow 1'),
+            null,
             [$expectedTransition]
         );
         self::assertEquals(
@@ -298,32 +239,55 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->willReturnCallback(function ($label, $parameters, $domain) {
-                $result = 'translated: ' . $label;
-                if (!empty($parameters)) {
-                    foreach ($parameters as $key => $val) {
-                        $result .= ' ' . $key . ': (' . $val . ')';
-                    }
-                }
-                if (!empty($domain)) {
-                    $result .= ' [domain: ' . $domain . ']';
-                }
-
-                return $result;
-            });
 
         $expectedTransition = new FieldSecurityMetadata(
             '__start__||next_step',
-            'translated: transition 1 [domain: workflows] '
-            . "(translated: (Start) [domain: jsmessages] \u{2192} translated: next step [domain: workflows])"
+            new TransitionLabel('transition 1', 'next step')
         );
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
-            'translated: workflow 1 [domain: workflows]',
-            '',
+            new WorkflowLabel('workflow 1'),
+            null,
             [$expectedTransition]
+        );
+        self::assertEquals(
+            [$expectedMetadata],
+            $this->workflowAclMetadataProvider->getMetadata()
+        );
+    }
+
+    public function testGetMetadataWhenTransitionDoesNotExist()
+    {
+        $workflowName = 'workflow1';
+        $workflowConfiguration = [
+            'steps'       => [
+                'step1' => ['allowed_transitions' => ['transition1'], 'label' => 'step 1']
+            ],
+            'transitions' => []
+        ];
+
+        $query = $this->loadWorkflowExpectations();
+        $query->expects(self::once())
+            ->method('getArrayResult')
+            ->willReturn(
+                [
+                    [
+                        'name'          => $workflowName,
+                        'label'         => 'workflow 1',
+                        'configuration' => $workflowConfiguration
+                    ]
+                ]
+            );
+        $this->featureChecker->expects(self::once())
+            ->method('isResourceEnabled')
+            ->with($workflowName)
+            ->willReturn(true);
+
+        $expectedMetadata = new WorkflowAclMetadata(
+            $workflowName,
+            new WorkflowLabel('workflow 1'),
+            null,
+            []
         );
         self::assertEquals(
             [$expectedMetadata],
@@ -359,21 +323,15 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->with(self::isType('string'), [], 'workflows')
-            ->willReturnCallback(function ($label) {
-                return 'translated: ' . $label;
-            });
 
         $expectedTransition = new FieldSecurityMetadata(
             'transition1|step1|next_step',
-            "translated: transition 1 (translated: step 1 \u{2192} )"
+            new TransitionLabel('transition 1', null, 'step 1')
         );
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
-            'translated: workflow 1',
-            '',
+            new WorkflowLabel('workflow 1'),
+            null,
             [$expectedTransition]
         );
         self::assertEquals(
@@ -410,21 +368,15 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->with(self::isType('string'), [], 'workflows')
-            ->willReturnCallback(function ($label) {
-                return 'translated: ' . $label;
-            });
 
         $expectedTransition = new FieldSecurityMetadata(
             'transition1|step1|',
-            "translated: transition 1 (translated: step 1 \u{2192} )"
+            new TransitionLabel('transition 1', null, 'step 1')
         );
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
-            'translated: workflow 1',
-            '',
+            new WorkflowLabel('workflow 1'),
+            null,
             [$expectedTransition]
         );
         self::assertEquals(
@@ -486,17 +438,11 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->with(self::isType('string'), [], 'workflows')
-            ->willReturnCallback(function ($label) {
-                return 'translated: ' . $label;
-            });
 
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
-            'translated: workflow 1',
-            '',
+            new WorkflowLabel('workflow 1'),
+            null,
             []
         );
         self::assertEquals(
@@ -538,31 +484,15 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->willReturnCallback(function ($label, $parameters, $domain) {
-                $result = 'translated: ' . $label;
-                if (!empty($parameters)) {
-                    foreach ($parameters as $key => $val) {
-                        $result .= ' ' . $key . ': (' . $val . ')';
-                    }
-                }
-                if (!empty($domain)) {
-                    $result .= ' [domain: ' . $domain . ']';
-                }
-
-                return $result;
-            });
 
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
-            'translated: workflow 1 [domain: workflows]',
-            '',
+            new WorkflowLabel('workflow 1'),
+            null,
             [
                 new FieldSecurityMetadata(
                     'start_transition||next_step',
-                    'translated: start transition [domain: workflows] '
-                    . "(translated: step 1 [domain: workflows] \u{2192} translated: next step [domain: workflows])"
+                    new TransitionLabel('start transition', 'next step', 'step 1')
                 )
             ]
         );
@@ -608,47 +538,28 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('isResourceEnabled')
             ->with($workflowName)
             ->willReturn(true);
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->willReturnCallback(function ($label, $parameters, $domain) {
-                $result = 'translated: ' . $label;
-                if (!empty($parameters)) {
-                    foreach ($parameters as $key => $val) {
-                        $result .= ' ' . $key . ': (' . $val . ')';
-                    }
-                }
-                if (!empty($domain)) {
-                    $result .= ' [domain: ' . $domain . ']';
-                }
-
-                return $result;
-            });
 
         $expectedMetadata = new WorkflowAclMetadata(
             $workflowName,
-            'translated: workflow 1 [domain: workflows]',
-            '',
+            new WorkflowLabel('workflow 1'),
+            null,
             [
                 new FieldSecurityMetadata(
                     'start_transition||next_step',
-                    'translated: start transition [domain: workflows] '
-                    . "(translated: (Start) [domain: jsmessages] \u{2192} translated: next step [domain: workflows])"
+                    new TransitionLabel('start transition', 'next step')
                 ),
                 new FieldSecurityMetadata(
                     'transition1|next_step|next_step',
-                    'translated: transition 1 [domain: workflows] '
-                    . "(translated: next step [domain: workflows] \u{2192} translated: next step [domain: workflows])"
+                    new TransitionLabel('transition 1', 'next step', 'next step')
                 ),
                 new FieldSecurityMetadata(
                     'transition1|step2|next_step',
-                    'translated: transition 1 [domain: workflows] '
-                    . "(translated: step 2 [domain: workflows] \u{2192} translated: next step [domain: workflows])"
+                    new TransitionLabel('transition 1', 'next step', 'step 2')
                 ),
                 new FieldSecurityMetadata(
                     'transition1|step1|next_step',
-                    'translated: transition 1 [domain: workflows] '
-                    . "(translated: step 1 [domain: workflows] \u{2192} translated: next step [domain: workflows])"
-                ),
+                    new TransitionLabel('transition 1', 'next step', 'step 1')
+                )
             ]
         );
         self::assertEquals(

@@ -6,6 +6,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
@@ -16,18 +17,21 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class UserTypeTest extends \PHPUnit\Framework\TestCase
 {
-    const MY_PROFILE_ROUTE    = 'oro_user_profile_update';
-    const OTHER_PROFILE_ROUTE = 'oro_user_update';
-    const RULE_BUSINESS_UNIT  = 'oro_business_unit_view';
-    const RULE_ORGANIZATION   = 'oro_organization_view';
-    const RULE_GROUP          = 'oro_user_group_view';
-    const RULE_ROLE           = 'oro_user_role_view';
+    private const MY_PROFILE_ROUTE = 'oro_user_profile_update';
+    private const OTHER_PROFILE_ROUTE = 'oro_user_update';
+    private const RULE_BUSINESS_UNIT = 'oro_business_unit_view';
+    private const RULE_ORGANIZATION = 'oro_organization_view';
+    private const RULE_GROUP = 'oro_user_group_view';
+    private const RULE_ROLE = 'oro_user_role_view';
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
@@ -36,9 +40,9 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
     private $tokenAccessor;
 
     /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $optionsProvider;
+    private $optionsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -47,98 +51,83 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider addEntityFieldsDataProvider
-     * @param $permissions
-     * @param $isMyProfile
      */
-    public function testAddEntityFields($permissions, $isMyProfile)
+    public function testAddEntityFields(array $permissions, bool $isMyProfile)
     {
         $user = new User();
         $user->setId(1);
-        $order = 0;
 
+        $withForIsGranted = [];
+        $willForIsGranted = [];
         foreach ($permissions as $rule => $isGranted) {
-            $this->authorizationChecker->expects($this->at($order))
-                ->method('isGranted')
-                ->with($rule)
-                ->will($this->returnValue($isGranted));
-            $order++;
+            $withForIsGranted[] = [$rule];
+            $willForIsGranted[] = $isGranted;
         }
+        $this->authorizationChecker->expects($this->exactly(count($permissions)))
+            ->method('isGranted')
+            ->withConsecutive(...$withForIsGranted)
+            ->willReturnOnConsecutiveCalls(...$willForIsGranted);
 
         $request = new Request();
-        $request->attributes->add(array('_route' => $isMyProfile ? self::MY_PROFILE_ROUTE : self::OTHER_PROFILE_ROUTE));
+        $request->attributes->add(['_route' => $isMyProfile ? self::MY_PROFILE_ROUTE : self::OTHER_PROFILE_ROUTE]);
 
-        $formFactory = $this->getMockBuilder('Symfony\Component\Form\FormFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formFactory = $this->createMock(FormFactory::class);
 
-        $userSubscriber = new UserSubscriber($formFactory, $this->tokenAccessor);
-
-        $order   = 0;
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(array('addEventSubscriber', 'add', 'getFormFactory', 'addEventListener'))
-            ->getMock();
-        $builder->expects($this->at($order))
+        $builder = $this->createMock(FormBuilder::class);
+        $builder->expects($this->once())
             ->method('getFormFactory')
-            ->will($this->returnValue($formFactory));
-        $builder->expects($this->at(++$order))
+            ->willReturn($formFactory);
+        $builder->expects($this->once())
             ->method('addEventSubscriber')
-            ->with($userSubscriber)
-            ->will($this->returnSelf());
+            ->with(new UserSubscriber($formFactory, $this->tokenAccessor))
+            ->willReturnSelf();
 
-        $this->mockSetDefaultUserFields($builder, $order);
+        $formFields = [
+            ['username', TextType::class],
+            ['email', EmailType::class],
+            ['phone', TextType::class],
+            ['namePrefix', TextType::class],
+            ['firstName', TextType::class],
+            ['middleName', TextType::class],
+            ['lastName', TextType::class],
+            ['nameSuffix', TextType::class],
+            ['birthday', OroBirthdayType::class]
+        ];
 
         if ($permissions[self::RULE_ROLE]) {
-            $builder->expects($this->at(++$order))
-                ->method('add')
-                ->with('roles', EntityType::class)
-                ->will($this->returnValue($builder));
+            $formFields[] = ['userRoles', EntityType::class];
         }
-        $attr = [];
 
+        $attr = [];
         if ($isMyProfile) {
             $attr['readonly'] = true;
         }
 
         if ($permissions[self::RULE_GROUP]) {
-            $arr = array(
-                'label'     => 'oro.user.groups.label',
-                'class'     => 'OroUserBundle:Group',
-                'choice_label' => 'name',
-                'multiple'  => true,
-                'expanded'  => true,
-                'required'  => false,
-                'attr'      => $attr,
-                'disabled'  => $isMyProfile,
+            $formFields[] = ['groups', EntityType::class, [
+                'label'                => 'oro.user.groups.label',
+                'class'                => Group::class,
+                'choice_label'         => 'name',
+                'multiple'             => true,
+                'expanded'             => true,
+                'required'             => false,
+                'attr'                 => $attr,
+                'disabled'             => $isMyProfile,
                 'translatable_options' => false
-            );
-            $builder->expects($this->at(++$order))
-                ->method('add')
-                ->with('groups', EntityType::class, $arr)
-                ->will($this->returnValue($builder));
+            ]];
         }
         if ($permissions[self::RULE_BUSINESS_UNIT] && $permissions[self::RULE_ORGANIZATION]) {
-            $builder->expects($this->at(++$order))
-                ->method('add')
-                ->with('organizations', OrganizationsSelectType::class)
-                ->will($this->returnValue($builder));
+            $formFields[] = ['organizations', OrganizationsSelectType::class];
         }
-        $builder->expects($this->at(++$order))
+        $formFields[] = ['emails', CollectionType::class];
+        $formFields[] = ['change_password', ChangePasswordType::class];
+        $formFields[] = ['avatar', ImageType::class];
+        $formFields[] = ['inviteUser', CheckboxType::class];
+
+        $builder->expects($this->exactly(count($formFields)))
             ->method('add')
-            ->with('emails', CollectionType::class)
-            ->will($this->returnValue($builder));
-        $builder->expects($this->at(++$order))
-            ->method('add')
-            ->with('change_password', ChangePasswordType::class)
-            ->will($this->returnValue($builder));
-        $builder->expects($this->at(++$order))
-            ->method('add')
-            ->with('avatar', ImageType::class)
-            ->will($this->returnValue($builder));
-        $builder->expects($this->at(++$order))
-            ->method('add')
-            ->with('inviteUser', CheckboxType::class)
-            ->will($this->returnValue($builder));
+            ->withConsecutive(...$formFields)
+            ->willReturnSelf();
 
         $requestStack = new RequestStack();
         $requestStack->push($request);
@@ -146,100 +135,69 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
         $type->buildForm($builder, []);
     }
 
-    /**
-     * @return array
-     */
-    public function addEntityFieldsDataProvider()
+    public function addEntityFieldsDataProvider(): array
     {
-        return array(
-            'own profile with all permission' => array(
-                'permissions' => array(
+        return [
+            'own profile with all permission'                  => [
+                'permissions' => [
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => true,
                     self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
-                ),
+                ],
                 'isMyProfile' => true
-            ),
-            'other profile with all permission' => array(
-                'permissions' => array(
+            ],
+            'other profile with all permission'                => [
+                'permissions' => [
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => true,
                     self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
-                ),
+                ],
                 'isMyProfile' => false
-            ),
-            'own profile without permission for role' => array(
-                'permissions' => array(
+            ],
+            'own profile without permission for role'          => [
+                'permissions' => [
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => true,
                     self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
-                ),
+                ],
                 'isMyProfile' => true
-            ),
-            'own profile without permission for group' => array(
-                'permissions' => array(
+            ],
+            'own profile without permission for group'         => [
+                'permissions' => [
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => false,
                     self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => true,
-                ),
+                ],
                 'isMyProfile' => true
-            ),
-            'own profile without permission for business unit' => array(
-                'permissions' => array(
+            ],
+            'own profile without permission for business unit' => [
+                'permissions' => [
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => true,
                     self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => false,
-                ),
+                ],
                 'isMyProfile' => true
-            ),
-            'own profile without all permission' => array(
-                'permissions' => array(
+            ],
+            'own profile without all permission'               => [
+                'permissions' => [
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => false,
                     self::RULE_ORGANIZATION  => true,
                     self::RULE_BUSINESS_UNIT => false,
-                ),
+                ],
                 'isMyProfile' => true
-            ),
-        );
-    }
-
-    /**
-     * @param $builder \PHPUnit\Framework\MockObject\MockObject
-     * @param $order
-     */
-    protected function mockSetDefaultUserFields($builder, &$order = -1)
-    {
-        $parameters = array(
-            array('username', TextType::class),
-            array('email', EmailType::class),
-            array('phone', TextType::class),
-            array('namePrefix', TextType::class),
-            array('firstName', TextType::class),
-            array('middleName', TextType::class),
-            array('lastName', TextType::class),
-            array('nameSuffix', TextType::class),
-            array('birthday', OroBirthdayType::class)
-        );
-
-        foreach ($parameters as $param) {
-            $builder->expects($this->at(++$order))
-                ->method('add')
-                ->with($param[0], $param[1])
-                ->will($this->returnValue($builder));
-        }
+            ],
+        ];
     }
 
     public function testConfigureOptions()
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults');
         $requestStack = new RequestStack();

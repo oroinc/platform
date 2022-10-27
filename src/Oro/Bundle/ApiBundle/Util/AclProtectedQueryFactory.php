@@ -10,7 +10,7 @@ use Oro\Component\EntitySerializer\QueryFactory;
 use Oro\Component\EntitySerializer\QueryResolver;
 
 /**
- * This query factory modifies Data API queries in order to protect data
+ * This query factory modifies API queries in order to protect data
  * that can be retrieved via these queries.
  */
 class AclProtectedQueryFactory extends QueryFactory
@@ -21,11 +21,6 @@ class AclProtectedQueryFactory extends QueryFactory
     /** @var RequestType|null */
     private $requestType;
 
-    /**
-     * @param SerializerDoctrineHelper $doctrineHelper
-     * @param QueryResolver            $queryResolver
-     * @param QueryModifierRegistry    $queryModifier
-     */
     public function __construct(
         SerializerDoctrineHelper $doctrineHelper,
         QueryResolver $queryResolver,
@@ -35,9 +30,11 @@ class AclProtectedQueryFactory extends QueryFactory
         $this->queryModifier = $queryModifier;
     }
 
-    /**
-     * @param RequestType|null $requestType
-     */
+    public function getRequestType(): ?RequestType
+    {
+        return $this->requestType;
+    }
+
     public function setRequestType(RequestType $requestType = null)
     {
         $this->requestType = $requestType;
@@ -48,16 +45,18 @@ class AclProtectedQueryFactory extends QueryFactory
      */
     public function getQuery(QueryBuilder $qb, EntityConfig $config)
     {
-        if (null !== $this->requestType) {
-            // ensure that FROM clause is initialized
-            $qb->getRootAliases();
-            // do query modification
-            $this->queryModifier->modifyQuery(
-                $qb,
-                (bool)$config->get(AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY),
-                $this->requestType
-            );
+        if (null === $this->requestType) {
+            throw new \LogicException('The query factory was not initialized.');
         }
+
+        // ensure that FROM clause is initialized
+        $qb->getRootAliases();
+        // do query modification
+        $this->queryModifier->modifyQuery(
+            $qb,
+            (bool)$config->get(AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY),
+            $this->requestType
+        );
 
         return parent::getQuery($qb, $config);
     }

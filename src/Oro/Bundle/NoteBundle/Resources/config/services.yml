@@ -1,22 +1,24 @@
-parameters:
-    oro_note.entity.class:                              Oro\Bundle\NoteBundle\Entity\Note
-
 services:
+    Oro\Bundle\NoteBundle\Entity\Manager\NoteManager:
+        alias: oro_note.manager
+
     oro_note.manager:
         class: Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_attachment.provider.attachment'
-            - '@oro_attachment.manager'
+            - '@oro_attachment.provider.picture_sources'
 
     oro_note.manager.api:
         class: Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_note.entity.class%'
+            - 'Oro\Bundle\NoteBundle\Entity\Note'
             - '@doctrine.orm.entity_manager'
 
     oro_note.activity_list.provider:
@@ -27,13 +29,15 @@ services:
            - '@oro_activity.association_helper'
            - '@oro_comment.association_helper'
         tags:
-           - {name: oro_activity_list.provider, priority: 40}
+           - { name: oro_activity_list.provider, class: Oro\Bundle\NoteBundle\Entity\Note, priority: 40 }
 
-    oro_note.handler.delete.activity_entity:
-        class: Oro\Bundle\NoteBundle\Entity\Manager\NoteActivityEntityDeleteHandler
-        parent: oro_activity.handler.delete.activity_entity
-        tags:
-            - { name: oro_activity.activity_entity_delete_handler, priority: -10 }
+    oro_note.activity_entity_delete_handler_extension:
+        class: Oro\Bundle\NoteBundle\Handler\NoteActivityEntityDeleteHandlerExtension
+        decorates: oro_activity.activity_entity_delete_handler_extension
+        arguments:
+            - '@.inner'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.delete_handler_access_denied_exception_factory'
 
     oro_note.listener.remove_note_configuration_scope:
         class: Oro\Bundle\NoteBundle\EventListener\RemoveNoteConfigurationScopeListener

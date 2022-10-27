@@ -21,12 +21,12 @@ oro:
                 lastActiveAt: Last Active At
         menu:
             label: Jobs
-            shortcut.label: Jobs List
+            shortcut.label: Job List
             shortcut.description: List of Message Queue Jobs
 
         header:
-            root_jobs: Jobs List
-            child_jobs: Child Jobs List
+            root_jobs: Job List
+            child_jobs: Child Job List
             startedAt: Started At
             stoppedAt: Stopped At
             unique: Unique
@@ -42,3 +42,14 @@ oro:
             failed: Failed
             failed_redelivered: Failed Redelivered
             stale: Stale
+
+    messagequeue:
+        job:
+            entity_label: Job
+            entity_plural_label: Jobs
+            entity_grid_all_view_label: All %entity_plural_label%
+
+        feature:
+            manage_jobs:
+                label: Job Management
+                description: Enables access to view the status, statistics, and progress of the message processing tasks (jobs).

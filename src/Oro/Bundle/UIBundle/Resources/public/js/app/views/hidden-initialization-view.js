@@ -2,9 +2,7 @@
 define(function(require) {
     'use strict';
 
-    var HiddenInitializationView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * View allows hide part of DOM tree till all page components will be initialized
@@ -25,21 +23,21 @@ define(function(require) {
      * @class HiddenInitializationView
      * @augments BaseView
      */
-    HiddenInitializationView = BaseView.extend(/** @lends HiddenInitializationView.prototype */{
+    const HiddenInitializationView = BaseView.extend(/** @lends HiddenInitializationView.prototype */{
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function HiddenInitializationView() {
-            HiddenInitializationView.__super__.constructor.apply(this, arguments);
+        constructor: function HiddenInitializationView(options) {
+            HiddenInitializationView.__super__.constructor.call(this, options);
         },
 
         render: function() {
             this.$el.addClass('invisible');
-            this.initLayout().done(_.bind(function() {
+            this.initLayout().done(() => {
                 this.$el.removeClass('invisible');
-            }, this));
+            });
         }
     });
 

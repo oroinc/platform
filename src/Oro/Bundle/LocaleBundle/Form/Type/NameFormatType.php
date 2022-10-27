@@ -14,9 +14,6 @@ class NameFormatType extends AbstractType
      */
     protected $nameFormatter;
 
-    /**
-     * @param NameFormatter $nameFormatter
-     */
     public function __construct(NameFormatter $nameFormatter)
     {
         $this->nameFormatter = $nameFormatter;

@@ -3,62 +3,74 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\EventListener\EnumFieldConfigSubscriber;
+use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Translation\Translator;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $enumSynchronizer;
+    /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject */
+    private $enumSynchronizer;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private $logger;
 
     /** @var EnumFieldConfigSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configManager    = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator       = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->enumSynchronizer = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
+        $this->translator = $this->createMock(Translator::class);
         $this->translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
+
+        $this->enumSynchronizer = $this->createMock(EnumSynchronizer::class);
+
+        $nameGenerator = $this->createMock(ExtendDbIdentifierNameGenerator::class);
+        $nameGenerator->expects($this->any())
+            ->method('getMaxEnumCodeSize')
+            ->willReturn(54);
 
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->subscriber = new EnumFieldConfigSubscriber(
             $this->configManager,
             $this->translator,
-            $this->enumSynchronizer
+            $this->enumSynchronizer,
+            $nameGenerator
         );
         $this->subscriber->setLogger($this->logger);
     }
 
     public function testPreSetDataForEntityConfigModel()
     {
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(EntityConfigModel::class);
 
         $event = $this->getFormEventMock($configModel);
-
         $event->expects($this->never())
             ->method('setData');
 
@@ -67,15 +79,12 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPreSetDataForNotEnumFieldType()
     {
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue('manyToOne'));
+            ->willReturn('manyToOne');
 
         $event = $this->getFormEventMock($configModel);
-
         $event->expects($this->never())
             ->method('setData');
 
@@ -85,21 +94,18 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPreSetDataForNewEnum($dataType)
+    public function testPreSetDataForNewEnum(string $dataType)
     {
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue($dataType));
+            ->willReturn($dataType);
         $configModel->expects($this->once())
             ->method('toArray')
             ->with('enum')
-            ->will($this->returnValue(['enum_name' => 'Test Enum']));
+            ->willReturn(['enum_name' => 'Test Enum']);
 
         $event = $this->getFormEventMock($configModel);
-
         $event->expects($this->never())
             ->method('setData');
 
@@ -109,22 +115,20 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPreSetDataForExistingEnum($dataType)
+    public function testPreSetDataForExistingEnum(string $dataType)
     {
-        $enumCode           = 'test_enum';
-        $enumLabel          = ExtendHelper::getEnumTranslationKey('label', $enumCode);
+        $enumCode = 'test_enum';
+        $enumLabel = ExtendHelper::getEnumTranslationKey('label', $enumCode);
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
 
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue($dataType));
+            ->willReturn($dataType);
         $configModel->expects($this->once())
             ->method('toArray')
             ->with('enum')
-            ->will($this->returnValue(['enum_code' => $enumCode]));
+            ->willReturn(['enum_code' => $enumCode]);
 
         $event = $this->getFormEventMock($configModel);
 
@@ -143,7 +147,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($initialData));
+            ->willReturn($initialData);
 
         $enumConfig = new Config(new EntityConfigId('enum', $enumValueClassName));
         $enumConfig->set('public', true);
@@ -151,21 +155,21 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->enumSynchronizer->expects($this->once())
             ->method('getEnumOptions')
             ->with($enumValueClassName)
-            ->will($this->returnValue($enumOptions));
+            ->willReturn($enumOptions);
 
-        $enumConfigProvider = $this->getConfigProviderMock();
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($enumConfigProvider));
+            ->willReturn($enumConfigProvider);
         $enumConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($enumValueClassName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($enumValueClassName)
-            ->will($this->returnValue($enumConfig));
+            ->willReturn($enumConfig);
 
         $event->expects($this->once())
             ->method('setData')
@@ -176,12 +180,9 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitForEntityConfigModel()
     {
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(EntityConfigModel::class);
 
         $event = $this->getFormEventMock($configModel);
-
         $event->expects($this->never())
             ->method('setData');
 
@@ -190,12 +191,10 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitForNotEnumFieldType()
     {
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue('manyToOne'));
+            ->willReturn('manyToOne');
 
         $event = $this->getFormEventMock($configModel);
 
@@ -208,19 +207,17 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPostSubmitForNotValidForm($dataType)
+    public function testPostSubmitForNotValidForm(string $dataType)
     {
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue($dataType));
+            ->willReturn($dataType);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
         $form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $event = $this->getFormEventMock($configModel, $form);
 
@@ -233,26 +230,24 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPostSubmitForNewEnum($dataType)
+    public function testPostSubmitForNewEnum(string $dataType)
     {
-        $enumCode           = 'test_enum';
-        $enumName           = 'Test Enum';
+        $enumCode = 'test_enum';
+        $enumName = 'Test Enum';
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-        $locale             = 'fr';
+        $locale = 'fr';
 
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->never())
             ->method('getId');
         $configModel->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue($dataType));
+            ->willReturn($dataType);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
         $form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $event = $this->getFormEventMock($configModel, $form);
 
@@ -283,24 +278,24 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($submittedData));
+            ->willReturn($submittedData);
         $configModel->expects($this->once())
             ->method('toArray')
             ->with('enum')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->translator->expects($this->once())
             ->method('getLocale')
-            ->will($this->returnValue($locale));
-        $enumConfigProvider = $this->getConfigProviderMock();
+            ->willReturn($locale);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($enumConfigProvider));
+            ->willReturn($enumConfigProvider);
         $enumConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($enumValueClassName)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $event->expects($this->once())
             ->method('setData')
@@ -312,7 +307,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPostSubmitForNewEnumWithoutNameAndPublic($dataType)
+    public function testPostSubmitForNewEnumWithoutNameAndPublic(string $dataType)
     {
         $entityClassName    = 'Test\Entity';
         $fieldName          = 'testField';
@@ -320,32 +315,28 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
         $locale             = 'fr';
 
-        $entityConfigModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityConfigModel = $this->createMock(EntityConfigModel::class);
         $entityConfigModel->expects($this->once())
             ->method('getClassName')
-            ->will($this->returnValue($entityClassName));
+            ->willReturn($entityClassName);
 
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->never())
             ->method('getId');
         $configModel->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue($dataType));
+            ->willReturn($dataType);
         $configModel->expects($this->once())
             ->method('getEntity')
-            ->will($this->returnValue($entityConfigModel));
+            ->willReturn($entityConfigModel);
         $configModel->expects($this->once())
             ->method('getFieldName')
-            ->will($this->returnValue($fieldName));
+            ->willReturn($fieldName);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
         $form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $event = $this->getFormEventMock($configModel, $form);
 
@@ -366,24 +357,24 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($submittedData));
+            ->willReturn($submittedData);
         $configModel->expects($this->once())
             ->method('toArray')
             ->with('enum')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->translator->expects($this->once())
             ->method('getLocale')
-            ->will($this->returnValue($locale));
-        $enumConfigProvider = $this->getConfigProviderMock();
+            ->willReturn($locale);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($enumConfigProvider));
+            ->willReturn($enumConfigProvider);
         $enumConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($enumValueClassName)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $event->expects($this->once())
             ->method('setData')
@@ -395,28 +386,26 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testPostSubmitForExistingEnum($dataType)
+    public function testPostSubmitForExistingEnum(string $dataType)
     {
-        $enumCode           = 'test_enum';
-        $enumName           = 'Test Enum';
-        $enumPublic         = false;
+        $enumCode = 'test_enum';
+        $enumName = 'Test Enum';
+        $enumPublic = false;
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-        $locale             = 'fr';
+        $locale = 'fr';
 
-        $configModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configModel = $this->createMock(FieldConfigModel::class);
         $configModel->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue(123));
+            ->willReturn(123);
         $configModel->expects($this->once())
             ->method('getType')
-            ->will($this->returnValue($dataType));
+            ->willReturn($dataType);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
         $form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $event = $this->getFormEventMock($configModel, $form);
 
@@ -436,24 +425,24 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($submittedData));
+            ->willReturn($submittedData);
         $configModel->expects($this->once())
             ->method('toArray')
             ->with('enum')
-            ->will($this->returnValue(['enum_code' => $enumCode]));
+            ->willReturn(['enum_code' => $enumCode]);
 
         $this->translator->expects($this->once())
             ->method('getLocale')
-            ->will($this->returnValue($locale));
-        $enumConfigProvider = $this->getConfigProviderMock();
+            ->willReturn($locale);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($enumConfigProvider));
+            ->willReturn($enumConfigProvider);
         $enumConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($enumValueClassName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->enumSynchronizer->expects($this->once())
             ->method('applyEnumNameTrans')
@@ -472,7 +461,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->postSubmit($event);
     }
 
-    public function enumTypeProvider()
+    public function enumTypeProvider(): array
     {
         return [
             ['enum'],
@@ -482,9 +471,8 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider enumTypeProvider
-     * @param string $dataType
      */
-    public function testPostSubmitForEnumSyncError($dataType)
+    public function testPostSubmitForEnumSyncError(string $dataType)
     {
         $enumCode = 'test_enum';
         $enumName = 'Test Enum';
@@ -529,7 +517,7 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getLocale')
             ->willReturn($locale);
 
-        $enumConfigProvider = $this->getConfigProviderMock();
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->with('enum')
@@ -560,42 +548,27 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->postSubmit($event);
     }
 
-    /**
-     * @param mixed                                         $configModel
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $form
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFormEventMock($configModel, $form = null)
-    {
+    private function getFormEventMock(
+        ConfigModel $configModel,
+        FormInterface|\PHPUnit\Framework\MockObject\MockObject|null $form = null
+    ): FormEvent|\PHPUnit\Framework\MockObject\MockObject {
         if (!$form) {
-            $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+            $form = $this->createMock(FormInterface::class);
         }
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $form->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
         $formConfig->expects($this->once())
             ->method('getOption')
             ->with('config_model')
-            ->will($this->returnValue($configModel));
+            ->willReturn($configModel);
 
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue($form));
+            ->willReturn($form);
 
         return $event;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

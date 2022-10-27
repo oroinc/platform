@@ -7,17 +7,15 @@ namespace Oro\Bundle\ApiBundle\Request;
  */
 class ChainExceptionTextExtractor implements ExceptionTextExtractorInterface
 {
-    /** @var ExceptionTextExtractorInterface[] */
-    private $extractors = [];
+    /** @var iterable|ExceptionTextExtractorInterface[] */
+    private $extractors;
 
     /**
-     * Registers a given extractor in the chain.
-     *
-     * @param ExceptionTextExtractorInterface $extractor
+     * @param iterable|ExceptionTextExtractorInterface[] $extractors
      */
-    public function addExtractor(ExceptionTextExtractorInterface $extractor)
+    public function __construct(iterable $extractors)
     {
-        $this->extractors[] = $extractor;
+        $this->extractors = $extractors;
     }
 
     /**

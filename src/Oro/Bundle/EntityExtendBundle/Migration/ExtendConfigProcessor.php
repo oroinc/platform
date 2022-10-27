@@ -10,6 +10,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
+ * Processes changes in entity configs.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ExtendConfigProcessor
@@ -32,9 +34,6 @@ class ExtendConfigProcessor
      */
     protected $appendConfigs;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -87,8 +86,6 @@ class ExtendConfigProcessor
      * Removes some configs.
      *  - removes configs for non configurable entities if requested only doctrine related changes,
      *    for example: field type, length, precision or scale
-     *
-     * @param array $configs
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -176,6 +173,7 @@ class ExtendConfigProcessor
      * @param string $fieldName
      * @param array  $configs
      * @param bool   $isExtendEntity
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function processFieldConfigs($className, $fieldName, array $configs, $isExtendEntity)
     {

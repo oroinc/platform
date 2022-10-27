@@ -1,6 +1,0 @@
-config:
-    shim:
-        'routing':
-            exports: 'window.Routing'
-    paths:
-        'routing': 'bundles/fosjsrouting/js/router.js'

@@ -13,17 +13,13 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class FormattingSelectTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LocalizationChoicesProvider
-     */
-    protected $provider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocalizationChoicesProvider */
+    private $provider;
 
-    /**
-     * @var AbstractType
-     */
-    protected $formType;
+    /** @var AbstractType */
+    private $formType;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->provider = $this->createMock(LocalizationChoicesProvider::class);
         $this->formType = new FormattingSelectType($this->provider);
@@ -47,7 +43,9 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
             'Spain' => 'es',
         ];
 
-        $this->provider->expects($this->once())->method('getFormattingChoices')->willReturn($data);
+        $this->provider->expects($this->once())
+            ->method('getFormattingChoices')
+            ->willReturn($data);
 
         $form = $this->factory->create(FormattingSelectType::class);
 
@@ -67,11 +65,10 @@ class FormattingSelectTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $choiceType = $this->getMockBuilder(OroChoiceType::class)
-            ->setMethods(['configureOptions', 'getParent'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
+        $choiceType = $this->createMock(OroChoiceType::class);
+        $choiceType->expects($this->any())
+            ->method('getParent')
+            ->willReturn(ChoiceType::class);
 
         return [
             new PreloadedExtension(

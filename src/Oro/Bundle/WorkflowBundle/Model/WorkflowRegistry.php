@@ -25,11 +25,6 @@ class WorkflowRegistry
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowAssembler $workflowAssembler
-     * @param WorkflowDefinitionFilters $definitionFilters
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         WorkflowAssembler $workflowAssembler,

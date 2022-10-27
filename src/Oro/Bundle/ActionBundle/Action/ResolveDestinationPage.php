@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Resolves the url where the user should be redirected after the operation is completed.
+ */
 class ResolveDestinationPage extends AbstractAction
 {
     /** @var DestinationPageResolver */
@@ -27,11 +30,6 @@ class ResolveDestinationPage extends AbstractAction
     /** @var PropertyPathInterface */
     protected $attribute;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param DestinationPageResolver $resolver
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         DestinationPageResolver $resolver,
@@ -60,7 +58,7 @@ class ResolveDestinationPage extends AbstractAction
      */
     protected function executeAction($context)
     {
-        if (null === ($request = $this->requestStack->getMasterRequest())) {
+        if (null === ($request = $this->requestStack->getMainRequest())) {
             return;
         }
 
@@ -71,7 +69,7 @@ class ResolveDestinationPage extends AbstractAction
         }
 
         if ($redirectUrl) {
-            $this->contextAccessor->setValue($context, $this->attribute, $redirectUrl);
+            $this->contextAccessor->setValue($context, $this->attribute, urldecode($redirectUrl));
         }
     }
 

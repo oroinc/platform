@@ -2,15 +2,20 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
+use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EmailControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
-        $this->loadFixtures(['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData']);
+        $this->loadFixtures([LoadEmailData::class]);
     }
 
     public function testView()
@@ -20,8 +25,8 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        $this->assertContains('My Web Store Introduction', $content);
-        $this->assertContains('Thank you for signing up to My Web Store!', $content);
+        self::assertStringContainsString('My Web Store Introduction', $content);
+        self::assertStringContainsString('Thank you for signing up to My Web Store!', $content);
     }
 
     public function testItems()
@@ -43,7 +48,7 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('GET', $url, [], [], $this->generateNoHashNavigationHeader());
         $result = $this->client->getResponse();
         $content = $result->getContent();
-        $this->assertEquals("", $content);
+        $this->assertEquals('', $content);
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
@@ -56,7 +61,7 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        $this->assertContains('From', $content);
+        self::assertStringContainsString('From', $content);
     }
 
     public function testBody()
@@ -66,7 +71,7 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        $this->assertContains('Thank you for signing up to My Web Store!', $content);
+        self::assertStringContainsString('Thank you for signing up to My Web Store!', $content);
     }
 
     public function testActivity()
@@ -150,9 +155,10 @@ class EmailControllerTest extends WebTestCase
     public function testEmailToggleSeen()
     {
         $url = $this->getUrl('oro_email_toggle_seen', ['id' => $this->getReference('emailUser_1')->getId()]);
-        $this->client->request('GET', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
-        $data = json_decode($result->getContent(), true);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful']);
     }
 
@@ -161,24 +167,24 @@ class EmailControllerTest extends WebTestCase
         $emailId = $this->getReference('emailUser_1')->getEmail()->getId();
 
         $url = $this->getUrl('oro_email_mark_seen', ['id' => $emailId, 'status' => 1]);
-        $this->client->request('GET', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
-        $data = json_decode($result->getContent(), true);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful']);
 
         $url = $this->getUrl('oro_email_mark_seen', ['id' => $emailId, 'status' => 0, 'checkThread' => 0]);
-        $this->client->request('GET', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
-        $data = json_decode($result->getContent(), true);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful']);
     }
 
     public function testMarkAllEmailsAsSeen()
     {
         $url = $this->getUrl('oro_email_mark_all_as_seen');
-        $this->client->request('GET', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
-        $data = json_decode($result->getContent(), true);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful']);
     }
 
@@ -194,9 +200,10 @@ class EmailControllerTest extends WebTestCase
                 'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
             ]
         );
-        $this->client->request('POST', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
-        $data = json_decode($result->getContent(), true);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful'] === true);
         $this->assertTrue($data['count'] === 1);
     }
@@ -213,9 +220,10 @@ class EmailControllerTest extends WebTestCase
                 'values' => $this->getReference('emailUser_for_mass_mark_test')->getId()
             ]
         );
-        $this->client->request('POST', $url);
+        $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
-        $data = json_decode($result->getContent(), true);
+        $this->assertJsonResponseStatusCodeEquals($result, 200);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful'] === true);
         $this->assertTrue($data['count'] === 1);
     }
@@ -332,5 +340,83 @@ class EmailControllerTest extends WebTestCase
             $this->getUrl('oro_email_widget_emails')
         );
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 404);
+    }
+
+    /**
+     * @dataProvider autocompleteRecipientActionProvider
+     */
+    public function testAutocompleteRecipientActionById(string $method, bool $searchById): void
+    {
+        /** @var User $user */
+        $user = $this->getReference('simple_user2');
+        $userString = sprintf('"%s" <%s>', $user->getFullName(), $user->getEmail());
+
+        $this->client->request(
+            $method,
+            $this->getUrl(
+                'oro_email_autocomplete_recipient',
+                [
+                    'entityClass' => User::class,
+                    'entityId' => $user->getId(),
+                    'query' => $searchById ? base64_encode($userString) : $user->getUsername(),
+                    'search_by_id' => $searchById,
+                    'per_page' => 100
+                ]
+            )
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseStatusCodeEquals($response, 200);
+
+        $data = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $context = ' (User)';
+        $expected = [
+            [
+                'text' => 'Contexts',
+                'children' => [
+                    [
+                        'id' => base64_encode($userString),
+                        'text' => $userString . $context,
+                        'data' => json_encode(
+                            [
+                                'key' => $userString,
+                                'contextText' => $user->getFullName() . $context,
+                                'contextValue' => [
+                                    'entityClass' => User::class,
+                                    'entityId' => $user->getId(),
+                                ],
+                                'organization' => $user->getOrganization()->getName(),
+                            ],
+                            JSON_THROW_ON_ERROR
+                        )
+                    ]
+                ]
+            ]
+        ];
+
+        $this->assertArrayHasKey('results', $data);
+        $this->assertEquals($searchById ? $expected[0]['children'] : $expected, $data['results']);
+    }
+
+    public function autocompleteRecipientActionProvider(): array
+    {
+        return [
+            [
+                'method' => 'GET',
+                'searchById' => false
+            ],
+            [
+                'method' => 'POST',
+                'searchById' => false
+            ],
+            [
+                'method' => 'GET',
+                'searchById' => true
+            ],
+            [
+                'method' => 'POST',
+                'searchById' => true
+            ],
+        ];
     }
 }

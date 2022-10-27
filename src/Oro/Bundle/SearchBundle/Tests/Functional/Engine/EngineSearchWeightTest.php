@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine;
 
 use Doctrine\Common\Collections\Expr\Expression;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
+use Oro\Bundle\SearchBundle\Engine\Orm;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -20,18 +21,14 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
     /** @var callable */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->ensureItemsLoaded($alias, 0);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->listener) {
             $this->getContainer()->get('event_dispatcher')
@@ -53,8 +50,16 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
         array $expectedItems,
         $listener,
         Expression $condition = null,
-        array $orderings = []
+        array $orderings = [],
+        $engine = null
     ) {
+        $engineName = static::getContainer()
+            ->get('oro_search.engine.parameters')
+            ->getEngineName();
+        if ($engine && $engineName !== $engine) {
+            $this->markTestSkipped('Should be tested only with ' . $engine . ' search engine');
+        }
+
         $this->listener = $listener;
         $this->getContainer()->get('event_dispatcher')->addListener(
             PrepareEntityMapEvent::EVENT_NAME,
@@ -62,10 +67,9 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
             -255
         );
 
+        $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
+
         $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->loadFixtures([LoadSearchItemData::class]);
-        $this->getSearchIndexer()->reindex(Item::class);
-        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
 
         $query = new Query();
         $query->from($alias);
@@ -145,6 +149,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                     'item_2',
                     'item_3',
                     'item_4',
+                    'item_5',
                     'item_6',
                     'item_7',
                     'item_8',
@@ -156,7 +161,9 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                         = 1 / $data[Query::TYPE_DECIMAL]['decimalValue'];
                     $event->setData($data);
                 },
-                'condition' => Criteria::expr()->notContains('text.stringValue', 'item5'),
+                'condition' => Criteria::expr()->contains('text.all_text', 'item'),
+                'orderings' => [],
+                'engine' => Orm::ENGINE_NAME,
             ],
             'descending with fulltext search without orderings' => [
                 'expected items' => [
@@ -164,6 +171,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                     'item_8',
                     'item_7',
                     'item_6',
+                    'item_5',
                     'item_4',
                     'item_3',
                     'item_2',
@@ -175,7 +183,9 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                         = $data[Query::TYPE_DECIMAL]['decimalValue'];
                     $event->setData($data);
                 },
-                'condition' => Criteria::expr()->notContains('text.stringValue', 'item5'),
+                'condition' => Criteria::expr()->contains('text.all_text', 'item'),
+                'orderings' => [],
+                'engine' => Orm::ENGINE_NAME,
             ],
             'without fulltext search with orderings' => [
                 // weight is generated for descending values, but actual results are ascending
@@ -208,6 +218,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                     'item_2',
                     'item_3',
                     'item_4',
+                    'item_5',
                     'item_6',
                     'item_7',
                     'item_8',
@@ -219,7 +230,7 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
                         = $data[Query::TYPE_DECIMAL]['decimalValue'];
                     $event->setData($data);
                 },
-                'condition' => Criteria::expr()->notContains('text.stringValue', 'item5'),
+                'condition' => Criteria::expr()->contains('text.all_text', 'item'),
                 'orderings' => ['integer.integerValue' => 'ASC']
             ],
         ];

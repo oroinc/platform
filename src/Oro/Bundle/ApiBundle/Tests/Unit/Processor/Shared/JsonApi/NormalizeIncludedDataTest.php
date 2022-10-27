@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
@@ -22,7 +23,11 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NormalizeIncludedDataTest extends FormProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
@@ -43,7 +48,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     /** @var NormalizeIncludedData */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -72,24 +77,18 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         );
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     *
-     * @return Config
-     */
-    private function getConfig(EntityDefinitionConfig $definition)
+    private function getConfig(EntityDefinitionConfig $definition): Config
     {
         $config = new Config();
         $config->setDefinition($definition);
 
         return $config;
     }
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "/included/0" element should be an array.
-     */
     public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidElement()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "/included/0" element should be an array.');
+
         $includedData = [
             null
         ];
@@ -98,12 +97,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "/included/0" element should have "data" property.
-     */
     public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidSchema()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "/included/0" element should have "data" property.');
+
         $includedData = [
             ['type' => 'testType', 'id' => 'testId']
         ];
@@ -112,12 +110,11 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "data" property of "/included/0" element should be an array.
-     */
     public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidDataElement()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "data" property of "/included/0" element should be an array.');
+
         $includedData = [
             [
                 'data' => null
@@ -227,11 +224,9 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             $includedEntity,
             $this->context->getIncludedEntities()->get($normalizedType, 'testId')
         );
-        self::assertAttributeSame(
-            ['Test\PrimaryClass', 'primaryId', null],
-            'primaryEntity',
-            $this->context->getIncludedEntities()
-        );
+
+        $includedEntityCollection = $this->context->getIncludedEntities();
+        self::assertTrue($includedEntityCollection->isPrimaryEntity('Test\PrimaryClass', 'primaryId'));
     }
 
     public function testProcessForNewIncludedEntityOrObject()
@@ -280,7 +275,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         ];
         $normalizedType = 'Test\Class';
         $normalizedId = 123;
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $error = Error::createValidationError(
             Constraint::VALUE,
@@ -338,7 +333,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $normalizedType = 'Test\Class';
         $normalizedId = 123;
         $includedEntity = new \stdClass();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
@@ -346,7 +341,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->willReturn($normalizedType);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
-            ->with($normalizedType, $normalizedId, self::isInstanceOf($metadata))
+            ->with($normalizedType, $normalizedId, self::isInstanceOf(EntityMetadata::class))
             ->willReturn($includedEntity);
 
         $config = new EntityDefinitionConfig();
@@ -398,7 +393,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         ];
         $normalizedType = 'Test\Class';
         $normalizedId = 123;
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $error = Error::createValidationError(
             Constraint::ENTITY,
             'The entity does not exist.'
@@ -410,7 +405,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ->willReturn($normalizedType);
         $this->entityLoader->expects(self::once())
             ->method('findEntity')
-            ->with($normalizedType, $normalizedId, self::isInstanceOf($metadata))
+            ->with($normalizedType, $normalizedId, self::isInstanceOf(EntityMetadata::class))
             ->willReturn(null);
 
         $config = new EntityDefinitionConfig();
@@ -456,13 +451,13 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
             ]
         ];
-        $error = Error::createValidationError(Constraint::ENTITY_TYPE)
+        $error = Error::createValidationError(Constraint::ENTITY_TYPE, 'Unknown entity type: testType.')
             ->setSource(ErrorSource::createByPointer('/included/0/type'));
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
             ->with('testType', DataType::ENTITY_CLASS, $this->context->getRequestType())
-            ->willThrowException(new \Exception('some error'));
+            ->willThrowException(new EntityAliasNotFoundException('testType'));
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
@@ -511,7 +506,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ]
         ];
         $normalizedType = 'Test\Class';
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $exception = new \Exception('some error');
         $error = Error::createValidationError(Constraint::ENTITY_ID)
             ->setSource(ErrorSource::createByPointer('/included/0/id'))

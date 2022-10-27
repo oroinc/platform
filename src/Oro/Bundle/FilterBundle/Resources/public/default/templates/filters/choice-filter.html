@@ -1,0 +1,35 @@
+<div class="choice-filter" data-choice-filter-template>
+    <div class="filter-select-oro-wrapper">
+        <select name="<%- name %>" class="select select--size-s select--full oro-select2 oro-select2--size-s" data-choice-value-select
+            <% if (typeof(dataName) !== "undefined") { %>
+                data-name="<%- dataName %>"
+            <% } %>
+            <% if (_.isMobile()) { %>
+                data-skip-input-widgets
+            <% } %>
+            aria-label="<%- choiceAriaLabel %>"
+        >
+            <% _.each(choices, function (option) { %>
+                <option value="<%- option.value %>"
+                    <% if (option.value == selectedChoice) { %>
+                        selected="selected"
+                    <% } %>
+                >
+                    <%- option.label %>
+                </option>
+            <% }); %>
+        </select>
+    </div>
+    <div class="value-field-frame">
+        <input class="input input--size-s input--full" type="text" name="value" value="" aria-label="<%- inputFieldAriaLabel %>">
+        <input class="name_input" type="hidden" name="<%- name %>" id="<%- name %>" value="<%- selectedChoice %>">
+        <% if (renderMode !== 'toggle-mode') { %>
+            <div class="filter-action-row">
+                <button type="button"
+                    class="btn btn--action btn--size-s filter-update"
+                    aria-label="<%- updateButtonAriaLabel %>"
+                ><%- _.__("oro.filter.updateButton.text") %></button>
+            </div>
+        <% } %>
+    </div>
+</div>

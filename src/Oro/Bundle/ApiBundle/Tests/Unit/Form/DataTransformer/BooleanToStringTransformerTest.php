@@ -3,19 +3,20 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\BooleanToStringTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class BooleanToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform($value, $expected)
+    public function testTransform(?bool $value, string $expected)
     {
         $transformer = new BooleanToStringTransformer();
         self::assertEquals($expected, $transformer->transform($value));
     }
 
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             [null, ''],
@@ -24,11 +25,9 @@ class BooleanToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testTransformWithInvalidValue()
     {
+        $this->expectException(TransformationFailedException::class);
         $transformer = new BooleanToStringTransformer();
         $transformer->transform(1);
     }
@@ -36,13 +35,13 @@ class BooleanToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform($value, $expected)
+    public function testReverseTransform(string $value, ?bool $expected)
     {
         $transformer = new BooleanToStringTransformer();
         self::assertEquals($expected, $transformer->reverseTransform($value));
     }
 
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
         return [
             ['', null],
@@ -55,20 +54,16 @@ class BooleanToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformWithNotStringValue()
     {
+        $this->expectException(TransformationFailedException::class);
         $transformer = new BooleanToStringTransformer();
         $transformer->reverseTransform(1);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\TransformationFailedException
-     */
     public function testReverseTransformWithInvalidValue()
     {
+        $this->expectException(TransformationFailedException::class);
         $transformer = new BooleanToStringTransformer();
         $transformer->reverseTransform('test');
     }

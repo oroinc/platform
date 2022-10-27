@@ -1,4 +1,4 @@
-{% extends 'OroUserBundle::layout.html.twig' %}
+{% extends '@OroUser/layout.html.twig' %}
 {% block head %}
     {{ parent() }}
     {# since some browsers (like FF) show html content before css and other resources are completely loaded follow loading animation was added #}
@@ -9,7 +9,7 @@
             left: 0;
             height: 100%;
             width: 100%;
-            z-index: 1000;
+            z-index: 800;
             background: white url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzgiIGhlaWdodD0iMzgiIHZpZXdCb3g9IjAgMCAzOCAzOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICAgIDxkZWZzPgogICAgICAgIDxsaW5lYXJHcmFkaWVudCB4MT0iOC4wNDIlIiB5MT0iMCUiIHgyPSI2NS42ODIlIiB5Mj0iMjMuODY1JSIgaWQ9ImEiPgogICAgICAgICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjODg4IiBzdG9wLW9wYWNpdHk9IjAiIG9mZnNldD0iMCUiLz4KICAgICAgICAgICAgPHN0b3Agc3RvcC1jb2xvcj0iIzg4OCIgc3RvcC1vcGFjaXR5PSIuNjMxIiBvZmZzZXQ9IjYzLjE0NiUiLz4KICAgICAgICAgICAgPHN0b3Agc3RvcC1jb2xvcj0iIzg4OCIgb2Zmc2V0PSIxMDAlIi8+CiAgICAgICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDwvZGVmcz4KICAgIDxnIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMSAxKSI+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0zNiAxOGMwLTkuOTQtOC4wNi0xOC0xOC0xOCIgaWQ9Ik92YWwtMiIgc3Ryb2tlPSJ1cmwoI2EpIiBzdHJva2Utd2lkdGg9IjIiPgogICAgICAgICAgICAgICAgPGFuaW1hdGVUcmFuc2Zvcm0KICAgICAgICAgICAgICAgICAgICBhdHRyaWJ1dGVOYW1lPSJ0cmFuc2Zvcm0iCiAgICAgICAgICAgICAgICAgICAgdHlwZT0icm90YXRlIgogICAgICAgICAgICAgICAgICAgIGZyb209IjAgMTggMTgiCiAgICAgICAgICAgICAgICAgICAgdG89IjM2MCAxOCAxOCIKICAgICAgICAgICAgICAgICAgICBkdXI9IjAuOXMiCiAgICAgICAgICAgICAgICAgICAgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICAgICAgICAgIDwvcGF0aD4KICAgICAgICAgICAgPGNpcmNsZSBmaWxsPSIjZmZmIiBjeD0iMzYiIGN5PSIxOCIgcj0iMSI+CiAgICAgICAgICAgICAgICA8YW5pbWF0ZVRyYW5zZm9ybQogICAgICAgICAgICAgICAgICAgIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIKICAgICAgICAgICAgICAgICAgICB0eXBlPSJyb3RhdGUiCiAgICAgICAgICAgICAgICAgICAgZnJvbT0iMCAxOCAxOCIKICAgICAgICAgICAgICAgICAgICB0bz0iMzYwIDE4IDE4IgogICAgICAgICAgICAgICAgICAgIGR1cj0iMC45cyIKICAgICAgICAgICAgICAgICAgICByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICAgICAgICAgICAgPC9jaXJjbGU+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4K') center center no-repeat;
         }
     </style>
@@ -22,7 +22,11 @@
 <div class="container">
     <div class="form-wrapper">
         <div class="form-wrapper__inner">
-            <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin">
+            {% set usernameLabel = 'Username'|trans %}
+            {% set passwordLabel = 'Password'|trans %}
+            {% set showLabels = (usernameLabel|length <= 9) and (passwordLabel|length <= 9) %}
+            {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
+            <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin form-signin--login {{ layoutName }}">
                 <div class="form-description">
                     {% if oro_theme_logo() %}
                         <div class="form-description__logo">
@@ -37,58 +41,47 @@
                 <div class="title-box">
                     <h2 class="title">{{ 'Login'|trans }}</h2>
                 </div>
-                <fieldset>
+                <fieldset class="field-set">
                     {% if error %}
                         <div class="alert alert-error" role="alert">
                             <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                         </div>
                     {% endif %}
                     {{ messagesContent }}
-                    {%- set usernameLabel = 'Username'|trans %}
-                    {%- set passwordLabel = 'Password'|trans %}
-                    {%- set organizationLabel = 'Organization'|trans %}
-                    {%- set showLabels = (usernameLabel|length <= 9) and (passwordLabel|trans <= 9) %}
                     <div class="input-field-group">
                         <div class="input-prepend">
-                            {% if showLabels %}
                             <label for="prependedInput" class="add-on">{{ usernameLabel }}</label>
-                            {% endif %}
-                            <input type="text" id="prependedInput" class="span2" name="_username" value="{{ last_username }}" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus/>
+                            <input type="text" id="prependedInput" class="input" autocomplete="username" name="_username" value="{{ last_username }}" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus>
                         </div>
                         <div class="input-prepend input-prepend--last">
-                            {% if showLabels %}
                             <label for="prependedInput2" class="add-on">{{ passwordLabel }}</label>
-                            {% endif %}
-                            <input type="password" id="prependedInput2" class="span2" name="_password" required="required" placeholder="{{ 'Password'|trans }}" autocomplete="off" />
+                            <input type="password" id="prependedInput2" class="input" autocomplete="off" name="_password" required="required" placeholder="{{ 'Password'|trans }}">
                         </div>
                     </div>
                     <div class="oro-remember-me">
-                        <label>
-                            <span class="checkbox-view">
-                                <input type="checkbox" id="remember_me" name="_remember_me" class="checkbox-view__input input-widget" value="on">
-                                <span class="checkbox-view__icon"></span>
-                            </span>
-                            {{ 'Remember me on this computer'|trans }}
+                        <label class="checkbox-label" for="remember_me">
+                            <input type="checkbox"
+                                    id="remember_me"
+                                    name="_remember_me"
+                                    value="on">
+                            {{- 'Remember me on this computer'|trans -}}
                         </label>
                     </div>
                     <div class="form-signin__footer">
+                        <button type="submit" class="btn extra-submit btn-uppercase btn-primary" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
                         <a href="{{ path('oro_user_reset_request') }}">{{ 'Forgot your password?'|trans }}</a>
-                        <button type="submit" class="btn btn-uppercase btn-primary pull-right" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
                     </div>
-                    {% if oro_config_value('oro_sso.enable_google_sso') %}
-                        <div class="form-signin__oauth">
-                            {% placeholder oro_user_login_form %}
-                        </div>
-                    {% endif %}
+                    <div class="form-signin__oauth">
+                        {% placeholder oro_user_login_form %}
+                    </div>
                 </fieldset>
-                <input type="hidden" name="_target_path" value="" />
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+                <input type="hidden" name="_target_path" value="">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
             </form>
         </div>
-        
-        <div class="login-copyright">{{ 'oro.auth.copy'|trans }}</div>
+        <div class="login-copyright">{{ 'oro.copyright'|trans({ '{{year}}': 'now'|date('Y') }) }}</div>
     </div>
-    <script type="text/javascript">
+    <script>
         document.getElementById('login-form').addEventListener('submit', function (event) {
             var buttons = event.target.getElementsByTagName('button');
             for (var i = 0; i < buttons.length; i++) {

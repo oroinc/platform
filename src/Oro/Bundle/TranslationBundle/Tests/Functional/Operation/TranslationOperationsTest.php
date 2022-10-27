@@ -3,15 +3,12 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Operation;
 
 use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslationOperationsTest extends ActionTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([
@@ -19,31 +16,13 @@ class TranslationOperationsTest extends ActionTestCase
         ]);
     }
 
-    public function testUpdateCacheOperation()
-    {
-        $translator = $this->getTranslatorMock();
-        $translator->expects($this->once())->method('rebuildCache');
-        $translator->expects($this->any())->method('getTranslations')->willReturn([]);
-
-        $this->setTranslator($translator);
-
-        $this->assertExecuteOperation(
-            'oro_translation_rebuild_cache',
-            null,
-            null,
-            ['route' => 'oro_translation_translation_index']
-        );
-    }
-
     /**
      * @dataProvider removeTranslationOperationDataProvider
-     *
-     * @param string $translation
      */
-    public function testRemoveTranslationOperation($translation)
+    public function testRemoveTranslationOperation(string $translation)
     {
         $translation = $this->getReference($translation);
-        $translationClass = $this->getContainer()->getParameter('oro_translation.entity.translation.class');
+        $translationClass = Translation::class;
 
         $entityId = $translation->getId();
         $this->assertExecuteOperation(
@@ -52,42 +31,23 @@ class TranslationOperationsTest extends ActionTestCase
             $translationClass,
             ['datagrid' => 'oro-translation-translations-grid', 'group' => ['datagridRowAction']]
         );
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals(true, $response['success']);
-        $this->assertContains("oro-translation-translations-grid", $response['refreshGrid']);
+        $this->assertContains('oro-translation-translations-grid', $response['refreshGrid']);
         $removedTranslation = self::getContainer()
             ->get('doctrine')
             ->getRepository($translationClass)
             ->find($entityId);
 
-        static::assertNull($removedTranslation);
+        self::assertNull($removedTranslation);
     }
 
-    /**
-     * @return array
-     */
-    public function removeTranslationOperationDataProvider()
+    public function removeTranslationOperationDataProvider(): array
     {
         return [
             'scope SYSTEM' => [LoadTranslations::TRANSLATION_KEY_1],
             'scope INSTALLED' => [LoadTranslations::TRANSLATION_KEY_4],
             'scope UI' => [LoadTranslations::TRANSLATION_KEY_5]
         ];
-    }
-
-    /**
-     * @param Translator $translator
-     */
-    private function setTranslator(Translator $translator)
-    {
-        self::$kernel->getContainer()->set('translator.default', $translator);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Translator
-     */
-    private function getTranslatorMock()
-    {
-        return $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
     }
 }

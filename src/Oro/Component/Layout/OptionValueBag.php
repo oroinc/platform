@@ -52,7 +52,7 @@ class OptionValueBag
     }
 
     /**
-     * Builds a block option value using the given builder
+     * Builds a block option value
      *
      * @return mixed The built value
      */

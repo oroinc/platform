@@ -2,61 +2,44 @@
 
 namespace Oro\Bundle\EntityBundle\DataCollector;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
+ * The logger that is used for the profiling of ORM operations.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OrmLogger
 {
     /** @var array */
-    protected $hydrations = [];
+    private $hydrations = [];
 
     /** @var float */
-    protected $startHydration;
+    private $startHydration;
 
     /** @var integer */
-    protected $currentHydration = 0;
+    private $currentHydration = 0;
 
     /** @var array */
-    protected $stats = [];
+    private $stats = [];
 
     /** @var float */
-    protected $statsTime = 0;
+    private $statsTime = 0;
 
     /** @var integer */
-    protected $hydrationStack = 0;
+    private $hydrationStack = 0;
 
     /** @var array */
-    protected $operationStack = [];
+    private $operationStack = [];
 
     /** @var array */
-    protected $metadataStack = [];
+    private $metadataStack = [];
 
     /** @var Stopwatch|null */
-    protected $stopwatch;
+    private $stopwatch;
 
-    /**
-     * @param array           $hydrators
-     * @param ManagerRegistry $doctrine
-     * @param Stopwatch|null  $stopwatch
-     */
-    public function __construct(array $hydrators, ManagerRegistry $doctrine, Stopwatch $stopwatch = null)
+    public function __construct(Stopwatch $stopwatch = null)
     {
-        // inject profiling logger and logging hydrators into a configuration of all registered entity managers
-        foreach ($doctrine->getManagers() as $manager) {
-            if ($manager instanceof EntityManagerInterface) {
-                $configuration = $manager->getConfiguration();
-                if ($configuration instanceof OrmConfiguration) {
-                    $configuration->setAttribute('OrmProfilingLogger', $this);
-                    $configuration->setAttribute('LoggingHydrators', $hydrators);
-                }
-            }
-        }
-
         $this->stopwatch = $stopwatch;
     }
 
@@ -132,9 +115,9 @@ class OrmLogger
      */
     public function stopHydration($resultCount, $aliasMap)
     {
-        $this->hydrations[$this->currentHydration]['time']        = microtime(true) - $this->startHydration;
+        $this->hydrations[$this->currentHydration]['time'] = microtime(true) - $this->startHydration;
         $this->hydrations[$this->currentHydration]['resultCount'] = $resultCount;
-        $this->hydrations[$this->currentHydration]['aliasMap']    = $aliasMap;
+        $this->hydrations[$this->currentHydration]['aliasMap'] = $aliasMap;
         if ($this->stopwatch) {
             $this->stopwatch->stop('doctrine.orm.hydrations');
         }
@@ -288,7 +271,7 @@ class OrmLogger
     /**
      * @param string $name
      */
-    protected function startOperation($name)
+    private function startOperation($name)
     {
         $startStopwatch = $this->stopwatch && empty($this->operationStack);
 
@@ -301,7 +284,7 @@ class OrmLogger
     /**
      * @param string $name
      */
-    protected function stopOperation($name)
+    private function stopOperation($name)
     {
         $time = microtime(true) - array_pop($this->operationStack[$name]);
         if (isset($this->stats[$name])) {
@@ -326,7 +309,7 @@ class OrmLogger
     /**
      * @param string $name
      */
-    protected function startMetadata($name)
+    private function startMetadata($name)
     {
         $startStopwatch = $this->stopwatch && empty($this->metadataStack);
 
@@ -339,7 +322,7 @@ class OrmLogger
     /**
      * @param string $name
      */
-    protected function stopMetadata($name)
+    private function stopMetadata($name)
     {
         $time = microtime(true) - array_pop($this->metadataStack[$name]);
         if (isset($this->stats[$name])) {

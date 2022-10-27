@@ -5,63 +5,71 @@ namespace Oro\Bundle\EntityExtendBundle\Provider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
+/**
+ * Provides available fields and it's config data.
+ */
 class FieldTypeProvider
 {
-    const GROUP_FIELDS = 'fields';
-    const GROUP_RELATIONS = 'relations';
+    protected ConfigManager $configManager;
 
-    /** @var ConfigManager */
-    protected $configManager;
+    protected array $supportedFields = [];
+    protected array $supportedRelations = [];
 
-    /** @var array */
-    protected $types = [];
-
-    /**
-     * @param ConfigManager $configManager
-     * @param array $fields
-     * @param array $relations
-     */
     public function __construct(ConfigManager $configManager, array $fields = [], array $relations = [])
     {
         $this->configManager = $configManager;
-        $this->types = [self::GROUP_FIELDS => $fields, self::GROUP_RELATIONS => $relations];
+        $this->supportedFields = $fields;
+        $this->supportedRelations = $relations;
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedFieldTypes()
+    public function addSupportedFieldType(string $fieldType): void
     {
-        return $this->types[self::GROUP_FIELDS];
+        if (!\in_array($fieldType, $this->supportedFields, true)) {
+            $this->supportedFields[] = $fieldType;
+        }
     }
 
-    /**
-     * @return array
-     */
-    public function getSupportedRelationTypes()
+    public function addSupportedRelation(string $relation): void
     {
-        return $this->types[self::GROUP_RELATIONS];
+        if (!\in_array($relation, $this->supportedRelations, true)) {
+            $this->supportedRelations[] = $relation;
+        }
+    }
+
+    public function getSupportedFieldTypes(): array
+    {
+        return $this->supportedFields;
+    }
+
+    public function getSupportedRelationTypes(): array
+    {
+        return $this->supportedRelations;
     }
 
     /**
      * @param string $fieldType
      * @param string $configType
-     * @return array
+     *
+     * @return array [scope => [parameter_name => [parameter_config_item, ...], ...], ...]
      */
-    public function getFieldProperties($fieldType, $configType = PropertyConfigContainer::TYPE_FIELD)
+    public function getFieldProperties($fieldType, $configType = PropertyConfigContainer::TYPE_FIELD): array
     {
         $properties = [];
 
         foreach ($this->configManager->getProviders() as $provider) {
             $propertyConfig = $provider->getPropertyConfig();
-
             if ($propertyConfig->hasForm($configType, $fieldType)) {
-                $items = $propertyConfig->getFormItems($configType, $fieldType);
                 $scope = $provider->getScope();
-
-                foreach ($items as $code => $config) {
-                    if (!isset($properties[$scope][$code])) {
-                        $properties[$scope][$code] = $config;
+                foreach ($propertyConfig->getItems($configType) as $code => $item) {
+                    if (isset($item['import_export']['import_template']['use_in_template'])
+                        && true === $item['import_export']['import_template']['use_in_template']
+                        && !isset($properties[$scope][$code])
+                        && (
+                            !isset($item['options']['allowed_type'])
+                            || in_array($fieldType, $item['options']['allowed_type'], true)
+                        )
+                    ) {
+                        $properties[$scope][$code] = $item;
                     }
                 }
             }

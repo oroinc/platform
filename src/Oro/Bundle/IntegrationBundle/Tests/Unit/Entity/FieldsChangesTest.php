@@ -7,19 +7,12 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class FieldsChangesTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FieldsChanges
-     */
-    protected $entity;
+    /** @var FieldsChanges */
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new FieldsChanges([]);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entity);
     }
 
     public function testGetId()
@@ -28,12 +21,9 @@ class FieldsChangesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $property
-     * @param mixed  $value
-     *
      * @dataProvider entityDataProvider
      */
-    public function testSetGet($property, $value)
+    public function testSetGet(string $property, mixed $value)
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
@@ -45,13 +35,10 @@ class FieldsChangesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function entityDataProvider()
+    public function entityDataProvider(): array
     {
         return [
-            'entityClass'       => ['entityClass', '\stdClass'],
+            'entityClass'       => ['entityClass', \stdClass::class],
             'empty_entityClass' => ['entityClass', null],
             'entityId'          => ['entityId', 1],
             'empty_entityId'    => ['entityId', null],
@@ -60,8 +47,6 @@ class FieldsChangesTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $fields
-     *
      * @dataProvider constructDataProvider
      */
     public function testConstruct(array $fields)
@@ -70,10 +55,7 @@ class FieldsChangesTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($fields, $fieldsChanges->getChangedFields());
     }
 
-    /**
-     * @return array
-     */
-    public function constructDataProvider()
+    public function constructDataProvider(): array
     {
         return [
             [[]],

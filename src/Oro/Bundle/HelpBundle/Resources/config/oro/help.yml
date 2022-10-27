@@ -1,0 +1,9 @@
+help:
+    vendors:
+        Oro:
+            prefix: ~
+            alias: Platform
+
+    routes:
+        oro_default:
+            uri: Platform/OroDashboardBundle

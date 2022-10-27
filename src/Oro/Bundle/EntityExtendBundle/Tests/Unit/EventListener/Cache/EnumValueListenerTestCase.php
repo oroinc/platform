@@ -3,16 +3,16 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener\Cache;
 
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 abstract class EnumValueListenerTestCase extends \PHPUnit\Framework\TestCase
 {
-    const ENUM_VALUE_CLASS = StubEnumValue::class;
+    protected const ENUM_VALUE_CLASS = TestEnumValue::class;
 
     /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $cache;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->cache = $this->createMock(EnumTranslationCache::class);
     }

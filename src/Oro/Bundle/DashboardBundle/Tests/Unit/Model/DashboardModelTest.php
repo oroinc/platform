@@ -3,49 +3,41 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\DashboardBundle\Entity\Dashboard;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
+use Oro\Bundle\DashboardBundle\Model\WidgetModel;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DashboardModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $dashboardEntity;
+    /** @var Dashboard|\PHPUnit\Framework\MockObject\MockObject */
+    private $dashboardEntity;
 
-    /**
-     * @var ArrayCollection
-     */
-    protected $widgets;
+    /** @var ArrayCollection */
+    private $widgets;
 
-    /**
-     * @var array
-     */
-    protected $config = array(
+    private array $config = [
         'label' => 'Dashboard label'
-    );
+    ];
 
-    /**
-     * @var DashboardModel
-     */
-    protected $dashboardModel;
+    /** @var DashboardModel */
+    private $dashboardModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->dashboardEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $this->dashboardEntity = $this->createMock(Dashboard::class);
 
-        $this->widgets = new ArrayCollection(
-            array(
-                $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
-                    ->disableOriginalConstructor()->getMock(),
-                $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
-                    ->disableOriginalConstructor()
-                    ->getMock(),
-            )
-        );
+        $this->widgets = new ArrayCollection([
+            $this->createMock(WidgetModel::class),
+            $this->createMock(WidgetModel::class)
+        ]);
 
         $this->dashboardModel = new DashboardModel($this->dashboardEntity, $this->widgets, $this->config);
     }
@@ -70,7 +62,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $id = 100;
         $this->dashboardEntity->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue($id));
+            ->willReturn($id);
 
         $this->assertEquals($id, $this->dashboardModel->getId());
     }
@@ -80,7 +72,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $name = 'Name';
         $this->dashboardEntity->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         $this->assertEquals($name, $this->dashboardModel->getName());
     }
@@ -97,17 +89,17 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetStartDashboard()
     {
-        $dashboard = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboard = $this->createMock(Dashboard::class);
         $this->dashboardEntity->expects($this->once())
             ->method('getStartDashboard')
-            ->will($this->returnValue($dashboard));
+            ->willReturn($dashboard);
 
         $this->assertEquals($dashboard, $this->dashboardModel->getStartDashboard());
     }
 
     public function testSetStartDashboard()
     {
-        $dashboard = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Dashboard');
+        $dashboard = $this->createMock(Dashboard::class);
         $this->dashboardEntity->expects($this->once())
             ->method('setStartDashboard')
             ->with($dashboard);
@@ -117,14 +109,12 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
 
     public function testAddWidget()
     {
-        $widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $widgetEntity = $this->createMock(Widget::class);
+        $widgetModel = $this->createMock(WidgetModel::class);
 
         $widgetModel->expects($this->once())
             ->method('getEntity')
-            ->will($this->returnValue($widgetEntity));
+            ->willReturn($widgetEntity);
 
         $this->dashboardEntity->expects($this->once())
             ->method('addWidget')
@@ -139,14 +129,12 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
      */
     public function testAddWidgetMinColumnPosition(array $layoutPositions, $column, array $expectedLayoutPosition)
     {
-        $widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $widgetEntity = $this->createMock(Widget::class);
+        $widgetModel = $this->createMock(WidgetModel::class);
 
         $widgetModel->expects($this->once())
             ->method('getEntity')
-            ->will($this->returnValue($widgetEntity));
+            ->willReturn($widgetEntity);
 
         $widgetModel->expects($this->once())
             ->method('setLayoutPosition')
@@ -159,49 +147,49 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         foreach ($layoutPositions as $index => $layoutPosition) {
             $this->widgets[$index]->expects($this->once())
                 ->method('getLayoutPosition')
-                ->will($this->returnValue($layoutPosition));
+                ->willReturn($layoutPosition);
         }
 
         $this->dashboardModel->addWidget($widgetModel, $column);
         $this->assertEquals($widgetModel, $this->widgets[2]);
     }
 
-    public function addWidgetRecalculatePositionDataProvider()
+    public function addWidgetRecalculatePositionDataProvider(): array
     {
-        return array(
-            array(
-                'layoutPositions' => array(
-                    array(0, 50),
-                    array(0, 100),
-                ),
+        return [
+            [
+                'layoutPositions' => [
+                    [0, 50],
+                    [0, 100],
+                ],
                 'column' => 0,
-                'expectedLayoutPosition' => array(0, 0)
-            ),
-            array(
-                'layoutPositions' => array(
-                    array(0, 50),
-                    array(1, 0),
-                ),
+                'expectedLayoutPosition' => [0, 0]
+            ],
+            [
+                'layoutPositions' => [
+                    [0, 50],
+                    [1, 0],
+                ],
                 'column' => 0,
-                'expectedLayoutPosition' => array(0, 0)
-            ),
-            array(
-                'layoutPositions' => array(
-                    array(1, -100),
-                    array(1, 100),
-                ),
+                'expectedLayoutPosition' => [0, 0]
+            ],
+            [
+                'layoutPositions' => [
+                    [1, -100],
+                    [1, 100],
+                ],
                 'column' => 1,
-                'expectedLayoutPosition' => array(1, -101)
-            ),
-            array(
-                'layoutPositions' => array(
-                    array(0, -100),
-                    array(0, 100),
-                ),
+                'expectedLayoutPosition' => [1, -101]
+            ],
+            [
+                'layoutPositions' => [
+                    [0, -100],
+                    [0, 100],
+                ],
                 'column' => 0,
-                'expectedLayoutPosition' => array(0, -101)
-            ),
-        );
+                'expectedLayoutPosition' => [0, -101]
+            ],
+        ];
     }
 
     public function testGetWidgetById()
@@ -210,10 +198,10 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $secondWidgetId = 101;
         $this->widgets[0]->expects($this->exactly(2))
             ->method('getId')
-            ->will($this->returnValue($firstWidgetId));
+            ->willReturn($firstWidgetId);
         $this->widgets[1]->expects($this->exactly(2))
             ->method('getId')
-            ->will($this->returnValue($secondWidgetId));
+            ->willReturn($secondWidgetId);
 
         $this->assertEquals($this->widgets[1], $this->dashboardModel->getWidgetById($secondWidgetId));
         $this->assertNull($this->dashboardModel->getWidgetById('undefined'));
@@ -231,14 +219,14 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
     ) {
         $this->widgets->clear();
         foreach ($layoutPositions as $layoutPosition) {
-            $widget = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $widget->expects($this->any())->method('getLayoutPosition')->will($this->returnValue($layoutPosition));
+            $widget = $this->createMock(WidgetModel::class);
+            $widget->expects($this->any())
+                ->method('getLayoutPosition')
+                ->willReturn($layoutPosition);
             $this->widgets->add($widget);
         }
 
-        $actualLayoutPositions = array();
+        $actualLayoutPositions = [];
         $orderedWidgets = $this->dashboardModel->getOrderedColumnWidgets($column, $appendGreater, $appendLesser);
         foreach ($orderedWidgets as $widget) {
             $actualLayoutPositions[] = $widget->getLayoutPosition();
@@ -247,55 +235,53 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedLayoutPositions, $actualLayoutPositions);
     }
 
-    public function getOrderedColumnWidgetsDataProvider()
+    public function getOrderedColumnWidgetsDataProvider(): array
     {
-        return array(
-            array(
+        return [
+            [
                 'column' => 0,
                 'appendGreater' => true,
                 'appendLesser' => true,
-                'layoutPositions' => array(array(2, 0), array(1, 0), array(0, 2), array(0, 1), array(0, 0)),
-                'expectedLayoutPositions' => array(array(0, 0), array(0, 1), array(0, 2), array(1, 0), array(2, 0)),
-            ),
-            array(
+                'layoutPositions' => [[2, 0], [1, 0], [0, 2], [0, 1], [0, 0]],
+                'expectedLayoutPositions' => [[0, 0], [0, 1], [0, 2], [1, 0], [2, 0]],
+            ],
+            [
                 'column' => 1,
                 'appendGreater' => true,
                 'appendLesser' => false,
-                'layoutPositions' => array(array(2, 0), array(1, 0), array(0, 2), array(0, 1), array(0, 0)),
-                'expectedLayoutPositions' => array(array(1, 0), array(2, 0)),
-            ),
-            array(
+                'layoutPositions' => [[2, 0], [1, 0], [0, 2], [0, 1], [0, 0]],
+                'expectedLayoutPositions' => [[1, 0], [2, 0]],
+            ],
+            [
                 'column' => 1,
                 'appendGreater' => false,
                 'appendLesser' => false,
-                'layoutPositions' => array(array(2, 0), array(1, 0), array(0, 2), array(0, 1), array(0, 0)),
-                'expectedLayoutPositions' => array(array(1, 0)),
-            ),
-            array(
+                'layoutPositions' => [[2, 0], [1, 0], [0, 2], [0, 1], [0, 0]],
+                'expectedLayoutPositions' => [[1, 0]],
+            ],
+            [
                 'column' => 0,
                 'appendGreater' => false,
                 'appendLesser' => false,
-                'layoutPositions' => array(array(2, 0), array(1, 0), array(0, 2), array(0, 1), array(0, 0)),
-                'expectedLayoutPositions' => array(array(0, 0), array(0, 1), array(0, 2)),
-            ),
-        );
+                'layoutPositions' => [[2, 0], [1, 0], [0, 2], [0, 1], [0, 0]],
+                'expectedLayoutPositions' => [[0, 0], [0, 1], [0, 2]],
+            ],
+        ];
     }
 
     public function testHasWidget()
     {
-        $widgetModel = $this->getMockBuilder('Oro\Bundle\DashboardBundle\Model\WidgetModel')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $widgetEntity = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widgetModel = $this->createMock(WidgetModel::class);
+        $widgetEntity = $this->createMock(Widget::class);
 
         $widgetModel->expects($this->once())
             ->method('getEntity')
-            ->will($this->returnValue($widgetEntity));
+            ->willReturn($widgetEntity);
 
         $this->dashboardEntity->expects($this->once())
             ->method('hasWidget')
             ->with($widgetEntity)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertTrue($this->dashboardModel->hasWidget($widgetModel));
     }
@@ -305,7 +291,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $isDefault = true;
         $this->dashboardEntity->expects($this->once())
             ->method('getIsDefault')
-            ->will($this->returnValue($isDefault));
+            ->willReturn($isDefault);
 
         $this->assertEquals($isDefault, $this->dashboardModel->isDefault());
     }
@@ -322,17 +308,17 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOwner()
     {
-        $owner = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $owner = $this->createMock(User::class);
         $this->dashboardEntity->expects($this->once())
             ->method('getOwner')
-            ->will($this->returnValue($owner));
+            ->willReturn($owner);
 
         $this->assertEquals($owner, $this->dashboardModel->getOwner());
     }
 
     public function testSetOwner()
     {
-        $owner = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $owner = $this->createMock(User::class);
         $this->dashboardEntity->expects($this->once())
             ->method('setOwner')
             ->with($owner);
@@ -342,17 +328,17 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOrganization()
     {
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock(Organization::class);
         $this->dashboardEntity->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue($organization));
+            ->willReturn($organization);
 
         $this->assertEquals($organization, $this->dashboardModel->getOrganization());
     }
 
     public function testSetOrganization()
     {
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $organization = $this->createMock(Organization::class);
         $this->dashboardEntity->expects($this->once())
             ->method('setOrganization')
             ->with($organization);
@@ -365,7 +351,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
         $label = 'Label';
         $this->dashboardEntity->expects($this->once())
             ->method('getLabel')
-            ->will($this->returnValue($label));
+            ->willReturn($label);
 
         $this->assertEquals($label, $this->dashboardModel->getLabel());
     }
@@ -384,7 +370,7 @@ class DashboardModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->dashboardEntity->expects($this->once())
             ->method('getLabel')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertEquals($this->config['label'], $this->dashboardModel->getLabel());
     }

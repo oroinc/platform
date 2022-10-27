@@ -1,8 +1,8 @@
 /* @theme: admin.oro; */
 
-.form-horizontal .control-label {
-    text-align: left;
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
 
+.form-horizontal .control-label {
     &.header-tooltips {
         display: inline;
         float: none;
@@ -23,50 +23,66 @@
         display: flex;
 
         > .control-label {
-            width: 200px;
-            min-width: 150px;
-            font-weight: normal;
-            text-align: #{$end};
-        }
+            width: $form-horizontal-control-label-width;
+            font-weight: font-weight('light');
+            text-align: right;
+            flex-shrink: 0;
 
-        label.control-label {
-            margin-bottom: 0;
-            padding-top: 9px;
-
-            .desktop-version & + .controls {
-                padding-top: 9px;
+            .ui-dialog-content &,
+            .modal-content & {
+                width: $form-horizontal-widget-control-label-width;
+                max-width: $form-horizontal-control-label-width;
             }
         }
 
-        .control-label.wrap {
-            padding-top: 6px;
-            line-height: 20px;
-
-            .desktop-version & + .controls {
-                padding-top: 6px;
+        &:not(.attribute-row) {
+            .control-label {
+                padding-top: $form-horizontal-control-label-offset;
+                line-height: $form-horizontal-control-label-line-height;
             }
+        }
 
+        .control-label {
             .tooltip-icon {
-                margin-right: 5px;
+                margin-right: $content-padding-small;
             }
 
             label {
+                position: relative;
                 display: inline;
             }
         }
 
         .controls {
-            margin-#{$start}: 13px;
+            margin-left: $form-horizontal-control-margin-start;
+            text-align: left;
+            flex-grow: 1;
+            min-width: $field-width;
 
-            text-align: #{$start};
+            .controls {
+                min-width: 0;
+            }
 
             &:first-child {
-                margin-#{$start}: 169px;
+                margin-left: $form-horizontal-control-label-width + $form-horizontal-control-margin-start;
+
+                .ui-dialog-content & {
+                    margin-left: $form-horizontal-control-margin-start;
+                }
             }
 
             &.autocomplete-box {
                 margin-bottom: 10px;
                 margin-top: 10px;
+            }
+
+            &.messages {
+                margin: 0;
+
+                .alert {
+                    margin: $content-padding-small 0 0;
+                    max-width: $field-width;
+                }
             }
 
             .control-label {
@@ -78,7 +94,7 @@
             .control-subgroup {
                 display: inline-block;
                 vertical-align: top;
-                margin-right: 8px;
+                margin-right: $content-padding-small;
 
                 .controls {
                     margin-left: 0;
@@ -86,38 +102,128 @@
                 }
 
                 .tooltip-icon {
-                    margin-right: 5px;
+                    margin-right: $content-padding-small;
                 }
+            }
+
+            &-description {
+                margin-top: $content-padding-small;
+            }
+
+            &.html-content {
+                padding-top: $form-horizontal-control-html-content-offset;
+                max-width: $field-width;
+            }
+
+            .ui-dialog-resized & {
+                min-width: $field-width + $dialog-content-inner-offset;
+            }
+
+            .description-container {
+                margin-top: $content-padding-small;
+                min-width: $field-width;
+                max-width: $field-width;
             }
         }
 
-        &.attribute-row label.control-label {
-            cursor: default;
-            color: $primary-550;
-        }
-
         &.control-group-datetime {
-            input[type="text"] {
+            input[type='text'] {
                 &.datepicker-input {
                     width: 189px;
                 }
+
                 &.timepicker-input {
                     width: 100px;
                 }
             }
         }
+
+        &.control-group-checkbox {
+            .controls {
+                padding-top: 5px;
+            }
+        }
+
+        &.control-group-choice {
+            .choice-widget-expanded {
+                padding-top: $control-group-choice-choice-widget-offset-top;
+            }
+        }
+
+        &.control-group-oro_type_filter {
+            .date-filter-container {
+                &:not(.date-filter-custom) {
+                    .control-group {
+                        margin-bottom: 0;
+                    }
+                }
+
+                &.date-filter-custom {
+                    .control-group {
+                        gap: 8px;
+                    }
+                }
+            }
+        }
+
+        &.control-group-oro_entity_relation_type {
+            > .controls {
+                margin-left: 0;
+            }
+        }
+
+        > .pull-right {
+            flex-grow: 1;
+            text-align: right;
+        }
+    }
+
+    .control-group-oro_pricing_price_lists_settings,
+    .control-group-oro_file {
+        .controls:first-child {
+            // stylelint-disable-next-line declaration-no-important
+            margin-left: 0 !important;
+        }
+    }
+
+    &:not(.form) {
+        .control-group {
+            &.attribute-row label.control-label {
+                cursor: default;
+            }
+        }
+    }
+
+    .control-group-button {
+        .btn {
+            display: block;
+            width: 100%;
+            max-width: $field-width;
+        }
     }
 }
 
-.form-horizontal-large {
-    .control-group {
-        max-width: 100%;
-
-        div.control-label,
-        label.control-label {
-            width: 230px;
-            text-align: right;
+.choice-widget-expanded {
+    &__item {
+        &:not(:last-child) {
+            margin-bottom: $content-padding-small * .5;
         }
+    }
+}
+
+.form-vertical {
+    .control-group,
+    .control-group-container {
+        margin-bottom: 0;
+
+        + .control-group,
+        .control-group-container {
+            margin-top: $form-container-control-row-space;
+        }
+    }
+
+    .control-label {
+        margin-bottom: $form-container-control-row-space * .5;
     }
 }
 
@@ -125,9 +231,14 @@
     margin-bottom: 22px;
 
     span {
-        background-color: #fff;
+        background-color: $primary-inverse;
         padding: 0 20px 0 0;
         display: inline-block;
+    }
+
+    &-block-actions:first-child {
+        text-align: right;
+        margin-bottom: $content-padding-medium;
     }
 }
 
@@ -137,28 +248,28 @@ input[type='checkbox'] + label {
     display: inline-block;
 }
 
-.form-pass-reset {
-    margin: 0 auto 20px;
-    max-width: 400px;
-    padding: 19px 29px 29px;
-    background: $form-pass-reset-background;
-    border: $form-pass-reset-border;
-    border-radius: $border-radius;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, .065);
-}
-
 .form-row {
-    padding: 0 0 $margin-bottom-box/2;
+    padding: 0 0 $margin-bottom-box*.5;
 }
 
-@media only screen and (max-width: 1200px) {
-    .form-horizontal {
-        .control-group {
-            > div.control-label,
-            > label.control-label {
-                width: 150px;
-                min-width: 150px;
-            }
+label {
+    &.required {
+        position: relative;
+
+        em {
+            color: $danger-dark;
+            font-size: 21px;
+            font-style: normal;
+            position: absolute;
+
+            margin-top: -2px;
+            margin-left: 4px;
+        }
+    }
+
+    &:not(.required) {
+        em {
+            display: none;
         }
     }
 }

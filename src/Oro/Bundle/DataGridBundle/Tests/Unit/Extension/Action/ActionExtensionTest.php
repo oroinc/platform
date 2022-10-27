@@ -18,36 +18,45 @@ use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ActionExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var DatagridActionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionProvider;
+
     /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $actionFactory;
+    private $actionFactory;
 
     /** @var ActionMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $actionMetadataFactory;
+    private $actionMetadataFactory;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var OwnershipQueryHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $ownershipQueryHelper;
+    private $ownershipQueryHelper;
 
     /** @var ActionExtension */
-    protected $extension;
+    private $extension;
 
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    protected function setUp(): void
     {
+        $this->actionProvider = $this->createMock(DatagridActionProviderInterface::class);
         $this->actionFactory = $this->createMock(ActionFactory::class);
         $this->actionMetadataFactory = $this->createMock(ActionMetadataFactory::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->ownershipQueryHelper = $this->createMock(OwnershipQueryHelper::class);
 
         $this->extension = new ActionExtension(
+            [$this->actionProvider],
             $this->actionFactory,
             $this->actionMetadataFactory,
             $this->authorizationChecker,
@@ -88,18 +97,16 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessConfigs()
     {
-        $provider = $this->createMock(DatagridActionProviderInterface::class);
         $config = DatagridConfiguration::create([]);
 
-        $provider->expects(self::once())
+        $this->actionProvider->expects(self::once())
             ->method('hasActions')
             ->with($config)
             ->willReturn(true);
-        $provider->expects(self::once())
+        $this->actionProvider->expects(self::once())
             ->method('applyActions')
             ->with($config);
 
-        $this->extension->addActionProvider($provider);
         $this->extension->processConfigs($config);
     }
 
@@ -466,6 +473,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         $datasource = $this->createMock(DatasourceInterface::class);
 
         $this->extension->visitDatasource($config, $datasource);
+        $this->expectNotToPerformAssertions();
     }
 
     public function testVisitDatasourceForOrmDatasource()
@@ -491,7 +499,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->extension->visitDatasource($config, $datasource);
 
-        self::assertAttributeEquals($ownershipFields, 'ownershipFields', $this->extension);
+        self::assertEquals($ownershipFields, ReflectionUtil::getPropertyValue($this->extension, 'ownershipFields'));
     }
 
     public function testVisitDatasourceForOrmDatasourceButNoAclProtectedActions()
@@ -511,22 +519,12 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->visitDatasource($config, $datasource);
     }
 
-    /**
-     * @param array $ownershipFields
-     */
-    protected function setOwnershipFields(array $ownershipFields)
+    private function setOwnershipFields(array $ownershipFields)
     {
-        $refl = new \ReflectionClass($this->extension);
-
         // set ownership fields
-        $ownershipFieldsProperty = $refl->getProperty('ownershipFields');
-        $ownershipFieldsProperty->setAccessible(true);
-        $ownershipFieldsProperty->setValue($this->extension, $ownershipFields);
-
+        ReflectionUtil::setPropertyValue($this->extension, 'ownershipFields', $ownershipFields);
         // skip load actions metadata
-        $isMetadataVisitedProperty = $refl->getProperty('isMetadataVisited');
-        $isMetadataVisitedProperty->setAccessible(true);
-        $isMetadataVisitedProperty->setValue($this->extension, true);
+        ReflectionUtil::setPropertyValue($this->extension, 'isMetadataVisited', true);
     }
 
     /**
@@ -534,7 +532,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
      *
      * @return mixed
      */
-    protected function getActionConfigurationOption(DatagridConfiguration $config)
+    private function getActionConfigurationOption(DatagridConfiguration $config)
     {
         return $config->offsetGetByPath('[properties][action_configuration]');
     }
@@ -599,6 +597,41 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         foreach ($records as $record) {
             $result = call_user_func($actionConfiguration['callable'], $record);
             self::assertEquals(['update' => false], $result);
+        }
+    }
+
+    public function testVisitResultForActionsWithDuplicatedAclResources(): void
+    {
+        $config = DatagridConfiguration::create([
+            'actions' => [
+                'action1' => ['type' => 'type1', 'acl_resource' => 'acl_resource1'],
+                'action2' => ['type' => 'type2', 'acl_resource' => 'acl_resource1'],
+                'action3' => ['type' => 'type3', 'acl_resource' => 'acl_resource3']
+            ],
+        ]);
+        $records = [
+            new ResultRecord(['id' => 1, 't_owner_id' => 123, 't_organization_id' => 456]),
+        ];
+
+        $this->authorizationChecker->expects($this->exactly(2))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['acl_resource1'],
+                ['acl_resource3']
+            )
+            ->willReturn(false);
+
+        $this->setOwnershipFields(
+            ['t' => ['Test\Entity', 'id', 't_organization_id', 't_owner_id']]
+        );
+        $this->extension->visitResult($config, ResultsObject::create(['data' => $records]));
+
+        $actionConfiguration = $this->getActionConfigurationOption($config);
+        $this->assertNotNull($actionConfiguration);
+        $this->assertArrayHasKey('callable', $actionConfiguration);
+        foreach ($records as $record) {
+            $result = call_user_func($actionConfiguration['callable'], $record);
+            $this->assertEquals(['action1' => false, 'action2' => false, 'action3' => false], $result);
         }
     }
 
@@ -699,5 +732,26 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
             $result = call_user_func($actionConfiguration['callable'], $record);
             self::assertEquals(['update' => false, 'delete' => false], $result);
         }
+    }
+
+    public function testVisitMetadataDisabledAction(): void
+    {
+        $config   = DatagridConfiguration::create(
+            [
+                'actions' => [
+                    'action1' => ['type' => 'type1', 'disabled' => true],
+                ],
+            ]
+        );
+        $metadata = MetadataObject::create([]);
+
+        $this->extension->visitMetadata($config, $metadata);
+
+        $this->assertEquals(
+            [
+                'rowActions' => []
+            ],
+            $metadata->toArray()
+        );
     }
 }

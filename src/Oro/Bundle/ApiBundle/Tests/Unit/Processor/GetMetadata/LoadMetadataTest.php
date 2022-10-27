@@ -27,7 +27,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
     /** @var LoadMetadata */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +46,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
 
     public function testProcessForAlreadyLoadedMetadata()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
@@ -61,7 +61,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -96,7 +96,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->addField('field1');
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -131,7 +131,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')

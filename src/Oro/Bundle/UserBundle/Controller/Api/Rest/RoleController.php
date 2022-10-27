@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for Role entity.
  */
-class RoleController extends RestController implements ClassResourceInterface
+class RoleController extends RestController
 {
     /**
      * Get the list of roles
@@ -53,7 +51,6 @@ class RoleController extends RestController implements ClassResourceInterface
      *
      * @param int $id Role id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Get role data",
      *      resource=true,
@@ -62,8 +59,10 @@ class RoleController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_role_view")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -88,7 +87,6 @@ class RoleController extends RestController implements ClassResourceInterface
      *
      * @param int $id Role id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Update existing role",
      *      resource=true,
@@ -97,8 +95,10 @@ class RoleController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_role_update")
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -108,7 +108,6 @@ class RoleController extends RestController implements ClassResourceInterface
      *
      * @param int $id Role id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Delete role",
      *      resource=true,
@@ -122,8 +121,10 @@ class RoleController extends RestController implements ClassResourceInterface
      *      class="OroUserBundle:Role",
      *      permission="DELETE"
      * )
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
@@ -150,7 +151,7 @@ class RoleController extends RestController implements ClassResourceInterface
         return $this->handleView(
             $this->view(
                 $entity ? $this->getPreparedItem($entity) : null,
-                $entity ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
+                $entity ? Response::HTTP_OK : Response::HTTP_NOT_FOUND
             )
         );
     }
@@ -196,13 +197,5 @@ class RoleController extends RestController implements ClassResourceInterface
     public function getFormHandler()
     {
         return $this->get('oro_user.form.handler.role.api');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDeleteHandler()
-    {
-        return $this->get('oro_user.role.handler.delete');
     }
 }

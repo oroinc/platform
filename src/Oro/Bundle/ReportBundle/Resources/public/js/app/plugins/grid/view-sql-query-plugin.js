@@ -1,24 +1,30 @@
 define(function(require) {
     'use strict';
 
-    var ViewSqlQueryPlugin;
-    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
-    var SqlQueryView = require('../../views/sql-query/sql-query-view');
+    const BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    const SqlQueryView = require('../../views/sql-query/sql-query-view');
 
-    ViewSqlQueryPlugin = BasePlugin.extend({
+    const ViewSqlQueryPlugin = BasePlugin.extend({
         enable: function() {
             this.view = new SqlQueryView({
-                grid: this.main,
-                metadata: this.options.data.metadata
+                autoRender: true,
+                el: '[data-role="sql-query-panel"]',
+                sql: this.options.data.metadata.stored_sql.sql
             });
-            this.view.render();
-            this.main.$el.append(this.view.$el);
-            this.view.listenTo(this.main, 'content:update', this.view.onUpdate);
-            this.view.listenTo(this.main, 'render', this.view.render);
+
+            this.listenTo(this.main, 'content:update', this.onGridContentUpdate);
+
             ViewSqlQueryPlugin.__super__.enable.call(this);
         },
+
+        onGridContentUpdate: function() {
+            this.view.updateSQL(this.main.metadata.stored_sql.sql);
+        },
+
         disable: function() {
             this.view.dispose();
+            delete this.view;
+
             ViewSqlQueryPlugin.__super__.disable.call(this);
         }
     });

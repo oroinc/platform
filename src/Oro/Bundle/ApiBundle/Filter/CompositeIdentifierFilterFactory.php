@@ -12,9 +12,6 @@ class CompositeIdentifierFilterFactory
     /** @var EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
-    /**
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
@@ -22,12 +19,8 @@ class CompositeIdentifierFilterFactory
 
     /**
      * Creates a new instance of CompositeIdentifierFilter.
-     *
-     * @param string $dataType
-     *
-     * @return CompositeIdentifierFilter
      */
-    public function createFilter($dataType)
+    public function createFilter(string $dataType): CompositeIdentifierFilter
     {
         $filter = new CompositeIdentifierFilter($dataType);
         $filter->setEntityIdTransformerRegistry($this->entityIdTransformerRegistry);

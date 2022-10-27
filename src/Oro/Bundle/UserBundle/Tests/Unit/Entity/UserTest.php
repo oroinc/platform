@@ -5,58 +5,40 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class UserTest extends AbstractUserTest
 {
-    /**
-     * @return User
-     */
-    public function getUser()
+    public function getUser(): User
     {
         return new User();
     }
 
-    public function testEmail()
+    public function testEmail(): void
     {
         $user = $this->getUser();
         $mail = 'tony@mail.org';
 
-        $this->assertNull($user->getEmail());
+        self::assertNull($user->getEmail());
 
         $user->setEmail($mail);
 
-        $this->assertEquals($mail, $user->getEmail());
+        self::assertEquals($mail, $user->getEmail());
     }
 
-    public function testSetRolesCollection()
-    {
-        $user = $this->getUser();
-        $role = new Role(User::ROLE_DEFAULT);
-        $roles = new ArrayCollection([$role]);
-        $user->setRolesCollection($roles);
-        $this->assertSame($roles, $user->getRolesCollection());
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $collection must be an instance of Doctrine\Common\Collections\Collection
-     */
-    public function testSetRolesCollectionThrowsException()
-    {
-        $user = $this->getUser();
-        $user->setRolesCollection([]);
-    }
-
-    public function testGroups()
+    public function testGroups(): void
     {
         $user = $this->getUser();
         $role = new Role('ROLE_FOO');
@@ -64,60 +46,37 @@ class UserTest extends AbstractUserTest
 
         $group->addRole($role);
 
-        $this->assertNotContains($role, $user->getRoles());
+        self::assertNotContains($role, $user->getUserRoles());
 
         $user->addGroup($group);
 
-        $this->assertContains($group, $user->getGroups());
-        $this->assertContains('Users', $user->getGroupNames());
-        $this->assertTrue($user->hasRole($role));
-        $this->assertTrue($user->hasGroup('Users'));
+        self::assertContains($group, $user->getGroups());
+        self::assertContains('Users', $user->getGroupNames());
+        self::assertTrue($user->hasRole($role));
+        self::assertTrue($user->hasGroup('Users'));
 
         $user->removeGroup($group);
 
-        $this->assertFalse($user->hasRole($role));
+        self::assertFalse($user->hasRole($role));
     }
 
-    public function testStatuses()
-    {
-        $user = $this->getUser();
-        $status = new Status();
-
-        $this->assertNotContains($status, $user->getStatuses());
-        $this->assertNull($user->getCurrentStatus());
-
-        $user->addStatus($status);
-        $user->setCurrentStatus($status);
-
-        $this->assertContains($status, $user->getStatuses());
-        $this->assertEquals($status, $user->getCurrentStatus());
-
-        $user->setCurrentStatus();
-
-        $this->assertNull($user->getCurrentStatus());
-
-        $user->getStatuses()->clear();
-
-        $this->assertNotContains($status, $user->getStatuses());
-    }
-
-    public function testEmails()
+    public function testEmails(): void
     {
         $user = $this->getUser();
         $email = new Email();
 
-        $this->assertNotContains($email, $user->getEmails());
+        self::assertNotContains($email, $user->getEmails());
 
         $user->addEmail($email);
 
-        $this->assertContains($email, $user->getEmails());
+        self::assertContains($email, $user->getEmails());
 
         $user->removeEmail($email);
 
-        $this->assertNotContains($email, $user->getEmails());
+        self::assertNotContains($email, $user->getEmails());
     }
 
-    public function testNames()
+    public function testNames(): void
     {
         $user = $this->getUser();
         $first = 'James';
@@ -127,7 +86,7 @@ class UserTest extends AbstractUserTest
         $user->setLastName($last);
     }
 
-    public function testDates()
+    public function testDates(): void
     {
         $user = $this->getUser();
         $now = new \DateTime('-1 year');
@@ -135,16 +94,11 @@ class UserTest extends AbstractUserTest
         $user->setBirthday($now);
         $user->setLastLogin($now);
 
-        $this->assertEquals($now, $user->getBirthday());
-        $this->assertEquals($now, $user->getLastLogin());
+        self::assertEquals($now, $user->getBirthday());
+        self::assertEquals($now, $user->getLastLogin());
     }
 
-    /**
-     * Data provider
-     *
-     * @return array
-     */
-    public function provider()
+    public function provider(): array
     {
         return [
             ['username', 'test'],
@@ -168,138 +122,174 @@ class UserTest extends AbstractUserTest
         ];
     }
 
-    public function testBeforeSave()
+    public function testBeforeSave(): void
     {
         $user = $this->getUser();
         $user->beforeSave();
-        $this->assertInstanceOf(\DateTime::class, $user->getCreatedAt());
-        $this->assertInstanceOf(\DateTime::class, $user->getUpdatedAt());
-        $this->assertEquals(0, $user->getLoginCount());
+        self::assertInstanceOf(\DateTime::class, $user->getCreatedAt());
+        self::assertInstanceOf(\DateTime::class, $user->getUpdatedAt());
+        self::assertEquals(0, $user->getLoginCount());
     }
 
-    public function testPreUpdateUnChanged()
+    public function testPreUpdateUnChanged(): void
     {
         $changeSet = [
             'lastLogin' => null,
-            'loginCount' => null
+            'loginCount' => null,
         ];
 
         $user = $this->getUser();
         $updatedAt = new \DateTime('2015-01-01');
-        $user->setUpdatedAt($updatedAt);
+        $user->setUpdatedAt($updatedAt)
+            ->setConfirmationToken('test_token')
+            ->setPasswordRequestedAt(new \DateTime());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|PreUpdateEventArgs $event */
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->any())
+        $event = $this->createMock(PreUpdateEventArgs::class);
+        $event->expects(self::any())
             ->method('getEntityChangeSet')
-            ->will($this->returnValue($changeSet));
+            ->willReturn($changeSet);
 
+        self::assertEquals($updatedAt, $user->getUpdatedAt());
+        self::assertNotNull($user->getConfirmationToken());
+        self::assertNotNull($user->getPasswordRequestedAt());
         $user->preUpdate($event);
-        $this->assertEquals($updatedAt, $user->getUpdatedAt());
+        self::assertEquals($updatedAt, $user->getUpdatedAt());
+        self::assertNotNull($user->getConfirmationToken());
+        self::assertNotNull($user->getPasswordRequestedAt());
     }
 
-    public function testPreUpdateChanged()
+    /**
+     * @dataProvider preUpdateDataProvider
+     */
+    public function testPreUpdateChanged(array $changeSet): void
     {
-        $changeSet = ['lastname' => null];
-
         $user = $this->getUser();
         $updatedAt = new \DateTime('2015-01-01');
-        $user->setUpdatedAt($updatedAt);
+        $user->setUpdatedAt($updatedAt)
+            ->setConfirmationToken('test_token')
+            ->setPasswordRequestedAt(new \DateTime());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|PreUpdateEventArgs $event */
-        $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->any())
+        $event = $this->createMock(PreUpdateEventArgs::class);
+        $event->expects(self::any())
             ->method('getEntityChangeSet')
-            ->will($this->returnValue($changeSet));
+            ->willReturn($changeSet);
 
+        self::assertEquals($updatedAt, $user->getUpdatedAt());
+        self::assertNotNull($user->getConfirmationToken());
+        self::assertNotNull($user->getPasswordRequestedAt());
         $user->preUpdate($event);
-        $this->assertNotEquals($updatedAt, $user->getUpdatedAt());
+        self::assertNotEquals($updatedAt, $user->getUpdatedAt());
+        self::assertNull($user->getConfirmationToken());
+        self::assertNull($user->getPasswordRequestedAt());
     }
 
-    public function testBusinessUnit()
+    public function preUpdateDataProvider(): array
+    {
+        return [
+            [
+                'changeSet' => array_flip(['username']),
+            ],
+            [
+                'changeSet' => array_flip(['email']),
+            ],
+            [
+                'changeSet' => array_flip(['password']),
+            ],
+            [
+                'changeSet' => array_flip(['username', 'email'])
+            ],
+            [
+                'changeSet' => array_flip(['email', 'password'])
+            ],
+            [
+                'changeSet' => array_flip(['username', 'password'])
+            ],
+            [
+                'changeSet' => array_flip(['username', 'email', 'password'])
+            ],
+        ];
+    }
+
+    public function testBusinessUnit(): void
     {
         $user = $this->getUser();
         $businessUnit = new BusinessUnit();
 
         $user->setBusinessUnits(new ArrayCollection([$businessUnit]));
 
-        $this->assertContains($businessUnit, $user->getBusinessUnits());
+        self::assertContains($businessUnit, $user->getBusinessUnits());
 
         $user->removeBusinessUnit($businessUnit);
 
-        $this->assertNotContains($businessUnit, $user->getBusinessUnits());
+        self::assertNotContains($businessUnit, $user->getBusinessUnits());
 
         $user->addBusinessUnit($businessUnit);
 
-        $this->assertContains($businessUnit, $user->getBusinessUnits());
+        self::assertContains($businessUnit, $user->getBusinessUnits());
     }
 
-    public function testOwners()
+    public function testOwners(): void
     {
         $entity = $this->getUser();
         $businessUnit = new BusinessUnit();
 
-        $this->assertEmpty($entity->getOwner());
+        self::assertEmpty($entity->getOwner());
 
         $entity->setOwner($businessUnit);
 
-        $this->assertEquals($businessUnit, $entity->getOwner());
+        self::assertEquals($businessUnit, $entity->getOwner());
     }
 
-    public function testImapConfiguration()
+    public function testImapConfiguration(): void
     {
         $entity = $this->getUser();
-        $imapConfiguration = $this->createMock('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin');
-        $imapConfiguration->expects($this->once())
+        $imapConfiguration = $this->createMock(UserEmailOrigin::class);
+        $imapConfiguration->expects(self::once())
             ->method('setActive')
             ->with(false);
-        $imapConfiguration->expects($this->exactly(2))
+        $imapConfiguration->expects(self::exactly(2))
             ->method('isActive')
             ->willReturn(true);
-        $imapConfiguration->expects($this->once())
+        $imapConfiguration->expects(self::once())
             ->method('getUser')
             ->willReturn($entity);
 
-        $this->assertCount(0, $entity->getEmailOrigins());
-        $this->assertNull($entity->getImapConfiguration());
+        self::assertCount(0, $entity->getEmailOrigins());
+        self::assertNull($entity->getImapConfiguration());
 
         $entity->setImapConfiguration($imapConfiguration);
-        $this->assertEquals($imapConfiguration, $entity->getImapConfiguration());
-        $this->assertCount(1, $entity->getEmailOrigins());
+        self::assertEquals($imapConfiguration, $entity->getImapConfiguration());
+        self::assertCount(1, $entity->getEmailOrigins());
 
         $entity->setImapConfiguration(null);
-        $this->assertNull($entity->getImapConfiguration());
-        $this->assertCount(0, $entity->getEmailOrigins());
+        self::assertNull($entity->getImapConfiguration());
+        self::assertCount(0, $entity->getEmailOrigins());
     }
 
-    public function testEmailOrigins()
+    public function testEmailOrigins(): void
     {
         $entity = $this->getUser();
         $origin1 = new InternalEmailOrigin();
         $origin2 = new InternalEmailOrigin();
 
-        $this->assertCount(0, $entity->getEmailOrigins());
+        self::assertCount(0, $entity->getEmailOrigins());
 
         $entity->addEmailOrigin($origin1);
         $entity->addEmailOrigin($origin2);
-        $this->assertCount(2, $entity->getEmailOrigins());
-        $this->assertSame($origin1, $entity->getEmailOrigins()->first());
-        $this->assertSame($origin2, $entity->getEmailOrigins()->last());
+        self::assertCount(2, $entity->getEmailOrigins());
+        self::assertSame($origin1, $entity->getEmailOrigins()->first());
+        self::assertSame($origin2, $entity->getEmailOrigins()->last());
 
         $entity->removeEmailOrigin($origin1);
-        $this->assertCount(1, $entity->getEmailOrigins());
-        $this->assertSame($origin2, $entity->getEmailOrigins()->first());
+        self::assertCount(1, $entity->getEmailOrigins());
+        self::assertSame($origin2, $entity->getEmailOrigins()->first());
     }
 
-    public function testGetApiKey()
+    public function testGetApiKey(): void
     {
         $entity = $this->getUser();
 
-        $this->assertEmpty($entity->getApiKeys(), 'Should return some key, even if is not present');
+        self::assertEmpty($entity->getApiKeys(), 'Should return some key, even if is not present');
 
         $organization1 = new Organization();
         $organization1->setName('test1');
@@ -318,89 +308,79 @@ class UserTest extends AbstractUserTest
         $entity->addApiKey($apiKey1);
         $entity->addApiKey($apiKey2);
 
-        $this->assertSame(
+        self::assertSame(
             $apiKey1->getApiKey(),
             $entity->getApiKeys()[0]->getApiKey(),
             'Should delegate call to userApi entity'
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             new ArrayCollection([$apiKey1, $apiKey2]),
             $entity->getApiKeys()
         );
 
         $entity->removeApiKey($apiKey2);
-        $this->assertEquals(
+        self::assertEquals(
             new ArrayCollection([$apiKey1]),
             $entity->getApiKeys()
         );
     }
 
-    public function testGetClass()
+    public function testGetEmailFields(): void
     {
         $user = $this->getUser();
-        $this->assertInstanceOf($user->getClass(), $user);
-    }
-
-    public function testGetEmailFields()
-    {
-        $user = $this->getUser();
-        $this->assertInternalType('array', $user->getEmailFields());
-        $this->assertEquals(['email'], $user->getEmailFields());
-    }
-
-    public function testGetNotificationEmails()
-    {
-        $user = $this->getUser();
-        $email = 'user@example.com';
-        $user->setEmail($email);
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $user->getNotificationEmails());
-        $this->assertEquals([$email], $user->getNotificationEmails()->toArray());
+        self::assertIsArray($user->getEmailFields());
+        self::assertEquals(['email'], $user->getEmailFields());
     }
 
     /**
-     * @param bool $skipOrigin
-     * @param string $accessToken
-     * @param string $accountType
-     *
      * @dataProvider setDataProviderAccountType
      */
-    public function testGetAccountType($skipOrigin, $accessToken, $accountType)
+    public function testGetAccountType(bool $skipOrigin, string $accessToken, string $accountType): void
     {
         $user = $this->getUser();
-        $origin = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $origin = $this->createMock(UserEmailOrigin::class);
+        $origin->expects(self::any())
+            ->method('getAccountType')
+            ->willReturn($accountType);
 
         $user->addEmailOrigin($origin);
 
         if ($skipOrigin) {
             $user->removeEmailOrigin($origin);
-            $this->assertEmpty($user->getImapAccountType());
+            self::assertEmpty($user->getImapAccountType());
         } else {
-            $origin->expects($this->once())->method('isActive')->willReturn(true);
-            $origin->expects($this->once())->method('getMailbox')->willReturn(false);
+            $origin->expects(self::once())
+                ->method('isActive')
+                ->willReturn(true);
+            $origin->expects(self::once())
+                ->method('getMailbox')
+                ->willReturn(false);
 
-            $origin->expects($this->any())->method('getAccessToken')->willReturn($accessToken);
-            $this->assertEquals($accountType, $user->getImapAccountType()->getAccountType());
+            $origin->expects(self::any())
+                ->method('getAccessToken')
+                ->willReturn($accessToken);
+            self::assertEquals($accountType, $user->getImapAccountType()->getAccountType());
         }
     }
 
-    /**
-     * @return array
-     */
-    public function setDataProviderAccountType()
+    public function setDataProviderAccountType(): array
     {
         return [
             'empty origin' => [
                 'skipOrigin' => true,
                 'accessToken' => '',
-                'accountType' => ''
+                'accountType' => '',
             ],
             'expect Gmail account type' => [
                 'skipOrigin' => false,
                 'accessToken' => '12345',
                 'accountType' => AccountTypeModel::ACCOUNT_TYPE_GMAIL
+            ],
+            'expect Microsoft account type' => [
+                'skipOrigin' => false,
+                'accessToken' => '12345',
+                'accountType' => AccountTypeModel::ACCOUNT_TYPE_MICROSOFT
             ],
             'expect Other account type' => [
                 'skipOrigin' => false,
@@ -410,33 +390,66 @@ class UserTest extends AbstractUserTest
         ];
     }
 
-    public function testOrganizations()
+    public function testOrganizations(): void
     {
         $user = $this->getUser();
         $disabledOrganization = new Organization();
+        $disabledOrganization->setEnabled(false);
         $organization = new Organization();
         $organization->setEnabled(true);
 
         $user->setOrganizations(new ArrayCollection([$organization]));
-        $this->assertContains($organization, $user->getOrganizations());
+        self::assertContains($organization, $user->getOrganizations());
 
         $user->removeOrganization($organization);
-        $this->assertNotContains($organization, $user->getOrganizations());
+        self::assertNotContains($organization, $user->getOrganizations());
 
         $user->addOrganization($organization);
-        $this->assertContains($organization, $user->getOrganizations());
+        self::assertContains($organization, $user->getOrganizations());
 
         $user->addOrganization($disabledOrganization);
         $result = $user->getOrganizations(true);
-        $this->assertCount(1, $result);
-        $this->assertSame($result->first(), $organization);
+        self::assertCount(1, $result);
+        self::assertSame($result->first(), $organization);
     }
 
-    public function testSetEmailGetEmailLowercase()
+    public function testSetEmailGetEmailLowercase(): void
     {
         $user = $this->getUser();
         $user->setEmail('John.Doe@example.org');
 
-        $this->assertEquals('john.doe@example.org', $user->getEmailLowercase());
+        self::assertEquals('john.doe@example.org', $user->getEmailLowercase());
+    }
+
+    public function testSetUsernameGetUsernameLowercase(): void
+    {
+        $user = $this->getUser();
+        $user->setUsername('John');
+
+        self::assertEquals('John', $user->getUsername());
+        self::assertEquals('john', $user->getUsernameLowercase());
+    }
+
+    public function testUnserialize(): void
+    {
+        $serialized = [
+            'password',
+            'salt',
+            'UserName',
+            true,
+            'confirmation_token',
+            10,
+        ];
+
+        $user = $this->getUser();
+        $user->__unserialize($serialized);
+
+        self::assertEquals($serialized[0], $user->getPassword());
+        self::assertEquals($serialized[1], $user->getSalt());
+        self::assertEquals($serialized[2], $user->getUsername());
+        self::assertEquals(mb_strtolower($serialized[2]), $user->getUsernameLowercase());
+        self::assertEquals($serialized[3], $user->isEnabled());
+        self::assertEquals($serialized[4], $user->getConfirmationToken());
+        self::assertEquals($serialized[5], $user->getId());
     }
 }

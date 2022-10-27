@@ -41,7 +41,7 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateHandlerFacade */
     private $facade;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->session = $this->createMock(Session::class);
@@ -66,21 +66,32 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         $update = $this->defaultUpdateBuilding();
 
         $request = $this->createMock(Request::class);
-        $this->requestStack->expects($this->never())->method('getCurrentRequest');
+        $this->requestStack->expects($this->never())
+            ->method('getCurrentRequest');
 
         $update->expects($this->once())
-            ->method('handle')->with($request)->willReturn(true);
+            ->method('handle')
+            ->with($request)
+            ->willReturn(true);
 
         //goes to construct response
         //not a widget
-        $request->expects($this->at(0))->method('get')->with('_wid')->willReturn(false);
+        $request->expects($this->once())
+            ->method('get')
+            ->with('_wid')
+            ->willReturn(false);
 
         $this->addingFlashMessage('save message');
 
-        $update->expects($this->once())->method('getFormData')->willReturn($this->data);
+        $update->expects($this->once())
+            ->method('getFormData')
+            ->willReturn($this->data);
 
         $redirectResponse = $this->createMock(RedirectResponse::class);
-        $this->router->expects($this->once())->method('redirect')->with($this->data)->willReturn($redirectResponse);
+        $this->router->expects($this->once())
+            ->method('redirect')
+            ->with($this->data)
+            ->willReturn($redirectResponse);
         $result = $this->facade->update(
             $this->data,
             $this->form,
@@ -98,20 +109,33 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         $update = $this->defaultUpdateBuilding();
 
         $request = $this->createMock(Request::class);
-        $this->requestStack->expects($this->once())->method('getCurrentRequest')->willReturn($request);
+        $this->requestStack->expects($this->once())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
 
-        $update->expects($this->once())->method('handle')->with($request)->willReturn(true);
+        $update->expects($this->once())
+            ->method('handle')
+            ->with($request)
+            ->willReturn(true);
 
         //goes to construct response
         //not a widget
-        $request->expects($this->at(0))->method('get')->with('_wid')->willReturn(false);
+        $request->expects($this->once())
+            ->method('get')
+            ->with('_wid')
+            ->willReturn(false);
 
         $this->addingFlashMessage('save message');
 
-        $update->expects($this->once())->method('getFormData')->willReturn($this->data);
+        $update->expects($this->once())
+            ->method('getFormData')
+            ->willReturn($this->data);
 
         $redirectResponse = $this->createMock(RedirectResponse::class);
-        $this->router->expects($this->once())->method('redirect')->with($this->data)->willReturn($redirectResponse);
+        $this->router->expects($this->once())
+            ->method('redirect')
+            ->with($this->data)
+            ->willReturn($redirectResponse);
         $result = $this->facade->update(
             $this->data,
             $this->form,
@@ -124,32 +148,51 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($redirectResponse, $result);
     }
 
-    public function testUpdateHandledWithWidget()
+    /**
+     * @dataProvider updateDataProvider
+     */
+    public function testUpdateHandledWithWidget(bool $isManageableEntity, array $expected): void
     {
         $update = $this->defaultUpdateBuilding();
 
         $request = $this->createMock(Request::class);
-        $this->requestStack->expects($this->never())->method('getCurrentRequest');
+        $this->requestStack->expects($this->never())
+            ->method('getCurrentRequest');
 
         $update->expects($this->once())
-            ->method('handle')->with($request)->willReturn(true);
+            ->method('handle')
+            ->with($request)
+            ->willReturn(true);
 
         //goes to constructResponse
         //is a widget
         $request->expects($this->exactly(2))
-            ->method('get')->with('_wid')->willReturn('widget_test');
+            ->method('get')
+            ->with('_wid')
+            ->willReturn('widget_test');
 
         //goes to getResult
         $formView = $this->createMock(FormView::class);
         $dataProviderResult = ['form' => $formView];
         $update->expects($this->once())
-            ->method('getTemplateData')->with($request)->willReturn($dataProviderResult);
+            ->method('getTemplateData')
+            ->with($request)
+            ->willReturn($dataProviderResult);
 
-        $update->expects($this->exactly(2))->method('getFormData')->willReturn($this->data);
+        $update->expects($this->exactly(2))
+            ->method('getFormData')
+            ->willReturn($this->data);
         //in constructResponse
         //pasting saveId
         $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')->with($this->data)->willReturn(42);
+            ->method('isManageableEntity')
+            ->with($this->data)
+            ->willReturn($isManageableEntity);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifier')
+            ->with($this->data)
+            ->willReturn(42);
 
         //execute
         $result = $this->facade->update(
@@ -162,14 +205,32 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertSame(
-            [
-                'form' => $formView,
-                'entity' => $this->data,
-                'isWidgetContext' => true,
-                'savedId' => 42
-            ],
+            array_merge(
+                [
+                    'form' => $formView,
+                    'entity' => $this->data,
+                    'isWidgetContext' => true,
+                ],
+                $expected
+            ),
             $result
         );
+    }
+
+    public function updateDataProvider(): array
+    {
+        return [
+            [
+                'isManageableEntity' => false,
+                'expected' => [],
+            ],
+            [
+                'isManageableEntity' => true,
+                'expected' => [
+                    'savedId' => 42
+                ],
+            ],
+        ];
     }
 
     public function testUpdateNotHandled()
@@ -177,21 +238,31 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         $update = $this->defaultUpdateBuilding();
 
         $request = $this->createMock(Request::class);
-        $this->requestStack->expects($this->never())->method('getCurrentRequest');
+        $this->requestStack->expects($this->never())
+            ->method('getCurrentRequest');
 
         $update->expects($this->once())
-            ->method('handle')->with($request)->willReturn(false);
+            ->method('handle')
+            ->with($request)
+            ->willReturn(false);
 
-        $update->expects($this->once())->method('getFormData')->willReturn($this->data);
+        $update->expects($this->once())
+            ->method('getFormData')
+            ->willReturn($this->data);
 
         //goes to getResult
         $formView = $this->createMock(FormView::class);
         $dataProviderResult = ['form' => $formView];
         $update->expects($this->once())
-            ->method('getTemplateData')->with($request)->willReturn($dataProviderResult);
+            ->method('getTemplateData')
+            ->with($request)
+            ->willReturn($dataProviderResult);
 
         //isWidgetContext => true
-        $request->expects($this->once())->method('get')->with('_wid')->willReturn('widget_test');
+        $request->expects($this->once())
+            ->method('get')
+            ->with('_wid')
+            ->willReturn('widget_test');
 
         $result = $this->facade->update(
             $this->data,
@@ -210,19 +281,29 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         $update = $this->defaultUpdateBuilding();
 
         $request = $this->createMock(Request::class);
-        $this->requestStack->expects($this->never())->method('getCurrentRequest');
+        $this->requestStack->expects($this->never())
+            ->method('getCurrentRequest');
 
-        $update->expects($this->once())->method('handle')->with($request)->willReturn(false);
+        $update->expects($this->once())
+            ->method('handle')
+            ->with($request)
+            ->willReturn(false);
 
         //goes to getResult
         $formView = $this->createMock(FormView::class);
         $customEntityFromProvider = (object)[];
         $dataProviderResult = ['form' => $formView, 'entity' => $customEntityFromProvider];
 
-        $update->expects($this->once())->method('getTemplateData')->with($request)->willReturn($dataProviderResult);
+        $update->expects($this->once())
+            ->method('getTemplateData')
+            ->with($request)
+            ->willReturn($dataProviderResult);
 
         //isWidgetContext => false
-        $request->expects($this->once())->method('get')->with('_wid')->willReturn(false);
+        $request->expects($this->once())
+            ->method('get')
+            ->with('_wid')
+            ->willReturn(false);
 
         $result = $this->facade->update(
             $this->data,
@@ -242,29 +323,26 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
     /**
      * @return UpdateInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function defaultUpdateBuilding()
+    private function defaultUpdateBuilding()
     {
         $update = $this->createMock(UpdateInterface::class);
 
         $this->updateFactory->expects($this->once())
             ->method('createUpdate')
-            ->with(
-                $this->data,
-                $this->form,
-                'some_handler',
-                'some_result_provider'
-            )->willReturn($update);
+            ->with($this->data, $this->form, 'some_handler', 'some_result_provider')
+            ->willReturn($update);
 
         return $update;
     }
 
-    /**
-     * @param string $message
-     */
-    protected function addingFlashMessage($message)
+    private function addingFlashMessage(string $message): void
     {
         $flashBag = $this->createMock(FlashBag::class);
-        $this->session->expects($this->once())->method('getFlashBag')->willReturn($flashBag);
-        $flashBag->expects($this->once())->method('add')->with('success', $message);
+        $this->session->expects($this->once())
+            ->method('getFlashBag')
+            ->willReturn($flashBag);
+        $flashBag->expects($this->once())
+            ->method('add')
+            ->with('success', $message);
     }
 }

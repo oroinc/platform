@@ -1,8 +1,11 @@
-{% extends 'OroActionBundle:Operation:button.html.twig' %}
+{% extends '@OroAction/Operation/button.html.twig' %}
 
 {% block button %}
     {% if actionData.entityLabel is defined %}
         {% set linkTitle = params.frontendOptions.title|default(params.label)|trans({'%entityLabel%': actionData.entityLabel|trans}) %}
+        {% if params.frontendOptions.options.ariaLabel is defined %}
+            {% set linkAriaLabel = params.frontendOptions.options.ariaLabel|trans({'%entityLabel%': actionData.entityLabel|trans}) %}
+        {% endif %}
     {% endif %}
 
     {{ parent() }}

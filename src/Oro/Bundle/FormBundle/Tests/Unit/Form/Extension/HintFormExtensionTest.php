@@ -9,18 +9,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $form;
+    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->form = $this->getMockBuilder(Form::class)->disableOriginalConstructor()->getMock();
+        $this->form = $this->createMock(Form::class);
     }
 
     public function testConfigureOptions()
     {
-        $resolver = $this->getMockBuilder(OptionsResolver::class)
-            ->getMock();
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefined')
             ->with(['hint']);
@@ -40,10 +39,10 @@ class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
             'hint_attr' => ['class' => 'test'],
         ];
         $view = new FormView();
-        $this->form = $this->getMockBuilder(Form::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->form->method('getParent')->willReturnSelf();
+        $this->form = $this->createMock(Form::class);
+        $this->form->expects($this->any())
+            ->method('getParent')
+            ->willReturnSelf();
 
         $extension = new HintFormExtension();
         $extension->buildView($view, $this->form, $options);
@@ -59,15 +58,10 @@ class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
         $view = new FormView();
         $this->form->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $extension = new HintFormExtension();
         $extension->buildView($view, $this->form, ['toolbar' => 'test']);
         $this->assertArrayNotHasKey('toolbar', $view->vars);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->form);
     }
 }

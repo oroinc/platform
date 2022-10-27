@@ -6,62 +6,50 @@ use Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProviderInt
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridDataConverter;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DatagridDataConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridColumnsFromContextProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $datagridColumnsFromContextProvider;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
-
-    /** @var DatagridDataConverter */
-    private $datagridDataConverter;
 
     /** @var Context|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
-    public function setUp()
-    {
-        $this->translator = $this->createMock(Translator::class);
-        $formatterProvider = $this->createMock(FormatterProvider::class);
+    /** @var DatagridDataConverter */
+    private $datagridDataConverter;
 
-        $this->datagridColumnsFromContextProvider = $this
-            ->createMock(DatagridColumnsFromContextProviderInterface::class);
+    protected function setUp(): void
+    {
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->datagridColumnsFromContextProvider = $this->createMock(
+            DatagridColumnsFromContextProviderInterface::class
+        );
+        $this->context = $this->createMock(Context::class);
 
         $this->datagridDataConverter = new DatagridDataConverter(
             $this->datagridColumnsFromContextProvider,
             $this->translator,
-            $formatterProvider
+            $this->createMock(FormatterProvider::class)
         );
-
-        $this->context = $this->createMock(Context::class);
     }
 
     /**
      * @dataProvider convertDataProvider
-     *
-     * @param array $columns
-     * @param array $exportedRecord
-     * @param array $expected
      */
     public function testConvertToExportFormat(array $columns, array $exportedRecord, array $expected): void
     {
-        $this->datagridColumnsFromContextProvider
-            ->expects(self::any())
+        $this->datagridColumnsFromContextProvider->expects(self::any())
             ->method('getColumnsFromContext')
             ->with($this->context)
             ->willReturn($columns);
 
-        $this->translator
-            ->expects(self::any())
+        $this->translator->expects(self::any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($parameter) {
-                    return $parameter;
-                }
-            );
+            ->willReturnArgument(0);
 
         $this->datagridDataConverter->setImportExportContext($this->context);
         $result = $this->datagridDataConverter->convertToExportFormat($exportedRecord);
@@ -69,11 +57,26 @@ class DatagridDataConverterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function convertDataProvider(): array
     {
         return [
+            'Columns with html type' => [
+                'columns' => [
+                    'c1' => [
+                        'label' => 'Label',
+                        'frontend_type' => 'html'
+                    ],
+                ],
+                'exported_record' => [
+                    'c1' => 'Carte d&#039;identité',
+                    'id' => 1
+                ],
+                'expectedResult' => [
+                    'Label' => 'Carte d\'identité',
+                ]
+            ],
             'Columns with same labels' => [
                 'columns' => [
                     'c1' => [

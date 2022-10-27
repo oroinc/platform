@@ -12,71 +12,22 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class RegionRepositoryTest extends WebTestCase
 {
-    /** @var RegionRepository */
-    protected $repository;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        parent::setUp();
-
         $this->initClient();
         $this->loadFixtures([LoadCountryRegionData::class]);
-
-        $this->repository = $this->getContainer()->get('doctrine')->getRepository(Region::class);
     }
 
-    public function testGetCountryRegions()
+    private function getRepository(): RegionRepository
     {
-        /** @var Country $usa */
-        $usa = $this->getReference(LoadCountryData::COUNTRY_USA);
-
-        /** @var Region $usny */
-        $usny = $this->getReference(LoadRegionData::REGION_US_NY);
-
-        $this->assertRegionExists($usny, $this->repository->getCountryRegions($usa));
+        return self::getContainer()->get('doctrine')->getRepository(Region::class);
     }
 
-    public function testGetCountryRegionsQueryBuilder()
+    private function assertRegionExists(Region $expected, array $regions): void
     {
-        /** @var Country $usa */
-        $usa = $this->getReference(LoadCountryData::COUNTRY_USA);
-
-        /** @var Region $usny */
-        $usny = $this->getReference(LoadRegionData::REGION_US_NY);
-
-        $this->assertRegionExists(
-            $usny,
-            $this->repository->getCountryRegionsQueryBuilder($usa)->getQuery()->getResult()
-        );
-    }
-
-    public function testGetAllIdentities()
-    {
-        $result = $this->repository->getAllIdentities();
-
-        $this->assertGreaterThanOrEqual(4601, count($result));
-
-        /** @var Region $usny */
-        $usny = $this->getReference(LoadRegionData::REGION_US_NY);
-        /** @var Region $ado7 */
-        $ado7 = $this->getReference(LoadRegionData::REGION_AD_07);
-        /** @var Region $dk85 */
-        $dk85 = $this->getReference(LoadRegionData::REGION_DK_85);
-
-        $this->assertContains($usny->getCombinedCode(), $result);
-        $this->assertContains($ado7->getCombinedCode(), $result);
-        $this->assertContains($dk85->getCombinedCode(), $result);
-    }
-
-    /**
-     * @param Region $expected
-     * @param array $regions
-     */
-    private function assertRegionExists(Region $expected, array $regions)
-    {
-        $this->assertGreaterThanOrEqual(1, count($regions));
-
+        /** @var Region|null $actual */
         $actual = null;
+        /** @var Region $region */
         foreach ($regions as $region) {
             if ($region->getCombinedCode() === $expected->getCombinedCode()) {
                 $actual = $region;
@@ -88,40 +39,27 @@ class RegionRepositoryTest extends WebTestCase
         $this->assertEquals($expected->getName(), $actual->getName());
     }
 
-    public function testUpdateTranslations()
+    public function testGetCountryRegions(): void
     {
-        $this->repository->updateTranslations(
-            [
-                'US-FL' => 'Floride',
-                'DE-HH' => 'Hambourg',
-            ]
-        );
-        $this->repository->clear();
+        /** @var Country $usa */
+        $usa = $this->getReference(LoadCountryData::COUNTRY_USA);
+        /** @var Region $usny */
+        $usny = $this->getReference(LoadRegionData::REGION_US_NY);
 
-        $actual = $this->repository->findBy(['combinedCode' => ['US-FL', 'DE-HH']]);
-
-        $this->assertCount(2, $actual);
-        $this->assertTranslationExists('US-FL', 'Floride', $actual);
-        $this->assertTranslationExists('DE-HH', 'Hambourg', $actual);
+        $regions = $this->getRepository()->getCountryRegions($usa);
+        $this->assertGreaterThanOrEqual(1, count($regions));
+        $this->assertRegionExists($usny, $regions);
     }
 
-    /**
-     * @param string $expectedCode
-     * @param string $expectedTranslation
-     * @param array|Region[] $entities
-     */
-    private function assertTranslationExists(string $expectedCode, string $expectedTranslation, array $entities)
+    public function testGetCountryRegionsQueryBuilder(): void
     {
-        $actual = null;
-        foreach ($entities as $entity) {
-            if ($entity->getCombinedCode() === $expectedCode) {
-                $actual = $entity;
-                break;
-            }
-        }
+        /** @var Country $usa */
+        $usa = $this->getReference(LoadCountryData::COUNTRY_USA);
+        /** @var Region $usny */
+        $usny = $this->getReference(LoadRegionData::REGION_US_NY);
 
-        $this->assertNotNull($actual);
-        $this->assertInstanceOf(Region::class, $actual);
-        $this->assertEquals($expectedTranslation, $actual->getName());
+        $regions = $this->getRepository()->getCountryRegionsQueryBuilder($usa)->getQuery()->getResult();
+        $this->assertGreaterThanOrEqual(1, count($regions));
+        $this->assertRegionExists($usny, $regions);
     }
 }

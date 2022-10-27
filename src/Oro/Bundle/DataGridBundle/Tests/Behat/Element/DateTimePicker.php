@@ -3,23 +3,57 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 
 class DateTimePicker extends Element
 {
     /**
-     * @param \DateTime $dateTime
+     * @param string|\DateTime $value
      */
-    public function setValue($dateTime)
+    public function setValue($value)
     {
-        $this->open();
-        $this->getYearPicker()->selectOption($dateTime->format('Y'));
-        $this->getMonthPicker()->selectOption($dateTime->format('M'));
-        $this->getCalendarDate($dateTime->format('j'))->click();
+        $dateTime = $this->getDateTime($value);
 
-        if ($this->getElements('TimePicker')) {
-            $this->getTimePicker()->setValue($dateTime);
+        $this->open();
+        if (null === $dateTime) {
+            $this->setDatePickerValue($value);
+        } else {
+            $this->getYearPicker()->selectOption($dateTime->format('Y'));
+            $monthPicker = $this->getMonthPicker();
+            $month = $dateTime->format('M');
+            try {
+                $monthPicker->selectOption($month);
+            } catch (ElementNotFoundException $e) {
+                $monthPicker->selectOption(strtolower($month));
+            }
+            $this->getCalendarDate($dateTime->format('j'))->click();
+            if ($this->getElements('TimePicker')) {
+                $this->getTimePicker()->setValue($dateTime);
+            }
         }
+    }
+
+    /**
+     * @param string|\DateTime $value
+     *
+     * @return \DateTime|null
+     */
+    protected function getDateTime($value)
+    {
+        if ($value instanceof \DateTime) {
+            return $value;
+        }
+
+        if (0 !== strncmp($value, 'today', 5) && 0 !== strncmp($value, 'now', 3)) {
+            try {
+                return new \DateTime($value);
+            } catch (\Exception $e) {
+                // ignore parsing errors
+            }
+        }
+
+        return null;
     }
 
     protected function open()
@@ -62,7 +96,7 @@ class DateTimePicker extends Element
      */
     protected function getMonthPicker()
     {
-        return $this->findVisible('css', '.ui-datepicker-month');
+        return $this->getDatePickerHeader()->find('css', '.ui-datepicker-month');
     }
 
     /**
@@ -70,7 +104,15 @@ class DateTimePicker extends Element
      */
     protected function getYearPicker()
     {
-        return $this->findVisible('css', '.ui-datepicker-year');
+        return $this->getDatePickerHeader()->find('css', '.ui-datepicker-year');
+    }
+
+    /**
+     * @return NodeElement|null
+     */
+    protected function getDatePickerHeader()
+    {
+        return $this->findVisible('css', '.ui-datepicker-header');
     }
 
     /**
@@ -118,5 +160,19 @@ class DateTimePicker extends Element
         }
 
         return false;
+    }
+
+    /**
+     * @param string $value
+     */
+    protected function setDatePickerValue($value)
+    {
+        $this->closeCalendarWidget();
+        $this->getDatePicker()->setValue($value);
+    }
+
+    protected function closeCalendarWidget()
+    {
+        $this->getDatePicker()->click();
     }
 }

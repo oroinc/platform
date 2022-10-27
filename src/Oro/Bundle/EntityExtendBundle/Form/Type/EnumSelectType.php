@@ -42,10 +42,11 @@ class EnumSelectType extends AbstractEnumType
         $resolver->setDefaults(
             [
                 'placeholder' => null,
-                'empty_data'  => null,
+                'empty_data'  => static fn (Options $options) => $options['multiple'] ? [] : null,
                 'configs'     => $defaultConfigs,
                 'disabled_values' => [],
                 'excluded_values' => [],
+                'choice_translation_domain' => false, // Enums should use the Gedmo for translations
             ]
         );
 
@@ -109,7 +110,7 @@ class EnumSelectType extends AbstractEnumType
             $choices,
             function (ChoiceView $choiceView) use ($disabledChoices) {
                 if (is_array($disabledChoices)) {
-                    if (in_array($choiceView->value, $disabledChoices)) {
+                    if (in_array($choiceView->value, $disabledChoices, true)) {
                         $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
                     }
                 } elseif (is_callable($disabledChoices)) {

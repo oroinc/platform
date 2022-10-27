@@ -4,11 +4,11 @@ namespace Oro\Bundle\UserBundle\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
+use Oro\Bundle\SecurityBundle\Metadata\ClassSecurityMetadata;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
@@ -17,6 +17,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The API manager for user permissions.
+ */
 class UserPermissionApiEntityManager extends ApiEntityManager
 {
     /** @var AuthorizationCheckerInterface */
@@ -61,10 +64,10 @@ class UserPermissionApiEntityManager extends ApiEntityManager
         $entityAclExtension = $this->aclSelector->select($user);
 
         $resources = array_map(
-            function (AclClassInfo $class) use ($entityAclExtension) {
+            function (ClassSecurityMetadata $classMetadata) use ($entityAclExtension) {
                 return [
                     'type'     => $entityAclExtension->getExtensionKey(),
-                    'resource' => $class->getClassName()
+                    'resource' => $classMetadata->getClassName()
                 ];
             },
             $entityAclExtension->getClasses()
@@ -112,19 +115,19 @@ class UserPermissionApiEntityManager extends ApiEntityManager
     protected function impersonateUser(User $user)
     {
         $currentToken = $this->tokenStorage->getToken();
-        if (!$currentToken instanceof OrganizationContextTokenInterface) {
+        if (!$currentToken instanceof OrganizationAwareTokenInterface) {
             throw new \UnexpectedValueException('The current security token must be aware of the organization.');
         }
 
-        $organization = $currentToken->getOrganizationContext();
+        $organization = $currentToken->getOrganization();
 
         // check if new user has access to the current organization
-        if (!$user->hasOrganization($organization)) {
+        if (!$user->isBelongToOrganization($organization)) {
             throw new AccessDeniedException();
         }
 
         $this->tokenStorage->setToken(
-            new ImpersonationToken($user, $organization, $user->getRoles())
+            new ImpersonationToken($user, $organization, $user->getUserRoles())
         );
 
         return $currentToken;
@@ -132,8 +135,6 @@ class UserPermissionApiEntityManager extends ApiEntityManager
 
     /**
      * Switches the security context to the previous security token
-     *
-     * @param TokenInterface|null $originalToken
      */
     protected function undoImpersonation(TokenInterface $originalToken = null)
     {

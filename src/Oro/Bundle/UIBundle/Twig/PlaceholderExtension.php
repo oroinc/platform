@@ -3,20 +3,24 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
+use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class PlaceholderExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to render placeholders:
+ *   - placeholder
+ */
+class PlaceholderExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXTENSION_NAME = 'oro_placeholder';
+    protected ContainerInterface $container;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -25,34 +29,10 @@ class PlaceholderExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return self::EXTENSION_NAME;
-    }
-
-    /**
-     * @return PlaceholderProvider
-     */
-    protected function getPlaceholderProvider()
-    {
-        return $this->container->get('oro_ui.placeholder.provider');
-    }
-
-    /**
-     * @return Request|null
-     */
-    protected function getRequest()
-    {
-        return $this->container->get('request_stack')->getCurrentRequest();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'placeholder',
                 [$this, 'renderPlaceholder'],
                 ['needs_environment' => true, 'is_safe' => ['html']]
@@ -63,7 +43,7 @@ class PlaceholderExtension extends \Twig_Extension
     /**
      * Render placeholder by name
      *
-     * @param \Twig_Environment $environment ,
+     * @param Environment       $environment
      * @param string            $name
      * @param array             $variables
      * @param array             $attributes  Supported attributes:
@@ -72,7 +52,7 @@ class PlaceholderExtension extends \Twig_Extension
      * @return string|array
      */
     public function renderPlaceholder(
-        \Twig_Environment $environment,
+        Environment $environment,
         $name,
         array $variables = [],
         array $attributes = []
@@ -86,7 +66,7 @@ class PlaceholderExtension extends \Twig_Extension
     /**
      * Renders the given item.
      *
-     * @param \Twig_Environment $environment
+     * @param Environment       $environment
      * @param array             $item
      * @param array             $variables
      *
@@ -94,7 +74,7 @@ class PlaceholderExtension extends \Twig_Extension
      *
      * @throws \RuntimeException If placeholder cannot be rendered.
      */
-    protected function renderItemContent(\Twig_Environment $environment, array $item, array $variables)
+    protected function renderItemContent(Environment $environment, array $item, array $variables)
     {
         if (isset($item['data']) || array_key_exists('data', $item)) {
             $variables['data'] = $item['data'];
@@ -111,7 +91,7 @@ class PlaceholderExtension extends \Twig_Extension
                 $query = $request->query->all();
             }
 
-            return $this->container->get('fragment.handler')->render(
+            return $this->getFragmentHandler()->render(
                 HttpKernelExtension::controller($item['action'], $variables, $query)
             );
         }
@@ -125,13 +105,13 @@ class PlaceholderExtension extends \Twig_Extension
     }
 
     /**
-     * @param \Twig_Environment $environment
+     * @param Environment       $environment
      * @param string            $name
      * @param array             $variables
      *
      * @return array
      */
-    protected function getPlaceholderData(\Twig_Environment $environment, $name, $variables)
+    protected function getPlaceholderData(Environment $environment, $name, $variables)
     {
         $result = [];
 
@@ -141,5 +121,32 @@ class PlaceholderExtension extends \Twig_Extension
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            'oro_ui.placeholder.provider' => PlaceholderProvider::class,
+            'fragment.handler' => FragmentHandler::class,
+            RequestStack::class,
+        ];
+    }
+
+    protected function getPlaceholderProvider(): PlaceholderProvider
+    {
+        return $this->container->get('oro_ui.placeholder.provider');
+    }
+
+    protected function getFragmentHandler(): FragmentHandler
+    {
+        return $this->container->get('fragment.handler');
+    }
+
+    protected function getRequest(): ?Request
+    {
+        return $this->container->get(RequestStack::class)->getCurrentRequest();
     }
 }

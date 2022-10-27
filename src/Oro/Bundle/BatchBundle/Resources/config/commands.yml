@@ -1,6 +1,7 @@
 services:
     Oro\Bundle\BatchBundle\Command\CleanupCommand:
-        public: false
-        class: Oro\Bundle\BatchBundle\Command\CleanupCommand
+        arguments:
+            - '@oro_batch.job.repository'
+            - '%oro_batch.cleanup_interval%'
         tags:
             - { name: console.command }

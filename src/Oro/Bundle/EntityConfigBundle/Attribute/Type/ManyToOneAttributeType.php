@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Provides metadata about many-to-one association attribute type.
+ */
 class ManyToOneAttributeType implements AttributeTypeInterface
 {
     /** @var EntityNameResolver */
@@ -15,10 +18,6 @@ class ManyToOneAttributeType implements AttributeTypeInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param EntityNameResolver $entityNameResolver
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(EntityNameResolver $entityNameResolver, DoctrineHelper $doctrineHelper)
     {
         $this->entityNameResolver = $entityNameResolver;
@@ -28,15 +27,7 @@ class ManyToOneAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
-        return 'manyToOne';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSearchable(FieldConfigModel $attribute = null)
+    public function isSearchable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -44,7 +35,7 @@ class ManyToOneAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isFilterable(FieldConfigModel $attribute = null)
+    public function isFilterable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -52,7 +43,7 @@ class ManyToOneAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return true;
     }

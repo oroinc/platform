@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Transformer;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Transformer\MessageTransformer;
 
@@ -17,7 +16,7 @@ class MessageTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->transformer = new MessageTransformer($this->doctrineHelper);
@@ -51,25 +50,14 @@ class MessageTransformerTest extends \PHPUnit\Framework\TestCase
 
         $entities = [$entity1, $entity2];
 
-        $this->doctrineHelper->expects($this->at(0))
+        $this->doctrineHelper->expects($this->exactly(2))
             ->method('getEntityClass')
-            ->with($entity1)
-            ->willReturn('stdClass1');
-
-        $this->doctrineHelper->expects($this->at(1))
+            ->withConsecutive([$this->identicalTo($entity1)], [$this->identicalTo($entity2)])
+            ->willReturnOnConsecutiveCalls('stdClass1', 'stdClass2');
+        $this->doctrineHelper->expects($this->exactly(2))
             ->method('getSingleEntityIdentifier')
-            ->with($entity1)
-            ->willReturn(48);
-
-        $this->doctrineHelper->expects($this->at(2))
-            ->method('getEntityClass')
-            ->with($entity2)
-            ->willReturn('stdClass2');
-
-        $this->doctrineHelper->expects($this->at(3))
-            ->method('getSingleEntityIdentifier')
-            ->with($entity2)
-            ->willReturn(54);
+            ->withConsecutive([$this->identicalTo($entity1)], [$this->identicalTo($entity2)])
+            ->willReturnOnConsecutiveCalls(48, 54);
 
         $this->assertEquals(
             [
@@ -91,10 +79,11 @@ class MessageTransformerTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($this->exactly($entitiesCount))
             ->method('getSingleEntityIdentifier')
-            ->will($this->returnCallback(function () {
+            ->willReturnCallback(function () {
                 static $id = 0;
+
                 return $id++;
-            }));
+            });
 
         $messages = $this->transformer->transform($entities);
         $this->assertCount(4, $messages);
@@ -117,10 +106,11 @@ class MessageTransformerTest extends \PHPUnit\Framework\TestCase
 
         $this->doctrineHelper->expects($this->exactly($entitiesCount))
             ->method('getSingleEntityIdentifier')
-            ->will($this->returnCallback(function () {
+            ->willReturnCallback(function () {
                 static $id = 0;
+
                 return $id++;
-            }));
+            });
 
         $messages = $this->transformer->transform($entities);
         $this->assertCount(1, $messages);

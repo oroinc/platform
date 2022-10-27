@@ -2,9 +2,9 @@
     Available variables:
     * entity       - email entity Oro\Bundle\EmailBundle\Entity\Email
 #}
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroEmailBundle::macros.html.twig' as EA %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroEmail/macros.html.twig' as EA %}
 {% set name = app.user|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%subject%": entity.subject|oro_html_strip_tags, "%username%": name} }) %}
 
@@ -22,7 +22,7 @@
     {% set breadcrumbs = [
         {'label': 'oro.email.menu.user_emails'|trans }
     ] %}
-    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+    {% include '@OroNavigation/Menu/breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}
 
 {% block stats %}
@@ -32,6 +32,8 @@
 {% block navButtons %}{% endblock navButtons %}
 
 {% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set id = 'email-profile' %}
     {% set attributes = [
         UI.attibuteRow('oro.email.sent_at.label'|trans, entity.sentAt|oro_format_datetime),

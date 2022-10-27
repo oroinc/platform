@@ -3,38 +3,35 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 use Oro\Bundle\OrganizationBundle\Tools\OwnershipEntityConfigDumperExtension;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 
 class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $relationBuilder;
+    /** @var RelationBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $relationBuilder;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $ownershipMetadataProvider;
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadataProvider;
 
     /** @var OwnershipEntityConfigDumperExtension */
-    protected $extension;
+    private $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->relationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->ownershipMetadataProvider =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->relationBuilder = $this->createMock(RelationBuilder::class);
+        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
 
         $this->extension = new OwnershipEntityConfigDumperExtension(
             $this->configManager,
@@ -91,73 +88,56 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
         $extendConfigs    = [$extendConfig1, $extendConfig3, $extendConfig3, $extendConfig4, $extendConfig5];
         $ownershipConfigs = [$ownershipConfig1, $ownershipConfig2];
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
-            ->will($this->returnValue($extendConfigs));
+            ->willReturn($extendConfigs);
 
-        $ownershipConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ownershipConfigProvider = $this->createMock(ConfigProvider::class);
         $ownershipConfigProvider->expects($this->any())
             ->method('hasConfig')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use ($ownershipConfigs) {
-                        foreach ($ownershipConfigs as $ownershipConfig) {
-                            if ($ownershipConfig->getId()->getClassName() === $className) {
-                                return true;
-                            }
-                        }
-
-                        return false;
+            ->willReturnCallback(function ($className, $fieldName) use ($ownershipConfigs) {
+                foreach ($ownershipConfigs as $ownershipConfig) {
+                    if ($ownershipConfig->getId()->getClassName() === $className) {
+                        return true;
                     }
-                )
-            );
+                }
+
+                return false;
+            });
         $ownershipConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use ($ownershipConfigs) {
-                        foreach ($ownershipConfigs as $ownershipConfig) {
-                            if ($ownershipConfig->getId()->getClassName() === $className) {
-                                return $ownershipConfig;
-                            }
-                        }
-
-                        throw new RuntimeException(sprintf('No config for "%s".', $className));
+            ->willReturnCallback(function ($className, $fieldName) use ($ownershipConfigs) {
+                foreach ($ownershipConfigs as $ownershipConfig) {
+                    if ($ownershipConfig->getId()->getClassName() === $className) {
+                        return $ownershipConfig;
                     }
-                )
-            );
+                }
+
+                throw new RuntimeException(sprintf('No config for "%s".', $className));
+            });
 
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['ownership', $ownershipConfigProvider],
-                        ['extend', $extendConfigProvider],
-                    ]
-                )
-            );
-        if ($getOwnerClassMethodNameCalls == 1) {
+            ->willReturnMap([
+                ['ownership', $ownershipConfigProvider],
+                ['extend', $extendConfigProvider],
+            ]);
+        if ($getOwnerClassMethodNameCalls === 1) {
             $this->ownershipMetadataProvider->expects($this->exactly(2))
                 ->method($getOwnerClassMethodName)
-                ->will($this->returnValue('Test\Owner'));
+                ->willReturn('Test\Owner');
         } else {
             $this->ownershipMetadataProvider->expects($this->once())
                 ->method($getOwnerClassMethodName)
-                ->will($this->returnValue('Test\Owner'));
+                ->willReturn('Test\Owner');
             $this->ownershipMetadataProvider->expects($this->any())
                 ->method('getOrganizationClass')
-                ->will($this->returnValue('Test\Organization'));
+                ->willReturn('Test\Organization');
         }
 
         $this->relationBuilder->expects($this->exactly($getOwnerClassMethodNameCalls))
             ->method('addManyToOneRelation');
-
 
         switch ($getOwnerClassMethodNameCalls) {
             case 1:
@@ -189,55 +169,55 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
                     );
                 break;
             case 2:
-                $this->relationBuilder->expects($this->at(0))
+                $this->relationBuilder->expects($this->exactly(2))
                     ->method('addManyToOneRelation')
-                    ->with(
-                        $this->identicalTo($extendConfig1),
-                        'Test\Owner',
-                        'owner_field',
-                        'id',
+                    ->withConsecutive(
                         [
-                            'entity'    => [
-                                'label'       => 'oro.custom_entity.owner_field.label',
-                                'description' => 'oro.custom_entity.owner_field.description',
-                            ],
-                            'view'      => [
-                                'is_displayable' => false
-                            ],
-                            'form'      => [
-                                'is_enabled' => false
-                            ],
-                            'dataaudit' => [
-                                'auditable' => true
-                            ],
-                            'datagrid' => [
-                                'is_visible' => 0
+                            $this->identicalTo($extendConfig1),
+                            'Test\Owner',
+                            'owner_field',
+                            'id',
+                            [
+                                'entity'    => [
+                                    'label'       => 'oro.custom_entity.owner_field.label',
+                                    'description' => 'oro.custom_entity.owner_field.description',
+                                ],
+                                'view'      => [
+                                    'is_displayable' => false
+                                ],
+                                'form'      => [
+                                    'is_enabled' => false
+                                ],
+                                'dataaudit' => [
+                                    'auditable' => true
+                                ],
+                                'datagrid' => [
+                                    'is_visible' => 0
+                                ]
                             ]
-                        ]
-                    );
-                $this->relationBuilder->expects($this->at(1))
-                    ->method('addManyToOneRelation')
-                    ->with(
-                        $this->identicalTo($extendConfig1),
-                        'Test\Organization',
-                        'organization_field',
-                        'id',
+                        ],
                         [
-                            'entity'    => [
-                                'label'       => 'oro.custom_entity.organization_field.label',
-                                'description' => 'oro.custom_entity.organization_field.description',
-                            ],
-                            'view'      => [
-                                'is_displayable' => false
-                            ],
-                            'form'      => [
-                                'is_enabled' => false
-                            ],
-                            'dataaudit' => [
-                                'auditable' => true
-                            ],
-                            'datagrid' => [
-                                'is_visible' => 0
+                            $this->identicalTo($extendConfig1),
+                            'Test\Organization',
+                            'organization_field',
+                            'id',
+                            [
+                                'entity'    => [
+                                    'label'       => 'oro.custom_entity.organization_field.label',
+                                    'description' => 'oro.custom_entity.organization_field.description',
+                                ],
+                                'view'      => [
+                                    'is_displayable' => false
+                                ],
+                                'form'      => [
+                                    'is_enabled' => false
+                                ],
+                                'dataaudit' => [
+                                    'auditable' => true
+                                ],
+                                'datagrid' => [
+                                    'is_visible' => 0
+                                ]
                             ]
                         ]
                     );
@@ -247,7 +227,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
         $this->extension->preUpdate();
     }
 
-    public function preUpdateProvider()
+    public function preUpdateProvider(): array
     {
         return [
             ['USER', 'getUserClass', 2],

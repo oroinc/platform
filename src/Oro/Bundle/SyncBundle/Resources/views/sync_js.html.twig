@@ -1,6 +1,6 @@
 {% if check_ws() %}
-<script type="text/javascript">
-    require(['jquery', 'orosync/js/sync', 'orosync/js/sync/wamp', 'routing'],
+<script>
+    loadModules(['jquery', 'orosync/js/sync', 'orosync/js/sync/wamp', 'routing'],
     function($, sync, Wamp, routing){
         $(document).on('click.action.data-api', '[data-action=sync-connect]', function (e) {
             sync.reconnect();
@@ -13,8 +13,7 @@
             host: '{{ ws.host == '*' ? app.request.host : ws.host }}',
             port: {{ ws.port|json_encode|raw }},
             path: '{{ ws.path|trim('/') }}',
-            maxRetries: 3,
-            retryDelay: 30000,
+            retryDelay: 60000,
             syncTicketUrl: routing.generate('oro_sync_ticket')
         }));
     });

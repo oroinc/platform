@@ -5,11 +5,12 @@ namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclClassInfo;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
-use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
+use Oro\Bundle\SecurityBundle\Metadata\ClassSecurityMetadata;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
+use Oro\Bundle\SecurityBundle\Metadata\Label;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
@@ -19,25 +20,28 @@ use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * The repository class that allows to manage Privilege models.
+ * @see \Oro\Bundle\SecurityBundle\Model\AclPrivilege
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AclPrivilegeRepository
 {
-    const ROOT_PRIVILEGE_NAME = '(default)';
+    public const ROOT_PRIVILEGE_NAME = '(default)';
 
-    /**
-     * @var AclManager
-     */
+    /** @var AclManager */
     protected $manager;
 
-    /**
-     * @param AclManager $manager
-     */
-    public function __construct(AclManager $manager)
+    /** @var TranslatorInterface */
+    private $translator;
+
+    public function __construct(AclManager $manager, TranslatorInterface $translator)
     {
         $this->manager = $manager;
+        $this->translator = $translator;
     }
 
     /**
@@ -87,8 +91,9 @@ class AclPrivilegeRepository
             $extensionKey = $extension->getExtensionKey();
             // fill a list of object identities;
             // the root object identity is added to the top of the list (for performance reasons)
-            /** @var OID[] $oids */
+            /** @var ClassSecurityMetadata[] $classes */
             $classes = [];
+            /** @var OID[] $oids */
             $oids = [];
             $extensionClasses = $extension->getClasses();
             foreach ($extensionClasses as $class) {
@@ -108,30 +113,30 @@ class AclPrivilegeRepository
             foreach ($oids as $oid) {
                 if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
                     continue;
-                } else {
-                    /** @var AclClassInfo $class */
-                    $class = $classes[$oid->getType()];
-                    $name = $class->getLabel();
-                    if (empty($name)) {
-                        $name = substr($class->getClassName(), strpos($class->getClassName(), '\\'));
-                    }
-                    $group = $class->getGroup();
-                    $description = $class->getDescription();
-                    $category = $class->getCategory();
+                }
+
+                $class = $classes[$oid->getType()];
+                $name = $class->getLabel();
+                if (!$name) {
+                    $name = substr($class->getClassName(), strpos($class->getClassName(), '\\'));
+                } elseif ($name instanceof Label) {
+                    $name = $name->trans($this->translator);
+                }
+                $description = $class->getDescription();
+                if ($description instanceof Label) {
+                    $description = $description->trans($this->translator);
                 }
 
                 $privilege = new AclPrivilege();
                 $privilege
-                    ->setIdentity(
-                        new AclPrivilegeIdentity(
-                            ObjectIdentityHelper::encodeIdentityString($oid->getIdentifier(), $oid->getType()),
-                            $name
-                        )
-                    )
-                    ->setGroup($group)
+                    ->setIdentity(new AclPrivilegeIdentity(
+                        ObjectIdentityHelper::encodeIdentityString($oid->getIdentifier(), $oid->getType()),
+                        $name
+                    ))
                     ->setExtensionKey($extensionKey)
                     ->setDescription($description)
-                    ->setCategory($category);
+                    ->setGroup($class->getGroup())
+                    ->setCategory($class->getCategory());
 
                 $this->addPermissions($sid, $privilege, $oid, $acls, $extension, $rootAcl, $aclGroup);
 
@@ -157,13 +162,12 @@ class AclPrivilegeRepository
      * @throws \RuntimeException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function savePrivileges(SID $sid, ArrayCollection $privileges)
     {
         /**
-         * @var $rootKeys
-         * key = ExtensionKey
-         * value = a key in $privilege collection
+         * @var array $rootKeys [<ExtensionKey> => <a key in $privilege collection>]
          */
         $rootKeys = [];
         // find all root privileges
@@ -176,7 +180,8 @@ class AclPrivilegeRepository
         }
 
         /**
-         * @var $context
+         * @var array $context
+         *
          * key = ExtensionKey
          * value = array
          *      'extension' => extension
@@ -248,39 +253,46 @@ class AclPrivilegeRepository
 
     /**
      * @param SID                   $sid
-     * @param AclClassInfo          $classInfo
+     * @param ClassSecurityMetadata $classMetadata
      * @param AclExtensionInterface $extension
      *
      * @return ArrayCollection
      */
     protected function getFieldsPrivileges(
         SID $sid,
-        AclClassInfo $classInfo,
+        ClassSecurityMetadata $classMetadata,
         AclExtensionInterface $extension
     ) {
-        $privileges = new ArrayCollection();
-        $className = $classInfo->getClassName();
+        $privileges = [];
+        $className = $classMetadata->getClassName();
         $extensionKey = $extension->getExtensionKey();
         $objectIdentity = new OID($extensionKey, $className);
         $acls = $this->findAcls($sid, [$objectIdentity]);
 
-        /** @var FieldSecurityMetadata $fieldInfo */
-        foreach ($classInfo->getFields() as $fieldInfo) {
-            if ($fieldInfo->isHidden()) {
+        foreach ($classMetadata->getFields() as $fieldMetadata) {
+            if ($fieldMetadata->isHidden()) {
                 continue;
             }
 
+            $name = $fieldMetadata->getLabel();
+            if ($name instanceof Label) {
+                $name = $name->trans($this->translator);
+            }
+            $description = $fieldMetadata->getDescription();
+            if ($description instanceof Label) {
+                $description = $description->trans($this->translator);
+            }
+
             $privilege = new AclPrivilege();
-            $privilege->setIdentity(
-                new AclPrivilegeIdentity(
+            $privilege
+                ->setIdentity(new AclPrivilegeIdentity(
                     ObjectIdentityHelper::encodeIdentityString(
                         $extensionKey,
-                        ObjectIdentityHelper::encodeEntityFieldInfo($className, $fieldInfo->getFieldName())
+                        ObjectIdentityHelper::encodeEntityFieldInfo($className, $fieldMetadata->getFieldName())
                     ),
-                    $fieldInfo->getLabel()
-                )
-            );
-            $privilege->setDescription($fieldInfo->getDescription());
+                    $name
+                ))
+                ->setDescription($description);
 
             $this->addFieldPermissions(
                 $sid,
@@ -288,19 +300,21 @@ class AclPrivilegeRepository
                 $objectIdentity,
                 $acls,
                 $extension->getFieldExtension(),
-                $fieldInfo->getFieldName()
+                $fieldMetadata->getFieldName()
             );
-            $privileges->add($privilege);
+            $privileges[] = $privilege;
         }
 
-        return $privileges;
+        // sort entity fields alphabetically by translated labels
+        if ($classMetadata instanceof EntitySecurityMetadata) {
+            uasort($privileges, function (AclPrivilege $a, AclPrivilege $b) {
+                return strcmp($a->getIdentity()->getName(), $b->getIdentity()->getName());
+            });
+        }
+
+        return new ArrayCollection($privileges);
     }
 
-    /**
-     * @param SID             $sid
-     * @param OID             $oid
-     * @param ArrayCollection $privileges
-     */
     protected function saveFieldPrivileges(SID $sid, OID $oid, ArrayCollection $privileges)
     {
         /** @var AclPrivilege $privilege */
@@ -361,10 +375,12 @@ class AclPrivilegeRepository
         $acl = $this->findAclByOid($acls, $oid);
         $this->addAclPermissions($sid, $field, $privilege, $allowedPermissions, $extension, null, $acl);
 
-        // add default permission for not found in db privileges. By default it should be the System access level.
+        // add default permission for not found in db privileges. By default it should be the maximum access level.
         foreach ($allowedPermissions as $permission) {
             if (!$privilege->hasPermission($permission)) {
-                $privilege->addPermission(new AclPermission($permission, AccessLevel::SYSTEM_LEVEL));
+                $accessLevels = $extension->getAccessLevelNames($privilege->getIdentity()->getId(), $permission);
+                $maxAccessLevel = max(array_keys($accessLevels));
+                $privilege->addPermission(new AclPermission($permission, $maxAccessLevel));
             }
         }
     }
@@ -578,13 +594,13 @@ class AclPrivilegeRepository
             $maskBuilder = $maskBuilders[$permission->getName()];
             $accessLevelName = AccessLevel::getAccessLevelName($permission->getAccessLevel());
             if ($accessLevelName !== null) {
-                $maskName = 'MASK_' . $permission->getName() . '_' . $accessLevelName;
+                $permissionName = $permission->getName() . '_' . $accessLevelName;
                 // check if a mask builder supports access levels
-                if (!$maskBuilder->hasMask($maskName)) {
+                if (!$maskBuilder->hasMaskForPermission($permissionName)) {
                     // remove access level name from the mask name if a mask builder do not support access levels
-                    $maskName = 'MASK_' . $permission->getName();
+                    $permissionName = $permission->getName();
                 }
-                $maskBuilder->add($maskBuilder->getMask($maskName));
+                $maskBuilder->add($maskBuilder->getMaskForPermission($permissionName));
             }
             $masks[$extension->getServiceBits($maskBuilder->get())] = $maskBuilder->get();
         }
@@ -612,15 +628,13 @@ class AclPrivilegeRepository
     /**
      * Sorts the given privileges by name in alphabetical order.
      * The root privilege is moved at the top of the list.
-     *
-     * @param ArrayCollection $privileges
      */
     protected function sortPrivileges(ArrayCollection $privileges)
     {
         $data = [];
         /** @var AclPrivilege $privilege */
         foreach ($privileges->getIterator() as $privilege) {
-            $isRoot = false !== strpos($privilege->getIdentity()->getId(), ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
+            $isRoot = str_contains($privilege->getIdentity()->getId(), ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
             $label = !$isRoot
                 ? $privilege->getIdentity()->getName()
                 : null;
@@ -690,9 +704,7 @@ class AclPrivilegeRepository
     ) {
         $allowedPermissions = $extension->getAllowedPermissions($oid, null, $aclGroup);
         $acl = $this->findAclByOid($acls, $oid);
-        if ($rootAcl !== null) {
-            $this->addAclPermissions($sid, null, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);
-        }
+        $this->addAclPermissions($sid, null, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);
 
         // add default permission for not found in db privileges
         foreach ($allowedPermissions as $permission) {
@@ -795,6 +807,7 @@ class AclPrivilegeRepository
      * @param EntryInterface[]      $aces
      * @param AclExtensionInterface $extension
      * @param bool                  $itIsRootAcl
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addAcesPermissions(
         AclPrivilege $privilege,

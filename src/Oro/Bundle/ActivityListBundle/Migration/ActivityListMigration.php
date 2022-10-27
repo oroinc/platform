@@ -29,13 +29,6 @@ class ActivityListMigration implements Migration
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ActivityListChainProvider       $provider
-     * @param ActivityListExtension           $activityListExtension
-     * @param EntityMetadataHelper            $metadataHelper
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param ConfigManager                   $configManager
-     */
     public function __construct(
         ActivityListChainProvider $provider,
         ActivityListExtension $activityListExtension,

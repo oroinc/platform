@@ -2,61 +2,48 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
-use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Oro\Bundle\SegmentBundle\Model\DynamicSegmentQueryDesigner;
 
+/**
+ * The query builder for dynamic segments.
+ */
 class DynamicSegmentQueryBuilder implements QueryBuilderInterface
 {
-    /** @var ServiceLink */
-    protected $segmentQueryConverterFactoryLink;
+    /** @var SegmentQueryConverterFactory */
+    private $segmentQueryConverterFactory;
 
     /** @var ManagerRegistry */
-    protected $doctrine;
+    private $doctrine;
 
-    /**
-     * @param ServiceLink     $segmentQueryConverterFactoryLink
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(
-        ServiceLink $segmentQueryConverterFactoryLink,
+        SegmentQueryConverterFactory $segmentQueryConverterFactory,
         ManagerRegistry $doctrine
     ) {
-        $this->segmentQueryConverterFactoryLink = $segmentQueryConverterFactoryLink;
+        $this->segmentQueryConverterFactory = $segmentQueryConverterFactory;
         $this->doctrine = $doctrine;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function build(Segment $segment)
+    public function build(Segment $segment): Query
     {
-        $qb = $this->getQueryBuilder($segment);
-
-        return $qb->getQuery();
+        return $this->getQueryBuilder($segment)->getQuery();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getQueryBuilder(Segment $segment)
+    public function getQueryBuilder(Segment $segment): QueryBuilder
     {
-        $em = $this->doctrine->getManagerForClass($segment->getEntity());
-        $converter = $this->getConverter();
-        $qb = $converter->convert(new RestrictionSegmentProxy($segment, $em));
-
-        return $qb;
-    }
-
-    /**
-     * @return SegmentQueryConverter
-     */
-    protected function getConverter()
-    {
-        /** @var SegmentQueryConverterFactory $factory */
-        $factory = $this->segmentQueryConverterFactoryLink->getService();
-
-        return  $factory->createInstance();
+        return $this->segmentQueryConverterFactory->createInstance()
+            ->convert(new DynamicSegmentQueryDesigner(
+                $segment,
+                $this->doctrine->getManagerForClass($segment->getEntity())
+            ));
     }
 }

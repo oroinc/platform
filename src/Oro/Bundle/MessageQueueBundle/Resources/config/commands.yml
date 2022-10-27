@@ -1,24 +1,35 @@
 services:
-    Oro\Bundle\MessageQueueBundle\Command\CleanupCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\MessageQueueBundle\Command\CleanupCommand
+
+    Oro\Bundle\MessageQueueBundle\Command\CleanupCommand:
+        arguments:
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: console.command }
 
     Oro\Bundle\MessageQueueBundle\Command\ClientConsumeMessagesCommand:
-        public: false
-        class: Oro\Bundle\MessageQueueBundle\Command\ClientConsumeMessagesCommand
+        arguments:
+            - '@oro_message_queue.client.queue_consumer'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
+            - '@oro_message_queue.log.consumer_state'
+            - '@monolog.logger.consumer'
         tags:
             - { name: console.command }
 
     Oro\Bundle\MessageQueueBundle\Command\ConsumerHeartbeatCommand:
-        public: false
-        class: Oro\Bundle\MessageQueueBundle\Command\ConsumerHeartbeatCommand
+        arguments:
+            - '@oro_message_queue.consumption.consumer_heartbeat'
+            - '@oro_sync.client.connection_checker'
+            - '@oro_sync.websocket_client'
+            - '%oro_message_queue.consumer_heartbeat_update_period%'
         tags:
             - { name: console.command }
 
     Oro\Bundle\MessageQueueBundle\Command\TransportConsumeMessagesCommand:
-        public: false
-        class: Oro\Bundle\MessageQueueBundle\Command\TransportConsumeMessagesCommand
+        arguments:
+            - '@oro_message_queue.consumption.queue_consumer'
+            - '@oro_message_queue.log.consumer_state'
+            - '@monolog.logger.consumer'
         tags:
             - { name: console.command }

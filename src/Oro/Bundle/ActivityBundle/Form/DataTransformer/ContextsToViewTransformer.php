@@ -7,8 +7,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Transforms activity contexts to the form view format
+ */
 class ContextsToViewTransformer implements DataTransformerInterface
 {
     const SEPARATOR = '-|-';
@@ -27,8 +30,7 @@ class ContextsToViewTransformer implements DataTransformerInterface
 
     /**
      * @param EntityManager $entityManager
-     * @param bool $collectionModel True if result should be Collection instead of array
-     * @param string $separator
+     * @param bool          $collectionModel True if result should be Collection instead of array
      */
     public function __construct(
         EntityManager $entityManager,

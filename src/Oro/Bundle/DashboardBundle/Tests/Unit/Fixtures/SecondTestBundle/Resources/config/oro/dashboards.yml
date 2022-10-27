@@ -9,6 +9,6 @@ dashboards:
 
     dashboards:
         alternative_dashboard:
-            twig: OroDashboardBundle:Index:default.html.twig
+            twig: '@OroDashboard/Index/default.html.twig'
         empty_board:
-            twig: OroDashboardBundle:Index:default.html.twig
+            twig: '@OroDashboard/Index/default.html.twig'

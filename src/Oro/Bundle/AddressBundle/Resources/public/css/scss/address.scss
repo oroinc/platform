@@ -8,14 +8,13 @@
 
     &__labels {
         padding: 0;
-        margin: 0;
         list-style: none;
+        margin: 0 0 $address-box-item-offset-vertical;
     }
 
     &__label-container {
         padding: 0;
         list-style: none;
-        margin: 0;
         display: inline;
     }
 
@@ -24,38 +23,35 @@
         padding: 0;
         text-shadow: none;
         color: $primary-600;
-        font-weight: normal;
-        font-size: $base-font-size--xs;
+        font-weight: font-weight('light');
+        font-size: $base-font-size--s;
+        border-radius: $border-radius;
 
-        &-container:last-of-type &:after {
-            content: '';
+        &:not(.label-info)::after {
+            content: ', ';
         }
 
-        &:not(.label-info):after {
-            content: ', ';
+        &-container:last-of-type &::after {
+            content: '';
         }
 
         &.label-info {
             background: $info;
             color: $primary-inverse;
-            font-weight: bold;
-            padding: 2px 4px;
+            padding: $address-box-item-label-info-padding-vertical $address-box-item-label-info-padding-horizontal;
+            margin: 0 $address-box-item-label-info-offset-horizontal 0 0;
         }
     }
 
     &__actions {
-        float: #{$end};
-        margin-#{$end}: -6px;
-    }
-    &__action {
-        width: $address-box-action-size;
-        height: $address-box-action-size;
+        float: right;
+        margin-right: -6px;
     }
 
     &__title {
         font-size: $font-size-base;
-        font-weight: bold;
-        margin-bottom: 4px;
+        font-weight: font-weight('bold');
+        margin: 0 0 $address-box-item-title-offset-vertical;
     }
 }
 
@@ -67,8 +63,9 @@
     .map-address-list {
         width: 40%;
         overflow: hidden;
-        margin: side-values(0 $address-box-margin-small/2 0 0);
-        padding: side-values(0 $address-box-margin-small/2 0 0);
+        max-height: inherit;
+        margin-right: $address-box-margin-small * .5;
+        padding-right: $address-box-margin-small * .5;
 
         &:hover {
             overflow-y: auto;
@@ -76,39 +73,26 @@
     }
 
     .map-visual-frame {
+        flex-grow: 1;
+
         .alert,
         .loader-overlay {
             width: auto;
-            margin: side-values(0 $address-box-margin-medium 0 $address-box-margin-small);
+            margin: 0 $address-box-margin-medium 0 $address-box-margin-small;
         }
-    }
 
-    .responsive-small & {
-        .map-address-list,
-        .map-visual-frame {
+        .map-visual-container {
             width: 100%;
-            height: auto;
-        }
-        .map-visual-frame,
-        .map-visual {
-            max-height: 50vh;
-        }
-        .map-visual-frame {
-            .alert,
-            .loader-overlay {
-                margin: $address-box-margin-small 0;
-            }
-        }
-        .map-visual {
-            margin: $address-box-margin-small 0;
         }
     }
 
     .map-visual {
-        margin: side-values(0 $address-box-margin-medium 0 $address-box-margin-small);
+        width: 100%;
+        height: 100%;
+        min-height: $address-map-visual-frame-min-height;
 
         img {
-            max-width:none;
+            max-width: none;
         }
     }
 
@@ -123,7 +107,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        min-height: $address-map-visual-frame-min-height;
+        min-height: $address-map-no-data-min-height;
 
         background: $primary-900;
         border-radius: $border-radius;
@@ -134,8 +118,32 @@
             text-align: center;
             border: none;
 
-            &:before {
+            .message {
+                text-align: center;
+            }
+
+            &::before {
                 content: none;
+            }
+        }
+    }
+
+    .responsive-small & {
+        .map-address-list,
+        .map-visual-frame {
+            width: 100%;
+            height: auto;
+        }
+
+        .map-visual-frame,
+        .map-visual {
+            max-height: 50vh;
+        }
+
+        .map-visual-frame {
+            .alert,
+            .loader-overlay {
+                margin: $address-box-margin-small 0;
             }
         }
     }
@@ -166,7 +174,8 @@
 
         .map-address-list {
             width: 100%;
-            margin: side-values( 0 0 $address-box-margin-small 0);
+            margin: 0 0 $address-box-margin-small 0;
+            padding-right: 0;
 
             &:hover {
                 overflow: inherit;

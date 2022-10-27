@@ -8,6 +8,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Contains methods for action Context/parameters
+ */
 class ContextHelper
 {
     const ROUTE_PARAM = 'route';
@@ -72,7 +75,7 @@ class ContextHelper
      */
     public function getActionParameters(array $context)
     {
-        $request = $this->requestStack->getMasterRequest();
+        $request = $this->requestStack->getMainRequest();
         if (!$request) {
             throw new \RuntimeException('Master Request is not defined');
         }
@@ -133,7 +136,7 @@ class ContextHelper
      * @param mixed $default
      * @return mixed
      */
-    protected function getRequestParameter($name, $default = null)
+    protected function getRequestParameter(string $name, $default = null)
     {
         $request = $this->requestStack->getCurrentRequest();
 

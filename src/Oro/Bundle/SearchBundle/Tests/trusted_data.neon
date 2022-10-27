@@ -1,0 +1,72 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\SearchBundle\Engine\AbstractIndexer:
+            reindexSingleEntity:
+                orderingsExpr: true
+        Oro\Bundle\SearchBundle\Engine\Indexer:
+            getSimpleSearchQuery:
+                offset: true
+                maxResults: true
+                page: true
+        Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter:
+            addRestriction:
+                restriction: true
+        Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver:
+            createQueryBuilder:
+                alias: true
+            getAggregatedData:
+                function: true
+                fieldSelect: true
+                field: true
+            runMultiInserts:
+                data: true
+            applyWhereToQB:
+                whereCondition: true
+        Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql:
+            setTextOrderBy:
+                index: true
+        Oro\Bundle\SearchBundle\Api\Model\LoadEntityIdsBySearchQuery:
+            getSearchResult:
+                maxResults: true
+    properties:
+        Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver:
+            createQueryBuilder:
+                entityName: true
+        Oro\Bundle\SearchBundle\Api\Model\LoadEntityIdsBySearchQuery:
+            getSearchResult:
+                firstResult: true
+    safe_methods:
+        Oro\Bundle\SearchBundle\Formatter\ResultFormatter:
+            getEntityIdentifier: true
+        Oro\Bundle\SearchBundle\Engine\FulltextIndexManager:
+            getQuery: true
+        Oro\Bundle\SearchBundle\Api\Model\LoadEntityIdsBySearchQuery:
+            getOrderBy: true
+    check_methods_safety:
+        Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql:
+            getJoinAlias: true
+            getJoinField: true
+        Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver:
+            getJoinAlias: true
+            getJoinField: true
+        Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql:
+            getJoinAlias: true
+            getJoinField: true
+        Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder:
+            __all__: true
+            in: [0]
+            notIn: [0]
+    check_methods:
+        Oro\Bundle\SearchBundle\Query\Query:
+            setCriteria: true
+            select: true
+            addSelect: [0]
+            addAggregate: [1]
+            addToSelect: [0]
+        Oro\Bundle\SearchBundle\Query\Criteria\Criteria:
+            __all__: true
+            where: [0, 1]
+            orWhere: [0, 1]
+            andWhere: [0, 1]
+            orderBy: true

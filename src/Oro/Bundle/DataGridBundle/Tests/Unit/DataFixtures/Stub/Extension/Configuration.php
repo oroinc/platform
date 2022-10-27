@@ -7,19 +7,17 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const ROOT = 'someExtensionConfig';
-    const NODE = 'someKey';
+    public const ROOT = 'someExtensionConfig';
+    public const NODE = 'someKey';
 
     /**
-     * Generates the configuration tree builder.
-     *
-     * @return \Symfony\Component\Config\Definition\Builder\TreeBuilder The tree builder
+     * {@inheritDoc}
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder(self::ROOT);
 
-        $builder->root(self::ROOT)->children()
+        $builder->getRootNode()->children()
                 ->scalarNode(self::NODE)->end()
             ->end();
 

@@ -6,7 +6,6 @@ use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputMethod;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\InputValue;
-use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableHeader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\TableRow;
 
 class GridRow extends TableRow
@@ -53,22 +52,6 @@ class GridRow extends TableRow
     }
 
     /**
-     * @param string $header
-     * @return NodeElement
-     */
-    public function getCell($header)
-    {
-        /** @var TableHeader $gridHeader */
-        $gridHeader = $this->elementFactory->createElement(static::HEADER_ELEMENT, $this->getParent()->getParent());
-        $columnNumber = $gridHeader->getColumnNumber($header);
-
-        /** @var NodeElement $cell */
-        $cell = $this->getCellByNumber($columnNumber);
-
-        return $cell;
-    }
-
-    /**
      * Inline edit row cell
      *
      * @param string $header Column header name
@@ -79,10 +62,17 @@ class GridRow extends TableRow
     {
         $cell = $this->startInlineEditing($header);
 
-        $this->getElement('OroForm')->fillField(
-            'value',
-            new InputValue(InputMethod::TYPE, $value)
-        );
+        //Tries to locate element several times to prevent premature ElementNotFoundException
+        $isElementFilled = $this->spin(function () use ($value) {
+            $this->getElement('OroForm')->fillField(
+                'value',
+                new InputValue(InputMethod::TYPE, $value)
+            );
+
+            return true;
+        });
+
+        $this->assertTrue($isElementFilled, "Could not fill field in '$header' column with value '$value'");
 
         $this->getDriver()->waitForAjax();
 
@@ -97,7 +87,7 @@ class GridRow extends TableRow
      */
     public function startInlineEditing($header)
     {
-        $cell = $this->getCell($header);
+        $cell = $this->getCellByHeader($header);
         $cell->mouseOver();
 
         /** @var NodeElement $pencilIcon */
@@ -151,7 +141,7 @@ class GridRow extends TableRow
      */
     public function setCellValueByDoubleClick($header, $value)
     {
-        $cell = $this->getCell($header);
+        $cell = $this->getCellByHeader($header);
 
         $cell->mouseOver();
         $cell->doubleClick();
@@ -172,11 +162,12 @@ class GridRow extends TableRow
     {
         if ($showMoreLink = $this->find('css', '.more-bar-holder .dropdown-toggle')) {
             $showMoreLink->mouseOver();
-            $link = $this->waitFor(5, function () use ($action) {
-                return $this->elementFactory
+            $link = $this->spin(function () use ($action) {
+                $link = $this->elementFactory
                     ->createElement('GridRowActionMenu')
                     ->find('named', ['link', ucfirst($action)]);
-            });
+                return $link->isVisible() ? $link : null;
+            }, 5);
         } else {
             $link = $this->find('named', ['link', ucfirst($action)]);
         }
@@ -185,13 +176,16 @@ class GridRow extends TableRow
     }
 
     /**
-     * @param $action
-     * @return NodeElement
+     * @param string $action
+     * @param bool $failIfNotFound
+     * @return NodeElement|null
      */
-    public function getActionLink($action)
+    public function getActionLink($action, $failIfNotFound = true)
     {
         $link = $this->findActionLink($action);
-        self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $this->getText(), $action));
+        if ($failIfNotFound) {
+            self::assertNotNull($link, sprintf('Row "%s" has no "%s" action', $this->getText(), $action));
+        }
 
         return $link;
     }

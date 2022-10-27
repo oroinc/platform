@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SSOBundle\Tests\Unit\Security;
 
+use Oro\Bundle\SSOBundle\Security\OAuthToken;
 use Oro\Bundle\SSOBundle\Security\OAuthTokenFactory;
 
 class OAuthTokenFactoryTest extends \PHPUnit\Framework\TestCase
@@ -11,7 +12,7 @@ class OAuthTokenFactoryTest extends \PHPUnit\Framework\TestCase
         $factory = new OAuthTokenFactory();
         $token = $factory->create('accessToken');
 
-        $this->assertInstanceOf('Oro\Bundle\SSOBundle\Security\OAuthToken', $token);
+        $this->assertInstanceOf(OAuthToken::class, $token);
         $this->assertEquals('accessToken', $token->getAccessToken());
     }
 }

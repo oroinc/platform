@@ -3,58 +3,41 @@
 namespace Oro\Bundle\WorkflowBundle\Async;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Async\Topic\ExecuteProcessJobTopic;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 
 /**
  * Process delayer process jobs.
  */
-class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class ExecuteProcessJobProcessor implements
+    MessageProcessorInterface,
+    TopicSubscriberInterface,
+    LoggerAwareInterface
 {
-    /**
-     * @var DoctrineHelper
-     */
-    private $doctrineHelper;
+    use LoggerAwareTrait;
 
-    /**
-     * @var ProcessHandler
-     */
-    private $processHandler;
+    private DoctrineHelper $doctrineHelper;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private ProcessHandler $processHandler;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ProcessHandler $processHandler
-     * @param LoggerInterface $logger
-     */
-    public function __construct(DoctrineHelper $doctrineHelper, ProcessHandler $processHandler, LoggerInterface $logger)
+    public function __construct(DoctrineHelper $doctrineHelper, ProcessHandler $processHandler)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->processHandler = $processHandler;
-        $this->logger = $logger;
+        $this->logger = new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $body = array_replace_recursive(['process_job_id' => null], JSON::decode($message->getBody()));
-        if (!$body['process_job_id']) {
-            $this->logger->critical('Process Job Id not set');
-
-            return self::REJECT;
-        }
+        $messageBody = $message->getBody();
 
         $entityManager = $this->doctrineHelper->getEntityManager(ProcessJob::class, false);
         if (null === $entityManager) {
@@ -67,11 +50,11 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         /** @var ProcessJob $processJob */
-        $processJob = $entityManager->find(ProcessJob::class, $body['process_job_id']);
+        $processJob = $entityManager->find(ProcessJob::class, $messageBody['process_job_id']);
         if (!$processJob) {
             $this->logger->critical(
                 'Process Job with id {process_job_id} not found',
-                ['process_job_id' => $body['process_job_id']]
+                ['process_job_id' => $messageBody['process_job_id']]
             );
 
             return self::REJECT;
@@ -99,7 +82,7 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
             $this->logger->error(
                 'Unexpected exception occurred during queue message processing',
                 [
-                    'topic' => Topics::EXECUTE_PROCESS_JOB,
+                    'topic' => ExecuteProcessJobTopic::getName(),
                     'exception' => $e
                 ]
             );
@@ -110,11 +93,8 @@ class ExecuteProcessJobProcessor implements MessageProcessorInterface, TopicSubs
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
-        return [Topics::EXECUTE_PROCESS_JOB];
+        return [ExecuteProcessJobTopic::getName()];
     }
 }

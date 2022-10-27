@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Provider;
 
 use Oro\Component\DependencyInjection\ServiceLink;
 
+/**
+ * The container for entity config providers.
+ */
 class ConfigProviderBag
 {
     /** @var array [scope => provider service id, ...] */
@@ -46,7 +49,6 @@ class ConfigProviderBag
             return $this->providers[$scope];
         }
 
-        $provider = null;
         if (!in_array($scope, $this->scopes, true)) {
             return null;
         }

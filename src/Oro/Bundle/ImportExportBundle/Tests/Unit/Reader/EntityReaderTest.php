@@ -2,414 +2,510 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\ExportPreGetIds;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityReaderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $managerRegistry;
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextRegistry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $contextRegistry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $ownershipMetadataProvider;
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadataProvider;
 
-    /**
-     * @var EntityReaderTestAdapter
-     */
-    protected $reader;
+    /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $exportQueryProvider;
 
-    protected function setUp()
+    /** @var EntityReaderTestAdapter */
+    private $reader;
+
+    protected function setUp(): void
     {
-        $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getByStepExecution'))
-            ->getMock();
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $this->exportQueryProvider = $this->createMock(ExportQueryProvider::class);
 
-        $this->ownershipMetadataProvider =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
         $this->reader = new EntityReaderTestAdapter(
             $this->contextRegistry,
-            $this->managerRegistry,
-            $this->ownershipMetadataProvider
+            $this->doctrine,
+            $this->ownershipMetadataProvider,
+            $this->exportQueryProvider
         );
+    }
+
+    private function getMockStepExecution($context): StepExecution
+    {
+        $stepExecution = $this->createMock(StepExecution::class);
+
+        $this->contextRegistry->expects(self::any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
+
+        return $stepExecution;
     }
 
     public function testReadMockIterator()
     {
-        $iterator = $this->createMock('\Iterator');
-        $this->managerRegistry->expects($this->never())->method($this->anything());
+        $iterator = $this->createMock(\Iterator::class);
+        $this->doctrine->expects(self::never())
+            ->method(self::anything());
 
         $fooEntity = $this->createMock(\stdClass::class);
         $barEntity = $this->createMock(\ArrayObject::class);
         $bazEntity = $this->createMock(\ArrayAccess::class);
 
-        $iterator->expects($this->at(0))->method('rewind');
-
-        $iterator->expects($this->at(1))->method('valid')->will($this->returnValue(true));
-        $iterator->expects($this->at(2))->method('current')->will($this->returnValue($fooEntity));
-        $iterator->expects($this->at(3))->method('next');
-
-        $iterator->expects($this->at(4))->method('valid')->will($this->returnValue(true));
-        $iterator->expects($this->at(5))->method('current')->will($this->returnValue($barEntity));
-        $iterator->expects($this->at(6))->method('next');
-
-        $iterator->expects($this->at(7))->method('valid')->will($this->returnValue(true));
-        $iterator->expects($this->at(8))->method('current')->will($this->returnValue($bazEntity));
-        $iterator->expects($this->at(9))->method('next');
-
-        $iterator->expects($this->at(10))->method('valid')->will($this->returnValue(false));
-        $iterator->expects($this->at(11))->method('valid')->will($this->returnValue(false));
+        $iterator->expects(self::once())
+            ->method('rewind');
+        $iterator->expects(self::exactly(5))
+            ->method('valid')
+            ->willReturnOnConsecutiveCalls(true, true, true, false, false);
+        $iterator->expects(self::exactly(3))
+            ->method('current')
+            ->willReturnOnConsecutiveCalls($fooEntity, $barEntity, $bazEntity);
+        $iterator->expects(self::exactly(3))
+            ->method('next');
 
         $this->reader->setSomeSourceIterator($iterator);
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
-        $context->expects($this->exactly(3))->method('incrementReadOffset');
-        $context->expects($this->exactly(3))->method('incrementReadCount');
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(3))
+            ->method('incrementReadOffset');
+        $context->expects(self::exactly(3))
+            ->method('incrementReadCount');
 
-        $stepExecution = $this->getMockStepExecution($context);
-        $this->reader->setStepExecution($stepExecution);
+        $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        $this->assertEquals($fooEntity, $this->reader->read());
-        $this->assertEquals($barEntity, $this->reader->read());
-        $this->assertEquals($bazEntity, $this->reader->read());
-        $this->assertNull($this->reader->read());
-        $this->assertNull($this->reader->read());
+        self::assertEquals($fooEntity, $this->reader->read());
+        self::assertEquals($barEntity, $this->reader->read());
+        self::assertEquals($bazEntity, $this->reader->read());
+        self::assertNull($this->reader->read());
+        self::assertNull($this->reader->read());
     }
 
     public function testReadRealIterator()
     {
-        $this->managerRegistry->expects($this->never())->method($this->anything());
+        $this->doctrine->expects(self::never())
+            ->method(self::anything());
 
         $fooEntity = $this->createMock(\stdClass::class);
         $barEntity = $this->createMock(\ArrayObject::class);
         $bazEntity = $this->createMock(\ArrayAccess::class);
 
-        $iterator = new \ArrayIterator(array($fooEntity, $barEntity, $bazEntity));
+        $iterator = new \ArrayIterator([$fooEntity, $barEntity, $bazEntity]);
 
         $this->reader->setSomeSourceIterator($iterator);
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
-        $context->expects($this->exactly(3))->method('incrementReadOffset');
-        $context->expects($this->exactly(3))->method('incrementReadCount');
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(3))
+            ->method('incrementReadOffset');
+        $context->expects(self::exactly(3))
+            ->method('incrementReadCount');
 
-        $stepExecution = $this->getMockStepExecution($context);
-        $this->reader->setStepExecution($stepExecution);
+        $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        $this->assertEquals($fooEntity, $this->reader->read());
-        $this->assertEquals($barEntity, $this->reader->read());
-        $this->assertEquals($bazEntity, $this->reader->read());
-        $this->assertNull($this->reader->read());
-        $this->assertNull($this->reader->read());
+        self::assertEquals($fooEntity, $this->reader->read());
+        self::assertEquals($barEntity, $this->reader->read());
+        self::assertEquals($bazEntity, $this->reader->read());
+        self::assertNull($this->reader->read());
+        self::assertNull($this->reader->read());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Reader must be configured with source
-     */
     public function testReadFailsWhenNoSourceIterator()
     {
-        $this->managerRegistry->expects($this->never())->method($this->anything());
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Reader must be configured with source');
 
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $stepExecution->expects($this->never())->method($this->anything());
-        $this->reader->read($stepExecution);
+        $this->doctrine->expects(self::never())
+            ->method(self::anything());
+
+        $this->reader->read();
     }
 
     public function testSetStepExecutionWithQueryBuilder()
     {
-        $this->managerRegistry->expects($this->never())->method($this->anything());
+        $this->doctrine->expects(self::never())
+            ->method(self::anything());
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
-        $context->expects($this->at(0))->method('hasOption')->with('entityName')->will($this->returnValue(false));
-        $context->expects($this->at(1))->method('hasOption')->with('queryBuilder')->will($this->returnValue(true));
-        $context->expects($this->at(2))->method('getOption')
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(2))
+            ->method('hasOption')
+            ->willReturnMap([
+                ['entityName', false],
+                ['queryBuilder', true]
+            ]);
+        $context->expects(self::once())
+            ->method('getOption')
             ->with('queryBuilder')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        $this->assertAttributeInstanceOf(
-            'Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator',
-            'sourceIterator',
-            $this->reader
-        );
-
-        $this->assertAttributeEquals(
-            $queryBuilder,
-            'source',
-            self::readAttribute($this->reader, 'sourceIterator')
-        );
+        self::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
+        self::assertEquals($queryBuilder, $this->reader->getSourceIterator()->getSource());
     }
 
     public function testSetStepExecutionWithQuery()
     {
-        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configuration->expects($this->once())
+        $configuration = $this->createMock(Configuration::class);
+        $configuration->expects(self::once())
             ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
-        $configuration->expects($this->once())
+            ->willReturn([]);
+        $configuration->expects(self::once())
             ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $em->expects($this->exactly(2))
+        $em = $this->createMock(EntityManager::class);
+        $em->expects(self::exactly(2))
             ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
-        $this->managerRegistry->expects($this->never())->method($this->anything());
+        $this->doctrine->expects(self::never())
+            ->method(self::anything());
 
         $query = new Query($em);
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
-        $context->expects($this->at(0))->method('hasOption')->with('entityName')->will($this->returnValue(false));
-        $context->expects($this->at(1))->method('hasOption')->with('queryBuilder')->will($this->returnValue(false));
-        $context->expects($this->at(2))->method('hasOption')->with('query')->will($this->returnValue(true));
-        $context->expects($this->at(3))->method('getOption')
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(3))
+            ->method('hasOption')
+            ->willReturnMap([
+                ['entityName', false],
+                ['queryBuilder', false],
+                ['query', true]
+            ]);
+        $context->expects(self::once())
+            ->method('getOption')
             ->with('query')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        $this->assertAttributeInstanceOf(
-            'Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator',
-            'sourceIterator',
-            $this->reader
-        );
-
-        $this->assertAttributeEquals(
-            $query,
-            'source',
-            self::readAttribute($this->reader, 'sourceIterator')
-        );
+        self::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
+        self::assertEquals($query, $this->reader->getSourceIterator()->getSource());
     }
 
     public function testSetStepExecutionWithEntityName()
     {
         $entityName = 'entityName';
 
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor()
-            ->getMock();
+        $classMetadata = $this->createMock(ClassMetadata::class);
 
-        $classMetadata->expects($this->once())->method('getAssociationMappings')->will($this->returnValue(array()));
-        $classMetadata->expects($this->once())
+        $classMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+        $classMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(['id']));
+            ->willReturn(['id']);
 
-        $emConfiguration = $this->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
-        $entityManager->expects($this->once())->method('getClassMetadata')
+        $emConfiguration = $this->createMock(Configuration::class);
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects(self::once())
+            ->method('getClassMetadata')
             ->with($entityName)
-            ->will($this->returnValue($classMetadata));
-        $entityManager->expects($this->any())
+            ->willReturn($classMetadata);
+        $entityManager->expects(self::any())
             ->method('getConfiguration')
-            ->will($this->returnValue($emConfiguration));
+            ->willReturn($emConfiguration);
 
         $query = new Query($entityManager);
 
-        $queryBuilder = $this
-            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $queryBuilder->expects($this->any())
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::any())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
-        $repository->expects($this->once())->method('createQueryBuilder')
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
+            ->method('createQueryBuilder')
             ->with('o')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
-        $entityManager->expects($this->once())->method('getRepository')
+        $entityManager->expects(self::once())
+            ->method('getRepository')
             ->with($entityName)
-            ->will($this->returnValue($repository));
+            ->willReturn($repository);
 
-        $this->managerRegistry->expects($this->once())->method('getManagerForClass')
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
             ->with($entityName)
-            ->will($this->returnValue($entityManager));
+            ->willReturn($entityManager);
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
-        $context->expects($this->at(0))->method('hasOption')->with('entityName')->will($this->returnValue(true));
-        $context->expects($this->at(1))->method('getOption')
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::once())
+            ->method('hasOption')
             ->with('entityName')
-            ->will($this->returnValue($entityName));
-        $context->expects($this->at(3))->method('getOption')->with('ids', [])->will($this->returnValue([]));
+            ->willReturn(true);
+        $context->expects(self::exactly(3))
+            ->method('getOption')
+            ->willReturnMap([
+                ['entityName', null, $entityName],
+                ['ids', [], []]
+            ]);
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
-        $this->assertAttributeInstanceOf(
-            'Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator',
-            'sourceIterator',
-            $this->reader
-        );
 
-        $this->assertAttributeEquals(
-            $query,
-            'source',
-            self::readAttribute($this->reader, 'sourceIterator')
-        );
+        self::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
+        self::assertEquals($query, $this->reader->getSourceIterator()->getSource());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetStepExecutionFailsWhenHasNoRequiredOptions()
     {
-        $this->managerRegistry->expects($this->never())->method($this->anything());
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".'
+        );
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
-        $context->expects($this->exactly(3))->method('hasOption')->will($this->returnValue(false));
+        $this->doctrine->expects(self::never())
+            ->method(self::anything());
+
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(3))
+            ->method('hasOption')
+            ->willReturn(false);
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
     }
 
     public function testSetSourceEntityName()
     {
-        $name = '\stdClass';
+        $name = \stdClass::class;
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $classMetadata->expects($this->once())
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->expects(self::once())
             ->method('getAssociationMappings')
-            ->will(
-                $this->returnValue(
-                    array(
-                        'testSingle'   => array('fieldName' => 'testSingle'),
-                        'testMultiple' => array('fieldName' => 'testMultiple'),
-                    )
-                )
-            );
-        $classMetadata->expects($this->exactly(2))
-            ->method('isAssociationWithSingleJoinColumn')
-            ->with($this->isType('string'))
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array('testSingle', true),
-                        array('testMultiple', false),
-                    )
-                )
-            );
+            ->willReturn([
+                'testSingle'   => ['fieldName' => 'testSingle'],
+                'testMultiple' => ['fieldName' => 'testMultiple'],
+            ]);
+
+        $this->exportQueryProvider->expects($this->exactly(2))
+            ->method('isAssociationExportable')
+            ->willReturnMap([
+                [$classMetadata, 'testSingle', true],
+                [$classMetadata, 'testMultiple', false],
+            ]);
+
         $classMetadata->expects($this->once())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(['id']));
+            ->willReturn(['id']);
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('addSelect')
             ->with('_testSingle');
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('leftJoin')
             ->with('o.testSingle', '_testSingle');
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('orderBy')
             ->with('o.id', 'ASC');
 
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository->expects($this->once())
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('o')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
-        $emConfiguration = $this->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emConfiguration = $this->createMock(Configuration::class);
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
-        $entityManager->expects($this->once())
+        $entityManager->expects(self::once())
             ->method('getRepository')
             ->with($name)
-            ->will($this->returnValue($repository));
-        $entityManager->expects($this->once())->method('getClassMetadata')
+            ->willReturn($repository);
+        $entityManager->expects(self::once())
+            ->method('getClassMetadata')
             ->with($name)
-            ->will($this->returnValue($classMetadata));
-        $entityManager->expects($this->any())
+            ->willReturn($classMetadata);
+        $entityManager->expects(self::any())
             ->method('getConfiguration')
-            ->will($this->returnValue($emConfiguration));
+            ->willReturn($emConfiguration);
 
-        $this->managerRegistry->expects($this->once())->method('getManagerForClass')
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
             ->with($name)
-            ->will($this->returnValue($entityManager));
+            ->willReturn($entityManager);
 
         $query = new Query($entityManager);
 
         $organization = new Organization();
         $ownershipMetadata = new OwnershipMetadata('', '', '', 'organization');
-        $this->ownershipMetadataProvider->expects($this->once())
+        $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
-            ->will($this->returnValue($ownershipMetadata));
-        $queryBuilder->expects($this->once())
+            ->willReturn($ownershipMetadata);
+        $queryBuilder->expects(self::once())
             ->method('andWhere')
             ->with('o.organization = :organization')
-            ->will($this->returnValue($queryBuilder));
-        $queryBuilder->expects($this->once())
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects(self::once())
             ->method('setParameter')
             ->with('organization', $organization)
-            ->will($this->returnValue($queryBuilder));
-        $queryBuilder->expects($this->any())
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects(self::any())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
         $this->reader->setSourceEntityName($name, $organization);
     }
 
-    /**
-     * @param mixed $context
-     * @return \PHPUnit\Framework\MockObject\MockObject+
-     */
-    protected function getMockStepExecution($context)
-    {
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->contextRegistry->expects($this->any())
-            ->method('getByStepExecution')
-            ->with($stepExecution)
-            ->will($this->returnValue($context));
-
-        return $stepExecution;
-    }
-
     public function testSetNullIterator()
     {
-        $iterator = $this->createMock('\Iterator');
+        $iterator = $this->createMock(\Iterator::class);
         $this->reader->setSourceIterator($iterator);
-        $this->assertSame($iterator, $this->reader->getSourceIterator());
+        self::assertSame($iterator, $this->reader->getSourceIterator());
         $this->reader->setSourceIterator();
-        $this->assertNull($this->reader->getSourceIterator());
+        self::assertNull($this->reader->getSourceIterator());
+    }
+
+    public function testGetIds()
+    {
+        $entityName = 'entityName';
+        $options = [];
+        $result = [1, 2, 3];
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+
+        $classMetadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $classMetadata->expects(self::once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+
+        $emConfiguration = $this->createMock(Configuration::class);
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::exactly(2))
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($classMetadata);
+        $entityManager->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn($emConfiguration);
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
+            ->method('getResult')
+            ->with(AbstractQuery::HYDRATE_ARRAY)
+            ->willReturn([
+                1 => 'a',
+                2 => 'b',
+                3 => 'c',
+            ]);
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::exactly(2))
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with('o ', 'o.id')
+            ->willReturn($queryBuilder);
+
+        $entityManager->expects(self::once())
+            ->method('getRepository')
+            ->with($entityName)
+            ->willReturn($repository);
+
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with($entityName)
+            ->willReturn($entityManager);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(new ExportPreGetIds($queryBuilder, $options), Events::BEFORE_EXPORT_GET_IDS);
+
+        $this->reader->setDispatcher($dispatcher);
+
+        self::assertEquals($result, $this->reader->getIds($entityName, $options));
+    }
+
+    public function testGetIdsCompositeKey()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Not supported entity (entityName) with composite primary key.');
+
+        $entityName = 'entityName';
+        $options = [];
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+
+        $classMetadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id', 'name']);
+        $classMetadata->expects(self::never())
+            ->method('getSingleIdentifierFieldName');
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())
+            ->method('getClassMetadata')
+            ->with($entityName)
+            ->willReturn($classMetadata);
+        $entityManager->expects(self::never())
+            ->method('getConfiguration');
+
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::never())
+            ->method('getResult');
+
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::never())
+            ->method('getQuery');
+
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::never())
+            ->method('createQueryBuilder');
+
+        $entityManager->expects(self::never())
+            ->method('getRepository');
+
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with($entityName)
+            ->willReturn($entityManager);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher->expects(self::never())
+            ->method('dispatch');
+
+        $this->reader->setDispatcher($dispatcher);
+
+        $this->reader->getIds($entityName, $options);
     }
 }

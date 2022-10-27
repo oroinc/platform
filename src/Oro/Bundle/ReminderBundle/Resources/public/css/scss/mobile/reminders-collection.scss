@@ -1,9 +1,9 @@
 /* @theme: admin.oro; */
 
-.reminders-collection,
-.ui-dialog .form-horizontal .control-group .controls .reminders-collection {
-    input.number {
-        height: 30px;
-        width: 40px !important;
+.reminders-collection .oro-multiselect-holder {
+    width: 100%;
+
+    .float-holder {
+        width: calc(100% - #{$btn-icon-mobile-width});
     }
 }

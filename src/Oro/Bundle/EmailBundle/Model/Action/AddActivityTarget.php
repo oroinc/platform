@@ -40,12 +40,6 @@ class AddActivityTarget extends AbstractAction
     /** @var EntityManager */
     private $entityManager;
 
-    /**
-     * @param ContextAccessor           $contextAccessor
-     * @param EmailActivityManager      $activityManager
-     * @param ActivityListChainProvider $chainProvider
-     * @param EntityManager             $entityManager
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         EmailActivityManager $activityManager,

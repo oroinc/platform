@@ -1,0 +1,156 @@
+action_groups:
+    oro_draft_create:
+        parameters:
+            source:
+                type: object
+            flush:
+                type: boolean
+                default: true
+        actions:
+            - '@draft_create':
+                source: $.source
+                target: $.target
+            - '@tree':
+                conditions:
+                    '@equal': [true, $.flush]
+                actions:
+                    - '@flush_entity': $.target
+                    - '@flash_message':
+                        message: oro.draft.operations.create.success
+                        type: 'success'
+                    - '@draft_redirect':
+                        source: $.target
+                        route: $.routes[update]
+    oro_draft_publish:
+        parameters:
+            source:
+                type: object
+        actions:
+            - '@draft_publish':
+                source: $.source
+                target: $.target
+            - '@remove_entity': $.source
+            - '@flush_entity': $.target
+            - '@flash_message':
+                message: oro.draft.operations.publish.success
+                type: 'success'
+            - '@draft_redirect':
+                source: $.target
+                route: $.routes[view]
+
+operations:
+    CREATE_DRAFT:
+        label: oro.draft.operations.create.label
+        acl_resource: [CREATE_DRAFT, $.data]
+        groups:
+            - view_navButtons
+        button_options:
+            icon: fa-files-o
+            class: btn
+        frontend_options:
+            confirmation:
+                content: '$.confirmationContent'
+                component: oroui/js/standart-confirmation
+        preconditions:
+            '@and':
+                - '@not_blank': $.data
+                - '@instanceof': [$.data, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
+                - '@equal': [$.data.draftUuid, null]
+        preactions:
+            - '@assign_draftable_fields':
+                object: $.data
+                attribute: $.draftableFields
+            - '@render_template':
+                attribute: $.confirmationContent
+                template: '@OroDraft/Draft/draftConfirmation.html.twig'
+                params:
+                    draftableFields: $.draftableFields
+        actions:
+            - '@run_action_group':
+                  action_group: oro_draft_create
+                  parameters_mapping:
+                      source: $.data
+                  results:
+                      redirectUrl: $.redirectUrl
+
+    PUBLISH_DRAFT:
+        label: oro.draft.operations.publish.label
+        acl_resource: [PUBLISH_DRAFT, $.data]
+        order: 10
+        button_options:
+            icon: fa-share-square-o
+            class: btn
+        groups:
+            - datagridRowAction
+            - view_navButtons
+        preconditions:
+            '@and':
+                - '@not_blank': $.data
+                - '@instanceof': [$.data, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
+                - '@not_equal': [$.data.draftUuid, null]
+                - '@not_equal': [$.data.draftSource, null]
+        actions:
+            - '@run_action_group':
+                  action_group: oro_draft_publish
+                  parameters_mapping:
+                      source: $.data
+                  results:
+                      redirectUrl: $.redirectUrl
+        frontend_options:
+            title: oro.draft.operations.publish.label
+            confirmation:
+                title: oro.draft.operations.publish.label
+                message: oro.draft.operations.publish.message
+                component: oroui/js/standart-confirmation
+
+    DUPLICATE_DRAFT:
+        extends: CREATE_DRAFT
+        label: oro.draft.operations.duplicate.label
+        order: 20
+        replace:
+            - preconditions
+            - groups
+        groups:
+            - datagridRowAction
+            - view_navButtons
+        preconditions:
+            '@and':
+                - '@not_blank': $.data
+                - '@instanceof': [$.data, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
+                - '@instanceof': [$.data.draftSource, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
+                - '@not_equal': [$.data.draftUuid, null]
+
+    UPDATE_DRAFT:
+        extends: UPDATE
+        replace:
+            - groups
+            - preconditions
+            - for_all_entities
+            - for_all_datagrids
+        groups:
+            - datagridRowAction
+        for_all_entities: false
+        for_all_datagrids: false
+        preconditions:
+            '@and':
+                - '@not_blank': $.data
+                - '@instanceof': [$.data, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
+                - '@not_blank': $.routes[update]
+                - '@not_equal': [$.data.draftUuid, null]
+
+    DELETE_DRAFT:
+        extends: DELETE
+        replace:
+            - groups
+            - preconditions
+        groups:
+            - datagridRowAction
+            - for_all_entities
+            - for_all_datagrids
+        for_all_entities: false
+        for_all_datagrids: false
+        preconditions:
+            '@and':
+                - '@not_blank': $.data
+                - '@instanceof': [$.data, Oro\Bundle\DraftBundle\Entity\DraftableInterface]
+                - '@not_equal': [$.data.draftUuid, null]

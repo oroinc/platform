@@ -2,17 +2,12 @@
 
 namespace Oro\Bundle\TagBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\Post;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("taggable")
- * @NamePrefix("oro_api_")
+ * API controller for taggable entities.
  */
 class TaggableController extends RestController
 {
@@ -22,8 +17,6 @@ class TaggableController extends RestController
      * @param string $entity   The type of the target entity.
      * @param int    $entityId The id of the target entity.
      *
-     * @Post("/tags/{entity}/{entityId}")
-     *
      * @ApiDoc(
      *      description="Sets tags to the target entity and return them",
      *      resource=true
@@ -31,7 +24,7 @@ class TaggableController extends RestController
      *
      * @return Response
      */
-    public function postAction($entity, $entityId)
+    public function postAction($entity, int $entityId)
     {
         $manager = $this->getManager();
         $manager->setClass($manager->resolveEntityClass($entity));
@@ -48,13 +41,13 @@ class TaggableController extends RestController
                     ['tags' => $result],
                     self::ACTION_READ,
                     ['result' => $result],
-                    Codes::HTTP_OK
+                    Response::HTTP_OK
                 );
             } else {
-                $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+                $view = $this->view($this->getForm(), Response::HTTP_BAD_REQUEST);
             }
         } else {
-            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+            $view = $this->view(null, Response::HTTP_NOT_FOUND);
         }
 
         return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $entityId, 'entity' => $entity]);

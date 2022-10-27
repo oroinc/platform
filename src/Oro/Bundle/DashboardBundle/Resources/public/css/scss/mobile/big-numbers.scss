@@ -2,15 +2,17 @@
 
 @media only screen and (max-width: $dashboard-big-numbers-two-column-gate) {
     .big-numbers-items > li {
+        // stylelint-disable-next-line declaration-no-important
         width: 50% !important;
 
-        &:nth-child(even):after {
-            width: calc(200% - 15px);
+        &:nth-child(even)::after {
+            width: calc(200% - 30px);
 
             content: '';
         }
 
-        &:nth-child(3n):after, &:last-child:after {
+        &:nth-child(3n)::after,
+        &:last-child::after {
             content: normal;
         }
     }
@@ -18,16 +20,21 @@
 
 @media only screen and (max-width: $dashboard-big-numbers-one-column-gate) {
     .big-numbers-items > li {
-        &, &.has-2-items, &.has-4-items {
+        &,
+        &.has-2-items,
+        &.has-4-items {
+            // stylelint-disable-next-line declaration-no-important
             width: 100% !important;
 
-            &:after, &:nth-child(3n):after, &:nth-child(even):after {
+            &::after,
+            &:nth-child(3n)::after,
+            &:nth-child(even)::after {
                 width: calc(100% - 30px);
 
                 content: '';
             }
 
-            &:last-child:after {
+            &:last-child::after {
                 content: normal;
             }
         }

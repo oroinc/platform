@@ -2,33 +2,21 @@
 
 namespace Oro\Bundle\SearchBundle\Datagrid\Filter;
 
-use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEntityFilterType;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
-use Symfony\Component\Form\FormFactoryInterface;
+use Oro\Component\Exception\UnexpectedTypeException;
 
+/**
+ * The filter by an entity for a datasource based on a search index.
+ * The entity class is specified in the options -> class parameter.
+ */
 class SearchEntityFilter extends EntityFilter
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(FormFactoryInterface $factory, FilterUtility $util, DoctrineHelper $doctrineHelper)
-    {
-        parent::__construct($factory, $util);
-
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -57,10 +45,18 @@ class SearchEntityFilter extends EntityFilter
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
-            throw new \RuntimeException('Invalid filter datasource adapter provided: ' . get_class($ds));
+            throw new UnexpectedTypeException($ds, SearchFilterDatasourceAdapter::class);
         }
 
         return $this->applyRestrictions($ds, $data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        throw new \BadMethodCallException('Not implemented');
     }
 
     /**
@@ -71,21 +67,49 @@ class SearchEntityFilter extends EntityFilter
      */
     protected function applyRestrictions(FilterDatasourceAdapterInterface $ds, array $data)
     {
-        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-
-        /** @var Collection $values */
-        $values = $data['value'];
-        $values = $values->map(
-            function ($entity) {
-                return $this->doctrineHelper->getSingleEntityIdentifier($entity, false);
+        $entityIds = [];
+        foreach ($data['value'] as $entity) {
+            $entityId = $this->getEntityIdentifier($entity);
+            if (null !== $entityId) {
+                $entityIds[] = $entityId;
             }
-        );
+        }
 
         $ds->addRestriction(
-            Criteria::expr()->in($fieldName, array_filter($values->toArray())),
+            Criteria::expr()->in($this->get(FilterUtility::DATA_NAME_KEY), $entityIds),
             FilterUtility::CONDITION_AND
         );
 
         return true;
+    }
+
+    protected function getEntityClass(): ?string
+    {
+        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY);
+        if (!$options) {
+            return null;
+        }
+
+        return $options['class'] ?? null;
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return mixed
+     */
+    private function getEntityIdentifier($entity)
+    {
+        $result = null;
+        $entityClass = ClassUtils::getClass($entity);
+        $manager = $this->doctrine->getManagerForClass($entityClass);
+        if (null !== $manager) {
+            $entityIdentifier = $manager->getClassMetadata($entityClass)->getIdentifierValues($entity);
+            if (count($entityIdentifier) === 1) {
+                $result = reset($entityIdentifier);
+            }
+        }
+
+        return $result;
     }
 }

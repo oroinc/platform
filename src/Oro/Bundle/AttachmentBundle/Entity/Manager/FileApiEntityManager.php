@@ -2,44 +2,50 @@
 
 namespace Oro\Bundle\AttachmentBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Model\FileContentProvider;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+/**
+ * The API manager for File entity.
+ */
 class FileApiEntityManager extends ApiEntityManager
 {
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    protected AuthorizationCheckerInterface $authorizationChecker;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    protected FileManager $fileManager;
 
-    /** @var FileManager */
-    protected $fileManager;
+    protected UrlGeneratorInterface $urlGenerator;
 
-    /**
-     * @param string                        $class
-     * @param ObjectManager                 $om
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param FileManager                   $fileManager
-     * @param AttachmentManager             $attachmentManager
-     */
     public function __construct(
-        $class,
+        string $class,
         ObjectManager $om,
         AuthorizationCheckerInterface $authorizationChecker,
         FileManager $fileManager,
-        AttachmentManager $attachmentManager
+        UrlGeneratorInterface $urlGenerator
     ) {
         parent::__construct($class, $om);
         $this->authorizationChecker = $authorizationChecker;
-        $this->attachmentManager = $attachmentManager;
         $this->fileManager = $fileManager;
+        $this->urlGenerator = $urlGenerator;
+    }
+
+    /**
+     * Get url of REST API resource which can be used to get the content of the given file
+     *
+     * @param int $fileId The id of the File object
+     *
+     * @return string
+     */
+    public function getFileRestApiUrl(int $fileId): string
+    {
+        return $this->urlGenerator->generate('oro_api_get_file', ['id' => $fileId, '_format' => 'binary']);
     }
 
     /**
@@ -47,13 +53,11 @@ class FileApiEntityManager extends ApiEntityManager
      */
     public function serializeOne($id)
     {
-        list($fileId, $ownerEntityClass, $ownerEntityId) = $this->attachmentManager->parseFileKey($id);
-
-        if (!$this->authorizationChecker->isGranted('VIEW', new ObjectIdentity($ownerEntityId, $ownerEntityClass))) {
+        if (!$this->authorizationChecker->isGranted('VIEW', new ObjectIdentity($id, File::class))) {
             throw new AccessDeniedException();
         }
 
-        return parent::serializeOne($fileId);
+        return parent::serializeOne($id);
     }
 
     /**
@@ -65,19 +69,18 @@ class FileApiEntityManager extends ApiEntityManager
             'fields'         => [
                 'owner' => ['fields' => 'id']
             ],
-            'post_serialize' => function (array &$result) {
-                $this->postSerializeFile($result);
+            'post_serialize' => function (array $result) {
+                return $this->postSerializeFile($result);
             }
         ];
 
         return $config;
     }
 
-    /**
-     * @param array $result
-     */
-    protected function postSerializeFile(array &$result)
+    protected function postSerializeFile(array $result): array
     {
         $result['content'] = new FileContentProvider($result['filename'], $this->fileManager);
+
+        return $result;
     }
 }

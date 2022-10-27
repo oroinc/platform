@@ -3,15 +3,17 @@
 namespace Oro\Bundle\CurrencyBundle\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
+/**
+ * Formats value by provided type.
+ */
 class MultiCurrencyTypeFormatter implements TypeFormatterInterface
 {
     protected $formatter;
 
     /**
      * MultiCurrencyTypeFormatter constructor.
-     *
-     * @param NumberFormatter $formatter
      */
     public function __construct(NumberFormatter $formatter)
     {

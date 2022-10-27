@@ -11,23 +11,17 @@ use Oro\Bundle\WorkflowBundle\Translation\TranslationProcessor;
 
 class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslationProcessor */
-    private $processor;
-
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $translationHelper;
 
-    protected function setUp()
+    /** @var TranslationProcessor */
+    private $processor;
+
+    protected function setUp(): void
     {
-        $this->translationHelper = $this->getMockBuilder(WorkflowTranslationHelper::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);
 
         $this->processor = new TranslationProcessor($this->translationHelper);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->translationHelper, $this->processor);
     }
 
     public function testImplementsInterfaces()
@@ -42,8 +36,8 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
         $result = $this->processor->prepare('test_workflow', $config);
 
         $this->assertEquals(
-            $result,
             ['label' => 'oro.workflow.test_workflow.label'],
+            $result,
             'should return modified with key configuration back'
         );
     }
@@ -64,37 +58,35 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->translationHelper->expects($this->at(0))
+        $this->translationHelper->expects($this->exactly(2))
             ->method('saveTranslation')
-            ->with('oro.workflow.test_workflow.label', 'wflabel');
-        $this->translationHelper->expects($this->at(1))
-            ->method('saveTranslation')
-            ->with('oro.workflow.test_workflow.transition.test_transition.label', 'test_transition');
-        $this->translationHelper->expects($this->at(2))
+            ->withConsecutive(
+                ['oro.workflow.test_workflow.label', 'wflabel'],
+                ['oro.workflow.test_workflow.transition.test_transition.label', 'test_transition']
+            );
+        $this->translationHelper->expects($this->exactly(3))
             ->method('saveTranslationAsSystem')
-            ->with('oro.workflow.test_workflow.transition.test_transition.button_label', '');
-        $this->translationHelper->expects($this->at(3))
-            ->method('saveTranslationAsSystem')
-            ->with('oro.workflow.test_workflow.transition.test_transition.button_title', '');
-        $this->translationHelper->expects($this->at(4))
-            ->method('saveTranslationAsSystem')
-            ->with('oro.workflow.test_workflow.transition.test_transition.warning_message', '');
+            ->withConsecutive(
+                ['oro.workflow.test_workflow.transition.test_transition.button_label', ''],
+                ['oro.workflow.test_workflow.transition.test_transition.button_title', ''],
+                ['oro.workflow.test_workflow.transition.test_transition.warning_message', '']
+            );
 
         $this->assertEquals($configuration, $this->processor->handle($configuration));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Workflow configuration for handler must contain valid `name` node.
-     */
     public function testHandleIncorrectConfigFormatException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Workflow configuration for handler must contain valid `name` node.');
+
         $this->processor->handle([]);
     }
 
     public function testTranslateWorkflowDefinitionFieldsWithoutWorkflowName()
     {
-        $this->translationHelper->expects($this->never())->method($this->anything());
+        $this->translationHelper->expects($this->never())
+            ->method($this->anything());
 
         $definition = new WorkflowDefinition();
         $definition->setLabel('stored_label');
@@ -109,19 +101,16 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider translateWorkflowDefinitionFieldsProvider
-     *
-     * @param WorkflowDefinition $expected
-     * @param WorkflowDefinition $definition
-     * @param array $values
-     * @param bool $useKeyAsTranslation
      */
     public function testTranslateWorkflowDefinitionFields(
         WorkflowDefinition $expected,
         WorkflowDefinition $definition,
         array $values,
-        $useKeyAsTranslation
+        bool $useKeyAsTranslation
     ) {
-        $this->translationHelper->expects($this->any())->method('findWorkflowTranslation')->willReturnMap($values);
+        $this->translationHelper->expects($this->any())
+            ->method('findWorkflowTranslation')
+            ->willReturnMap($values);
 
         $this->processor->translateWorkflowDefinitionFields($definition, $useKeyAsTranslation);
 
@@ -130,10 +119,8 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function translateWorkflowDefinitionFieldsProvider()
+    public function translateWorkflowDefinitionFieldsProvider(): array
     {
         $definition = new WorkflowDefinition();
         $definition->setName('test_workflow');
@@ -210,7 +197,6 @@ class TranslationProcessorTest extends \PHPUnit\Framework\TestCase
 
             ]
         ]);
-
 
         $keyedConfig = [
             'transitions' => [

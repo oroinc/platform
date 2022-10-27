@@ -2,25 +2,22 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
 class MetadataRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $metadataBuilder;
+    /** @var MetadataBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $metadataBuilder;
 
-    /**
-     * @var MetadataRegistry
-     */
-    protected $metadataRegistry;
+    /** @var MetadataRegistry */
+    private $metadataRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->metadataBuilder = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->metadataBuilder = $this->createMock(MetadataBuilder::class);
+
         $this->metadataRegistry = new MetadataRegistry($this->metadataBuilder);
     }
 
@@ -28,14 +25,12 @@ class MetadataRegistryTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'TestEntity';
 
-        $expectedResult = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $expectedResult = $this->createMock(EntityMetadata::class);
 
         $this->metadataBuilder->expects($this->once())
             ->method('createEntityMetadataByClass')
             ->with($className)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertEquals($expectedResult, $this->metadataRegistry->getEntityMetadata($className));
         $this->assertEquals($expectedResult, $this->metadataRegistry->getEntityMetadata($className));

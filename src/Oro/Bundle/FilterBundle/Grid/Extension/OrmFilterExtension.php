@@ -8,8 +8,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
 /**
- * Applies filters to orm datasource.
- * {@inheritDoc}
+ * Applies filters to an ORM datasource.
  */
 class OrmFilterExtension extends AbstractFilterExtension
 {
@@ -34,38 +33,30 @@ class OrmFilterExtension extends AbstractFilterExtension
 
         /** @var OrmDatasource $datasource */
         $countQb = $datasource->getCountQb();
-        $countQbAdapter = $countQb ? new OrmFilterDatasourceAdapter($countQb) : null;
-        $datasourceAdapter = new OrmFilterDatasourceAdapter($datasource->getQueryBuilder());
+        $countDs = $countQb ? new OrmFilterDatasourceAdapter($countQb) : null;
+        $ds = new OrmFilterDatasourceAdapter($datasource->getQueryBuilder());
 
-        foreach ($filters as $filter) {
-            $value = $filtersState[$filter->getName()] ?? null;
-            if ($value === null) {
-                continue;
+        $this->filterExecutionContext->enableValidation();
+        try {
+            foreach ($filters as $filter) {
+                $data = $filtersState[$filter->getName()] ?? null;
+                if (null === $data) {
+                    continue;
+                }
+
+                $filterForm = $this->submitFilter($filter, $data);
+                if (!$filterForm->isValid()) {
+                    continue;
+                }
+
+                $normalizedData = $filterForm->getData();
+                $filter->apply($ds, $normalizedData);
+                if (null !== $countDs) {
+                    $filter->apply($countDs, $normalizedData);
+                }
             }
-
-            $filterForm = $this->submitFilter($filter, $value);
-            if (!$filterForm->isValid()) {
-                continue;
-            }
-
-            $data = $filterForm->getData();
-
-            // Initially added in AEIV-405 to make work date interval filters.
-            if (isset($value['value']['start'])) {
-                $data['value']['start_original'] = $value['value']['start'];
-            }
-
-            if (isset($value['value']['end'])) {
-                $data['value']['end_original'] = $value['value']['end'];
-            }
-
-            // Applies filter to datasource.
-            $filter->apply($datasourceAdapter, $data);
-
-            // Applies filter to count query of datasource, if any.
-            if ($countQbAdapter) {
-                $filter->apply($countQbAdapter, $data);
-            }
+        } finally {
+            $this->filterExecutionContext->disableValidation();
         }
     }
 }

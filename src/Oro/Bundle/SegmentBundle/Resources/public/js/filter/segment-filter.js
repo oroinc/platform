@@ -6,8 +6,6 @@ define([
 ], function($, _, __, AbstractFilter) {
     'use strict';
 
-    var SegmentFilter;
-
     /**
      * Segment filter
      *
@@ -15,7 +13,7 @@ define([
      * @class   orosegment.filter.SegmentFilter
      * @extends oro.filter.AbstractFilter
      */
-    SegmentFilter = AbstractFilter.extend({
+    const SegmentFilter = AbstractFilter.extend({
         /**
          * Filter selector template
          *
@@ -59,10 +57,10 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SegmentFilter() {
-            SegmentFilter.__super__.constructor.apply(this, arguments);
+        constructor: function SegmentFilter(options) {
+            SegmentFilter.__super__.constructor.call(this, options);
         },
 
         /**
@@ -80,7 +78,7 @@ define([
                 };
             }
 
-            AbstractFilter.prototype.initialize.apply(this, arguments);
+            AbstractFilter.prototype.initialize.call(this, options);
         },
 
         render: function() {
@@ -88,7 +86,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(value) {
             this._setInputValue(this.inputSelector, value.value);
@@ -96,7 +94,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
             return {

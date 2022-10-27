@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
+/**
+ * The generator of proxy classes for extended entities.
+ */
 class EntityProxyGenerator
 {
     /** @var EntityManagerBag */
@@ -65,8 +68,6 @@ class EntityProxyGenerator
     }
     /**
      * Generate doctrine proxy classes for extended entities for the given entity manager
-     *
-     * @param EntityManager $em
      */
     protected function generateEntityManagerProxies(EntityManager $em)
     {
@@ -75,9 +76,9 @@ class EntityProxyGenerator
             $proxyDir = $em->getConfiguration()->getProxyDir();
             if (!empty($this->cacheDir)
                 && $this->kernelCacheDir !== $this->cacheDir
-                && strpos($proxyDir, $this->kernelCacheDir) === 0
+                && str_starts_with($proxyDir, $this->kernelCacheDir)
             ) {
-                $proxyDir = $this->cacheDir . substr($proxyDir, strlen($this->kernelCacheDir));
+                $proxyDir = $this->cacheDir . substr($proxyDir, \strlen($this->kernelCacheDir));
             }
             $metadataFactory = $em->getMetadataFactory();
             $proxyFactory    = $em->getProxyFactory();

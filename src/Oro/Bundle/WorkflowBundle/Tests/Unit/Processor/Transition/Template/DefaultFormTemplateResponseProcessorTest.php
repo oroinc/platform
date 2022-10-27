@@ -8,18 +8,19 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\DefaultFormTemplateResponseProcessor;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
-    protected $twig;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $twig;
 
     /** @var DefaultFormTemplateResponseProcessor */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->twig = $this->createMock(\Twig_Environment::class);
+        $this->twig = $this->createMock(Environment::class);
 
         $this->processor = new DefaultFormTemplateResponseProcessor($this->twig);
     }
@@ -32,9 +33,10 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCa
      */
     public function testRenderedResponseResult($dialogTemplate, $expectedToRender)
     {
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())->method('getDialogTemplate')->willReturn($dialogTemplate);
+        $transition->expects($this->once())
+            ->method('getDialogTemplate')
+            ->willReturn($dialogTemplate);
 
         $context = new TransitionContext();
         $context->setSaved(false);
@@ -54,43 +56,46 @@ class DefaultFormTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals('content', $context->getResult()->getContent());
     }
 
-    /**
-     * @return \Generator
-     */
-    public function templateProvider()
+    public function templateProvider(): array
     {
-        yield 'dialogTemplateDefined' => [
-            'dialog-template',
-            'dialog-template'
-        ];
-
-        yield 'default template if not defined' => [
-            null,
-            DefaultFormTemplateResponseProcessor::DEFAULT_TRANSITION_TEMPLATE
+        return [
+            'dialogTemplateDefined' => [
+                'dialog-template',
+                'dialog-template'
+            ],
+            'default template if not defined' => [
+                null,
+                DefaultFormTemplateResponseProcessor::DEFAULT_TRANSITION_TEMPLATE
+            ]
         ];
     }
 
     public function testSkipUnsupportedResultTypeContextSaved()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())->method('isSaved')->willReturn(true);
-        $context->expects($this->never())->method('getResultType');
-        $context->expects($this->never())->method('getTransition');
+        $context->expects($this->once())
+            ->method('isSaved')
+            ->willReturn(true);
+        $context->expects($this->never())
+            ->method('getResultType');
+        $context->expects($this->never())
+            ->method('getTransition');
 
         $this->processor->process($context);
     }
 
     public function testSkipUnsupportedResultTypeContextResultType()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())->method('isSaved')->willReturn(false);
+        $context->expects($this->once())
+            ->method('isSaved')
+            ->willReturn(false);
         $context->expects($this->once())
             ->method('getResultType')
             ->willReturn($this->createMock(TransitActionResultTypeInterface::class));
 
-        $context->expects($this->never())->method('getTransition');
+        $context->expects($this->never())
+            ->method('getTransition');
 
         $this->processor->process($context);
     }

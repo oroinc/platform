@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Region;
 
 class LoadRegionData extends AbstractFixture
@@ -33,15 +33,13 @@ class LoadRegionData extends AbstractFixture
 
     /**
      * Load address types
-     *
-     * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {
         $repository = $manager->getRepository(Region::class);
 
         foreach ($this->regions as $reference => $data) {
-            /** @var $region Region */
+            /** @var Region $region */
             $region = $repository->find($data['combinedCode']);
             if (!$region) {
                 $region = new Region($data['combinedCode']);

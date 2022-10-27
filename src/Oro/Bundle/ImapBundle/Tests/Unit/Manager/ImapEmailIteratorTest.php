@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
+namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailIterator;
@@ -22,7 +22,7 @@ class ImapEmailIteratorTest extends TestCase
     /** @var ImapEmailIterator */
     private $iterator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->messageIterator = $this->createMock(ImapMessageIterator::class);
         $this->manager = $this->createMock(ImapEmailManager::class);
@@ -37,8 +37,7 @@ class ImapEmailIteratorTest extends TestCase
     {
         $reverse = false;
 
-        $this->messageIterator
-            ->expects(static::once())
+        $this->messageIterator->expects(self::once())
             ->method('setIterationOrder')
             ->with($reverse);
 
@@ -49,8 +48,7 @@ class ImapEmailIteratorTest extends TestCase
     {
         $batchSize = 10;
 
-        $this->messageIterator
-            ->expects(static::once())
+        $this->messageIterator->expects(self::once())
             ->method('setBatchSize')
             ->with($batchSize);
 
@@ -61,8 +59,7 @@ class ImapEmailIteratorTest extends TestCase
     {
         $logger = $this->createMock(LoggerInterface::class);
 
-        $this->messageIterator
-            ->expects(static::once())
+        $this->messageIterator->expects(self::once())
             ->method('setLogger')
             ->with($logger);
 
@@ -71,8 +68,7 @@ class ImapEmailIteratorTest extends TestCase
 
     public function testSetBatchCallbackOnNull()
     {
-        $this->messageIterator
-            ->expects(static::once())
+        $this->messageIterator->expects(self::once())
             ->method('setBatchCallback');
 
         $this->iterator->setBatchCallback(null);
@@ -80,8 +76,7 @@ class ImapEmailIteratorTest extends TestCase
 
     public function testSetBatchCallback()
     {
-        $this->messageIterator
-            ->expects(static::once())
+        $this->messageIterator->expects(self::once())
             ->method('setBatchCallback');
 
         $this->iterator->setBatchCallback(function () {
@@ -97,23 +92,21 @@ class ImapEmailIteratorTest extends TestCase
     {
         $count = 0;
 
-        $this->messageIterator
-            ->expects(static::once())
+        $this->messageIterator->expects(self::once())
             ->method('count')
             ->willReturn($count);
 
-        static::assertSame($count, $this->iterator->count());
+        self::assertSame($count, $this->iterator->count());
     }
 
     public function testCurrent()
     {
-        static::assertNull($this->iterator->current());
+        self::assertNull($this->iterator->current());
     }
 
     public function testNext()
     {
-        $this->messageIterator
-            ->expects(static::once())
+        $this->messageIterator->expects(self::once())
             ->method('next');
 
         $this->iterator->next();
@@ -121,18 +114,17 @@ class ImapEmailIteratorTest extends TestCase
 
     public function testKey()
     {
-        static::assertSame(0, $this->iterator->key());
+        self::assertSame(0, $this->iterator->key());
     }
 
     public function testValid()
     {
-        static::assertFalse($this->iterator->valid());
+        self::assertFalse($this->iterator->valid());
     }
 
     public function testRewind()
     {
-        $this->messageIterator
-            ->expects(static::once())
+        $this->messageIterator->expects(self::once())
             ->method('rewind');
 
         $this->iterator->rewind();

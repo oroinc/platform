@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
@@ -10,28 +11,24 @@ class DbalSchemaTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        $schemaManger = $this->createSchemaManagerMock();
+        $schemaManger = $this->createMock(AbstractSchemaManager::class);
 
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())
             ->method('getSchemaManager')
-            ->will($this->returnValue($schemaManger))
-        ;
+            ->willReturn($schemaManger);
 
         new DbalSchema($connection, 'table-name');
     }
 
     public function testShouldCreateTable()
     {
-        $schemaManger = $this->createSchemaManagerMock();
+        $schemaManger = $this->createMock(AbstractSchemaManager::class);
 
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())
             ->method('getSchemaManager')
-            ->will($this->returnValue($schemaManger))
-        ;
+            ->willReturn($schemaManger);
 
         $schema = new DbalSchema($connection, 'table-name');
 
@@ -39,21 +36,7 @@ class DbalSchemaTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(1, $tables);
         $table = current($tables);
-
         $this->assertInstanceOf(Table::class, $table);
         $this->assertEquals('table-name', $table->getName());
-    }
-
-    private function createSchemaManagerMock()
-    {
-        return $this->createMock(AbstractSchemaManager::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
-     */
-    private function createConnectionMock()
-    {
-        return $this->createMock(Connection::class);
     }
 }

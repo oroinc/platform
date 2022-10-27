@@ -1,5 +1,6 @@
 /* @theme: admin.oro; */
 
 .mobile-version {
-    @import "./workflow";
+    @import 'oroui/css/scss/mobile/variables/layout';
+    @import './workflow';
 }

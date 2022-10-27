@@ -1,12 +1,10 @@
 define([
-    'tpl!orodatagrid/templates/datagrid/page-size.html',
+    'tpl-loader!orodatagrid/templates/datagrid/page-size.html',
     'jquery',
     'underscore',
     'backbone'
 ], function(template, $, _, Backbone) {
     'use strict';
-
-    var PageSize;
 
     /**
      * Datagrid page size widget
@@ -15,7 +13,7 @@ define([
      * @class   orodatagrid.datagrid.PageSize
      * @extends Backbone.View
      */
-    PageSize = Backbone.View.extend({
+    const PageSize = Backbone.View.extend({
         /** @property */
         template: template,
 
@@ -38,10 +36,10 @@ define([
         showLabels: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function PageSize() {
-            PageSize.__super__.constructor.apply(this, arguments);
+        constructor: function PageSize(options) {
+            PageSize.__super__.constructor.call(this, options);
         },
 
         /**
@@ -49,7 +47,7 @@ define([
          *
          * @param {Object} options
          * @param {Backbone.Collection} options.collection
-         * @param {Array} [options.items]
+         * @param {Array} [options.items] page size values
          */
         initialize: function(options) {
             options = options || {};
@@ -59,7 +57,7 @@ define([
             }
 
             if (options.items) {
-                this.items = options.items;
+                this.items = this.preparePageSizes(options.items);
             }
 
             if (typeof this.template !== 'function' || options.template) {
@@ -89,6 +87,25 @@ define([
         },
 
         /**
+         * Convert each page size value to integer value
+         *
+         * @param {array} items
+         * @returns {array}
+         */
+        preparePageSizes(items) {
+            return items.map(item => {
+                if (_.isObject(item)) {
+                    return {
+                        ...item,
+                        size: parseInt(item.size, 10)
+                    };
+                }
+
+                return parseInt(item, 10);
+            });
+        },
+
+        /**
          * Enable page size
          *
          * @return {*}
@@ -106,7 +123,7 @@ define([
          */
         onChangePageSize: function(e) {
             e.preventDefault();
-            var pageSize = parseInt($(e.target).data('size') || $(e.target).val(), 10);
+            const pageSize = parseInt($(e.target).data('size') || $(e.target).val(), 10);
             if (pageSize !== this.collection.state.pageSize) {
                 this.changePageSize(pageSize);
             }
@@ -119,30 +136,16 @@ define([
 
         render: function() {
             this.$el.empty();
-
-            var currentSizeLabel = _.filter(
-                this.items,
-                _.bind(
-                    function(item) {
-                        return item.size === undefined
-                            ? this.collection.state.pageSize === item : this.collection.state.pageSize === item.size;
-                    },
-                    this
-                )
-            );
-
-            if (currentSizeLabel.length > 0) {
-                currentSizeLabel = _.isUndefined(currentSizeLabel[0].label)
-                    ? currentSizeLabel[0] : currentSizeLabel[0].label;
-            } else {
-                currentSizeLabel = this.items[0];
-            }
+            const {pageSize: currentPageSize} = this.collection.state;
+            const currentItem =
+                this.items.find(item => currentPageSize === (typeof item.size !== 'undefined' ? item.size : item));
 
             this.$el.append($(this.template({
                 disabled: !this.enabled || !this.collection.state.totalRecords,
                 collectionState: this.collection.state,
                 items: this.items,
-                currentSizeLabel: currentSizeLabel,
+                currentPageSize,
+                currentSizeLabel: typeof currentItem.label !== 'undefined' ? currentItem.label : currentItem,
                 showLabels: this.showLabels
             })));
 

@@ -7,19 +7,20 @@ use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraint;
 
+/**
+ * Converts constraints definitions specified in "constrains" option to {@see Constraint} objects.
+ */
 class ConstraintAsOptionExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
     /**
      * @var ConstraintFactory
      */
     protected $constraintFactory;
 
-    /**
-     * @param ConstraintFactory $constraintFactory
-     */
     public function __construct(ConstraintFactory $constraintFactory)
     {
         $this->constraintFactory = $constraintFactory;
@@ -30,11 +31,16 @@ class ConstraintAsOptionExtension extends AbstractTypeExtension
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setAllowedTypes(
+            'constraints',
+            [Constraint::class, Constraint::class . '[]', 'array', 'string', 'null']
+        );
+
         $resolver->setNormalizer(
             'constraints',
             function (Options $options, $constraints) {
                 return $this->constraintFactory->parse(
-                    is_object($constraints) ? [$constraints] : (array) $constraints
+                    is_object($constraints) ? [$constraints] : (array)$constraints
                 );
             }
         );

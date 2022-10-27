@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\ThemeBundle\Model\Theme;
@@ -13,46 +12,37 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $themeRegistry;
+    private $themeRegistry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $theme;
+    private $theme;
 
     /** @var ThemeExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->themeRegistry = $this->getMockBuilder(ThemeRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->theme = $this->getMockBuilder(Theme::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->themeRegistry = $this->createMock(ThemeRegistry::class);
+        $this->theme = $this->createMock(Theme::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_theme.registry', $this->themeRegistry)
+            ->add(ThemeRegistry::class, $this->themeRegistry)
             ->getContainer($this);
 
         $this->extension = new ThemeExtension($container);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(ThemeExtension::NAME, $this->extension->getName());
     }
 
     public function testGetThemeLogo()
     {
         $this->themeRegistry->expects($this->once())
             ->method('getActiveTheme')
-            ->will($this->returnValue($this->theme));
+            ->willReturn($this->theme);
 
         $logo = 'logo.png';
 
         $this->theme->expects($this->once())
             ->method('getLogo')
-            ->will($this->returnValue($logo));
+            ->willReturn($logo);
 
         $this->assertEquals(
             $logo,
@@ -64,7 +54,7 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->themeRegistry->expects($this->once())
             ->method('getActiveTheme')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertEquals(
             '',
@@ -76,13 +66,13 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->themeRegistry->expects($this->once())
             ->method('getActiveTheme')
-            ->will($this->returnValue($this->theme));
+            ->willReturn($this->theme);
 
         $icon = 'icon.ico';
 
         $this->theme->expects($this->once())
             ->method('getIcon')
-            ->will($this->returnValue($icon));
+            ->willReturn($icon);
 
         $this->assertEquals(
             $icon,
@@ -94,7 +84,7 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->themeRegistry->expects($this->once())
             ->method('getActiveTheme')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertEquals(
             '',

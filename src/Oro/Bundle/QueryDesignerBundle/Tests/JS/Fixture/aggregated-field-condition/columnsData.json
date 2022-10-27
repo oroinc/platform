@@ -7,7 +7,7 @@
   },
   {
     "name":"id",
-    "label":"NUMBER OF LEADS",
+    "label":"Number of Leads",
     "func":{
       "name":"Count",
       "group_type":"aggregates",

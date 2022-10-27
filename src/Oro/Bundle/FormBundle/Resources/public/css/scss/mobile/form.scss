@@ -1,4 +1,52 @@
+/* @theme: admin.oro; */
+
 .section-content {
-    margin-top: 0;
-    padding-top: 0;
+    margin-top: $section-content-mobile-offset-top;
+    padding: $section-content-mobile-inner-offset;
+
+    .row-fluid {
+        margin: $row-fluid-mobile-inner-offset;
+    }
+}
+
+fieldset .span6 {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+.responsive-form-inner {
+    .input-append {
+        display: flex;
+        flex-grow: 1;
+    }
+
+    .float-holder {
+        width: calc(100% - 44px);
+        margin-right: $content-padding-small;
+    }
+
+    input[type='text']:not(.precision, .conversionRate),
+    input[type='email'],
+    input[type='password'] {
+        width: 100%;
+    }
+
+    .control-group-checkbox {
+        .controls {
+            right: auto;
+            left: 0;
+        }
+    }
+
+    .control-label.wrap {
+        + .controls {
+            /* stylelint-disable selector-max-compound-selectors, declaration-no-important */
+            > .input-widget-select,
+            > .input-widget-select span {
+                // Override js width setting
+                width: 100% !important;
+            }
+            /* stylelint-enable selector-max-compound-selectors, declaration-no-important */
+        }
+    }
 }

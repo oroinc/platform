@@ -7,12 +7,10 @@ use Oro\Bundle\EntityBundle\Form\DataTransformer\EntityFieldFallbackTransformer;
 
 class EntityFieldFallbackTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityFieldFallbackTransformer
-     */
-    protected $entityFieldFallbackTransformer;
+    /** @var EntityFieldFallbackTransformer */
+    private $entityFieldFallbackTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityFieldFallbackTransformer = new EntityFieldFallbackTransformer();
     }

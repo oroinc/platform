@@ -1,14 +1,24 @@
 oro:
+    user:
+        google_id.label: Google ID
+
     google_integration:
+        sso:
+            login_button.label: Log in with Google
         system_configuration:
                 groups:
                     google_settings.title: Google Settings
                     google_integration_settings.title: Google Integration Settings
                     google_integration_settings.tooltip: Please read <a href="https://support.google.com/cloud/answer/6158862?hl=en" target="_blank">instructions</a> for obtaining credentials. Make sure that your OroCRM domain is included into `Authorized JavaScript origins` and `Authorized redirect URIs`.
+                    google_sso_settings.title: Google Single Sign-On
                 fields:
-                    domains.label: Domains
-                    domains.tooltip: Comma separated list of allowed domains
-                    client_id:
-                        label: Client Id
+                    client_id.label: Client Id
                     client_secret.label: Client secret
                     google_api_key.label: Google API Key
+                    enable_sso.label: Enable
+                    enable_sso.tooltip: Select the option to enable Google single sign-on. Make sure that you fill the Google Integration settings to display the SSO button on the login form.
+                    sso_domains.label: Domains
+                    sso_domains.tooltip: A comma separated list of allowed domains. Leave the field empty to set no limitations.
+                    redirect_uri.label: Redirect URI
+                    redirect_uri.tooltip: Copy this value and add it to the trusted redirect URIs of your Google application.
+

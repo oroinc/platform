@@ -1,27 +1,29 @@
 define(function(require) {
     'use strict';
 
-    var WidgetPickerModal;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var routing = require('routing');
-    var mediator = require('oroui/js/mediator');
-    var Modal = require('oroui/js/modal');
-    var widgetPickerModalTemplate = require('text!oroui/templates/widget-picker/widget-picker-modal-template.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const routing = require('routing');
+    const mediator = require('oroui/js/mediator');
+    const Modal = require('oroui/js/modal');
+    const widgetPickerModalTemplate = require('tpl-loader!oroui/templates/widget-picker/widget-picker-modal-template.html');
 
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');
-    var WidgetPickerComponent = require('oroui/js/app/components/widget-picker-component');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');
+    const WidgetPickerComponent = require('oroui/js/app/components/widget-picker-component');
 
-    WidgetPickerModal = Modal.extend({
-        className: 'modal oro-modal-normal widget-picker__modal',
+    const WidgetPickerModal = Modal.extend({
+        className: 'modal oro-modal-normal widget-picker__modal  modal--fullscreen-small-device',
 
-        options: {
+        defaultOptions: {
             /**
              * @property {DashboardContainer}
              */
-            dashboard: null
+            dashboard: null,
+            content: widgetPickerModalTemplate(),
+            title: __('oro.dashboard.add_dashboard_widgets.title'),
+            cancelText: __('Close')
         },
 
         /**
@@ -30,37 +32,53 @@ define(function(require) {
         component: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function WidgetPickerModal() {
-            WidgetPickerModal.__super__.constructor.apply(this, arguments);
+        constructor: function WidgetPickerModal(options) {
+            WidgetPickerModal.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
-            options.content = _.template(widgetPickerModalTemplate)({});
-            options.title = __('oro.dashboard.add_dashboard_widgets.title');
-            options.cancelText = __('Close');
-            Modal.prototype.initialize.apply(this, arguments);
+            this.options = _.defaults(options || {}, this.defaultOptions);
+
+            WidgetPickerModal.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         open: function(cb) {
-            Modal.prototype.open.apply(this, arguments);
-            var widgetPickerCollection = new BaseCollection(
-                this.options.dashboard.getAvailableWidgets(),
-                {model: WidgetPickerModel}
-            );
-            this.component = new WidgetPickerComponent({
-                _sourceElement: this.$content,
-                collection: widgetPickerCollection,
-                loadWidget: _.bind(this.loadWidget, this)
-            });
+            WidgetPickerModal.__super__.open.call(this, cb);
+
+            if (!this.component) {
+                const widgetPickerCollection = new BaseCollection(
+                    this.options.dashboard.getAvailableWidgets(),
+                    {model: WidgetPickerModel}
+                );
+                this.component = new WidgetPickerComponent({
+                    _sourceElement: this.$content,
+                    collection: widgetPickerCollection,
+                    loadWidget: this.loadWidget.bind(this)
+                });
+            }
+
+            return this;
+        },
+
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            if (this.component) {
+                this.component.dispose();
+                this.component = null;
+            }
+
+            WidgetPickerModal.__super__.dispose.call(this);
         },
 
         /**

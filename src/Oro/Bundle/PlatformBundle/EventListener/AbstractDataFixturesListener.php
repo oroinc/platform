@@ -17,9 +17,6 @@ class AbstractDataFixturesListener
     /** @var array */
     protected $listeners = [];
 
-    /**
-     * @param OptionalListenerManager $listenerManager
-     */
     public function __construct(OptionalListenerManager $listenerManager)
     {
         $this->listenerManager = $listenerManager;
@@ -33,9 +30,6 @@ class AbstractDataFixturesListener
         $this->listeners[] = $listener;
     }
 
-    /**
-     * @param MigrationDataFixturesEvent $event
-     */
     public function onPreLoad(MigrationDataFixturesEvent $event)
     {
         $this->beforeDisableListeners($event);
@@ -43,23 +37,14 @@ class AbstractDataFixturesListener
         $this->afterDisableListeners($event);
     }
 
-    /**
-     * @param MigrationDataFixturesEvent $event
-     */
     protected function beforeDisableListeners(MigrationDataFixturesEvent $event)
     {
     }
 
-    /**
-     * @param MigrationDataFixturesEvent $event
-     */
     protected function afterDisableListeners(MigrationDataFixturesEvent $event)
     {
     }
 
-    /**
-     * @param MigrationDataFixturesEvent $event
-     */
     public function onPostLoad(MigrationDataFixturesEvent $event)
     {
         $this->beforeEnableListeners($event);
@@ -67,16 +52,10 @@ class AbstractDataFixturesListener
         $this->afterEnableListeners($event);
     }
 
-    /**
-     * @param MigrationDataFixturesEvent $event
-     */
     protected function beforeEnableListeners(MigrationDataFixturesEvent $event)
     {
     }
 
-    /**
-     * @param MigrationDataFixturesEvent $event
-     */
     protected function afterEnableListeners(MigrationDataFixturesEvent $event)
     {
     }

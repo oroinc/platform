@@ -2,16 +2,19 @@
 
 namespace Oro\Bundle\UserBundle\Dashboard;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Provides owner ids for the specified widget options.
+ */
 class OwnerHelper
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var TokenStorageInterface */
@@ -26,13 +29,8 @@ class OwnerHelper
     /** @var array */
     protected $ownerIds;
 
-    /**
-     * @param RegistryInterface          $registry
-     * @param TokenStorageInterface      $tokenStorage
-     * @param OwnerTreeProviderInterface $ownerTreeProvider
-     */
     public function __construct(
-        RegistryInterface $registry,
+        ManagerRegistry $registry,
         TokenStorageInterface $tokenStorage,
         OwnerTreeProviderInterface $ownerTreeProvider
     ) {
@@ -121,7 +119,6 @@ class OwnerHelper
         return $this->tokenStorage->getToken()->getUser();
     }
 
-
     /**
      * @param WidgetOptionBag $widgetOptions
      *
@@ -196,7 +193,7 @@ class OwnerHelper
         $qb = $this->registry->getRepository('OroUserBundle:User')
             ->createQueryBuilder('u')
             ->select('DISTINCT(u.id)')
-            ->join('u.roles', 'r');
+            ->join('u.userRoles', 'r');
         QueryBuilderUtil::applyOptimizedIn($qb, 'r.id', $roleIds);
 
         $result = array_map('current', $qb->getQuery()->getResult());

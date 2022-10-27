@@ -1,11 +1,12 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Functional\Transport\Dbal;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Test\DbalSchemaExtensionTrait;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalDestination;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
+use Oro\Component\MessageQueue\Transport\Queue;
 
 /**
  * @dbIsolationPerTest
@@ -14,7 +15,7 @@ class DbalMessageProducerTest extends WebTestCase
 {
     use DbalSchemaExtensionTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -23,14 +24,14 @@ class DbalMessageProducerTest extends WebTestCase
         $this->ensureTableExists('message_queue');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
         $this->dropTable('message_queue');
     }
 
-    public function testShouldCreateMessageInDb()
+    public function testShouldCreateMessageInDb(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -51,13 +52,13 @@ class DbalMessageProducerTest extends WebTestCase
         ]);
 
         // test
-        $producer->send(new DbalDestination('default'), $message);
+        $producer->send(new Queue('default'), $message);
 
         $messages = $dbal->executeQuery('SELECT * FROM message_queue')->fetchAll();
 
         $this->assertCount(1, $messages);
         $this->assertNotEmpty($messages[0]['id']);
-        $this->assertEquals('body', $messages[0]['body']);
+        $this->assertEquals('"body"', $messages[0]['body']);
         $this->assertEquals('{"hkey":"hvalue"}', $messages[0]['headers']);
         $this->assertEquals('{"pkey":"pvalue"}', $messages[0]['properties']);
         $this->assertNull($messages[0]['consumer_id']);
@@ -65,7 +66,7 @@ class DbalMessageProducerTest extends WebTestCase
         $this->assertEquals(0, $messages[0]['priority']);
     }
 
-    public function testCouldSetMessagePriority()
+    public function testCouldSetMessagePriority(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -80,14 +81,14 @@ class DbalMessageProducerTest extends WebTestCase
         $message = new DbalMessage();
         $message->setPriority(5);
 
-        $producer->send(new DbalDestination('default'), $message);
+        $producer->send(new Queue('default'), $message);
 
         $messages = $dbal->executeQuery('SELECT * FROM message_queue')->fetchAll();
         $this->assertCount(1, $messages);
         $this->assertEquals(5, $messages[0]['priority']);
 
         $message->setPriority(10);
-        $producer->send(new DbalDestination('default'), $message);
+        $producer->send(new Queue('default'), $message);
 
         $messages = $dbal->executeQuery('SELECT * FROM message_queue ORDER BY id ASC')->fetchAll();
         $this->assertCount(2, $messages);

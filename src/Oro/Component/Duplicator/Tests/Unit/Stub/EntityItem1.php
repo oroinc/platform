@@ -21,9 +21,6 @@ class EntityItem1
         $this->items = new ArrayCollection();
     }
 
-    /**
-     * @param EntityItem2 $item
-     */
     public function addItem(EntityItem2 $item)
     {
         $this->items->add($item);

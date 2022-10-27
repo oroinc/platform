@@ -3,13 +3,12 @@ define([
 ], function(Backbone) {
     'use strict';
 
-    var AddressRegionModel;
     /**
      * @export  oroaddress/js/region/model
      * @class   oroaddress.region.Model
      * @extends Backbone.Model
      */
-    AddressRegionModel = Backbone.Model.extend({
+    const AddressRegionModel = Backbone.Model.extend({
         defaults: {
             country: '',
             code: '',
@@ -17,10 +16,10 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AddressRegionModel() {
-            AddressRegionModel.__super__.constructor.apply(this, arguments);
+        constructor: function AddressRegionModel(attrs, options) {
+            AddressRegionModel.__super__.constructor.call(this, attrs, options);
         }
     });
 

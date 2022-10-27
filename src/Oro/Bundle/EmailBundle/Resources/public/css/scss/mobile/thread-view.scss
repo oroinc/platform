@@ -1,73 +1,17 @@
 /* @theme: admin.oro; */
 
 .thread-view {
-    padding-left: 0;
+    .email-actions-items {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
 
-    .email-info,
-    .email-load-more {
-        margin: 0;
-    }
+        .btn-group {
+            margin-left: $email-actions-btn-group-mobile-offset;
+            margin-bottom: $email-actions-btn-group-mobile-offset;
 
-    .email-info {
-        .responsive-cell {
-            padding: 0;
-        }
-
-        .email-participants {
-            margin-right: 100px;
-        }
-
-        .email-actions {
-            margin: 16px -15px -5px 0;
-
-            .btn-group {
-                margin-bottom: 5px;
-                margin-right: 5px;
-
-                & + .btn-group {
-                    margin-left: 0;
-                }
-            }
-        }
-
-        .email-full {
-            .email-sent-date {
-                padding: 0;
-                height: 18px;
-                font-size: 12px;
-                color: #888;
-            }
-        }
-
-        .email-view-toggle {
-            padding: $content-padding;
-        }
-
-        .email-content {
-            padding: 0 $content-padding $content-padding;
-        }
-
-        &:only-child {
-            .email-view-toggle {
-                padding: 0 0 10px;
-            }
-
-            .email-content {
-                padding: 0;
-            }
-        }
-    }
-
-    .email-detailed-info-table {
-        .dropdown-menu {
-            padding: 0 $content-padding;
-        }
-
-        .control-group:last-child {
-            margin-bottom: 0;
-
-            .controls {
-                margin-bottom: 0;
+            &:first-child {
+                margin-left: $email-actions-btn-group-first-mobile-offset;
             }
         }
     }

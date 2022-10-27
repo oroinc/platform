@@ -1,12 +1,13 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var template = require('tpl!orofilter/templates/filter/filter-hint.html');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var module = require('module');
-    var FilterTemplate = require('orofilter/js/filter-template');
-    var config = module.config();
+    const template = require('tpl-loader!orofilter/templates/filter/filter-hint.html');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    let config = require('module-config').default(module.id);
+    const FilterTemplate = require('orofilter/js/filter-template');
+
     config = _.extend({
         inline: true,
         selectors: {
@@ -18,9 +19,7 @@ define(function(require) {
         }
     }, config);
 
-    var FilterHint;
-
-    FilterHint = BaseView.extend(_.extend({}, FilterTemplate, {
+    const FilterHint = BaseView.extend(_.extend({}, FilterTemplate, {
         /**
          * @property
          */
@@ -59,39 +58,46 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function FilterHint() {
-            FilterHint.__super__.constructor.apply(this, arguments);
+        constructor: function FilterHint(options) {
+            FilterHint.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'filter');
-            _.extend(this, opts);
-
+            if (!options.filter) {
+                throw new Error('Required option filter not found.');
+            }
+            this.filter = options.filter;
+            this.selectors = {...this.selectors, ...options.selectors};
             this.templateTheme = this.filter.templateTheme;
             this.label = this.filter.label;
             this.hint = this.filter._getCriteriaHint();
 
             this._defineTemplate();
 
-            FilterHint.__super__.initialize.apply(this, arguments);
+            this.listenTo(this.filter, 'rendered', this.render);
+
+            FilterHint.__super__.initialize.call(this, options);
         },
 
         render: function() {
+            // Avoid duplicate HTML
+            if (document.contains(this.el)) {
+                this.el.remove();
+            }
+
             this.setElement(this.template({
                 label: this.inline ? null : this.label,
                 allowClear: this.filter.allowClear
             }));
 
-            if (this.filter.selectWidget) {
-                this.filter.selectWidget.multiselect('getButton').hide();
-            }
-
-            if (this.inline) {
+            if (this.filter.outerHintContainer) {
+                $(this.filter.outerHintContainer).find(this.selectors.itemsHint).prepend(this.$el);
+            } else if (this.inline) {
                 this.filter.$el.find(this.selectors.itemHint).append(this.$el);
             } else {
                 this.filter.$el.closest(this.selectors.filters).find(this.selectors.itemsHint)

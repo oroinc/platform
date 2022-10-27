@@ -1,15 +1,15 @@
 Oro\Bundle\NotificationBundle\Entity\EmailNotification:
     properties:
-        event:
+        eventName:
             - NotBlank: ~
         template:
             - NotBlank: ~
         entityName:
             - NotBlank: ~
+        recipientList:
+            - Oro\Bundle\NotificationBundle\Validator\Constraints\RecipientListNotEmpty: ~
 
 Oro\Bundle\NotificationBundle\Entity\RecipientList:
     properties:
         email:
             - Email: ~
-    constraints:
-        - Callback: isValid

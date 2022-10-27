@@ -2,32 +2,34 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entitiesWithWorkflowCache;
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $entitiesWithWorkflowCache;
 
     /** @var WorkflowVirtualRelationProvider */
-    protected $provider;
+    private $provider;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->entitiesWithWorkflowCache = $this->createMock(Cache::class);
+        $this->entitiesWithWorkflowCache = $this->createMock(CacheInterface::class);
 
         $this->provider = new WorkflowVirtualRelationProvider(
             $this->doctrineHelper,
@@ -35,10 +37,10 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // testIsVirtualRelation
     public function testIsVirtualRelationAndUnknownRelationFieldName()
     {
-        $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
+        $this->doctrineHelper->expects($this->never())
+            ->method('getSingleEntityIdentifierFieldName');
         $this->entitiesWithWorkflowCache->expects($this->never())
             ->method($this->anything());
 
@@ -47,10 +49,11 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsVirtualRelationAndNoApplicableWorkflows()
     {
-        $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
+        $this->doctrineHelper->expects($this->never())
+            ->method('getSingleEntityIdentifierFieldName');
 
         $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
             ->willReturn([]);
 
@@ -61,11 +64,11 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider fieldDataProvider
-     * @param string $field
      */
-    public function testIsVirtualRelationAndKnownRelation($field)
+    public function testIsVirtualRelationAndKnownRelation(string $field)
     {
-        $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
+        $this->doctrineHelper->expects($this->never())
+            ->method('getSingleEntityIdentifierFieldName');
 
         $class = 'stdClass';
         $this->assertGetEntitiesWithoutCacheCall($class);
@@ -73,10 +76,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->provider->isVirtualRelation($class, $field));
     }
 
-    /**
-     * @return array
-     */
-    public function fieldDataProvider()
+    public function fieldDataProvider(): array
     {
         return [
             'item' => [WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME],
@@ -86,10 +86,11 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetVirtualRelationsAndNoApplicableWorkflows()
     {
-        $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
+        $this->doctrineHelper->expects($this->never())
+            ->method('getSingleEntityIdentifierFieldName');
 
         $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
             ->willReturn([]);
 
@@ -98,10 +99,11 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetVirtualRelationsCachedEntitiesWithWorkflows()
     {
-        $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
+        $this->doctrineHelper->expects($this->never())
+            ->method('getSingleEntityIdentifierFieldName');
 
         $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
             ->willReturn(['stdClass' => true]);
 
@@ -110,12 +112,12 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
                 WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME => [
                     'label' => 'oro.workflow.workflowitem.entity_label',
                     'relation_type' => 'OneToMany',
-                    'related_entity_name' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
+                    'related_entity_name' => WorkflowItem::class,
                 ],
                 WorkflowVirtualRelationProvider::STEPS_RELATION_NAME => [
                     'label' => 'oro.workflow.workflowstep.entity_label',
                     'relation_type' => 'OneToMany',
-                    'related_entity_name' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowStep',
+                    'related_entity_name' => WorkflowStep::class,
                 ],
             ],
             $this->provider->getVirtualRelations('stdClass')
@@ -126,7 +128,8 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'stdClass';
 
-        $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
+        $this->doctrineHelper->expects($this->never())
+            ->method('getSingleEntityIdentifierFieldName');
         $this->assertGetEntitiesWithoutCacheCall($className);
 
         $this->assertEquals(
@@ -134,22 +137,22 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
                 WorkflowVirtualRelationProvider::ITEMS_RELATION_NAME => [
                     'label' => 'oro.workflow.workflowitem.entity_label',
                     'relation_type' => 'OneToMany',
-                    'related_entity_name' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowItem',
+                    'related_entity_name' => WorkflowItem::class,
                 ],
                 WorkflowVirtualRelationProvider::STEPS_RELATION_NAME => [
                     'label' => 'oro.workflow.workflowstep.entity_label',
                     'relation_type' => 'OneToMany',
-                    'related_entity_name' => 'Oro\Bundle\WorkflowBundle\Entity\WorkflowStep',
+                    'related_entity_name' => WorkflowStep::class,
                 ],
             ],
             $this->provider->getVirtualRelations('stdClass')
         );
     }
 
-    // testGetVirtualRelationsQuery
     public function testGetVirtualRelationQueryAndNoApplicableWorkflows()
     {
-        $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
+        $this->doctrineHelper->expects($this->never())
+            ->method('getSingleEntityIdentifierFieldName');
 
         $this->assertGetEntitiesWithoutCacheCall();
 
@@ -161,7 +164,8 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetVirtualRelationQueryAndUnknownRelationFieldName()
     {
-        $this->doctrineHelper->expects($this->never())->method('getSingleEntityIdentifierFieldName');
+        $this->doctrineHelper->expects($this->never())
+            ->method('getSingleEntityIdentifierFieldName');
         $this->entitiesWithWorkflowCache->expects($this->never())
             ->method($this->anything());
 
@@ -176,7 +180,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn('id');
 
         $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
             ->willReturn(['stdClass' => true]);
 
@@ -212,10 +216,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('virtual_relation', $this->provider->getTargetJoinAlias('', 'virtual_relation'));
     }
 
-    /**
-     * @param string|null $class
-     */
-    private function assertGetEntitiesWithoutCacheCall($class = null)
+    private function assertGetEntitiesWithoutCacheCall(string $class = null): void
     {
         $classes = [];
         $expectedClasses = [];
@@ -223,7 +224,6 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
             $classes[] = $class;
             $expectedClasses[$class] = true;
         }
-        /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject $repo */
         $repo = $this->createMock(WorkflowDefinitionRepository::class);
         $repo->expects($this->once())
             ->method('getAllRelatedEntityClasses')
@@ -236,11 +236,11 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($repo);
 
         $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW)
-            ->willReturn(false);
-        $this->entitiesWithWorkflowCache->expects($this->once())
-            ->method('save')
-            ->with(WorkflowVirtualRelationProvider::ENTITIES_WITH_WORKFLOW, $expectedClasses);
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
     }
 }

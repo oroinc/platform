@@ -4,19 +4,22 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 
+/**
+ * Helps to determine whether an to-many association attribute type is localizable.
+ */
 trait AttributeLocalizableTrait
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /**
-     * @param FieldConfigModel|null $attribute
+     * @param FieldConfigModel $attribute
      *
      * @return bool
      */
-    protected function isAttributeLocalizable(FieldConfigModel $attribute = null)
+    protected function isAttributeLocalizable(FieldConfigModel $attribute)
     {
         if (!$attribute) {
             return false;
@@ -24,7 +27,7 @@ trait AttributeLocalizableTrait
 
         $config = $attribute->toArray('extend');
         if (isset($config['target_entity'])) {
-            return is_a($config['target_entity'], LocalizedFallbackValue::class, true);
+            return is_a($config['target_entity'], AbstractLocalizedFallbackValue::class, true);
         }
 
         $fieldName = $attribute->getFieldName();
@@ -35,7 +38,7 @@ trait AttributeLocalizableTrait
 
         $mapping = $metadata->getAssociationMapping($fieldName);
         if (isset($mapping['targetEntity'])) {
-            return is_a($mapping['targetEntity'], LocalizedFallbackValue::class, true);
+            return is_a($mapping['targetEntity'], AbstractLocalizedFallbackValue::class, true);
         }
 
         return false;

@@ -2,8 +2,6 @@
 
 .zoomable-area {
     cursor: move;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
     position: relative; /* required for valid controls positioning */
 
     .zoom-controls {
@@ -19,16 +17,40 @@
             vertical-align: middle;
         }
 
-        [class^="fa-"] {
+        [class^='fa-'] {
             font-size: $zoomable-area-zoom-controls-icon-font-size;
+        }
+    }
+
+    .zoom-scroll-hint {
+        display: flex;
+
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        background-color: $zoomable-area-dimmed-background-color;
+
+        pointer-events: none;
+        align-items: center;
+
+        > div {
+            margin: 0 auto;
+            padding: $content-padding-small;
+
+            font-size: $base-font-size--m;
+            background-color: $zoomable-area-dimmed-background-color;
+            text-align: center;
         }
     }
 }
 
-.fa-search-plus:before {
+.fa-search-plus::before {
     content: $fa-var-search-plus;
 }
 
-.fa-search-minus:before {
+.fa-search-minus::before {
     content: $fa-var-search-minus;
 }

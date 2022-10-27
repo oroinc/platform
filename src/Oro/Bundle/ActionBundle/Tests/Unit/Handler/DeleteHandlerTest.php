@@ -3,66 +3,37 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Handler;
 
 use Oro\Bundle\ActionBundle\Handler\DeleteHandler;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\SoapBundle\Handler\DeleteHandler as BaseDeleteHandler;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
+use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface;
+use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 
 class DeleteHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BaseDeleteHandler|\PHPUnit\Framework\MockObject\MockObject */
-    protected $deleteHandler;
-
-    /** @var ApiEntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $apiEntityManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var EntityDeleteHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $deleteHandlerRegistry;
 
     /** @var DeleteHandler */
-    protected $handler;
+    private $handler;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->deleteHandler = $this->getMockBuilder('Oro\Bundle\SoapBundle\Handler\DeleteHandler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->deleteHandlerRegistry = $this->createMock(EntityDeleteHandlerRegistry::class);
 
-        $this->apiEntityManager = $this->getMockBuilder('Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->handler = new DeleteHandler($this->deleteHandler, $this->apiEntityManager, $this->doctrineHelper);
+        $this->handler = new DeleteHandler($this->deleteHandlerRegistry);
     }
 
     public function testHandleDelete()
     {
-        $entity = 'TestEntity';
-        $id = '123';
+        $entity = new TestEntity1();
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')
-            ->with($entity)
-            ->willReturn($entity);
-
-        $this->apiEntityManager->expects($this->once())
-            ->method('setClass')
-            ->with($entity);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityIdentifier')
-            ->with($entity)
-            ->willReturn($id);
-
-        $this->deleteHandler->expects($this->once())
-            ->method('handleDelete')
-            ->with($id, $this->apiEntityManager);
+        $deleteHandler = $this->createMock(EntityDeleteHandlerInterface::class);
+        $this->deleteHandlerRegistry->expects($this->once())
+            ->method('getHandler')
+            ->with(get_class($entity))
+            ->willReturn($deleteHandler);
+        $deleteHandler->expects($this->once())
+            ->method('delete')
+            ->with($this->identicalTo($entity));
 
         $this->handler->handleDelete($entity);
     }

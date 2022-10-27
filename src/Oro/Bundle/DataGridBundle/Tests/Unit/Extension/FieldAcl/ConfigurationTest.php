@@ -3,33 +3,38 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\FieldAcl;
 
 use Oro\Bundle\DataGridBundle\Extension\FieldAcl\Configuration;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    protected $configuration;
+    /** @var Configuration */
+    private $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = new Configuration();
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Unrecognized option "a" under "fields_acl"
-     */
+    private function validateConfiguration(Configuration $configuration, array $config): array
+    {
+        return (new Processor())->processConfiguration($configuration, $config);
+    }
+
     public function testValidateWrongArrayData()
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Unrecognized option "a" under "fields_acl"');
+
         $config = ['fields_acl' => ['a' => 'b']];
         $this->validateConfiguration($this->configuration, $config);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Invalid type for path "fields_acl
-     */
     public function testValidateWrongNonArrayData()
     {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid type for path "fields_acl');
+
         $config = ['fields_acl' => 's'];
         $this->validateConfiguration($this->configuration, $config);
     }
@@ -62,23 +67,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             $resultConfig
-        );
-    }
-
-    /**
-     * Validate configuration
-     *
-     * @param Configuration $configuration
-     * @param               $config
-     *
-     * @return array
-     */
-    protected function validateConfiguration(Configuration $configuration, $config)
-    {
-        $processor = new Processor();
-        return $processor->processConfiguration(
-            $configuration,
-            $config
         );
     }
 }

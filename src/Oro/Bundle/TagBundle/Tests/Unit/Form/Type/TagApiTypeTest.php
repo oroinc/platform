@@ -2,29 +2,24 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Oro\Bundle\TagBundle\Form\Type\TagApiType;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TagApiTypeTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TagApiType */
+    private $type;
 
-    /**
-     * @var TagApiType
-     */
-    protected $type;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new TagApiType();
     }
 
-    protected function tearDown()
-    {
-        unset($this->type);
-    }
-
     public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
@@ -34,17 +29,15 @@ class TagApiTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $builder->expects($this->once())
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'));
+            ->with($this->isInstanceOf(PatchSubscriber::class));
 
-        $this->type->buildForm($builder, array());
+        $this->type->buildForm($builder, []);
     }
 }

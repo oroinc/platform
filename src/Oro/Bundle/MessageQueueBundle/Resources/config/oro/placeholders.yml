@@ -5,5 +5,5 @@ placeholders:
                 oro_message_queue_consumer_heartbeat: ~
     items:
         oro_message_queue_consumer_heartbeat:
-            template: OroMessageQueueBundle:ConsumerHeartbeat:queue_consumer_heartbeat_js.html.twig
+            template: '@@OroMessageQueue/ConsumerHeartbeat/queue_consumer_heartbeat_js.html.twig'
 

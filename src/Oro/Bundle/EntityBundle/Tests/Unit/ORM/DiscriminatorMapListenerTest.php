@@ -10,19 +10,18 @@ use Oro\Bundle\EntityBundle\ORM\DiscriminatorMapListener;
 class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DiscriminatorMapListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new DiscriminatorMapListener();
     }
 
     public function testEmptyClasses()
     {
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock(EntityManagerInterface::class);
 
-        $metadata = new ClassMetadata('\stdClass');
+        $metadata = new ClassMetadata(\stdClass::class);
         $event = new LoadClassMetadataEventArgs($metadata, $em);
 
         $this->listener->loadClassMetadata($event);
@@ -32,13 +31,12 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testNotSingleTable()
     {
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock(EntityManagerInterface::class);
 
-        $metadata = new ClassMetadata('\stdClass');
+        $metadata = new ClassMetadata(\stdClass::class);
         $event = new LoadClassMetadataEventArgs($metadata, $em);
 
-        $this->listener->addClass('key', '\stdClass');
+        $this->listener->addClass('key', \stdClass::class);
         $this->listener->loadClassMetadata($event);
 
         $this->assertEmpty($metadata->discriminatorMap);
@@ -46,15 +44,14 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testSingleTableNotRoot()
     {
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock(EntityManagerInterface::class);
 
-        $metadata = new ClassMetadata('\stdClass');
+        $metadata = new ClassMetadata(\stdClass::class);
         $metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
         $metadata->rootEntityName = '\stdClass2';
         $event = new LoadClassMetadataEventArgs($metadata, $em);
 
-        $this->listener->addClass('key', '\stdClass');
+        $this->listener->addClass('key', \stdClass::class);
         $this->listener->loadClassMetadata($event);
 
         $this->assertEmpty($metadata->discriminatorMap);
@@ -62,14 +59,13 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testSingleTableRoot()
     {
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock(EntityManagerInterface::class);
 
-        $metadata = new ClassMetadata('\stdClass');
+        $metadata = new ClassMetadata(\stdClass::class);
         $metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
         $event = new LoadClassMetadataEventArgs($metadata, $em);
 
-        $this->listener->addClass('key', '\stdClass');
+        $this->listener->addClass('key', \stdClass::class);
         $this->listener->loadClassMetadata($event);
 
         $this->assertEquals(['key' => 'stdClass'], $metadata->discriminatorMap);
@@ -77,10 +73,9 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testMapOverride()
     {
-        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
+        $em = $this->createMock(EntityManagerInterface::class);
 
-        $metadata = new ClassMetadata('\stdClass');
+        $metadata = new ClassMetadata(\stdClass::class);
         $metadata->inheritanceType = ClassMetadata::INHERITANCE_TYPE_SINGLE_TABLE;
         $metadata->discriminatorMap = [
             'key' => 'class',
@@ -88,7 +83,7 @@ class DiscriminatorMapListenerTest extends \PHPUnit\Framework\TestCase
         ];
         $event = new LoadClassMetadataEventArgs($metadata, $em);
 
-        $this->listener->addClass('key', '\stdClass');
+        $this->listener->addClass('key', \stdClass::class);
         $this->listener->loadClassMetadata($event);
 
         $this->assertEquals(['key' => 'stdClass', 'other' => 'second'], $metadata->discriminatorMap);

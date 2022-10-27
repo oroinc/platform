@@ -1,0 +1,12 @@
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
+{% import '@OroUI/macros.html.twig' as UI %}
+
+{% set dynamicField = oro_get_dynamic_field(entity, field) %}
+{% if dynamicField %}
+    {{ entityConfig.formatDynamicFieldValue(
+        entity,
+        field.entity.className,
+        field.fieldName,
+        dynamicField
+    ) }}
+{% endif %}

@@ -5,76 +5,62 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Validator;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\UserGridFieldValidator;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class UserGridFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
+
     /** @var UserGridFieldValidator */
-    protected $validator;
+    private $validator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $this->validator = new UserGridFieldValidator($this->tokenAccessor);
+        $this->validator = new UserGridFieldValidator($this->tokenAccessor, new PropertyAccessor());
     }
 
-    /**
-     * @dataProvider hasAccessEditFiledDataProvider
-     *
-     * @param int    $currentUserId
-     * @param int    $userId
-     * @param string $fieldName
-     * @param bool   $result
-     */
-    public function testHasAccessEditField($currentUserId, $userId, $fieldName, $result)
+    public function testHasAccessEditFieldWhenValidatedUserIsCurrentUserAndFieldIsInBlackList()
     {
-        $currentUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->setMethods(['getId'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        if ('enabled' === $fieldName) {
-            $currentUser->expects(self::once())->method('getId')->willReturn($currentUserId);
-        }
-
-        $this->tokenAccessor->expects(self::once())->method('getUser')->willReturn($currentUser);
+        $currentUser = new User();
+        $currentUser->setId(1);
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($currentUser);
 
         $entity = new User();
-        $entity->setId($userId);
+        $entity->setId(1);
 
-        self::assertEquals(
-            $this->validator->hasAccessEditField($entity, $fieldName),
-            $result
-        );
+        self::assertFalse($this->validator->hasAccessEditField($entity, 'enabled'));
     }
 
-    /**
-     * @return array
-     */
-    public function hasAccessEditFiledDataProvider()
+    public function testHasAccessEditFieldWhenValidatedUserIsCurrentUserAndFieldIsNotInBlackList()
     {
-        return [
-            'field is in black list and user is current user' => [
-                'currentUserId' => 1,
-                'userId'        => 1,
-                'fieldName'     => 'enabled',
-                'result'        => false
-            ],
-            'user is not current user'                        => [
-                'currentUserId' => 1,
-                'userId'        => 2,
-                'fieldName'     => 'enabled',
-                'result'        => true
-            ],
-            'field is not in black list user is current user' => [
-                'currentUserId' => 1,
-                'userId'        => 1,
-                'fieldName'     => 'email',
-                'result'        => true
-            ],
-        ];
+        $currentUser = new User();
+        $currentUser->setId(1);
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($currentUser);
+
+        $entity = new User();
+        $entity->setId(1);
+
+        self::assertTrue($this->validator->hasAccessEditField($entity, 'email'));
+    }
+
+    public function testHasAccessEditFieldWhenValidatedUserIsNotCurrentUser()
+    {
+        $currentUser = new User();
+        $currentUser->setId(1);
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($currentUser);
+
+        $entity = new User();
+        $entity->setId(2);
+
+        self::assertTrue($this->validator->hasAccessEditField($entity, 'enabled'));
     }
 }

@@ -3,19 +3,23 @@
 namespace Oro\Bundle\ImapBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+use Laminas\Mail\Protocol\Exception\RuntimeException;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
+use Oro\Bundle\EmailBundle\Exception\SyncWithNotificationAlertException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
+use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -23,35 +27,27 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
  */
 class ImapEmailBodyLoader implements EmailBodyLoaderInterface
 {
-    /**
-     * @var ImapConnectorFactory
-     */
+    /** @var ImapConnectorFactory */
     protected $connectorFactory;
 
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var ImapEmailGoogleOauth2Manager */
-    protected $imapEmailGoogleOauth2Manager;
+    /** @var OAuthManagerRegistry */
+    protected $oauthManagerRegistry;
 
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ImapConnectorFactory $connectorFactory
-     * @param SymmetricCrypterInterface $encryptor
-     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager,
+        OAuthManagerRegistry $oauthManagerRegistry,
         ConfigManager $configManager
     ) {
         $this->connectorFactory = $connectorFactory;
         $this->encryptor = $encryptor;
-        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
         $this->configManager = $configManager;
     }
 
@@ -70,6 +66,9 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     {
         /** @var UserEmailOrigin $origin */
         $origin = $folder->getOrigin();
+        $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
+            ? $this->oauthManagerRegistry->getManager($origin->getAccountType())
+            : null;
 
         $config = new ImapConfig(
             $origin->getImapHost(),
@@ -77,13 +76,33 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
             $origin->getImapEncryption(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword()),
-            $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
+            $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null
         );
 
-        $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
-        $manager->selectFolder($folder->getFullName());
+        try {
+            $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
+            $manager->selectFolder($folder->getFullName());
+        } catch (UnselectableFolderException $e) {
+            throw new SyncWithNotificationAlertException(
+                EmailSyncNotificationAlert::createForSwitchFolderFail(
+                    sprintf('The folder "%s" cannot be selected.', $folder->getFullName()),
+                ),
+                $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        } catch (RuntimeException $e) {
+            throw new SyncWithNotificationAlertException(
+                EmailSyncNotificationAlert::createForSwitchFolderFail(
+                    'Cannot connect to the IMAP server. Exception message:' . $e->getMessage()
+                ),
+                $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
 
-        $repo = $em->getRepository('OroImapBundle:ImapEmail');
+        $repo = $em->getRepository(ImapEmail::class);
         $query = $repo->createQueryBuilder('e')
             ->select('e.uid')
             ->innerJoin('e.imapFolder', 'if')

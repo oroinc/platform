@@ -4,7 +4,7 @@ namespace Oro\Component\Action\Tests\Unit\Action\Stub;
 
 class TestService
 {
-    const TEST_METHOD_RESULT = 'test_method_result';
+    public const TEST_METHOD_RESULT = 'test_method_result';
 
     /**
      * @param mixed $value

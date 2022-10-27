@@ -2,12 +2,34 @@
 
 namespace Oro\Bundle\OrganizationBundle\Filter;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * The filter by business unit for User entity.
+ */
 class BusinessUnitChoiceFilter extends ChoiceTreeFilter
 {
+    /** @var ManagerRegistry */
+    private $doctrine;
+
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util,
+        RouterInterface $router,
+        EventDispatcherInterface $eventDispatcher,
+        ManagerRegistry $doctrine
+    ) {
+        parent::__construct($factory, $util, $router, $eventDispatcher);
+        $this->doctrine = $doctrine;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -18,11 +40,10 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
             return false;
         }
 
-        $type = $data['type'];
-        if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != "")) {
+        if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != '')) {
             $parameterName = $ds->generateParameterName($this->getName());
 
-            $qb2 = $this->registry->getManager()->getRepository('Oro\Bundle\UserBundle\Entity\User')
+            $dql = $this->doctrine->getManager()->getRepository(User::class)
                 ->createQueryBuilder('u')
                 ->select('u.id')
                 ->leftJoin('u.businessUnits', 'bu')
@@ -32,10 +53,10 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
 
             $this->applyFilterToClause(
                 $ds,
-                $this->get(FilterUtility::DATA_NAME_KEY) . ' in (' . $qb2 . ')'
+                $this->get(FilterUtility::DATA_NAME_KEY) . ' in (' . $dql . ')'
             );
 
-            if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+            if ($this->isValueRequired($data['type'])) {
                 $ds->setParameter($parameterName, $data['value']);
             }
         }
@@ -55,14 +76,5 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
         }
 
         return $metadata;
-    }
-    /**
-     * {@inheritDoc}
-     */
-    public function parseData($data)
-    {
-        $data['value'] = explode(',', $data['value']);
-
-        return $data;
     }
 }

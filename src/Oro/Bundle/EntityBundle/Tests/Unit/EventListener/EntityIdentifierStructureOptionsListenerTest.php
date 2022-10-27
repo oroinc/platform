@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\EventListener\EntityIdentifierStructureOptionsListener;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
@@ -17,15 +17,12 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
     use EntityTrait;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $managerRegistry;
+    private $managerRegistry;
 
     /** @var EntityIdentifierStructureOptionsListener */
-    protected $listener;
+    private $listener;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
 
@@ -70,8 +67,8 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
                         [
                             'name' => 'field1',
                             'options' => [
-                                EntityIdentifierStructureOptionsListener::OPTION_NAME => true,
-                            ],
+                                'identifier' => true
+                            ]
                         ]
                     )
                 ]
@@ -84,19 +81,6 @@ class EntityIdentifierStructureOptionsListenerTest extends \PHPUnit\Framework\Te
         $this->listener->onOptionsRequest($event);
 
         $this->assertEquals([$expectedEntityStructure], $event->getData());
-    }
-
-    public function testOnOptionsRequestUnsupported()
-    {
-        $this->managerRegistry->expects($this->never())
-            ->method($this->anything());
-
-        $event = new EntityStructureOptionsEvent();
-        $event->setData([new \stdClass()]);
-
-        $this->listener->onOptionsRequest($event);
-
-        $this->assertEquals([new \stdClass()], $event->getData());
     }
 
     public function testOnOptionsRequestWithoutObjectManager()

@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Helper;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 
 class WorkflowAwareEntityFetcherTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowDefinitions::class]);
@@ -47,29 +47,16 @@ class WorkflowAwareEntityFetcherTest extends WebTestCase
         );
     }
 
-    /**
-     * @param string $name
-     * @return WorkflowAwareEntity
-     */
-    protected function createWorkflowAwareEntity($name)
+    private function createWorkflowAwareEntity(string $name): WorkflowAwareEntity
     {
-        $manager = $this->getObjectManager(WorkflowAwareEntity::class);
-
         $obj = new WorkflowAwareEntity();
         $obj->setName($name);
 
-        $manager->persist($obj);
-        $manager->flush();
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(WorkflowAwareEntity::class);
+        $em->persist($obj);
+        $em->flush();
 
         return $obj;
-    }
-
-    /**
-     * @param string $className
-     * @return ObjectManager
-     */
-    protected function getObjectManager($className)
-    {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
     }
 }

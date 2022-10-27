@@ -9,16 +9,16 @@ use Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider;
 
 class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActionPermissionProvider */
-    protected $provider;
-
     /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    private $featureChecker;
 
     /** @var ConfigurationChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configurationChecker;
+    private $configurationChecker;
 
-    protected function setUp()
+    /** @var ActionPermissionProvider */
+    private $provider;
+
+    protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);
         $this->configurationChecker = $this->createMock(ConfigurationChecker::class);
@@ -28,50 +28,45 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getWorkflowDefinitionPermissionsDataProvider
-     *
-     * @param array $expected
-     * @param ResultRecordInterface $input
-     * @param bool $featureEnabled
-     * @param bool $configurationClean
      */
     public function testGetWorkflowDefinitionPermissionsSystemRelated(
         array $expected,
         ResultRecordInterface $input,
-        $featureEnabled,
-        $configurationClean
+        bool $featureEnabled,
+        bool $configurationClean
     ) {
-        $this->featureChecker->expects($this->any())->method('isResourceEnabled')->willReturn($featureEnabled);
-        $this->configurationChecker->expects($this->any())->method('isClean')->willReturn($configurationClean);
+        $this->featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturn($featureEnabled);
+        $this->configurationChecker->expects($this->any())
+            ->method('isClean')
+            ->willReturn($configurationClean);
 
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function getWorkflowDefinitionPermissionsDataProvider()
+    public function getWorkflowDefinitionPermissionsDataProvider(): array
     {
         $systemDefinition = $this->createMock(ResultRecordInterface::class);
         $systemDefinition->expects($this->any())
             ->method('getValue')
-            ->willReturnMap(
-                [
-                    ['system', true],
-                    ['configuration', []],
-                ]
-            );
+            ->willReturnMap([
+                ['name', 'test'],
+                ['system', true],
+                ['configuration', []],
+            ]);
 
         $regularDefinition = $this->createMock(ResultRecordInterface::class);
         $regularDefinition->expects($this->any())
             ->method('getValue')
-            ->willReturnMap(
-                [
-                    ['system', false],
-                    ['configuration', []],
-                ]
-            );
+            ->willReturnMap([
+                ['name', 'test'],
+                ['system', false],
+                ['configuration', []],
+            ]);
 
         return [
             'system definition' => [
@@ -183,30 +178,27 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getWorkflowDefinitionActivationDataProvider
-     *
-     * @param array $expected
-     * @param ResultRecordInterface $input
-     * @param bool $featureEnabled
-     * @param bool $configurationClean
      */
     public function testGetWorkflowDefinitionPermissionsActivationRelated(
         array $expected,
         ResultRecordInterface $input,
-        $featureEnabled,
-        $configurationClean
+        bool $featureEnabled,
+        bool $configurationClean
     ) {
-        $this->featureChecker->expects($this->any())->method('isResourceEnabled')->willReturn($featureEnabled);
-        $this->configurationChecker->expects($this->any())->method('isClean')->willReturn($configurationClean);
+        $this->featureChecker->expects($this->any())
+            ->method('isResourceEnabled')
+            ->willReturn($featureEnabled);
+        $this->configurationChecker->expects($this->any())
+            ->method('isClean')
+            ->willReturn($configurationClean);
 
         $this->assertEquals($expected, $this->provider->getWorkflowDefinitionPermissions($input));
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function getWorkflowDefinitionActivationDataProvider()
+    public function getWorkflowDefinitionActivationDataProvider(): array
     {
         return [
             'no config' => [
@@ -218,7 +210,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => true,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(false),
+                'input' => $this->getDefinition(false),
                 'featureEnabled' => true,
                 'configurationClean' => true
             ],
@@ -231,7 +223,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => true,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(false),
+                'input' => $this->getDefinition(false),
                 'featureEnabled' => true,
                 'configurationClean' => false
             ],
@@ -244,7 +236,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => false,
                     'deactivate' => true
                 ],
-                'input' => $this->getDefinitionMock(true),
+                'input' => $this->getDefinition(true),
                 'featureEnabled' => true,
                 'configurationClean' => true
             ],
@@ -257,7 +249,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => false,
                     'deactivate' => true
                 ],
-                'input' => $this->getDefinitionMock(true),
+                'input' => $this->getDefinition(true),
                 'featureEnabled' => true,
                 'configurationClean' => false
             ],
@@ -270,7 +262,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => true,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(false),
+                'input' => $this->getDefinition(false),
                 'featureEnabled' => true,
                 'configurationClean' => true
             ],
@@ -283,7 +275,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => true,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(false),
+                'input' => $this->getDefinition(false),
                 'featureEnabled' => true,
                 'configurationClean' => false
             ],
@@ -296,7 +288,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => false,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(false),
+                'input' => $this->getDefinition(false),
                 'featureEnabled' => false,
                 'configurationClean' => true
             ],
@@ -309,7 +301,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => false,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(false),
+                'input' => $this->getDefinition(false),
                 'featureEnabled' => false,
                 'configurationClean' => false
             ],
@@ -322,7 +314,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => false,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(true),
+                'input' => $this->getDefinition(true),
                 'featureEnabled' => false,
                 'configurationClean' => true
             ],
@@ -335,7 +327,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => false,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(true),
+                'input' => $this->getDefinition(true),
                 'featureEnabled' => false,
                 'configurationClean' => false
             ],
@@ -348,7 +340,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => false,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(false),
+                'input' => $this->getDefinition(false),
                 'featureEnabled' => false,
                 'configurationClean' => true
             ],
@@ -361,32 +353,24 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
                     'activate' => false,
                     'deactivate' => false
                 ],
-                'input' => $this->getDefinitionMock(false),
+                'input' => $this->getDefinition(false),
                 'featureEnabled' => false,
                 'configurationClean' => false
             ]
         ];
     }
 
-    /**
-     * @param bool $active weather workflow is active
-     * @return \PHPUnit\Framework\MockObject\MockObject|ResultRecordInterface
-     */
-    protected function getDefinitionMock($active)
+    private function getDefinition(bool $active): ResultRecordInterface
     {
         $definition = $this->createMock(ResultRecordInterface::class);
         $definition->expects($this->any())
             ->method('getValue')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['active', $active],
-                        ['name', 'workflow_name'],
-                        ['entityClass', \stdClass::class],
-                        ['configuration', []]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['active', $active],
+                ['name', 'workflow_name'],
+                ['entityClass', \stdClass::class],
+                ['configuration', []]
+            ]);
 
         return $definition;
     }

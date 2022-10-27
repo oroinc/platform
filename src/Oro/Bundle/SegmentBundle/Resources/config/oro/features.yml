@@ -1,0 +1,21 @@
+features:
+    segments:
+        label: oro.segment.feature.label
+        description: oro.segment.feature.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_segment_index
+            - oro_segment_view
+            - oro_segment_create
+            - oro_segment_update
+            - oro_segment_clone
+            - oro_segment_refresh
+            - oro_api_delete_segment
+            - oro_api_post_segment_run
+        entities:
+            - Oro\Bundle\SegmentBundle\Entity\Segment
+            - Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot
+            - Oro\Bundle\SegmentBundle\Entity\SegmentType
+        navigation_items:
+            - application_menu.reports_tab.segments_divider
+            - application_menu.reports_tab.manage_segments

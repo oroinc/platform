@@ -5,64 +5,60 @@ namespace Oro\Bundle\UserBundle\Security;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
+use Oro\Bundle\UserBundle\Exception\EmptyOwnerException;
 use Oro\Bundle\UserBundle\Exception\OrganizationException;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Security\Core\Exception\DisabledException;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 
-class UserChecker extends BaseUserChecker
+/**
+ * Checks the state of User during authentication.
+ */
+class UserChecker implements UserCheckerInterface
 {
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
-    /** @var FlashBagInterface */
-    protected $flashBag;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param FlashBagInterface     $flashBag
-     * @param TranslatorInterface   $translator
-     */
-    public function __construct(
-        TokenStorageInterface $tokenStorage,
-        FlashBagInterface $flashBag,
-        TranslatorInterface $translator
-    ) {
+    public function __construct(TokenStorageInterface $tokenStorage)
+    {
         $this->tokenStorage = $tokenStorage;
-        $this->flashBag = $flashBag;
-        $this->translator = $translator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function checkPostAuth(UserInterface $user)
+    public function checkPostAuth(SymfonyUserInterface $user): void
     {
-        parent::checkPostAuth($user);
+        if (!$user instanceof User) {
+            return;
+        }
 
-        if ($user instanceof User && null !== $user->getAuthStatus()) {
-            if (!$this->hasOrganization($user)) {
-                $exception = new OrganizationException();
-                $exception->setUser($user);
+        if (!$user->isEnabled()) {
+            $exception = new DisabledException('The user is disabled.');
+            $exception->setUser($user);
 
-                throw $exception;
-            }
+            throw $exception;
+        }
+        if (null !== $user->getAuthStatus() && $user->getOrganizations(true)->count() === 0) {
+            $exception = new OrganizationException();
+            $exception->setUser($user);
+
+            throw $exception;
+        }
+        if (!$user->getOwner()) {
+            $exception = new EmptyOwnerException('The user does not have an owner.');
+            $exception->setUser($user);
+
+            throw $exception;
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function checkPreAuth(UserInterface $user)
+    public function checkPreAuth(SymfonyUserInterface $user): void
     {
-        parent::checkPreAuth($user);
-
         if (!$user instanceof User) {
             return;
         }
@@ -72,11 +68,6 @@ class UserChecker extends BaseUserChecker
             && null !== $user->getLastLogin()
             && $user->getPasswordChangedAt() > $user->getLastLogin()
         ) {
-            $this->flashBag->add(
-                'error',
-                $this->translator->trans('oro.user.security.password_changed.message')
-            );
-
             $exception = new PasswordChangedException('Invalid password.');
             $exception->setUser($user);
 
@@ -89,15 +80,5 @@ class UserChecker extends BaseUserChecker
 
             throw $exception;
         }
-    }
-
-    /**
-     * @param User $user
-     *
-     * @return bool
-     */
-    protected function hasOrganization(User $user)
-    {
-        return $user->getOrganizations(true)->count() > 0;
     }
 }

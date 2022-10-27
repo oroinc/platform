@@ -4,6 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\Extension\FieldMaskBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FieldMaskBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testViewGroup()

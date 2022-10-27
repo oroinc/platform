@@ -8,13 +8,14 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PropertyConfigContainer */
-    protected $configContainer;
+    private $configContainer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configContainer = new PropertyConfigContainer([]);
     }
@@ -44,19 +45,6 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         $result = $this->configContainer->getItems($type);
 
         $this->assertEquals($expectedValues, $result);
-    }
-
-    /**
-     * @dataProvider getDefaultValuesProvider
-     */
-    public function testGetDefaultValues($type, $fieldType, $config, $expectedValues)
-    {
-        $this->configContainer->setConfig($config);
-        $result = $this->configContainer->getDefaultValues($type, $fieldType);
-
-        $this->assertEquals($expectedValues, $result);
-        // test that a result is cached locally
-        $this->assertEquals($expectedValues, $this->configContainer->getDefaultValues($type, $fieldType));
     }
 
     /**
@@ -229,12 +217,12 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider getRequireJsModulesProvider
+     * @dataProvider getJsModulesProvider
      */
-    public function testGetRequireJsModules($type, $config, $expectedValues)
+    public function testGetJsModules($type, $config, $expectedValues)
     {
         $this->configContainer->setConfig($config);
-        $result = $this->configContainer->getRequireJsModules($type);
+        $result = $this->configContainer->getJsModules($type);
 
         $this->assertEquals($expectedValues, $result);
     }
@@ -328,95 +316,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getDefaultValuesProvider()
-    {
-        return [
-            'no entity config'                     => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                null,
-                [],
-                [],
-            ],
-            'entity config'                        => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                null,
-                [
-                    'entity' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item4' => 'value4',
-                    'item5' => 'value5',
-                ]
-            ],
-            'entity config (by id)'                => [
-                new EntityConfigId('testScope', 'Test\Cls'),
-                null,
-                [
-                    'entity' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item4' => 'value4',
-                    'item5' => 'value5',
-                ]
-            ],
-            'field config (no field type)'         => [
-                PropertyConfigContainer::TYPE_FIELD,
-                null,
-                [
-                    'field' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item4' => 'value4',
-                    'item5' => 'value5',
-                ]
-            ],
-            'field config (no field type) (by id)' => [
-                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
-                null,
-                [
-                    'field' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item4' => 'value4',
-                    'item5' => 'value5',
-                ]
-            ],
-            'field config'                         => [
-                PropertyConfigContainer::TYPE_FIELD,
-                'string',
-                [
-                    'field' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item5' => 'value5',
-                ]
-            ],
-            'field config (by id)'                 => [
-                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
-                'string',
-                [
-                    'field' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item5' => 'value5',
-                ]
-            ],
-        ];
-    }
-
-    protected function getItemsForDefaultValuesTest()
+    private function getItemsForDefaultValuesTest(): array
     {
         return [
             'items' => [
@@ -501,7 +401,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForRequiredPropertyValuesTest()
+    private function getItemsForRequiredPropertyValuesTest(): array
     {
         return [
             'items' => [
@@ -570,7 +470,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForNotAuditableValuesTest()
+    private function getItemsForNotAuditableValuesTest(): array
     {
         return [
             'items' => [
@@ -633,7 +533,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForTranslatableValuesTest()
+    private function getItemsForTranslatableValuesTest(): array
     {
         return [
             'items' => [
@@ -704,7 +604,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForIndexedValuesTest()
+    private function getItemsForIndexedValuesTest(): array
     {
         return [
             'items' => [
@@ -925,7 +825,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getItemsForFormItemsTest()
+    private function getItemsForFormItemsTest(): array
     {
         return [
             'items' => [
@@ -1518,7 +1418,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getRequireJsModulesProvider()
+    public function getJsModulesProvider()
     {
         return [
             'no entity config'                      => [
@@ -1530,7 +1430,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 PropertyConfigContainer::TYPE_ENTITY,
                 [
                     'entity' => [
-                        'require_js' => [
+                        'jsmodules' => [
                             'test' => 'testVal',
                         ]
                     ]
@@ -1541,7 +1441,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 PropertyConfigContainer::TYPE_ENTITY,
                 [
                     'entity' => [
-                        'require_js' => [
+                        'jsmodules' => [
                         ]
                     ]
                 ],
@@ -1559,7 +1459,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
-                        'require_js' => [
+                        'jsmodules' => [
                             'test' => 'testVal',
                         ]
                     ]
@@ -1570,7 +1470,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
-                        'require_js' => [
+                        'jsmodules' => [
                         ]
                     ]
                 ],
@@ -1588,7 +1488,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 PropertyConfigContainer::TYPE_FIELD,
                 [
                     'field' => [
-                        'require_js' => [
+                        'jsmodules' => [
                             'test' => 'testVal',
                         ]
                     ]
@@ -1599,7 +1499,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 PropertyConfigContainer::TYPE_FIELD,
                 [
                     'field' => [
-                        'require_js' => [
+                        'jsmodules' => [
                         ]
                     ]
                 ],
@@ -1617,7 +1517,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
-                        'require_js' => [
+                        'jsmodules' => [
                             'test' => 'testVal',
                         ]
                     ]
@@ -1628,7 +1528,7 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
-                        'require_js' => [
+                        'jsmodules' => [
                         ]
                     ]
                 ],

@@ -3,8 +3,6 @@
 namespace Oro\Bundle\NotificationBundle\Migrations\Schema\v1_2;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
-use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -17,11 +15,9 @@ class AddMassNotificationTable implements Migration
     {
         $this->createOroNotificationMassNotifTable($schema);
     }
-    
+
     /**
      * Create oro_notification_mass_notif table
-     *
-     * @param Schema $schema
      */
     protected function createOroNotificationMassNotifTable(Schema $schema)
     {

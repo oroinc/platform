@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * Transforms a value between a boolean and a string.
+ */
 class BooleanToStringTransformer implements DataTransformerInterface
 {
     /**
@@ -16,7 +19,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
             return '';
         }
 
-        if (!is_bool($value)) {
+        if (!\is_bool($value)) {
             throw new TransformationFailedException('Expected a boolean.');
         }
 
@@ -28,7 +31,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }
 

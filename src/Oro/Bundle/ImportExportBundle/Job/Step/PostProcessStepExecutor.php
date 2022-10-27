@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job\Step;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Exception\InvalidItemException;
+use Oro\Bundle\BatchBundle\Item\ExecutionContext;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -84,9 +84,6 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
         return $this;
     }
 
-    /**
-     * @param array $contextSharedKeys
-     */
     public function setContextSharedKeys(array $contextSharedKeys)
     {
         $this->contextSharedKeys = $contextSharedKeys;
@@ -105,8 +102,9 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null)
+    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         $itemsToWrite = [];
         $writeCount   = 0;

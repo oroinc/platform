@@ -3,33 +3,25 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
-use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 
 class EmailBodyHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var HtmlTagHelper */
-    protected $htmlTagHelper;
-
     /** @var EmailBodyHelper */
-    protected $bodyHelper;
+    private $bodyHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $htmlTagProvider = $this->getMockBuilder('Oro\Bundle\FormBundle\Provider\HtmlTagProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->htmlTagHelper = new HtmlTagHelper($htmlTagProvider);
-        $this->bodyHelper = new EmailBodyHelper($this->htmlTagHelper);
+        $this->bodyHelper = new EmailBodyHelper();
     }
     /**
      * @dataProvider bodyData
      */
-    public function testGetClearBody($bodyText, $expectedResult)
+    public function testGetClearBody(string $bodyText, string $expectedResult)
     {
         $this->assertEquals($expectedResult, $this->bodyHelper->getTrimmedClearText($bodyText));
     }
 
-    public function bodyData()
+    public function bodyData(): array
     {
         $htmlTest = <<<HTMLTEXT
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
@@ -53,7 +45,11 @@ HTMLTEXT;
                 'another text'
             ],
             'text with body tag' => [$htmlTest, 'The body text'],
-            'text with non printed symbols' => ["some\ntext with\tsymbols", 'some text with symbols']
+            'text with non printed symbols' => ["some\ntext with\tsymbols", 'some text with symbols'],
+            'text with non printed unicode symbols' => [
+                "text \u{200b}\u{200c}\u{200d}\u{200e}\u{200f}\u{feff}",
+                'text'
+            ]
         ];
     }
 }

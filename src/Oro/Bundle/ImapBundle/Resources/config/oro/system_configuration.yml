@@ -4,6 +4,9 @@ system_configuration:
             handler: '@oro_imap.form.google_imap_config_handler::handle'
         google_imap_settings:
             title: oro.imap.system_configuration.groups.google_imap_settings.title
+            priority: 40
+        microsoft_settings:
+            handler: '@oro_imap.form.microsoft_imap_config_handler::handle'
 
     fields:
         oro_imap.enable_google_imap:
@@ -15,7 +18,14 @@ system_configuration:
                 required: false
                 resettable: false
             priority: 10
-
+        oro_imap.enable_microsoft_imap:
+            data_type: boolean
+            type: Oro\Bundle\MicrosoftIntegrationBundle\Form\Type\EnableConfigCheckboxType
+            options:
+                label: oro.imap.system_configuration.fields.enable_microsoft_imap.label
+                tooltip: oro.imap.system_configuration.fields.enable_microsoft_imap.tooltip
+                required: false
+                resettable: false
     tree:
         system_configuration:
             platform:
@@ -27,3 +37,8 @@ system_configuration:
                                     google_imap_settings:
                                         children:
                                             - oro_imap.enable_google_imap
+                            microsoft_settings:
+                                children:
+                                    microsoft_integrations:
+                                        children:
+                                            - oro_imap.enable_microsoft_imap

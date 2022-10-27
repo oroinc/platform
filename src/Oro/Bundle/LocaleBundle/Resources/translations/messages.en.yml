@@ -8,6 +8,7 @@ oro.locale:
     localization:
         entity_label:               'Localization'
         entity_plural_label:        'Localizations'
+        entity_grid_all_view_label: 'All %entity_plural_label%'
         entity_description:         "Localization item stores locale-specific configuration: the language code of the locale's main language, a formatting code that is used for the locale, and a parent localization that is used by default whenever the translation for the main language is missing."
         id.label:                   'Id'
         name:
@@ -21,6 +22,9 @@ oro.locale:
         formatting_code:
             label:                  'Formatting'
             description:            Code of the formatting style that should apply in the localized instance.
+        rtl_mode:
+            label:                  'Enable RTL Mode'
+            description:            This option enables "Right-To-Left" text direction if such direction is supported by your design theme.
         child_localizations:
             label:                  'Child localizations'
             description:            The relationships between the localization item and other localization items that treat the localization item as a parent localization.
@@ -37,6 +41,11 @@ oro.locale:
         navigation:
             view: 'Localization "%name%"'
 
+        feature:
+            manage:
+                label: Localization Management
+                description: Enables creating and managing localizations that help adapt the website content and system elements to the user-specific location.
+
         form:
             placeholder:
                 select_parent_localization: 'Please select parent localization...'
@@ -48,6 +57,7 @@ oro.locale:
     localizedfallbackvalue:
         entity_label:         'Localized fallback value'
         entity_plural_label:  'Localized fallback values'
+        entity_grid_all_view_label: 'All %entity_plural_label%'
         entity_description:   Localizedfallbackvalue stores relationships between the text values (content like name, description, etc.) and their translation data.
         id.label:             'ID'
         fallback:
@@ -64,9 +74,14 @@ oro.locale:
             description: The text value for the curent localization, can contain html tags
 
     fallback:
+        form:
+            label: 'Inherit Localization'
+            tooltip: 'Choose "Default" or a localization to inherit the contents. Choose "Custom" to override the automatically inherited value with a custom value.'
+
         type:
             parent_localization: 'Parent Localization'
             default: 'Default Value'
+            custom: 'Custom'
 
         value:
             default: 'Default Value'
@@ -102,9 +117,7 @@ oro.locale:
     system_configuration:
         groups:
             localization.title: 'Localization'
-            language_settings.title: 'Language Settings'
-            language_languages.title: 'Languages'
-            locale_settings.title: 'Localization options'
+            locale_settings.title: 'Location options'
             map_settings.title: 'Map options'
             localization_settings.title: 'Localization settings'
         fields:
@@ -136,13 +149,13 @@ oro.locale:
         tooltip:
             languages: "Select the languages that can be used to translate email templates."
             locale: "Locale selection affects the formatting of numbers, addresses, names, and dates."
-            location: " If Format address per country option is disabled, or there is no country-specific formatting, the addresses will be formatted according to the rules of primary location."
-            format_address_by_address_country: "When this option is selected, addresses will be formatted according to the rules of their countries. Otherwise, the primary location formatting will be applied."
+            location: " Select the location whose address formatting should be used if the Format Address Per Country option is disabled, or there is no country-specific formatting."
+            format_address_by_address_country: "Select the option to format addresses following addressing guidelines of the required country. If unselected, primary location formatting is applied."
             language: "Select the system language from the list of the installed translations (see System &rarr; Localization &rarr; Languages)."
-            timezone: "Select the timezone of your location. All dates and times will be displayed in the specified timezone."
+            timezone: "Select the timezone to display all dates and times based on your location. "
             currency: "Select the default currency"
             quarter_start: "Set the date when the first quarter of the year starts."
-            temperature_unit: "Select the temperature unit. This settings will be applied for the weather on the map."
-            wind_speed_unit: "Select the wind speed unit. This settings will be applied for the weather on the map."
+            temperature_unit: "Select the temperature unit to apply to the weather on the map."
+            wind_speed_unit: "Select the wind speed unit to apply for the weather on the map."
 
 oro.scope.localization.label: Localization

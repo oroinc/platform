@@ -1,42 +1,41 @@
 services:
-    Oro\Bundle\InstallerBundle\Command\CheckRequirementsCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\InstallerBundle\Command\CheckRequirementsCommand
-        tags:
-            - { name: console.command }
 
-    Oro\Bundle\InstallerBundle\Command\ConfigUpgradeCommand:
-        public: false
-        class: Oro\Bundle\InstallerBundle\Command\ConfigUpgradeCommand
+    Oro\Bundle\InstallerBundle\Command\CheckRequirementsCommand:
+        arguments:
+            - !tagged_iterator oro.requirements_provider
         tags:
             - { name: console.command }
 
     Oro\Bundle\InstallerBundle\Command\InstallCommand:
-        public: false
-        class: Oro\Bundle\InstallerBundle\Command\InstallCommand
+        arguments:
+            - '@service_container'
+            - '@doctrine'
+            - '@event_dispatcher'
+            - '@oro_distribution.handler.application_status'
+            - '@oro_installer.script_manager'
         tags:
             - { name: console.command }
 
     Oro\Bundle\InstallerBundle\Command\LoadPackageDemoDataCommand:
-        public: false
-        class: Oro\Bundle\InstallerBundle\Command\LoadPackageDemoDataCommand
+        arguments:
+            - '@kernel'
+            - '@?oro_migration.data_fixtures.loader'
+            - '@?oro_migration.data_fixtures.executor'
+            - '@?oro_migration.locator.fixture_path_locator'
         tags:
             - { name: console.command }
 
     Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand:
-        public: false
-        class: Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand
+        arguments:
+            - '@service_container'
+            - '@oro_installer.platform_update_checker'
         tags:
             - { name: console.command }
 
     Oro\Bundle\InstallerBundle\Command\RunScriptsCommand:
-        public: false
-        class: Oro\Bundle\InstallerBundle\Command\RunScriptsCommand
-        tags:
-            - { name: console.command }
-
-    Oro\Bundle\InstallerBundle\Command\UpgradeCommand:
-        public: false
-        class: Oro\Bundle\InstallerBundle\Command\UpgradeCommand
+        arguments:
+            - '@service_container'
         tags:
             - { name: console.command }

@@ -1,27 +1,34 @@
 define(function(require) {
     'use strict';
 
-    var BaseChartComponent;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var chartTemplate = require('text!orochart/js/templates/base-chart-template.html');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const chartTemplate = require('text-loader!orochart/js/templates/base-chart-template.html');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
     /**
      * @class orochart.app.components.BaseChartComponent
      * @extends oroui.app.components.base.Component
      * @exports orochart/app/components/base-chart-component
      */
-    BaseChartComponent = BaseComponent.extend({
+    const BaseChartComponent = BaseComponent.extend({
         template: _.template(chartTemplate),
 
         aspectRatio: 0.4,
 
+        updateDelay: 40,
+
+        listen: {
+            'layout:reposition mediator': 'debouncedUpdate'
+        },
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function BaseChartComponent() {
-            BaseChartComponent.__super__.constructor.apply(this, arguments);
+        constructor: function BaseChartComponent(options) {
+            this.debouncedUpdate = _.debounce(this.update, this.updateDelay);
+
+            BaseChartComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -29,7 +36,6 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            var updateHandler;
             this.data = options.data;
             this.options = options.options;
             this.config = options.config;
@@ -39,12 +45,9 @@ define(function(require) {
 
             this.renderBaseLayout();
 
-            updateHandler = _.bind(this.update, this);
+            const updateHandler = this.update.bind(this);
 
             this.$chart.bind('update.' + this.cid, updateHandler);
-            // updates the chart on resize once per frame (1000/25)
-            $(window).bind('resize.' + this.cid, _.throttle(updateHandler, 40, {leading: false}));
-            $(window).bind('responsive-reflow.' + this.cid, updateHandler);
 
             _.defer(updateHandler);
         },
@@ -56,11 +59,11 @@ define(function(require) {
          */
         dispose: function() {
             this.$chart.unbind('.' + this.cid);
-            $(window).unbind('.' + this.cid);
             delete this.$el;
             delete this.$chart;
             delete this.$legend;
             delete this.$container;
+
             BaseChartComponent.__super__.dispose.call(this);
         },
 
@@ -75,7 +78,7 @@ define(function(require) {
          * Update chart size and redraw
          */
         update: function() {
-            var isChanged = this.setChartSize();
+            const isChanged = this.setChartSize();
 
             if (isChanged) {
                 this.draw();
@@ -89,9 +92,9 @@ define(function(require) {
          * @returns {boolean}
          */
         setChartSize: function() {
-            var $chart = this.$chart;
-            var $widgetContent = $chart.parents('.chart-container').parent();
-            var chartWidth = Math.round($widgetContent.width() * 0.9);
+            const $chart = this.$chart;
+            const $widgetContent = $chart.parents('.chart-container').parent();
+            const chartWidth = Math.round($widgetContent.width() * 0.9);
 
             if (chartWidth > 0 && chartWidth !== $chart.width()) {
                 $chart.width(chartWidth);
@@ -112,13 +115,13 @@ define(function(require) {
          * Fix chart size after drawing to solve problems with too long labels
          */
         fixSize: function() {
-            var $chart = this.$chart;
-            var $labels = $chart.find('.flotr-grid-label-x');
-            var labelMaxHeight = $labels.height();
-            var labelMinHeight = $labels.height();
+            const $chart = this.$chart;
+            const $labels = $chart.find('.flotr-grid-label-x');
+            let labelMaxHeight = $labels.height();
+            let labelMinHeight = $labels.height();
 
             $labels.each(function(index, element) {
-                var height = $(element).height();
+                const height = $(element).height();
                 if (height > labelMaxHeight) {
                     labelMaxHeight = height;
                 } else if (height < labelMinHeight) {

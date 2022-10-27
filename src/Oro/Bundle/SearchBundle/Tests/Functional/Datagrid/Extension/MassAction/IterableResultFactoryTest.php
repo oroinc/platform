@@ -14,27 +14,23 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 /**
  * @group search
- * @dbIsolationPerTest
  */
 class IterableResultFactoryTest extends SearchBundleWebTestCase
 {
-    const GRID_NAME = 'test-search-grid';
+    private const GRID_NAME = 'test-search-grid';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
-        if (static::getContainer()->getParameter('oro_search.engine') !== 'orm') {
+        $engine = static::getContainer()
+            ->get('oro_search.engine.parameters')
+            ->getEngineName();
+        if ($engine !== 'orm') {
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }
 
-        $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $this->getSearchIndexer()->resetIndex(Item::class);
-        $this->ensureItemsLoaded($alias, 0);
-
-        $this->loadFixtures([LoadSearchItemData::class]);
-        $this->getSearchIndexer()->reindex(Item::class);
-        $this->ensureItemsLoaded($alias, LoadSearchItemData::COUNT);
+        $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
     }
 
     public function testCreateIterableResultWithoutIdentifierField()
@@ -119,32 +115,22 @@ class IterableResultFactoryTest extends SearchBundleWebTestCase
         $this->assertRecordIds([$firstItem->getId(), $seventhItem->getId()], $iterableResult);
     }
 
-    /**
-     * @param array $expectedRecordTitles
-     * @param IterableResultInterface $result
-     */
-    private function assertRecordIds(array $expectedRecordTitles, IterableResultInterface $result)
+    private function assertRecordIds(array $expectedRecordIds, IterableResultInterface $result)
     {
         $items = iterator_to_array($result);
-        $recordTitles = array_map(function (\Oro\Bundle\SearchBundle\Query\Result\Item $item) {
+        $recordIds = array_map(function (\Oro\Bundle\SearchBundle\Query\Result\Item $item) {
             return $item->getRecordId();
         }, $items);
 
-        $this->assertEquals($expectedRecordTitles, $recordTitles);
+        $this->assertEquals($expectedRecordIds, $recordIds);
     }
 
-    /**
-     * @return IterableResultFactoryInterface
-     */
-    private function getFactory()
+    private function getFactory(): IterableResultFactoryInterface
     {
         return $this->client->getContainer()->get('oro_search.extension.mass_action.iterable_result_factory.alias');
     }
 
-    /**
-     * @return Manager
-     */
-    private function getDatagridManager()
+    private function getDatagridManager(): Manager
     {
         return $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
     }

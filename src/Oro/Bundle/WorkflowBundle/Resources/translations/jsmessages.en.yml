@@ -3,7 +3,6 @@ oro:
         change_entity_confirmation: "Are you sure you want to change entity?"
         activated: "Workflow activated"
         deactivated_list: "Deactivated workflows: "
-        translation_rebuild_required: "Translation cache update is required. <a href='{{ path }}'>Click here</a> to update"
         workflowdefinition:
             activate: 'Activate workflow "{{ label }}"'
             deactivate: 'Deactivate workflow "{{ label }}"'
@@ -13,6 +12,8 @@ oro:
             reset_message: 'Attention: This action will reset workflow data for this workflow.'
             reset_button_text: 'Yes, Reset'
         error:
+            complexity: 'To work with steps and transitions use the grid above. Current graph is too complex and cannot be rendered in the designer.'
+            unknown: 'An error occurred during graph rendering. Please contact your system administrator. To work with steps and transitions use the grid above.'
             maxconnections: 'Maximum connections ({{ maxConnections }}) reached'
             cannot:
                 set:

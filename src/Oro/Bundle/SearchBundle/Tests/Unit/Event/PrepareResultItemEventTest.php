@@ -3,27 +3,20 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
 
 class PrepareResultItemEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PrepareResultItemEvent
-     */
-    protected $event;
+    /** @var Item|\PHPUnit\Framework\MockObject\MockObject */
+    private $resultItem;
 
-    /**
-     * @var \Oro\Bundle\SearchBundle\Query\Result\Item
-     */
-    protected $resultItem;
+    /** @var PrepareResultItemEvent */
+    private $event;
 
-    /**
-     * Set Up test environment
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->resultItem = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->resultItem = $this->createMock(Item::class);
+
         $this->event = new PrepareResultItemEvent($this->resultItem);
     }
 

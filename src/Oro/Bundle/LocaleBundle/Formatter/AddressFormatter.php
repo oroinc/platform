@@ -9,6 +9,9 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Encapsulates methods for address formatting.
+ */
 class AddressFormatter
 {
     /**
@@ -31,11 +34,6 @@ class AddressFormatter
      */
     protected $phoneProvider;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param NameFormatter $nameFormatter
-     * @param PropertyAccessor $propertyAccessor
-     */
     public function __construct(
         LocaleSettings $localeSettings,
         NameFormatter $nameFormatter,
@@ -46,9 +44,6 @@ class AddressFormatter
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * @param PhoneProvider $phoneProvider
-     */
     public function setPhoneProvider(PhoneProvider $phoneProvider)
     {
         $this->phoneProvider = $phoneProvider;
@@ -61,8 +56,6 @@ class AddressFormatter
      * @param null|string $country
      * @param string $newLineSeparator
      * @return string
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function format(AddressInterface $address, $country = null, $newLineSeparator = "\n")
     {
@@ -71,42 +64,8 @@ class AddressFormatter
         }
 
         $format = $this->getAddressFormat($country);
-        $countryLocale = $this->localeSettings->getLocaleByCountry($country);
-        $formatted = preg_replace_callback(
-            '/%(\w+)%/',
-            function ($data) use ($address, $countryLocale, $newLineSeparator) {
-                $key = $data[1];
-                $lowerCaseKey = strtolower($key);
-                if ('name' === $lowerCaseKey) {
-                    $value = $this->nameFormatter->format($address, $countryLocale);
-                } elseif ('street' === $lowerCaseKey) {
-                    $value = trim($this->getValue($address, 'street') . ' ' . $this->getValue($address, 'street2'));
-                } elseif ('street1' === $lowerCaseKey) {
-                    $value = $this->getValue($address, 'street');
-                } elseif ('country' === $lowerCaseKey) {
-                    $value = $this->getValue($address, 'countryName');
-                } elseif ('region' === $lowerCaseKey) {
-                    $value = $this->getValue($address, 'regionName');
-                } elseif ('phone' === $lowerCaseKey && $this->phoneProvider) {
-                    $value = $this->phoneProvider->getPhoneNumber($address);
-                } elseif ('region_code' === $lowerCaseKey) {
-                    $value = $this->getValue($address, 'regionCode');
-                    if (!$value) {
-                        $value = $this->getValue($address, 'regionName');
-                    }
-                } else {
-                    $value = $this->getValue($address, $lowerCaseKey);
-                }
-                if ($value) {
-                    if ($key !== $lowerCaseKey) {
-                        $value = strtoupper($value);
-                    }
-                    return $value;
-                }
-                return '';
-            },
-            $format
-        );
+        $parts = $this->getAddressParts($address, $format, $country);
+        $formatted = str_replace(array_keys($parts), array_values($parts), $format);
 
         $formatted = str_replace(
             $newLineSeparator . $newLineSeparator,
@@ -118,6 +77,62 @@ class AddressFormatter
         $formatted = preg_replace('/ +\n/', "\n", $formatted);
 
         return trim($formatted);
+    }
+
+    /**
+     * Provides address parts according for the address format corresponding to the locale settings.
+     * Look into Resources/config/oro/address_format.yml for available formats.
+     *
+     * @param AddressInterface $address
+     * @param string $addressFormat The address format to get parts for.
+     * @param null|string $country
+     * @return array
+     *  [
+     *      // '%part_name%' => 'part value',
+     *      '%country%' => 'US'
+     *  ]
+     */
+    public function getAddressParts(AddressInterface $address, string $addressFormat, ?string $country = null): array
+    {
+        if (!$country) {
+            $country = $this->getCountry($address);
+        }
+
+        $countryLocale = $this->localeSettings->getLocaleByCountry($country);
+        preg_match_all('/%(\w+)%/', $addressFormat, $partsKeys);
+        $parts = [];
+        $partsMap = [
+            'street1' => 'street',
+            'country' => 'countryName',
+            'region' => 'regionName',
+        ];
+        foreach ($partsKeys[1] ?? [] as $i => $partKey) {
+            $lowercasePartKey = strtolower($partKey);
+            if ('name' === $lowercasePartKey) {
+                $value = $this->nameFormatter->format($address, $countryLocale);
+            } elseif ('street' === $lowercasePartKey) {
+                $value = trim($this->getValue($address, 'street') . ' ' . $this->getValue($address, 'street2'));
+            } elseif ('phone' === $lowercasePartKey && $this->phoneProvider) {
+                $value = $this->phoneProvider->getPhoneNumber($address);
+            } elseif ('region_code' === $lowercasePartKey) {
+                $value = $this->getRegionCode($address);
+            } else {
+                $value = $this->getValue($address, $partsMap[$lowercasePartKey] ?? $lowercasePartKey);
+            }
+
+            if ($partKey !== $lowercasePartKey) {
+                $value = strtoupper((string)$value);
+            }
+
+            $parts[$partsKeys[0][$i]] = trim((string)$value);
+        }
+
+        return $parts;
+    }
+
+    private function getRegionCode(AddressInterface $address): string
+    {
+        return (string) ($this->getValue($address, 'regionCode') ?: $this->getValue($address, 'regionName'));
     }
 
     /**
@@ -180,11 +195,13 @@ class AddressFormatter
     }
 
     /**
+     * Provides country name or country ISO2 code for the given $address depending on locale settings.
+     *
      * @param AddressInterface $address
      *
-     * @return string
+     * @return string Country name, ISO2 code or default country ISO2 code if country was not fetched from $address.
      */
-    protected function getCountry(AddressInterface $address)
+    public function getCountry(AddressInterface $address)
     {
         $country = null;
         if ($this->localeSettings->isFormatAddressByAddressCountry()) {

@@ -4,18 +4,14 @@ api:
             documentation_resource: '@OroAttachmentBundle/Resources/doc/api/attachment.md'
             fields:
                 target:
-                    data_type:    association:manyToOne
-            actions:
-                create:
-                    fields:
-                        target:
-                            form_options:
-                                constraints:
-                                    - NotNull: ~
+                    data_type: association:manyToOne
 
         Oro\Bundle\AttachmentBundle\Entity\File:
             documentation_resource: '@OroAttachmentBundle/Resources/doc/api/file.md'
             fields:
+                uuid:
+                    form_options:
+                        mapped: false
                 filename:
                     exclude: true
                 extension:
@@ -26,3 +22,15 @@ api:
                     depends_on: [filename]
                     form_options:
                         property_path: file
+                        allow_file_upload: true
+                parent:
+                    data_type: nestedAssociation
+                    fields:
+                        __class__:
+                            property_path: parentEntityClass
+                        id:
+                            property_path: parentEntityId
+                parentFieldName:
+                    property_path: parentEntityFieldName
+            actions:
+                get_list: false

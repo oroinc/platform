@@ -12,15 +12,16 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\SubmitButtonTypeInterface;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 
+/**
+ * A wrapper for an API form type and its extensions.
+ */
 class ApiResolvedFormType implements ResolvedFormTypeInterface
 {
     /** @var ResolvedFormTypeInterface */
-    protected $innerType;
+    private $innerType;
 
-    /**
-     * @param ResolvedFormTypeInterface $innerType
-     */
     public function __construct(ResolvedFormTypeInterface $innerType)
     {
         $this->innerType = $innerType;
@@ -29,14 +30,6 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
     public function getBlockPrefix()
     {
         return $this->innerType->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->innerType->getName();
     }
 
     /**
@@ -83,10 +76,26 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
             throw new UnexpectedTypeException($this->innerType, FormTypeInterface::class);
         }
 
-        $options = $this->getOptionsResolver()->resolve($options);
-        $dataClass = isset($options['data_class']) ? $options['data_class'] : null;
+        try {
+            $options = $this->getOptionsResolver()->resolve($options);
+        } catch (ExceptionInterface $e) {
+            throw new $e(
+                sprintf(
+                    'An error has occurred resolving the options of the form "%s": ',
+                    \get_class($this->getInnerType())
+                ) . $e->getMessage(),
+                $e->getCode(),
+                $e
+            );
+        }
 
-        $builder = new ApiFormBuilder($name, $dataClass, new EventDispatcher(), $factory, $options);
+        $builder = new ApiFormBuilder(
+            $name,
+            $options['data_class'] ?? null,
+            new EventDispatcher(),
+            $factory,
+            $options
+        );
         $builder->setType($this);
 
         return $builder;
@@ -122,29 +131,5 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $this->innerType->finishView($view, $form, $options);
-    }
-
-    /**
-     * Creates a new builder instance.
-     *
-     * Override this method if you want to customize the builder class.
-     *
-     * @param string               $name      The name of the builder
-     * @param string               $dataClass The data class
-     * @param FormFactoryInterface $factory   The current form factory
-     * @param array                $options   The builder options
-     *
-     * @return FormBuilderInterface The new builder instance
-     */
-    protected function newBuilder($name, $dataClass, FormFactoryInterface $factory, array $options)
-    {
-        if ($this->innerType instanceof ButtonTypeInterface) {
-            throw new UnexpectedTypeException($this->innerType, FormTypeInterface::class);
-        }
-        if ($this->innerType instanceof SubmitButtonTypeInterface) {
-            throw new UnexpectedTypeException($this->innerType, FormTypeInterface::class);
-        }
-
-        return new ApiFormBuilder($name, $dataClass, new EventDispatcher(), $factory, $options);
     }
 }

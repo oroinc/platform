@@ -2,40 +2,33 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
-use Liuggio\ExcelBundle\Factory as ExcelFactory;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
+/**
+ * Write xlsx to file
+ */
 class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareInterface
 {
-    /**
-     * @var ContextRegistry
-     */
+    /** @var ContextRegistry */
     protected $contextRegistry;
 
-    /**
-     * @var DoctrineClearWriter
-     */
+    /** @var DoctrineClearWriter */
     protected $clearWriter;
 
-    /**
-     * @param ContextRegistry $contextRegistry
-     * @param ExcelFactory $phpExcel
-     */
-    public function __construct(ContextRegistry $contextRegistry, ExcelFactory $phpExcel)
+    public function __construct(ContextRegistry $contextRegistry)
     {
         $this->contextRegistry = $contextRegistry;
-        parent::__construct($phpExcel);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function write(array $items)
+    public function write(array $items): void
     {
         parent::write($items);
 
@@ -44,10 +37,7 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
         }
     }
 
-    /**
-     * @param DoctrineClearWriter $clearWriter
-     */
-    public function setClearWriter(DoctrineClearWriter $clearWriter)
+    public function setClearWriter(DoctrineClearWriter $clearWriter): void
     {
         $this->clearWriter = $clearWriter;
     }
@@ -55,7 +45,7 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
     /**
      * {@inheritdoc}
      */
-    public function setStepExecution(StepExecution $stepExecution)
+    public function setStepExecution(StepExecution $stepExecution): void
     {
         $context = $this->contextRegistry->getByStepExecution($stepExecution);
         $this->setImportExportContext($context);
@@ -64,15 +54,15 @@ class XlsxFileWriter extends XlsxFileStreamWriter implements StepExecutionAwareI
     /**
      * {@inheritdoc}
      */
-    public function setImportExportContext(ContextInterface $context)
+    public function setImportExportContext(ContextInterface $context): void
     {
         if (!$context->hasOption('filePath')) {
             throw new InvalidConfigurationException(
                 'Configuration of XLSX writer must contain "filePath".'
             );
-        } else {
-            $this->setFilePath($context->getOption('filePath'));
         }
+
+        $this->setFilePath($context->getOption('filePath'));
 
         parent::setImportExportContext($context);
     }

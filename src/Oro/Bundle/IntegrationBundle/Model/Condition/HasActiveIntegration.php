@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Model\Condition;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
@@ -28,9 +28,6 @@ class HasActiveIntegration extends AbstractCondition implements ContextAccessorA
      */
     protected $type;
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub;
 
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 use Symfony\Component\Form\AbstractType;
@@ -16,11 +16,13 @@ class ApplicableEntitiesTypeStub extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        $inflector = (new InflectorFactory())->build();
+
         $resolver->setDefaults(
             [
                 'choices' => [
-                    Inflector::tableize(StubEntity::class) => StubEntity::class,
-                    Inflector::tableize(\stdClass::class) => \stdClass::class
+                    $inflector->tableize(StubEntity::class) => StubEntity::class,
+                    $inflector->tableize(\stdClass::class) => \stdClass::class
                 ]
             ]
         );

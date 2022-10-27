@@ -8,14 +8,14 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
+/**
+ * Column options Guesser for extend field configs.
+ */
 class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {
     /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -33,7 +33,7 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
                     $options = [
                         'frontend_type' => Property::TYPE_HTML,
                         'type'          => 'twig',
-                        'template'      => 'OroEntityExtendBundle:Datagrid:Property/enum.html.twig',
+                        'template'      => '@OroEntityExtend/Datagrid/Property/enum.html.twig',
                         'context'       => [
                             'entity_class' => $extendFieldConfig->get('target_entity')
                         ]
@@ -47,7 +47,7 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
                         'frontend_type' => Property::TYPE_HTML,
                         'export_type'   => 'list',
                         'type'          => 'twig',
-                        'template'      => 'OroEntityExtendBundle:Datagrid:Property/multiEnum.html.twig',
+                        'template'      => '@OroEntityExtend/Datagrid/Property/multiEnum.html.twig',
                         'context'       => [
                             'entity_class' => $extendFieldConfig->get('target_entity')
                         ]

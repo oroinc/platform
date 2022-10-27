@@ -1,5 +1,5 @@
 {% extends bap.layout %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% oro_title_set({ params: { '%keyword%': searchString|default('oro.search.result.empty'|trans) } }) %}
 {% set gridName = 'search-grid' %}
@@ -11,9 +11,11 @@
         </h2>
         <form method="get" action="{{ path('oro_search_results') }}" class="form-inline search-form">
             <input type="hidden" name="from" value="" />
-            <div class="input-append">
-                <input type="text" id="search" class="span2 search" name="search" value="{{ searchString }}" />
-                <button type="submit" class="btn btn-search btn-primary">{{ 'Search'|trans }}</button>
+            <div class="input-group">
+                <input type="text" id="search" class="form-control span2 search" name="search" value="{{ searchString }}">
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-square-default btn-search">{{ 'Search'|trans }}</button>
+                </div>
             </div>
         </form>
     </div>
@@ -27,7 +29,7 @@
                     <span class="fa-filter" aria-hidden="true"></span>
                     {% if selectedResult %}
                         {% if selectedResult.class %}{{ selectedResult.label }}{% else %}{{ 'oro.search.result.all'|trans }}{% endif %}
-                        ({{ selectedResult.count }}) <span class="fa-sort-desc" aria-hidden="true"></span>
+                        ({{ selectedResult.count }})
                     {% endif %}
                 </a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="{{ togglerId }}">
@@ -46,10 +48,10 @@
                     {% endif %}
 
                     <li{% if selected %} class="selected"{% endif %}>
-                        <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}" {% if selected %}aria-selected="true"{% endif %}>
-                            {% if selected %}<span class="fa-chevron-right pull-right" aria-hidden="true"></span>{% endif %}
+                        <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}" {% if selected %}aria-selected="true"{% endif %} title="{{ label }}">
                             <span class="{{ iconClass }}" aria-hidden="true"></span>
-                            {{ label }} ({{ type.count }})
+                            <span class="search-label">{{ label|trans }}</span>
+                            <span>&nbsp;({{ type.count }})</span>
                         </a>
                     </li>
                 {% endfor %}
@@ -62,7 +64,7 @@
             </div>
         </div>
     {% else %}
-    <div class="search-no-results">
+    <div class="no-data">
         {% trans %}No results were found to match your search.{% endtrans %}
         <br />
         {% trans %}Try modifying your search criteria or creating a new ...{% endtrans %}

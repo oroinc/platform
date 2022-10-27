@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic:
+        arguments:
+            - '%oro_datagrid.export.size_of_batch%'
+
+    Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic: ~

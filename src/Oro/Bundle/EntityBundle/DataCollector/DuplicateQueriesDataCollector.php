@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 
+/**
+ * Collects identical and similar queries number
+ */
 class DuplicateQueriesDataCollector extends DataCollector
 {
     /**
@@ -17,11 +20,7 @@ class DuplicateQueriesDataCollector extends DataCollector
 
     public function __construct()
     {
-        $this->data = [
-            'queriesCount' => [],
-            'identical' => [],
-            'similar' => [],
-        ];
+        $this->reset();
     }
 
     /**
@@ -38,7 +37,7 @@ class DuplicateQueriesDataCollector extends DataCollector
     /**
      * {@inheritdoc}
      */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         foreach ($this->loggers as $name => $logger) {
             $queryAnalyser = new DuplicateQueryAnalyzer();
@@ -107,5 +106,17 @@ class DuplicateQueriesDataCollector extends DataCollector
     protected function countGroupedQueries(array $queries)
     {
         return array_sum(array_map('count', $queries));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reset()
+    {
+        $this->data = [
+            'queriesCount' => [],
+            'identical' => [],
+            'similar' => [],
+        ];
     }
 }

@@ -8,6 +8,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles organization update
+ */
 class OrganizationHandler
 {
     use RequestHandlerTrait;
@@ -21,14 +24,8 @@ class OrganizationHandler
     /** @var EntityManager */
     protected $manager;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param EntityManager $manager
-     */
-    public function __construct(FormInterface $form, RequestStack $requestStack, EntityManager $manager)
+    public function __construct(RequestStack $requestStack, EntityManager $manager)
     {
-        $this->form = $form;
         $this->requestStack = $requestStack;
         $this->manager = $manager;
     }
@@ -37,16 +34,17 @@ class OrganizationHandler
      * Process form
      *
      * @param  Organization $entity
+     * @param FormInterface $form
      * @return bool True on successful processing, false otherwise
      */
-    public function process(Organization $entity)
+    public function process(Organization $entity, FormInterface $form)
     {
-        $this->form->setData($entity);
+        $form->setData($entity);
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->submitPostPutRequest($this->form, $request);
-            if ($this->form->isValid()) {
+            $this->submitPostPutRequest($form, $request);
+            if ($form->isValid()) {
                 $this->onSuccess($entity);
                 return true;
             }
@@ -55,9 +53,6 @@ class OrganizationHandler
         return false;
     }
 
-    /**
-     * @param Organization $entity
-     */
     protected function onSuccess(Organization $entity)
     {
         $this->manager->persist($entity);

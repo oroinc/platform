@@ -1,0 +1,63 @@
+oro:
+    api:
+        asyncoperation:
+            entity_label: API Asynchronous Operation
+            entity_plural_label: API Asynchronous Operations
+            entity_description: Represents details of an API asynchronous operation.
+            entity_grid_all_view_label: All %entity_plural_label%
+
+            id:
+                label: ID
+                description: The unique identifier of the asynchronous operation.
+            status:
+                label: Status
+                description: "The status of the asynchronous operation. Possible values: `new`, `running`, `failed`, `success`, `cancelled`."
+            progress:
+                label: Progress
+                description: The progress, in percentage, for the asynchronous operation.
+            job_id:
+                label: Job ID
+                description: The identifier of a job that is used to process the asynchronous operation.
+            owner:
+                label: Owner
+                description: A user who created the asynchronous operation.
+            organization:
+                label: Organization
+                description: An organization that the asynchronous operation belongs to.
+            created_at:
+                label: Created At
+                description: The date and time when the asynchronous operation was created.
+            updated_at:
+                label: Updated At
+                description: The date and time when the asynchronous operation was last updated.
+            data_file_name:
+                label: Data File Name
+                description: The name of a file that contains the request data for the asynchronous operation.
+            entity_class:
+                label: Entity Class
+                description: The class name of an entity for which the asynchronous operation was created.
+            action_name:
+                label: Action Name
+                description: The name of an API action for which the asynchronous operation was created.
+            elapsed_time:
+                label: Elapsed Time
+                description: The number of seconds the asynchronous operation has been running.
+            has_errors:
+                label: Has Errors
+                description: Indicates whether the asynchronous operation has at least one error.
+            summary:
+                label: Summary
+                description: The summary statistics of the asynchronous operation.
+
+        system_configuration:
+            groups:
+                web_api_settings:
+                    label: Web API
+            fields:
+                web_api:
+                    label: Enable API
+
+        feature:
+            web_api:
+                label: Back-Office API
+                description: Enables the back-office API feature for the application.

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
@@ -14,6 +14,9 @@ use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Synchronizes data from the application using an export processor
+ */
 class ReverseSyncProcessor extends AbstractSyncProcessor
 {
     /** @var ManagerRegistry */
@@ -114,7 +117,7 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
         if ($isSuccess) {
             if ($errors) {
                 $warningsText = 'Some entities were skipped due to warnings:' . PHP_EOL;
-                $warningsText .= implode($errors, PHP_EOL);
+                $warningsText .= implode(PHP_EOL, $errors);
 
                 $message .= PHP_EOL . $warningsText;
             }

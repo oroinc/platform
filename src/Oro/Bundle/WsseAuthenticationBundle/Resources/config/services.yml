@@ -1,0 +1,62 @@
+services:
+    oro_wsse_authentication.security.core.authentication.provider.wsse:
+        class:  Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\Provider\WsseAuthenticationProvider
+        abstract: true
+        arguments:
+            - '<UserCheckerInterface $userChecker>'
+            - '@oro_wsse_authentication.security.wsse_token_factory'
+            - '<UserProviderInterface $userProvider>' # set in WsseSecurityListenerFactory
+            - '<string $providerKey>' # set in WsseSecurityListenerFactory
+            - '<PasswordEncoderInterface $encoder>' # set in WsseSecurityListenerFactory
+            - '<CacheInterface $nonceCache>' # set in WsseSecurityListenerFactory
+            - 300
+            - '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/'
+
+    oro_wsse_authentication.security.http.firewall.wsse_authentication_listener:
+        class:  Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall\WsseAuthenticationListener
+        abstract: true
+        arguments:
+            - '@security.token_storage'
+            - '@security.authentication.manager'
+            - '@oro_wsse_authentication.security.wsse_token_factory'
+            - '<AuthenticationEntryPointInterface $authenticationEntryPoint>' # set in WsseSecurityListenerFactory
+            - '<string $providerKey>' # set in WsseSecurityListenerFactory
+
+    oro_wsse_authentication.security.http.entry_point.wsse:
+        class:  Oro\Bundle\WsseAuthenticationBundle\Security\Http\EntryPoint\WsseEntryPoint
+        abstract: true
+        arguments:
+            - '@?logger'
+            - ''
+            - 'UsernameToken'
+
+    oro_wsse_authentication.encoder:
+        class:  Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder
+        abstract: true
+        arguments:
+            - 'sha1'
+            - true
+            - 1
+
+    oro_wsse_authentication.nonce_cache:
+        class: Symfony\Component\Cache\Adapter\PhpFilesAdapter
+        abstract: true
+        arguments:
+            - '<namespace>' # set in WsseNonceCachePass
+            - '<lifetime>' # set in WsseNonceCachePass
+            - '%kernel.cache_dir%/security/nonces'
+
+    oro_wsse_authentication.security.wsse_token_factory:
+        class: Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactory
+
+    oro_wsse_authentication.security.wsse_login_source_provider:
+        class: Oro\Bundle\WsseAuthenticationBundle\Security\WsseLoginSourceProvider
+        tags:
+            - { name: oro_security.login_source_provider.fail }
+
+    oro_wsse_authentication.event_listener.authentication:
+        class: Oro\Bundle\WsseAuthenticationBundle\EventListener\AuthenticationListener
+        arguments:
+            - "@oro_user.logger.user_login_attempt"
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.success, method: onAuthenticationSuccess }

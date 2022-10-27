@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+use Oro\Bundle\ApiBundle\Form\NamedValidationConstraint;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\ApiBundle\Validator\Constraints\ConstraintWithStatusCodeInterface;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
@@ -41,6 +42,27 @@ class ConstraintTextExtractor implements ConstraintTextExtractorInterface
      */
     public function getConstraintType(Validator\Constraint $constraint)
     {
-        return ValueNormalizerUtil::humanizeClassName(\get_class($constraint), 'Constraint');
+        $suffix = 'Constraint';
+        if ($constraint instanceof NamedValidationConstraint) {
+            $constraintType = $constraint->getConstraintType();
+            $delimiter = strrpos($constraintType, '\\');
+            if (false !== $delimiter) {
+                $constraintType = substr($constraintType, $delimiter + 1);
+            }
+            $constraintType = preg_replace('/\W+/', ' ', $constraintType);
+            if (str_contains($constraintType, ' ')) {
+                $constraintType = str_replace('_', ' ', strtolower($constraintType));
+                $suffix = ' ' . strtolower($suffix);
+                if (!str_ends_with($constraintType, $suffix)) {
+                    $constraintType .= $suffix;
+                }
+            } else {
+                $constraintType = ValueNormalizerUtil::humanizeClassName($constraintType, $suffix);
+            }
+        } else {
+            $constraintType = ValueNormalizerUtil::humanizeClassName(\get_class($constraint), $suffix);
+        }
+
+        return $constraintType;
     }
 }

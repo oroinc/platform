@@ -4,6 +4,7 @@ namespace Oro\Bundle\CurrencyBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\CurrencyBundle\Migrations\Schema\v1_0\CurrencyConfigOrganizationMigration;
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -26,7 +27,7 @@ class OroCurrencyBundleInstaller implements Installation, ContainerAwareInterfac
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
+        if ($this->container->get(ApplicationState::class)->isInstalled()) {
             CurrencyConfigOrganizationMigration::migrateOrganizationCurrencyConfig($queries);
         }
     }

@@ -1,7 +1,8 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Tests\Functional\Entity\Repository;
+namespace Oro\Bundle\NotificationBundle\Tests\Functional\Entity\Repository;
 
+use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Tests\Functional\DataFixtures\LoadRecipientListData;
@@ -11,18 +12,15 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 
 class RecipientListRepositoryTest extends WebTestCase
 {
-    /**
-     * @var RecipientListRepository
-     */
-    protected $repository;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadRecipientListData::class]);
-        $this->repository = self::getContainer()
-            ->get('doctrine')
-            ->getRepository('OroNotificationBundle:RecipientList');
+    }
+
+    private function getRepository(): RecipientListRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(RecipientList::class);
     }
 
     public function testGetRecipientEmailsForRecipientListWithUsers(): void
@@ -39,7 +37,7 @@ class RecipientListRepositoryTest extends WebTestCase
             $simpleUser2->getEmail()
         ];
 
-        $this->assertEmails($expectedEmails, $this->repository->getRecipientEmails($recipientList));
+        $this->assertEmails($expectedEmails, $this->getRepository()->getRecipientEmails($recipientList));
     }
 
     public function testGetRecipientsForRecipientListWithUsers(): void
@@ -51,7 +49,7 @@ class RecipientListRepositoryTest extends WebTestCase
             $this->getReference(LoadUserData::SIMPLE_USER_2)
         ];
 
-        $this->assertRecipients($expectedRecipients, $this->repository->getRecipients($recipientList));
+        $this->assertRecipients($expectedRecipients, $this->getRepository()->getRecipients($recipientList));
     }
 
     public function testGetRecipientEmailsForRecipientListWithGroups(): void
@@ -68,7 +66,7 @@ class RecipientListRepositoryTest extends WebTestCase
             $userWithToken->getEmail()
         ];
 
-        $this->assertEmails($expectedEmails, $this->repository->getRecipientEmails($recipientList));
+        $this->assertEmails($expectedEmails, $this->getRepository()->getRecipientEmails($recipientList));
     }
 
     public function testGetRecipientsForRecipientListWithGroups(): void
@@ -85,7 +83,7 @@ class RecipientListRepositoryTest extends WebTestCase
             new EmailAddressWithContext($userWithToken->getEmail(), $userWithToken)
         ];
 
-        $this->assertRecipients($expectedRecipients, $this->repository->getRecipients($recipientList));
+        $this->assertRecipients($expectedRecipients, $this->getRepository()->getRecipients($recipientList));
     }
 
     public function testGetRecipientEmailsForRecipientListWithGroupsAndUsers(): void
@@ -105,7 +103,7 @@ class RecipientListRepositoryTest extends WebTestCase
             $userWithToken->getEmail()
         ];
 
-        $this->assertEmails($expectedEmails, array_values($this->repository->getRecipientEmails($recipientList)));
+        $this->assertEmails($expectedEmails, array_values($this->getRepository()->getRecipientEmails($recipientList)));
     }
 
     public function testGetRecipientsForRecipientListWithGroupsAndUsers(): void
@@ -125,7 +123,7 @@ class RecipientListRepositoryTest extends WebTestCase
             new EmailAddressWithContext($userWithToken->getEmail(), $userWithToken)
         ];
 
-        $this->assertRecipients($expectedRecipients, $this->repository->getRecipients($recipientList));
+        $this->assertRecipients($expectedRecipients, $this->getRepository()->getRecipients($recipientList));
     }
 
     public function testGetRecipientEmailsForRecipientListWithGroupsAndUsersAndEmail(): void
@@ -146,7 +144,7 @@ class RecipientListRepositoryTest extends WebTestCase
             LoadRecipientListData::CUSTOM_EMAIL
         ];
 
-        $this->assertEmails($expectedEmails, $this->repository->getRecipientEmails($recipientList));
+        $this->assertEmails($expectedEmails, $this->getRepository()->getRecipientEmails($recipientList));
     }
 
     public function testGetRecipientsForRecipientListWithGroupsAndUsersAndEmail(): void
@@ -167,7 +165,7 @@ class RecipientListRepositoryTest extends WebTestCase
             new EmailAddressWithContext(LoadRecipientListData::CUSTOM_EMAIL)
         ];
 
-        $this->assertRecipients($expectedEmails, array_values($this->repository->getRecipients($recipientList)));
+        $this->assertRecipients($expectedEmails, array_values($this->getRepository()->getRecipients($recipientList)));
     }
 
     public function testGetRecipientEmailsForRecipientListWithGroupsAndUsersAndDuplicatedEmail(): void
@@ -189,7 +187,7 @@ class RecipientListRepositoryTest extends WebTestCase
             $userWithToken->getEmail()
         ];
 
-        $this->assertEmails($expectedEmails, array_values($this->repository->getRecipientEmails($recipientList)));
+        $this->assertEmails($expectedEmails, array_values($this->getRepository()->getRecipientEmails($recipientList)));
     }
 
     public function testGetRecipientsForRecipientListWithGroupsAndUsersAndDuplicatedEmail(): void
@@ -211,25 +209,17 @@ class RecipientListRepositoryTest extends WebTestCase
             new EmailAddressWithContext($userWithToken->getEmail(), $userWithToken),
         ];
 
-        $this->assertRecipients($expectedEmails, array_values($this->repository->getRecipients($recipientList)));
+        $this->assertRecipients($expectedEmails, array_values($this->getRepository()->getRecipients($recipientList)));
     }
 
-    /**
-     * @param array $expectedRecipients
-     * @param array $actualRecipients
-     */
     private function assertRecipients(array $expectedRecipients, array $actualRecipients): void
     {
         self::assertCount(\count($expectedRecipients), $actualRecipients);
         foreach ($expectedRecipients as $recipient) {
-            self::assertContains($recipient, $actualRecipients, '', false, false);
+            self::assertContainsEquals($recipient, $actualRecipients);
         }
     }
 
-    /**
-     * @param array $expectedEmails
-     * @param array $actualEmails
-     */
     private function assertEmails(array $expectedEmails, array $actualEmails): void
     {
         self::assertCount(\count($expectedEmails), $actualEmails);

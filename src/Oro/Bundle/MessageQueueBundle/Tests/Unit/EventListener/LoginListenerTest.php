@@ -10,37 +10,35 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LoginListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LoginListener */
-    protected $listener;
+    private $listener;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $consumerHeartbeat;
+    /** @var ConsumerHeartbeat|\PHPUnit\Framework\MockObject\MockObject */
+    private $consumerHeartbeat;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var FlashBag */
-    protected $flashBag;
+    private $flashBag;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $request;
+    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
+    private $request;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->consumerHeartbeat = $this->createMock(ConsumerHeartbeat::class);
 
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($string) {
-                    return $string . '|translated';
-                }
-            );
+            ->willReturnCallback(function ($string) {
+                return $string . '|translated';
+            });
 
         $this->flashBag = new FlashBag();
         $session = $this->createMock(Session::class);

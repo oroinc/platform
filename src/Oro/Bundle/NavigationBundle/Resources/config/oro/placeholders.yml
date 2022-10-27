@@ -28,34 +28,37 @@ placeholders:
             items:
                 pin_button:
                     order: 100
-        requirejs_config_extend:
+        js_modules_config:
             items:
-                routing_requirejs_config:
+                navigation_js_modules_config:
                     order: 100
 
     items:
-        routing_requirejs_config:
-            template: OroNavigationBundle:Js:requirejs.config.js.twig
+        navigation_js_modules_config:
+            template: '@@OroNavigation/js_modules_config.html.twig'
+            applicable: '@oro_user.placeholder.filter->isUserApplicable()'
+            data:
+                js_routing_filename_prefix: '%oro_navigation.js_routing_filename_prefix%'
         shortcuts:
-            template: OroNavigationBundle:Shortcut:shortcuts.html.twig
-            applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+            template: '@@OroNavigation/Shortcut/shortcuts.html.twig'
+            applicable: '@oro_user.placeholder.filter->isUserApplicable()'
         application_menu:
-            template: OroNavigationBundle:ApplicationMenu:applicationMenu.html.twig
-            applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+            template: '@@OroNavigation/ApplicationMenu/applicationMenu.html.twig'
+            applicable: '@oro_user.placeholder.filter->isUserApplicable()'
         dots_menu:
-            template: OroNavigationBundle:ApplicationMenu:dotsMenu.html.twig
-            applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+            template: '@@OroNavigation/ApplicationMenu/dotsMenu.html.twig'
+            applicable: '@oro_user.placeholder.filter->isUserApplicable()'
         pin_tabs_list:
-            template: OroNavigationBundle:Menu:pin_tabs_list.html.twig
-            applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+            template: '@@OroNavigation/Menu/pin_tabs_list.html.twig'
+            applicable: '@oro_user.placeholder.filter->isUserApplicable()'
         pin_button:
-            template: OroNavigationBundle:ApplicationMenu:pinButton.html.twig
-            applicable: "@oro_user.placeholder.filter->isUserApplicable()"
+            template: '@@OroNavigation/ApplicationMenu/pinButton.html.twig'
+            applicable: '@oro_user.placeholder.filter->isUserApplicable()'
         oro_edit_menus_button:
-            template: OroNavigationBundle:menuUpdate:editMenusButton.html.twig
-            applicable: "@oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)"
+            template: '@@OroNavigation/menuUpdate/editMenusButton.html.twig'
+            applicable: '@oro_ui.placeholder.filter->isInstanceOf($entity$, Oro\Bundle\UserBundle\Entity\User)'
             acl: oro_navigation_manage_menus
         oro_edit_menus_link:
-            template: OroNavigationBundle:menuUpdate:editMenusLink.html.twig
-            applicable: "@oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)"
+            template: '@@OroNavigation/menuUpdate/editMenusLink.html.twig'
+            applicable: '@oro_ui.placeholder.filter->isInstanceOf($entity$, Oro\Bundle\UserBundle\Entity\User)'
             acl: oro_navigation_manage_menus

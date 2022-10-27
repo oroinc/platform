@@ -18,7 +18,7 @@ class SchedulesByArgumentsFilterTest extends \PHPUnit\Framework\TestCase
 
         $filter = new SchedulesByArgumentsFilter();
 
-        static::assertSame(
+        self::assertSame(
             [1 => $schedules[1]],
             $filter->filter($schedules, $arguments)
         );

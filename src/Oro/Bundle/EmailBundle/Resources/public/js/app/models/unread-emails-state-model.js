@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var UnreadEmailsStateModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export oroemail/js/app/models/email-variable-model
      */
-    UnreadEmailsStateModel = BaseModel.extend({
+    const UnreadEmailsStateModel = BaseModel.extend({
         defaults: {
             count: 0,
             ids: []
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function UnreadEmailsStateModel() {
-            UnreadEmailsStateModel.__super__.constructor.apply(this, arguments);
+        constructor: function UnreadEmailsStateModel(attrs, options) {
+            UnreadEmailsStateModel.__super__.constructor.call(this, attrs, options);
         }
     });
 

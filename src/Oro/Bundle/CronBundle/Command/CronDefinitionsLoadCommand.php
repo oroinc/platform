@@ -1,39 +1,70 @@
 <?php
+declare(strict_types=1);
+
 namespace Oro\Bundle\CronBundle\Command;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Entity\Schedule;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CronDefinitionsLoadCommand extends ContainerAwareCommand
+/**
+ * Updates cron commands definitions stored in the database.
+ */
+class CronDefinitionsLoadCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:cron:definitions:load';
+
+    private ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this
-            ->setName('oro:cron:definitions:load')
-            ->setDescription('Loads cron commands definitions from application to database.')
-        ;
+        $this->setDescription('Updates cron commands definitions stored in the database.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates cron commands definitions stored in the database.
+
+The previously loaded command definitions are removed from the database, and all command definitions
+from <info>oro:cron</info> namespace that implement
+<info>Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface</info>
+are saved to the database.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            );
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Removing all previously loaded commands...</info>');
-        $this->getRepository('OroCronBundle:Schedule')->createQueryBuilder('d')->delete()->getQuery()->execute();
+        $this->doctrine->getRepository('OroCronBundle:Schedule')
+            ->createQueryBuilder('d')
+            ->delete()
+            ->getQuery()
+            ->execute();
 
         $applicationCommands = $this->getApplication()->all('oro:cron');
-        $em = $this->getEntityManager('OroCronBundle:Schedule');
+        $em = $this->doctrine->getManagerForClass('OroCronBundle:Schedule');
 
         foreach ($applicationCommands as $name => $command) {
+            if ($this === $command) {
+                continue;
+            }
             $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
             if ($this->checkCommand($output, $command)) {
                 $schedule = $this->createSchedule($output, $command, $name);
@@ -42,22 +73,16 @@ class CronDefinitionsLoadCommand extends ContainerAwareCommand
         }
 
         $em->flush();
+
+        return 0;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param CronCommandInterface $command
-     * @param string $name
-     * @param array $arguments
-     *
-     * @return Schedule
-     */
     private function createSchedule(
         OutputInterface $output,
-        CronCommandInterface $command,
-        $name,
+        CronCommandScheduleDefinitionInterface $command,
+        string $name,
         array $arguments = []
-    ) {
+    ): Schedule {
         $output->writeln('<comment>setting up schedule..</comment>');
 
         $schedule = new Schedule();
@@ -69,17 +94,11 @@ class CronDefinitionsLoadCommand extends ContainerAwareCommand
         return $schedule;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param Command $command
-     *
-     * @return bool
-     */
-    private function checkCommand(OutputInterface $output, Command $command)
+    private function checkCommand(OutputInterface $output, Command $command): bool
     {
-        if (!$command instanceof CronCommandInterface) {
+        if (!$command instanceof CronCommandScheduleDefinitionInterface) {
             $output->writeln(
-                '<info>Skipping, the command does not implement CronCommandInterface</info>'
+                '<info>Skipping, the command does not implement CronCommandScheduleDefinitionInterface</info>'
             );
 
             return false;
@@ -92,23 +111,5 @@ class CronDefinitionsLoadCommand extends ContainerAwareCommand
         }
 
         return true;
-    }
-
-    /**
-     * @param string $className
-     * @return ObjectManager
-     */
-    private function getEntityManager($className)
-    {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
-    }
-
-    /**
-     * @param string $className
-     * @return ObjectRepository
-     */
-    private function getRepository($className)
-    {
-        return $this->getEntityManager($className)->getRepository($className);
     }
 }

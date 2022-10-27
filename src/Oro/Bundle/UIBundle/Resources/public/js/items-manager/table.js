@@ -1,5 +1,11 @@
-define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _, mediator) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    require('jquery-ui/widget');
+    require('jquery-ui/widgets/sortable');
 
     /**
      * Item container widget
@@ -19,7 +25,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _create: function() {
-            var options = this.options;
+            const options = this.options;
 
             switch (typeof options.itemTemplate) {
                 case 'function':
@@ -79,27 +85,32 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
                     });
                     return ui;
                 },
-                stop: _.bind(function(e, ui) {
+                stop: (e, ui) => {
                     this._sortCollection();
-                }, this)
+                }
             }).disableSelection();
         },
 
         _sortCollection: function() {
-            var collection = this.options.collection;
-            var positions = {};
+            const collection = this.options.collection;
+            const positions = {};
             this.element.find('tr').each(function(index) {
                 positions[$(this).data('cid')] = index;
             });
             collection.models.sort(function(left, right) {
-                var diff = positions[left.cid] - positions[right.cid];
+                const diff = positions[left.cid] - positions[right.cid];
                 return diff > 0 ? 1 : (diff < 0 ? -1 : 0);
             });
             collection.trigger('sort');
         },
 
-        _onModelAdded: function(model, collection, options) {
-            var newRow = this._renderModel(model);
+        _getItemElementByModel: function(model) {
+            return this.element.find('[data-cid="' + model.cid + '"]');
+        },
+
+        _onModelAdded: function(model, collection, options = {}) {
+            const newRow = this._renderModel(model);
+
             if (_.isUndefined(options.at)) {
                 this.element.append(newRow);
             } else if (options.at === 0) {
@@ -107,9 +118,12 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             } else {
                 this.element.children().eq(options.at).insertBefore(newRow);
             }
+
             if (this.options.sorting) {
                 this.element.sortable('refresh');
             }
+
+            this._getItemElementByModel(model).trigger('content:changed');
 
             mediator.trigger(
                 'items-manager:table:add:' + this._getIdentifier(),
@@ -120,7 +134,11 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _onModelChanged: function(model) {
-            this.element.find('[data-cid="' + model.cid + '"]').replaceWith(this._renderModel(model));
+            const $oldItemElement = this._getItemElementByModel(model);
+
+            $oldItemElement.trigger('content:remove');
+            $oldItemElement.replaceWith(this._renderModel(model));
+            this._getItemElementByModel(model).trigger('content:changed');
 
             mediator.trigger(
                 'items-manager:table:change:' + this._getIdentifier(),
@@ -131,7 +149,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _onModelDeleted: function(model) {
-            this.element.find('[data-cid="' + model.cid + '"]').remove();
+            this._getItemElementByModel(model).trigger('content:remove').remove();
 
             mediator.trigger(
                 'items-manager:table:remove:' + this._getIdentifier(),
@@ -153,13 +171,14 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
 
         _renderCollection: function() {
             this.element.empty();
-            this.options.collection.each(this._onModelAdded, this);
+            const {collection} = this.options;
+            collection.each(model => this._onModelAdded(model, collection));
         },
 
         _renderModel: function(model) {
-            var collection = this.options.collection;
-            var index = collection.indexOf(model);
-            var data = _.extend({
+            const collection = this.options.collection;
+            const index = collection.indexOf(model);
+            const data = _.extend({
                 cid: model.cid,
                 isFirst: index === 0,
                 isLast: index === collection.length - 1
@@ -174,16 +193,16 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         _onAction: function(ev) {
             ev.preventDefault();
 
-            var $el = $(ev.currentTarget);
-            var cid = $el.closest('[data-cid]').data('cid');
-            var model = this.options.collection.get(cid);
+            const $el = $(ev.currentTarget);
+            const cid = $el.closest('[data-cid]').data('cid');
+            const model = this.options.collection.get(cid);
             if (!model) {
                 return;
             }
 
-            var data = $el.data();
-            var action = data.collectionAction;
-            var handler = this.options[action + 'Handler'];
+            const data = $el.data();
+            const action = data.collectionAction;
+            const handler = this.options[action + 'Handler'];
             if (typeof handler === 'function') {
                 handler(model, data);
             } else {

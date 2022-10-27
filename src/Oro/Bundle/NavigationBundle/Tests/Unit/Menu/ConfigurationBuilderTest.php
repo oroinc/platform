@@ -5,7 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
-use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
@@ -13,70 +13,53 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurationBuilder */
-    protected $configurationBuilder;
-
     /** @var MenuFactory */
-    protected $factory;
+    private $factory;
 
     /** @var FactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $menuFactory;
+    private $menuFactory;
 
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
-    /** @var MenuConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    protected $menuConfiguration;
+    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurationProvider;
 
-    protected function setUp()
+    /** @var ConfigurationBuilder */
+    private $configurationBuilder;
+
+    protected function setUp(): void
     {
-        $resolver = new SystemAwareResolver();
-
+        $this->factory = new MenuFactory();
         $this->menuFactory = $this->createMock(FactoryInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
         $this->configurationBuilder = new ConfigurationBuilder(
-            $resolver,
+            new SystemAwareResolver(),
             $this->menuFactory,
             $this->eventDispatcher,
-            $this->menuConfiguration
+            $this->configurationProvider
         );
-
-        $this->factory = $this->getMockBuilder(MenuFactory::class)
-            ->setMethods(['getRouteInfo', 'processRoute'])
-            ->getMock();
-
-        $this->factory->expects($this->any())
-            ->method('getRouteInfo')
-            ->will($this->returnValue(false));
-
-        $this->factory->expects($this->any())
-            ->method('processRoute')
-            ->will($this->returnSelf());
     }
 
     /**
      * @dataProvider menuStructureProvider
-     * @param array $options
      */
-    public function testBuild($options)
+    public function testBuild(array $options)
     {
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::any())
-            ->method('getItems')
-            ->willReturn(isset($options['items']) ? $options['items'] : []);
+        $this->configurationProvider->expects(self::any())
+            ->method('getMenuItems')
+            ->willReturn($options['items'] ?? []);
 
         $menu = new MenuItem('navbar', $this->factory);
 
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with('oro_menu.configure.navbar', new ConfigureMenuEvent($this->menuFactory, $menu));
+            ->with(new ConfigureMenuEvent($this->menuFactory, $menu), 'oro_menu.configure.navbar');
 
         $this->configurationBuilder->build($menu, [], 'navbar');
 
@@ -91,16 +74,14 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider setAreaToExtraProvider
-     * @param array $options
-     * @param string $expectedArea
      */
-    public function testSetAreaToExtra($options, $expectedArea)
+    public function testSetAreaToExtra(array $options, string $expectedArea)
     {
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::once())
-            ->method('getItems')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuItems')
             ->willReturn($options['items']);
 
         $menu = new MenuItem('navbar', $this->factory);
@@ -109,10 +90,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedArea, $menu->getExtra('scope_type'));
     }
 
-    /**
-     * @return array
-     */
-    public function setAreaToExtraProvider()
+    public function setAreaToExtraProvider(): array
     {
         return [
             'with no scope type specified' => [
@@ -173,20 +151,17 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function menuStructureProvider()
+    public function menuStructureProvider(): array
     {
         return [
             'full_menu' => [[
                 'areas' => [],
                 'templates' => [
                     'navbar' => [
-                        'template' => 'OroNavigationBundle:Menu:navbar.html.twig'
+                        'template' => '@OroNavigation/Menu/navbar.html.twig'
                     ],
                     'dropdown' => [
-                        'template' => 'OroNavigationBundle:Menu:dropdown.html.twig'
+                        'template' => '@OroNavigation/Menu/dropdown.html.twig'
                     ]
                 ],
                 'items' => [
@@ -242,12 +217,11 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Item key "user_user_show" duplicated in tree menu "navbar".
-     */
     public function testBuildDuplicatedItemTreeCallException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Item key "user_user_show" duplicated in tree menu "navbar".');
+
         $options = [
             'areas' => [],
             'items' => [
@@ -281,17 +255,20 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::any())
-            ->method('getItems')
+        $this->configurationProvider->expects(self::any())
+            ->method('getMenuItems')
             ->willReturn($options['items']);
         $menu = new MenuItem('navbar', $this->factory);
         $this->configurationBuilder->build($menu, [], 'navbar');
     }
 
-    public function testBuildExtraIsAllowed()
+    /**
+     * @dataProvider isAllowedTreeDataProvider
+     */
+    public function testBuildExtraIsAllowed(array $menuOptions, bool $displayChildren, bool $expected)
     {
         $options = [
             'items' => [
@@ -312,17 +289,39 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn($options['tree']);
-        $this->menuConfiguration->expects(self::any())
-            ->method('getItems')
+        $this->configurationProvider->expects(self::any())
+            ->method('getMenuItems')
             ->willReturn($options['items']);
 
         $menu = new MenuItem('navbar', $this->factory);
         $menu->setExtra('isAllowed', true);
-        $this->configurationBuilder->build($menu, [], 'navbar');
+        $menu->setDisplayChildren($displayChildren);
+        $this->configurationBuilder->build($menu, $menuOptions, 'navbar');
 
-        $this->assertFalse($menu->getExtra('isAllowed'));
+        $this->assertEquals($expected, $menu->getExtra('isAllowed'));
+    }
+
+    public function isAllowedTreeDataProvider(): array
+    {
+        return [
+            'is not allowed, as item has no allowed children' => [
+                'menuOptions' => [],
+                'displayChildren' => true,
+                'expected' => false
+            ],
+            'is allowed, as item has allowed children' => [
+                'menuOptions' => ['extras' => ['isAllowed' => true]],
+                'displayChildren' => true,
+                'expected' => true
+            ],
+            'is allowed, as item has no allowed children but children are not displayed' => [
+                'menuOptions' => [],
+                'displayChildren' => false,
+                'expected' => true
+            ],
+        ];
     }
 }

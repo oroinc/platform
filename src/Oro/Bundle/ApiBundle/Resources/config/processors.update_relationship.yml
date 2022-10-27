@@ -1,7 +1,6 @@
 services:
     oro_api.update_relationship.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\UpdateRelationshipProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - update_relationship
@@ -47,6 +46,13 @@ services:
             - '@oro_api.form_helper'
         tags:
             - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: 100 }
+
+    oro_api.update_relationship.handle_unidirectional_associations:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\UpdateRelationship\HandleUnidirectionalAssociations
+        arguments:
+            - '@oro_api.form.unidirectional_association_handler'
+        tags:
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, priority: -150 }
 
     #
     # save_data

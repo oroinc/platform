@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ActionHeaderCell;
-    var Backgrid = require('backgrid');
-    var ActionsPanel = require('../actions-panel');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!orodatagrid/templates/datagrid/action-header-cell.html');
+    const __ = require('orotranslation/js/translator');
+    const Backgrid = require('backgrid');
+    const ActionsPanel = require('../actions-panel');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid/action-header-cell.html');
 
     /**
      *
@@ -14,8 +14,19 @@ define(function(require) {
      * @class   orodatagrid.datagrid.headerCell.ActionHeaderCell
      * @extends oroui/js/app/views/base/view
      */
-    ActionHeaderCell = BaseView.extend({
+    const ActionHeaderCell = BaseView.extend({
+        optionNames: ['column'],
+
+        _attributes() {
+            const attrs = Backgrid.Cell.prototype._attributes.call(this);
+
+            attrs['aria-label'] = __('oro.datagrid.cell.action_header.aria_label');
+
+            return attrs;
+        },
+
         keepElement: false,
+
         /** @property */
         className: 'action-column renderable',
 
@@ -34,14 +45,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ActionHeaderCell() {
-            ActionHeaderCell.__super__.constructor.apply(this, arguments);
+        constructor: function ActionHeaderCell(options) {
+            ActionHeaderCell.__super__.constructor.call(this, options);
         },
 
         initialize: function(options) {
-            ActionHeaderCell.__super__.initialize.apply(this, arguments);
+            ActionHeaderCell.__super__.initialize.call(this, options);
 
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
@@ -50,30 +61,30 @@ define(function(require) {
 
             this.createActionsPanel();
 
-            var datagrid = this.column.get('datagrid');
+            const datagrid = this.column.get('datagrid');
             this.listenTo(datagrid, 'enable', this.enable);
             this.listenTo(datagrid, 'disable', this.disable);
             this.listenTo(datagrid.massActions, 'reset', this.rebuildAndRender);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
                 return;
             }
             delete this.column;
-            ActionHeaderCell.__super__.dispose.apply(this, arguments);
+            ActionHeaderCell.__super__.dispose.call(this);
             delete this.actionsPanel;
         },
 
         createActionsPanel: function() {
-            var actions = [];
-            var datagrid = this.column.get('datagrid');
+            const actions = [];
+            const datagrid = this.column.get('datagrid');
 
             this.column.get('massActions').each(function(Action) {
-                var ActionModule = Action.get('module');
+                const ActionModule = Action.get('module');
 
                 actions.push(
                     new ActionModule({
@@ -86,13 +97,13 @@ define(function(require) {
         },
 
         render: function() {
-            var panel = this.subview('actionsPanel');
+            const panel = this.subview('actionsPanel');
             this.$el.empty();
             if (panel.haveActions()) {
                 this.$el.append(this.getTemplateFunction()(this.getTemplateData()));
                 panel.setElement(this.$('[data-action-panel]'));
                 panel.render();
-                panel.$el.children().addClass('dropdown-item').wrap('<li/>');
+                panel.$el.children().wrap('<li/>');
             }
             return this;
         },
@@ -106,12 +117,22 @@ define(function(require) {
 
         enable: function() {
             this.subview('actionsPanel').enable();
-            this.$(this.options.controls).removeClass('disabled');
+            this.$(this.options.controls)
+                .attr({
+                    'tabindex': null,
+                    'aria-disabled': null
+                })
+                .removeClass('disabled');
         },
 
         disable: function() {
             this.subview('actionsPanel').disable();
-            this.$(this.options.controls).addClass('disabled');
+            this.$(this.options.controls)
+                .attr({
+                    'tabindex': -1,
+                    'aria-disabled': true
+                })
+                .addClass('disabled');
         }
     });
 

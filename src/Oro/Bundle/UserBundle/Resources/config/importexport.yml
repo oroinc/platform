@@ -1,6 +1,3 @@
-parameters:
-    oro_user.importexport.template_fixture.user.class:    Oro\Bundle\UserBundle\ImportExport\TemplateFixture\UserFixture
-
 services:
     oro_user.importexport.data_converter:
         parent: oro_importexport.data_converter.configurable
@@ -8,27 +5,26 @@ services:
     oro_user.importexport.template_fixture.data_converter:
         parent: oro_importexport.data_converter.template_fixture.configurable
 
-    # Export processor
     oro_user.importexport.processor.export:
         parent: oro_importexport.processor.export_abstract
         calls:
             - [setDataConverter,  ['@oro_user.importexport.data_converter']]
         tags:
-            - { name: oro_importexport.processor, type: export, entity: '%oro_user.entity.class%', alias: oro_user }
+            - { name: oro_importexport.processor, type: export, entity: 'Oro\Bundle\UserBundle\Entity\User', alias: oro_user }
 
     oro_user.importexport.processor.export_template:
         parent: oro_importexport.processor.export_abstract
         calls:
             - [setDataConverter,  ['@oro_user.importexport.template_fixture.data_converter']]
         tags:
-            - { name: oro_importexport.processor, type: export_template, entity: '%oro_user.entity.class%', alias: oro_user }
+            - { name: oro_importexport.processor, type: export_template, entity: 'Oro\Bundle\UserBundle\Entity\User', alias: oro_user }
 
     oro_user.importexport.template_fixture.user:
-        class: '%oro_user.importexport.template_fixture.user.class%'
+        class: Oro\Bundle\UserBundle\ImportExport\TemplateFixture\UserFixture
         tags:
             - { name: oro_importexport.template_fixture }
 
     oro_user.importexport.configuration_provider.user:
-        class: 'Oro\Bundle\UserBundle\ImportExport\Configuration\UserImportExportConfigurationProvider'
+        class: Oro\Bundle\UserBundle\ImportExport\Configuration\UserImportExportConfigurationProvider
         tags:
             - { name: oro_importexport.configuration, alias: oro_user }

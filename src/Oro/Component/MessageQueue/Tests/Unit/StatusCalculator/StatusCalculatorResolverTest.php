@@ -31,7 +31,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->queryCalculator = $this->createMock(QueryCalculator::class);
         $this->collectionCalculator = $this->createMock(CollectionCalculator::class);
@@ -45,40 +45,35 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->queryCalculator);
         unset($this->collectionCalculator);
         unset($this->statusCalculatorResolver);
     }
 
-    public function testGetCalculatorForRootJobPersistentCollectionInitialized()
+    public function testGetQueryCalculatorForPersistentCollection()
     {
         $childJobCollection = new PersistentCollection(
             $this->createMock(EntityManager::class),
             Job::class,
             new ArrayCollection()
         );
-
-        $rootJob = $this->getRootJobWithChildCollection($childJobCollection);
-        $calculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
-
-        $this->assertSame($this->collectionCalculator, $calculator);
-    }
-
-    public function testGetCalculatorForRootJobPersistentCollectionIsNotInitialized()
-    {
-        $childJobCollection = new PersistentCollection(
-            $this->createMock(EntityManager::class),
-            Job::class,
-            new ArrayCollection()
-        );
-        $childJobCollection->setInitialized(false);
 
         $rootJob = $this->getRootJobWithChildCollection($childJobCollection);
         $calculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
 
         $this->assertSame($this->queryCalculator, $calculator);
+    }
+
+    public function testGetCollectionCalculatorForArrayCollection()
+    {
+        $childJobCollection = new ArrayCollection();
+
+        $rootJob = $this->getRootJobWithChildCollection($childJobCollection);
+        $calculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
+
+        $this->assertSame($this->collectionCalculator, $calculator);
     }
 
     public function testGetCalculatorForRootJobCollection()

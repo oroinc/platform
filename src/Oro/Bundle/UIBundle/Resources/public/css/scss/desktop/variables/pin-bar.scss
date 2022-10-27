@@ -1,9 +1,13 @@
 /* @theme: admin.oro; */
 
-$pin-item-active-bg-color:           $extra-200 !default;
-$pin-item-close-color:               $primary-700 !default;
-$pin-item-close-hover-color:         darken($pin-item-close-color, 8%) !default;
-$pin-item-outdated-color:            $warning-dark !default;
-$pin-item-outdated-hover-color:      darken($pin-item-outdated-color, 8%) !default;
+$pin-item-active-bg-color: $extra-200 !default;
+$pin-item-close-color: $primary-700 !default;
+$pin-item-close-hover-color: darken($pin-item-close-color, 8%) !default;
+$pin-item-outdated-color: $warning-dark !default;
+$pin-item-outdated-hover-color: darken($pin-item-outdated-color, 8%) !default;
 
-$pin-show-more-gradient:             linear-gradient(to if-ltr(left, right), $primary-900, transparent) !default;
+$pin-item-show-more-menu-width: 20px !default;
+$pin-item-show-more-menu-offset: -8px !default;
+$pin-item-show-more-menu-arrow-end: 12px !default;
+
+$pin-show-more-gradient: linear-gradient(to left, $primary-900, rgba($primary-900, 0)) !default;

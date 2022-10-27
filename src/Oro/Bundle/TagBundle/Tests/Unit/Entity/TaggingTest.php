@@ -2,23 +2,24 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\TagBundle\Entity\Tag;
+use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\Tagging;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class TaggingTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Tagging
-     */
-    protected $tagging;
+    /** @var Tagging */
+    private $tagging;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tagging = new Tagging();
     }
 
     public function testSetGetUserMethods()
     {
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $user = $this->createMock(User::class);
 
         $this->tagging->setOwner($user);
         $this->assertEquals($user, $this->tagging->getOwner());
@@ -26,7 +27,7 @@ class TaggingTest extends \PHPUnit\Framework\TestCase
 
     public function testSetGetTagMethods()
     {
-        $tag = $this->createMock('Oro\Bundle\TagBundle\Entity\Tag');
+        $tag = $this->createMock(Tag::class);
         $this->tagging->setTag($tag);
 
         $this->assertEquals($tag, $this->tagging->getTag());
@@ -39,10 +40,10 @@ class TaggingTest extends \PHPUnit\Framework\TestCase
 
     public function testSetGetResourceMethods()
     {
-        $resource = $this->getMockForAbstractClass('Oro\Bundle\TagBundle\Entity\Taggable');
+        $resource = $this->getMockForAbstractClass(Taggable::class);
         $resource->expects($this->exactly(2))
             ->method('getTaggableId')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
 
         $this->tagging->setResource($resource);
 

@@ -19,6 +19,7 @@ class WidgetFilterTypeTest extends TypeTestCase
         $form->submit($formData);
 
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals(
             ['entity' => 'TestClass', 'definition' => ['filters' => []]],
             $form->getData()
@@ -27,25 +28,21 @@ class WidgetFilterTypeTest extends TypeTestCase
 
     /**
      * @dataProvider testViewDataProvider
-     *
-     * @param array $options
-     * @param array $expectedData
-     * @param array $value
      */
-    public function testView(array $options, array $expectedData, $value = [])
+    public function testView(array $options, array $expectedData, array $value = [])
     {
-        $form    = $this->factory->create(
+        $form = $this->factory->create(
             WidgetFilterType::class,
             $value,
             array_merge(['entity' => 'TestClass', 'widgetType' => 'test_widget'], $options)
         );
-        $view    = $form->createView();
+        $view = $form->createView();
         $this->assertEquals('test_widget', $view->vars['widgetType']);
         $this->assertEquals($expectedData['collapsible'], $view->vars['collapsible']);
         $this->assertEquals($expectedData['collapsed'], $view->vars['collapsed']);
     }
 
-    public function testViewDataProvider()
+    public function testViewDataProvider(): array
     {
         return [
             'default options' => [

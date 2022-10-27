@@ -6,9 +6,10 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\Exception\UnexpectedTypeException;
 
 /**
- * A filter that can be used on any grid to get entities by any related entity to original one.
+ * The filter by an entity that is marked as a dictionary.
  */
 class DictionaryFilter extends BaseMultiChoiceFilter
 {
@@ -35,10 +36,18 @@ class DictionaryFilter extends BaseMultiChoiceFilter
     /**
      * {@inheritDoc}
      */
+    public function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
-        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+        if ($this->isValueRequired($comparisonType)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 
@@ -79,17 +88,12 @@ class DictionaryFilter extends BaseMultiChoiceFilter
     protected function getFilteredFieldName(FilterDatasourceAdapterInterface $ds)
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
-            throw new \LogicException(
-                sprintf(
-                    '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
-                    get_class($ds)
-                )
-            );
+            throw new UnexpectedTypeException($ds, OrmFilterDatasourceAdapter::class);
         }
 
         try {
             $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-            list($joinAlias) = explode('.', $fieldName);
+            [$joinAlias] = explode('.', $fieldName);
 
             $join = QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $joinAlias);
             if ($join && $this->isToOne($ds)) {
@@ -112,5 +116,26 @@ class DictionaryFilter extends BaseMultiChoiceFilter
         }
 
         return $field;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildComparisonExpr(
+        FilterDatasourceAdapterInterface $ds,
+        $comparisonType,
+        $fieldName,
+        $parameterName
+    ) {
+        QueryBuilderUtil::checkField($fieldName);
+
+        switch ($comparisonType) {
+            case FilterUtility::TYPE_NOT_EMPTY:
+                return $ds->expr()->isNotNull($fieldName);
+            case FilterUtility::TYPE_EMPTY:
+                return $ds->expr()->isNull($fieldName);
+            default:
+                return parent::buildComparisonExpr($ds, $comparisonType, $fieldName, $parameterName);
+        }
     }
 }

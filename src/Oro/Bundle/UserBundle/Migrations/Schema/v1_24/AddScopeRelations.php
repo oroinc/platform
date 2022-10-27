@@ -31,9 +31,6 @@ class AddScopeRelations implements Migration, ExtendExtensionAwareInterface
         $this->addRelationsToScope($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function addRelationsToScope(Schema $schema)
     {
         if ($schema->hasTable('oro_scope')) {

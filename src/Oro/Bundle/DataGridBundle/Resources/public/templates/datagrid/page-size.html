@@ -5,7 +5,7 @@
 <div class="btn-group">
     <button class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>" type="button"
             id="<%- togglerId %>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-            aria-label="<%- _.__('View per page') %>" data-placement="bottom-end">
+            aria-label="<%- _.__('View per page') %>" data-placement="bottom-end" data-position-fixed="false">
         <%- currentSizeLabel %>
     </button>
     <ul class="dropdown-menu" aria-labelledby="<%- togglerId %>">

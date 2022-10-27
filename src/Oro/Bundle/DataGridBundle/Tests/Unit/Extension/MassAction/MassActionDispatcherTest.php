@@ -28,45 +28,28 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
 {
-    const DATAGRID_NAME = 'datagridName';
-    const ACTION_NAME = 'actionName';
+    private const DATAGRID_NAME = 'datagridName';
+    private const ACTION_NAME = 'actionName';
 
-    /**
-     * @var array
-     */
-    private static $data = ['some' => 'data'];
+    private static array $data = ['some' => 'data'];
+    private static array $filters = ['someFilter' => 'data'];
 
-    /**
-     * @var array
-     */
-    private static $filters = ['someFilter' => 'data'];
+    /** @var MassActionHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $massActionHelper;
 
-    /**
-     * @var MassActionHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $massActionHelper;
+    /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
 
-    /**
-     * @var Manager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $manager;
+    /** @var MassActionParametersParser|\PHPUnit\Framework\MockObject\MockObject */
+    private $massActionParametersParser;
 
-    /**
-     * @var MassActionParametersParser|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $massActionParametersParser;
+    /** @var IterableResultFactoryRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $iterableResultFactoryRegistry;
 
-    /**
-     * @var IterableResultFactoryRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $iterableResultFactoryRegistry;
+    /** @var MassActionDispatcher */
+    private $massActionDispatcher;
 
-    /**
-     * @var MassActionDispatcher
-     */
-    protected $massActionDispatcher;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->manager = $this->createMock(Manager::class);
         $this->massActionParametersParser = $this->createMock(MassActionParametersParser::class);
@@ -93,8 +76,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     public function testDispatchByRequestWhenNoItemsSelected()
     {
         $request = new Request();
-        $this->massActionParametersParser
-            ->expects($this->once())
+        $this->massActionParametersParser->expects($this->once())
             ->method('parse')
             ->with($request)
             ->willReturn(['inset' => true, 'values' => []]);
@@ -119,8 +101,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     public function testDispatchByRequestWhenNoMassActionExtensionAppliedForGrid()
     {
         $request = new Request();
-        $this->massActionParametersParser
-            ->expects($this->once())
+        $this->massActionParametersParser->expects($this->once())
             ->method('parse')
             ->with($request)
             ->willReturn(['inset' => true, 'values' => [1], 'filters' => self::$filters]);
@@ -132,38 +113,29 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->massActionDispatcher->dispatchByRequest(self::DATAGRID_NAME, self::ACTION_NAME, $request);
     }
 
-    /**
-     * @param DatasourceInterface $datasource
-     * @param DatagridConfiguration|null $gridConfig
-     * @return DatagridInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createDatagrid(DatasourceInterface $datasource = null, DatagridConfiguration $gridConfig = null)
-    {
+    private function createDatagrid(
+        DatasourceInterface $datasource = null,
+        DatagridConfiguration $gridConfig = null
+    ): DatagridInterface {
         $gridParameters = $this->createMock(ParameterBag::class);
-        $gridParameters
-            ->expects($this->once())
+        $gridParameters->expects($this->once())
             ->method('mergeKey')
             ->with(OrmFilterExtension::FILTER_ROOT_PARAM, self::$filters);
 
-        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $datagrid */
         $datagrid = $this->createMock(DatagridInterface::class);
-        $datagrid
-            ->expects($this->once())
+        $datagrid->expects($this->once())
             ->method('getParameters')
             ->willReturn($gridParameters);
 
-        $datagrid
-            ->expects($this->any())
+        $datagrid->expects($this->any())
             ->method('getAcceptedDatasource')
             ->willReturn($datasource);
 
-        $datagrid
-            ->expects($this->any())
+        $datagrid->expects($this->any())
             ->method('getConfig')
             ->willReturn($gridConfig);
 
-        $this->manager
-            ->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('getDatagridByRequestParams')
             ->with(self::DATAGRID_NAME)
             ->willReturn($datagrid);
@@ -171,15 +143,10 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         return $datagrid;
     }
 
-    /**
-     * @param ActionConfiguration|null $actionConfiguration
-     * @return MassActionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createMassAction(ActionConfiguration $actionConfiguration = null)
+    private function createMassAction(ActionConfiguration $actionConfiguration = null): MassActionInterface
     {
         $massAction = $this->createMock(MassActionInterface::class);
-        $massAction
-            ->expects($this->any())
+        $massAction->expects($this->any())
             ->method('getOptions')
             ->willReturn($actionConfiguration);
 
@@ -190,8 +157,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $datagrid = $this->createDatagrid();
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('getMassActionByName')
             ->with(self::ACTION_NAME, $datagrid)
             ->willThrowException(new LogicException('Mass action exception'));
@@ -211,8 +177,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     public function testDispatchByRequestWhenNoHandlerFoundForMassAction()
     {
         $request = new Request();
-        $this->massActionParametersParser
-            ->expects($this->once())
+        $this->massActionParametersParser->expects($this->once())
             ->method('parse')
             ->with($request)
             ->willReturn(['inset' => true, 'values' => [1], 'filters' => self::$filters]);
@@ -229,14 +194,12 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $dataGrid = $this->createDatagrid();
         $massAction = $this->createMassAction();
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('getMassActionByName')
             ->with(self::ACTION_NAME, $dataGrid)
             ->willReturn($massAction);
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('getHandler')
             ->with($massAction)
             ->willThrowException(new LogicException('No handler exception'));
@@ -256,8 +219,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     public function testDispatchByRequestWhenDatasourceIsNotSupported()
     {
         $request = new Request();
-        $this->massActionParametersParser
-            ->expects($this->once())
+        $this->massActionParametersParser->expects($this->once())
             ->method('parse')
             ->with($request)
             ->willReturn(
@@ -272,8 +234,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $actionConfiguration = ActionConfiguration::create([]);
         $massAction = $this->createMassAction($actionConfiguration);
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('isRequestMethodAllowed')
             ->with($massAction, Request::METHOD_GET)
             ->willReturn(true);
@@ -295,20 +256,17 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $massAction = $this->createMassAction($actionConfiguration);
         $handler = $this->createMock(MassActionHandlerInterface::class);
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('getMassActionByName')
             ->with(self::ACTION_NAME, $dataGrid)
             ->willReturn($massAction);
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('getHandler')
             ->with($massAction)
             ->willReturn($handler);
 
-        $this->iterableResultFactoryRegistry
-            ->expects($this->once())
+        $this->iterableResultFactoryRegistry->expects($this->once())
             ->method('createIterableResult')
             ->with($acceptedDatasource, $actionConfiguration, $gridConfig, $this->isInstanceOf(SelectedItems::class))
             ->willThrowException(new LogicException('Not supported datasource'));
@@ -330,8 +288,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         self::$data[MassActionDispatcher::REQUEST_TYPE] = Request::METHOD_GET;
         $request = new Request(self::$data);
-        $this->massActionParametersParser
-            ->expects($this->once())
+        $this->massActionParametersParser->expects($this->once())
             ->method('parse')
             ->with($request)
             ->willReturn(
@@ -346,8 +303,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $actionConfiguration = ActionConfiguration::create([]);
         $massAction = $this->createMassAction($actionConfiguration);
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('isRequestMethodAllowed')
             ->with($massAction, Request::METHOD_GET)
             ->willReturn(true);
@@ -364,8 +320,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         self::$data[MassActionDispatcher::REQUEST_TYPE] = Request::METHOD_GET;
         $request = new Request(self::$data);
-        $this->massActionParametersParser
-            ->expects($this->once())
+        $this->massActionParametersParser->expects($this->once())
             ->method('parse')
             ->with($request)
             ->willReturn(['inset' => true, 'values' => [1], 'filters' => self::$filters]);
@@ -373,8 +328,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $actionConfiguration = ActionConfiguration::create([]);
         $massAction = $this->createMassAction($actionConfiguration);
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('isRequestMethodAllowed')
             ->with($massAction, Request::METHOD_GET)
             ->willReturn(false);
@@ -386,16 +340,14 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $actionConfiguration = ActionConfiguration::create([]);
         $massAction = $this->createMassAction($actionConfiguration);
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('getMassActionByName')
             ->with(self::ACTION_NAME, $dataGrid)
             ->willReturn($massAction);
 
         $handler = $this->createMock(MassActionHandlerInterface::class);
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('getHandler')
             ->with($massAction)
             ->willReturn($handler);
@@ -405,9 +357,6 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->massActionDispatcher->dispatchByRequest(self::DATAGRID_NAME, self::ACTION_NAME, $request);
     }
 
-    /**
-     * @return MassActionResponseInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function setExpectationsForDispatch(): MassActionResponseInterface
     {
         $acceptedDatasource = $this->createMock(DatasourceInterface::class);
@@ -417,8 +366,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $actionConfiguration = ActionConfiguration::create([]);
         $massAction = $this->createMassAction($actionConfiguration);
 
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('getMassActionByName')
             ->with(self::ACTION_NAME, $dataGrid)
             ->willReturn($massAction);
@@ -426,23 +374,19 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $handler = $this->createMock(MassActionHandlerInterface::class);
 
         $massActionResponse = $this->createMock(MassActionResponseInterface::class);
-        $this->massActionHelper
-            ->expects($this->once())
+        $this->massActionHelper->expects($this->once())
             ->method('getHandler')
             ->with($massAction)
             ->willReturn($handler);
 
-        /** @var IterableResultInterface|\PHPUnit\Framework\MockObject\MockObject $iterableResult */
         $iterableResult = $this->createMock(IterableResultInterface::class);
 
-        $handler
-            ->expects($this->once())
+        $handler->expects($this->once())
             ->method('handle')
             ->with(new MassActionHandlerArgs($massAction, $dataGrid, $iterableResult, self::$data))
             ->willReturn($massActionResponse);
 
-        $this->iterableResultFactoryRegistry
-            ->expects($this->once())
+        $this->iterableResultFactoryRegistry->expects($this->once())
             ->method('createIterableResult')
             ->with($acceptedDatasource, $actionConfiguration, $gridConfig, $this->isInstanceOf(SelectedItems::class))
             ->willReturn($iterableResult);

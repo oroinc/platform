@@ -1,0 +1,64 @@
+/* @theme: default; */
+
+// Variables for both checkbox and radio
+$checkbox-background: get-color('additional', 'ultra') !default;
+$checkbox-size: 16px !default;
+$checkbox-size-var: var(--checkbox-size, #{$checkbox-size}) !default;
+$checkbox-appearance: none !default;
+$checkbox-vertical-align: middle !default;
+$checkbox-margin: 0 !default;
+$checkbox-border: 1px solid get-color('additional', 'middle') !default;
+$checkbox-color: get-color('additional', 'ultra') !default;
+$checkbox-display: inline-grid !default;
+$checkbox-border-radius: 3px !default;
+$checkbox-flex: none !default;
+$checkbox-outline: none !default;
+
+$checkbox-icon-size: 10px !default;
+$checkbox-icon-line-height: 1 !default;
+$checkbox-icon-checked: $fa-var-check !default;
+$checkbox-icon-indeterminate: $fa-var-minus !default;
+$checkbox-icon-place-self: center !default;
+$checkbox-icon-opacity: 0 !default;
+$checkbox-icon-opacity-checked: 1 !default;
+
+// Checked
+$checkbox-background-checked: get-color('ui', 'normal') !default;
+$checkbox-border-color-checked: $base-ui-element-border-color-focus !default;
+
+// Indeterminate
+$checkbox-background-indeterminate: get-color('ui', 'normal') !default;
+$checkbox-border-color-indeterminate: $base-ui-element-border-color-focus !default;
+
+// Hover
+$checkbox-border-color-hover: get-color('additional', 'dark') !default;
+
+// Focus
+$checkbox-border-width-focus: 2px !default;
+$checkbox-border-color-focus: get-color('ui', 'focus') !default;
+$checkbox-box-shadow-focus: 0 0 6px get-color('ui', 'normal') !default;
+
+// Disable
+$checkbox-background-disabled: get-color('additional', 'base') !default;
+$checkbox-border-color-disabled: get-color('additional', 'light') !default;
+$checkbox-background-checked-disabled: get-color('additional', 'base') !default;
+$checkbox-border-color-checked-disabled: get-color('additional', 'light') !default;
+$checkbox-color-disabled: #{rgba(get-color('ui', 'focus'), .5)} !default;
+$checkbox-opacity-disabled: null !default;
+
+// Variables for radio
+$checkbox-radio-border-radius: 50% !default;
+
+$checkbox-radio-icon-content: '' !default;
+$checkbox-radio-icon-background-checked: get-color('ui', 'focus') !default;
+$checkbox-radio-icon-size: 10px !default;
+$checkbox-radio-icon-border-radius: 50% !default;
+
+// Focus
+$checkbox-radio-border-color-focus: transparent !default;
+$checkbox-radio-border-color-checked-focus: get-color('ui', 'focus') !default;
+
+// Checkbox round
+$checkbox-round-size: 24px !default;
+$checkbox-round-border-radius: 50% !default;
+$checkbox-round-icon-size: 14px !default;

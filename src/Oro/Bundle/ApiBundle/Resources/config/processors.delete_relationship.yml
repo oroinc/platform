@@ -1,7 +1,6 @@
 services:
     oro_api.delete_relationship.processor:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationshipProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - delete_relationship
@@ -48,6 +47,13 @@ services:
             - '@oro_api.form_property_accessor'
         tags:
             - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: 100 }
+
+    oro_api.delete_relationship.handle_unidirectional_associations:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\HandleUnidirectionalAssociations
+        arguments:
+            - '@oro_api.form.unidirectional_association_handler'
+        tags:
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, priority: -150 }
 
     #
     # save_data

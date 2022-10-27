@@ -3,57 +3,54 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\DistributionBundle\DependencyInjection\Compiler\HiddenRoutesPass;
+use Oro\Component\Routing\Matcher\PhpMatcherDumper;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Routing\Matcher\Dumper\CompiledUrlMatcherDumper;
 
 class HiddenRoutesPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var HiddenRoutesPass */
-    protected $compilerPass;
-
-    protected function setUp()
-    {
-        $this->compilerPass = new HiddenRoutesPass();
-    }
-
     /**
      * @dataProvider processDataProvider
      */
-    public function testProcess($params, $expectedParams)
+    public function testProcess(array $options, array $expectedOptions): void
     {
+        $router = new Definition(Router::class);
+        $router->addArgument($this->createMock(LoaderInterface::class));
+        $router->addArgument('resource');
+        $router->addArgument($options);
+
         $container = new ContainerBuilder();
-        foreach ($params as $name => $val) {
-            $container->getParameterBag()->set($name, $val);
-        }
+        $container->setDefinition('router.default', $router);
 
-        $this->compilerPass->process($container);
+        (new HiddenRoutesPass())->process($container);
 
-        $this->assertEquals(
-            $expectedParams,
-            $container->getParameterBag()->all()
-        );
+        $routerDefinition = $container->getDefinition('router.default');
+
+        self::assertEquals($expectedOptions, $routerDefinition->getArgument(2));
     }
 
-    public function processDataProvider()
+    public function processDataProvider(): array
     {
         return [
             [[], []],
             [
                 [
-                    HiddenRoutesPass::MATCHER_DUMPER_CLASS_PARAM =>
-                        HiddenRoutesPass::EXPECTED_MATCHER_DUMPER_CLASS
+                    'matcher_dumper_class' => CompiledUrlMatcherDumper::class,
                 ],
                 [
-                    HiddenRoutesPass::MATCHER_DUMPER_CLASS_PARAM =>
-                        HiddenRoutesPass::NEW_MATCHER_DUMPER_CLASS
-                ]
+                    'matcher_dumper_class' => PhpMatcherDumper::class,
+                ],
             ],
             [
                 [
-                    HiddenRoutesPass::MATCHER_DUMPER_CLASS_PARAM => 'OtherMatcherDumper'
+                    'matcher_dumper_class' => 'OtherMatcherDumper',
                 ],
                 [
-                    HiddenRoutesPass::MATCHER_DUMPER_CLASS_PARAM => 'OtherMatcherDumper'
-                ]
+                    'matcher_dumper_class' => 'OtherMatcherDumper',
+                ],
             ],
         ];
     }

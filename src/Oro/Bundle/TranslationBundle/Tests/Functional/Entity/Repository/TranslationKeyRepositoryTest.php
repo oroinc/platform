@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -10,41 +9,33 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
 class TranslationKeyRepositoryTest extends WebTestCase
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var TranslationKeyRepository */
-    protected $repository;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-
         $this->loadFixtures([LoadTranslations::class]);
-
-        $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(TranslationKey::class);
-        $this->repository = $this->em->getRepository(TranslationKey::class);
     }
 
-    public function testGetCount()
+    private function getRepository(): TranslationKeyRepository
     {
-        $this->assertGreaterThanOrEqual(3, $this->repository->getCount());
+        return self::getContainer()->get('doctrine')->getRepository(TranslationKey::class);
     }
 
-    public function testFindAvailableDomains()
+    public function testGetCount(): void
     {
-        $domains = $this->repository->findAvailableDomains();
+        $this->assertGreaterThanOrEqual(3, $this->getRepository()->getCount());
+    }
 
-        $this->assertContains('test_domain', $domains);
+    public function testFindAvailableDomains(): void
+    {
+        $domains = $this->getRepository()->findAvailableDomains();
+
+        $this->assertContains(LoadTranslations::TRANSLATION_KEY_DOMAIN, $domains);
         $this->assertGreaterThanOrEqual(1, count($domains));
     }
 
-    public function testGetTranslationKeysData()
+    public function testGetTranslationKeysData(): void
     {
-        $data = $this->repository->getTranslationKeysData();
+        $data = $this->getRepository()->getTranslationKeysData();
         $this->assertArrayHasKey(LoadTranslations::TRANSLATION_KEY_DOMAIN, $data);
         $expectedTranslationKeys = [
             LoadTranslations::TRANSLATION_KEY_1,

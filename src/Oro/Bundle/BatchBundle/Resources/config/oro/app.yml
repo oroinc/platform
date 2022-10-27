@@ -1,21 +1,10 @@
 doctrine:
-    dbal:
-        connections:
-            batch:
-                driver:   '%database_driver%'
-                host:     '%database_host%'
-                port:     '%database_port%'
-                dbname:   '%database_name%'
-                user:     '%database_user%'
-                password: '%database_password%'
-                options:  '%database_driver_options%'
-                charset:  UTF8
     orm:
         entity_managers:
             batch:
-                connection: batch
+                connection: message_queue
                 mappings:
-                    AkeneoBatchBundle:
+                    OroBatchBundle:
                         mapping: true
                         is_bundle: true
                 metadata_cache_driver:

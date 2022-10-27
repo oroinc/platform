@@ -14,13 +14,13 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
         $this->loadFixtures([LoadWorkflowTranslations::class]);
 
-        /* @var $provider WorkflowConfigFinderBuilder */
+        /* @var WorkflowConfigFinderBuilder $provider */
         $builder = $this->getContainer()->get('oro_workflow.configuration.workflow_config_finder.builder');
         $builder->setSubDirectory('/Tests/Functional/Command/DataFixtures/ValidDefinitions');
 
@@ -30,7 +30,7 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
     public function testExecute()
     {
         $result = $this->runCommand(
-            DumpWorkflowTranslationsCommand::NAME,
+            DumpWorkflowTranslationsCommand::getDefaultName(),
             [
                 LoadWorkflowTranslations::WORKFLOW4,
                 '--locale' => LoadLanguages::LANGUAGE2,

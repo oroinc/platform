@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
-use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
-use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -15,15 +13,12 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class ResourcesWithoutIdentifierLoader
 {
-    /** @var ActionProcessorBagInterface */
-    private $processorBag;
+    /** @var ConfigProvider */
+    private $configProvider;
 
-    /**
-     * @param ActionProcessorBagInterface $processorBag
-     */
-    public function __construct(ActionProcessorBagInterface $processorBag)
+    public function __construct(ConfigProvider $configProvider)
     {
-        $this->processorBag = $processorBag;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -46,27 +41,16 @@ class ResourcesWithoutIdentifierLoader
         return $resourcesWithoutIdentifier;
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return bool
-     */
     private function hasIdentifierFields(string $entityClass, string $version, RequestType $requestType): bool
     {
-        $processor = $this->processorBag->getProcessor(ApiActions::GET);
-        /** @var Context $context */
-        $context = $processor->createContext();
-        $context->setClassName($entityClass);
-        $context->setVersion($version);
-        $context->getRequestType()->set($requestType);
-        $context->addConfigExtra(new EntityDefinitionConfigExtra($context->getAction()));
-        $context->addConfigExtra(new FilterIdentifierFieldsConfigExtra());
-        $context->setLastGroup('initialize');
-
-        $processor->process($context);
-        $config = $context->getConfig();
+        $config = $this->configProvider
+            ->getConfig(
+                $entityClass,
+                $version,
+                $requestType,
+                [new EntityDefinitionConfigExtra(ApiAction::GET), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->getDefinition();
 
         $result = false;
         if (null !== $config) {

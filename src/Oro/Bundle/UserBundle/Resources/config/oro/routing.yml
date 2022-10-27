@@ -11,85 +11,291 @@ oro_user_bundle_config:
     type:         annotation
     prefix:       /config
 
-oro_user_api_user:
-    resource:     "@OroUserBundle/Controller/Api/Rest/UserController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest
-
-oro_user_api_role:
-    resource:     "@OroUserBundle/Controller/Api/Rest/RoleController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format: json
-    defaults:
-        version:  latest
-
-oro_user_api_group:
-    resource:     "@OroUserBundle/Controller/Api/Rest/GroupController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format: json
-    defaults:
-        version:  latest
-
-oro_user_api_user_permission:
-    resource:     "@OroUserBundle/Controller/Api/Rest/UserPermissionController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest
-
-# deprecated API routes
-oro_api_post_role_deprecated:
-    path:            /api/rest/{version}/role.{_format}
-    methods:         [POST]
-    defaults:
-        _controller: Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::postAction
-        _format:     json
-        version:     latest
-    requirements:
-        _format:     json|html
-        version:     latest|v1
-
-oro_api_post_user_deprecated:
-    path:            /api/rest/{version}/user.{_format}
-    methods:         [POST]
-    defaults:
-        _controller: Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::postAction
-        _format:     json
-        version:     latest
-    requirements:
-        _format:     json|html
-        version:     latest|v1
-
-oro_api_post_group_deprecated:
-    path:            /api/rest/{version}/group.{_format}
-    methods:         [POST]
-    defaults:
-        _controller: Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::postAction
-        _format:     json
-        version:     latest
-    requirements:
-        _format:     json|html
-        version:     latest|v1
-
 oro_rest_api_user_profile:
     path: '%oro_api.rest.prefix%userprofile'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiController::itemAction
     defaults:
-        _controller: OroApiBundle:RestApi:item
         entity: userprofile
     options:
         group: rest_api
         override_path: '%oro_api.rest.prefix%userprofile/{id}'
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_get_users:
+    path: '/api/rest/{version}/users.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_user:
+    path: '/api/rest/{version}/users/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_post_user:
+    path: '/api/rest/{version}/users.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_put_user:
+    path: '/api/rest/{version}/users/{id}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::putAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_user:
+    path: '/api/rest/{version}/users/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_user_roles:
+    path: '/api/rest/{version}/users/{id}/roles.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::getRolesAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_user_groups:
+    path: '/api/rest/{version}/users/{id}/groups.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::getGroupsAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_user_filter:
+    path: '/api/rest/{version}/user/filter.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::getFilterAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_options_users:
+    path: '/api/rest/{version}/users.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_roles:
+    path: '/api/rest/{version}/roles.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_role:
+    path: '/api/rest/{version}/roles/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_post_role:
+    path: '/api/rest/{version}/roles.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_put_role:
+    path: '/api/rest/{version}/roles/{id}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::putAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_role:
+    path: '/api/rest/{version}/roles/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_role_byname:
+    path: '/api/rest/{version}/roles/{name}/byname.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::getBynameAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_options_roles:
+    path: '/api/rest/{version}/roles.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_groups:
+    path: '/api/rest/{version}/groups.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_group:
+    path: '/api/rest/{version}/groups/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_post_group:
+    path: '/api/rest/{version}/groups.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_put_group:
+    path: '/api/rest/{version}/groups/{id}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::putAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_group:
+    path: '/api/rest/{version}/groups/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_options_groups:
+    path: '/api/rest/{version}/groups.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_user_permissions:
+    path: '/api/rest/{version}/users/{id}/permissions.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserPermissionController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_options_user_permissions:
+    path: '/api/rest/{version}/user/permissions.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\UserBundle\Controller\Api\Rest\UserPermissionController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1

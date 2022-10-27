@@ -7,6 +7,9 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 
+/**
+ * The filter by predefined values.
+ */
 class ChoiceFilter extends AbstractFilter
 {
     /**
@@ -33,45 +36,26 @@ class ChoiceFilter extends AbstractFilter
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
-        $isNullValueSelected = $this->checkNullValue($data);
-        if ($isNullValueSelected) {
+        if ($this->checkNullValue($data)) {
             if (empty($data['value'])) {
-                return $this->buildNullValueExpr(
-                    $ds,
-                    $comparisonType,
-                    $fieldName
-                );
-            } else {
-                $parameterName = $ds->generateParameterName($this->getName());
-                $ds->setParameter($parameterName, $data['value']);
-
-                return $this->buildCombinedExpr(
-                    $ds,
-                    $comparisonType,
-                    $this->buildComparisonExpr(
-                        $ds,
-                        $comparisonType,
-                        $fieldName,
-                        $parameterName
-                    ),
-                    $this->buildNullValueExpr(
-                        $ds,
-                        $comparisonType,
-                        $fieldName
-                    )
-                );
+                return $this->buildNullValueExpr($ds, $comparisonType, $fieldName);
             }
-        } else {
+
             $parameterName = $ds->generateParameterName($this->getName());
             $ds->setParameter($parameterName, $data['value']);
 
-            return $this->buildComparisonExpr(
+            return $this->buildCombinedExpr(
                 $ds,
                 $comparisonType,
-                $fieldName,
-                $parameterName
+                $this->buildComparisonExpr($ds, $comparisonType, $fieldName, $parameterName),
+                $this->buildNullValueExpr($ds, $comparisonType, $fieldName)
             );
         }
+
+        $parameterName = $ds->generateParameterName($this->getName());
+        $ds->setParameter($parameterName, $data['value']);
+
+        return $this->buildComparisonExpr($ds, $comparisonType, $fieldName, $parameterName);
     }
 
     /**
@@ -79,7 +63,7 @@ class ChoiceFilter extends AbstractFilter
      */
     public function getMetadata()
     {
-        $formView  = $this->getForm()->createView();
+        $formView = $this->getForm()->createView();
         $fieldView = $formView->children['value'];
 
         $choices = array_map(
@@ -92,9 +76,8 @@ class ChoiceFilter extends AbstractFilter
             $fieldView->vars['choices']
         );
 
-
-        $metadata                    = parent::getMetadata();
-        $metadata['choices']         = $choices;
+        $metadata = parent::getMetadata();
+        $metadata['choices'] = $choices;
         $metadata['populateDefault'] = $formView->vars['populate_default'];
         if (!empty($formView->vars['default_value'])) {
             $metadata['placeholder'] = $formView->vars['default_value'];
@@ -102,39 +85,69 @@ class ChoiceFilter extends AbstractFilter
         if (!empty($formView->vars['null_value'])) {
             $metadata['nullValue'] = $formView->vars['null_value'];
         }
-
         if ($fieldView->vars['multiple']) {
             $metadata[FilterUtility::TYPE_KEY] = 'multichoice';
         }
+
         return $metadata;
     }
 
     /**
-     * @param mixed $data
-     *
-     * @return array|bool
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        if (isset($data['value']) && !$this->getOr('keep_string_value', false)) {
+            if (\is_array($data['value'])) {
+                foreach ($data['value'] as $key => $value) {
+                    if (is_numeric($value)) {
+                        $data['value'][$key] = (int)$value;
+                    }
+                }
+            } elseif (is_numeric($data['value'])) {
+                $data['value'] = (int)$data['value'];
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function parseData($data)
     {
-        if (!is_array($data)
-            || !array_key_exists('value', $data)
-            || $data['value'] === ''
-            || is_null($data['value'])
-            || ((is_array($data['value']) || $data['value'] instanceof Collection) && !count($data['value']))
-        ) {
+        $data = parent::parseData($data);
+        if (!\is_array($data)) {
+            return false;
+        }
+
+        return $this->parseValue($data);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return mixed
+     */
+    protected function parseValue(array $data)
+    {
+        if (!isset($data['value'])) {
             return false;
         }
 
         $value = $data['value'];
+        if ('' === $value || ((\is_array($value) || $value instanceof Collection) && count($value) === 0)) {
+            return false;
+        }
 
         if ($value instanceof Collection) {
             $value = $value->getValues();
         }
-        if (!is_array($value)) {
-            $value = array($value);
+        if (!\is_array($value)) {
+            $value = [$value];
         }
-
-        $data['type']  = isset($data['type']) ? $data['type'] : null;
         $data['value'] = $value;
 
         return $data;
@@ -219,14 +232,14 @@ class ChoiceFilter extends AbstractFilter
      */
     protected function checkNullValue(array &$data)
     {
-        $nullValue          = $this->getOr('null_value');
+        $nullValue = $this->getOr('null_value');
         $isNullValueSelected = false;
         if ($nullValue) {
             $values = $data['value'];
             foreach ($values as $key => $value) {
                 if ($value === $nullValue) {
                     unset($values[$key]);
-                    $data['value']        = $values;
+                    $data['value'] = $values;
                     $isNullValueSelected = true;
                     break;
                 }

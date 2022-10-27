@@ -1,31 +1,47 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% extends '@OroUI/actions/view.html.twig' %}
 
 {% set entity = null %}
 
 {% block pageHeader %}
-    {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.platform.system_info'|trans } %}
+    {% include '@OroUI/page_title_block.html.twig' with { title: 'oro.platform.system_info'|trans } %}
 {% endblock %}
 
 {% block navButtons %}{% endblock navButtons %}
 
 {% block content_data %}
+    {% import _self as systeminfo %}
+
+    {% set deploymentSection %}
+        <div class="row-fluid">
+            <div class="responsive-block package-list">
+                {{ systeminfo.deploymentVariables(deploymentVariables) }}
+            </div>
+        </div>
+    {% endset %}
+
     {% set packagesSection %}
         <div class="row-fluid">
             <div class="responsive-block package-list">
                 <h3>{{ 'oro.platform.caption.oro'|trans }}</h3>
-                {{ _self.packagesTable(oroPackages) }}
+                {{ systeminfo.packagesTable(oroPackages) }}
             </div>
             <div class="responsive-block package-list">
                 <h3>{{ 'oro.platform.caption.thirdParty'|trans }}</h3>
-                {{ _self.packagesTable(thirdPartyPackages) }}
+                {{ systeminfo.packagesTable(thirdPartyPackages) }}
             </div>
         </div>
     {% endset %}
 
     {% set dataBlocks = [
         {
-            'title': 'oro.platform.packages'|trans,
+            'title': 'oro.platform.deployment_variables'|trans,
             'class': 'active',
+            'subblocks': [
+            {'data' : [deploymentSection]}
+        ]
+        },
+        {
+            'title': 'oro.platform.packages'|trans,
             'subblocks': [
                 {'data' : [packagesSection]}
             ]
@@ -49,10 +65,10 @@
             </tr>
             </thead>
             <tbody>
-            {% for package in packages %}
+            {% for packageName, package in packages %}
                 <tr>
-                    <td>{{ package.prettyName }}</td>
-                    <td>{{ package.prettyVersion }}</td>
+                    <td>{{ packageName }}</td>
+                    <td>{{ package.pretty_version }}</td>
                     <td>
                         {% for license in package.license %}
                             {{ license }}
@@ -67,4 +83,17 @@
             {{ 'oro.platform.no_packages'|trans }}
         </div>
     {% endif %}
+{% endmacro %}
+
+{% macro deploymentVariables(variables) %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+    <div class="widget-content">
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {% for variable in variables %}
+                    {{ UI.renderProperty(variable.label|trans, variable.value|default('N/A')) }}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 {% endmacro %}

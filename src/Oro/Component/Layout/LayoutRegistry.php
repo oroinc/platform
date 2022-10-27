@@ -6,6 +6,9 @@ use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\Extension\ExtensionInterface;
 
+/**
+ * The main registry of the Layout component
+ */
 class LayoutRegistry implements LayoutRegistryInterface
 {
     /** @var array */
@@ -22,6 +25,20 @@ class LayoutRegistry implements LayoutRegistryInterface
 
     /** @var BlockTypeExtensionInterface[] */
     private $typeExtensions = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypeNames(): array
+    {
+        $typeNames = [];
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
+            $typeNames[] = $extension->getTypeNames();
+        }
+
+        return array_unique(array_merge(...$typeNames));
+    }
 
     /**
      * {@inheritdoc}
@@ -218,7 +235,7 @@ class LayoutRegistry implements LayoutRegistryInterface
         if (null === $this->sorted) {
             ksort($this->extensions);
             $this->sorted = !empty($this->extensions)
-                ? call_user_func_array('array_merge', $this->extensions)
+                ? array_merge(...array_values($this->extensions))
                 : [];
         }
 

@@ -10,10 +10,10 @@ namespace Oro\Bundle\ApiBundle\Filter;
 class StandaloneFilterWithDefaultValue extends StandaloneFilter
 {
     /** @var mixed|null */
-    protected $defaultValue;
+    private $defaultValue;
 
     /** @var callable|null */
-    protected $defaultValueToStringConverter;
+    private $defaultValueToStringConverter;
 
     /**
      * @param string              $dataType
@@ -22,8 +22,8 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
      * @param callable|null       $defaultValueToStringConverter
      */
     public function __construct(
-        $dataType,
-        $description = null,
+        string $dataType,
+        string $description = null,
         $defaultValue = null,
         $defaultValueToStringConverter = null
     ) {
@@ -34,10 +34,8 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
 
     /**
      * Checks if the filter default value is set.
-     *
-     * @return bool
      */
-    public function hasDefaultValue()
+    public function hasDefaultValue(): bool
     {
         return null !== $this->defaultValue;
     }
@@ -61,17 +59,15 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
      *
      * @param mixed|callable|null $defaultValue
      */
-    public function setDefaultValue($defaultValue)
+    public function setDefaultValue($defaultValue): void
     {
         $this->defaultValue = $defaultValue;
     }
 
     /**
      * Gets a string representation of the filter default value.
-     *
-     * @return string
      */
-    public function getDefaultValueString()
+    public function getDefaultValueString(): string
     {
         $value = $this->getDefaultValue();
         if (null !== $this->defaultValueToStringConverter) {
@@ -86,7 +82,7 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
      *
      * @param callable|null $converter
      */
-    public function setDefaultValueToStringConverter($converter)
+    public function setDefaultValueToStringConverter($converter): void
     {
         $this->defaultValueToStringConverter = $converter;
     }

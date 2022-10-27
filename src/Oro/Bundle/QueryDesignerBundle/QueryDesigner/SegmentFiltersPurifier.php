@@ -3,27 +3,17 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FiltersParserContext;
 
 /**
  * Purifies segment filters from definition skipping incomplete parts (i.e. filters and groups).
  */
 class SegmentFiltersPurifier
 {
-    /**
-     * @param array $filters
-     * @return array
-     */
     public function purifyFilters(array $filters): array
     {
         return $this->purify($filters, new FiltersParserContext());
     }
 
-    /**
-     * @param array $filters
-     * @param FiltersParserContext $context
-     * @return array
-     */
     private function purify(array $filters, FiltersParserContext $context): array
     {
         $context->checkBeginGroup();
@@ -54,11 +44,6 @@ class SegmentFiltersPurifier
         return $resultFilters;
     }
 
-    /**
-     * @param array $token
-     * @param FiltersParserContext $context
-     * @param array $resultFilters
-     */
     private function handleFilterGroupToken(array $token, FiltersParserContext $context, array &$resultFilters)
     {
         if (!empty($token)) {
@@ -70,11 +55,6 @@ class SegmentFiltersPurifier
         }
     }
 
-    /**
-     * @param array $token
-     * @param FiltersParserContext $context
-     * @param array $resultFilters
-     */
     private function handleFilterToken(array $token, FiltersParserContext $context, array &$resultFilters)
     {
         try {
@@ -85,11 +65,6 @@ class SegmentFiltersPurifier
         }
     }
 
-    /**
-     * @param string $token
-     * @param FiltersParserContext $context
-     * @param array $resultFilters
-     */
     private function handleOperatorToken(string $token, FiltersParserContext $context, array &$resultFilters)
     {
         if ($context->getLastTokenType() === FiltersParserContext::OPERATOR_TOKEN) {

@@ -11,29 +11,33 @@ class TranslationExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var TranslationsDatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationRouteHelper;
+    private $translationRouteHelper;
 
     /** @var TranslationExtension */
-    protected $extension;
+    private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translationRouteHelper = $this->getMockBuilder(TranslationsDatagridRouteHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translationRouteHelper = $this->createMock(TranslationsDatagridRouteHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_translation.helper.translation_route', $this->translationRouteHelper)
             ->getContainer($this);
 
-        $this->extension = new TranslationExtension($container, true);
+        $this->extension = new TranslationExtension($container, true, true);
     }
 
-    public function testGetName()
+    public function testIsDebugTranslator(): void
     {
-        $this->assertEquals(TranslationExtension::NAME, $this->extension->getName());
+        $this->assertTrue(
+            self::callTwigFunction($this->extension, 'oro_translation_debug_translator', [])
+        );
+    }
+
+    public function testIsDebugJsTranslations(): void
+    {
+        $this->assertTrue(
+            self::callTwigFunction($this->extension, 'oro_translation_debug_js_translations', [])
+        );
     }
 }

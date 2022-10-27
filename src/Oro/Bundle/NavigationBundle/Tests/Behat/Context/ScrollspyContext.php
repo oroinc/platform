@@ -18,7 +18,7 @@ class ScrollspyContext extends OroFeatureContext implements
      * Click link in scrollspy
      * Example: When I click "Additional information" in scrollspy
      *
-     * @When /^(?:|I )click "(?P<name>[\w\s-]+)" in scrollspy$/
+     * @When /^(?:|I )click "(?P<name>[\w\s\-]+)" in scrollspy$/
      */
     public function iClickLinkInScrollspy($name)
     {

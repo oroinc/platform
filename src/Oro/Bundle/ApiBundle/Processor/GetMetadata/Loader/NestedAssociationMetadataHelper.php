@@ -11,18 +11,17 @@ use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * Provides methods to build metadata for nested associations.
+ */
 class NestedAssociationMetadataHelper
 {
     /** @var MetadataHelper */
-    protected $metadataHelper;
+    private $metadataHelper;
 
     /** @var ObjectMetadataFactory */
-    protected $objectMetadataFactory;
+    private $objectMetadataFactory;
 
-    /**
-     * @param MetadataHelper        $metadataHelper
-     * @param ObjectMetadataFactory $objectMetadataFactory
-     */
     public function __construct(
         MetadataHelper $metadataHelper,
         ObjectMetadataFactory $objectMetadataFactory
@@ -114,7 +113,7 @@ class NestedAssociationMetadataHelper
      *
      * @throws RuntimeException if the target field cannot be found or it has invalid configuration
      */
-    protected function assertRequiredTargetField(
+    private function assertRequiredTargetField(
         EntityDefinitionConfig $targetConfig,
         $targetFieldName,
         $parentClassName,
@@ -122,37 +121,28 @@ class NestedAssociationMetadataHelper
     ) {
         $targetField = $targetConfig->getField($targetFieldName);
         if (null === $targetField) {
-            throw new RuntimeException(
-                sprintf(
-                    'The "%s" field should be configured for the nested association.'
-                    . ' Parent Field: %s::%s.',
-                    $targetFieldName,
-                    $parentClassName,
-                    $parentFieldName
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'The "%s" field should be configured for the nested association. Parent Field: %s::%s.',
+                $targetFieldName,
+                $parentClassName,
+                $parentFieldName
+            ));
         }
         if (!$targetField->hasPropertyPath()) {
-            throw new RuntimeException(
-                sprintf(
-                    'A property path should be configured for the "%s" field.'
-                    . ' Parent Field: %s::%s.',
-                    $targetFieldName,
-                    $parentClassName,
-                    $parentFieldName
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'A property path should be configured for the "%s" field. Parent Field: %s::%s.',
+                $targetFieldName,
+                $parentClassName,
+                $parentFieldName
+            ));
         }
         if ($targetField->hasTargetEntity()) {
-            throw new RuntimeException(
-                sprintf(
-                    'The "%s" field should not be an association.'
-                    . ' Parent Field: %s::%s.',
-                    $targetFieldName,
-                    $parentClassName,
-                    $parentFieldName
-                )
-            );
+            throw new RuntimeException(sprintf(
+                'The "%s" field should not be an association. Parent Field: %s::%s.',
+                $targetFieldName,
+                $parentClassName,
+                $parentFieldName
+            ));
         }
 
         return $targetField;

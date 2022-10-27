@@ -6,6 +6,9 @@ use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldBlackList;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Describes the configuration tree for the inline datagrid editing feature.
+ */
 class Configuration implements ConfigurationInterface
 {
     const ENABLED_CONFIG_PATH           = '[inline_editing][enable]';
@@ -57,9 +60,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder($this->root);
 
-        $builder->root($this->root)
+        $builder->getRootNode()
             ->validate()
                 ->ifTrue(
                     function ($value) {
@@ -77,6 +80,12 @@ class Configuration implements ConfigurationInterface
                 ->enumNode('behaviour')
                     ->values($this->behaviourConfigValues)
                     ->defaultValue(self::BEHAVIOUR_ENABLE_ALL_VALUE)
+                ->end()
+                ->booleanNode('mobile_enabled')->defaultFalse()->end()
+                ->arrayNode('cell_editor')
+                    ->children()
+                        ->scalarNode('component')->end()
+                    ->end()
                 ->end()
                 ->scalarNode('plugin')->end()
                 ->scalarNode('default_editors')->end()

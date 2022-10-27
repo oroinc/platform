@@ -1,0 +1,124 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\FilterBundle\Filter\FilterOrmQueryUtil:
+            processSubQueryExpressionGroupBy:
+                fieldExpr: true
+        Oro\Bundle\FilterBundle\Filter\DuplicateFilter:
+            buildComparisonExpr:
+                fieldName: true
+        Oro\Bundle\FilterBundle\Filter\EnumFilter:
+            buildComparisonExpr:
+                fieldName: true
+                parameterName: true
+        Oro\Bundle\FilterBundle\Filter\BooleanFilter:
+            buildComparisonExpr:
+                fieldName: true
+        Oro\Bundle\FilterBundle\Filter\ChoiceFilter:
+            buildComparisonExpr:
+                fieldName: true
+            buildNullValueExpr:
+                fieldName: true
+            buildCombinedExpr:
+                comparisonExpr: true
+                nullValueExpr: true
+        Oro\Bundle\FilterBundle\Filter\AbstractDateFilter:
+            buildFilterBetween:
+                fieldName: true
+                startDateParameterName: true
+                endDateParameterName: true
+            buildFilterLessMore:
+                fieldName: true
+                dateParameterName: true
+            buildFilterNotBetween:
+                fieldName: true
+                startDateParameterName: true
+                endDateParameterName: true
+            buildFilterEqual:
+                fieldName: true
+                dateParameterName: true
+        Oro\Bundle\FilterBundle\Filter\SingleChoiceFilter:
+            buildComparisonExpr:
+                fieldName: true
+                parameterName: true
+        Oro\Bundle\FilterBundle\Filter\NumberFilter:
+            buildComparisonExpr:
+                fieldName: true
+                parameterName: true
+        Oro\Bundle\FilterBundle\Filter\NumberRangeFilter:
+            buildBetweenExpr:
+                fieldName: true
+                parameterStart: true
+                parameterEnd: true
+            buildNotBetweenExpr:
+                fieldName: true
+                parameterStart: true
+                parameterEnd: true
+        Oro\Bundle\FilterBundle\Filter\StringFilter:
+            buildComparisonExpr:
+                fieldName: true
+                parameterName: true
+        Oro\Bundle\FilterBundle\Filter\BaseMultiChoiceFilter:
+            buildComparisonExpr:
+                fieldName: true
+                parameterName: true
+        Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder:
+            createSubQueryBuilder:
+                rootEntity: true
+            buildComparisonExpr:
+                alias: true
+            buildNullValueExpr:
+                alias: true
+        Oro\Bundle\FilterBundle\Filter\DateGroupingFilter:
+            getUsedDates:
+                filterType: true
+                extraWhereClauses: true
+            addSelect:
+                parts: true
+            addWhereClause:
+                filterType: true
+        Oro\Bundle\FilterBundle\Filter\AbstractFilter:
+            getSubQueryExpressionWithParameters:
+                fieldExpr: true
+            createSubQueryBuilder:
+                filter: true
+        Oro\Bundle\FilterBundle\Filter\JsonArrayChoiceFilter:
+            getExpression:
+                fieldName: true
+            getExpressionForPostgreSql:
+                fieldName: true
+    safe_static_methods:
+        Oro\Bundle\FilterBundle\Filter\FilterOrmQueryUtil:
+            getSelectFieldFromGroupBy: true
+    safe_methods:
+        Oro\Bundle\FilterBundle\Filter\AbstractFilter:
+            getSubQueryExpressionWithParameters: true
+        Oro\Bundle\FilterBundle\Filter\DateGroupingFilter:
+            getSelectAlias: true
+            getSelectClause: true
+            getDataFieldName: true
+            getCalendarEntity: true
+            getTargetEntity: true
+            addFilter: true
+        Oro\Bundle\FilterBundle\Filter\SkipEmptyPeriodsFilter:
+            getDataFieldName: true
+        Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter:
+            generateParameterName: true
+        Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder:
+            getFilterParts: true
+        Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface:
+            generateParameterName: true
+        Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder:
+            setCaseInsensitive: true
+            literal: true
+    check_methods:
+        Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface:
+            __all__: true
+            comparison: [0, 2]
+            in: [0]
+            notIn: [0]
+        Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder:
+            __all__: true
+        Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter:
+            groupBy: true
+            addGroupBy: true

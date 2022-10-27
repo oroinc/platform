@@ -10,17 +10,11 @@ class EntitySecurityMetadataConfigListener
     /** @var EntitySecurityMetadataProvider */
     protected $provider;
 
-    /**
-     * @param EntitySecurityMetadataProvider $provider
-     */
     public function __construct(EntitySecurityMetadataProvider $provider)
     {
         $this->provider = $provider;
     }
 
-    /**
-     * @param PreFlushConfigEvent $event
-     */
     public function preFlush(PreFlushConfigEvent $event)
     {
         if ($event->isFieldConfig()) {

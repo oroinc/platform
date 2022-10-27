@@ -5,20 +5,15 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItemsValues;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ItemControllerTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures([
-            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItemsValues',
-        ]);
+        $this->loadFixtures([LoadItemsValues::class]);
     }
 
     public function testIndexPage()
@@ -40,8 +35,8 @@ class ItemControllerTest extends WebTestCase
 
         $this->assertArrayHasKey('update', $data['data'][0]['action_configuration']);
         $this->assertArrayHasKey('delete', $data['data'][0]['action_configuration']);
-        $this->assertInternalType('array', $data['data'][0]['action_configuration']['update']);
-        $this->assertInternalType('array', $data['data'][0]['action_configuration']['delete']);
+        $this->assertIsArray($data['data'][0]['action_configuration']['update']);
+        $this->assertIsArray($data['data'][0]['action_configuration']['delete']);
 
         // the "metadata" section is returned only if datagrid data is requested by AJAX,
         // during datagrid initialization the metadata is not returned together with data
@@ -50,7 +45,7 @@ class ItemControllerTest extends WebTestCase
 
     public function testViewPage()
     {
-        /* @var $item Item */
+        /* @var Item $item */
         $item = $this->getReference(LoadItems::ITEM1);
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_test_item_view', ['id' => $item->getId()]));
@@ -80,7 +75,7 @@ class ItemControllerTest extends WebTestCase
 
     public function testUpdatePage()
     {
-        /* @var $item Item */
+        /* @var Item $item */
         $item = $this->getReference(LoadItems::ITEM1);
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_test_item_update', ['id' => $item->getId()]));
@@ -112,15 +107,15 @@ class ItemControllerTest extends WebTestCase
 
         $this->assertArrayHasKey('update', $data['data'][0]['action_configuration']);
         $this->assertArrayHasKey('delete', $data['data'][0]['action_configuration']);
-        $this->assertInternalType('array', $data['data'][0]['action_configuration']['update']);
-        $this->assertInternalType('array', $data['data'][0]['action_configuration']['delete']);
+        $this->assertIsArray($data['data'][0]['action_configuration']['update']);
+        $this->assertIsArray($data['data'][0]['action_configuration']['delete']);
 
         // the "metadata" section should be returned together with data
         // if datagrid data is requested by AJAX
         $this->assertArrayHasKey('metadata', $data);
         $this->assertArrayHasKey('massActions', $data['metadata']);
         $this->assertArrayHasKey('delete', $data['metadata']['massActions']);
-        $this->assertInternalType('array', $data['metadata']['massActions']['delete']);
+        $this->assertIsArray($data['metadata']['massActions']['delete']);
     }
 
     /**
@@ -128,9 +123,9 @@ class ItemControllerTest extends WebTestCase
      * @param string $gridName
      * @return array
      */
-    protected function assertDataGrid(Crawler $crawler, $gridName)
+    private function assertDataGrid(Crawler $crawler, $gridName)
     {
-        $this->assertContains($gridName, $crawler->html());
+        self::assertStringContainsString($gridName, $crawler->html());
 
         $container = $crawler->filter(sprintf('div[data-page-component-name="%s"]', $gridName));
 
@@ -140,16 +135,12 @@ class ItemControllerTest extends WebTestCase
 
         $this->assertNotNull($encodedOptions);
 
-        $options = json_decode($encodedOptions, true);
+        $options = json_decode($encodedOptions, true, 512, JSON_THROW_ON_ERROR);
 
         return $options['data'];
     }
 
-    /**
-     * @param Crawler $crawler
-     * @param array $operations
-     */
-    protected function assertPageContainsOperations(Crawler $crawler, array $operations)
+    private function assertPageContainsOperations(Crawler $crawler, array $operations)
     {
         $node = $crawler->filter('a.operation-button');
 
@@ -159,7 +150,7 @@ class ItemControllerTest extends WebTestCase
         $container = $node->parents()->parents()->html();
 
         foreach ($operations as $operation) {
-            $this->assertContains(
+            self::assertStringContainsString(
                 $router->generate('oro_action_operation_execute', ['operationName' => $operation]),
                 $container
             );

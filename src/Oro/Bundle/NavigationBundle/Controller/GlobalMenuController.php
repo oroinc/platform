@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Knp\Menu\ItemInterface;
+use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * Menu controller for global level.
+ *
  * @Route("/menu/global")
  */
 class GlobalMenuController extends AbstractMenuController
@@ -38,9 +42,9 @@ class GlobalMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_global_menu_create")
-     * @Template("OroNavigationBundle:GlobalMenu:update.html.twig")
+     * @Template("@OroNavigation/GlobalMenu/update.html.twig")
      *
-     * @param string      $menuName
+     * @param string $menuName
      * @param string|null $parentKey
      *
      * @return array|RedirectResponse
@@ -68,7 +72,7 @@ class GlobalMenuController extends AbstractMenuController
      * @Route("/{menuName}/move", name="oro_navigation_global_menu_move")
      *
      * @param Request $request
-     * @param string  $menuName
+     * @param string $menuName
      *
      * @return array|RedirectResponse
      */
@@ -86,5 +90,24 @@ class GlobalMenuController extends AbstractMenuController
             throw $this->createAccessDeniedException();
         }
         parent::checkAcl($context);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function handleUpdate(
+        MenuUpdateInterface $menuUpdate,
+        array $context,
+        ItemInterface $menu
+    ): array|RedirectResponse {
+        $response = parent::handleUpdate($menuUpdate, $context, $menu);
+
+        // On save RedirectResponse is returned, during rendering response is an array.
+        // Perform updates only after update.
+        if (!is_array($response)) {
+            $this->updateDependentMenuUpdateUrls($menuUpdate);
+        }
+
+        return $response;
     }
 }

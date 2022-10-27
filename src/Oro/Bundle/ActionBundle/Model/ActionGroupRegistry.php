@@ -17,10 +17,6 @@ class ActionGroupRegistry
     /** @var array|ActionGroup[] */
     protected $actionGroups;
 
-    /**
-     * @param ConfigurationProviderInterface $configurationProvider
-     * @param ActionGroupAssembler $assembler
-     */
     public function __construct(ConfigurationProviderInterface $configurationProvider, ActionGroupAssembler $assembler)
     {
         $this->configurationProvider = $configurationProvider;

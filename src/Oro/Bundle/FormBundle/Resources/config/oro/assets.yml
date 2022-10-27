@@ -1,4 +1,25 @@
-assets:
-    css:
-        'oroform':
-            - 'bundles/oroform/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oroform/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroform/css/scss/main.scss'
+
+css_tinymce_content:
+    inputs:
+        # Settings
+        - 'bundles/oroui/css/scss/settings/global-settings.scss'
+
+        # Styles
+        - 'bundles/oroform/css/scss/tinymce/content.scss'
+    output: tinymce/content.min.css
+
+css_tinymce_wysiwyg_editor:
+    inputs:
+        # Settings
+        - 'bundles/oroui/css/scss/settings/global-settings.scss'
+
+        # Styles
+        - 'bundles/oroform/css/scss/tinymce/wysiwyg-editor.scss'
+    output: tinymce/wysiwyg-editor.css

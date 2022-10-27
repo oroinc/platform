@@ -1,0 +1,14 @@
+services:
+    oro_api.post_processor_registry:
+        class: Oro\Bundle\ApiBundle\PostProcessor\PostProcessorRegistry
+        arguments:
+            - [] # post processors. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\PostProcessorCompilerPass
+            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\PostProcessorCompilerPass
+            - '@oro_api.request_expression_matcher'
+
+    oro_api.post_processor.twig:
+        class: Oro\Bundle\ApiBundle\PostProcessor\TwigPostProcessor
+        arguments:
+            - '@twig'
+        tags:
+            - { name: oro.api.post_processor, alias: twig }

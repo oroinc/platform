@@ -1,6 +1,0 @@
-services:
-    Oro\Bundle\RequireJSBundle\Command\OroBuildCommand:
-        public: false
-        class: Oro\Bundle\RequireJSBundle\Command\OroBuildCommand
-        tags:
-            - { name: console.command }

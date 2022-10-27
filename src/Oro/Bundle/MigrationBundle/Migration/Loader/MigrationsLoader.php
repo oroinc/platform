@@ -7,7 +7,6 @@ use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
-use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
@@ -20,15 +19,18 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
+ * Locates, sorts and loads migrations.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class MigrationsLoader
 {
-    const MIGRATIONS_PATH = 'Migrations/Schema';
+    private const MIGRATIONS_PATH = 'Migrations/Schema';
+    private const MIGRATIONS_SCHEMA = 'Schema';
+    private const DEFAULT_APP_MIGRATION_DIR = 'migrations';
 
     /**
      * @var KernelInterface
-     *
      */
     protected $kernel;
 
@@ -64,12 +66,6 @@ class MigrationsLoader
      */
     protected $excludeBundles;
 
-    /**
-     * @param KernelInterface          $kernel
-     * @param Connection               $connection
-     * @param ContainerInterface       $container
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         KernelInterface $kernel,
         Connection $connection,
@@ -107,7 +103,7 @@ class MigrationsLoader
 
         // process "pre" migrations
         $preEvent = new PreMigrationEvent($this->connection);
-        $this->eventDispatcher->dispatch(MigrationEvents::PRE_UP, $preEvent);
+        $this->eventDispatcher->dispatch($preEvent, MigrationEvents::PRE_UP);
         $preMigrations = $preEvent->getMigrations();
         foreach ($preMigrations as $migration) {
             $result[] = new MigrationState($migration);
@@ -126,7 +122,7 @@ class MigrationsLoader
 
         // process "post" migrations
         $postEvent = new PostMigrationEvent($this->connection);
-        $this->eventDispatcher->dispatch(MigrationEvents::POST_UP, $postEvent);
+        $this->eventDispatcher->dispatch($postEvent, MigrationEvents::POST_UP);
         $postMigrations = $postEvent->getMigrations();
         foreach ($postMigrations as $migration) {
             $result[] = new MigrationState($migration);
@@ -145,13 +141,26 @@ class MigrationsLoader
      *      .            or empty string for root migration directory
      *      .    value = full path to a migration directory
      */
-    protected function getMigrationDirectories()
+    protected function getMigrationDirectories(): array
     {
-        $result = [];
+        $bundleMigrationList = $this->getBundleMigrationDirectoryList();
+        $appMigrationList = $this->getAppMigrationDirectoryList();
+        $duplicatedMigrationStructure = array_intersect_key($bundleMigrationList, $appMigrationList);
+        if (!empty($duplicatedMigrationStructure)) {
+            throw new \RuntimeException(
+                'Application-level migration should not have the same path as a bundle migration: '
+                . implode(', ', $duplicatedMigrationStructure)
+            );
+        }
+        return array_merge($bundleMigrationList, $appMigrationList);
+    }
 
+    protected function getBundleMigrationDirectoryList(): array
+    {
+        $migrationDirectoryList = [];
         $bundles = $this->getBundleList();
         foreach ($bundles as $bundleName => $bundle) {
-            $bundlePath          = $bundle->getPath();
+            $bundlePath = $bundle->getPath();
             $bundleMigrationPath = str_replace(
                 '/',
                 DIRECTORY_SEPARATOR,
@@ -159,32 +168,70 @@ class MigrationsLoader
             );
 
             if (is_dir($bundleMigrationPath)) {
-                $bundleMigrationDirectories = [];
-
-                // get directories contain versioned migration scripts
-                $finder = new Finder();
-                $finder->directories()->depth(0)->in($bundleMigrationPath);
-                /** @var SplFileInfo $directory */
-                foreach ($finder as $directory) {
-                    $bundleMigrationDirectories[$directory->getRelativePathname()] = $directory->getPathname();
-                }
-                // add root migration directory (it may contains an installation script)
-                $bundleMigrationDirectories[''] = $bundleMigrationPath;
-                // sort them by version number (the oldest version first)
-                if (!empty($bundleMigrationDirectories)) {
-                    uksort(
-                        $bundleMigrationDirectories,
-                        function ($a, $b) {
-                            return version_compare($a, $b);
-                        }
-                    );
-                }
-
-                $result[$bundleName] = $bundleMigrationDirectories;
+                $migrationDirectoryList[$bundleName] = $this->getMigrationDirectoryStructure($bundleMigrationPath);
             }
         }
+        return $migrationDirectoryList;
+    }
 
-        return $result;
+    /**
+     * Gets a list of all directories contain migration scripts for app
+     *
+     * @return array
+     */
+    protected function getAppMigrationDirectoryList(): array
+    {
+        $migrationDirList = [];
+        $appMigrationDirectory = $this->kernel->getProjectDir() . DIRECTORY_SEPARATOR . self::DEFAULT_APP_MIGRATION_DIR;
+        if (!is_dir($appMigrationDirectory)) {
+            return $migrationDirList;
+        }
+        $finder = new Finder();
+        $finder->directories()
+            ->depth(0)
+            ->in($appMigrationDirectory);
+        foreach ($finder as $directory) {
+            $migrationItemDir = implode(
+                DIRECTORY_SEPARATOR,
+                [$appMigrationDirectory, $directory->getFilename(), self::MIGRATIONS_SCHEMA]
+            );
+
+            if (is_dir($migrationItemDir)) {
+                $migrationDirList[$directory->getFilename()] = $this->getMigrationDirectoryStructure($migrationItemDir);
+            }
+        }
+        return $migrationDirList;
+    }
+
+    /**
+     * Get migration directory structure for migration path
+     *
+     * @param string $migrationPath
+     *
+     * @return array
+     */
+    protected function getMigrationDirectoryStructure(string $migrationPath): array
+    {
+        $migrationDirectories = [];
+        // get directories contain versioned migration scripts
+        $finder = new Finder();
+        $finder->directories()->depth(0)->in($migrationPath);
+        /** @var SplFileInfo $directory */
+        foreach ($finder as $directory) {
+            $migrationDirectories[$directory->getRelativePathname()] = $directory->getPathname();
+        }
+        // add root migration directory (it may contains an installation script)
+        $migrationDirectories[''] = $migrationPath;
+        // sort them by version number (the oldest version first)
+        if (!empty($migrationDirectories)) {
+            uksort(
+                $migrationDirectories,
+                function ($a, $b) {
+                    return version_compare($a, $b);
+                }
+            );
+        }
+        return $migrationDirectories;
     }
 
     /**
@@ -252,6 +299,7 @@ class MigrationsLoader
      *                                'bundles'    => string[] names of bundles
      *
      * @throws \RuntimeException if a migration script contains more than one class
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function createMigrationObjects(&$result, $files)
     {
@@ -311,6 +359,7 @@ class MigrationsLoader
      * @param array $migrations
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function groupAndSortMigrations($files, $migrations)
     {
@@ -361,7 +410,6 @@ class MigrationsLoader
         return $groupedMigrations;
     }
 
-
     /**
      * Loads migration objects
      *
@@ -369,6 +417,7 @@ class MigrationsLoader
      *
      * @return array
      * @throws \RuntimeException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function loadMigrationObjects($files)
     {
@@ -381,7 +430,7 @@ class MigrationsLoader
             $sourceFile = $reflClass->getFileName();
             if (isset($files['migrations'][$sourceFile])) {
                 if (is_subclass_of($className, 'Oro\Bundle\MigrationBundle\Migration\Migration')) {
-                    $migration = new $className;
+                    $migration = new $className();
                     if (isset($migrations[$sourceFile])) {
                         throw new \RuntimeException('A migration script must contains only one class.');
                     }
@@ -392,7 +441,7 @@ class MigrationsLoader
                 }
             } elseif (isset($files['installers'][$sourceFile])) {
                 if (is_subclass_of($className, 'Oro\Bundle\MigrationBundle\Migration\Installation')) {
-                    $installer = new $className;
+                    $installer = new $className();
                     if (isset($migrations[$sourceFile])) {
                         throw new \RuntimeException('An installation  script must contains only one class.');
                     }
@@ -413,7 +462,6 @@ class MigrationsLoader
             $installers
         ];
     }
-
 
     /**
      * Removes already installed migrations

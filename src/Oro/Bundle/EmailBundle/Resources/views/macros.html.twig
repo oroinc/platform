@@ -58,29 +58,29 @@
         <ul class="nav">
             <% _.each(variables, function(variable, varName) { %>
             <li>
-                <a href="javascript:void(0);"
+                <a href="#"
                    class="variable"
-                   title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
-                <span>&ndash; <%= variable.label %></span>
+                   title="<%- _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%- root %>.<%- varName %><% if(variable.filter){%>|<%- variable.filter %><% } %> }}{% endverbatim %}</a>
+                <span>&ndash; <%- variable.label %></span>
             </li>
             <% }); %>
         </ul>
     </script>
     <script type="text/template" id="oro-email-template-variables-entity-variable-template">
         <li>
-            <a href="javascript:void(0);"
+            <a href="#"
                class="variable"
-               title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
-            >{% verbatim %}{{ <%= varValue %> }}{% endverbatim %}</a>
+               title="<%- _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
+            >{% verbatim %}{{ <%- varValue %> }}{% endverbatim %}</a>
             <span>&ndash;</span>
             <ul class="caption">
                 <% for (var i = 1; i < breadcrumbs.length; i++) { %>
                 <li>
-                    <span><%= pathLabels[breadcrumbs[i]] %></span>
+                    <span><%- pathLabels[breadcrumbs[i]] %></span>
                     <span>/</span>
                 </li>
                 <% } %>
-                <li><%= variable.label %></li>
+                <li><%- variable.label %></li>
             </ul>
         </li>
     </script>
@@ -93,12 +93,12 @@
             <% breadcrumbItemLabel = (i === 0 ? entityLabel : pathLabels[breadcrumbs[i]]); %>
             <li<% if (i === breadcrumbs.length - 1) { %> class="active"<% } %>>
                 <% if (i !== breadcrumbs.length - 1) { %>
-                <a href="javascript:void(0);"
+                <a href="#"
                    class="reference"
-                   data-path="<%= breadcrumbPath.substring(root.length + 1) %>"><%= breadcrumbItemLabel %></a>
+                   data-path="<%- breadcrumbPath.substring(root.length + 1) %>"><%- breadcrumbItemLabel %></a>
                 <span class="divider">/&nbsp;</span>
                 <% } else { %>
-                    <%= breadcrumbItemLabel %>
+                    <%- breadcrumbItemLabel %>
                 <% } %>
             </li>
             <% } %>
@@ -108,7 +108,7 @@
         <ul class="nav groups">
             <% if (!_.isEmpty(fields)) { %>
             <li>
-                <div class="group-label"><%= _.__('oro.entity.field_choice.fields') %></div>
+                <div class="group-label"><%- _.__('oro.entity.field_choice.fields') %></div>
                 <ul class="nav">
                 <% var variableTemplate =  _.template($('#oro-email-template-variables-entity-variable-template').html()) %>
                 <% _.each(fields, function(variable, varName) { %>
@@ -154,15 +154,15 @@
             <% } %>
             <% if (!_.isEmpty(relations)) { %>
             <li>
-                <div class="group-label"><%= _.__('oro.entity.field_choice.relations') %></div>
+                <div class="group-label"><%- _.__('oro.entity.field_choice.relations') %></div>
                 <ul class="nav">
                     <% _.each(relations, function(variable, varName) { %>
                     <li>
-                        <a href="javascript:void(0);"
+                        <a href="#"
                            class="reference"
-                           data-path="<%= path + '/' + varName %>"
-                           title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
-                        <span>&ndash; <%= variable.label %></span>
+                           data-path="<%- path + '/' + varName %>"
+                           title="<%- _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%- varPrefix %>.<%- varName %> }}{% endverbatim %}</a>
+                        <span>&ndash; <%- variable.label %></span>
                     </li>
                     <% }); %>
                 </ul>
@@ -197,7 +197,7 @@
         emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
 #}
 {% macro email_address_text(emailAddress) -%}
-    {{ emailAddress.owner|oro_format_name|default('N/A')|oro_html_strip_tags }}
+    {{ emailAddress.owner|oro_format_name|default('N/A') }}
 {%- endmacro -%}
 
 {#
@@ -207,9 +207,11 @@
         label - [optional] A text representation of email address
 #}
 {% macro email_address_link(emailAddress, label) -%}
-    {{ _self.renderEmailAddressLink(
-        label|oro_html_strip_tags|default(_self.email_address_text(emailAddress)),
-        emailAddress.owner.class,
+    {% import _self as emailMacros %}
+
+    {{ emailMacros.renderEmailAddressLink(
+        label|oro_html_strip_tags|default(emailMacros.email_address_text(emailAddress)),
+        oro_class_name(emailAddress.owner),
         emailAddress.owner.id) }}
 {%- endmacro -%}
 
@@ -236,12 +238,12 @@
 #}
 {% macro email_address_recipient_link(emailAddress, emailAddressName, label) -%}
     {% set label = label|oro_html_strip_tags|default(emailAddressName|default('N/A')) %}
-    {% set route = oro_entity_route(emailAddress.owner.class) %}
+    {% set route = oro_entity_route(oro_class_name(emailAddress.owner)) %}
     {% if route is not null %}
-        <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
+        <a href="{{ path(route, {id: emailAddress.owner.id}) }}" dir="ltr">
             {{ label }}</a>
     {% else %}
-        {{ label }}
+        <bdo dir="ltr">{{ label }}</bdo>
     {% endif %}
 {%- endmacro -%}
 
@@ -254,15 +256,17 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_address(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% if emailAddress.owner is null -%}
         {% if not knownOnly|default(false) -%}
             {{ emailAddressName|oro_html_strip_tags }}
         {%- endif %}
     {%- else -%}
         {% if noLink|default(false) -%}
-            {{ _self.email_address_text(emailAddress) }}
+            {{ emailMacros.email_address_text(emailAddress) }}
         {%- else -%}
-            {{ _self.email_address_link(emailAddress)|raw }}
+            {{ emailMacros.email_address_link(emailAddress)|raw }}
         {%- endif %}
     {%- endif %}
 {%- endmacro %}
@@ -276,6 +280,8 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_address_recipient(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% if emailAddress.owner is null -%}
         {% if not knownOnly|default(false) -%}
             {{ emailAddressName }}
@@ -284,7 +290,7 @@
         {% if noLink|default(false) -%}
             {{ emailAddressName }}
         {%- else -%}
-            {{ _self.email_address_recipient_link(emailAddress, emailAddressName)|raw }}
+            {{ emailMacros.email_address_recipient_link(emailAddress, emailAddressName)|raw }}
         {%- endif %}
     {%- endif %}
 {%- endmacro %}
@@ -313,7 +319,7 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}" class="email">{{ title|oro_html_strip_tags }}</a>
+            <a href="mailto:{{ emailAddress|e('html_attr') }}" aria-label="{{ 'oro.email.emailuser.email.aria_label'|trans({'%email%': title|oro_html_strip_tags }) }}" title="{{ title|e('html_attr') }}" class="email"><bdo dir="ltr">{{ title|oro_html_strip_tags }}</bdo></a>
         {% endif %}
     {% endif %}
 {%- endmacro -%}
@@ -325,13 +331,15 @@
         entity - related entity record
 #}
 {%- macro renderEmailWithActions(email, entity) -%}
+    {% import _self as emailMacros %}
+
     {% if email is not empty %}
         {%- set actions %}
             {%- placeholder email_actions with {email: email, entity: entity} -%}
         {% endset -%}
         {% set actions = actions|trim %}
         <span class="inline-actions-element{% if actions is empty %} inline-actions-element_no-actions{% endif %}">
-            <span class="inline-actions-element_wrapper">{{ _self.email_address_simple(email) }}</span>
+            <span class="inline-actions-element_wrapper">{{ emailMacros.email_address_simple(email) }}</span>
             {% if actions is not empty -%}
                 <span class="inline-actions-element_actions email-actions">{{ actions|raw }}</span>
             {%- endif %}
@@ -347,9 +355,11 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro recipient_email_addresses(recipients, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% set addresses = {} -%}
     {% for recipient in recipients -%}
-        {% set address = _self.email_address_recipient(recipient.emailAddress, recipient.name, noLink, knownOnly) %}
+        {% set address = emailMacros.email_address_recipient(recipient.emailAddress, recipient.name, noLink, knownOnly) %}
         {%- if address|length > 0 -%}
             {% set addresses = addresses|merge([address]) %}
         {% else %}
@@ -392,7 +402,7 @@
                         </a>
                     {% else %}
                         <div class="thumbnail">
-                            <i class="fa {{ icon }} fa-3x"></i>
+                            <span class="fa {{ icon }} fa-offset-none" aria-hidden="true"></span>
                         </div>
                     {% endif %}
                 </div>
@@ -455,17 +465,19 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_participant_name_or_me(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% if emailAddress.owner is not null and
           oro_class_name(emailAddress.owner, true) == oro_class_name(app.user, true) and
           emailAddress.owner.id == app.user.id -%}
         {% if noLink|default(false) -%}
             {{ 'Me'|trans|lower }}
         {%- else -%}
-            {{ _self.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
+            {{ emailMacros.email_address_link(emailAddress, 'Me'|trans|lower)|raw }}
         {%- endif %}
     {%- else -%}
         {%- set name = oro_get_email_address_name(emailAddressName)|default(oro_get_email_address(emailAddressName))|oro_html_strip_tags -%}
-        {{ _self.email_address(emailAddress, name, noLink, knownOnly) }}
+        {{ emailMacros.email_address(emailAddress, name, noLink, knownOnly) }}
     {%- endif %}
 {%- endmacro %}
 
@@ -477,10 +489,12 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_participants_name(recipients, noLink, knownOnly) -%}
+    {% import _self as emailMacros %}
+
     {% set recipientHtmlCollection = [] %}
     {% for recipient in recipients %}
         {% set recipientHtml -%}
-            <span class="email-recipient">{{ _self.email_participant_name_or_me(recipient.emailAddress, recipient.name, noLink, knownOnly) }}</span>
+            <span class="email-recipient">{{ emailMacros.email_participant_name_or_me(recipient.emailAddress, recipient.name, noLink, knownOnly) }}</span>
         {%- endset %}
         {% set recipientHtmlCollection = recipientHtmlCollection|merge([recipientHtml]) %}
     {% endfor %}
@@ -516,7 +530,13 @@
     {% set recipientsCc = [] %}
     {% set recipientsBcc = [] %}
     {% for recipient in email.recipients %}
-        {% set recipientName = oro_get_email_address_name(recipient.name)|oro_html_strip_tags ~ " &lt;" ~ oro_get_email_address(recipient.name)|oro_html_strip_tags ~ "&gt;" %}
+        {% set emailAddressName = oro_get_email_address_name(recipient.name)|oro_html_strip_tags %}
+        {% set emailAddress = oro_get_email_address(recipient.name)|oro_html_strip_tags %}
+        {% if emailAddressName == '' and emailAddress == '' %}
+            {% set recipientName = '' %}
+        {% else %}
+            {% set recipientName = emailAddressName ~ ' <bdo dir="ltr">&lt;' ~ emailAddress ~ '&gt;</bdo>' %}
+        {% endif %}
         {% if recipient.type == 'to' %}
             {% set recipientsTo = recipientsTo|merge([recipientName])%}
         {% elseif recipient.type == 'cc' %}
@@ -526,7 +546,7 @@
         {% endif %}
     {% endfor %}
     {% set fromUserName = oro_get_email_address_name(email.fromName)|oro_html_strip_tags %}
-    {% set fromEmailAddress = '&lt;' ~ oro_get_email_address(email.fromName)|oro_html_strip_tags ~ '&gt;' %}
+    {% set fromEmailAddress = '<bdo dir="ltr">&lt;' ~ oro_get_email_address(email.fromName)|oro_html_strip_tags ~ '&gt;</bdo>' %}
     {% set data = [{
             label: 'From'|trans,
             value: fromUserName ? '<b>' ~ fromUserName ~ '</b> ' ~ fromEmailAddress : '<b>' ~ fromEmailAddress ~ '</b>' ,
@@ -547,16 +567,22 @@
             label: 'Subject'|trans,
             value: email.subject|oro_html_strip_tags
     }] %}
-    <ul class="form-horizontal">
-    {% for item in data %}
-        {% if item.value is not empty %}
-        <li class="control-group">
-            <label class="control-label">{{ item.label|raw }}:</label>
-            <div class="controls {{ item.cssClass is defined ? item.cssClass : '' }}">{{ item.value|raw }}</div>
-        </li>
-        {% endif %}
-    {% endfor %}
-    </ul>
+    <div class="email-detail-info">
+        <table class="email-detail-info__table">
+            {% for item in data %}
+                {% if item.value is not empty %}
+                    <tr class="email-detail-info__tr">
+                        <td class="email-detail-info__td">
+                            <div class="email-detail-info__label">{{ item.label|raw }}:</div>
+                        </td>
+                        <td class="email-detail-info__td">
+                            <div  class="email-detail-info__value {{ item.cssClass is defined ? item.cssClass : '' }}">{{ item.value|raw }}</div>
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
 {% endmacro %}
 
 {#
@@ -573,53 +599,47 @@
     Render title and buttons for Mailbox configuration
 #}
 {% macro renderMailboxConfigTitleAndButtons(pageTitle, buttons) %}
-    <div class="container-fluid page-title configuration-header">
-        {% if pageTitle is iterable %}
-            <div class="customer-info customer-simple pull-left">
-                {% for title in pageTitle%}
-                    {% if not loop.last %}
-                        <div class="sub-title">
-                            {% if title is iterable and title.link is defined and title.label is defined %}
-                                <a href="{{ title.link }}">{{ title.label }}</a>
-                            {% else %}
-                                {{ title }}
-                            {% endif %}
+    <div class="container-fluid page-title">
+        <div class="navigation navbar-extra navbar-extra-right">
+            <div class="row">
+                <div class="pull-left pull-left-extra">
+                    <div class="page-title__path">
+                        <div class="top-row">
+                            <div class="page-title__entity-title-wrapper">
+                                {% if pageTitle is iterable %}
+                                    {% for title in pageTitle%}
+                                        {% if not loop.last %}
+                                            <div class="sub-title">
+                                                {% if title is iterable and title.link is defined and title.label is defined %}
+                                                    <a href="{{ title.link }}">{{ title.label }}</a>
+                                                {% else %}
+                                                    {{ title }}
+                                                {% endif %}
+                                            </div>
+                                            <span class="separator">/</span>
+                                        {% else %}
+                                            <h1 class="page-title__entity-title">
+                                                {% if title is iterable and title.link is defined and title.label is defined %}
+                                                    <a href="{{ title.link }}">{{ title.label }}</a>
+                                                {% else %}
+                                                    {{ title }}
+                                                {% endif %}
+                                            </h1>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <h1 class="page-title__entity-title">
+                                        {{ pageTitle }}
+                                    </h1>
+                                {% endif %}
+                            </div>
                         </div>
-                        <span class="separator">/</span>
-                    {% else %}
-                        <h1 class="user-name">
-                            {% if title is iterable and title.link is defined and title.label is defined %}
-                                <a href="{{ title.link }}">{{ title.label }}</a>
-                            {% else %}
-                                {{ title }}
-                            {% endif %}
-                        </h1>
-                    {% endif %}
-                {% endfor %}
+                    </div>
+                </div>
+                <div class="pull-right title-buttons-container">
+                    {{ buttons|raw }}
+                </div>
             </div>
-        {% else %}
-            <h1>
-                {{ pageTitle }}
-            </h1>
-        {% endif %}
-
-        <div class="pull-right title-buttons-container">
-            {{ buttons|raw }}
         </div>
     </div>
-{% endmacro %}
-
-{#
-    Wrap text to tag
-    @deprecated since 2.3, no replacement because this macro was used
-        only in OroEmailBundle:Email:Datagrid/Property/contacts.html.twig,
-        now renderEmailAddressCell macro is used in this temmplate
-#}
-{% macro wrapTextToTag(text, isWrap, tag) %}
-    {% set tag = tag is not null ? tag : 'strong' %}
-    {% if isWrap == true %}
-        <{{ tag }}>{{ text }}</{{ tag }}>
-    {% else %}
-        {{ text }}
-    {% endif %}
 {% endmacro %}

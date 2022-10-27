@@ -14,9 +14,6 @@ class BusinessUnitTreeType extends AbstractType
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /**
-     * @param BusinessUnitManager $businessUnitManager
-     */
     public function __construct(BusinessUnitManager $businessUnitManager)
     {
         $this->businessUnitManager = $businessUnitManager;

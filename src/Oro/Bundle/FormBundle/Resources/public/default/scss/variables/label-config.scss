@@ -1,3 +1,5 @@
 /* @theme: default; */
 
-$label-offset: 8px;
+$label-offset: $offset-x-m !default;
+$label-font-size: $base-font-size !default;
+$label-required-color: get-color('ui', 'error-dark') !default;

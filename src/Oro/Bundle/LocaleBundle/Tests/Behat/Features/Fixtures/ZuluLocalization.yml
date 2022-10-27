@@ -9,5 +9,5 @@ Oro\Bundle\LocaleBundle\Entity\Localization:
     localization_zulu:
         name: 'Zulu_Loc'
         language: '@zulu_lang'
-        formattingCode: 'zu'
+        formattingCode: 'zu_ZA'
         titles: ['@title_localization_zulu']

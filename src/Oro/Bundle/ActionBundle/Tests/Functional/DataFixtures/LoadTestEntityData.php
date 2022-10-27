@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 
 class LoadTestEntityData extends AbstractFixture
@@ -19,9 +19,6 @@ class LoadTestEntityData extends AbstractFixture
         self::TEST_ENTITY_2 => ['message' => 'new message', 'description' => 'Test Description']
     ];
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         foreach ($this->activities as $name => $activity) {

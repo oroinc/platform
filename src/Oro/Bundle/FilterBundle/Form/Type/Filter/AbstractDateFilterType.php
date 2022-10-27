@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubmitContext;
 use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
@@ -12,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Abstract form type for date filter forms.
@@ -52,19 +53,14 @@ abstract class AbstractDateFilterType extends AbstractType
     protected $dateModifiers;
 
     /** @var null|array */
-    protected $dateVarsChoices = null;
+    protected $dateVarsChoices;
 
     /** @var null|array */
-    protected $datePartsChoices = null;
+    protected $datePartsChoices;
 
     /** @var DateFilterSubscriber */
     protected $subscriber;
 
-    /**
-     * @param TranslatorInterface      $translator
-     * @param DateModifierInterface    $dateModifiers
-     * @param EventSubscriberInterface $subscriber
-     */
     public function __construct(
         TranslatorInterface $translator,
         DateModifierInterface $dateModifiers,
@@ -110,13 +106,15 @@ abstract class AbstractDateFilterType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'date_parts'   => $this->getDateParts(),
-                'date_vars'    => $this->getDateVariables(),
-                'compile_date' => true
-            ]
-        );
+        $resolver->setDefaults([
+            'date_parts'     => $this->getDateParts(),
+            'date_vars'      => $this->getDateVariables(),
+            'compile_date'   => true,
+            'submit_context' => null
+        ]);
+        $resolver->setNormalizer('submit_context', function () {
+            return new DateFilterSubmitContext();
+        });
     }
 
     /**
@@ -160,11 +158,6 @@ abstract class AbstractDateFilterType extends AbstractType
         return $this->dateVarsChoices;
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget_options'] = $options['widget_options'];

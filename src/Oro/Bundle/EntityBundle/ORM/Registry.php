@@ -7,8 +7,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\ORMException;
 
 /**
- * Handles services registry logic
- * @TODO: Deprecate setContainer should be removed after doctrine updated to corresponding symfony version #BAP-16324
+ * This manager registry has the following improvements:
+ * * allows to configure the default lifetime of cached ORM queries
+ * * implements caching of entity managers and other performance related improvements
  */
 class Registry extends BaseRegistry
 {
@@ -21,6 +22,17 @@ class Registry extends BaseRegistry
     /** @var array [service id => manager, ...] */
     private $cachedManagerServices = [];
 
+    /** @var int|null */
+    private $defaultQueryCacheLifetime;
+
+    /**
+     * @param int|null $defaultQueryCacheLifetime
+     */
+    public function setDefaultQueryCacheLifetime($defaultQueryCacheLifetime)
+    {
+        $this->defaultQueryCacheLifetime = $defaultQueryCacheLifetime;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -32,9 +44,10 @@ class Registry extends BaseRegistry
 
         $manager = parent::getService($name);
         if ($manager instanceof OroEntityManager) {
-            $manager->setDefaultQueryCacheLifetime(
-                $this->container->getParameter('oro_entity.default_query_cache_lifetime')
-            );
+            $configuration = $manager->getConfiguration();
+            if ($configuration instanceof OrmConfiguration) {
+                $this->initializeEntityManagerConfiguration($configuration);
+            }
         }
 
         $this->cachedManagerServices[$name] = $manager;
@@ -67,7 +80,7 @@ class Registry extends BaseRegistry
      */
     public function getManagerForClass($class)
     {
-        if (array_key_exists($class, $this->managersMap)) {
+        if (\array_key_exists($class, $this->managersMap)) {
             return $this->cachedManagers[$this->managersMap[$class]];
         }
 
@@ -85,7 +98,7 @@ class Registry extends BaseRegistry
      *
      * The default Doctrine's implementation is overridden to avoid unnecessary loading
      * of all managers if the alias belongs to the default manager.
-     * @see \Doctrine\Bundle\DoctrineBundle\Registry::getAliasNamespace
+     * @see \Doctrine\Persistence\ManagerRegistry::getAliasNamespace
      */
     public function getAliasNamespace($alias)
     {
@@ -98,6 +111,11 @@ class Registry extends BaseRegistry
         }
 
         throw ORMException::unknownEntityNamespace($alias);
+    }
+
+    protected function initializeEntityManagerConfiguration(OrmConfiguration $configuration)
+    {
+        $configuration->setAttribute('DefaultQueryCacheLifetime', $this->defaultQueryCacheLifetime);
     }
 
     /**
@@ -116,7 +134,7 @@ class Registry extends BaseRegistry
          * In this case the namespaces can be retrieved by
          * $manager->getConfiguration()->getDocumentNamespaces().
          * But this is not implemented for now because default Doctrine's implementation does not do this as well.
-         * @see \Doctrine\Bundle\DoctrineBundle\Registry::getAliasNamespace
+         * @see \Doctrine\Persistence\ManagerRegistry::getAliasNamespace
          */
 
         return [];

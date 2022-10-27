@@ -10,6 +10,10 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles user's imap settings by passing a currently configured user to the form and updating configuration form
+ * with data from ajax-generated form.
+ */
 class UserImapConfigSubscriber implements EventSubscriberInterface
 {
     /** @var EntityManager */
@@ -21,11 +25,6 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param EntityManager          $entityManager
-     * @param RequestStack           $requestStack
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         EntityManager $entityManager,
         RequestStack $requestStack,
@@ -43,29 +42,10 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
-            FormEvents::POST_SUBMIT => 'postSubmit',
             FormEvents::PRE_SUBMIT => 'preSubmit',
         ];
     }
 
-    /**
-     * Save user with new imap configuration
-     *
-     * @param FormEvent $event
-     */
-    public function postSubmit(FormEvent $event)
-    {
-        /** @var User $user */
-        $user = $event->getData();
-        if ($user) {
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
-        }
-    }
-
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event)
     {
         $request = $this->getRequest();
@@ -81,8 +61,6 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
 
     /**
      * Pass currenlty configured user to the form
-     *
-     * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {

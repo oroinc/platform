@@ -14,18 +14,37 @@ oro_behat_extension:
               element: Select2Entity
 
     Add Grouping button:
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
       selector:
-        locator: '//div[@id="oro_report-grouping-form"]//a[@title="Add"]'
+        locator: '//div[@id="oro_report-grouping-form"]//a[normalize-space(text())="Add"]'
         type: xpath
+
+    Show SQL Query:
+      selector:
+        locator: '//div[@class="sql-query-container"]//a[text()="Show SQL Query"]'
+        type: xpath
+
+    Copy to Clipboard:
+      selector:
+        locator: '//div[@class="sql-query-container"]//a[text()="Copy to Clipboard"]'
+        type: xpath
+
+    Clone Report Button:
+      selector: 'a[title="Clone Report"]'
+
+    Column Names:
+      selector: 'div#select2-drop ul.select2-results'
 
   suites:
     OroReportBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroDataGridBundle::GridContext
-        - OroQueryDesignerBundle::QueryDesignerContext
-        - OroFilterBundle::FilterContext
-        - OroFormBundle::FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\QueryDesignerBundle\Tests\Behat\Context\QueryDesignerContext
+        - Oro\Bundle\FilterBundle\Tests\Behat\Context\FilterContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+        - Oro\Bundle\LocaleBundle\Tests\Behat\Context\LocalizationContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
       paths:
         - '@OroReportBundle/Tests/Behat/Features'

@@ -5,15 +5,15 @@
 
 {% block menu %}
     <span class="label {{ collector.empty ? 'disabled' }}">
-        <strong>Data API</strong>
+        <strong>API</strong>
     </span>
 {% endblock %}
 
 {% block panel %}
     {% if collector.empty %}
-        <h2>Data API</h2>
+        <h2>API</h2>
         <div class="empty">
-            <p>No Data API actions were executed.</p>
+            <p>No API actions were executed.</p>
         </div>
     {% else %}
         {{ block('stats') }}
@@ -21,7 +21,7 @@
         {{ block('applicableCheckers') }}
         {{ block('processors') }}
 
-        <script type="text/javascript">//<![CDATA[
+        <script>//<![CDATA[
 
             function sortTable(header, column, targetId) {
                 "use strict";
@@ -63,7 +63,7 @@
 {% endblock %}
 
 {% block stats %}
-    <h2>Data API Metrics</h2>
+    <h2>API Metrics</h2>
 
     <div class="metrics">
         <div class="metric">

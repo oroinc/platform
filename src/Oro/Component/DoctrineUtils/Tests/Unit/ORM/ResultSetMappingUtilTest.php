@@ -10,9 +10,7 @@ class ResultSetMappingUtilTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateResultSetMapping()
     {
-        $platform = $this->getMockBuilder(AbstractPlatform::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $platform = $this->createMock(AbstractPlatform::class);
 
         $this->assertInstanceOf(
             PlatformResultSetMapping::class,

@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
@@ -27,7 +27,11 @@ class AssociationHandler extends EntityHandler
      * @param string                   $propertyPath
      * @param string                   $entityClass
      * @param EntityDefinitionConfig   $config
+     * @param ConfigExtraInterface[]   $configExtras
+     * @param bool                     $collection
      * @param callable|null            $previousHandler
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         ActionProcessorInterface $customizationProcessor,
@@ -37,6 +41,8 @@ class AssociationHandler extends EntityHandler
         string $propertyPath,
         string $entityClass,
         EntityDefinitionConfig $config,
+        array $configExtras,
+        bool $collection,
         ?callable $previousHandler = null
     ) {
         $this->rootEntityClass = $rootEntityClass;
@@ -47,6 +53,8 @@ class AssociationHandler extends EntityHandler
             $requestType,
             $entityClass,
             $config,
+            $configExtras,
+            $collection,
             $previousHandler
         );
     }
@@ -80,29 +88,15 @@ class AssociationHandler extends EntityHandler
             && parent::isRedundantHandler($handler);
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $propertyPath
-     *
-     * @return EntityDefinitionConfig|null
-     */
     private function getAssociationConfig(
         EntityDefinitionConfig $config,
         string $propertyPath
     ): ?EntityDefinitionConfig {
-        $currentConfig = $config;
-        $path = ConfigUtil::explodePropertyPath($propertyPath);
-        foreach ($path as $fieldName) {
-            $fieldConfig = $currentConfig->getField($fieldName);
-            $currentConfig = null;
-            if (null !== $fieldConfig) {
-                $currentConfig = $fieldConfig->getTargetEntity();
-            }
-            if (null === $currentConfig) {
-                break;
-            }
+        $associationConfig = $config->findFieldByPath($propertyPath);
+        if (null === $associationConfig) {
+            return null;
         }
 
-        return $currentConfig;
+        return $associationConfig->getTargetEntity();
     }
 }

@@ -11,12 +11,12 @@ use Oro\Bundle\WorkflowBundle\Processor\Transition\FeatureCheckProcessor;
 class FeatureCheckProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FeatureCheckProcessor */
-    protected $processor;
+    private $processor;
 
     /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);
 
@@ -28,7 +28,8 @@ class FeatureCheckProcessorTest extends \PHPUnit\Framework\TestCase
         $context = new TransitionContext();
         $context->setError(new \Exception('message'));
 
-        $this->featureChecker->expects($this->never())->method('isResourceEnabled');
+        $this->featureChecker->expects($this->never())
+            ->method('isResourceEnabled');
 
         $this->processor->process($context);
 

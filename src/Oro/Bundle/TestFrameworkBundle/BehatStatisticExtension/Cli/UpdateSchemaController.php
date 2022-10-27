@@ -34,7 +34,7 @@ class UpdateSchemaController implements Controller
         $this->connection = $connection;
         $this->models = $models;
     }
-    
+
     /**
      * {@inheritdoc}
      */

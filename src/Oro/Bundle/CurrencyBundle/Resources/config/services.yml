@@ -6,7 +6,7 @@ services:
         class: Oro\Bundle\CurrencyBundle\Twig\CurrencyExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
@@ -31,9 +31,13 @@ services:
     #currencyConfig
     oro_currency.config.currency:
         class: 'Oro\Bundle\CurrencyBundle\Config\DefaultCurrencyConfigProvider'
+        public: true
         lazy: true
         arguments:
             - '@oro_config.manager'
+
+    Oro\Bundle\CurrencyBundle\Provider\CurrencyProviderInterface:
+        alias: 'oro_currency.config.currency'
 
     oro_currency.provider.view_type:
         class: Oro\Bundle\CurrencyBundle\Provider\ViewTypeConfigProvider
@@ -43,6 +47,7 @@ services:
 
     oro_currency.helper.currency_name:
         class: Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper
+        public: true
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.number'
@@ -55,7 +60,7 @@ services:
             - '@oro_currency.helper.currency_name'
             - '@oro_currency.converter.currency_to_string'
         tags:
-            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 91 }
+            - { name: oro_datagrid.inline_edit_column_options_guesser }
 
     oro_currency.datagrid.column_options_guesser:
         class: Oro\Bundle\CurrencyBundle\Grid\CurrencyColumnOptionsGuesser
@@ -71,6 +76,7 @@ services:
 
     oro_currency.query.currency_transformer:
         class: Oro\Bundle\CurrencyBundle\Query\CurrencyQueryBuilderTransformer
+        public: true
 
     oro_currency.locale_settings:
         class: Oro\Bundle\CurrencyBundle\Model\LocaleSettings
@@ -78,18 +84,19 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_locale.calendar_factory'
+            - '@oro_locale.manager.localization'
+            - '@oro_locale.configuration_provider'
             - '@oro_currency.provider.view_type'
-        calls:
-            - [addNameFormats, ['%oro_locale.format.name%']]
-            - [addAddressFormats, ['%oro_locale.format.address%']]
-            - [addLocaleData, ['%oro_locale.locale_data%']]
-            - [addCurrencyData, ['%oro_locale.currency_data%']]
+            - '@oro_currency.config.currency'
+            - '@oro_theme.registry'
 
     oro_currency.converter.currency_to_string:
         class: Oro\Bundle\CurrencyBundle\Converter\CurrencyToString
+        public: true
 
     oro_currency.importexport.formatter.multi_currency_type:
         class: Oro\Bundle\CurrencyBundle\Formatter\MultiCurrencyTypeFormatter
+        public: true
         arguments:
             - '@oro_locale.formatter.number'
         tags:
@@ -101,20 +108,9 @@ services:
              - '@oro_locale.formatter.number'
              - '@oro_currency.rounding.price_rounding_service'
 
-    oro_currency.formatter.number:
-        class: Oro\Bundle\CurrencyBundle\Formatter\NumberFormatter
-        decorates: oro_locale.formatter.number
-        arguments:
-            - '@oro_locale.settings'
-            - '@oro_currency.provider.view_type'
-
     oro_currency.converter.rate:
         class: Oro\Bundle\CurrencyBundle\Converter\RateConverter
         public: false
-
-    oro_currency.converter.rate.link:
-        tags:
-            - { name: oro_service_link, service: oro_currency.converter.rate }
 
     oro_currency.datagrid.listener.column_config:
         class: Oro\Bundle\CurrencyBundle\Datagrid\EventListener\ColumnConfigListener
@@ -134,7 +130,6 @@ services:
           class: Oro\Bundle\CurrencyBundle\EventListener\AclLoadFieldMetadataListener
           arguments:
               - '@oro_entity_config.config_manager'
-              - '@translator'
           tags:
               - { name: kernel.event_listener, event: oro_security.event.load_fields_metadata.after, method: onLoad }
 
@@ -146,3 +141,12 @@ services:
             - [addDoctrineTypeMapping, ['money_value', 'float']]
         tags:
             - { name: oro.action.extension.doctrine_type_mapping }
+
+    oro_currency.listener.orm.fix_money_changeset_listener:
+        class: 'Oro\Bundle\CurrencyBundle\EventListener\ORM\FixMoneyChangeSetListener'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, priority: 255 } # Should be the first called
+
+    Oro\Bundle\CurrencyBundle\EntityConfig\MulticurrencyFieldConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config

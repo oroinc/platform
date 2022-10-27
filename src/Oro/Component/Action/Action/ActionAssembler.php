@@ -23,10 +23,6 @@ class ActionAssembler extends AbstractAssembler
      */
     protected $conditionFactory;
 
-    /**
-     * @param ActionFactoryInterface $actionFactory
-     * @param ConditionFactoryInterface $conditionFactory
-     */
     public function __construct(ActionFactoryInterface $actionFactory, ConditionFactoryInterface $conditionFactory)
     {
         $this->actionFactory = $actionFactory;

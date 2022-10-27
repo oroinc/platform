@@ -2,25 +2,28 @@
 
 namespace Oro\Bundle\EntityBundle\Model;
 
+/**
+ * Represents detailed information about an entity field.
+ */
 class EntityFieldStructure
 {
     /** @var string */
-    protected $name;
+    private $name;
 
     /** @var string */
-    protected $type;
+    private $type;
 
     /** @var string */
-    protected $label;
+    private $label;
 
     /** @var string */
-    protected $relationType;
+    private $relationType;
 
     /** @var string */
-    protected $relatedEntityName;
+    private $relatedEntityName;
 
     /** @var array */
-    protected $options = [];
+    private $options = [];
 
     /**
      * @return string
@@ -32,14 +35,10 @@ class EntityFieldStructure
 
     /**
      * @param string $name
-     *
-     * @return $this
      */
     public function setName($name)
     {
         $this->name = $name;
-
-        return $this;
     }
 
     /**
@@ -52,14 +51,10 @@ class EntityFieldStructure
 
     /**
      * @param string $type
-     *
-     * @return $this
      */
     public function setType($type)
     {
         $this->type = $type;
-
-        return $this;
     }
 
     /**
@@ -72,14 +67,10 @@ class EntityFieldStructure
 
     /**
      * @param string $label
-     *
-     * @return $this
      */
     public function setLabel($label)
     {
         $this->label = $label;
-
-        return $this;
     }
 
     /**
@@ -92,14 +83,10 @@ class EntityFieldStructure
 
     /**
      * @param string $relationType
-     *
-     * @return $this
      */
     public function setRelationType($relationType)
     {
         $this->relationType = $relationType;
-
-        return $this;
     }
 
     /**
@@ -112,14 +99,10 @@ class EntityFieldStructure
 
     /**
      * @param string $relatedEntityName
-     *
-     * @return $this
      */
     public function setRelatedEntityName($relatedEntityName)
     {
         $this->relatedEntityName = $relatedEntityName;
-
-        return $this;
     }
 
     /**
@@ -132,15 +115,11 @@ class EntityFieldStructure
 
     /**
      * @param string $name
-     * @param mixed $value
-     *
-     * @return $this
+     * @param mixed  $value
      */
     public function addOption($name, $value)
     {
         $this->options[$name] = $value;
-
-        return $this;
     }
 
     /**
@@ -165,5 +144,29 @@ class EntityFieldStructure
     public function hasOption($name)
     {
         return isset($this->options[$name]);
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            $this->name,
+            $this->type,
+            $this->label,
+            $this->relationType,
+            $this->relatedEntityName,
+            $this->options
+        ];
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        [
+            $this->name,
+            $this->type,
+            $this->label,
+            $this->relationType,
+            $this->relatedEntityName,
+            $this->options
+        ] = $serialized;
     }
 }

@@ -1,11 +1,11 @@
-{% extends 'OroNavigationBundle:Menu:menu_base.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroNavigationBundle::macros.html.twig' as Navigation %}
+{% extends '@OroNavigation/Menu/menu_base.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroNavigation/macros.html.twig' as Navigation %}
 
 {% macro attributes(attributes) %}
     {% for name, value in attributes %}
-        {%- if value is not none and value is not sameas(false) -%}
-            {{- ' %s="%s"'|format(name, value is sameas(true) ? name|e : value|e)|raw -}}
+        {%- if value is not none and value is not same as(false) -%}
+            {{- ' %s="%s"'|format(name, value is same as(true) ? name|e : value|e)|raw -}}
         {%- endif -%}
     {%- endfor -%}
 {% endmacro %}
@@ -17,9 +17,9 @@
 {% endmacro %}
 
 {% block compressed_root %}
-    {% spaceless %}
+    {% apply spaceless %}
         {{ block('root') }}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}
 
 {% block root %}
@@ -33,7 +33,7 @@
 {% endblock %}
 
 {%- block list -%}
-    {%- if item.hasChildren and options.depth is not sameas(0) and item.displayChildren -%}
+    {%- if item.hasChildren and options.depth is not same as(0) and item.displayChildren -%}
         {%- import _self as oro_menu -%}
         {%- set childrenContent = block('children') -%}
         {%- if childrenContent -%}
@@ -90,7 +90,7 @@
             {%- set classes = classes|merge([options.lastClass]) %}
         {%- endif %}
         {%- if classes is not empty %}
-            {%- set itemAttributes = itemAttributes|merge({'class': classes|join(' ')}) %}
+            {%- set itemAttributes = itemAttributes|merge({'class': classes|array_unique|join(' ')}) %}
         {%- endif %}
         {# displaying the item #}
         {% import _self as oro_menu %}
@@ -112,7 +112,7 @@
     {%- endset -%}
     {# render the list of children#}
     {%- set childrenClasses = childrenClasses|merge(['menu', 'menu-level-' ~ item.level]) %}
-    {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|join(' ') }) %}
+    {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|array_unique|join(' ') }) %}
     {%- set wrapperContent = block('list_wrapper') -%}
     {% if item.uri != '#' or wrapperContent %}
         {{- elementContent|raw -}}
@@ -150,10 +150,10 @@
         <span class="{{- item.getExtra('icon') ~ ' menu-icon' -}}" aria-hidden="true"></span>
     {% endif -%}
     {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
-        {{- item.label|trans|raw -}}
+        {{- item.getLabel()|trans|oro_html_sanitize -}}
     {% elseif item.getExtra('translate_disabled', false) == false %}
-        {{- item.label|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages')) -}}
+        {{- item.getLabel()|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages')) -}}
     {% else %}
-        {{- item.label -}}
+        {{- item.getLabel() -}}
     {% endif %}
 {% endblock %}

@@ -1,0 +1,14 @@
+/* @theme: default; */
+
+$datagrid-body-cell-offset: 12px !default;
+$datagrid-body-cell-sm-offset: 8px 12px !default;
+$datagrid-body-cell-vertical-align: middle !default;
+$datagrid-body-cell-border-width: 1px 0 !default;
+
+$datagrid-body-cell-action-cell-width: 50px !default;
+$datagrid-body-cell-action-offset: 6px !default;
+$datagrid-body-cell-action-cell-text-align: right !default;
+
+$datagrid-body-cell-dropdown-action-offset: 2px !default;
+
+$datagrid-body-select-row-cell-offset-start: $datagrid-body-cell-offset + 7 !default;

@@ -11,12 +11,10 @@ use Symfony\Component\Form\FormEvents;
 
 class ChangeRoleSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ChangeRoleSubscriber
-     */
-    protected $changeRoleSubscriber;
+    /** @var ChangeRoleSubscriber */
+    private $changeRoleSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->changeRoleSubscriber = new ChangeRoleSubscriber();
     }
@@ -34,36 +32,26 @@ class ChangeRoleSubscriberTest extends \PHPUnit\Framework\TestCase
         $role = $this->createMock(Role::class);
         $user = $this->createMock(User::class);
 
-        $user->expects($this->exactly(1))
-            ->method('addRole')
+        $user->expects($this->once())
+            ->method('addUserRole')
+            ->with($role);
+        $user->expects($this->once())
+            ->method('removeUserRole')
             ->with($role);
 
-        $user->expects($this->exactly(1))
-            ->method('removeRole')
-            ->with($role);
-
-        /** @var Form|\PHPUnit\Framework\MockObject\MockObject $form */
-        $form = $this->getMockBuilder(Form::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $child = $this->getMockBuilder(Form::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $form = $this->createMock(Form::class);
+        $child = $this->createMock(Form::class);
 
         $child->expects($this->exactly(2))
             ->method('getData')
             ->willReturn([$user]);
 
-        $form->expects($this->at(0))
+        $form->expects($this->exactly(2))
             ->method('get')
-            ->with('appendUsers')
-            ->willReturn($child);
-
-        $form->expects($this->at(1))
-            ->method('get')
-            ->with('removeUsers')
-            ->willReturn($child);
+            ->willReturnMap([
+                ['appendUsers', $child],
+                ['removeUsers', $child]
+            ]);
 
         $event = new FormEvent($form, $role);
         $this->changeRoleSubscriber->onSubmit($event);

@@ -6,6 +6,9 @@ use Oro\Bundle\ChartBundle\Exception\InvalidArgumentException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for chart settings.
+ */
 class ChartSettingsType extends ConfigProviderAwareType
 {
     /**
@@ -16,8 +19,7 @@ class ChartSettingsType extends ConfigProviderAwareType
         $chartConfig = $this->getChartConfig($options);
 
         foreach ($chartConfig['settings_schema'] as $field) {
-            $fieldOptions = !empty($field['options']) ? $field['options'] : array();
-
+            $fieldOptions = !empty($field['options']) ? $field['options'] : [];
             $fieldOptions['label'] = $field['label'];
 
             $builder->add($field['name'], $field['type'], $fieldOptions);
@@ -61,12 +63,6 @@ class ChartSettingsType extends ConfigProviderAwareType
     {
         $chartName = $options['chart_name'];
 
-        if (isset($options['chart_config'])) {
-            $chartConfig = $options['chart_config'];
-        } else {
-            $chartConfig = $this->configProvider->getChartConfig($chartName);
-        }
-
-        return $chartConfig;
+        return $options['chart_config'] ?? $this->configProvider->getChartConfig($chartName);
     }
 }

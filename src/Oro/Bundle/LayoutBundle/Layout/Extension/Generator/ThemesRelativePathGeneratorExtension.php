@@ -6,12 +6,23 @@ use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use Symfony\Component\Finder\Finder;
 
+/**
+ * Extension for using relative paths in setBlockTheme and setFormTheme
+ */
 class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
     const THEMES_KEY = 'themes';
     const ACTION_SET_FORM_THEME = '@setFormTheme';
     const ACTION_SET_BLOCK_THEME = '@setBlockTheme';
+
+    private string $projectDir;
+
+    public function __construct(string $projectDir)
+    {
+        $this->projectDir = $projectDir;
+    }
 
     /**
      * {@inheritdoc}
@@ -49,12 +60,60 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
      */
     protected function prepareThemePath($theme, $file)
     {
-        if ($theme && strpos($theme, ':') === false && strpos($theme, '/') !== 0 && strpos($theme, '@') !== 0) {
-            $absolutePath = realpath(dirname($file).'/'.$theme);
+        if ($theme && !str_contains($theme, ':') && !str_starts_with($theme, '/') && !str_starts_with($theme, '@')) {
+            $directoryPath = \dirname($file);
+            $absolutePath = realpath($directoryPath.'/'.$theme);
             if ($absolutePath) {
-                return $absolutePath;
+                $theme = $this->getNamespacedThemeName($directoryPath, $absolutePath) ?? $absolutePath;
             }
         }
         return $theme;
+    }
+
+    /**
+     * Returns namespaced theme name (e.g. "@OroLayout/folder1/folder2/layout.html.twig")
+     * if we can find a Bundle name or project's relative path otherwise.
+     */
+    private function getNamespacedThemeName(string $directoryPath, string $absolutePath): string
+    {
+        $bundleClassData = $this->findBundleClass($directoryPath);
+        if (!$bundleClassData) {
+            return str_replace([$this->projectDir, '/templates'], ['', ''], $absolutePath);
+        }
+
+        [$bundleClassFolder, $namespace] = $bundleClassData;
+
+        $search = [$bundleClassFolder, '/Resources/views', '\Resources\views'];
+        $replace = [$namespace, '', ''];
+
+        return '@' . str_replace($search, $replace, $absolutePath);
+    }
+
+    /**
+     * Recursively find a Bundle class
+     */
+    private function findBundleClass(string $directoryPath): ?array
+    {
+        $directoryPath = realpath($directoryPath);
+        if (!is_dir($directoryPath)) {
+            return null;
+        }
+
+        $finder = Finder::create()->files()->name('*Bundle.php')->in($directoryPath)->depth(0);
+        if (!$finder->hasResults()) {
+            return $directoryPath !== $this->projectDir
+                ? $this->findBundleClass($directoryPath . DIRECTORY_SEPARATOR . '..')
+                : null;
+        }
+
+        $iterator = $finder->getIterator();
+        $iterator->rewind();
+
+        $bundleClass = $iterator->current();
+
+        return [
+            \dirname($bundleClass->getRealPath()),
+            str_replace('Bundle', '', $bundleClass->getFilenameWithoutExtension())
+        ];
     }
 }

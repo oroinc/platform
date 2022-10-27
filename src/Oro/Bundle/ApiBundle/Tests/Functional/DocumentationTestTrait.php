@@ -6,7 +6,9 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 use Symfony\Component\Routing\Route;
@@ -18,90 +20,107 @@ use Symfony\Component\Routing\Route;
  */
 trait DocumentationTestTrait
 {
-    /** @var int */
-    private static $resourceErrorCount = 3;
+    private static int $resourceErrorCount = 3;
 
     /**
      * @see \Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider::TEMPLATES
-     * @var array
      */
-    private static $defaultDocumentation = [
-        ApiActions::GET                 => 'Get an entity',
-        ApiActions::GET_LIST            => 'Get a list of entities',
-        ApiActions::DELETE              => 'Delete an entity',
-        ApiActions::DELETE_LIST         => 'Delete a list of entities',
-        ApiActions::CREATE              => 'Create an entity',
-        ApiActions::UPDATE              => 'Update an entity',
-        ApiActions::GET_SUBRESOURCE     => [
+    private static array $defaultDocumentation = [
+        ApiAction::GET                 => 'Get an entity',
+        ApiAction::GET_LIST            => 'Get a list of entities',
+        ApiAction::DELETE              => 'Delete an entity',
+        ApiAction::DELETE_LIST         => 'Delete a list of entities',
+        ApiAction::CREATE              => 'Create an entity',
+        ApiAction::UPDATE              => 'Update an entity',
+        ApiAction::GET_SUBRESOURCE     => [
             'Get a related entity',
             'Get a list of related entities'
         ],
-        ApiActions::DELETE_SUBRESOURCE  => [
+        ApiAction::DELETE_SUBRESOURCE  => [
             'Delete the specified related entity',
             'Delete the specified related entities'
         ],
-        ApiActions::ADD_SUBRESOURCE     => [
+        ApiAction::ADD_SUBRESOURCE     => [
             'Add the specified related entity',
             'Add the specified related entities'
         ],
-        ApiActions::UPDATE_SUBRESOURCE  => [
+        ApiAction::UPDATE_SUBRESOURCE  => [
             'Update the specified related entity',
             'Update the specified related entities'
         ],
-        ApiActions::GET_RELATIONSHIP    => 'Get the relationship data',
-        ApiActions::DELETE_RELATIONSHIP => 'Delete the specified members from the relationship',
-        ApiActions::ADD_RELATIONSHIP    => 'Add the specified members to the relationship',
-        ApiActions::UPDATE_RELATIONSHIP => [
+        ApiAction::GET_RELATIONSHIP    => 'Get the relationship data',
+        ApiAction::DELETE_RELATIONSHIP => 'Delete the specified members from the relationship',
+        ApiAction::ADD_RELATIONSHIP    => 'Add the specified members to the relationship',
+        ApiAction::UPDATE_RELATIONSHIP => [
             'Update the relationship',
             'Completely replace every member of the relationship'
         ]
     ];
 
-    /**
-     * @param string $entityClass
-     * @param string $entityType
-     *
-     * @return bool
-     */
-    private function isSkippedEntity($entityClass, $entityType)
+    private function isSkippedEntity(string $entityClass, string $entityType): bool
     {
         return
             is_a($entityClass, TestFrameworkEntityInterface::class, true)
-            || 0 === strpos($entityType, 'testapi')
+            || str_starts_with($entityType, 'testapi')
             || (// custom entities (entities from "Extend\Entity" namespace), except enums
-                0 === strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE)
-                && 0 !== strpos($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
+                str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE)
+                && (
+                    !str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_')
+                    || str_starts_with($entityClass, ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_')
+                )
             );
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $associationName
-     *
-     * @return bool
-     */
-    private function isSkippedField($entityClass, $fieldName)
+    private function isSkippedField(string $entityClass, string $fieldName): bool
     {
         return false;
     }
 
-    /**
-     * @return ApiDocExtractor
-     */
-    private function getExtractor()
+    private function isTestField(string $entityClass, string $fieldName): bool
+    {
+        if (str_starts_with($fieldName, ExtendConfigDumper::DEFAULT_PREFIX)) {
+            return $this->isTestField(
+                $entityClass,
+                substr($fieldName, strlen(ExtendConfigDumper::DEFAULT_PREFIX))
+            );
+        }
+
+        $configManager = $this->getEntityConfigManager();
+        if (!$configManager->hasConfig($entityClass, $fieldName)) {
+            return false;
+        }
+
+        $label = $configManager->getFieldConfig('entity', $entityClass, $fieldName)->get('label');
+
+        return str_starts_with($label, 'extend.entity.test');
+    }
+
+    private function getExtractor(): ApiDocExtractor
     {
         return self::getContainer()->get('nelmio_api_doc.extractor.api_doc_extractor');
     }
 
-    /**
-     * @return FormatterInterface
-     */
-    private function getSimpleFormatter()
+    private function getSimpleFormatter(): FormatterInterface
     {
         return self::getContainer()->get('nelmio_api_doc.formatter.simple_formatter');
     }
 
-    private function warmUpDocumentationCache()
+    private function getEntityConfigManager(): ConfigManager
+    {
+        return self::getContainer()->get('oro_entity_config.config_manager');
+    }
+
+    private function getResourceData(array $data): array
+    {
+        if (!$data) {
+            self::fail('The formatted documentation data must be not empty.');
+        }
+        $item = reset($data);
+
+        return reset($item);
+    }
+
+    private function warmUpDocumentationCache(): void
     {
         $apiDocExtractor = $this->getExtractor();
         if ($apiDocExtractor instanceof CachingApiDocExtractor) {
@@ -109,7 +128,7 @@ trait DocumentationTestTrait
         }
     }
 
-    private function checkDocumentation()
+    private function checkDocumentation(): void
     {
         $missingDocs = [];
         $docs = $this->getExtractor()->all(self::VIEW);
@@ -140,27 +159,30 @@ trait DocumentationTestTrait
     }
 
     /**
-     * @param array  $definition
-     * @param string $entityClass
-     * @param string $action
-     * @param string $association
-     *
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function checkApiResource(array $definition, $entityClass, $action, $association)
-    {
+    private function checkApiResource(
+        array $definition,
+        string $entityClass,
+        string $action,
+        ?string $association
+    ): array {
         $missingDocs = [];
-        if (empty($definition['description'])) {
+        if ($this->isEmptyDescription($definition, 'description')) {
             $missingDocs[] = 'Empty description';
         }
-        if (empty($definition['documentation'])) {
+        if ($this->isEmptyDescription($definition, 'documentation')) {
             $missingDocs[] = 'Empty documentation';
         } elseif (isset(self::$defaultDocumentation[$action])
             && in_array($definition['documentation'], (array)self::$defaultDocumentation[$action], true)
-            && !$this->isSkippedField($entityClass, $association)
+            && (
+                !$association
+                || (
+                    !$this->isSkippedField($entityClass, $association)
+                    && !$this->isTestField($entityClass, $association)
+                )
+            )
         ) {
             $missingDocs[] = sprintf(
                 'Missing documentation. Default value is used: "%s"',
@@ -170,22 +192,51 @@ trait DocumentationTestTrait
             $missingDocs[] = 'Duplicates in documentation. Full documentation:' . "\n" . $definition['documentation'];
         }
         if (!empty($definition['parameters'])) {
+            $idFieldName = null;
+            if (!empty($definition['requirements']) && count($definition['requirements']) === 1) {
+                $idFieldName = key($definition['requirements']);
+            }
             foreach ($definition['parameters'] as $name => $item) {
-                if (empty($item['description']) && !$this->isSkippedField($entityClass, $name)) {
-                    $missingDocs[] = sprintf('Input Field: %s. Empty description.', $name);
+                if (!$this->isSkippedField($entityClass, $name) && !$this->isTestField($entityClass, $name)) {
+                    if ($this->isEmptyDescription($item, 'description')) {
+                        $missingDocs[] = sprintf('Input Field: %s. Empty description.', $name);
+                    } elseif (ApiAction::UPDATE === $action && $idFieldName && $name === $idFieldName) {
+                        $description = $item['description'];
+                        if (str_contains($description, 'The required field.')) {
+                            $description = preg_replace('#\<\/?\w+\>#', '', $description);
+                            $description = trim(substr($description, 0, strpos($description, 'The required field.')));
+                            if (!$description) {
+                                $missingDocs[] = sprintf(
+                                    'Input Field: %s. Empty description before "The required field." note.'
+                                    . ' (Description: "%s")',
+                                    $name,
+                                    $item['description']
+                                );
+                            }
+                        } else {
+                            $missingDocs[] = sprintf(
+                                'Input Field: %s. No "The required field." note. (Description: "%s")',
+                                $name,
+                                $item['description']
+                            );
+                        }
+                    }
                 }
             }
         }
         if (!empty($definition['filters'])) {
             foreach ($definition['filters'] as $name => $item) {
-                if (empty($item['description'])) {
+                if ($this->isEmptyDescription($item, 'description')) {
                     $missingDocs[] = sprintf('Filter: %s. Empty description.', $name);
                 }
             }
         }
         if (!$association && !empty($definition['response'])) {
             foreach ($definition['response'] as $name => $item) {
-                if (empty($item['description']) && !$this->isSkippedField($entityClass, $name)) {
+                if ($this->isEmptyDescription($item, 'description')
+                    && !$this->isSkippedField($entityClass, $name)
+                    && !$this->isTestField($entityClass, $name)
+                ) {
                     $missingDocs[] = sprintf('Output Field: %s. Empty description.', $name);
                 }
             }
@@ -194,12 +245,7 @@ trait DocumentationTestTrait
         return $missingDocs;
     }
 
-    /**
-     * @param string $documentation
-     *
-     * @return bool
-     */
-    private function hasDuplicates($documentation)
+    private function hasDuplicates(string $documentation): bool
     {
         $delimiter = strpos($documentation, '.');
         if (false === $delimiter) {
@@ -213,12 +259,7 @@ trait DocumentationTestTrait
             && false !== strpos($documentation, $firstSentence, $delimiter);
     }
 
-    /**
-     * @param array $missingDocs
-     *
-     * @return string
-     */
-    private function buildFailMessage(array $missingDocs)
+    private function buildFailMessage(array $missingDocs): string
     {
         $message = sprintf(
             'Missing documentation for %s entit%s.' . PHP_EOL . PHP_EOL,
@@ -245,13 +286,7 @@ trait DocumentationTestTrait
         return $message;
     }
 
-    /**
-     * @param string $entityType
-     * @param string $action
-     *
-     * @return array
-     */
-    private function getEntityDocsForAction($entityType, $action)
+    private function getEntityDocsForAction(string $entityType, string $action): array
     {
         return $this->filterDocs(
             $this->getExtractor()->all(self::VIEW),
@@ -263,14 +298,7 @@ trait DocumentationTestTrait
         );
     }
 
-    /**
-     * @param string $entityType
-     * @param string $subresource
-     * @param string $action
-     *
-     * @return array
-     */
-    private function getSubresourceEntityDocsForAction($entityType, $subresource, $action)
+    private function getSubresourceEntityDocsForAction(string $entityType, string $subresource, string $action): array
     {
         return $this->filterDocs(
             $this->getExtractor()->all(self::VIEW),
@@ -289,7 +317,7 @@ trait DocumentationTestTrait
      *
      * @return array
      */
-    private function filterDocs(array $docs, $filter)
+    private function filterDocs(array $docs, callable $filter): array
     {
         $result = [];
         foreach ($docs as $doc) {
@@ -303,12 +331,9 @@ trait DocumentationTestTrait
         return $result;
     }
 
-    /**
-     * @param string $entityType
-     */
-    private function checkOptionsDocumentationForEntity($entityType)
+    private function checkOptionsDocumentationForEntity(string $entityType): void
     {
-        $docs = $this->getEntityDocsForAction($entityType, ApiActions::OPTIONS);
+        $docs = $this->getEntityDocsForAction($entityType, ApiAction::OPTIONS);
         $data = $this->getSimpleFormatter()->format($docs);
         foreach ($data as $resource => $resourceData) {
             $resourceData = reset($resourceData);
@@ -316,11 +341,7 @@ trait DocumentationTestTrait
         }
     }
 
-    /**
-     * @param string $resource
-     * @param string $resourceData
-     */
-    private function checkOptionsDocumentationForResource($resource, array $resourceData)
+    private function checkOptionsDocumentationForResource(string $resource, array $resourceData): void
     {
         self::assertArrayContains(
             [
@@ -342,5 +363,17 @@ trait DocumentationTestTrait
             empty($resourceData['response']),
             sprintf('The "response" section for %s should be empty', $resource)
         );
+    }
+
+    private function isEmptyDescription(array $definition, string $name): bool
+    {
+        if (empty($definition[$name])) {
+            return true;
+        }
+
+        $description = $definition[$name];
+        $description = trim(strtr($description, ['<p>' => '', '</p>' => '']));
+
+        return empty($description);
     }
 }

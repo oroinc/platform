@@ -13,20 +13,16 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var CurrencyExtension */
-    protected $extension;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|NumberFormatter */
-    protected $formatter;
+    private $formatter;
 
-    protected function setUp()
+    /** @var CurrencyExtension */
+    private $extension;
+
+    protected function setUp(): void
     {
-        $this->formatter = $this->getMockBuilder(NumberFormatter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $viewTypeProvider = $this->getMockBuilder(ViewTypeConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formatter = $this->createMock(NumberFormatter::class);
+        $viewTypeProvider = $this->createMock(ViewTypeConfigProvider::class);
         $currencyNameHelper = new CurrencyNameHelperStub();
 
         $container = self::getContainerBuilder()
@@ -46,7 +42,8 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormatCurrency(Price $price, array $options, $expected)
     {
-        $this->formatter->expects($this->once())->method('formatCurrency')
+        $this->formatter->expects($this->once())
+            ->method('formatCurrency')
             ->with(
                 $price->getValue(),
                 $price->getCurrency(),
@@ -55,7 +52,7 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
                 $options['symbols'],
                 $options['locale']
             )
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals(
             $expected,
@@ -63,10 +60,7 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function formatCurrencyDataProvider()
+    public function formatCurrencyDataProvider(): array
     {
         return [
             '$1,234.5' => [
@@ -82,8 +76,11 @@ class CurrencyExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetName()
+    public function testGetSymbolCollection()
     {
-        $this->assertEquals('oro_currency', $this->extension->getName());
+        $this->assertEquals(
+            ['USD' => ['symbol' => '$'], 'EUR' => ['symbol' => '€']],
+            self::callTwigFunction($this->extension, 'oro_currency_symbol_collection', [])
+        );
     }
 }

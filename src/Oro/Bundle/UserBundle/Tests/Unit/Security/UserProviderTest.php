@@ -2,73 +2,155 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
+use Doctrine\ORM\ORMInvalidArgumentException;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Oro\Bundle\UserBundle\Security\UserProvider;
+use Oro\Bundle\UserBundle\Tests\Unit\Fixture\RegularUser;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 
 class UserProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
+    private const USER_CLASS = User::class;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    private $userManager;
+    /** @var UserLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $userLoader;
 
-    /**
-     * @var UserProvider
-     */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var UserProvider */
     private $userProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
-            $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
-        }
+        $this->userLoader = $this->createMock(UserLoaderInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\BaseUserManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->userLoader->expects(self::any())
+            ->method('getUserClass')
+            ->willReturn(self::USER_CLASS);
 
-        $this->userManager
-            ->expects($this->any())
-            ->method('getClass')
-            ->will($this->returnValue(static::USER_CLASS));
-
-        $this->userProvider = new UserProvider($this->userManager);
+        $this->userProvider = new UserProvider($this->userLoader, $this->doctrine);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
-    public function testLoadUserByInvalidUsername()
+    public function testLoadUserForExistingUsername()
     {
-        $this->userManager
-            ->expects($this->once())
-            ->method('findUserByUsernameOrEmail')
-            ->with($this->equalTo('foobar'))
-            ->will($this->returnValue(null));
+        $username = 'foobar';
+        $user = $this->createMock(self::USER_CLASS);
 
-        $this->userProvider->loadUserByUsername('foobar');
+        $this->userLoader->expects(self::once())
+            ->method('loadUser')
+            ->with($username)
+            ->willReturn($user);
+
+        self::assertSame(
+            $user,
+            $this->userProvider->loadUserByUsername($username)
+        );
     }
 
-    public function testRefreshUserBy()
+    public function testLoadUserForNotExistingUsername()
     {
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->setMethods(array('getId'))
-            ->getMock();
+        $this->expectException(UsernameNotFoundException::class);
+        $username = 'foobar';
+        $this->userLoader->expects(self::once())
+            ->method('loadUser')
+            ->with($username)
+            ->willReturn(null);
 
-        $refreshedUser = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $this->userProvider->loadUserByUsername($username);
+    }
 
-        $this->userManager
-            ->expects($this->once())
-            ->method('refreshUser')
+    public function testRefreshUserNotFound()
+    {
+        $this->expectException(UsernameNotFoundException::class);
+        $user = $this->createMock(self::USER_CLASS);
+        $user->expects(self::any())
+            ->method('getId')
+            ->willReturn(123);
+
+        $manager = $this->createMock(ObjectManager::class);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(self::USER_CLASS)
+            ->willReturn($manager);
+        $manager->expects(self::once())
+            ->method('refresh')
             ->with($user)
-            ->will($this->returnValue($refreshedUser));
+            ->willThrowException(new ORMInvalidArgumentException('Not managed'));
+        $manager->expects(self::once())
+            ->method('find')
+            ->with(self::USER_CLASS, $user->getId())
+            ->willReturn(null);
 
-        $this->assertSame($refreshedUser, $this->userProvider->refreshUser($user));
+        $this->userProvider->refreshUser($user);
     }
 
-    public function testSupportsClass()
+    public function testRefreshUserManaged()
     {
-        $this->assertTrue($this->userProvider->supportsClass(static::USER_CLASS));
+        $user = $this->createMock(self::USER_CLASS);
+        $user->expects(self::any())
+            ->method('getId')
+            ->willReturn(123);
+
+        $manager = $this->createMock(ObjectManager::class);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(self::USER_CLASS)
+            ->willReturn($manager);
+        $manager->expects(self::once())
+            ->method('refresh')
+            ->with(self::identicalTo($user));
+        $manager->expects(self::never())
+            ->method('find');
+
+        $this->userProvider->refreshUser($user);
+    }
+
+    public function testRefreshManagedUser()
+    {
+        $user = $this->createMock(self::USER_CLASS);
+        $user->expects(self::any())
+            ->method('getId')
+            ->willReturn(123);
+
+        $manager = $this->createMock(ObjectManager::class);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(self::USER_CLASS)
+            ->willReturn($manager);
+        $manager->expects(self::once())
+            ->method('refresh')
+            ->with(self::identicalTo($user))
+            ->willThrowException(new ORMInvalidArgumentException('Not managed'));
+        $manager->expects(self::once())
+            ->method('find')
+            ->with(self::USER_CLASS, $user->getId())
+            ->willReturn($user);
+
+        $this->userProvider->refreshUser($user);
+    }
+
+    public function testRefreshUserNotOroUser()
+    {
+        $this->expectException(UnsupportedUserException::class);
+        $this->expectExceptionMessage('Expected an instance of Oro\Bundle\UserBundle\Entity\User, but got');
+
+        $user = $this->createMock(RegularUser::class);
+        $this->userProvider->refreshUser($user);
+    }
+
+    public function testSupportsClassForSupportedUserObject()
+    {
+        $this->assertTrue($this->userProvider->supportsClass(self::USER_CLASS));
+    }
+
+    public function testSupportsClassForNotSupportedUserObject()
+    {
+        $this->assertFalse($this->userProvider->supportsClass(RegularUser::class));
     }
 }

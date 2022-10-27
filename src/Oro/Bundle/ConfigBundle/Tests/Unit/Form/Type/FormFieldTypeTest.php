@@ -3,66 +3,53 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
+use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\Test\TypeTestCase;
 
-class FormFieldTypeTest extends TypeTestCase
+class FormFieldTypeTest extends FormIntegrationTestCase
 {
-    const TEST_LABEL = 'label';
+    private const TEST_LABEL = 'label';
 
     /**
      * @dataProvider buildFormOptionsProvider
-     *
-     * @param array  $options
-     * @param string $expectedType
-     * @param array  $expectedOptions
      */
-    public function testBuildForm($options, $expectedType, array $expectedOptions)
+    public function testBuildForm(array $options, string $expectedType, array $expectedOptions): void
     {
-        $form = $this->factory->create(FormFieldType::class, array(), $options);
+        $form = $this->factory->create(FormFieldType::class, [], $options);
 
-        $this->assertTrue($form->has('value'));
-        $this->assertTrue($form->has('use_parent_scope_value'));
+        self::assertTrue($form->has('value'));
+        self::assertTrue($form->has('use_parent_scope_value'));
 
-        $this->assertEquals($expectedType, get_class($form->get('value')->getConfig()->getType()->getInnerType()));
+        self::assertEquals($expectedType, get_class($form->get('value')->getConfig()->getType()->getInnerType()));
 
         foreach ($expectedOptions as $option => $value) {
-            $this->assertEquals($value, $form->get('value')->getConfig()->getOption($option));
+            self::assertEquals($value, $form->get('value')->getConfig()->getOption($option));
         }
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormOptionsProvider()
+    public function buildFormOptionsProvider(): array
     {
-        return array(
-            'target field options empty'                => array(
-                'options'         => array(),
-                'expectedType'    => TextType::class,
-                'expectedOptions' => array()
-            ),
-            'target field options from array'           => array(
-                'options'         => array(
-                    'target_field_type'    => ChoiceType::class,
-                    'target_field_options' => array('label' => self::TEST_LABEL)
-                ),
-                'expectedType'    => ChoiceType::class,
-                'expectedOptions' => array('label' => self::TEST_LABEL)
-            ),
-        );
+        return [
+            'target field options empty' => [
+                'options' => [],
+                'expectedType' => TextType::class,
+                'expectedOptions' => [],
+            ],
+            'target field options from array' => [
+                'options' => [
+                    'target_field_type' => ChoiceType::class,
+                    'target_field_options' => ['label' => self::TEST_LABEL],
+                ],
+                'expectedType' => ChoiceType::class,
+                'expectedOptions' => ['label' => self::TEST_LABEL],
+            ],
+        ];
     }
 
-    public function testGetName()
-    {
-        $formType = new FormFieldType();
-        $this->assertEquals('oro_config_form_field_type', $formType->getName());
-    }
-
-    public function listenersDataProvider()
+    public function listenersDataProvider(): array
     {
         return [
             'resettable' => [true, 1],
@@ -72,26 +59,23 @@ class FormFieldTypeTest extends TypeTestCase
 
     /**
      * @dataProvider listenersDataProvider
-     *
-     * @param bool $resettable
-     * @param int $expectedCount Expected invocation count
      */
-    public function testListeners($resettable, $expectedCount)
+    public function testListeners(bool $resettable, int $expectedCount): void
     {
         /* @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $fieldBuilder = $this->createMock(FormBuilderInterface::class);
 
-        $fieldBuilder->expects($this->exactly($expectedCount))
+        $fieldBuilder->expects(self::exactly($expectedCount))
             ->method('addEventListener')
             ->with(FormEvents::POST_SUBMIT);
 
-        $builder->expects($this->exactly($expectedCount))
+        $builder->expects(self::exactly($expectedCount))
             ->method('get')
             ->with('use_parent_scope_value')
             ->willReturn($fieldBuilder);
 
-        $builder->expects($this->exactly($expectedCount))
+        $builder->expects(self::exactly($expectedCount))
             ->method('addEventListener')
             ->with(FormEvents::PRE_SET_DATA);
 
@@ -99,12 +83,58 @@ class FormFieldTypeTest extends TypeTestCase
         $formType->buildForm(
             $builder,
             [
-                'parent_checkbox_label' => '',
-                'resettable' => $resettable,
                 'target_field_type' => 'array',
                 'target_field_options' => [],
+                'resettable' => $resettable,
                 'use_parent_field_options' => [],
+                'use_parent_field_label' => '',
             ]
         );
+    }
+
+    /**
+     * @dataProvider submitDataProvider
+     */
+    public function testSubmit(
+        array $data,
+        array $submitData,
+        array $expected,
+        bool $valueDisabled
+    ): void {
+        $form = $this->factory->create(FormFieldType::class, $data);
+
+        $form->submit($submitData);
+
+        self::assertTrue($form->isSubmitted());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($expected, $form->getData());
+        self::assertEquals(
+            $valueDisabled,
+            $form->get('value')->getConfig()->getOption('disabled', false)
+        );
+    }
+
+    public function submitDataProvider(): array
+    {
+        return [
+            'empty data' => [
+                'data' => [],
+                'submitData' => [],
+                'expected' => ['use_parent_scope_value' => false, 'value' => null],
+                'valueDisabled' => false,
+            ],
+            'with value provided' => [
+                'data' => [],
+                'submitData' => ['value' => 'sample_value', 'use_parent_scope_value' => false],
+                'expected' => ['use_parent_scope_value' => false, 'value' => 'sample_value'],
+                'valueDisabled' => false,
+            ],
+            'parent scope used' => [
+                'data' => ['use_parent_scope_value' => true],
+                'submitData' => ['value' => 'sample_value', 'use_parent_scope_value' => true],
+                'expected' => ['use_parent_scope_value' => true],
+                'valueDisabled' => true,
+            ],
+        ];
     }
 }

@@ -1,0 +1,24 @@
+<div class="filter-select-oro-wrapper" data-select-field-template>
+    <select class="select select--size-s select--full oro-select2 oro-select2--size-s"
+        name="<%- name %>"
+        <% if (_.isMobile()) { %>
+            data-skip-input-widgets
+        <% } %>
+
+        <% if (typeof(dataName) !== "undefined") { %>
+            data-name="<%- dataName %>"
+        <% } %>
+        aria-label="<%- choiceAriaLabel %>"
+    >
+        <% _.each(choices, function (option) { %>
+            <option value="<%- option.value %>"
+
+                <% if (option.value == selectedChoice) { %>
+                    selected="selected"
+                <% } %>
+            >
+                <%- option.label %>
+            </option>
+        <% }); %>
+    </select>
+</div>

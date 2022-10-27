@@ -8,14 +8,14 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetConfigTreeBuilder()
+    public function testGetConfigTreeBuilder(): void
     {
         $configuration = new Configuration();
         $treeBuilder = $configuration->getConfigTreeBuilder();
-        $this->assertInstanceOf(TreeBuilder::class, $treeBuilder);
+        self::assertInstanceOf(TreeBuilder::class, $treeBuilder);
     }
 
-    public function testProcessConfiguration()
+    public function testProcessConfiguration(): void
     {
         $configuration = new Configuration();
         $processor     = new Processor();
@@ -38,76 +38,14 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'view' => ['annotations' => true],
             'templating' => [
                 'default' => 'twig',
-                'php' => [
-                    'enabled' => true,
-                    'resources' => [Configuration::DEFAULT_LAYOUT_PHP_RESOURCE]
-                ],
                 'twig' => [
-                    'enabled' => true,
-                    'resources' => [Configuration::DEFAULT_LAYOUT_TWIG_RESOURCE]
+                    'resources' => ['@OroLayout/Layout/div_layout.html.twig']
                 ]
             ],
-            'themes' => [
-                'oro-black' => [
-                    'label' => 'Oro Black theme',
-                    'config' => [
-                        'page_templates' => [
-                            'templates' => [
-                                [
-                                    'label' => 'Some label',
-                                    'key' => 'some_key',
-                                    'route_name' => 'some_route_name',
-                                    'description' => null,
-                                    'screenshot' => null,
-                                    'enabled' => null
-                                ],
-                                [
-                                    'label' => 'Some label (disabled)',
-                                    'key' => 'some_key_disabled',
-                                    'route_name' => 'some_route_name_disabled',
-                                    'description' => null,
-                                    'screenshot' => null,
-                                    'enabled' => false
-                                ]
-                            ],
-                            'titles' => ['route_1' => 'Title for route 1', 'route_2' => 'Title for route 2'],
-                        ],
-                        'assets' => [],
-                        'extra_config' => ['label' => 'Sample label'],
-                    ],
-                    'groups' => []
-                ]
-            ],
-            'debug' => '%kernel.debug%'
+            'debug' => '%kernel.debug%',
+            "enabled_themes" => []
         ];
-        $configs = [
-            'oro_layout' => [
-                'themes' => [
-                    'oro-black' => [
-                        'label' => 'Oro Black theme',
-                        'config' => [
-                            'page_templates' => [
-                                'templates' => [
-                                    [
-                                        'label' => 'Some label',
-                                        'key' => 'some_key',
-                                        'route_name' => 'some_route_name',
-                                    ],
-                                    [
-                                        'label' => 'Some label (disabled)',
-                                        'key' => 'some_key_disabled',
-                                        'route_name' => 'some_route_name_disabled',
-                                        'enabled' => false
-                                    ],
-                                ],
-                                'titles' => ['route_1' => 'Title for route 1', 'route_2' => 'Title for route 2'],
-                            ],
-                            'extra_config' => ['label' => 'Sample label'],
-                        ]
-                    ]
-                ]
-            ]
-        ];
-        $this->assertEquals($expected, $processor->processConfiguration($configuration, $configs));
+
+        self::assertEquals($expected, $processor->processConfiguration($configuration, []));
     }
 }

@@ -2,15 +2,43 @@
 
 .enum-value-collection {
     position: relative;
-    width: 297px;
+    width: $field-width;
 
     &__clear-default {
         position: absolute;
-        bottom: 3px;
-        right: 3px;
+        bottom: $content-padding-small;
+        right: 0;
 
         &.disabled {
             display: none;
+        }
+    }
+
+    .controls & {
+        margin-bottom: $content-padding-small;
+    }
+
+    .removeRow,
+    .tooltip-icon-container {
+        position: absolute;
+        top: 0;
+        right: -$tooltip-icon-container-size;
+    }
+
+    .oro-item-collection {
+        padding-right: $tooltip-icon-container-size;
+        margin-right: -$tooltip-icon-container-size;
+    }
+
+    .tooltip-icon-container {
+        width: $tooltip-icon-container-size;
+        height: $tooltip-icon-container-size;
+
+        .tooltip-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
     }
 }

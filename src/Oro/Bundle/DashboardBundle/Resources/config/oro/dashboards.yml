@@ -9,11 +9,11 @@ dashboards:
         quick_launchpad:
             label:      oro.dashboard.title.quick_launchpad
             route:      oro_dashboard_itemized_widget
-            route_parameters: { bundle: OroDashboardBundle, name: quickLaunchpad }
+            route_parameters: { bundle: OroDashboard, name: quickLaunchpad }
             description: oro.dashboard.quick_launchpad_widget_description
             icon:       bundles/orodashboard/img/quick_launchpad.png
             icon_class: fa-rocket
 
     dashboards:
         main:
-            twig: OroDashboardBundle:Index:default.html.twig
+            twig: '@OroDashboard/Index/default.html.twig'

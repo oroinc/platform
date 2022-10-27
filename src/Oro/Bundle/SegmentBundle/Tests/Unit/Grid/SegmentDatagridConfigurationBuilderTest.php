@@ -2,59 +2,48 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
-use Doctrine\ORM\Query;
-use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
+use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\ColumnOptionsGuesserMock;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
 class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
 {
-    const TEST_GRID_NAME = 'test';
-
-    /** @var EntityNameResolver */
-    protected $entityNameResolver;
-
-    public function setUp()
-    {
-        $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
+    private const TEST_GRID_NAME = 'test';
 
     public function testConfiguration()
     {
-        $segment       = $this->getSegment();
-        $doctrine      = $this->getDoctrine(
+        $segment = $this->getSegment();
+        $doctrineHelper = $this->getDoctrineHelper(
             [self::TEST_ENTITY => ['userName' => 'string']],
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
-        $entityMetadata            = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()->getMock();
+        $entityMetadata = new EntityMetadata(\stdClass::class);
         $entityMetadata->routeView = 'route';
 
         $configManager->expects($this->once())
             ->method('getEntityMetadata')
             ->with($segment->getEntity())
-            ->will($this->returnValue($entityMetadata));
+            ->willReturn($entityMetadata);
 
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
-            $doctrine,
-            new DatagridGuesserMock(),
-            $this->entityNameResolver
+            $this->getVirtualRelationProvider(),
+            $doctrineHelper,
+            new DatagridGuesser([new ColumnOptionsGuesserMock()]),
+            $this->getEntityNameResolver()
         );
 
         $builder->setGridName(self::TEST_GRID_NAME);
         $builder->setSource($segment);
         $builder->setConfigManager($configManager);
 
-        $result   = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
         $expected = $this->getExpectedDefinition('route');
 
         $this->assertEquals($expected, $result);
@@ -66,38 +55,33 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
      */
     public function testNoRouteConfiguration()
     {
-        $segment       = $this->getSegment();
-        $doctrine      = $this->getDoctrine(
+        $segment = $this->getSegment();
+        $doctrineHelper = $this->getDoctrineHelper(
             [self::TEST_ENTITY => ['userName' => 'string']],
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
-            $doctrine,
-            new DatagridGuesserMock(),
-            $this->entityNameResolver
+            $this->getVirtualRelationProvider(),
+            $doctrineHelper,
+            new DatagridGuesser([new ColumnOptionsGuesserMock()]),
+            $this->getEntityNameResolver()
         );
 
         $builder->setConfigManager($configManager);
         $builder->setGridName(self::TEST_GRID_NAME);
         $builder->setSource($segment);
 
-        $result   = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
         $expected = $this->getExpectedDefinition();
 
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @param null $route
-     *
-     * @return array
-     */
-    public function getExpectedDefinition($route = null)
+    private function getExpectedDefinition(string $route = null): array
     {
         $definition = [
             'name'    => self::TEST_GRID_NAME,
@@ -121,12 +105,6 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                     'column_aliases' => ['userName' => 'c1',]
                 ],
                 'type'         => 'orm',
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => SqlWalker::class,
-                    ]
-                ],
                 'acl_resource' => 'oro_segment_view',
             ],
             'options' => ['export' => true],
@@ -134,7 +112,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         ];
 
         if (!empty($route)) {
-            $definition                              = array_merge(
+            $definition = array_merge(
                 $definition,
                 [
                     'properties' => [
@@ -158,6 +136,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
                 ]
             );
             $definition['source']['query']['select'] = ['t1.userName as c1', 't1.' . self::TEST_IDENTIFIER_NAME];
+            $definition['source']['hints'][] = 'HINT_TRANSLATABLE';
         }
 
         return $definition;

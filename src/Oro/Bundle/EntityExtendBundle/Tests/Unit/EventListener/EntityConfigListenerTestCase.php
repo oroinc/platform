@@ -2,56 +2,57 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderBagMock;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityConfigListenerTestCase extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigCache|\PHPUnit\Framework\MockObject\MockObject */
     protected $configCache;
 
-    protected function setUp()
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $eventDispatcher;
+
+    protected function setUp(): void
     {
-        $eventDispatcher    = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataFactory    = $this->getMockBuilder('Metadata\MetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $modelManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $auditManager       = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Audit\AuditManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->configCache = $this->createMock(ConfigCache::class);
 
-        $this->configCache = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigCache')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configManager = new ConfigManager(
-            $eventDispatcher,
-            $metadataFactory,
-            $modelManager,
-            $auditManager,
-            $this->configCache
-        );
-
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->configProvider->expects($this->any())
             ->method('getScope')
             ->willReturn('extend');
 
-        $configProviderBag = new ConfigProviderBagMock();
-        $configProviderBag->addProvider($this->configProvider);
+        $configProviderBag = $this->createMock(ConfigProviderBag::class);
+        $configProviderBag->expects($this->any())
+            ->method('getProvider')
+            ->willReturnCallback(function ($scope) {
+                return 'extend' === $scope
+                    ? $this->configProvider
+                    : null;
+            });
+
+        $this->configManager = new ConfigManager(
+            $this->eventDispatcher,
+            $this->createMock(MetadataFactory::class),
+            $this->createMock(ConfigModelManager::class),
+            $this->createMock(AuditManager::class),
+            $this->configCache,
+            ConfigurationHandlerMock::getInstance()
+        );
         $this->configManager->setProviderBag($configProviderBag);
     }
 }

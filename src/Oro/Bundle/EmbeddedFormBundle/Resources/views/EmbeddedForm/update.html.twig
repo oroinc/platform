@@ -1,9 +1,11 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 
 {% set formAction = form.vars.value.id ? path('oro_embedded_form_update', { 'id': form.vars.value.id }) : path('oro_embedded_form_create') %}
 {% oro_title_set({ params : {"%form.title%": form.vars.value.title, "%entityName%": 'oro.embeddedform.entity_label'|trans} }) %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if form.vars.value.id and is_granted('oro_embedded_form_delete') %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_embedded_form_delete', {'id': form.vars.value.id}),
@@ -48,7 +50,7 @@
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.embeddedform.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with {title: title} %}
+        {% include '@OroUI/page_title_block.html.twig' with {title: title} %}
     {% endif %}
 {% endblock pageHeader %}
 
@@ -70,6 +72,8 @@
                 ]
             }]
         }] %}
+
+        {% set dataBlocks = dataBlocks|merge(oro_form_additional_data(form, 'Additional'|trans)) %}
 
         {% set data = {
             'formErrors': form_errors(form) ? form_errors(form) : null,
@@ -93,7 +97,7 @@
         <div class="container-fluid">
             <div class="grid-container">
                 <div class="no-data">
-                    <span>{{ 'oro.embeddedform.no_types_available'|trans }}</span>
+                    {{ 'oro.embeddedform.no_types_available'|trans }}
                 </div>
             </div>
         </div>

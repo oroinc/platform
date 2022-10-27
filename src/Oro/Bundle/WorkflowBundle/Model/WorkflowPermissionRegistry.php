@@ -7,6 +7,9 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityReposit
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 
+/**
+ * Provides permissions for the given entity.
+ */
 class WorkflowPermissionRegistry
 {
     /**
@@ -40,10 +43,6 @@ class WorkflowPermissionRegistry
     /** @var WorkflowRegistry */
     protected $workflowRegistry;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowRegistry $workflowRegistry
-     */
     public function __construct(DoctrineHelper $doctrineHelper, WorkflowRegistry $workflowRegistry)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -163,7 +162,7 @@ class WorkflowPermissionRegistry
 
         /** @var WorkflowEntityAclIdentityRepository $repository */
         $repository = $this->doctrineHelper->getEntityRepository('OroWorkflowBundle:WorkflowEntityAclIdentity');
-        $identities = $repository->findByClassAndIdentifier($class, $identifier);
+        $identities = $repository->findByClassAndIdentifierAndActiveWorkflows($class, $identifier);
 
         foreach ($identities as $identity) {
             $aclId = $identity->getAcl()->getId();

@@ -6,20 +6,34 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\AbstractMatcher;
 use Oro\Component\ChainProcessor\ExpressionParser;
 
+/**
+ * This applicable checker allows to check whether a specific request type
+ * is matched to a request type expression.
+ */
 class RequestExpressionMatcher extends AbstractMatcher
 {
+    /** @var array [expression => parsed expression, ...] */
+    private $expressions = [];
+
     /**
-     * @param mixed       $value
+     * @param mixed       $expression
      * @param RequestType $requestType
      *
      * @return bool
      */
-    public function matchValue($value, RequestType $requestType)
+    public function matchValue($expression, RequestType $requestType)
     {
-        return $this->isMatch(
-            ExpressionParser::parse($value),
-            $requestType,
-            null
-        );
+        if (!$expression) {
+            return true;
+        }
+
+        if (isset($this->expressions[$expression])) {
+            $expr = $this->expressions[$expression];
+        } else {
+            $expr = ExpressionParser::parse($expression);
+            $this->expressions[$expression] = $expr;
+        }
+
+        return $this->isMatch($expr, $requestType, null);
     }
 }

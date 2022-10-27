@@ -1,141 +1,76 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Validator\Constraints;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Validator\Constraints;
 
-use Oro\Bundle\EntityMergeBundle\Metadata\FieldData;
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntityValidator;
-use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class UniqueEntityValidatorTest extends \PHPUnit\Framework\TestCase
+class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var UniqueEntityValidator
-     */
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $doctrineHelper
-            ->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
             ->method('getEntityIdentifierValue')
-            ->will(
-                $this->returnCallback(
-                    function ($entity) {
-                        return $entity->getId();
-                    }
-                )
-            );
+            ->willReturnCallback(function ($entity) {
+                return $entity->getId();
+            });
 
-        $this->validator = new UniqueEntityValidator($doctrineHelper);
+        return new UniqueEntityValidator($doctrineHelper);
     }
 
-    /**
-     * @dataProvider invalidArgumentProvider
-     */
-    public function testInvalidArgument($value, $expectedExceptionMessage)
+    public function testUnexpectedConstraint()
     {
-        $this->expectException('Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException');
-        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->expectException(UnexpectedTypeException::class);
 
-        $constraint = $this
-            ->createMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity');
+        $this->validator->validate($this->createMock(EntityData::class), $this->createMock(Constraint::class));
+    }
+
+    public function testValueIsNotEntityData()
+    {
+        $this->expectException(UnexpectedTypeException::class);
+
+        $this->validator->validate('test', new UniqueEntity());
+    }
+
+    public function testValidateForValidValue()
+    {
+        $value = $this->createEntityData(['entity-0', 'entity-1']);
+
+        $constraint = new UniqueEntity();
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
-    public function invalidArgumentProvider()
+    public function testValidateForInvalidValue()
     {
-        return [
-            'bool'    => [
-                'value'                    => true,
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, boolean given'
-            ],
-            'string'  => [
-                'value'                    => 'string',
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, string given'
-            ],
-            'integer' => [
-                'value'                    => 5,
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, integer given'
-            ],
-            'null'    => [
-                'value'                    => null,
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, NULL given'
-            ],
-            'object'  => [
-                'value'                    => new \stdClass(),
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, stdClass given'
-            ],
-            'array'   => [
-                'value'                    => [],
-                'expectedExceptionMessage' =>
-                    'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, array given'
-            ],
-        ];
+        $value = $this->createEntityData(['duplicate', 'duplicate']);
+
+        $constraint = new UniqueEntity();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
-    /**
-     * @dataProvider validArgumentProvider
-     */
-    public function testValidate($entityData, $addViolation)
+    private function createEntityData(array $ids): EntityData
     {
-        $context = $this->createMock(ExecutionContext::class);
-
-        $context->expects($this->$addViolation())
-            ->method('addViolation');
-
-        $constraint = $this->createMock(UniqueEntity::class);
-        $this->validator->initialize($context);
-
-        $this->validator->validate($entityData, $constraint);
-    }
-
-    public function validArgumentProvider()
-    {
-        return [
-            'valid'     => [
-                'entityData'   => $this->createEntityData(['entity-0', 'entity-1']),
-                'addViolation' => 'never',
-            ],
-            'non-valid' => [
-                'entityData'   => $this->createEntityData(['duplicate', 'duplicate']),
-                'addViolation' => 'once',
-            ],
-        ];
-    }
-
-    /**
-     * @return object
-     */
-    private function createEntityData($ids)
-    {
-        $entities = array_map(
-            function ($id) {
-                return new EntityStub($id);
-            },
-            $ids
-        );
-
-        $entityData = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityData
-            ->expects($this->any())
+        $entityData = $this->createMock(EntityData::class);
+        $entityData->expects($this->any())
             ->method('getEntities')
-            ->will($this->returnValue($entities));
+            ->willReturn(array_map(
+                function ($id) {
+                    return new EntityStub($id);
+                },
+                $ids
+            ));
 
         return $entityData;
     }

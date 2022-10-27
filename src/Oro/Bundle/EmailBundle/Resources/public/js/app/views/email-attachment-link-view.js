@@ -9,22 +9,20 @@ define([
 ], function($, _, __, Backbone, messenger, BaseView, mediator) {
     'use strict';
 
-    var EmailAttachmentLink;
-
     /**
      * @export oroemail/js/app/views/email-attachment-link-view
      */
-    EmailAttachmentLink = BaseView.extend({
+    const EmailAttachmentLink = BaseView.extend({
         options: {},
         events: {
             click: 'linkAttachment'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailAttachmentLink() {
-            EmailAttachmentLink.__super__.constructor.apply(this, arguments);
+        constructor: function EmailAttachmentLink(options) {
+            EmailAttachmentLink.__super__.constructor.call(this, options);
         },
 
         /**
@@ -34,16 +32,16 @@ define([
         */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
-            EmailAttachmentLink.__super__.initialize.apply(this, arguments);
+            EmailAttachmentLink.__super__.initialize.call(this, options);
         },
 
         /**
          * onClick event listener
          */
         linkAttachment: function(e) {
-            var self = this;
+            const self = this;
             e.preventDefault();
-            $.getJSON(
+            $.post(
                 this.options.url,
                 {},
                 function(response) {
@@ -55,7 +53,8 @@ define([
                     } else {
                         messenger.notificationFlashMessage('error', __(response.error));
                     }
-                }
+                },
+                'json'
             );
             return false;
         },

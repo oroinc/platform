@@ -5,8 +5,9 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -22,7 +23,7 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
             ['code', 'some_code'],
             ['entityClass', 'SomeClass'],
             ['isEnabled', true],
-            ['owner', new User()],
+            ['owner', new Organization()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()]
         ];
@@ -76,7 +77,12 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHash()
     {
+        /** @var AttributeGroup $group1 */
         $group1 = $this->getEntity(AttributeGroup::class, ['id' => 1]);
+        $group1->addAttributeRelation($this->getEntity(AttributeGroupRelation::class, ['id' => 1]));
+        $group1->addAttributeRelation($this->getEntity(AttributeGroupRelation::class, ['id' => 2]));
+
+        /** @var AttributeGroup $group2 */
         $group2 = $this->getEntity(AttributeGroup::class, ['id' => 2]);
         $attributeGroups = new ArrayCollection([$group1, $group2]);
         /** @var AttributeFamily $entity */
@@ -91,7 +97,7 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
         $result[1] = [
             [
                 'group' => 1,
-                'attributes' => [],
+                'attributes' => [1, 2],
                 'visible' => true
             ],
             [
@@ -106,7 +112,6 @@ class AttributeFamilyTest extends \PHPUnit\Framework\TestCase
 
     public function testToString()
     {
-        /** @var AttributeFamily $entity */
         $entity = new AttributeFamily();
         $entity->setCode('default_family');
         $this->assertEquals('code:default_family', $entity->toString());

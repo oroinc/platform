@@ -3,6 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
@@ -13,10 +16,11 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
-use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
@@ -25,14 +29,19 @@ use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -40,61 +49,44 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class EmailTypeTest extends TypeTestCase
 {
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
-    protected $emailRenderer;
+    private $emailRenderer;
 
     /** @var EmailModelBuilderHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $emailModelBuilderHelper;
-
-    /** @var EmailTemplate */
-    protected $emailTemplate;
+    private $emailModelBuilderHelper;
 
     /** @var MailboxManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $mailboxManager;
+    private $mailboxManager;
 
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $emailOriginHelper;
+    private $emailOriginHelper;
 
     /** @var ConfigManager */
-    protected $configManager;
+    private $configManager;
 
-    /** @var HtmlTagProvider */
-    protected $htmlTagProvider;
-
-    /** @var ValidatorInterface */
-    protected $validator;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->emailRenderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
-            ->disableOriginalConstructor()->getMock();
-        $this->emailModelBuilderHelper = $this
-            ->getMockBuilder('Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper')
-            ->disableOriginalConstructor()->getMock();
-        $this->htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
+        $this->emailRenderer = $this->createMock(EmailRenderer::class);
+        $this->emailModelBuilderHelper = $this->createMock(EmailModelBuilderHelper::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         parent::setUp();
     }
 
-    /**
-     * @return EmailType
-     */
-    protected function createEmailType()
+    private function createEmailType(): EmailType
     {
         return new EmailType(
             $this->authorizationChecker,
@@ -106,66 +98,47 @@ class EmailTypeTest extends TypeTestCase
     }
 
     /**
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
     protected function getExtensions()
     {
-        $translatableType = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translatableType = $this->createMock(TranslatableEntityType::class);
         $translatableType->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue(TranslatableEntityType::NAME));
+            ->willReturn(TranslatableEntityType::NAME);
 
-        // $translatableType = new \Oro\Component\Testing\Unit\Form\Type\Stub\EntityType(
-        //     [
-        //         'test_name' => (new EmailTemplate())->setName('test_name'),
-        //     ],
-        //     TranslatableEntityType::NAME
-        // );
-        $this->mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mailboxManager = $this->createMock(MailboxManager::class);
 
         $user = new User();
         $this->tokenAccessor->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
-        $relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $relatedEmailsProvider = $this->createMock(RelatedEmailsProvider::class);
         $relatedEmailsProvider->expects($this->any())
             ->method('getEmails')
             ->with($user)
-            ->will($this->returnValue(['john@example.com' => 'John Smith <john@example.com>']));
+            ->willReturn(['john@example.com' => 'John Smith <john@example.com>']);
 
         $this->mailboxManager->expects($this->any())
             ->method('findAvailableMailboxEmails')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
-        $this->registry = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $helper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $helper = $this->createMock(EmailModelBuilderHelper::class);
 
-        $this->emailOriginHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tools\EmailOriginHelper')
-            ->disableOriginalConstructor()->getMock();
+        $this->emailOriginHelper = $this->createMock(EmailOriginHelper::class);
 
         $emailOriginFromType = new EmailOriginFromType(
             $this->tokenAccessor,
             $relatedEmailsProvider,
             $helper,
             $this->mailboxManager,
-            $this->registry,
+            $this->doctrine,
             $this->emailOriginHelper
         );
 
@@ -176,56 +149,41 @@ class EmailTypeTest extends TypeTestCase
         );
         $emailAddressRecipientsType = new EmailAddressRecipientsType($configManager);
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $htmlTagProvider = $this->createMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $configManager = $this->createMock(ConfigManager::class);
+        $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
         $htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
         $context = $this->createMock(ContextInterface::class);
-        $richTextType = new OroRichTextType($configManager, $htmlTagProvider, $context);
-        $resizableRichTextType = new OroResizeableRichTextType($configManager, $htmlTagProvider);
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $richTextType = new OroRichTextType($configManager, $htmlTagProvider, $context, $htmlTagHelper);
+        $resizableRichTextType = new OroResizeableRichTextType();
+        $this->em = $this->createMock(EntityManager::class);
+        $metadata = $this->createMock(ClassMetadataInfo::class);
         $metadata->expects($this->any())
             ->method('getName');
         $this->em->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadata);
-        $repo = $this->getMockBuilder('\Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EntityRepository::class);
         $repo->expects($this->any())
             ->method('find');
         $this->em->expects($this->any())
             ->method('getRepository')
             ->willReturn($repo);
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\DataCollectorTranslator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityTitleResolver = $this->getMockBuilder(EntityNameResolver::class)
-                    ->disableOriginalConstructor()
-                    ->getMock();
+        $configManager = $this->createMock(\Oro\Bundle\EntityConfigBundle\Config\ConfigManager::class);
+        $translator = $this->createMock(DataCollectorTranslator::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
+        $entityTitleResolver = $this->createMock(EntityNameResolver::class);
 
-        $this->validator = $this->createMock(ValidatorInterface::class);
-        $this->validator
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->any())
             ->method('validate')
             ->willReturn(new ConstraintViolationList());
-        $this->validator
+        $validator->expects($this->any())
             ->method('getMetadataFor')
-            ->with('Symfony\Component\Form\Form')
-            ->willReturn($this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock());
+            ->with(Form::class)
+            ->willReturn($this->createMock(ClassMetadata::class));
 
         $contextsSelectType = new ContextsSelectType(
             $this->em,
@@ -250,23 +208,16 @@ class EmailTypeTest extends TypeTestCase
                 ],
                 []
             ),
-            new ValidatorExtension($this->validator),
+            new ValidatorExtension($validator),
         ];
     }
 
     /**
      * @dataProvider messageDataProvider
-     * @param array $formData
-     * @param array $to
-     * @param array $cc
-     * @param array $bcc
      */
-    public function testSubmitValidData($formData, $to, $cc, $bcc)
+    public function testSubmitValidData(array $formData, array $to, array $cc, array $bcc)
     {
-        $body = '';
-        if (isset($formData['body'])) {
-            $body = $formData['body'];
-        }
+        $body = $formData['body'] ?? '';
 
         $user = new User();
         $origin = new TestUserEmailOrigin(1);
@@ -277,8 +228,12 @@ class EmailTypeTest extends TypeTestCase
         $mailBox->setOrigin($origin);
         $response = [$mailBox];
 
-        $this->mailboxManager->expects(self::once())->method('findAvailableMailboxes')->willReturn($response);
-        $this->registry->expects(self::once())->method('getManager')->willReturn($this->em);
+        $this->mailboxManager->expects(self::once())
+            ->method('findAvailableMailboxes')
+            ->willReturn($response);
+        $this->doctrine->expects(self::once())
+            ->method('getManager')
+            ->willReturn($this->em);
 
         $form = $this->factory->create(EmailType::class);
 
@@ -287,7 +242,7 @@ class EmailTypeTest extends TypeTestCase
 
         /** @var Email $result */
         $result = $form->getData();
-        $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email', $result);
+        $this->assertInstanceOf(Email::class, $result);
         $this->assertEquals('test_grid', $result->getGridName());
         $this->assertEquals($to, $result->getTo());
         $this->assertEquals($cc, $result->getCc());
@@ -298,14 +253,14 @@ class EmailTypeTest extends TypeTestCase
 
     public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(
                 [
-                    'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
-                    'csrf_token_id'      => 'email',
-                    'csrf_protection'    => true,
+                    'data_class'      => Email::class,
+                    'csrf_token_id'   => 'email',
+                    'csrf_protection' => true,
                 ]
             );
 
@@ -313,27 +268,24 @@ class EmailTypeTest extends TypeTestCase
         $type->configureOptions($resolver);
     }
 
-    /**
-     * @return array
-     */
-    public function messageDataProvider()
+    public function messageDataProvider(): array
     {
         return [
             [
                 [
                     'gridName' => 'test_grid',
                     'origin'=>'1|john@example.com',
-                    'to' => [
+                    'to' => implode(EmailRecipientsHelper::EMAIL_IDS_SEPARATOR, [
                         'John Smith 1 <john1@example.com>',
-                        '"John Smith 2" <john2@example.com>',
+                        '\"John Smith 2\" <john2@example.com>',
                         'john3@example.com',
-                    ],
+                    ]),
                     'subject' => 'Test subject',
                     'type' => 'text',
                     'attachments' => [],
                     'template' => new EmailTemplate(),
                 ],
-                ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],
+                ['John Smith 1 <john1@example.com>', '\"John Smith 2\" <john2@example.com>', 'john3@example.com'],
                 [],
                 [],
             ],
@@ -341,37 +293,34 @@ class EmailTypeTest extends TypeTestCase
                 [
                     'gridName' => 'test_grid',
                     'origin'=>'1|john@example.com',
-                    'to' => [
+                    'to' => implode(EmailRecipientsHelper::EMAIL_IDS_SEPARATOR, [
                         'John Smith 1 <john1@example.com>',
-                        '"John Smith 2" <john2@example.com>',
+                        '\"John Smith 2\" <john2@example.com>',
                         'john3@example.com',
-                    ],
-                    'cc' => [
+                    ]),
+                    'cc' => implode(EmailRecipientsHelper::EMAIL_IDS_SEPARATOR, [
                         'John Smith 4 <john4@example.com>',
-                        '"John Smith 5" <john5@example.com>',
+                        '\"John Smith 5\" <john5@example.com>',
                         'john6@example.com',
-                    ],
-                    'bcc' => [
+                    ]),
+                    'bcc' => implode(EmailRecipientsHelper::EMAIL_IDS_SEPARATOR, [
                         'John Smith 7 <john7@example.com>',
-                        '"John Smith 8" <john8@example.com>',
+                        '\"John Smith 8\" <john8@example.com>',
                         'john9@example.com',
-                    ],
+                    ]),
                     'subject' => 'Test subject',
                     'body' => 'Test body',
                     'type' => 'text',
                     'template' => new EmailTemplate(),
                 ],
-                ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],
-                ['John Smith 4 <john4@example.com>', '"John Smith 5" <john5@example.com>', 'john6@example.com'],
-                ['John Smith 7 <john7@example.com>', '"John Smith 8" <john8@example.com>', 'john9@example.com'],
+                ['John Smith 1 <john1@example.com>', '\"John Smith 2\" <john2@example.com>', 'john3@example.com'],
+                ['John Smith 4 <john4@example.com>', '\"John Smith 5\" <john5@example.com>', 'john6@example.com'],
+                ['John Smith 7 <john7@example.com>', '\"John Smith 8\" <john8@example.com>', 'john9@example.com'],
             ],
         ];
     }
 
     /**
-     * @param Email $inputData
-     * @param array $expectedData
-     *
      * @dataProvider fillFormByTemplateProvider
      */
     public function testFillFormByTemplate(Email $inputData = null, array $expectedData = [])
@@ -405,10 +354,7 @@ class EmailTypeTest extends TypeTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function fillFormByTemplateProvider()
+    public function fillFormByTemplateProvider(): array
     {
         return [
             'template is not empty' => [
@@ -449,10 +395,7 @@ class EmailTypeTest extends TypeTestCase
         ];
     }
 
-    /**
-     * @return EmailTemplate
-     */
-    protected function createEmailTemplate()
+    private function createEmailTemplate(): EmailTemplate
     {
         $template = new EmailTemplate();
         $template

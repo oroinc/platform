@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+/**
+ * This interface defines the methods required for the password reset functionality
+ */
 interface PasswordRecoveryInterface
 {
     /**
@@ -11,12 +14,12 @@ interface PasswordRecoveryInterface
     public function isPasswordRequestNonExpired($ttl);
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getConfirmationToken();
 
     /**
-     * @param string $token
+     * @param string|null $token
      */
     public function setConfirmationToken($token);
 

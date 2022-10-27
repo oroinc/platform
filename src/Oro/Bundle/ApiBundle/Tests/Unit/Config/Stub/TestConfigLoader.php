@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub;
 
-use Oro\Bundle\ApiBundle\Config\AbstractConfigLoader;
+use Oro\Bundle\ApiBundle\Config\Loader\AbstractConfigLoader;
 
 class TestConfigLoader extends AbstractConfigLoader
 {

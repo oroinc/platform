@@ -2,48 +2,50 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
-use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
-use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
-use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
+use Oro\Bundle\ApiBundle\Provider\CacheManager;
+use Oro\Bundle\FeatureToggleBundle\Event\FeaturesChange;
 
 /**
- * The event listener that can be used to clear ApiDoc cache.
+ * The event listener that is used to clear ApiDoc cache.
  */
 class ApiSourceListener
 {
-    /** @var ResourcesCache */
-    private $resourcesCache;
-
-    /** @var ApiDocExtractor */
-    private $apiDocExtractor;
+    /** @var CacheManager */
+    private $cacheManager;
 
     /** @var string[] */
-    private $apiDocViews;
+    private $excludedFeatures;
 
     /**
-     * @param ResourcesCache  $resourcesCache
-     * @param ApiDocExtractor $apiDocExtractor
-     * @param string[]        $apiDocViews
+     * @param CacheManager $cacheManager
+     * @param string[]     $excludedFeatures
      */
-    public function __construct(
-        ResourcesCache $resourcesCache,
-        ApiDocExtractor $apiDocExtractor,
-        array $apiDocViews
-    ) {
-        $this->resourcesCache = $resourcesCache;
-        $this->apiDocExtractor = $apiDocExtractor;
-        $this->apiDocViews = $apiDocViews;
+    public function __construct(CacheManager $cacheManager, array $excludedFeatures)
+    {
+        $this->cacheManager = $cacheManager;
+        $this->excludedFeatures = $excludedFeatures;
     }
 
-    public function clearCache()
+    public function clearCache(): void
     {
-        // clear the cache for API resources
-        $this->resourcesCache->clear();
+        // clear all api caches data
+        $this->cacheManager->clearCaches();
         // clear the cache for API documentation
-        if ($this->apiDocExtractor instanceof CachingApiDocExtractor) {
-            foreach ($this->apiDocViews as $view) {
-                $this->apiDocExtractor->clear($view);
+        $this->cacheManager->clearApiDocCache();
+    }
+
+    public function onFeaturesChange(FeaturesChange $event): void
+    {
+        // do not clear the cache if only excluded features are changed
+        $numberOfChangedExcludedFeatures = 0;
+        $changeSet = $event->getChangeSet();
+        foreach ($this->excludedFeatures as $featureName) {
+            if (\array_key_exists($featureName, $changeSet)) {
+                $numberOfChangedExcludedFeatures++;
             }
+        }
+        if (0 === $numberOfChangedExcludedFeatures || count($changeSet) > $numberOfChangedExcludedFeatures) {
+            $this->clearCache();
         }
     }
 }

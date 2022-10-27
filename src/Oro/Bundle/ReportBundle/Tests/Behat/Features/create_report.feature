@@ -16,8 +16,8 @@ Feature: Create report
     And I add the following columns:
       | Email |
     And I add the following filters:
-      | Field Condition | Id      | is empty |
       | Field Condition | Primary | Yes      |
+      | Field Condition | Id      | is empty |
     When I save form
     Then I should see "Report saved" flash message
     And I should see "field value is Yes"

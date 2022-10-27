@@ -1,55 +1,65 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/variables";
-@import "oroui/css/scss/mixins";
-@import "variables";
+@import 'role/permissions-grid';
+@import 'role/capabilities';
 
-@import "role/permissions-grid";
-@import "role/capabilities";
+/* mobile version */
+@import 'mobile/main';
 
-.api-block #btn-apigen {
-    display: inline;
-    line-height: 1.2em;
+.api-block .btn {
     vertical-align: baseline;
-    padding: 4px 12px;
 }
 
-.control-group.api-block label.control-label-api-key {
-    padding-top: 9px;
+.message .api-key {
+    word-break: break-all;
 }
 
 form.change-password-form {
     .controls {
         position: relative;
+        padding-right: $content-padding;
     }
 
     span.fa-eye-slash,
     span.fa-eye {
-        left: 300px;
         position: absolute;
-        top: 6px;
+        top: 7px;
+        left: $field-width + 12px;
+    }
+
+    .validation-failed {
+        max-width: $field-width;
     }
 }
 
 .mobile-version {
-    form.change-password-form .controls {
-        input[type='text'],
-        input[type='password'] {
-            box-sizing: border-box;
-            width: calc(100% - 28px) !important;
-            height: 30px;
+    form.change-password-form {
+        .controls {
+            [class^='fa-'] {
+                top: 10px;
+            }
+        }
+
+        .validation-failed {
+            max-width: 100%;
+        }
+
+        span.fa-eye-slash,
+        span.fa-eye {
+            left: calc(100% - 12px);
         }
     }
 }
 
-.form-horizontal .control-group-oro_user_emailsettings > .controls,
-.form-horizontal .control-group-oro_user_emailsettings > .controls > div > .control-group > .controls {
-    margin-left: 0;
-}
-
-.form-horizontal .control-group-oro_user_emailsettings .controls .control-label.wrap {
-    width: 230px;
-    text-align: right;
+.form-horizontal {
+    .control-group {
+        &.control-group-oro_user_emailsettings,
+        &.control-group-oro_imap_configuration {
+            > .controls {
+                margin-left: 0;
+            }
+        }
+    }
 }
 
 .form-horizontal .control-group-oro_organizations_select .select2-choices {
@@ -59,5 +69,5 @@ form.change-password-form {
 h1 .popover .oro-popover-content {
     font-size: 13px;
     line-height: 20px;
-    font-weight: normal;
+    font-weight: font-weight('light');
 }

@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Filter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -16,15 +14,14 @@ use Oro\Bundle\FilterBundle\Filter\EntityFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by entities that are included in a segment.
+ */
 class SegmentFilter extends EntityFilter
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
     /** @var SegmentManager */
     protected $segmentManager;
 
@@ -37,17 +34,6 @@ class SegmentFilter extends EntityFilter
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
-    /**
-     * Constructor
-     *
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility        $util
-     * @param ManagerRegistry      $doctrine
-     * @param SegmentManager       $segmentManager
-     * @param EntityNameProvider   $entityNameProvider
-     * @param ConfigProvider       $entityConfigProvider
-     * @param ConfigProvider       $extendConfigProvider
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
@@ -57,9 +43,7 @@ class SegmentFilter extends EntityFilter
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider
     ) {
-        parent::__construct($factory, $util);
-
-        $this->doctrine = $doctrine;
+        parent::__construct($factory, $util, $doctrine);
         $this->segmentManager = $segmentManager;
         $this->entityNameProvider = $entityNameProvider;
         $this->entityConfigProvider = $entityConfigProvider;
@@ -89,12 +73,9 @@ class SegmentFilter extends EntityFilter
             if ($this->extendConfigProvider->getConfig($className)->in(
                 'state',
                 [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
-            )
-            ) {
-                $classMetadata         = $this->doctrine
-                    ->getManagerForClass($className)
-                    ->getClassMetadata($className);
-                $identifiers           = $classMetadata->getIdentifier();
+            )) {
+                $classMetadata = $this->doctrine->getManagerForClass($className)->getClassMetadata($className);
+                $identifiers = $classMetadata->getIdentifier();
                 $entityIds[$className] = array_shift($identifiers);
             }
         }
@@ -142,16 +123,6 @@ class SegmentFilter extends EntityFilter
     }
 
     /**
-     * @param ExpressionBuilderInterface $expression
-     *
-     * @return bool
-     */
-    public function isExpressionBuilderSupported(ExpressionBuilderInterface $expression)
-    {
-        return $expression instanceof OrmExpressionBuilder;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
@@ -162,7 +133,7 @@ class SegmentFilter extends EntityFilter
             return false;
         }
 
-        if (!$this->isExpressionBuilderSupported($ds->expr())) {
+        if (!$ds->expr() instanceof OrmExpressionBuilder) {
             throw new \LogicException('The SegmentFilter supports ORM data source only.');
         }
 
@@ -180,28 +151,14 @@ class SegmentFilter extends EntityFilter
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
-     * @param Segment      $segment
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    protected function getIdentityFieldWithAlias(QueryBuilder $queryBuilder, Segment $segment)
+    public function prepareData(array $data): array
     {
-        $tableAliases   = $queryBuilder->getRootAliases();
-        $em             = $queryBuilder->getEntityManager();
-        $entityMetadata = $em->getClassMetadata($segment->getEntity());
-        $idField        = $entityMetadata->getSingleIdentifierFieldName();
-
-        if ($segment->isDynamic()) {
-            return $tableAliases[0] . '.' . $idField;
+        if (isset($data['value'])) {
+            $data['value'] = $this->getEntity(Segment::class, $data['value'], true);
         }
 
-        $idFieldType   = $entityMetadata->getTypeOfField($idField);
-        $fieldToSelect = SegmentSnapshot::ENTITY_REF_FIELD;
-        if ($idFieldType === 'integer') {
-            $fieldToSelect = SegmentSnapshot::ENTITY_REF_INTEGER_FIELD;
-        }
-
-        return $tableAliases[0] . '.' . $fieldToSelect;
+        return $data;
     }
 }

@@ -5,63 +5,54 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class EmailUserListener
+/**
+ * Sends notification to websocket that user have new emails.
+ */
+class EmailUserListener implements ServiceSubscriberInterface
 {
-    const ENTITY_STATUS_NEW = 'new';
-    const ENTITY_STATUS_UPDATE = 'update';
+    private const ENTITY_STATUS_NEW = 'new';
+    private const ENTITY_STATUS_UPDATE = 'update';
 
-    /**
-     * @var WebSocketSendProcessor
-     */
-    protected $processor;
+    private ContainerInterface $container;
+    private array $processEmailUsersEntities = [];
 
-    /**
-     * @var array
-     */
-    protected $processEmailUsersEntities = [];
-
-    public function __construct(WebSocketSendProcessor $processor)
+    public function __construct(ContainerInterface $container)
     {
-        $this->processor = $processor;
+        $this->container = $container;
     }
 
-    /**
-     * Collecting added EmailUser entities for processing in postFlush
-     *
-     * @param OnFlushEventArgs $args
-     */
-    public function onFlush(OnFlushEventArgs $args)
+    public function onFlush(OnFlushEventArgs $args): void
     {
         $uow = $args->getEntityManager()->getUnitOfWork();
         $this->collectNewEmailUserEntities($uow->getScheduledEntityInsertions());
         $this->collectUpdatedEmailUserEntities($uow->getScheduledEntityUpdates(), $uow);
     }
 
-    /**
-     * Send notification to websocket that user have new emails
-     *
-     * @param PostFlushEventArgs $args
-     */
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush(PostFlushEventArgs $args): void
     {
-        $usersWithNewEmails = [];
         if (!$this->processEmailUsersEntities) {
             return;
         }
 
+        $processEmailUsersEntities = $this->processEmailUsersEntities;
+        $this->processEmailUsersEntities = [];
+
+        $usersWithNewEmails = [];
         /** @var EmailUser $entity */
-        foreach ($this->processEmailUsersEntities as $item) {
+        foreach ($processEmailUsersEntities as $item) {
             $status = $item['status'];
             $entity = $item['entity'];
 
             $em = $args->getEntityManager();
             $ownerIds = $this->determineOwners($entity, $em);
-
             foreach ($ownerIds as $ownerId) {
-                if (array_key_exists($ownerId, $usersWithNewEmails) === true) {
+                if (\array_key_exists($ownerId, $usersWithNewEmails) === true) {
                     $new = $usersWithNewEmails[$ownerId]['new'];
                     if ($status === self::ENTITY_STATUS_NEW) {
                         $usersWithNewEmails[$ownerId]['new'] = $new + 1;
@@ -76,18 +67,11 @@ class EmailUserListener
         }
 
         if ($usersWithNewEmails) {
-            $this->processor->send($usersWithNewEmails);
+            $this->getWebSocketSendProcessor()->send($usersWithNewEmails);
         }
-        $this->processEmailUsersEntities = [];
     }
 
-    /**
-     * @param EmailUser     $entity
-     * @param EntityManager $em
-     *
-     * @return array
-     */
-    protected function determineOwners(EmailUser $entity, EntityManager $em)
+    private function determineOwners(EmailUser $entity, EntityManager $em): array
     {
         $ownerIds = [];
         if ($entity->getOwner() !== null) {
@@ -117,45 +101,56 @@ class EmailUserListener
         return array_unique($ownerIds);
     }
 
-    /**
-     * Collect new EmailUser entities
-     *
-     * @param array $entities
-     */
-    protected function collectNewEmailUserEntities($entities)
+    private function collectNewEmailUserEntities(array $entities): void
     {
-        if ($entities) {
-            foreach ($entities as $entity) {
-                if ($entity instanceof EmailUser && !$entity->isSeen()) {
-                    $this->processEmailUsersEntities[] = [
-                        'status' => self::ENTITY_STATUS_NEW,
-                        'entity' => $entity
-                    ];
-                }
+        if (!$entities) {
+            return;
+        }
+
+        foreach ($entities as $entity) {
+            if (!$entity instanceof EmailUser || $entity->isSeen()) {
+                continue;
             }
+            $this->processEmailUsersEntities[] = [
+                'status' => self::ENTITY_STATUS_NEW,
+                'entity' => $entity
+            ];
+        }
+    }
+
+    private function collectUpdatedEmailUserEntities(array $entities, UnitOfWork $uow): void
+    {
+        if (!$entities) {
+            return;
+        }
+
+        foreach ($entities as $entity) {
+            if (!$entity instanceof EmailUser) {
+                continue;
+            }
+            $changes = $uow->getEntityChangeSet($entity);
+            if (!\array_key_exists('seen', $changes)) {
+                continue;
+            }
+            $this->processEmailUsersEntities[] = [
+                'status' => self::ENTITY_STATUS_UPDATE,
+                'entity' => $entity
+            ];
         }
     }
 
     /**
-     * Collect updated EmailUser entities
-     *
-     * @param $entities
-     * @param $uow - UnitOfWork
+     * {@inheritDoc}
      */
-    protected function collectUpdatedEmailUserEntities($entities, $uow)
+    public static function getSubscribedServices()
     {
-        if ($entities) {
-            foreach ($entities as $entity) {
-                if ($entity instanceof EmailUser) {
-                    $changes = $uow->getEntityChangeSet($entity);
-                    if (array_key_exists('seen', $changes) === true) {
-                        $this->processEmailUsersEntities[] = [
-                            'status' => self::ENTITY_STATUS_UPDATE,
-                            'entity' => $entity
-                        ];
-                    }
-                }
-            }
-        }
+        return [
+            'oro_email.email_websocket.processor' => WebSocketSendProcessor::class
+        ];
+    }
+
+    private function getWebSocketSendProcessor(): WebSocketSendProcessor
+    {
+        return $this->container->get('oro_email.email_websocket.processor');
     }
 }

@@ -1,0 +1,20 @@
+acls:
+    oro_digital_asset_view:
+        type: entity
+        class: OroDigitalAssetBundle:DigitalAsset
+        permission: VIEW
+
+    oro_digital_asset_create:
+        type: entity
+        class: OroDigitalAssetBundle:DigitalAsset
+        permission: CREATE
+
+    oro_digital_asset_update:
+        type: entity
+        class: OroDigitalAssetBundle:DigitalAsset
+        permission: EDIT
+
+    oro_digital_asset_delete:
+        type: entity
+        class: OroDigitalAssetBundle:DigitalAsset
+        permission: DELETE

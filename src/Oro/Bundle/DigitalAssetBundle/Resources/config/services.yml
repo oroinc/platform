@@ -1,0 +1,135 @@
+services:
+    oro_digital_asset.provider.file_constraints:
+        parent: oro_attachment.provider.file_constraints
+        # Public because used in digital-asset-grid
+        public: true
+
+    oro_digital_asset.provider.preview_metadata:
+        class: Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProvider
+        # Public because used in digital-asset-select-file-grid
+        public: true
+        arguments:
+            - '@oro_attachment.provider.file_url'
+            - '@oro_attachment.tools.mime_type_checker'
+            - '@oro_attachment.provider.file_icon'
+            - '@oro_attachment.provider.file_title'
+
+    oro_digital_asset.provider.preview_metadata.webp_aware:
+        class: Oro\Bundle\DigitalAssetBundle\Provider\WebpAwarePreviewMetadataProvider
+        decorates: oro_digital_asset.provider.preview_metadata
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.manager'
+
+    oro_digital_asset.form.type.digital_asset:
+        class: Oro\Bundle\DigitalAssetBundle\Form\Type\DigitalAssetType
+        arguments:
+            - '@translator'
+        tags:
+            - { name: form.type }
+
+    oro_digital_asset.form.type.digital_asset_in_dialog:
+        class: Oro\Bundle\DigitalAssetBundle\Form\Type\DigitalAssetInDialogType
+        tags:
+            - { name: form.type }
+
+    oro_digital_asset.acl.voter.digital_asset_deletion:
+        class: Oro\Bundle\DigitalAssetBundle\Acl\Voter\DigitalAssetDeleteVoter
+        tags:
+            - { name: security.voter }
+
+    oro_digital_asset.listener.source_changed_listener:
+        class: Oro\Bundle\DigitalAssetBundle\EventListener\DigitalAssetSourceChangedListener
+        arguments:
+            - '@oro_digital_asset.reflector.file_reflector'
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postUpdate }
+
+    oro_digital_asset.reflector.file_reflector:
+        class: Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector
+        arguments:
+            - '@property_accessor'
+            - '@logger'
+
+    oro_digital_asset.listener.file_digital_asset_changed:
+        class: Oro\Bundle\DigitalAssetBundle\EventListener\FileDigitalAssetChangedListener
+        arguments:
+            - '@oro_digital_asset.reflector.file_reflector'
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preUpdate }
+            - { name: doctrine.event_listener, event: onFlush }
+
+    oro_digital_asset.form.transformer.digital_asset_to_id:
+        class: Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset
+            - id
+
+    oro_digital_asset.form.extension.digital_asset_manager:
+        class: Oro\Bundle\DigitalAssetBundle\Form\Extension\DigitalAssetManagerExtension
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+            - '@oro_entity.entity_class_name_helper'
+            - '@oro_digital_asset.provider.preview_metadata'
+            - '@oro_digital_asset.form.transformer.digital_asset_to_id'
+            - '@oro_digital_asset.reflector.file_reflector'
+        tags:
+            - { name: form.type_extension }
+
+    oro_digital_asset.provider.file_title:
+        decorates: oro_attachment.provider.file_title
+        class: Oro\Bundle\DigitalAssetBundle\Provider\FileTitleProvider
+        arguments:
+            - '@.inner'
+            - '@oro_locale.helper.localization'
+            - '@doctrine'
+
+    oro_digital_asset.listener.file_delete_listener:
+        decorates: oro_attachment.listener.file_delete_listener
+        class: Oro\Bundle\DigitalAssetBundle\EventListener\FileDeleteListener
+        arguments:
+            - '@.inner'
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preRemove }
+
+    oro_digital_asset.import_export.event_listener.digital_asset_aware_file_strategy_event_listener:
+        class: Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFileStrategyEventListener
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+            - '@oro_entity.helper.field_helper'
+            - '@oro_importexport.field.database_helper'
+            - '@oro_importexport.strategy.import.helper'
+            - '@oro_attachment.import_export.file_import_strategy_helper'
+            - '@translator'
+            - '@oro_digital_asset.import_export.digital_asset_aware_file_strategy_event_listener.memory_cache'
+        tags:
+            # Listener priority should be lower than onProcessAfter in oro_attachment.import_export.file_strategy_event_listener
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter, priority: 40 }
+
+    oro_digital_asset.import_export.event_listener.digital_asset_aware_file_strategy_persist_event_listener:
+        class: Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFileStrategyPersistEventListener
+        arguments:
+            - '@oro_digital_asset.import_export.digital_asset_aware_file_strategy_event_listener.memory_cache'
+        tags:
+            - { name: doctrine.event_listener, event: preFlush }
+
+    oro_digital_asset.import_export.digital_asset_aware_file_strategy_event_listener.memory_cache:
+        class: Oro\Bundle\CacheBundle\Provider\MemoryCache
+
+    oro_digital_asset.event_listener.digital_asset_preloading:
+        parent: oro_entity.event_listener.default_preloading
+        tags:
+            - { name: kernel.event_listener, event: oro_entity.preload_entity.digitalasset, method: onPreload }
+
+    Oro\Bundle\DigitalAssetBundle\EntityConfig\AttachmentFieldConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    oro_digital_asset.provider.extend_field_form_options.file_dam:
+        class: Oro\Bundle\DigitalAssetBundle\Provider\ExtendFieldFileDamFormOptionsProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro_entity_extend.form_options_provider }

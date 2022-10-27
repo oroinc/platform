@@ -6,10 +6,12 @@ use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * General DateTime form type.
+ * Makes default format with timezone.
+ */
 class OroDateTimeType extends OroDateType
 {
-    const NAME = 'oro_datetime';
-
     /**
      * {@inheritdoc}
      */
@@ -17,7 +19,7 @@ class OroDateTimeType extends OroDateType
     {
         parent::configureOptions($resolver);
 
-        $resolver->setDefaults(['format' => DateTimeExtension::HTML5_FORMAT_WITH_TIMEZONE]);
+        $resolver->setDefaults(['format' => DateTimeExtension::HTML5_FORMAT_WITH_TIMEZONE, 'html5' => false]);
     }
 
     /**
@@ -31,16 +33,8 @@ class OroDateTimeType extends OroDateType
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix()
     {
-        return self::NAME;
+        return 'oro_datetime';
     }
 }

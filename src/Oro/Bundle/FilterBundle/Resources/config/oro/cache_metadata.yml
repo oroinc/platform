@@ -1,0 +1,4 @@
+Oro\Bundle\DataGridBundle\Datagrid\ParameterBag:
+    attributes:
+        _filter:
+            groups: [ 'datagrid_results' ]

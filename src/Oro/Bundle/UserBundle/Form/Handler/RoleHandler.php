@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * TODO: Remove this class after api for acl is ready
+ * Form handler for Role entity.
  */
 class RoleHandler
 {
@@ -31,11 +31,6 @@ class RoleHandler
      */
     protected $manager;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     */
     public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $manager)
     {
         $this->form = $form;
@@ -94,7 +89,7 @@ class RoleHandler
     {
         /** @var $user User */
         foreach ($users as $user) {
-            $user->addRole($role);
+            $user->addUserRole($role);
             $this->manager->persist($user);
         }
     }
@@ -109,7 +104,7 @@ class RoleHandler
     {
         /** @var $user User */
         foreach ($users as $user) {
-            $user->removeRole($role);
+            $user->removeUserRole($role);
             $this->manager->persist($user);
         }
     }

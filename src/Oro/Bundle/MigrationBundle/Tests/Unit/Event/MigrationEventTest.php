@@ -2,36 +2,35 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Event;
 
+use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvent;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 
 class MigrationEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MigrationEvent
-     */
-    protected $migrationEvent;
+    /** @var MigrationEvent */
+    private $migrationEvent;
 
-    protected $connection;
+    private $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->connection = $this->createMock(Connection::class);
+
         $this->migrationEvent = new MigrationEvent($this->connection);
     }
 
     public function testMigrationData()
     {
-        $middleMigration = $this->getMockForAbstractClass('Oro\Bundle\MigrationBundle\Migration\Migration');
+        $middleMigration = $this->getMockForAbstractClass(Migration::class);
         $this->migrationEvent->addMigration($middleMigration);
-        $firstMigration = $this->getMockForAbstractClass('Oro\Bundle\MigrationBundle\Migration\Migration');
+        $firstMigration = $this->getMockForAbstractClass(Migration::class);
         $this->migrationEvent->addMigration($firstMigration, true);
-        $lastMigration = $this->getMockForAbstractClass('Oro\Bundle\MigrationBundle\Migration\Migration');
+        $lastMigration = $this->getMockForAbstractClass(Migration::class);
         $this->migrationEvent->addMigration($lastMigration);
 
         $migrations = $this->migrationEvent->getMigrations();
-        $this->assertEquals(3, count($migrations));
+        $this->assertCount(3, $migrations);
         $this->assertEquals($firstMigration, $migrations[0]);
         $this->assertEquals($middleMigration, $migrations[1]);
         $this->assertEquals($lastMigration, $migrations[2]);
@@ -46,7 +45,7 @@ class MigrationEventTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects($this->once())
             ->method('fetchAll')
             ->with($sql, $params, $types)
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $this->migrationEvent->getData($sql, $params, $types);
     }
 }

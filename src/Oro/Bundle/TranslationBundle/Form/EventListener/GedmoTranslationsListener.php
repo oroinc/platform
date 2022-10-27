@@ -22,7 +22,6 @@ class GedmoTranslationsListener implements EventSubscriberInterface
     }
 
     /**
-     * @param FormEvent $event
      * @throws \LogicException
      */
     public function preSetData(FormEvent $event)

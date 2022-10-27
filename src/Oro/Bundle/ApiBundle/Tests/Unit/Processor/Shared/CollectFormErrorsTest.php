@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Form\Type\ArrayType;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
@@ -14,9 +15,13 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CollectFormErrorsTest extends FormProcessorTestCase
 {
     /** @var ErrorCompleterRegistry */
@@ -25,7 +30,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     /** @var CollectFormErrors */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,8 +38,19 @@ class CollectFormErrorsTest extends FormProcessorTestCase
 
         $this->processor = new CollectFormErrors(
             new ConstraintTextExtractor(),
-            $this->errorCompleterRegistry
+            $this->errorCompleterRegistry,
+            PropertyAccess::createPropertyAccessor()
         );
+    }
+
+    private function createErrorObject(string $title, string $detail, string $propertyPath): Error
+    {
+        $error = Error::createValidationError($title, $detail);
+        if ($propertyPath) {
+            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
+        }
+
+        return $error;
     }
 
     public function testProcessWithoutForm()
@@ -79,6 +95,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -106,6 +123,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -139,6 +157,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -167,6 +186,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -180,7 +200,11 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add('field1', TextType::class, ['constraints' => [new Constraints\NotBlank(), new Constraints\NotNull()]])
-            ->add('field2', TextType::class, ['constraints' => [new Constraints\Length(['min' => 2, 'max' => 4])]])
+            ->add(
+                'field2',
+                TextType::class,
+                ['constraints' => [new Constraints\Length(['min' => 2, 'max' => 4, 'allowEmptyString' => false])]]
+            )
             ->getForm();
         $form->submit(
             [
@@ -193,6 +217,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -211,7 +236,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     public function testProcessWithInvalidCollectionPropertyValue()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
-            ->add('field1', TextType::class, ['constraints' => [new Constraints\All(new Constraints\NotNull())]])
+            ->add('field1', ArrayType::class, ['constraints' => [new Constraints\All(new Constraints\NotNull())]])
             ->getForm();
         $form->submit(
             [
@@ -223,6 +248,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -237,7 +263,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add(
                 'renamedField1',
-                TextType::class,
+                ArrayType::class,
                 ['property_path' => '[field1]', 'constraints' => [new Constraints\All(new Constraints\NotNull())]]
             )
             ->getForm();
@@ -251,6 +277,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -283,6 +310,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -316,6 +344,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -354,6 +383,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -395,6 +425,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -425,6 +456,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -461,6 +493,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [
@@ -468,22 +501,5 @@ class CollectFormErrorsTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
-    }
-
-    /**
-     * @param string $title
-     * @param string $detail
-     * @param string $propertyPath
-     *
-     * @return Error
-     */
-    private function createErrorObject($title, $detail, $propertyPath)
-    {
-        $error = Error::createValidationError($title, $detail);
-        if ($propertyPath) {
-            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
-        }
-
-        return $error;
     }
 }

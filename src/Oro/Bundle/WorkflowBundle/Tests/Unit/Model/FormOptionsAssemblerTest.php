@@ -3,34 +3,30 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
+use Oro\Component\Action\Action\ActionFactoryInterface;
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $actionFactory;
+    /** @var ActionFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionFactory;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configurationPass;
+    /** @var ConfigurationPassInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurationPass;
 
-    /**
-     * @var FormOptionsAssembler
-     */
-    protected $assembler;
+    /** @var FormOptionsAssembler */
+    private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
-
-        $this->configurationPass = $this->getMockBuilder(
-            'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
-        )->getMockForAbstractClass();
+        $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
+        $this->configurationPass = $this->createMock(ConfigurationPassInterface::class);
 
         $this->assembler = new FormOptionsAssembler($this->actionFactory);
         $this->assembler->addConfigurationPass($this->configurationPass);
@@ -38,51 +34,52 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
 
     public function testAssemble()
     {
-        $options = array(
-            'attribute_fields' => array(
-                'attribute_one' => array('form_type' => 'text'),
-                'attribute_two' => array('form_type' => 'text'),
-            ),
-            'attribute_default_values' => array(
+        $options = [
+            'attribute_fields' => [
+                'attribute_one' => ['form_type' => 'text'],
+                'attribute_two' => ['form_type' => 'text'],
+            ],
+            'attribute_default_values' => [
                 'attribute_one' => '$foo',
                 'attribute_two' => '$bar',
-            ),
-            'form_init' => array(
-                array('@foo' => 'bar')
-            )
-        );
+            ],
+            'form_init' => [
+                ['@foo' => 'bar']
+            ]
+        ];
 
-        $expectedOptions = array(
-            'attribute_fields' => array(
-                'attribute_one' => array('form_type' => 'text'),
-                'attribute_two' => array('form_type' => 'text'),
-            ),
-            'attribute_default_values' => array(
+        $expectedOptions = [
+            'attribute_fields' => [
+                'attribute_one' => ['form_type' => 'text'],
+                'attribute_two' => ['form_type' => 'text'],
+            ],
+            'attribute_default_values' => [
                 'attribute_one' => new PropertyPath('data.foo'),
                 'attribute_two' => new PropertyPath('data.bar'),
-            ),
-            'form_init' => $this->createMock('Oro\Component\Action\Action\ActionInterface')
-        );
+            ],
+            'form_init' => $this->createMock(ActionInterface::class)
+        ];
 
-        $attributes = array(
+        $attributes = [
             $this->createAttribute('attribute_one'),
             $this->createAttribute('attribute_two'),
-        );
+        ];
 
-        $this->configurationPass->expects($this->at(0))
+        $this->configurationPass->expects($this->exactly(2))
             ->method('passConfiguration')
-            ->with($options['attribute_fields'])
-            ->will($this->returnValue($expectedOptions['attribute_fields']));
-
-        $this->configurationPass->expects($this->at(1))
-            ->method('passConfiguration')
-            ->with($options['attribute_default_values'])
-            ->will($this->returnValue($expectedOptions['attribute_default_values']));
+            ->withConsecutive(
+                [$options['attribute_fields']],
+                [$options['attribute_default_values']]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $expectedOptions['attribute_fields'],
+                $expectedOptions['attribute_default_values']
+            );
 
         $this->actionFactory->expects($this->once())
             ->method('create')
             ->with(Configurable::ALIAS, $options['form_init'])
-            ->will($this->returnValue($expectedOptions['form_init']));
+            ->willReturn($expectedOptions['form_init']);
 
         $this->assertEquals(
             $expectedOptions,
@@ -97,105 +94,92 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidOptionsDataProvider
-     * @param array $options
-     * @param array $attributes
-     * @param string $owner
-     * @param string $ownerName
-     * @param string $expectedException
-     * @param string $expectedExceptionMessage
      */
     public function testAssembleRequiredOptionException(
         array $options,
         array $attributes,
-        $owner,
-        $ownerName,
-        $expectedException,
-        $expectedExceptionMessage
+        string $owner,
+        string $ownerName,
+        string $expectedException,
+        string $expectedExceptionMessage
     ) {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->assembler->assemble($options, $attributes, $owner, $ownerName);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
-        return array(
-            'string_attribute_fields' => array(
-                'options' => array(
+        return [
+            'string_attribute_fields' => [
+                'options' => [
                     'attribute_fields' => 'string'
-                ),
-                'attributes' => array(),
+                ],
+                'attributes' => [],
                 'owner' => FormOptionsAssembler::STEP_OWNER,
                 'ownerName' => 'test',
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
+                'expectedException' => InvalidParameterException::class,
                 'expectedExceptionMessage' => 'Option "form_options.attribute_fields" at step "test" must be an array.'
-            ),
-            'string_attribute_default_values' => array(
-                'options' => array(
+            ],
+            'string_attribute_default_values' => [
+                'options' => [
                     'attribute_default_values' => 'string'
-                ),
-                'attributes' => array(),
+                ],
+                'attributes' => [],
                 'owner' => FormOptionsAssembler::STEP_OWNER,
                 'ownerName' => 'test',
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
+                'expectedException' => InvalidParameterException::class,
                 'expectedExceptionMessage' =>
                     'Option "form_options.attribute_default_values" of step "test" must be an array.'
-            ),
-            'attribute_not_exist_at_attribute_fields' => array(
-                'options' => array(
-                    'attribute_fields' => array(
-                        'attribute_one' => array('form_type' => 'text'),
-                    )
-                ),
-                'attributes' => array(),
+            ],
+            'attribute_not_exist_at_attribute_fields' => [
+                'options' => [
+                    'attribute_fields' => [
+                        'attribute_one' => ['form_type' => 'text'],
+                    ]
+                ],
+                'attributes' => [],
                 'owner' => FormOptionsAssembler::STEP_OWNER,
                 'ownerName' => 'test',
-                'expectedException' => 'Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException',
+                'expectedException' => UnknownAttributeException::class,
                 'expectedExceptionMessage' => 'Unknown attribute "attribute_one" at step "test".'
-            ),
-            'attribute_not_exist_at_attribute_default_values' => array(
-                'options' => array(
-                    'attribute_default_values' => array(
-                        'attribute_one' => array('form_type' => 'text'),
-                    )
-                ),
-                'attributes' => array(),
+            ],
+            'attribute_not_exist_at_attribute_default_values' => [
+                'options' => [
+                    'attribute_default_values' => [
+                        'attribute_one' => ['form_type' => 'text'],
+                    ]
+                ],
+                'attributes' => [],
                 'owner' => FormOptionsAssembler::STEP_OWNER,
                 'ownerName' => 'test',
-                'expectedException' => 'Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException',
+                'expectedException' => UnknownAttributeException::class,
                 'expectedExceptionMessage' => 'Unknown attribute "attribute_one" at step "test".'
-            ),
-            'attribute_default_value_not_in_attribute_fields' => array(
-                'options' => array(
-                    'attribute_fields' => array(
-                        'attribute_one' => array('form_type' => 'text'),
-                    ),
-                    'attribute_default_values' => array(
+            ],
+            'attribute_default_value_not_in_attribute_fields' => [
+                'options' => [
+                    'attribute_fields' => [
+                        'attribute_one' => ['form_type' => 'text'],
+                    ],
+                    'attribute_default_values' => [
                         'attribute_two' => '$attribute_one'
-                    )
-                ),
-                array(
+                    ]
+                ],
+                [
                     $this->createAttribute('attribute_one'),
                     $this->createAttribute('attribute_two'),
-                ),
+                ],
                 'owner' => FormOptionsAssembler::STEP_OWNER,
                 'ownerName' => 'test',
-                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
+                'expectedException' => InvalidParameterException::class,
                 'expectedExceptionMessage' =>
                     'Form options of step "test" doesn\'t have attribute "attribute_two" which is referenced in ' .
                     '"attribute_default_values" option.'
-            ),
-        );
+            ],
+        ];
     }
 
-    /**
-     * @param string $name
-     * @return Attribute
-     */
-    protected function createAttribute($name)
+    private function createAttribute(string $name): Attribute
     {
         $attribute = new Attribute();
         $attribute->setName($name);

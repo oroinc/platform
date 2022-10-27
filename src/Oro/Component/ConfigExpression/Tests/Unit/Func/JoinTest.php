@@ -12,7 +12,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /** @var Func\Join */
     protected $function;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->function = new Func\Join();
         $this->function->setContextAccessor(new ContextAccessor());
@@ -86,21 +86,19 @@ class JoinTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have at least 2 elements, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have at least 2 elements, but 0 given.');
+
         $this->function->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have at least 2 elements, but 1 given.
-     */
     public function testInitializeFailsWhenOnlyGlueSpecified()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have at least 2 elements, but 1 given.');
+
         $this->function->initialize([',']);
     }
 

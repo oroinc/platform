@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 /**
  * This class represents the entity ownership metadata
  */
-class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
+class OwnershipMetadata implements OwnershipMetadataInterface
 {
     const OWNER_TYPE_NONE          = 0;
     const OWNER_TYPE_ORGANIZATION  = 1;
@@ -30,7 +30,7 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
     protected $organizationColumnName;
 
     /**
-     * @param int    $ownerType Can be one of ORGANIZATION, BUSINESS_UNIT or USER
+     * @param string $ownerType Can be one of ORGANIZATION, BUSINESS_UNIT or USER
      * @param string $ownerFieldName
      * @param string $ownerColumnName
      * @param string $organizationFieldName
@@ -39,13 +39,13 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        $ownerType = null,
+        $ownerType = '',
         $ownerFieldName = '',
         $ownerColumnName = '',
         $organizationFieldName = '',
         $organizationColumnName = ''
     ) {
-        $constantName = $this->getConstantName($ownerType);
+        $constantName = $this->getConstantName((string)$ownerType);
 
         if (defined($constantName)) {
             $this->ownerType = constant($constantName);
@@ -75,7 +75,7 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
      *
      * @return string
      */
-    protected function getConstantName($ownerType)
+    protected function getConstantName(string $ownerType)
     {
         return sprintf('static::OWNER_TYPE_%s', strtoupper($ownerType));
     }
@@ -106,15 +106,6 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3, use isOrganizationOwned instead
-     */
-    public function isGlobalLevelOwned()
-    {
-        return $this->isOrganizationOwned();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function isBusinessUnitOwned()
     {
@@ -123,37 +114,10 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3, use isBusinessUnitOwned instead
-     */
-    public function isLocalLevelOwned($deep = false)
-    {
-        return $this->isBusinessUnitOwned();
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function isUserOwned()
     {
         return self::OWNER_TYPE_USER === $this->ownerType;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3, use isUserOwned instead
-     */
-    public function isBasicLevelOwned()
-    {
-        return $this->isUserOwned();
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3
-     */
-    public function isSystemLevelOwned()
-    {
-        return false;
     }
 
     /**
@@ -191,22 +155,6 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
     /**
      * {@inheritdoc}
      */
-    public function getGlobalOwnerColumnName()
-    {
-        return $this->getOrganizationColumnName();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getGlobalOwnerFieldName()
-    {
-        return $this->getOrganizationFieldName();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessLevelNames()
     {
         if (!$this->hasOwner()) {
@@ -233,34 +181,26 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
         return AccessLevel::getAccessLevelNames($minLevel, $maxLevel);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize(
-            [
-                $this->ownerType,
-                $this->ownerFieldName,
-                $this->ownerColumnName,
-                $this->organizationFieldName,
-                $this->organizationColumnName,
-            ]
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        list(
+        return [
             $this->ownerType,
             $this->ownerFieldName,
             $this->ownerColumnName,
             $this->organizationFieldName,
-            $this->organizationColumnName
-            ) = unserialize($serialized);
+            $this->organizationColumnName,
+        ];
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        [
+            $this->ownerType,
+            $this->ownerFieldName,
+            $this->ownerColumnName,
+            $this->organizationFieldName,
+            $this->organizationColumnName,
+        ] = $serialized;
     }
 
     /**

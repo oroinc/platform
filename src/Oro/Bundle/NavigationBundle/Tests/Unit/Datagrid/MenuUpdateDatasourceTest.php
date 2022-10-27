@@ -5,49 +5,40 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Datagrid;
 use Knp\Menu\MenuFactory;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Datagrid\MenuUpdateDatasource;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 
 class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MenuUpdateDatasource */
-    protected $datasource;
-
     /** @var BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $chainProvider;
+    private $chainProvider;
 
     /** @var MenuManipulator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $menuManipulator;
+    private $menuManipulator;
 
-    /** @var string */
-    protected $scopeType = 'default';
+    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurationProvider;
 
-    /** @var MenuConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    protected $menuConfiguration;
+    /** @var MenuUpdateDatasource */
+    private $datasource;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->chainProvider = $this->createMock(BuilderChainProvider::class);
         $this->menuManipulator = $this->createMock(MenuManipulator::class);
-        $this->menuConfiguration = $this->getMockBuilder(MenuConfiguration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
 
         $this->datasource = new MenuUpdateDatasource(
             $this->chainProvider,
             $this->menuManipulator,
-            $this->scopeType,
-            $this->menuConfiguration
+            'default',
+            $this->configurationProvider
         );
     }
 
     public function testProcess()
     {
-        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $grid */
         $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->once())
             ->method('setDatasource')
@@ -58,40 +49,32 @@ class MenuUpdateDatasourceTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider menuConfigurationProvider
-     *
-     * @param array $menu
-     * @param int $resultCount
      */
-    public function testGetResults(array $menu, $resultCount)
+    public function testGetResults(array $menu, int $resultCount)
     {
-        $this->menuConfiguration->expects(self::once())
-            ->method('getTree')
+        $this->configurationProvider->expects(self::once())
+            ->method('getMenuTree')
             ->willReturn([$menu['name'] => $menu]);
 
         $factory = new MenuFactory();
         $menuItem = $factory->createItem($menu['name'], $menu);
 
-        $this->chainProvider
-            ->expects($this->once())
+        $this->chainProvider->expects($this->once())
             ->method('get')
             ->with($menu['name'])
-            ->will($this->returnValue($menuItem));
+            ->willReturn($menuItem);
 
         if ($resultCount) {
-            $this->menuManipulator
-                ->expects($this->once())
+            $this->menuManipulator->expects($this->once())
                 ->method('toArray')
                 ->with($menuItem)
-                ->will($this->returnValue([]));
+                ->willReturn([]);
         }
 
-        $this->assertEquals($resultCount, count($this->datasource->getResults()));
+        $this->assertCount($resultCount, $this->datasource->getResults());
     }
 
-    /**
-     * @return array
-     */
-    public function menuConfigurationProvider()
+    public function menuConfigurationProvider(): array
     {
         return [
             [

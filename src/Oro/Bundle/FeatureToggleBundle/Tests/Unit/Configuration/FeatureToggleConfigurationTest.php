@@ -2,28 +2,40 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtension;
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureToggleConfiguration
-     */
-    protected $configuration;
+    private FeatureToggleConfiguration $configuration;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configuration = new FeatureToggleConfiguration();
+        $extension = $this->createMock(ConfigurationExtensionInterface::class);
+        $extension->expects(self::any())
+            ->method('extendConfigurationTree')
+            ->willReturnCallback(function (NodeBuilder $node) {
+                $node->arrayNode('test_items')->prototype('variable')->end()->end();
+            });
+
+        $this->configuration = new FeatureToggleConfiguration(new ConfigurationExtension([$extension]));
     }
 
-    public function testProcessEmptyConfiguration()
+    private function processConfiguration(array $inputData): array
+    {
+        return (new Processor())->processConfiguration($this->configuration, [$inputData]);
+    }
+
+    public function testProcessEmptyConfiguration(): void
     {
         $this->assertEquals([], $this->processConfiguration([]));
     }
 
-    public function testProcessMinValidConfiguration()
+    public function testProcessMinValidConfiguration(): void
     {
         $inputData = [
             'feature1' => [
@@ -38,15 +50,16 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'routes' => [],
                 'configuration' => [],
                 'entities' => [],
-                'field_configs' => [],
-                'commands' => []
+                'commands' => [],
+                'mq_topics' => [],
+                'test_items' => []
             ]
         ];
 
         $this->assertEquals($expected, $this->processConfiguration($inputData));
     }
 
-    public function testProcessFullValidConfiguration()
+    public function testProcessFullValidConfiguration(): void
     {
         $inputData = [
             'feature1' => [
@@ -56,10 +69,11 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'routes' => ['oro_feature_route'],
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
-                'field_configs' => [],
                 'strategy' => 'affirmative',
                 'allow_if_all_abstain' => true,
-                'allow_if_equal_granted_denied' => true
+                'allow_if_equal_granted_denied' => true,
+                'mq_topics' => ['mq.topic1', 'mq.topic2'],
+                'test_items' => ['item1', 'item2']
             ],
         ];
 
@@ -71,11 +85,12 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'routes' => ['oro_feature_route'],
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
-                'field_configs' => [],
                 'strategy' => 'affirmative',
                 'allow_if_all_abstain' => true,
                 'allow_if_equal_granted_denied' => true,
-                'commands' => []
+                'commands' => [],
+                'mq_topics' => ['mq.topic1', 'mq.topic2'],
+                'test_items' => ['item1', 'item2']
             ]
         ];
 
@@ -84,30 +99,26 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processInvalidConfigurationProvider
-     *
-     * @param array $inputData
-     * @param string $expectedExceptionMessage
      */
-    public function testProcessInvalidConfiguration(array $inputData, $expectedExceptionMessage)
+    public function testProcessInvalidConfiguration(array $inputData, string $expectedExceptionMessage): void
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
         $this->processConfiguration($inputData);
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function processInvalidConfigurationProvider()
+    public function processInvalidConfigurationProvider(): array
     {
         return [
             'incorrect root' => [
                 'input' => [
                     'feature1' => 'not array value'
                 ],
-                'message' => 'Invalid type for path "features.feature1". Expected array, but got string'
+                'message' => 'Invalid type for path "features.feature1". Expected "array", but got "string"'
             ],
             'incorrect label' => [
                 'input' => [
@@ -115,7 +126,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                         'toggle' => 'oro_feature.test.feature_enabled',
                     ]
                 ],
-                'message' => 'The child node "label" at path "features.feature1" must be configured'
+                'message' => 'The child config "label" under "features.feature1" must be configured'
             ],
             'incorrect description' => [
                 'input' => [
@@ -126,7 +137,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "features.feature1.description". ' .
-                    'Expected scalar, but got array'
+                    'Expected "scalar", but got "array"'
             ],
             'incorrect dependencies' => [
                 'input' => [
@@ -137,7 +148,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "features.feature1.dependencies". ' .
-                    'Expected array, but got string'
+                    'Expected "array", but got "string"'
             ],
             'incorrect route' => [
                 'input' => [
@@ -148,7 +159,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "features.feature1.routes". ' .
-                    'Expected array, but got string'
+                    'Expected "array", but got "string"'
             ],
             'incorrect configuration' => [
                 'input' => [
@@ -159,7 +170,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "features.feature1.configuration". ' .
-                    'Expected array, but got integer'
+                    'Expected "array", but got "int"'
             ],
             'incorrect strategy' => [
                 'input' => [
@@ -168,10 +179,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                         'strategy' => 'not supported'
                     ]
                 ],
-                'message' => 'The "strategy" can be "'
-                    . FeatureChecker::STRATEGY_AFFIRMATIVE
-                    . '", "' . FeatureChecker::STRATEGY_CONSENSUS. '" or "'
-                    . FeatureChecker::STRATEGY_UNANIMOUS. '.'
+                'message' => 'The value "not supported" is not allowed for path "features.feature1.strategy". ' .
+                    'Permissible values: "unanimous", "affirmative", "consensus"'
             ],
             'incorrect allow_if_all_abstain' => [
                 'input' => [
@@ -181,7 +190,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "features.feature1.allow_if_all_abstain". ' .
-                             'Expected boolean, but got string'
+                             'Expected "bool", but got "string"'
             ],
             'incorrect allow_if_equal_granted_denied' => [
                 'input' => [
@@ -191,19 +200,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'message' => 'Invalid type for path "features.feature1.allow_if_equal_granted_denied". ' .
-                             'Expected boolean, but got string'
+                             'Expected "bool", but got "string"'
             ],
         ];
-    }
-
-    /**
-     * @param array $inputData
-     * @return array
-     */
-    protected function processConfiguration(array $inputData)
-    {
-        $processor = new Processor();
-
-        return $processor->processConfiguration($this->configuration, [$inputData]);
     }
 }

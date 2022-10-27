@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
 class UpdateSegmentWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface

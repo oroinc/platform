@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterHelper;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
@@ -23,7 +24,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
     /** @var FilterHelper */
     private $filterHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->filters = new FilterCollection();
         $this->filterValues = $this->createMock(FilterValueAccessorInterface::class);
@@ -127,14 +128,12 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->filterValues->expects(self::any())
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['page[number]', new FilterValue('page[number]', 2)],
-                    ['page[size]', new FilterValue('page[size]', 20)],
-                    ['sorting', new FilterValue('sorting', ['id' => 'DESC'])],
-                    ['filter[test]', new FilterValue('filter[test]', true)]
-                ]
-            );
+            ->willReturnMap([
+                ['page[number]', new FilterValue('page[number]', 2)],
+                ['page[size]', new FilterValue('page[size]', 20)],
+                ['sorting', new FilterValue('sorting', ['id' => 'DESC'])],
+                ['filter[test]', new FilterValue('filter[test]', true)]
+            ]);
 
         self::assertEquals(
             new FilterValue('filter[test]', true),
@@ -158,10 +157,10 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         $this->filterValues->expects(self::once())
             ->method('get')
             ->with('filter[test]')
-            ->willReturn(new FilterValue('filter[test]', true, ComparisonFilter::EQ));
+            ->willReturn(new FilterValue('filter[test]', true, FilterOperator::EQ));
 
         self::assertEquals(
-            new FilterValue('filter[test]', true, ComparisonFilter::EQ),
+            new FilterValue('filter[test]', true, FilterOperator::EQ),
             $this->filterHelper->getFilterValue('test')
         );
         self::assertTrue($this->filterHelper->getBooleanFilterValue('test'));
@@ -179,10 +178,10 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         $this->filterValues->expects(self::once())
             ->method('get')
             ->with('filter[test]')
-            ->willReturn(new FilterValue('filter[test]', true, ComparisonFilter::NEQ));
+            ->willReturn(new FilterValue('filter[test]', true, FilterOperator::NEQ));
 
         self::assertEquals(
-            new FilterValue('filter[test]', true, ComparisonFilter::NEQ),
+            new FilterValue('filter[test]', true, FilterOperator::NEQ),
             $this->filterHelper->getFilterValue('test')
         );
         self::assertFalse($this->filterHelper->getBooleanFilterValue('test'));

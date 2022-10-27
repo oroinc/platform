@@ -16,9 +16,9 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
+        $builder = new TreeBuilder('fields_acl');
 
-        $builder->root('fields_acl')
+        $builder->getRootNode()
             ->children()
                 ->arrayNode('columns')
                     ->useAttributeAsKey('name')

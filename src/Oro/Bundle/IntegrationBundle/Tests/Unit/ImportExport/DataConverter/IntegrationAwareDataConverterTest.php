@@ -7,34 +7,22 @@ use Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\IntegrationAwareData
 
 class IntegrationAwareDataConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var IntegrationAwareDataConverter|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $dataConverter;
+    /** @var IntegrationAwareDataConverter|\PHPUnit\Framework\MockObject\MockObject */
+    private $dataConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->dataConverter = $this->getMockForAbstractClass(
-            'Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\IntegrationAwareDataConverter'
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->dataConverter);
+        $this->dataConverter = $this->getMockForAbstractClass(IntegrationAwareDataConverter::class);
     }
 
     /**
      * @dataProvider inputDataProvider
-     * @param array $input
-     * @param array $expected
-     * @param ContextInterface $context
      */
-    public function testConvertToImportFormat(array $input, array $expected, ContextInterface $context = null)
+    public function testConvertToImportFormat(array $input, array $expected, ?ContextInterface $context)
     {
         $this->dataConverter->expects($this->once())
             ->method('getHeaderConversionRules')
-            ->will($this->returnValue(['key' => 'cKey']));
+            ->willReturn(['key' => 'cKey']);
 
         if ($context) {
             $this->dataConverter->setImportExportContext($context);
@@ -42,21 +30,18 @@ class IntegrationAwareDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->dataConverter->convertToImportFormat($input));
     }
 
-    /**
-     * @return array
-     */
-    public function inputDataProvider()
+    public function inputDataProvider(): array
     {
-        $emptyContext = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $emptyContext = $this->createMock(ContextInterface::class);
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->any())
             ->method('hasOption')
             ->with('channel')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $context->expects($this->any())
             ->method('getOption')
             ->with('channel')
-            ->will($this->returnValue(2));
+            ->willReturn(2);
 
         return [
             [

@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigQuery;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2;
@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 
 class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
 {
-    const FIELD_NAME = 'fieldName';
+    private const FIELD_NAME = 'fieldName';
 
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
@@ -25,10 +25,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $relationFullName;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
         $this->connection->expects($this->once())
@@ -46,16 +43,14 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @dataProvider getConfiguration
      */
     public function testGetDescription($key, $value)
     {
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
-        $statement->expects($this->never())->method('execute');
+        $statement->expects($this->never())
+            ->method('execute');
 
         $this->query->setConnection($this->connection);
 
@@ -85,16 +80,15 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @dataProvider getConfiguration
      */
     public function testUpdateCascadeValue($key, $value)
     {
         $this->initializeQuery($key, $value);
         $statement = $this->setUpConnection($key, $value);
-        $statement->expects($this->once())->method('execute')->with(['data serialized payload to persist', '42']);
+        $statement->expects($this->once())
+            ->method('execute')
+            ->with(['data serialized payload to persist', '42']);
 
         $logger = new ArrayLogger;
 
@@ -116,33 +110,30 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @dataProvider getConfiguration
      */
     public function testNoRelationAlert($key, $value)
     {
         $this->initializeQuery($key, $value);
-        $this->connection->expects($this->at(1))
+        $this->connection->expects($this->once())
             ->method('convertToPHPValue')
-            ->with('data persisted payload serialized', Type::TARRAY)
+            ->with('data persisted payload serialized', Types::ARRAY)
             ->willReturn([
                 'extend' => [
                     'relation' => [] //no relation defined in persisted entity config
                 ]
             ]);
 
-        /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
-        $logger->expects($this->at(0))
-            ->method('info')->with('SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1');
-        $logger->expects($this->at(1))
-            ->method('info')->with('Parameters:');
-        $logger->expects($this->at(2))
-            ->method('info')->with('[1] = Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1');
-        $logger->expects($this->at(3))
+        $logger->expects($this->exactly(3))
+            ->method('info')
+            ->withConsecutive(
+                ['SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1'],
+                ['Parameters:'],
+                ['[1] = Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1']
+            );
+        $logger->expects($this->once())
             ->method('warning')
             ->with(
                 '{key} value for entity `{entity}` config field `{field}`' .
@@ -164,11 +155,11 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
      * @param $value
      * @return Statement|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function setUpConnection($key, $value)
+    private function setUpConnection($key, $value)
     {
-        $this->connection->expects($this->at(1))
+        $this->connection->expects($this->once())
             ->method('convertToPHPValue')
-            ->with('data persisted payload serialized', Type::TARRAY)
+            ->with('data persisted payload serialized', Types::ARRAY)
             ->willReturn(
                 [
                     'extend' => [
@@ -179,7 +170,8 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->connection->expects($this->at(2))->method('convertToDatabaseValue')
+        $this->connection->expects($this->once())
+            ->method('convertToDatabaseValue')
             ->with(
                 [
                     'extend' => [
@@ -188,12 +180,12 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ],
-                Type::TARRAY
+                Types::ARRAY
             )->willReturn('data serialized payload to persist');
 
         $statement = $this->createMock(Statement::class);
 
-        $this->connection->expects($this->at(3))
+        $this->connection->expects($this->once())
             ->method('prepare')
             ->with('UPDATE oro_entity_config SET data = ? WHERE id = ?')
             ->willReturn($statement);
@@ -222,7 +214,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
      * @param string $key
      * @param string $value
      */
-    protected function initializeQuery($key, $value)
+    private function initializeQuery($key, $value)
     {
         $this->query = new UpdateEntityConfigQuery(
             TestEntity1::class,

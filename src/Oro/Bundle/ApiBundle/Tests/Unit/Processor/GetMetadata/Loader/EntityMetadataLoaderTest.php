@@ -19,6 +19,8 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityMetadataLoaderTest extends LoaderTestCase
 {
@@ -43,7 +45,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
     /** @var EntityMetadataLoader */
     private $entityMetadataLoader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->metadataFactory = $this->createMock(MetadataFactory::class);
@@ -73,8 +75,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames([$fieldName]);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -127,8 +128,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setPropertyPath($propertyPath);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames([$propertyPath]);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -181,8 +181,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field1->setPropertyPath('realField1');
         $field2 = $config->addField('id');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id']);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -203,23 +202,23 @@ class EntityMetadataLoaderTest extends LoaderTestCase
             ->with(self::identicalTo($classMetadata))
             ->willReturn($entityMetadata);
 
-        $this->entityMetadataFactory->expects(self::at(0))
+        $this->entityMetadataFactory->expects(self::exactly(2))
             ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'id',
-                self::identicalTo($field2),
-                $targetAction
-            );
-        $this->entityMetadataFactory->expects(self::at(1))
-            ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'field1',
-                self::identicalTo($field1),
-                $targetAction
+            ->withConsecutive(
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'id',
+                    self::identicalTo($field2),
+                    $targetAction
+                ],
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'field1',
+                    self::identicalTo($field1),
+                    $targetAction
+                ]
             );
 
         $result = $this->entityMetadataLoader->loadEntityMetadata(
@@ -243,8 +242,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field1 = $config->addField('field1');
         $field2 = $config->addField('id');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->setHasIdentifierGenerator(true);
 
@@ -266,23 +264,23 @@ class EntityMetadataLoaderTest extends LoaderTestCase
             ->with(self::identicalTo($classMetadata))
             ->willReturn($entityMetadata);
 
-        $this->entityMetadataFactory->expects(self::at(0))
+        $this->entityMetadataFactory->expects(self::exactly(2))
             ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'id',
-                self::identicalTo($field2),
-                $targetAction
-            );
-        $this->entityMetadataFactory->expects(self::at(1))
-            ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'field1',
-                self::identicalTo($field1),
-                $targetAction
+            ->withConsecutive(
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'id',
+                    self::identicalTo($field2),
+                    $targetAction
+                ],
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'field1',
+                    self::identicalTo($field1),
+                    $targetAction
+                ]
             );
 
         $result = $this->entityMetadataLoader->loadEntityMetadata(
@@ -307,8 +305,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field1 = $config->addField('field1');
         $field2 = $config->addField('id');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->setHasIdentifierGenerator(true);
 
@@ -330,23 +327,23 @@ class EntityMetadataLoaderTest extends LoaderTestCase
             ->with(self::identicalTo($classMetadata))
             ->willReturn($entityMetadata);
 
-        $this->entityMetadataFactory->expects(self::at(0))
+        $this->entityMetadataFactory->expects(self::exactly(2))
             ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'id',
-                self::identicalTo($field2),
-                $targetAction
-            );
-        $this->entityMetadataFactory->expects(self::at(1))
-            ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'field1',
-                self::identicalTo($field1),
-                $targetAction
+            ->withConsecutive(
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'id',
+                    self::identicalTo($field2),
+                    $targetAction
+                ],
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'field1',
+                    self::identicalTo($field1),
+                    $targetAction
+                ]
             );
 
         $result = $this->entityMetadataLoader->loadEntityMetadata(
@@ -371,8 +368,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setExcluded();
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -415,8 +411,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setExcluded();
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -466,8 +461,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -509,8 +503,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $fieldName = 'testField';
         $field = $config->addField($fieldName);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -561,8 +554,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setPropertyPath($propertyPath);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -610,8 +602,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
 
         $config->addField('unknownField');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -654,8 +645,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setMetaProperty(true);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -706,8 +696,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setMetaProperty(true);
         $field->setExcluded();
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -752,8 +741,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setMetaProperty(true);
         $field->setPropertyPath($propertyPath);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -802,8 +790,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField('unknownField');
         $field->setMetaProperty(true);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -845,8 +832,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $associationName = 'testAssociation';
         $field = $config->addField($associationName);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -896,8 +882,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($associationName);
         $field->setExcluded();
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -941,8 +926,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($associationName);
         $field->setPropertyPath($propertyPath);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -990,8 +974,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
 
         $config->addField('unknownAssociation');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1035,8 +1018,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setTargetClass('Test\AssociationTargetClass');
         $field->setTargetType('to-one');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1076,6 +1058,60 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertSame($entityMetadata, $result);
     }
 
+    public function testForAssociationThatIsFieldInEntityAndConfiguredByTargetClassAndTargetType()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $associationName = 'testAssociation';
+        $field = $config->addField($associationName);
+        $field->setTargetClass('Test\AssociationTargetClass');
+        $field->setTargetType('to-one');
+
+        $entityMetadata = new EntityMetadata($entityClass);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([$associationName]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->entityMetadataFactory->expects(self::never())
+            ->method('createAndAddFieldMetadata');
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddAssociationMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                $entityClass,
+                self::identicalTo($config),
+                $associationName,
+                self::identicalTo($field),
+                $targetAction
+            );
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+    }
+
     public function testForAdditionalPropertyWithoutDataType()
     {
         $entityClass = 'Test\Class';
@@ -1086,8 +1122,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $fieldName = 'testField';
         $config->addField($fieldName);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1139,8 +1174,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setMetaProperty(true);
         $field->setExcluded();
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1192,8 +1226,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setMetaProperty(true);
         $field->setExcluded();
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1243,8 +1276,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setMetaProperty(true);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1294,8 +1326,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setDataType('string');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1346,8 +1377,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setDataType('integer');
         $field->setTargetClass('Test\TargetClass');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1398,8 +1428,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setDataType('nestedObject');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1452,8 +1481,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setDataType('nestedAssociation');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
         $classMetadata->expects(self::once())
@@ -1505,8 +1533,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($fieldName);
         $field->setDirection('output-only');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $fieldMetadata = new FieldMetadata($fieldName);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -1561,8 +1588,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setMetaProperty(true);
         $field->setDirection('output-only');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $propertyMetadata = new MetaPropertyMetadata($fieldName);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -1616,8 +1642,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field = $config->addField($associationName);
         $field->setDirection('output-only');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $associationMetadata = new AssociationMetadata($associationName);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -1672,8 +1697,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setDataType('string');
         $field->setDirection('output-only');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $fieldMetadata = new FieldMetadata($fieldName);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -1728,8 +1752,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setMetaProperty(true);
         $field->setDirection('output-only');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $propertyMetadata = new MetaPropertyMetadata($fieldName);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -1785,8 +1808,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setTargetType('to-one');
         $field->setDirection('output-only');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $associationMetadata = new AssociationMetadata($associationName);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -1842,8 +1864,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setDataType('nestedObject');
         $field->setDirection('output-only');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $associationMetadata = new AssociationMetadata($fieldName);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);
@@ -1901,8 +1922,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $field->setDataType('nestedAssociation');
         $field->setDirection('output-only');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $associationMetadata = new AssociationMetadata($fieldName);
 
         $classMetadata = $this->getClassMetadataMock($entityClass);

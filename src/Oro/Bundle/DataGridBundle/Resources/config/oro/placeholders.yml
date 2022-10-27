@@ -8,4 +8,4 @@ placeholders:
     items:
         template_datagrid_toolbar:
             applicable: "@oro_layout.helper->isTemplateRequest()"
-            template: OroDataGridBundle:js:toolbar.html.twig
+            template: '@@OroDataGrid/js/toolbar.html.twig'

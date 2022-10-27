@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 use Oro\Component\ChainProcessor\AbstractParameterBag;
+use Symfony\Component\HttpFoundation\AcceptHeader;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -14,21 +16,14 @@ class RestRequestHeaders extends AbstractParameterBag
     private $request;
 
     /**
-     * @var array|null
-     *  [
-     *      normalized_key => [] | false | ['v' => value],
-     *      ...
-     *  ]
-     * value is:
-     *  []             - a parameter exists, but a value should be retrieved using $this->request->headers->get($key)
+     * @var array|null [normalized_key => [] | false | ['v' => value], ...]
+     * where the value can be:
+     *  []             - a parameter exists, but a value should be retrieved using $this->getHeaderValue()
      *  false          - a parameter was removed
      *  ['v' => value] - a parameter exists and its value is stored in this array
      */
     private $parameters;
 
-    /**
-     * @param Request $request
-     */
     public function __construct(Request $request)
     {
         $this->request = $request;
@@ -40,7 +35,7 @@ class RestRequestHeaders extends AbstractParameterBag
     public function has($key)
     {
         if (null === $this->parameters) {
-            return $this->request->headers->has($key);
+            return $this->hasHeader($key);
         }
 
         $key = $this->normalizeKey($key);
@@ -54,7 +49,7 @@ class RestRequestHeaders extends AbstractParameterBag
     public function get($key)
     {
         if (null === $this->parameters) {
-            return $this->request->headers->get($key);
+            return $this->getHeaderValue($key);
         }
 
         $key = $this->normalizeKey($key);
@@ -66,8 +61,8 @@ class RestRequestHeaders extends AbstractParameterBag
             return null;
         }
 
-        return empty($val)
-            ? $this->request->headers->get($key)
+        return !$val
+            ? $this->getHeaderValue($key)
             : $val['v'];
     }
 
@@ -98,9 +93,9 @@ class RestRequestHeaders extends AbstractParameterBag
     {
         $result = [];
         if (null === $this->parameters) {
-            $keys = $this->request->headers->keys();
-            foreach ($keys as $key) {
-                $result[$key] = $this->request->headers->get($key);
+            $names = $this->getHeaderNames();
+            foreach ($names as $name) {
+                $result[$name] = $this->getHeaderValue($name);
             }
         } else {
             foreach ($this->parameters as $key => $parameter) {
@@ -120,7 +115,7 @@ class RestRequestHeaders extends AbstractParameterBag
     {
         $this->ensureInternalStorageInitialized();
 
-        $keys = \array_keys($this->parameters);
+        $keys = array_keys($this->parameters);
         foreach ($keys as $key) {
             $this->parameters[$key] = false;
         }
@@ -129,10 +124,10 @@ class RestRequestHeaders extends AbstractParameterBag
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         if (null === $this->parameters) {
-            return $this->request->headers->count();
+            return count($this->getHeaderNames());
         }
 
         $result = 0;
@@ -145,28 +140,81 @@ class RestRequestHeaders extends AbstractParameterBag
         return $result;
     }
 
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
-    private function normalizeKey($key)
+    private function normalizeKey(string $key): string
     {
-        return \str_replace('_', '-', \strtolower($key));
+        return str_replace('_', '-', strtolower($key));
     }
 
     /**
      * Makes sure $this->parameters was initialized
      */
-    private function ensureInternalStorageInitialized()
+    private function ensureInternalStorageInitialized(): void
     {
         if (null === $this->parameters) {
             $this->parameters = [];
 
-            $keys = $this->request->headers->keys();
-            foreach ($keys as $key) {
-                $this->parameters[$this->normalizeKey($key)] = [];
+            $names = $this->getHeaderNames();
+            foreach ($names as $name) {
+                $this->parameters[$this->normalizeKey($name)] = [];
             }
         }
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getHeaderNames(): array
+    {
+        return $this->request->headers->keys();
+    }
+
+    private function hasHeader(string $name): bool
+    {
+        return $this->request->headers->has($name);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return array|string|null
+     */
+    private function getHeaderValue(string $name)
+    {
+        $lowerName = strtolower($name);
+        if ('accept' === $lowerName) {
+            return $this->getAcceptHeaderValue($name);
+        }
+        if ('accept-language' === $lowerName) {
+            return $this->request->getLanguages();
+        }
+        if ('accept-charset' === $lowerName) {
+            return $this->request->getCharsets();
+        }
+        if ('accept-encoding' === $lowerName) {
+            return $this->request->getEncodings();
+        }
+
+        return $this->request->headers->get($name);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string[]
+     */
+    private function getAcceptHeaderValue(string $name): array
+    {
+        $result = [];
+        $items = AcceptHeader::fromString($this->request->headers->get($name))->all();
+        foreach ($items as $item) {
+            $value = $item->getValue();
+            $attributes = $item->getAttributes();
+            if ($attributes) {
+                $value .= '; ' . HeaderUtils::toString($attributes, ';');
+            }
+            $result[] = $value;
+        }
+
+        return $result;
     }
 }

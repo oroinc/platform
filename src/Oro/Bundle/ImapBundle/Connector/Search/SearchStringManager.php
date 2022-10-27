@@ -83,6 +83,7 @@ class SearchStringManager extends AbstractSearchStringManager
      *
      * @param SearchQueryExpr $expr The search expression
      * @return SearchQueryExpr
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function arrangeExpr(SearchQueryExpr $expr)
     {

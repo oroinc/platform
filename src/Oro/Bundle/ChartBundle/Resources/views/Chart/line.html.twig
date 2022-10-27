@@ -1,4 +1,4 @@
-{% import 'OroChartBundle::macros.html.twig' as chart %}
+{% import '@OroChart/macros.html.twig' as chart %}
 
 {# Chart variables format:
 
@@ -22,7 +22,7 @@
 {% if data|length > 0  %}
     {{ chart.renderChart(data, options, config, isMobileVersion()) }}
 {% else %}
-    <div class="clearfix no-data">
-        <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+    <div class="no-data">
+        {{ 'oro.dashboard.no_data_found'|trans }}
     </div>
 {% endif %}

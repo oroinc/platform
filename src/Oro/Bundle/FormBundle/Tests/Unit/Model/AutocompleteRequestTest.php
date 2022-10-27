@@ -9,9 +9,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class AutocompleteRequestTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param Request $request
-     * @param array   $expected
-     *
      * @dataProvider createDataProvider
      */
     public function testCreate(Request $request, array $expected)
@@ -29,10 +26,7 @@ class AutocompleteRequestTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
         return [
             'empty' => [

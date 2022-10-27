@@ -15,9 +15,6 @@ class RelatedEntityApiType extends AbstractType
     /** @var DataTransformerInterface */
     protected $dataTransformer;
 
-    /**
-     * @param DataTransformerInterface $dataTransformer
-     */
     public function __construct(DataTransformerInterface $dataTransformer)
     {
         $this->dataTransformer = $dataTransformer;

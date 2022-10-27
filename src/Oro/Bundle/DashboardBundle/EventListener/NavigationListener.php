@@ -15,19 +15,12 @@ class NavigationListener
     /** @var Manager */
     protected $manager;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param Manager                $manager
-     */
     public function __construct(TokenAccessorInterface $tokenAccessor, Manager $manager)
     {
         $this->tokenAccessor = $tokenAccessor;
         $this->manager = $manager;
     }
 
-    /**
-     * @param ConfigureMenuEvent $event
-     */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         if (!$this->tokenAccessor->hasUser()) {

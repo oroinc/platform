@@ -3,15 +3,15 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\Query;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class JoinCasesTest extends DatagridConfigurationBuilderTestCase
 {
     public function testJoinFromColumns()
     {
-        $en         = 'Acme\Entity\TestEntity';
-        $en1        = 'Acme\Entity\TestEntity1';
+        $en = 'Acme\Entity\TestEntity';
+        $en1 = 'Acme\Entity\TestEntity1';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
@@ -19,7 +19,7 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
             ],
             'filters' => []
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en  => [
                     'column1' => 'string',
@@ -29,11 +29,9 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -61,12 +59,6 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                         'column1'                   => 'c1',
                         'rc1+' . $en1 . '::column2' => 'c2',
                     ],
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
@@ -102,10 +94,10 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
      */
     public function testUnidirectionalJoinFromColumns()
     {
-        $en         = 'Acme\Entity\TestEntity';
-        $en1        = 'Acme\Entity\TestEntity1';
-        $en2        = 'Acme\Entity\TestEntity2';
-        $enR1       = 'Acme\Entity\TestEntityReverse1';
+        $en = 'Acme\Entity\TestEntity';
+        $en1 = 'Acme\Entity\TestEntity1';
+        $en2 = 'Acme\Entity\TestEntity2';
+        $enR1 = 'Acme\Entity\TestEntityReverse1';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
@@ -120,7 +112,7 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
             ],
             'filters' => []
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en   => [
                     'column1' => 'string',
@@ -156,11 +148,9 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -227,12 +217,6 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                         $enR1 . '::rc3+'  .$en1 . '::column2'                        => 'c4',
                         'rc1+' . $en1 . '::' . $enR1 . '::rc1+' . $en2 . '::column1' => 'c5',
                     ],
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
@@ -277,8 +261,8 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
 
     public function testJoinFromFilters()
     {
-        $en         = 'Acme\Entity\TestEntity';
-        $en1        = 'Acme\Entity\TestEntity1';
+        $en = 'Acme\Entity\TestEntity';
+        $en1 = 'Acme\Entity\TestEntity1';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
@@ -296,7 +280,7 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                 ],
             ],
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en  => [
                     'column1' => 'string',
@@ -306,11 +290,9 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -345,12 +327,6 @@ class JoinCasesTest extends DatagridConfigurationBuilderTestCase
                                 'value' => 'test'
                             ]
                         ],
-                    ]
-                ],
-                'hints' => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
                     ]
                 ]
             ],

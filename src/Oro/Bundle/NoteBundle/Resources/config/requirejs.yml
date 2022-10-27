@@ -1,5 +1,0 @@
-config:
-    paths:
-        'oronote/js/app/components/notes-component': 'bundles/oronote/js/app/components/notes-component.js'
-        'oronote/js/app/components/note-context-component': 'bundles/oronote/js/app/components/note-context-component.js'
-        'oronote/js/app/views/note-context-component-view': 'bundles/oronote/js/app/views/note-context-component-view.js'

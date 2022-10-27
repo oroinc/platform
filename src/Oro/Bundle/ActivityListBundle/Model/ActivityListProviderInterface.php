@@ -7,6 +7,9 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides a way to use different kind of entities in an activity list.
+ */
 interface ActivityListProviderInterface
 {
     /**
@@ -16,7 +19,6 @@ interface ActivityListProviderInterface
      * @param bool   $accessible  Whether only targets are ready to be used in a business logic should be returned.
      *                            It means that an association with the target entity should exist
      *                            and should not be marked as deleted.
-     *
      *
      * @return bool
      */
@@ -56,18 +58,23 @@ interface ActivityListProviderInterface
     public function getActivityOwners($entity, ActivityList $activityList);
 
     /**
-     * @param ActivityList $activityListEntity
+     * Checks whether the given item is applicable to be added to the activity list.
+     */
+    public function isActivityListApplicable(ActivityList $activityList): bool;
+
+    /**
+     * @param ActivityList $activityList
      *
      * @return array
      */
-    public function getData(ActivityList $activityListEntity);
+    public function getData(ActivityList $activityList);
 
     /**
-     * @param object $activityEntity
+     * @param object $entity
      *
      * @return Organization|null
      */
-    public function getOrganization($activityEntity);
+    public function getOrganization($entity);
 
     /**
      * @return string
@@ -82,24 +89,10 @@ interface ActivityListProviderInterface
      *      'itemDelete => 'item_delete_route'
      * ]
      *
-     * @param object $activityEntity
+     * @param object $entity
      * @return array
      */
-    public function getRoutes($activityEntity);
-
-    /**
-     * returns a class name of entity for which we monitor changes
-     *
-     * @return string
-     */
-    public function getActivityClass();
-
-    /**
-     * returns a class name of entity for which we verify ACL
-     *
-     * @return string
-     */
-    public function getAclClass();
+    public function getRoutes($entity);
 
     /**
      * @param object $entity
@@ -111,7 +104,7 @@ interface ActivityListProviderInterface
     /**
      * Check if provider supports given activity
      *
-     * @param  object $entity
+     * @param object $entity
      *
      * @return bool
      */

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Tests\Functional\Fixtures\Filters\FixtureInterface;
 use Oro\Bundle\SegmentBundle\Tests\Functional\Fixtures\Filters\ToManyToManyContainsAndContains;
@@ -16,7 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class FiltersTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
     }
@@ -53,17 +52,9 @@ class FiltersTest extends WebTestCase
     /**
      * @return EntityManager
      */
-    protected function getEntityManager()
+    private function getEntityManager()
     {
         return self::getContainer()->get('doctrine')
             ->getManagerForClass(Segment::class);
-    }
-
-    /**
-     * @return Manager
-     */
-    protected function getDatagridManager()
-    {
-        return self::getContainer()->get('oro_datagrid.datagrid.manager');
     }
 }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -15,7 +16,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
     /** @var FormContext */
     private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $configProvider = $this->createMock(ConfigProvider::class);
         $metadataProvider = $this->createMock(MetadataProvider::class);
@@ -47,6 +48,24 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setIncludedEntities();
         self::assertNull($this->context->getIncludedEntities());
+    }
+
+    public function testAdditionalEntities()
+    {
+        self::assertSame([], $this->context->getAdditionalEntities());
+
+        $entity1 = new \stdClass();
+        $entity2 = new \stdClass();
+
+        $this->context->addAdditionalEntity($entity1);
+        $this->context->addAdditionalEntity($entity2);
+        self::assertSame([$entity1, $entity2], $this->context->getAdditionalEntities());
+
+        $this->context->addAdditionalEntity($entity1);
+        self::assertSame([$entity1, $entity2], $this->context->getAdditionalEntities());
+
+        $this->context->removeAdditionalEntity($entity1);
+        self::assertSame([$entity2], $this->context->getAdditionalEntities());
     }
 
     public function testEntityMapper()
@@ -103,5 +122,23 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->skipFormValidation(false);
         self::assertFalse($this->context->isFormValidationSkipped());
+    }
+
+    public function testGetAllEntities()
+    {
+        self::assertSame([], $this->context->getAllEntities());
+        self::assertSame([], $this->context->getAllEntities(true));
+
+        $entity = new \stdClass();
+        $this->context->setResult($entity);
+        self::assertSame([$entity], $this->context->getAllEntities());
+        self::assertSame([$entity], $this->context->getAllEntities(true));
+
+        $includedEntity = new \stdClass();
+        $this->context->setIncludedEntities(new IncludedEntityCollection());
+        $this->context->getIncludedEntities()
+            ->add($includedEntity, \stdClass::class, 1, $this->createMock(IncludedEntityData::class));
+        self::assertSame([$entity, $includedEntity], $this->context->getAllEntities());
+        self::assertSame([$entity], $this->context->getAllEntities(true));
     }
 }

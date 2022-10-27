@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\Statistic;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
 
 /**
@@ -63,10 +63,10 @@ class FilesystemStatisticRepository implements StatisticRepositoryInterface, Obj
         $model = new FeatureStatistic();
 
         if (isset($this->featureDuration[$id])) {
-            return $model->setTime($this->featureDuration[$id]);
+            return $model->setDuration($this->featureDuration[$id]);
         }
 
-        return $model->setTime($this->averageFeatureTime);
+        return $model->setDuration($this->averageFeatureTime);
     }
 
     /**

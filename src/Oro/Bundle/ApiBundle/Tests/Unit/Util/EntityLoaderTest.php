@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
@@ -18,7 +18,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityLoader */
     private $entityLoader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 
@@ -59,7 +59,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $entityId = 1;
         $entity = new \stdClass();
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'));
 
@@ -100,7 +100,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $entityId = 1;
         $entity = new \stdClass();
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['renamedId']);
         $metadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
 
@@ -143,7 +143,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
 
         $expectedCriteria = ['field1' => $entityId];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['field1']);
         $metadata->addField(new FieldMetadata('field1'));
 
@@ -185,7 +185,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
 
         $expectedCriteria = ['field1' => $entityId];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['field1']);
         $metadata->addField(new FieldMetadata('field1'));
 
@@ -227,7 +227,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
 
         $expectedCriteria = ['field1' => $entityId];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['renamedField1']);
         $metadata->addField(new FieldMetadata('renamedField1'))->setPropertyPath('field1');
 
@@ -268,7 +268,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $entityId = ['id1' => 1, 'id2' => 2];
         $entity = new \stdClass();
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'));
         $metadata->addField(new FieldMetadata('id2'));
@@ -310,7 +310,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $entityId = ['renamedId1' => 1, 'renamedId2' => 2];
         $entity = new \stdClass();
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['renamedId1', 'renamedId2']);
         $metadata->addField(new FieldMetadata('renamedId1'))->setPropertyPath('id1');
         $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
@@ -352,7 +352,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $entityId = ['field1' => 1, 'field2' => 2];
         $entity = new \stdClass();
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['field1', 'field2']);
         $metadata->addField(new FieldMetadata('field1'));
         $metadata->addField(new FieldMetadata('field2'));
@@ -396,7 +396,7 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
 
         $expectedCriteria = ['field1' => 1, 'field2' => 2];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['renamedField1', 'renamedField2']);
         $metadata->addField(new FieldMetadata('renamedField1'))->setPropertyPath('field1');
         $metadata->addField(new FieldMetadata('renamedField2'))->setPropertyPath('field2');

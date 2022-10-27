@@ -13,82 +13,53 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 class FieldsHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
-    const FIELD_NAME = 'testFieldName';
+    private const ENTITY_CLASS = 'Test\Entity';
+    private const FIELD_NAME = 'testFieldName';
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var FieldsHelper */
-    protected $helper;
+    private $helper;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
+    private $entityConfigProvider;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
+    private $extendConfigProvider;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datagridConfigProvider;
+    private $datagridConfigProvider;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $viewConfigProvider;
+    private $viewConfigProvider;
 
     /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    private $featureChecker;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->helper = new FieldsHelper(
             $this->configManager,
             $this->featureChecker
         );
 
-        $this->entityConfigProvider       = $this->getConfigProviderMock();
-        $this->extendConfigProvider       = $this->getConfigProviderMock();
-        $this->datagridConfigProvider     = $this->getConfigProviderMock();
-        $this->viewConfigProvider         = $this->getConfigProviderMock();
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->datagridConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->viewConfigProvider = $this->createMock(ConfigProvider::class);
 
-        $this->configManager
-            ->expects($this->any())
+        $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['entity', $this->entityConfigProvider],
-                        ['extend', $this->extendConfigProvider],
-                        ['datagrid', $this->datagridConfigProvider],
-                        ['view', $this->viewConfigProvider],
-                    ]
-                )
-            );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function tearDown()
-    {
-        unset(
-            $this->configManager,
-            $this->featureChecker,
-            $this->helper,
-            $this->entityConfigProvider,
-            $this->extendConfigProvider,
-            $this->datagridConfigProvider,
-            $this->viewConfigProvider
-        );
+            ->willReturnMap([
+                ['entity', $this->entityConfigProvider],
+                ['extend', $this->extendConfigProvider],
+                ['datagrid', $this->datagridConfigProvider],
+                ['view', $this->viewConfigProvider],
+            ]);
     }
 
     public function testGetFieldsWithoutConfig()
@@ -164,7 +135,7 @@ class FieldsHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$fieldId]);
 
         $extendConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, self::FIELD_NAME, 'string'));
-        $extendConfig->set('owner', ExtendScope::ORIGIN_SYSTEM);
+        $extendConfig->set('owner', ExtendScope::OWNER_SYSTEM);
         $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         $extendConfig->set('is_deleted', false);
 
@@ -207,7 +178,7 @@ class FieldsHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$fieldId]);
 
         $extendConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, self::FIELD_NAME, 'string'));
-        $extendConfig->set('owner', ExtendScope::ORIGIN_SYSTEM);
+        $extendConfig->set('owner', ExtendScope::OWNER_SYSTEM);
         $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         $extendConfig->set('is_deleted', false);
         $extendConfig->set('target_entity', self::ENTITY_CLASS);
@@ -229,15 +200,5 @@ class FieldsHelperTest extends \PHPUnit\Framework\TestCase
 
         $fields = $this->helper->getFields(self::ENTITY_CLASS);
         $this->assertEquals([], $fields);
-    }
-
-    /**
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

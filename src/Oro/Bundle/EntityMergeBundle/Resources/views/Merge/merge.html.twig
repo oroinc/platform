@@ -1,15 +1,19 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% oro_title_set({params : {'{{ label }}': entityLabel|trans }}) %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {{ UI.cancelButton(oro_url_add_query(cancelPath)) }}
-    {{ UI.saveAndStayButton('oro.entity_merge.form.merge_button'|trans) }}
+    {{ UI.saveAndStayButton({
+        'label' : 'oro.entity_merge.form.merge_button'|trans
+    }) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}
-    {% include 'OroUIBundle::page_title_block.html.twig' %}
+    {% include '@OroUI/page_title_block.html.twig' %}
 {% endblock pageHeader %}
 
 {% block content_data %}

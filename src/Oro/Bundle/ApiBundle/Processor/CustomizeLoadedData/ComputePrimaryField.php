@@ -53,15 +53,12 @@ class ComputePrimaryField implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!is_array($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         $primaryFieldName = $context->getResultFieldName($this->primaryFieldName);
         if ($context->isFieldRequested($primaryFieldName, $data)) {
             $data[$primaryFieldName] = $this->getPrimaryValue($context->getConfig(), $data);
-            $context->setResult($data);
+            $context->setData($data);
         }
     }
 
@@ -75,17 +72,14 @@ class ComputePrimaryField implements ProcessorInterface
     {
         $result = null;
         $associationName = $config->findFieldNameByPropertyPath($this->associationName);
-        if ($associationName) {
-            $associationName = $config->findFieldNameByPropertyPath($this->associationName);
-            if (!empty($data[$associationName]) && is_array($data[$associationName])) {
-                $associationTargetConfig = $config->getField($associationName)->getTargetEntity();
-                if (null !== $associationTargetConfig) {
-                    $result = $this->extractPrimaryValue(
-                        $data[$associationName],
-                        $associationTargetConfig->findFieldNameByPropertyPath($this->associationDataFieldName),
-                        $associationTargetConfig->findFieldNameByPropertyPath($this->associationPrimaryFlagFieldName)
-                    );
-                }
+        if ($associationName && !empty($data[$associationName]) && is_array($data[$associationName])) {
+            $associationTargetConfig = $config->getField($associationName)->getTargetEntity();
+            if (null !== $associationTargetConfig) {
+                $result = $this->extractPrimaryValue(
+                    $data[$associationName],
+                    $associationTargetConfig->findFieldNameByPropertyPath($this->associationDataFieldName),
+                    $associationTargetConfig->findFieldNameByPropertyPath($this->associationPrimaryFlagFieldName)
+                );
             }
         }
 

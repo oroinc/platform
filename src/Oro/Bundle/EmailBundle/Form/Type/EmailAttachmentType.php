@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfig;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Symfony\Component\Form\AbstractType;
@@ -12,27 +15,23 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for Email Attachments.
+ */
 class EmailAttachmentType extends AbstractType
 {
-    /**
-     * @var ObjectManager
-     */
-    protected $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /**
-     * @var EmailAttachmentTransformer
-     */
-    protected $emailAttachmentTransformer;
+    /** @var EmailAttachmentTransformer */
+    private $emailAttachmentTransformer;
 
-    /**
-     * @param ObjectManager              $objectManager
-     * @param EmailAttachmentTransformer $emailAttachmentTransformer
-     */
-    public function __construct(ObjectManager $objectManager, EmailAttachmentTransformer $emailAttachmentTransformer)
+    public function __construct(ManagerRegistry $doctrine, EmailAttachmentTransformer $emailAttachmentTransformer)
     {
-        $this->em = $objectManager;
+        $this->doctrine = $doctrine;
         $this->emailAttachmentTransformer = $emailAttachmentTransformer;
     }
 
@@ -58,8 +57,8 @@ class EmailAttachmentType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\EmailAttachment',
-            'csrf_token_id'      => 'email_attachment',
+            'data_class' => EmailAttachmentModel::class,
+            'csrf_token_id' => 'email_attachment',
         ]);
     }
 
@@ -70,51 +69,62 @@ class EmailAttachmentType extends AbstractType
     {
         $builder->add('id', TextType::class);
         $builder->add('type', TextType::class, ['required' => true]);
-        $builder->add('file', FileType::class);
+        $builder->add(
+            'file',
+            FileType::class,
+            [
+                'constraints' => [
+                    new FileConstraintFromSystemConfig([
+                        'maxSizeConfigPath' => 'oro_email.attachment_max_size'
+                    ])
+                ]
+            ]
+        );
 
         $builder->addEventListener(FormEvents::SUBMIT, [$this, 'initAttachmentEntity']);
     }
 
     /**
-     * @param FormEvent $event
-     *
      * @throws FormException
      */
     public function initAttachmentEntity(FormEvent $event)
     {
-        /** @var AttachmentModel $attachment */
-        $attachment = $event->getData();
+        /** @var EmailAttachmentModel $emailAttachmentModel */
+        $emailAttachmentModel = $event->getData();
 
         // this check is necessary due to inability to capture file input dialog cancel event
-        if (!$attachment) {
+        if (!$emailAttachmentModel) {
             return;
         }
 
-        if (!$attachment->getEmailAttachment()) {
-            switch ($attachment->getType()) {
-                case AttachmentModel::TYPE_ATTACHMENT:
-                    $repo = $this->em->getRepository('OroAttachmentBundle:Attachment');
-                    $oroAttachment = $repo->find($attachment->getId());
-                    $emailAttachment = $this->emailAttachmentTransformer->oroToEntity($oroAttachment);
+        $emailAttachment = null;
+        if (!$emailAttachmentModel->getEmailAttachment()) {
+            switch ($emailAttachmentModel->getType()) {
+                case EmailAttachmentModel::TYPE_ATTACHMENT:
+                    $emailAttachment = $this->emailAttachmentTransformer->attachmentEntityToEntity(
+                        $this->doctrine->getRepository(Attachment::class)->find($emailAttachmentModel->getId())
+                    );
 
                     break;
-                case AttachmentModel::TYPE_EMAIL_ATTACHMENT:
-                    $repo = $this->em->getRepository('OroEmailBundle:EmailAttachment');
-                    $emailAttachment = $repo->find($attachment->getId());
+                case EmailAttachmentModel::TYPE_EMAIL_ATTACHMENT:
+                    $emailAttachment = $this->doctrine->getRepository(EmailAttachment::class)
+                        ->find($emailAttachmentModel->getId());
 
                     break;
-                case AttachmentModel::TYPE_UPLOADED:
-                    $emailAttachment = $this->emailAttachmentTransformer
-                        ->entityFromUploadedFile($attachment->getFile());
+                case EmailAttachmentModel::TYPE_UPLOADED:
+                    if ($emailAttachmentModel->getFile() instanceof UploadedFile) {
+                        $emailAttachment = $this->emailAttachmentTransformer
+                            ->entityFromUploadedFile($emailAttachmentModel->getFile());
+                    }
 
                     break;
                 default:
-                    throw new FormException(sprintf('Invalid attachment type: %s', $attachment->getType()));
+                    throw new FormException(sprintf('Invalid attachment type: %s', $emailAttachmentModel->getType()));
             }
 
-            $attachment->setEmailAttachment($emailAttachment);
+            $emailAttachmentModel->setEmailAttachment($emailAttachment);
         }
 
-        $event->setData($attachment);
+        $event->setData($emailAttachmentModel);
     }
 }

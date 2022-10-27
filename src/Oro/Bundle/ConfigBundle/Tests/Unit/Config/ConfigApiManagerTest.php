@@ -6,26 +6,25 @@ use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigApiManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Provider\ProviderInterface;
 
 class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var ConfigApiManager */
-    protected $manager;
+    private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ProviderInterface::class);
-        $this->configManager  = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->manager = new ConfigApiManager($this->configProvider);
         $this->manager->addConfigManager('user', $this->configManager);
@@ -44,7 +43,7 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSections()
     {
-        $apiTree     = new SectionDefinition('');
+        $apiTree = new SectionDefinition('');
         $testSection = new SectionDefinition('test_section');
         $apiTree->addSubSection($testSection);
         $testSection->addVariable(new VariableDefinition('acme.item1', 'string'));
@@ -61,7 +60,7 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->once())
             ->method('getApiTree')
             ->with(null)
-            ->will($this->returnValue($apiTree));
+            ->willReturn($apiTree);
         $this->assertSame(
             [
                 'section2',
@@ -129,32 +128,21 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->once())
             ->method('getApiTree')
             ->with($path)
-            ->will($this->returnValue($apiTree));
+            ->willReturn($apiTree);
         $this->configManager->expects($this->any())
             ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['acme.item1', false, false, null, 'val1'],
-                        ['acme.item2', false, false, null, 123],
-                        ['acme.item3', false, false, null, ['val1' => 1, 'val2' => true]],
-                        ['acme.item4', false, false, null, false],
-                        ['acme.item5', false, false, null, ''],
-                        ['acme.item6', false, false, null, '123'],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['acme.item1', false, false, null, 'val1'],
+                ['acme.item2', false, false, null, 123],
+                ['acme.item3', false, false, null, ['val1' => 1, 'val2' => true]],
+                ['acme.item4', false, false, null, false],
+                ['acme.item5', false, false, null, ''],
+                ['acme.item6', false, false, null, '123'],
+            ]);
         $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->configManager->expects($this->any())
             ->method('getInfo')
-            ->will(
-                $this->returnValue(
-                    [
-                        'createdAt' => $datetime,
-                        'updatedAt' => $datetime,
-                    ]
-                )
-            );
+            ->willReturn(['createdAt' => $datetime, 'updatedAt' => $datetime]);
 
         $this->assertEquals(
             [
@@ -237,14 +225,7 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($value);
         $this->configManager->expects($this->once())
             ->method('getInfo')
-            ->will(
-                $this->returnValue(
-                    [
-                        'createdAt' => $datetime,
-                        'updatedAt' => $datetime,
-                    ]
-                )
-            );
+            ->willReturn(['createdAt' => $datetime, 'updatedAt' => $datetime]);
 
         $this->assertEquals(
             [
@@ -268,7 +249,7 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
         $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
         $apiTree = new SectionDefinition($path);
         $apiTree->addVariable(new VariableDefinition($key, $dataType));
-        $dataTransformer = $this->createMock('Oro\Bundle\ConfigBundle\Config\DataTransformerInterface');
+        $dataTransformer = $this->createMock(DataTransformerInterface::class);
 
         $this->configProvider->expects($this->once())
             ->method('getApiTree')
@@ -280,14 +261,7 @@ class ConfigApiManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($value);
         $this->configManager->expects($this->once())
             ->method('getInfo')
-            ->will(
-                $this->returnValue(
-                    [
-                        'createdAt' => $datetime,
-                        'updatedAt' => $datetime,
-                    ]
-                )
-            );
+            ->willReturn(['createdAt' => $datetime, 'updatedAt' => $datetime]);
         $this->configProvider->expects($this->once())
             ->method('getDataTransformer')
             ->with($key)

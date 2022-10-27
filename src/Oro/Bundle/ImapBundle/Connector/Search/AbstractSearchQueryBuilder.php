@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Connector\Search;
 
-use \Closure;
+use Closure;
 
 abstract class AbstractSearchQueryBuilder
 {
@@ -10,8 +10,6 @@ abstract class AbstractSearchQueryBuilder
 
     /**
      * Constructor.
-     *
-     * @param SearchQuery $query
      */
     public function __construct(SearchQuery $query)
     {

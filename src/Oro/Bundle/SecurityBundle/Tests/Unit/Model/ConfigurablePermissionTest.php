@@ -6,10 +6,10 @@ use Oro\Bundle\SecurityBundle\Model\ConfigurablePermission;
 
 class ConfigurablePermissionTest extends \PHPUnit\Framework\TestCase
 {
-    const CAPABILITY = 'test_capability';
-    const ENTITY_CLASS = 'test_entity';
-    const WORKFLOW = 'test_workflow';
-    const PERMISSION = 'test_permission';
+    private const CAPABILITY = 'test_capability';
+    private const ENTITY_CLASS = 'test_entity';
+    private const WORKFLOW = 'test_workflow';
+    private const PERMISSION = 'test_permission';
 
     public function testGetName()
     {

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\UserBundle\Entity\Email;
@@ -62,7 +63,8 @@ class ToManyToManyContainsAndContains implements FixtureInterface
             )
             ->setBusinessUnits(new ArrayCollection([
                 $businessUnitA,
-            ]));
+            ]))
+            ->setOrganization($organization);
         $user2 = (new User())
             ->setUsername('u2')
             ->setEmail('u2@example.com')
@@ -74,7 +76,8 @@ class ToManyToManyContainsAndContains implements FixtureInterface
             ->setBusinessUnits(new ArrayCollection([
                 $businessUnitA,
                 $businessUnitB,
-            ]));
+            ]))
+            ->setOrganization($organization);
 
         $em->persist($businessUnitA);
         $em->persist($businessUnitB);
@@ -100,7 +103,7 @@ class ToManyToManyContainsAndContains implements FixtureInterface
                     ->findOneByName(SegmentType::TYPE_DYNAMIC)
             )
             ->setEntity(BusinessUnit::class)
-            ->setDefinition(json_encode([
+            ->setDefinition(QueryDefinitionUtil::encodeDefinition([
                 'filters' => [
                     [
                         'columnName' => 'users+Oro\Bundle\UserBundle\Entity\User::'
@@ -135,7 +138,7 @@ class ToManyToManyContainsAndContains implements FixtureInterface
                     ],
                  ],
             ]));
-        
+
         $em->persist($segment);
 
         return $segment;

@@ -1,29 +1,28 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var Select2AutocompleteView = require('oroform/js/app/views/select2-autocomplete-view');
+    const Select2AutocompleteView = require('oroform/js/app/views/select2-autocomplete-view');
 
-    var Select2BuTreeAutocompleteView = Select2AutocompleteView.extend({
+    const Select2BuTreeAutocompleteView = Select2AutocompleteView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function Select2BuTreeAutocompleteView() {
-            Select2BuTreeAutocompleteView.__super__.constructor.apply(this, arguments);
+        constructor: function Select2BuTreeAutocompleteView(options) {
+            Select2BuTreeAutocompleteView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        initialize: function() {
-            this.$el.on('input-widget:init', _.bind(this.setPlaceholder, this));
-            this.$el.on('select2-blur', _.bind(this.setPlaceholder, this));
-            Select2BuTreeAutocompleteView.__super__.initialize.apply(this, arguments);
+        initialize: function(options) {
+            this.$el.on('input-widget:init', this.setPlaceholder.bind(this));
+            this.$el.on('select2-blur', this.setPlaceholder.bind(this));
+            Select2BuTreeAutocompleteView.__super__.initialize.call(this, options);
         },
 
         setPlaceholder: function() {
-            var select2 = this.$el.data('select2');
-            var placeholder = select2.getPlaceholder();
+            const select2 = this.$el.data('select2');
+            const placeholder = select2.getPlaceholder();
 
             if (typeof placeholder !== 'undefined' &&
                 !select2.opened() &&

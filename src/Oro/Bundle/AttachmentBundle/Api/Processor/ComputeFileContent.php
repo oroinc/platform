@@ -22,10 +22,6 @@ class ComputeFileContent implements ProcessorInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param FileManager     $fileManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(FileManager $fileManager, LoggerInterface $logger)
     {
         $this->fileManager = $fileManager;
@@ -39,10 +35,7 @@ class ComputeFileContent implements ProcessorInterface
     {
         /** @var CustomizeLoadedDataContext $context */
 
-        $data = $context->getResult();
-        if (!is_array($data)) {
-            return;
-        }
+        $data = $context->getData();
 
         if (!$context->isFieldRequested(self::CONTENT_FIELD_NAME, $data)) {
             return;
@@ -56,15 +49,10 @@ class ComputeFileContent implements ProcessorInterface
         $content = $this->getFileContent($data[$fileNameFieldName]);
         if (null !== $content) {
             $data[self::CONTENT_FIELD_NAME] = $content;
-            $context->setResult($data);
+            $context->setData($data);
         }
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string|null
-     */
     private function getFileContent(string $fileName): ?string
     {
         $content = null;

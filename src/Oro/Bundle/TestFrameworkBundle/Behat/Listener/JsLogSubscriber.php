@@ -5,7 +5,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\AfterStepTested;
 use Behat\Mink\Mink;
-use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Driver;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use WebDriver\Exception\UnknownCommand;
 use WebDriver\LogType;
@@ -97,10 +96,11 @@ class JsLogSubscriber implements EventSubscriberInterface
      */
     protected function getLogs()
     {
-        /** @var OroSelenium2Driver $driver */
-        $driver = $this->mink->getSession()->getDriver();
+        $webDriverSession = $this->mink->getSession()
+            ->getDriver()
+            ->getWebDriverSession();
 
-        return $driver->getWebDriverSession()->log(LogType::BROWSER);
+        return $webDriverSession ? $webDriverSession->log(LogType::BROWSER) : [];
     }
 
     /**

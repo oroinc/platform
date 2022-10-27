@@ -11,7 +11,6 @@
         flex-shrink: $content-sidebar-sidebar-flex-shrink;
         width: $content-sidebar-sidebar-width;
 
-
         &:not(.ui-resizable-resizing) {
             transition: $content-sidebar-sidebar-not-ui-resizable-resizing-transition;
         }
@@ -63,8 +62,19 @@
         }
 
         .default-price-list-choice {
-            margin-bottom: 16px;
+            margin-bottom: 22px;
+
+            .control-label {
+                label {
+                    margin-bottom: 6px;
+                }
+            }
         }
+    }
+
+    &--sidebar-content {
+        min-height: $content-sidebar-sidebar-content-min-height;
+        flex-shrink: $content-sidebar-sidebar-content-flex-shrink;
     }
 
     &--header-content {
@@ -84,6 +94,7 @@
         align-items: $content-sidebar-align-items;
         height: $content-sidebar-height;
         padding: $content-sidebar-offset-inner;
+        flex-shrink: 0;
 
         .content-sidebar-minimized & {
             padding: $content-sidebar-minimized-offset-inner;
@@ -124,7 +135,11 @@
 
     &--container {
         display: $content-sidebar-container-display;
-        margin-#{$start}: $content-sidebar-container-offset-left;
+        margin-left: $content-sidebar-container-offset-left;
+
+        &:only-child {
+            height: 100%;
+        }
     }
 
     &--content {

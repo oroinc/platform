@@ -2,153 +2,119 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
+use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigHelper;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigListener;
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityConfigListener
-     */
-    protected $listener;
+    /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $helper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $helper;
+    /** @var EntityConfigListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->helper = $this
-            ->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\EventListener\\Metadata\\EntityConfigHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->helper = $this->createMock(EntityConfigHelper::class);
 
         $this->listener = new EntityConfigListener($this->helper);
     }
 
+    private function createConfig(array $options): ConfigInterface
+    {
+        $config = $this->createMock(ConfigInterface::class);
+        $config->expects($this->once())
+            ->method('all')
+            ->willReturn($options);
+
+        return $config;
+    }
+
     public function testOnCreateMetadata()
     {
-        $className = 'Foo\\Entity';
+        $className = 'Foo\Entity';
 
-        $entityMetadata = $this->createEntityMetadata();
+        $entityMetadata = $this->createMock(EntityMetadata::class);
 
-        $event = $this->createEntityMetadataEvent();
-
-        $event->expects($this->once())
-            ->method('getEntityMetadata')
-            ->will($this->returnValue($entityMetadata));
-
-        // Check entity metadata
         $entityMetadata->expects($this->once())
             ->method('getClassName')
-            ->will($this->returnValue($className));
+            ->willReturn($className);
 
-        $entityMergeOptions = array('enable' => true);
+        $entityMergeOptions = ['enable' => true];
         $entityMergeConfig = $this->createConfig($entityMergeOptions);
-
-        $this->helper->expects($this->at(0))
-            ->method('getConfig')
-            ->with(EntityConfigListener::CONFIG_MERGE_SCOPE, $className, null)
-            ->will($this->returnValue($entityMergeConfig));
 
         $entityMetadata->expects($this->once())
             ->method('merge')
             ->with($entityMergeOptions);
 
-        $fooFieldMetadata = $this->createFieldMetadata();
-        $barFieldMetadata = $this->createFieldMetadata();
+        $fooFieldMetadata = $this->createMock(FieldMetadata::class);
+        $barFieldMetadata = $this->createMock(FieldMetadata::class);
         $entityMetadata->expects($this->once())
             ->method('getFieldsMetadata')
-            ->will($this->returnValue(array($fooFieldMetadata, $barFieldMetadata)));
+            ->willReturn([$fooFieldMetadata, $barFieldMetadata]);
 
-        // Check field defined by source entity
-        $this->helper->expects($this->at(1))
-            ->method('prepareFieldMetadataPropertyPath')
-            ->with($fooFieldMetadata);
-
-        $fooEntityMergeOptions = array(
+        $fooEntityMergeOptions = [
             'display' => false,
             'inverse_display' => true,
             'property_path' => 'test',
-        );
-        $expectedFooEntityMergeOptions = array(
+        ];
+        $expectedFooEntityMergeOptions = [
             'display' => false,
             'property_path' => 'test',
-        );
+        ];
         $fooEntityMergeConfig = $this->createConfig($fooEntityMergeOptions);
-
-        $this->helper->expects($this->at(2))
-            ->method('getConfigByFieldMetadata')
-            ->with(EntityConfigListener::CONFIG_MERGE_SCOPE, $fooFieldMetadata)
-            ->will($this->returnValue($fooEntityMergeConfig));
 
         $fooFieldMetadata->expects($this->once())
             ->method('isDefinedBySourceEntity')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $fooFieldMetadata->expects($this->once())
             ->method('merge')
             ->with($expectedFooEntityMergeOptions);
 
-        // Check field defined by inverse entity
-        $this->helper->expects($this->at(3))
-            ->method('prepareFieldMetadataPropertyPath')
-            ->with($barFieldMetadata);
-
-        $barEntityMergeOptions = array(
+        $barEntityMergeOptions = [
             'display' => false,
             'inverse_display' => true,
             'property_path' => 'test',
-        );
-        $expectedBarEntityMergeOptions = array(
+        ];
+        $expectedBarEntityMergeOptions = [
             'display' => true,
             'property_path' => 'test',
-        );
+        ];
         $barEntityMergeConfig = $this->createConfig($barEntityMergeOptions);
-
-        $this->helper->expects($this->at(4))
-            ->method('getConfigByFieldMetadata')
-            ->with(EntityConfigListener::CONFIG_MERGE_SCOPE, $barFieldMetadata)
-            ->will($this->returnValue($barEntityMergeConfig));
 
         $barFieldMetadata->expects($this->once())
             ->method('isDefinedBySourceEntity')
-            ->will($this->returnValue(false));
-
+            ->willReturn(false);
         $barFieldMetadata->expects($this->once())
             ->method('merge')
             ->with($expectedBarEntityMergeOptions);
 
-        $this->listener->onCreateMetadata($event);
-    }
+        $this->helper->expects($this->once())
+            ->method('getConfig')
+            ->with(EntityConfigListener::CONFIG_MERGE_SCOPE, $className, null)
+            ->willReturn($entityMergeConfig);
+        $this->helper->expects($this->exactly(2))
+            ->method('getConfigByFieldMetadata')
+            ->withConsecutive(
+                [EntityConfigListener::CONFIG_MERGE_SCOPE, $this->identicalTo($fooFieldMetadata)],
+                [EntityConfigListener::CONFIG_MERGE_SCOPE, $this->identicalTo($barFieldMetadata)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $fooEntityMergeConfig,
+                $barEntityMergeConfig
+            );
+        $this->helper->expects($this->exactly(2))
+            ->method('prepareFieldMetadataPropertyPath')
+            ->withConsecutive(
+                [$this->identicalTo($fooFieldMetadata)],
+                [$this->identicalTo($barFieldMetadata)]
+            );
 
-    protected function createConfig(array $arrayOptions)
-    {
-        $result = $this->createMock('Oro\\Bundle\\EntityConfigBundle\\Config\\ConfigInterface');
-        $result->expects($this->once())
-            ->method('all')
-            ->will($this->returnValue($arrayOptions));
-        return $result;
-    }
-
-    protected function createEntityMetadataEvent()
-    {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Event\\EntityMetadataEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createEntityMetadata()
-    {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createFieldMetadata()
-    {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->listener->onCreateMetadata(new EntityMetadataEvent($entityMetadata));
     }
 }

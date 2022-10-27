@@ -4,13 +4,14 @@ namespace Oro\Bundle\FilterBundle\Expression\Exception;
 
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 
+/**
+ * Expression denied exception
+ */
 class ExpressionDenied extends SyntaxException implements UserInputErrorExceptionInterface
 {
-    /** @var string */
-    private $template = 'Variable of type “%s” cannot be used with a constant!';
+    private string $template = 'Variable of type “%s” cannot be used with a constant!';
 
-    /** @var string */
-    private $variableLabel;
+    private string $variableLabel;
 
     /**
      * @param string $variableLabel
@@ -25,7 +26,7 @@ class ExpressionDenied extends SyntaxException implements UserInputErrorExceptio
     /**
      * {@inheritdoc}
      */
-    public function getMessageTemplate()
+    public function getMessageTemplate(): string
     {
         return $this->template;
     }
@@ -33,7 +34,7 @@ class ExpressionDenied extends SyntaxException implements UserInputErrorExceptio
     /**
      * {@inheritdoc}
      */
-    public function getMessageParams()
+    public function getMessageParams(): array
     {
         return ['%s' => $this->variableLabel];
     }

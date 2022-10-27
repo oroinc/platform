@@ -1,11 +1,9 @@
-define([
-    'underscore',
-    'backgrid',
-    'orodatagrid/js/datagrid/formatter/number-formatter'
-], function(_, Backgrid, NumberFormatter) {
+define(function(require) {
     'use strict';
 
-    var NumberCell;
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const NumberFormatter = require('orodatagrid/js/datagrid/formatter/number-formatter');
 
     /**
      * Number column cell.
@@ -14,7 +12,7 @@ define([
      * @class   oro.datagrid.cell.NumberCell
      * @extends Backgrid.NumberCell
      */
-    NumberCell = Backgrid.NumberCell.extend({
+    const NumberCell = Backgrid.NumberCell.extend({
         /** @property {orodatagrid.datagrid.formatter.NumberFormatter} */
         formatterPrototype: NumberFormatter,
 
@@ -22,18 +20,18 @@ define([
         style: 'decimal',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function NumberCell() {
-            NumberCell.__super__.constructor.apply(this, arguments);
+        constructor: function NumberCell(options) {
+            NumberCell.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, options);
-            NumberCell.__super__.initialize.apply(this, arguments);
+            NumberCell.__super__.initialize.call(this, options);
             this.formatter = this.createFormatter();
         },
 
@@ -47,10 +45,10 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
-            var render = NumberCell.__super__.render.apply(this, arguments);
+            const render = NumberCell.__super__.render.call(this);
 
             this.enterEditMode();
 
@@ -58,20 +56,20 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enterEditMode: function() {
             if (this.isEditableColumn()) {
-                NumberCell.__super__.enterEditMode.apply(this, arguments);
+                NumberCell.__super__.enterEditMode.call(this);
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         exitEditMode: function() {
             if (!this.isEditableColumn()) {
-                NumberCell.__super__.exitEditMode.apply(this, arguments);
+                NumberCell.__super__.exitEditMode.call(this);
             }
         }
     });

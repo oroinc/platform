@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var VariableDateTimePickerView;
-    var _ = require('underscore');
-    var VariableDatePickerView = require('./variable-datepicker-view');
-    var dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin');
-    var moment = require('moment');
+    const $ = require('jquery');
+    const VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
+    const dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin');
+    const moment = require('moment');
 
-    VariableDateTimePickerView = VariableDatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
+    const VariableDateTimePickerView = VariableDatePickerView.extend(Object.assign({}, dateTimePickerViewMixin, {
         /**
          * Default options
          */
-        defaults: _.extend({}, VariableDatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
+        defaults: $.extend(true, {}, VariableDatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         partsDateTimeValidation: {
             value: function(date, time) {
@@ -38,7 +37,7 @@ define(function(require) {
          *  - hides/shows the field, depending on whether date has variable value or not
          */
         updateTimeFieldState: function() {
-            var value = this.$el.val();
+            const value = this.$el.val();
             if ((!this.$variables || this.$variables.dateVariables('getPart') !== 'value') ||
                 this.dateVariableHelper.isDateVariable(value) ||
                 this.dateValueHelper.isValid(value)
@@ -55,21 +54,26 @@ define(function(require) {
          * @param target
          */
         checkConsistency: function(target) {
-            dateTimePickerViewMixin.checkConsistency.apply(this, arguments);
-            VariableDateTimePickerView.__super__.checkConsistency.apply(this, arguments);
+            dateTimePickerViewMixin.checkConsistency.call(this, target);
+            VariableDateTimePickerView.__super__.checkConsistency.call(this, target);
 
-            var date = this.$frontDateField.val();
-            var time = this.$frontTimeField.val();
+            const date = this.$frontDateField.val();
+            const time = this.$frontTimeField.val();
 
-            if (!this._preventFrontendUpdate && !target && !this._isDateTimeValid(date, time)) {
+            if (
+                !this._preventFrontendUpdate &&
+                !this.$frontDateField.is(target) &&
+                !this.$frontTimeField.is(target) &&
+                !this._isDateTimeValid(date, time)
+            ) {
                 this.$frontDateField.val('');
                 this.$frontTimeField.val('');
             }
         },
 
         _isDateTimeValid: function(date, time) {
-            var part = this.$variables.dateVariables('getPart');
-            var validator = this.partsDateTimeValidation[part];
+            const part = this.$variables.dateVariables('getPart');
+            const validator = this.partsDateTimeValidation[part];
             if (!validator) {
                 return true;
             }
@@ -83,7 +87,7 @@ define(function(require) {
          * @returns {string}
          */
         getBackendFormattedValue: function() {
-            var value = this.$frontDateField.val();
+            const value = this.$frontDateField.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 return this.dateVariableHelper.formatRawValue(value);
             }
@@ -103,7 +107,7 @@ define(function(require) {
          * @returns {string}
          */
         getFrontendFormattedDate: function() {
-            var value = this.$el.val();
+            const value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 return this.dateVariableHelper.formatDisplayValue(value);
             }

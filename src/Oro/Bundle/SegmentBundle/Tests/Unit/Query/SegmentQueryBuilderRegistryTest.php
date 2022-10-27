@@ -14,13 +14,13 @@ class SegmentQueryBuilderRegistryTest extends \PHPUnit\Framework\TestCase
         $queryBuilder = $this->createMock(QueryBuilderInterface::class);
         $queryBuilderRegistry->addQueryBuilder('test', $queryBuilder);
 
-        $this->assertSame($queryBuilder, $queryBuilderRegistry->getQueryBuilder('test'));
+        self::assertSame($queryBuilder, $queryBuilderRegistry->getQueryBuilder('test'));
     }
 
     public function testGetQueryBuilderNull()
     {
         $queryBuilderRegistry = new SegmentQueryBuilderRegistry();
 
-        $this->assertNull($queryBuilderRegistry->getQueryBuilder('test'));
+        self::assertNull($queryBuilderRegistry->getQueryBuilder('test'));
     }
 }

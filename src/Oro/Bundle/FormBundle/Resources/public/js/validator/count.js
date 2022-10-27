@@ -1,7 +1,10 @@
-define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
+define(function(require) {
     'use strict';
 
-    var defaultParam = {
+    const $ = require('jquery');
+    const numberValidator = require('oroform/js/validator/number');
+
+    const defaultParam = {
         exactMessage: 'This collection should contain exactly {{ limit }} element.|' +
             'This collection should contain exactly {{ limit }} elements.',
         maxMessage: 'This collection should contain {{ limit }} element or less.|' +
@@ -18,6 +21,16 @@ define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
      */
     function getCheckboxCount($fields) {
         return $fields.filter(':checked').length;
+    }
+
+    /**
+     * Return only selected options count.
+     *
+     * @param {jQuery} $fields
+     * @returns {Number}
+     */
+    function getSelectedCount($fields) {
+        return $fields.find('option:selected').length;
     }
 
     /**
@@ -55,7 +68,7 @@ define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
      * @returns {jQuery}
      */
     function filterChildFields(collectionName, $fields) {
-        var childName = getChildName(collectionName, $fields.get(0).name);
+        const childName = getChildName(collectionName, $fields.get(0).name);
         return $fields.filter(function() {
             return getChildName(collectionName, this.name) === childName;
         });
@@ -63,19 +76,23 @@ define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
 
     function getCount(validator, element) {
         // Example: collectionName = 'form[additional]'
-        var collectionName = $(element).data('collectionName');
+        const collectionName = $(element).data('collectionName');
         if (!collectionName) {
-            // use old logic if data-collection-name not found
-            return getCheckboxCount(validator.findByName(element.name));
+            const $fields = validator.findByName(element.name);
+            if (element.type === 'select-multiple' || element.type === 'select-one') {
+                return getSelectedCount($fields);
+            } else {
+                return getCheckboxCount($fields);
+            }
         }
 
-        var $fields = findByCollectionName(collectionName, validator);
+        const $fields = findByCollectionName(collectionName, validator);
         if ($fields.length === 0) {
             return $fields.length;
         }
 
         // if all $fields is a checkbox/radio fields
-        var $choicesFields = $fields.filter(':checkbox, :radio');
+        const $choicesFields = $fields.filter(':checkbox, :radio');
         if ($choicesFields.length === $fields.length) {
             return getCheckboxCount($choicesFields);
         }
@@ -93,9 +110,9 @@ define(['jquery', 'underscore', './number'], function($, _, numberValidator) {
             return numberValidator[1].call(this, value, element, param);
         },
         function(param, element) {
-            var value = getCount(this, element);
-            var placeholders = {};
-            param = _.extend({}, defaultParam, param);
+            const value = getCount(this, element);
+            const placeholders = {};
+            param = Object.assign({}, defaultParam, param);
             placeholders.count = value;
             return numberValidator[2].call(this, param, element, value, placeholders);
         }

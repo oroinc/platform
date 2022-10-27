@@ -4,8 +4,11 @@ namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides base functionality for list of grid views.
+ */
 abstract class AbstractViewsList
 {
     /** @var TranslatorInterface */
@@ -13,7 +16,7 @@ abstract class AbstractViewsList
 
     /** @var null|ArrayCollection */
     protected $views = null;
-    
+
     /** @var array */
     protected $systemViews = [];
 
@@ -48,7 +51,7 @@ abstract class AbstractViewsList
             if ($view['is_default']) {
                 $systemView->setDefault(true);
             }
-            $systemView->setLabel($this->translator->trans($view['label']));
+            $systemView->setLabel(isset($view['label']) ? $this->translator->trans($view['label']) : '');
             $views[] = $systemView;
         }
 
@@ -106,7 +109,10 @@ abstract class AbstractViewsList
         /** @var View[] $views */
         $views = $this->getList();
         foreach ($views as $view) {
-            $choices[] = ['value' => $view->getName(), 'label' => $this->translator->trans($view->getLabel())];
+            $choices[] = [
+                'value' => $view->getName(),
+                'label' => $this->translator->trans($view->getLabel())
+            ];
         }
 
         return $choices;
@@ -130,8 +136,6 @@ abstract class AbstractViewsList
 
     /**
      * Validates input array
-     *
-     * @param array $list
      *
      * @throws InvalidArgumentException
      */

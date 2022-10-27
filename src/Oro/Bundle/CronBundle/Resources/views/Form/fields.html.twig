@@ -15,7 +15,7 @@
         <td>{{ form_widget(form.activeAt) }}</td>
         <td>{{ form_widget(form.deactivateAt) }}</td>
         <td>
-            <button type="button" class="removeRow btn btn-icon icons-holder"><i class="fa-close"></i></button>
+            <button type="button" class="removeRow btn btn-icon btn-square-lighter" aria-label="{{ 'Remove row'|trans }}"><span class="fa-trash-o" aria-hidden="true"></span></button>
         </td>
     </tr>
     <tr {% if not hasErrors %}style="display: none"{% endif %} class="schedule-interval__error-row" data-role="schedule-interval-row-error">
@@ -28,11 +28,13 @@
 {% endmacro %}
 
 {% block oro_cron_schedule_intervals_collection_widget %}
-    {% spaceless %}
+    {% import _self as cronFormFields %}
+
+    {% apply spaceless %}
         {% if prototype is defined %}
-            {% set prototype_html = _self.schedule_interval_prototype(form) %}
+            {% set prototype_html = cronFormFields.schedule_interval_prototype(form) %}
         {% endif %}
-        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
+        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection oro-item-collection__row--align-middle collection-fields-list' }) %}
         {% set id = id ~ '_collection' %}
         <div class="row-oro schedule-intervals"
              data-page-component-module="oroui/js/app/components/view-component"
@@ -41,7 +43,7 @@
              }|json_encode }}">
             {% set prototype_name = form.vars.prototype_name %}
             <div {{ block('widget_container_attributes') }}>
-                <table class="grid table-hover table table-bordered table-condensed">
+                <table class="grid grid-main-container table-hover table table-bordered table-condensed">
                     <thead>
                     <tr>
                         <th><span>{{ 'oro.cron.schedule_interval.active_at.label'|trans }}</span></th>
@@ -52,7 +54,7 @@
                     <tbody data-last-index="{{ form.children|length }}" data-row-count-add="{{ form.vars.row_count_add }}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
                     {% if form.children|length %}
                         {% for child in form.children %}
-                            {{ _self.schedule_interval_prototype(child) }}
+                            {{ cronFormFields.schedule_interval_prototype(child) }}
                         {% endfor %}
                     {% elseif show_form_when_empty and prototype_html is defined %}
                         {% for i in 0..(form.vars.row_count_initial - 1) %}
@@ -62,10 +64,12 @@
                     </tbody>
                 </table>
             </div>
-            <a class="btn add-list-item" data-container=".oro-item-collection tbody" href="javascript: void(0);"><i class="fa-plus"></i>{{ 'oro.cron.schedule_interval.add'|trans }}</a>
+            <div class="btn-container">
+                <a class="btn add-list-item" data-container=".oro-item-collection tbody" href="#"><i class="fa-plus"></i>{{ 'oro.cron.schedule_interval.add'|trans }}</a>
+            </div>
         </div>
         {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
-            {{ _self.oro_collection_validate_primary_js(_context) }}
+            {{ cronFormFields.oro_collection_validate_primary_js(_context) }}
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {% endblock %}

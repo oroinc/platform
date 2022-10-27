@@ -1,0 +1,39 @@
+<% var selectorId = _.uniqueId('selector-'); %>
+<% var criteriaId = _.uniqueId('criteria-'); %>
+<div class="filter-item" data-select-filter-template>
+    <%
+        var criteriaClasses = 'filter-select filter-criteria-selector';
+        if (obj.isEmpty) {
+            criteriaClasses += ' filter-default-value';
+        }
+        if (obj.criteriaClass) {
+            criteriaClasses += obj.criteriaClass;
+        }
+    %>
+    <button id="<%- selectorId %>"
+        class="<%- criteriaClasses %>"
+        data-zoom-disable
+        type="button"
+    <% if (renderMode === 'toggle-mode') { %>
+        aria-controls="<%- criteriaId %>"
+    <% } %>
+    >
+        <% if (showLabel) { %><span class="filter-item-label"><%- label %></span><% } %><span class="filter-item-hint"></span>
+        <span class="filter-criteria-selector-icon-wrap" aria-hidden="true">
+            <span class="filter-criteria-selector-icon"></span>
+        </span>
+    </button>
+
+    <select data-skip-input-widgets>
+        <% _.each(options, function (option) { %>
+        <option value="<%- option.value %>" title="<%- option.label %>"
+            <% if (option.value == selected.value) { %>selected="selected"<% } %>
+            <% if (option.count !== undefined) { %>data-option-count="<%- option.count %>"<% } %>
+            ><%- option.label %></option>
+        <% }); %>
+    </select>
+
+    <% if (renderMode === 'toggle-mode') { %>
+        <div id="<%- criteriaId %>" class="filter-criteria" aria-labelledby="<%- selectorId %>"></div>
+    <% } %>
+</div>

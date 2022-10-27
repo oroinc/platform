@@ -23,10 +23,6 @@ class SearchEntityFilterType extends AbstractType
     /** @var Localization */
     protected $currentLocalization = false;
 
-    /**
-     * @param EntityNameResolver $entityNameResolver
-     * @param LocalizationHelper $localizationHelper
-     */
     public function __construct(EntityNameResolver $entityNameResolver, LocalizationHelper $localizationHelper)
     {
         $this->entityNameResolver = $entityNameResolver;

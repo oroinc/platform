@@ -26,3 +26,13 @@ oro:
             show_restricted_fields:
                 label:   Show restricted
                 tooltip: If Field Level ACL enabled and user have no access to field, on create and edit pages this field will be shown as disabled field.
+        system_configuration:
+            groups:
+                development_settings.title: 'Development Settings'
+                development_layout_symfony_profiler.title: 'Symfony Profiler'
+            fields:
+                symfony_profiler_collection_of_voter_decisions:
+                    label: 'Enable collection of voter decisions in debug toolbar'
+                    choices:
+                        no: 'No'
+                        yes: 'Yes'

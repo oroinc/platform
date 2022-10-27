@@ -6,6 +6,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerAwareInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
@@ -19,9 +20,11 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
+ * Provides helper methods for building full email address and user email related methods.
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class EmailModelBuilderHelper
@@ -47,23 +50,12 @@ class EmailModelBuilderHelper
     /** @var EmailCacheManager */
     protected $emailCacheManager;
 
-    /** @var EngineInterface */
-    protected $templating;
+    /** @var Environment */
+    protected $twig;
 
     /** @var MailboxManager */
     protected $mailboxManager;
 
-    /**
-     * @param EntityRoutingHelper    $entityRoutingHelper
-     * @param EmailAddressHelper     $emailAddressHelper
-     * @param EntityNameResolver     $entityNameResolver
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param EmailAddressManager    $emailAddressManager
-     * @param EntityManager          $entityManager
-     * @param EmailCacheManager      $emailCacheManager
-     * @param EngineInterface        $engineInterface
-     * @param MailboxManager         $mailboxManager
-     */
     public function __construct(
         EntityRoutingHelper $entityRoutingHelper,
         EmailAddressHelper $emailAddressHelper,
@@ -72,7 +64,7 @@ class EmailModelBuilderHelper
         EmailAddressManager $emailAddressManager,
         EntityManager $entityManager,
         EmailCacheManager $emailCacheManager,
-        EngineInterface $engineInterface,
+        Environment $twig,
         MailboxManager $mailboxManager
     ) {
         $this->entityRoutingHelper = $entityRoutingHelper;
@@ -82,7 +74,7 @@ class EmailModelBuilderHelper
         $this->emailAddressManager= $emailAddressManager;
         $this->entityManager = $entityManager;
         $this->emailCacheManager = $emailCacheManager;
-        $this->templating = $engineInterface;
+        $this->twig = $twig;
         $this->mailboxManager = $mailboxManager;
     }
 
@@ -91,6 +83,7 @@ class EmailModelBuilderHelper
      * @param string|null $ownerClass
      * @param mixed|null  $ownerId
      * @param bool        $excludeCurrentUser
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function preciseFullEmailAddress(
         &$emailAddress,
@@ -105,7 +98,11 @@ class EmailModelBuilderHelper
                     if ($this->doExcludeCurrentUser($excludeCurrentUser, $emailAddress, $owner)) {
                         return;
                     }
-                    $ownerName = $this->entityNameResolver->getName($owner);
+                    if ($owner instanceof EmailOwnerAwareInterface) {
+                        $ownerName = $this->entityNameResolver->getName($owner->getEmailOwner());
+                    } else {
+                        $ownerName = $this->entityNameResolver->getName($owner);
+                    }
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
 
@@ -171,9 +168,6 @@ class EmailModelBuilderHelper
         return $this->tokenAccessor->getOrganization();
     }
 
-    /**
-     * @param EmailEntity $emailEntity
-     */
     public function ensureEmailBodyCached(EmailEntity $emailEntity)
     {
         $this->emailCacheManager->ensureEmailBodyCached($emailEntity);
@@ -216,8 +210,7 @@ class EmailModelBuilderHelper
             return null;
         }
 
-        return $this->templating
-            ->render($templatePath, ['email' => $emailEntity]);
+        return $this->twig->render($templatePath, ['email' => $emailEntity]);
     }
 
     /**

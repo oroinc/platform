@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ActivityContextActivityCollection;
-    var ActivityContextActivityModel = require('./activity-context-activity-model');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
+    const ActivityContextActivityModel = require('./activity-context-activity-model');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
 
     /**
      * @export  oroactivity/js/app/models/activity-context-collection
      */
-    ActivityContextActivityCollection = BaseCollection.extend({
+    const ActivityContextActivityCollection = BaseCollection.extend({
         route: null,
 
         routeId: null,
@@ -22,10 +21,10 @@ define(function(require) {
         model: ActivityContextActivityModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ActivityContextActivityCollection() {
-            ActivityContextActivityCollection.__super__.constructor.apply(this, arguments);
+        constructor: function ActivityContextActivityCollection(...args) {
+            ActivityContextActivityCollection.__super__.constructor.apply(this, args);
         }
     });
 

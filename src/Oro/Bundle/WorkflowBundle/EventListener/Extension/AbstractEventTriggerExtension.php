@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
@@ -121,7 +121,6 @@ abstract class AbstractEventTriggerExtension implements EventTriggerExtensionInt
 
         return $first == $second;
     }
-
 
     /**
      * @return ObjectRepository

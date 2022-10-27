@@ -1,4 +1,7 @@
-assets:
-    css:
-      'orotag':
-          - 'bundles/orotag/css/scss/main.scss'
+css:
+    inputs:
+        # Settings
+        - 'bundles/orotag/css/scss/settings/global-settings.scss'
+
+        # Styles
+        - 'bundles/orotag/css/scss/main.scss'

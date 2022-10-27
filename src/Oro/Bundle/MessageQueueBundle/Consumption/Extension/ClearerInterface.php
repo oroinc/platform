@@ -17,8 +17,6 @@ interface ClearerInterface
 {
     /**
      * Clears the consumer state.
-     *
-     * @param LoggerInterface $logger
      */
     public function clear(LoggerInterface $logger);
 }

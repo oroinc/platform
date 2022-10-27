@@ -1,2 +1,2 @@
 bundles:
-    - OroImapBundle:Form:fields.html.twig
+    - '@OroImap/Form/fields.html.twig'

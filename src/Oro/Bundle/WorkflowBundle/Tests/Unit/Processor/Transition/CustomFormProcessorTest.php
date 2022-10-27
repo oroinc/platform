@@ -15,12 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
 class CustomFormProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formHandlerRegistry;
+    private $formHandlerRegistry;
 
     /** @var CustomFormProcessor */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formHandlerRegistry = $this->createMock(FormHandlerRegistry::class);
         $this->processor = new CustomFormProcessor($this->formHandlerRegistry);
@@ -28,29 +28,34 @@ class CustomFormProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSaved()
     {
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())->method('getFormHandler')->willReturn('formHandlerName');
-        $transition->expects($this->once())->method('getFormDataAttribute')->willReturn('dataAttribute');
+        $transition->expects($this->once())
+            ->method('getFormHandler')
+            ->willReturn('formHandlerName');
+        $transition->expects($this->once())
+            ->method('getFormDataAttribute')
+            ->willReturn('dataAttribute');
 
         $dataObject = (object)['id' => 42];
 
-        /** @var WorkflowData|\PHPUnit\Framework\MockObject\MockObject $workflowData */
         $workflowData = $this->createMock(WorkflowData::class);
-        $workflowData->expects($this->once())->method('get')->with('dataAttribute')->willReturn($dataObject);
+        $workflowData->expects($this->once())
+            ->method('get')
+            ->with('dataAttribute')
+            ->willReturn($dataObject);
 
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
-        $workflowItem->expects($this->once())->method('getData')->willReturn($workflowData);
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
+        $workflowItem->expects($this->once())
+            ->method('getData')
+            ->willReturn($workflowData);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form $form */
         $form = $this->createMock(FormInterface::class);
 
-        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
 
-        /** @var FormHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $context */
         $handler = $this->createMock(FormHandlerInterface::class);
         $handler->expects($this->once())
             ->method('process')

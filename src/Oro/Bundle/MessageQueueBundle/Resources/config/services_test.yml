@@ -1,15 +1,71 @@
 services:
-    oro_message_queue.async.unique_message_processor.stub:
-        class: Oro\Bundle\MessageQueueBundle\Tests\Functional\Stub\UniqueMessageProcessorStub
+    oro_message_queue.test.message_collector:
+        class: Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector
+        decorates: oro_message_queue.client.message_producer
+        arguments:
+            - '@.inner'
+            - '@oro_message_queue.test.driver.message_collector'
+
+    oro_message_queue.test.driver.message_collector:
+        class: Oro\Bundle\MessageQueueBundle\Test\Functional\DriverMessageCollector
+        decorates: oro_message_queue.client.driver
+        arguments:
+            - '@.inner'
+
+    oro_message_queue.async.basic_message_processor:
+        class: Oro\Component\MessageQueue\Test\Async\BasicMessageProcessor
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.async.unique_message_processor:
+        class: Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor
         arguments:
             - '@oro_message_queue.job.runner'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_message_queue.async.dependent_message_processor.stub:
-        class: Oro\Bundle\MessageQueueBundle\Tests\Functional\Stub\DependentMessageProcessorStub
+    oro_message_queue.async.dependent_message_processor:
+        class: Oro\Component\MessageQueue\Test\Async\DependentMessageProcessor
         arguments:
             - '@oro_message_queue.job.runner'
             - '@oro_message_queue.job.dependent_job_service'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.async.change_config:
+        class: Oro\Bundle\MessageQueueBundle\Test\Async\ChangeConfigProcessor
+        arguments:
+            - '@oro_config.manager'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.async.topic.sample_normalizable_body_topic:
+        class: Oro\Bundle\MessageQueueBundle\Test\Async\Topic\SampleNormalizableBodyTopic
+        tags:
+            - { name: 'oro_message_queue.topic' }
+
+    oro_message_queue.async.topic.sample_child_job_topic:
+        class: Oro\Bundle\MessageQueueBundle\Test\Async\Topic\SampleChildJobTopic
+        tags:
+            - { name: 'oro_message_queue.topic' }
+
+    oro_message_queue.async.redelivery_aware_processor:
+        class: Oro\Bundle\MessageQueueBundle\Test\Async\RedeliveryAwareMessageProcessor
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.async.sample_job_child_processor:
+        class: Oro\Bundle\MessageQueueBundle\Test\Async\SampleChildJobProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.test.async.extension.consumed_messages_collector:
+        class: 'Oro\Component\MessageQueue\Test\Async\Extension\ConsumedMessagesCollectorExtension'
+        arguments:
+            - '@oro_message_queue.client.message_processor_registry'
+            - '@logger'
+        tags:
+            # Must be definitely the last extension to collect the latest data.
+            - { name: 'oro_message_queue.consumption.extension', priority: -500, persistent: true }

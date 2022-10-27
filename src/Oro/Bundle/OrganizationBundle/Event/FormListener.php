@@ -6,13 +6,13 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 
+/**
+ * Adds the owner field subblock to an entity edit page.
+ */
 class FormListener
 {
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -20,38 +20,27 @@ class FormListener
 
     /**
      * Add owner field to forms
-     *
-     * @param BeforeFormRenderEvent $event
      */
     public function addOwnerField(BeforeFormRenderEvent $event)
     {
-        $environment = $event->getTwigEnvironment();
-        $data = $event->getFormData();
         $form = $event->getForm();
+        if (!isset($form['owner']) || $form['owner']->isRendered()) {
+            return;
+        }
+
         $label = false;
-        $entityProvider = $this->configManager->getProvider('entity');
 
         if (is_object($form->vars['value'])) {
             $className = ClassUtils::getClass($form->vars['value']);
-            if (class_exists($className)
-                && $entityProvider->hasConfig($className, 'owner')
-            ) {
+            $entityProvider = $this->configManager->getProvider('entity');
+            if (class_exists($className) && $entityProvider->hasConfig($className, 'owner')) {
                 $config = $entityProvider->getConfig($className, 'owner');
-                $label  = $config->get('label');
+                $label = $config->get('label');
             }
         }
 
-        $ownerField = $environment->render(
-            "OroOrganizationBundle::owner.html.twig",
-            array(
-                'form'  => $form,
-                'label' => $label
-            )
-        );
-
-        /**
-         * Setting owner field as first field in first data block
-         */
+        // Setting owner field as first field in first data block.
+        $data = $event->getFormData();
         if (!empty($data['dataBlocks'])) {
             reset($data['dataBlocks']);
             $firstBlockId = key($data['dataBlocks']);
@@ -59,6 +48,9 @@ class FormListener
                 if (!isset($data['dataBlocks'][$firstBlockId]['subblocks'][0])) {
                     $data['dataBlocks'][$firstBlockId]['subblocks'][0] = ['data' => []];
                 }
+
+                $ownerField = $event->getTwigEnvironment()
+                    ->render('@OroOrganization/owner.html.twig', ['form'  => $form, 'label' => $label]);
                 array_unshift($data['dataBlocks'][$firstBlockId]['subblocks'][0]['data'], $ownerField);
             }
         }

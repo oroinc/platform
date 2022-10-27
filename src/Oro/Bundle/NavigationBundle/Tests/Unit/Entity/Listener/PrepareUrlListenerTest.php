@@ -16,12 +16,10 @@ class PrepareUrlListenerTest extends \PHPUnit\Framework\TestCase
     /** @var PrepareUrlListener */
     private $listener;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
+
         $this->listener = new PrepareUrlListener();
     }
 
@@ -36,8 +34,7 @@ class PrepareUrlListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldMapping')
             ->with('url')
             ->willReturn(['length' => 3]);
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
             ->with(UrlAwareStub::class)
             ->willReturn($metadata);
@@ -58,8 +55,7 @@ class PrepareUrlListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldMapping')
             ->with('url')
             ->willReturn(['length' => 3]);
-        $this->entityManager
-            ->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
             ->with(UrlAwareStub::class)
             ->willReturn($metadata);

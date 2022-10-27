@@ -9,8 +9,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class StartWithTest extends \PHPUnit\Framework\TestCase
 {
     protected $condition;
-    
-    public function setUp()
+
+    protected function setUp(): void
     {
         $this->condition = new Condition\StartWith();
         $this->condition->setContextAccessor(new ContextAccessor());

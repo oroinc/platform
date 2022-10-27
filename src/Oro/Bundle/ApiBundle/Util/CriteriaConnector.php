@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Util;
 
+use Doctrine\Common\Collections\Criteria as CommonCriteria;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory;
@@ -25,12 +26,6 @@ class CriteriaConnector
     /** @var EntityClassResolver */
     private $entityClassResolver;
 
-    /**
-     * @param CriteriaNormalizer            $criteriaNormalizer
-     * @param CriteriaPlaceholdersResolver  $placeholdersResolver
-     * @param QueryExpressionVisitorFactory $expressionVisitorFactory
-     * @param EntityClassResolver           $entityClassResolver
-     */
     public function __construct(
         CriteriaNormalizer $criteriaNormalizer,
         CriteriaPlaceholdersResolver $placeholdersResolver,
@@ -45,31 +40,18 @@ class CriteriaConnector
 
     /**
      * Adds the given criteria to the query builder.
-     *
-     * @param QueryBuilder $qb
-     * @param Criteria     $criteria
      */
-    public function applyCriteria(QueryBuilder $qb, Criteria $criteria): void
+    public function applyCriteria(QueryBuilder $qb, CommonCriteria $criteria): void
     {
         $rootAlias = QueryBuilderUtil::getSingleRootAlias($qb);
-        $rootEntityClass = $this->entityClassResolver->getEntityClass($qb->getRootEntities()[0]);
-        $this->criteriaNormalizer->normalizeCriteria($criteria, $rootEntityClass);
-        $this->placeholdersResolver->resolvePlaceholders($criteria, $rootAlias);
-
-        $joins = $criteria->getJoins();
-        if (!empty($joins)) {
-            foreach ($joins as $join) {
-                $method = \strtolower($join->getJoinType()) . 'Join';
-                $qb->{$method}(
-                    $join->getJoin(),
-                    $join->getAlias(),
-                    $join->getConditionType(),
-                    $join->getCondition(),
-                    $join->getIndexBy()
-                );
-            }
+        if ($criteria instanceof Criteria) {
+            $rootEntityClass = $this->entityClassResolver->getEntityClass($qb->getRootEntities()[0]);
+            $this->criteriaNormalizer->normalizeCriteria($criteria, $rootEntityClass);
+            $this->placeholdersResolver->resolvePlaceholders($criteria, $rootAlias);
+            $this->addJoins($qb, $criteria);
+        } else {
+            $this->placeholdersResolver->resolvePlaceholders($criteria, $rootAlias);
         }
-
         $this->addCriteria($qb, $criteria);
     }
 
@@ -77,11 +59,8 @@ class CriteriaConnector
      * Adds criteria to the query.
      * This is a copy of QueryBuilder addCriteria method. We should set another QueryExpressionVisitor that is able
      * to add own comparison or composite expressions.
-     *
-     * @param QueryBuilder $qb
-     * @param Criteria     $criteria
      */
-    private function addCriteria(QueryBuilder $qb, Criteria $criteria): void
+    private function addCriteria(QueryBuilder $qb, CommonCriteria $criteria): void
     {
         $aliases = $qb->getAllAliases();
         $this->processWhere($qb, $criteria, $aliases);
@@ -98,12 +77,24 @@ class CriteriaConnector
         }
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param Criteria     $criteria
-     * @param array        $aliases
-     */
-    private function processWhere(QueryBuilder $qb, Criteria $criteria, array $aliases): void
+    private function addJoins(QueryBuilder $qb, Criteria $criteria): void
+    {
+        $joins = $criteria->getJoins();
+        if (!empty($joins)) {
+            foreach ($joins as $join) {
+                $method = strtolower($join->getJoinType()) . 'Join';
+                $qb->{$method}(
+                    $join->getJoin(),
+                    $join->getAlias(),
+                    $join->getConditionType(),
+                    $join->getCondition(),
+                    $join->getIndexBy()
+                );
+            }
+        }
+    }
+
+    private function processWhere(QueryBuilder $qb, CommonCriteria $criteria, array $aliases): void
     {
         $whereExpression = $criteria->getWhereExpression();
         if (null !== $whereExpression) {
@@ -119,18 +110,13 @@ class CriteriaConnector
         }
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param Criteria     $criteria
-     * @param array        $aliases
-     */
-    private function processOrderings(QueryBuilder $qb, Criteria $criteria, array $aliases): void
+    private function processOrderings(QueryBuilder $qb, CommonCriteria $criteria, array $aliases): void
     {
         $orderings = $criteria->getOrderings();
         foreach ($orderings as $sort => $order) {
             $hasValidAlias = false;
             foreach ($aliases as $alias) {
-                if ($sort !== $alias && 0 === \strpos($sort . '.', $alias . '.')) {
+                if ($sort !== $alias && str_starts_with($sort . '.', $alias . '.')) {
                     $hasValidAlias = true;
                     break;
                 }
@@ -146,16 +132,18 @@ class CriteriaConnector
     }
 
     /**
-     * @param Criteria $criteria
+     * @param CommonCriteria $criteria
      *
      * @return array [path => join alias, ...]
      */
-    private function getJoinMap(Criteria $criteria): array
+    private function getJoinMap(CommonCriteria $criteria): array
     {
         $map = [];
-        $joins = $criteria->getJoins();
-        foreach ($joins as $path => $join) {
-            $map[$path] = $join->getAlias();
+        if ($criteria instanceof Criteria) {
+            $joins = $criteria->getJoins();
+            foreach ($joins as $path => $join) {
+                $map[$path] = $join->getAlias();
+            }
         }
 
         return $map;

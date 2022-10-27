@@ -15,45 +15,48 @@ class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowManager;
+    private $workflowManager;
 
     /** @var WorkflowExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
 
         $workflowManagerRegistry = $this->createMock(WorkflowManagerRegistry::class);
-        $workflowManagerRegistry->expects($this->any())->method('getManager')->willReturn($this->workflowManager);
+        $workflowManagerRegistry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->workflowManager);
 
         $workflowVariableFormatter = $this->createMock(WorkflowVariableFormatter::class);
-        $workflowVariableFormatter->expects($this->any())->method('formatWorkflowVariableValue')->willReturn('test');
+        $workflowVariableFormatter->expects($this->any())
+            ->method('formatWorkflowVariableValue')
+            ->willReturn('test');
 
         $container = self::getContainerBuilder()
-            ->add('oro_workflow.registry.workflow_manager', $workflowManagerRegistry)
-            ->add('oro_workflow.formatter.workflow_variable', $workflowVariableFormatter)
+            ->add(WorkflowManagerRegistry::class, $workflowManagerRegistry)
+            ->add(WorkflowVariableFormatter::class, $workflowVariableFormatter)
             ->getContainer($this);
 
         $this->extension = new WorkflowExtension($container);
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals(WorkflowExtension::NAME, $this->extension->getName());
-    }
-
     public function testHasApplicableWorkflows()
     {
         $entity = new StubEntity();
-        $this->workflowManager->expects($this->once())->method('hasApplicableWorkflows')->with($entity);
+        $this->workflowManager->expects($this->once())
+            ->method('hasApplicableWorkflows')
+            ->with($entity);
         $this->callTwigFunction($this->extension, 'has_workflows', [$entity]);
     }
 
     public function testHasWorkflowItemsByEntity()
     {
         $entity = new StubEntity();
-        $this->workflowManager->expects($this->once())->method('hasWorkflowItemsByEntity')->with($entity);
+        $this->workflowManager->expects($this->once())
+            ->method('hasWorkflowItemsByEntity')
+            ->with($entity);
         $this->callTwigFunction($this->extension, 'has_workflow_items', [$entity]);
     }
 

@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource;
 
-use Doctrine\Common\Inflector\Inflector;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 use Symfony\Component\PropertyAccess\Exception\ExceptionInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Model represents datagrid result rows
+ */
 class ResultRecord implements ResultRecordInterface
 {
     /** @var array */
@@ -46,16 +49,13 @@ class ResultRecord implements ResultRecordInterface
     }
 
     /**
-     * Set value of property by name
-     *
-     * @param string $name
-     * @param mixed $value
+     * {@inheritdoc}
      */
     public function setValue($name, $value)
     {
         foreach ($this->valueContainers as $key => $data) {
             if (is_array($data)) {
-                if (strpos($name, '[') === 0) {
+                if (str_starts_with($name, '[')) {
                     $this->getPropertyAccessor()->setValue($this->valueContainers[$key], $name, $value);
                     return;
                 } else {
@@ -65,7 +65,7 @@ class ResultRecord implements ResultRecordInterface
             } elseif (is_object($data)) {
                 $this->getPropertyAccessor()->setValue(
                     $this->valueContainers[$key],
-                    Inflector::camelize($name),
+                    InflectorFactory::create()->camelize($name),
                     $value
                 );
             }
@@ -73,24 +73,23 @@ class ResultRecord implements ResultRecordInterface
     }
 
     /**
-     * Get value of property by name
-     *
-     * @param  string $name
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getValue($name)
     {
         foreach ($this->valueContainers as $data) {
             if (is_array($data)) {
-                if (strpos($name, '[') === 0) {
+                if (str_starts_with($name, '[')) {
                     return $this->getPropertyAccessor()->getValue($data, $name);
                 } elseif (array_key_exists($name, $data)) {
                     return $data[$name];
                 }
             } elseif (is_object($data)) {
                 try {
-                    return $this->getPropertyAccessor()->getValue($data, Inflector::camelize($name));
+                    return $this->getPropertyAccessor()->getValue(
+                        $data,
+                        InflectorFactory::create()->camelize($name)
+                    );
                 } catch (ExceptionInterface $e) {
                     return null;
                 }

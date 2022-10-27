@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -20,7 +19,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="name", type="string", length=30)
- * @JMS\ExclusionPolicy("ALL")
  */
 abstract class EmailOrigin
 {
@@ -30,8 +28,6 @@ abstract class EmailOrigin
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $id;
 
@@ -62,6 +58,13 @@ abstract class EmailOrigin
      * @ORM\Column(name="isActive", type="boolean")
      */
     protected $isActive = true;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_sync_enabled", type="boolean", nullable=true)
+     */
+    protected $isSyncEnabled = true;
 
     /**
      * @var \DateTime
@@ -402,5 +405,21 @@ abstract class EmailOrigin
         $this->mailbox = $mailbox;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSyncEnabled(): bool
+    {
+        return $this->isSyncEnabled ?? true;
+    }
+
+    /**
+     * @param bool $isSyncEnabled
+     */
+    public function setIsSyncEnabled(bool $isSyncEnabled): void
+    {
+        $this->isSyncEnabled = $isSyncEnabled;
     }
 }

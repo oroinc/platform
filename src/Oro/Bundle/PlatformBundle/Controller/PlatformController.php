@@ -2,22 +2,30 @@
 
 namespace Oro\Bundle\PlatformBundle\Controller;
 
+use Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * Controller provide information about installed packages
+ *
  * @Route("/platform")
  */
-class PlatformController extends Controller
+class PlatformController
 {
-    /** @deprecated since 1.10 */
-    const ORO_NAMESPACE = PackageProvider::ORO_NAMESPACE;
+    private PackageProvider $packageProvider;
 
-    /** @deprecated since 1.10 */
-    const NAMESPACE_DELIMITER = PackageProvider::NAMESPACE_DELIMITER;
+    private DeploymentVariableProvider $deploymentVariableProvider;
+
+    public function __construct(
+        PackageProvider $packageProvider,
+        DeploymentVariableProvider $deploymentVariableProvider
+    ) {
+        $this->packageProvider = $packageProvider;
+        $this->deploymentVariableProvider = $deploymentVariableProvider;
+    }
 
     /**
      * @Route("/information", name="oro_platform_system_info")
@@ -32,11 +40,10 @@ class PlatformController extends Controller
      */
     public function systemInfoAction()
     {
-        $packageProvider = $this->get('oro_platform.provider.package');
-
         return [
-            'thirdPartyPackages' => $packageProvider->getThirdPartyPackages(),
-            'oroPackages' => $packageProvider->getOroPackages(),
+            'thirdPartyPackages' => $this->packageProvider->getThirdPartyPackages(),
+            'oroPackages' => $this->packageProvider->getOroPackages(),
+            'deploymentVariables' => $this->deploymentVariableProvider->getVariables(),
         ];
     }
 }

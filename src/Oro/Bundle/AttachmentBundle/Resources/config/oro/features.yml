@@ -1,0 +1,33 @@
+features:
+    attachment_post_processors:
+        label: oro.attachment.config.feature.attachment_processors.label
+        description: oro.attachment.config.feature.attachment_processors.description
+        configuration:
+            - 'attachment_processors_settings'
+
+    attachment_post_processors_allowed:
+        label: oro.attachment.config.feature.attachment_processors_allowed.label
+        description: oro.attachment.config.feature.attachment_processors_allowed.description
+        toggle: oro_attachment.processors_allowed
+        dependencies:
+            - 'attachment_post_processors'
+        configuration:
+            - 'oro_attachment.jpeg_quality'
+            - 'oro_attachment.png_quality'
+
+    attachment_post_processing:
+        label: oro.attachment.config.feature.attachment_processing.label
+        description: oro.attachment.config.feature.attachment_processing.description
+        dependencies:
+            - 'attachment_post_processors_allowed'
+
+    attachment_webp:
+        label: oro.attachment.config.feature.webp.label
+        description: oro.attachment.config.feature.webp.description
+        configuration:
+            - 'oro_attachment.webp_quality'
+
+    attachment_original_filenames:
+        label: oro.attachment.config.feature.original_file_names_enabled.label
+        description: oro.attachment.config.feature.original_file_names_enabled.description
+        toggle: oro_attachment.original_file_names_enabled

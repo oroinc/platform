@@ -1,9 +1,11 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set gridName = 'taxonomy-grid' %}
 {% set pageTitle = 'oro.taxonomy.entity_plural_label'|trans %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_taxonomy_create') %}
         {{ UI.addButton({
             'path': path('oro_taxonomy_create'),

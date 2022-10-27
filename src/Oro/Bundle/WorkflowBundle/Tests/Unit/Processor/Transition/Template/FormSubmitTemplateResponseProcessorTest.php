@@ -9,37 +9,70 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TemplateResultType;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitActionResultTypeInterface;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\Template\FormSubmitTemplateResponseProcessor;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowItem\WorkflowItemSerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ViewHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $viewHandler;
+    /** @var WorkflowItemSerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflowItemSerializer;
 
-    /** @var \Twig_Environment|\PHPUnit\Framework\MockObject\MockObject */
-    protected $twig;
+    /** @var ViewHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $viewHandler;
+
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $twig;
 
     /** @var FormSubmitTemplateResponseProcessor */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
+        $this->workflowItemSerializer = $this->createMock(WorkflowItemSerializerInterface::class);
         $this->viewHandler = $this->createMock(ViewHandlerInterface::class);
-        $this->twig = $this->createMock(\Twig_Environment::class);
+        $this->twig = $this->createMock(Environment::class);
 
-        $this->processor = new FormSubmitTemplateResponseProcessor($this->viewHandler, $this->twig);
+        $this->processor = new FormSubmitTemplateResponseProcessor(
+            $this->workflowItemSerializer,
+            $this->viewHandler,
+            $this->twig
+        );
+    }
+
+    private function createContext(
+        string $message,
+        int $code = null,
+        WorkflowItem $workflowItem = null
+    ): TransitionContext {
+        $context = new TransitionContext();
+        $context->setResultType(new TemplateResultType());
+        $context->set('responseMessage', $message);
+
+        if ($code) {
+            $context->set('responseCode', $code);
+        }
+
+        if ($workflowItem) {
+            $context->setWorkflowItem($workflowItem);
+        }
+
+        return $context;
     }
 
     public function testCompleteResponseOk()
     {
         $context = $this->createContext('message1', 200);
 
-        $this->viewHandler->expects($this->never())->method('handle');
+        $this->workflowItemSerializer->expects($this->never())
+            ->method('serialize');
+        $this->viewHandler->expects($this->never())
+            ->method('handle');
 
         $this->twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
+                '@OroWorkflow/Widget/widget/transitionComplete.html.twig',
                 [
                     'response' => null,
                     'responseCode' => 200,
@@ -59,12 +92,15 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
     {
         $context = $this->createContext('message2', 500);
 
-        $this->viewHandler->expects($this->never())->method('handle');
+        $this->workflowItemSerializer->expects($this->never())
+            ->method('serialize');
+        $this->viewHandler->expects($this->never())
+            ->method('handle');
 
         $this->twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
+                '@OroWorkflow/Widget/widget/transitionComplete.html.twig',
                 [
                     'response' => null,
                     'responseCode' => 500,
@@ -84,22 +120,31 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
 
     public function testCompleteResponseWithoutCode()
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
+        $serializedWorkflowItem = ['name' => 'test_workflow'];
 
         $context = $this->createContext('message3', null, $workflowItem);
 
-        $view = View::create(['workflowItem' => $workflowItem])->setFormat('json');
+        $view = View::create(['workflowItem' => $serializedWorkflowItem])
+            ->setFormat('json');
+        $view->getContext()->setSerializeNull(true);
 
-        $this->viewHandler->expects($this->once())->method('handle')
+        $this->workflowItemSerializer->expects($this->once())
+            ->method('serialize')
+            ->with($this->identicalTo($workflowItem))
+            ->willReturn($serializedWorkflowItem);
+        $this->viewHandler->expects($this->once())
+            ->method('handle')
             ->with($view)
-            ->willReturn(new Response(json_encode('content3'), 200));
+            ->willReturn(new Response(json_encode('content3', JSON_THROW_ON_ERROR), 200));
 
         $this->twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
+                '@OroWorkflow/Widget/widget/transitionComplete.html.twig',
                 [
                     'response' => 'content3',
                     'responseCode' => 200,
@@ -117,38 +162,15 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->assertTrue($context->isProcessed());
     }
 
-    /**
-     * @param string $message
-     * @param integer|null $code
-     * @param WorkflowItem|null $workflowItem
-     * @return TransitionContext
-     */
-    protected function createContext($message, $code = null, WorkflowItem $workflowItem = null)
-    {
-        $context = new TransitionContext();
-        $context->setResultType(new TemplateResultType());
-        $context->set('responseMessage', $message);
-
-        if ($code) {
-            $context->set('responseCode', $code);
-        }
-
-        if ($workflowItem) {
-            $context->setWorkflowItem($workflowItem);
-        }
-
-        return $context;
-    }
-
     public function testShouldSkipUnsupportedResponseTypes()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')
             ->willReturn($this->createMock(TransitActionResultTypeInterface::class));
 
-        $context->expects($this->never())->method('getWorkflowItem');
+        $context->expects($this->never())
+            ->method('getWorkflowItem');
 
         $this->processor->process($context);
     }

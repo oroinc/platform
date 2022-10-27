@@ -1,30 +1,26 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\Tests\Unit\Layput\DataProvider;
+namespace Oro\Bundle\TranslationBundle\Tests\Unit\Layout\DataProvider;
 
 use Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\Translator;
 
 class TranslatorProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var TranslatorProvider */
-    protected $translatorProvider;
+    private $translatorProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->translator = $this->createMock(Translator::class);
+
         $this->translatorProvider = new TranslatorProvider($this->translator);
     }
 
-    protected function tearDown()
-    {
-        unset($this->translator, $this->translatorProvider);
-    }
-
-    public function testGetTrans()
+    public function testGetTrans(): void
     {
         $id = 'test_key';
         $parameters = ['test_param' => 'test_value'];
@@ -32,39 +28,22 @@ class TranslatorProviderTest extends \PHPUnit\Framework\TestCase
         $locale = 'test_locale';
         $data = 'data';
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with($id, $parameters, $domain, $locale)
             ->willReturn($data);
 
-        $this->assertEquals($data, $this->translatorProvider->getTrans($id, $parameters, $domain, $locale));
+        self::assertEquals($data, $this->translatorProvider->getTrans($id, $parameters, $domain, $locale));
     }
 
-    public function testGetTransChoice()
-    {
-        $id = 'test_key';
-        $number = '42';
-        $parameters = ['test_param' => 'test_value'];
-        $domain = 'test_domain';
-        $locale = 'test_locale';
-        $data = 'data';
-
-        $this->translator->expects($this->once())
-            ->method('transChoice')
-            ->with($id, $number, $parameters, $domain, $locale)
-            ->willReturn($data);
-
-        $this->assertEquals(
-            $data,
-            $this->translatorProvider->getTransChoice($id, $number, $parameters, $domain, $locale)
-        );
-    }
-
-    public function testGetLocale()
+    public function testGetLocale(): void
     {
         $locale = 'test_locale';
 
-        $this->translator->expects($this->once())->method('getLocale')->willReturn($locale);
-        $this->assertEquals($locale, $this->translatorProvider->getLocale());
+        $this->translator->expects(self::once())
+            ->method('getLocale')
+            ->willReturn($locale);
+
+        self::assertEquals($locale, $this->translatorProvider->getLocale());
     }
 }

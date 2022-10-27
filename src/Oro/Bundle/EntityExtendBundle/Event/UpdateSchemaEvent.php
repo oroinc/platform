@@ -4,8 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Event;
 
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Allows to do things after the database schema is changed.
@@ -22,10 +21,6 @@ class UpdateSchemaEvent extends Event
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param CommandExecutor $commandExecutor
-     * @param LoggerInterface $logger
-     */
     public function __construct(CommandExecutor $commandExecutor, LoggerInterface $logger)
     {
         $this->commandExecutor = $commandExecutor;
@@ -34,12 +29,12 @@ class UpdateSchemaEvent extends Event
 
     /**
      * Launches a command as a separate process.
-     * @see Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor::runCommand
+     * @see \Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor::runCommand
      *
      * @param string $command
      * @param array  $options
      *
-     * @return integer The exit status code
+     * @return int The exit status code
      */
     protected function executeCommand($command, array $options)
     {

@@ -12,78 +12,79 @@ use Symfony\Component\Routing\RouterInterface;
 class DestinationPageHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
+    private $requestStack;
 
     /** @var EntityConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigHelper;
+    private $entityConfigHelper;
 
     /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    private $router;
 
     /** @var DestinationPageHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)->disableOriginalConstructor()->getMock();
+        $this->requestStack = $this->createMock(RequestStack::class);
         $this->router = $this->createMock(RouterInterface::class);
-        $this->entityConfigHelper = $this->getMockBuilder(EntityConfigHelper::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->entityConfigHelper = $this->createMock(EntityConfigHelper::class);
 
         $this->helper = new DestinationPageHelper($this->requestStack, $this->entityConfigHelper, $this->router);
     }
 
-    public function testGetAvailableDestinations()
+    public function testGetAvailableDestinations(): void
     {
-        $this->entityConfigHelper->expects($this->once())
+        $this->entityConfigHelper->expects(self::once())
             ->method('getRoutes')
             ->with('TestClass', DestinationPageHelper::AVAILABLE_DESTINATIONS)
             ->willReturn(['name' => 'index_route', 'view' => 'view_route', 'custom' => 'custom_route']);
 
-        $this->assertEquals(['name', 'view'], $this->helper->getAvailableDestinations('TestClass'));
+        self::assertEquals(['name', 'view'], $this->helper->getAvailableDestinations('TestClass'));
     }
 
-    public function testGetAvailableDestinationsWithoutRoutes()
+    public function testGetAvailableDestinationsWithoutRoutes(): void
     {
-        $this->entityConfigHelper->expects($this->once())
+        $this->entityConfigHelper->expects(self::once())
             ->method('getRoutes')
             ->with('TestClass', DestinationPageHelper::AVAILABLE_DESTINATIONS)
             ->willReturn(['custom' => 'custom_route']);
 
-        $this->assertEquals([], $this->helper->getAvailableDestinations('TestClass'));
+        self::assertEquals([], $this->helper->getAvailableDestinations('TestClass'));
     }
 
-    public function testGetOriginalUrl()
+    public function testGetOriginalUrl(): void
     {
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
             ->willReturn(
                 new Request([], [], [], [], [], ['REQUEST_URI' => 'example.com'])
             );
 
-        $this->assertEquals('example.com', $this->helper->getOriginalUrl());
+        self::assertEquals('example.com', $this->helper->getOriginalUrl());
     }
 
-    public function testGetDestinationUrls()
+    public function testGetDestinationUrls(): void
     {
         $entity = new Item();
         $entity->id = 10;
 
-        $this->entityConfigHelper->expects($this->once())
+        $this->entityConfigHelper->expects(self::once())
             ->method('getRoutes')
             ->with($entity, DestinationPageHelper::AVAILABLE_DESTINATIONS)
             ->willReturn(['name' => 'index_route', 'view' => 'view_route', 'custom' => 'custom_route']);
 
-        $this->router->expects($this->at(0))->method('generate')
-            ->with('index_route')->willReturn('example.com/index');
+        $this->router->expects($this->exactly(2))
+            ->method('generate')
+            ->withConsecutive(
+                ['index_route'],
+                ['view_route', ['id' => 10]]
+            )
+            ->willReturnOnConsecutiveCalls(
+                'example.com/index',
+                'example.com/view'
+            );
 
-        $this->router->expects($this->at(1))->method('generate')
-            ->with('view_route', ['id' => 10])->willReturn('example.com/view');
-
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'name' => 'example.com/index',
                 'view' => 'example.com/view'
@@ -92,19 +93,21 @@ class DestinationPageHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDestinationUrlsWithoutEntityId()
+    public function testGetDestinationUrlsWithoutEntityId(): void
     {
         $entity = new Item();
 
-        $this->entityConfigHelper->expects($this->once())
+        $this->entityConfigHelper->expects(self::once())
             ->method('getRoutes')
             ->with($entity, DestinationPageHelper::AVAILABLE_DESTINATIONS)
             ->willReturn(['name' => 'index_route', 'view' => 'view_route', 'custom' => 'custom_route']);
 
-        $this->router->expects($this->once())->method('generate')
-            ->with('index_route')->willReturn('example.com/index');
+        $this->router->expects(self::once())
+            ->method('generate')
+            ->with('index_route')
+            ->willReturn('example.com/index');
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'name' => 'example.com/index',
             ],
@@ -112,38 +115,40 @@ class DestinationPageHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDestinationUrlsWithoutRoutes()
+    public function testGetDestinationUrlsWithoutRoutes(): void
     {
         $entity = new Item();
         $entity->id = 10;
 
-        $this->entityConfigHelper->expects($this->once())
+        $this->entityConfigHelper->expects(self::once())
             ->method('getRoutes')
             ->with($entity, DestinationPageHelper::AVAILABLE_DESTINATIONS)
             ->willReturn(['custom' => 'custom_route']);
 
-        $this->router->expects($this->never())->method('generate');
+        $this->router->expects($this->never())
+            ->method('generate');
 
-        $this->assertEquals([], $this->helper->getDestinationUrls($entity));
+        self::assertEquals([], $this->helper->getDestinationUrls($entity));
     }
 
-    public function testGetDestinationUrl()
+    public function testGetDestinationUrl(): void
     {
         $entity = new Item();
         $entity->id = 10;
 
-        $this->entityConfigHelper->expects($this->any())
+        $this->entityConfigHelper->expects(self::any())
             ->method('getRoutes')
             ->willReturn(['name' => 'index_route', 'view' => 'view_route']);
 
-        $this->router->expects($this->any())->method('generate')
-            ->will($this->returnValueMap([
+        $this->router->expects(self::any())
+            ->method('generate')
+            ->willReturnMap([
                 ['index_route', [], RouterInterface::ABSOLUTE_PATH, 'example.com/index'],
                 ['view_route', ['id' => 10], RouterInterface::ABSOLUTE_PATH, 'example.com/view'],
-            ]));
+            ]);
 
-        $this->assertEquals('example.com/index', $this->helper->getDestinationUrl($entity, 'name'));
-        $this->assertEquals('example.com/view', $this->helper->getDestinationUrl($entity, 'view'));
-        $this->assertEquals(null, $this->helper->getDestinationUrl($entity, 'unknown_route'));
+        self::assertEquals('example.com/index', $this->helper->getDestinationUrl($entity, 'name'));
+        self::assertEquals('example.com/view', $this->helper->getDestinationUrl($entity, 'view'));
+        self::assertEquals(null, $this->helper->getDestinationUrl($entity, 'unknown_route'));
     }
 }

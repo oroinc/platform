@@ -20,8 +20,8 @@
             ],
         ],
         'attributes' => [
-            'attribute1' => ['type' => 'string', 'property_path' => null, 'options' => []],
-            'attribute2' => ['type' => 'integer', 'property_path' => null, 'options' => []],
+            'attribute1' => ['type' => 'string', 'property_path' => null, 'options' => [], 'default' => null],
+            'attribute2' => ['type' => 'integer', 'property_path' => null, 'options' => [], 'default' => null],
         ],
         'transitions' => [
             'transition_two' => [

@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\ActionBundle\Provider;
 
+/**
+ * Represents the provider for the current application info.
+ */
 interface CurrentApplicationProviderInterface
 {
-    const DEFAULT_APPLICATION = 'default';
+    public const DEFAULT_APPLICATION = 'default';
 
     /**
-     * @param array $applications
+     * @param string[] $applications
      *
      * @return bool
      */
-    public function isApplicationsValid(array $applications);
+    public function isApplicationsValid(array $applications): bool;
 
-    /**
-     * @return string|null
-     */
-    public function getCurrentApplication();
+    public function getCurrentApplication(): ?string;
 }

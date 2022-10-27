@@ -3,9 +3,10 @@
 namespace Oro\Bundle\MessageQueueBundle\EventListener;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Listener that checks that consumers are alive upon a user login.
@@ -40,8 +41,6 @@ class LoginListener
 
     /**
      * Checks that consumers are alive upon a user login and adds the flash message if there are no alive consumers.
-     *
-     * @param InteractiveLoginEvent $event
      */
     public function onLogin(InteractiveLoginEvent $event)
     {
@@ -50,7 +49,9 @@ class LoginListener
             return;
         }
 
-        if ($event->getAuthenticationToken()->getUser() instanceof AdvancedUserInterface
+        $token = $event->getAuthenticationToken();
+        if ($token instanceof UsernamePasswordToken
+            && $token->getUser() instanceof UserInterface
             && !$this->consumerHeartbeat->isAlive()
         ) {
             $event->getRequest()->getSession()->getFlashBag()->add(

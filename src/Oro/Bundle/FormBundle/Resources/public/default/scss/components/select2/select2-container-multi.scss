@@ -1,0 +1,106 @@
+/* @theme: default; */
+
+.select2-container-multi {
+    .select2-choices {
+        position: relative;
+
+        min-height: 28px;
+        margin: 0;
+        padding: 5px 9px 5px 4px;
+
+        cursor: text;
+
+        overflow: hidden;
+
+        list-style: none;
+
+        @include clearfix();
+
+        li {
+            float: left;
+        }
+    }
+
+    .select2-search-field {
+        margin: 0;
+        padding: 0;
+
+        white-space: nowrap;
+    }
+
+    .select2-search-choice {
+        position: relative;
+
+        max-width: calc(100% - 10px);
+        padding: 4px 20px 4px 7px;
+        margin: 3px 0 3px 5px;
+
+        line-height: 13px;
+        border: $select2-container-multi-search-choice-border;
+        background-clip: padding-box;
+        background-image: $select2-container-multi-search-choice-background-image;
+
+        border-radius: $base-ui-element-border-radius;
+        color: $select2-container-multi-search-choice-color;
+        cursor: default;
+        user-select: none;
+        word-wrap: break-word;
+    }
+
+    .select2-chosen {
+        cursor: default;
+    }
+
+    .select2-input {
+        padding: 3px 5px 1px;
+        margin: 4px 0;
+        border: 0;
+        box-shadow: none;
+        border-radius: $select2-container-multi-input-radius;
+        color: $select2-container-multi-input-color;
+    }
+
+    .select2-search-choice-close {
+        position: absolute;
+        top: 4px;
+        right: 3px;
+        display: block;
+        width: 12px;
+        height: 13px;
+        color: $select2-container-multi-choice-close-color;
+        outline: none;
+
+        @include fa-icon($fa-var-remove);
+
+        @include hover-focus {
+            text-decoration: none;
+        }
+    }
+
+    &.select2-container-disabled {
+        .select2-choices {
+            background: $select2-container-multi-disabled-choices-background;
+            cursor: default;
+        }
+
+        .select2-search-choice {
+            padding: 3px 5px;
+            border: $select2-container-multi-disabled-choice-border;
+            background: $select2-container-multi-disabled-choice-background;
+        }
+
+        .select2-search-choice-close {
+            display: none;
+        }
+    }
+
+    &.oro-select2 {
+        &--size {
+            &-s {
+                .select2-choices {
+                    padding: 1px 9px 1px 4px;
+                }
+            }
+        }
+    }
+}

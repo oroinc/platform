@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -12,12 +12,9 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 class WorkflowActivationTest extends WebTestCase
 {
     /** @var WorkflowManager */
-    protected $workflowManager;
+    private $workflowManager;
 
-    /** @var EntityManager */
-    protected $entityManager;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadWorkflowDefinitionsWithGroups::class]);
@@ -25,8 +22,6 @@ class WorkflowActivationTest extends WebTestCase
         $this->workflowManager = $this->getContainer()->get('oro_workflow.manager');
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitionsWithGroups::WITH_GROUPS1);
         $this->workflowManager->activateWorkflow(LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2);
-
-        $this->entityManager = $this->getContainer()->get('doctrine')->getManagerForClass(WorkflowAwareEntity::class);
     }
 
     public function testStartTransitionFormActionExclusiveGroups()
@@ -37,28 +32,21 @@ class WorkflowActivationTest extends WebTestCase
         $this->assertNotNull($this->getWorkflowItem($entity, LoadWorkflowDefinitionsWithGroups::WITH_GROUPS2));
     }
 
-    /**
-     * @return WorkflowAwareEntity
-     */
-    protected function createNewEntity()
+    private function createNewEntity(): WorkflowAwareEntity
     {
         $entity = new WorkflowAwareEntity();
         $entity->setName(uniqid('test_', true));
 
-        $this->entityManager->persist($entity);
-        $this->entityManager->flush($entity);
-        $this->entityManager->clear();
+        /** @var EntityManagerInterface $em */
+        $em = $this->getContainer()->get('doctrine')->getManagerForClass(WorkflowAwareEntity::class);
+        $em->persist($entity);
+        $em->flush($entity);
+        $em->clear();
 
         return $entity;
     }
 
-    /**
-     * @param WorkflowAwareEntity $entity
-     * @param string $workflowName
-     *
-     * @return null|WorkflowItem
-     */
-    protected function getWorkflowItem(WorkflowAwareEntity $entity, $workflowName)
+    private function getWorkflowItem(WorkflowAwareEntity $entity, string $workflowName): ?WorkflowItem
     {
         return $this->workflowManager->getWorkflowItem($entity, $workflowName);
     }

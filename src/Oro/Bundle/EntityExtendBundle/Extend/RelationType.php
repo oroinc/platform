@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
+/**
+ * Enumerates relation types and holds related constants
+ */
 class RelationType
 {
     /**
@@ -47,7 +50,7 @@ class RelationType
     public static $toManyRelations = [
         self::ONE_TO_MANY,
         self::MANY_TO_MANY,
-        self::TO_MANY,
+        self::TO_MANY
     ];
 
     /**
@@ -58,7 +61,7 @@ class RelationType
     public static $toOneRelations = [
         self::ONE_TO_ONE,
         self::MANY_TO_ONE,
-        self::TO_ONE,
+        self::TO_ONE
     ];
 
     /**
@@ -68,7 +71,7 @@ class RelationType
      */
     public static $toAnyRelations = [
         self::TO_ONE,
-        self::TO_MANY,
+        self::TO_MANY
     ];
 
     /**
@@ -80,6 +83,6 @@ class RelationType
         self::ONE_TO_ONE,
         self::MANY_TO_ONE,
         self::ONE_TO_MANY,
-        self::MANY_TO_MANY,
+        self::MANY_TO_MANY
     ];
 }

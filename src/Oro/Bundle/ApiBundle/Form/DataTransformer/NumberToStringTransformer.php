@@ -42,7 +42,7 @@ class NumberToStringTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             throw new TransformationFailedException('Expected a string.');
         }
 
@@ -59,6 +59,7 @@ class NumberToStringTransformer implements DataTransformerInterface
      * @return string
      *
      * @throws TransformationFailedException if the given string cannot be converted to a number
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function transformStringToNumber($value)
     {
@@ -78,7 +79,7 @@ class NumberToStringTransformer implements DataTransformerInterface
         if (false !== $delimiter) {
             if ($this->scale > 0) {
                 $numberToRound = substr($value, $delimiter + 1);
-                if (strlen($numberToRound) > $this->scale) {
+                if (\strlen($numberToRound) > $this->scale) {
                     $numberToRound = substr($numberToRound, 0, $this->scale + 1);
                     $value = substr($value, 0, $delimiter + 1) . $this->round($numberToRound);
                 }

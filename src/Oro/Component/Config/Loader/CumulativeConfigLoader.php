@@ -5,7 +5,7 @@ namespace Oro\Component\Config\Loader;
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Oro\Component\Config\ResourcesContainerInterface;
 
 /**
  * This loader can be used to load configuration files that can be located in any bundle.
@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *      new YamlCumulativeFileLoader('Resources/config/acme.yml')
  *  );
  *  $acmeConfig = [];
- *  $resources = $configLoader->load($container);
+ *  $resources = $configLoader->load(new ContainerBuilderAdapter($container));
  *  foreach ($resources as $resource) {
  *      $acmeConfig = array_merge($acmeConfig, $resource->data);
  *  }
@@ -55,23 +55,19 @@ class CumulativeConfigLoader
     /**
      * Loads resources
      *
-     * @param ContainerBuilder|null $container The container builder
-     *                                         If NULL the loaded resources will not be registered in the container
-     *                                         and as result will not be monitored for changes
+     * @param ResourcesContainerInterface|null $resourcesContainer
      *
      * @return CumulativeResourceInfo[]
      */
-    public function load(ContainerBuilder $container = null): array
+    public function load(ResourcesContainerInterface $resourcesContainer = null): array
     {
         $result = [];
 
-        $bundles = CumulativeResourceManager::getInstance()->getBundles();
-        $appRootDir = CumulativeResourceManager::getInstance()->getAppRootDir();
-
+        $manager = CumulativeResourceManager::getInstance();
+        $bundles = $manager->getBundles();
         foreach ($bundles as $bundleName => $bundleClass) {
-            $bundleDir = $this->getBundleDir($bundleClass);
-            $bundleAppDir = $this->getBundleAppDir($bundleName, $appRootDir);
-
+            $bundleDir = $manager->getBundleDir($bundleClass);
+            $bundleAppDir = $manager->getBundleAppDir($bundleName);
             /** @var CumulativeResourceLoader $resourceLoader */
             foreach ($this->resourceLoaders as $resourceLoader) {
                 $resource = $resourceLoader->load($bundleClass, $bundleDir, $bundleAppDir);
@@ -87,8 +83,8 @@ class CumulativeConfigLoader
             }
         }
 
-        if ($container) {
-            $this->registerResources($container);
+        if ($resourcesContainer) {
+            $this->registerResources($resourcesContainer);
         }
 
         return $result;
@@ -97,60 +93,29 @@ class CumulativeConfigLoader
     /**
      * Adds a resource objects to the container.
      * These objects will be used to monitor whether resources are up-to-date or not.
-     *
-     * @param ContainerBuilder $container
      */
-    public function registerResources(ContainerBuilder $container): void
+    public function registerResources(ResourcesContainerInterface $resourcesContainer): void
     {
-        $container->addResource($this->getResources());
+        $resourcesContainer->addResource($this->getResources());
     }
 
     /**
      * Gets CumulativeResource object that can be used to monitor whether resources are up-to-date or not.
-     *
-     * @return CumulativeResource
      */
     public function getResources(): CumulativeResource
     {
-        $bundles = CumulativeResourceManager::getInstance()->getBundles();
-        $appRootDir = CumulativeResourceManager::getInstance()->getAppRootDir();
-
+        $manager = CumulativeResourceManager::getInstance();
+        $bundles = $manager->getBundles();
         $resource = new CumulativeResource($this->name, $this->resourceLoaders);
-        /** @var CumulativeResourceLoader $resourceLoader */
-        foreach ($this->resourceLoaders as $resourceLoader) {
-            foreach ($bundles as $bundleName => $bundleClass) {
-                $bundleDir = $this->getBundleDir($bundleClass);
-                $bundleAppDir = $this->getBundleAppDir($bundleName, $appRootDir);
-
+        foreach ($bundles as $bundleName => $bundleClass) {
+            $bundleDir = $manager->getBundleDir($bundleClass);
+            $bundleAppDir = $manager->getBundleAppDir($bundleName);
+            /** @var CumulativeResourceLoader $resourceLoader */
+            foreach ($this->resourceLoaders as $resourceLoader) {
                 $resourceLoader->registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, $resource);
             }
         }
 
         return $resource;
-    }
-
-    /**
-     * @param string $bundleClass
-     *
-     * @return string
-     */
-    private function getBundleDir(string $bundleClass): string
-    {
-        $reflection = new \ReflectionClass($bundleClass);
-
-        return dirname($reflection->getFileName());
-    }
-
-    /**
-     * @param string      $bundleName
-     * @param string|null $appRootDir
-     *
-     * @return string
-     */
-    private function getBundleAppDir(string $bundleName, ?string $appRootDir): string
-    {
-        return $appRootDir && is_dir($appRootDir)
-            ? $appRootDir . '/Resources/' . $bundleName
-            : '';
     }
 }

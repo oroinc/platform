@@ -3,16 +3,26 @@ imports:
     - { resource: processors.transit.template.yml }
     - { resource: processors.transit.layout.yml }
 services:
-    oro_workflow.processor_factory:
-        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorFactory
+    oro_workflow.processor_registry:
+        class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorRegistry
+        public: false
         arguments:
-            - '@service_container'
+            - ~ # service locator. It is set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+
+    oro_workflow.simple_processor_registry:
+        class: Oro\Component\ChainProcessor\SimpleProcessorRegistry
+        public: false
+        decorates: oro_workflow.processor_registry
+        arguments:
+            - [] # processors. They are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
+            - '@.inner'
 
     oro_workflow.processor_bag:
         class: Oro\Component\ChainProcessor\ProcessorBag
+        public: false
         arguments:
             - '@oro_workflow.processor_bag_config_provider'
-            - '@oro_workflow.processor_factory'
+            - '@oro_workflow.processor_registry'
             - '%kernel.debug%'
 
     oro_workflow.processor_bag_config_provider:
@@ -21,7 +31,7 @@ services:
         arguments:
             - # groups
                 'transit': ['initialize', 'configure', 'createForm', 'processForm', 'handle', 'normalize', 'result']
-            - [] # processors; injected by Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass
+            - [] # processors. They are set by Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass
 
     oro_workflow.transit.action_processor:
         class: Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor
@@ -31,3 +41,5 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_workflow.processor }
 
+    Oro\Bundle\WorkflowBundle\Processor\TransitActionProcessor:
+        alias: oro_workflow.transit.action_processor

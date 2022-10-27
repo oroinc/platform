@@ -14,25 +14,26 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Component\Testing\ReflectionUtil;
 
 class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
-    protected $entityClassResolver;
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationRegistry */
-    protected $registry;
-
-    /** @var DeleteMassActionExtension */
-    protected $extension;
+    /** @var OperationRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
     /** @var ContextHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextHelper;
+    private $contextHelper;
 
-    protected function setUp()
+    /** @var DeleteMassActionExtension */
+    private $extension;
+
+    protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
@@ -48,33 +49,19 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    protected function tearDown()
-    {
-        unset(
-            $this->extension,
-            $this->doctrineHelper,
-            $this->entityClassResolver,
-            $this->registry
-        );
-    }
-
     public function testSetGroups()
     {
         $data = ['test_group'];
 
         $this->extension->setGroups($data);
 
-        $this->assertAttributeEquals($data, 'groups', $this->extension);
+        self::assertEquals($data, ReflectionUtil::getPropertyValue($this->extension, 'groups'));
     }
 
     /**
      * @dataProvider isApplicableDataProvider
-     *
-     * @param ActionData $actionData
-     * @param Operation $operation
-     * @param bool $expected
      */
-    public function testIsApplicable(ActionData $actionData, Operation $operation = null, $expected = false)
+    public function testIsApplicable(ActionData $actionData, Operation $operation = null, bool $expected = false)
     {
         $this->registry->expects($this->once())
             ->method('findByName')
@@ -96,7 +83,8 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
                 ->with($context)
                 ->willReturn($actionData);
         } else {
-            $this->contextHelper->expects($this->never())->method('getActionData');
+            $this->contextHelper->expects($this->never())
+                ->method('getActionData');
         }
 
         $this->entityClassResolver->expects($this->any())
@@ -114,10 +102,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->extension->isApplicable($this->getDatagridConfiguration()));
     }
 
-    /**
-     * @return array
-     */
-    public function isApplicableDataProvider()
+    public function isApplicableDataProvider(): array
     {
         $actionData = new ActionData([
             'entityClass' => 'TestEntity',
@@ -125,17 +110,23 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
             'group' => ['test_group']
         ]);
 
-        $operationAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $operationAvailable = $this->createMock(Operation::class);
         $operationAvailable->expects($this->once())
-            ->method('isAvailable')->with($actionData)->willReturn(true);
-        $operationAvailable->expects($this->once())
-            ->method('getDefinition')->willReturn(new OperationDefinition());
+            ->method('isAvailable')
+            ->with($actionData)
+            ->willReturn(true);
+        $operationAvailable->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn(new OperationDefinition());
 
-        $operationNotAvailable = $this->getMockBuilder(Operation::class)->disableOriginalConstructor()->getMock();
+        $operationNotAvailable = $this->createMock(Operation::class);
         $operationNotAvailable->expects($this->once())
-            ->method('isAvailable')->with($actionData)->willReturn(false);
-        $operationNotAvailable->expects($this->once())
-            ->method('getDefinition')->willReturn(new OperationDefinition());
+            ->method('isAvailable')
+            ->with($actionData)
+            ->willReturn(false);
+        $operationNotAvailable->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn(new OperationDefinition());
 
         return [
             [
@@ -154,10 +145,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return DatagridConfiguration
-     */
-    private function getDatagridConfiguration()
+    private function getDatagridConfiguration(): DatagridConfiguration
     {
         return DatagridConfiguration::createNamed(
             'test-grid',

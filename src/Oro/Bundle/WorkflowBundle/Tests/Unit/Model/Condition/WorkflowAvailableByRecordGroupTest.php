@@ -10,25 +10,20 @@ use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
 {
-    const GROUP_NAME = 'test_group_name';
-    const ENTITY_CLASS = 'stdClass';
+    private const GROUP_NAME = 'test_group_name';
+    private const ENTITY_CLASS = 'stdClass';
 
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
+    private $manager;
 
     /** @var WorkflowAvailableByRecordGroup */
-    protected $condition;
+    private $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->manager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
+        $this->manager = $this->createMock(WorkflowManager::class);
 
         $this->condition = new WorkflowAvailableByRecordGroup($this->manager);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->condition, $this->manager);
     }
 
     public function testGetName()
@@ -38,28 +33,20 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider evaluateDataProvider
-     *
-     * @param array $options
-     * @param bool $expectedResult
      */
-    public function testEvaluate(array $options, $expectedResult)
+    public function testEvaluate(array $options, bool $expectedResult)
     {
         $this->manager->expects($this->any())
             ->method('getApplicableWorkflows')
-            ->willReturnCallback(
-                function ($entityClass) {
-                    return $entityClass === self::ENTITY_CLASS ? [$this->createWorkflow()] : [];
-                }
-            );
+            ->willReturnCallback(function ($entityClass) {
+                return $entityClass === self::ENTITY_CLASS ? [$this->createWorkflow()] : [];
+            });
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate([]));
     }
 
-    /**
-     * @return array
-     */
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
             [
@@ -77,28 +64,23 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return Workflow
-     */
-    protected function createWorkflow()
+    private function createWorkflow(): Workflow
     {
         $definition = new WorkflowDefinition();
         $definition->setExclusiveRecordGroups([self::GROUP_NAME]);
 
-        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
-        $workflow->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($definition);
 
         return $workflow;
     }
 
     /**
      * @dataProvider initializeExceptionProvider
-     *
-     * @param array $options
-     * @param string $exception
-     * @param string $exceptionMessage
      */
-    public function testInitializeException(array $options, $exception, $exceptionMessage)
+    public function testInitializeException(array $options, string $exception, string $exceptionMessage)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($exceptionMessage);
@@ -106,10 +88,7 @@ class WorkflowAvailableByRecordGroupTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionProvider()
+    public function initializeExceptionProvider(): array
     {
         return [
             [

@@ -1,26 +1,26 @@
 Oro\Bundle\TranslationBundle\Entity\Language:
     language1:
-        code: 'lang1'
+        code: 'pl'
         enabled: true
         organization: '@organization'
         owner: '@admin'
     language2:
-        code: 'lang2'
+        code: 'cz'
         enabled: true
         organization: '@organization'
         owner: '@admin'
     language3:
-        code: 'lang3'
+        code: 'bg'
         enabled: true
         organization: '@organization'
         owner: '@admin'
     language4:
-        code: 'lang4'
+        code: 'es'
         enabled: true
         organization: '@organization'
         owner: '@admin'
     language5:
-        code: 'lang5'
+        code: 'hr'
         enabled: true
         organization: '@organization'
         owner: '@admin'

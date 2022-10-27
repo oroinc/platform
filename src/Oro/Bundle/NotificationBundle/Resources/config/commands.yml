@@ -1,6 +1,31 @@
 services:
-    Oro\Bundle\NotificationBundle\Command\MassNotificationCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\NotificationBundle\Command\MassNotificationCommand
+
+    Oro\Bundle\NotificationBundle\Command\MassNotificationCommand:
+        arguments:
+            - '@oro_notification.mass_notification_sender'
+            - '@logger'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\NotificationBundle\Command\NotificationAlertCleanupCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\NotificationBundle\Command\Cron\NotificationAlertCleanupCronCommand:
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\NotificationBundle\Command\NotificationAlertListCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_security.token_accessor'
+            - '@oro_locale.formatter.date_time'
         tags:
             - { name: console.command }

@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
+/**
+ * Collects configuration search data from all applicable child providers.
+ */
 class ChainSearchProvider implements SearchProviderInterface
 {
-    /** @var SearchProviderInterface[] */
-    private $providers = [];
+    /** @var iterable|SearchProviderInterface[] */
+    private $providers;
 
     /**
-     * @param SearchProviderInterface $provider
+     * @param iterable|SearchProviderInterface[] $providers
      */
-    public function addProvider(SearchProviderInterface $provider)
+    public function __construct(iterable $providers)
     {
-        $this->providers[] = $provider;
+        $this->providers = $providers;
     }
 
     /**
@@ -20,7 +23,7 @@ class ChainSearchProvider implements SearchProviderInterface
      */
     public function supports($name)
     {
-        return 0 !== count($this->providers);
+        return true;
     }
 
     /**
@@ -29,13 +32,11 @@ class ChainSearchProvider implements SearchProviderInterface
     public function getData($name)
     {
         $data = [];
-
         foreach ($this->providers as $provider) {
             if ($provider->supports($name)) {
                 $data[] = $provider->getData($name);
             }
         }
-
         if ($data) {
             $data = array_merge(...$data);
         }

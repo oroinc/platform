@@ -2,17 +2,30 @@
 
 namespace Oro\Bundle\SegmentBundle\Controller;
 
+use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Entity\SegmentType;
+use Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler;
+use Oro\Bundle\SegmentBundle\Form\Type\SegmentType;
+use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
+use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Oro\Bundle\UIBundle\Route\Router;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SegmentController extends Controller
+/**
+ * Covers the CRUD functionality and the additional operation clone for the Segment entity.
+ */
+class SegmentController extends AbstractController
 {
     /**
      * @Route(
@@ -32,7 +45,7 @@ class SegmentController extends Controller
     }
 
     /**
-     * @Route("/view/{id}", name="oro_segment_view", requirements={"id"="\d+"}, defaults={"id"=0})
+     * @Route("/view/{id}", name="oro_segment_view", requirements={"id"="\d+"})
      * @Acl(
      *      id="oro_segment_view",
      *      type="entity",
@@ -40,19 +53,22 @@ class SegmentController extends Controller
      *      class="OroSegmentBundle:Segment"
      * )
      * @Template
+     *
+     * @param Segment $entity
+     * @return array
      */
     public function viewAction(Segment $entity)
     {
         $this->checkSegment($entity);
 
-        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
+        $this->get(EntityNameProvider::class)->setCurrentItem($entity);
 
-        $segmentGroup = $this->get('oro_entity_config.provider.entity')
-            ->getConfig($entity->getEntity())
+        $segmentGroup = $this->get(ConfigManager::class)
+            ->getEntityConfig('entity', $entity->getEntity())
             ->get('plural_label');
 
         $gridName = $entity::GRID_PREFIX . $entity->getId();
-        if (!$this->get('oro_segment.datagrid.configuration.provider')->isConfigurationValid($gridName)) {
+        if (!$this->get(ConfigurationProvider::class)->isConfigurationValid($gridName)) {
             // unset grid name if invalid
             $gridName = false;
         }
@@ -66,7 +82,7 @@ class SegmentController extends Controller
 
     /**
      * @Route("/create", name="oro_segment_create")
-     * @Template("OroSegmentBundle:Segment:update.html.twig")
+     * @Template("@OroSegment/Segment/update.html.twig")
      * @Acl(
      *      id="oro_segment_create",
      *      type="entity",
@@ -74,13 +90,13 @@ class SegmentController extends Controller
      *      class="OroSegmentBundle:Segment"
      * )
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        return $this->update(new Segment());
+        return $this->update(new Segment(), $request);
     }
 
     /**
-     * @Route("/update/{id}", name="oro_segment_update", requirements={"id"="\d+"}, defaults={"id"=0})
+     * @Route("/update/{id}", name="oro_segment_update", requirements={"id"="\d+"})
      *
      * @Template
      * @Acl(
@@ -89,31 +105,62 @@ class SegmentController extends Controller
      *      permission="EDIT",
      *      class="OroSegmentBundle:Segment"
      * )
+     *
+     * @param Segment $entity
+     * @param Request $request
+     * @return array
      */
-    public function updateAction(Segment $entity)
+    public function updateAction(Segment $entity, Request $request)
     {
         $this->checkSegment($entity);
 
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
-     * @Route("/refresh/{id}", name="oro_segment_refresh", requirements={"id"="\d+"}, defaults={"id"=0})
+     * @Route("/clone/{id}", name="oro_segment_clone", requirements={"id"="\d+"})
+     * @Template("@OroSegment/Segment/update.html.twig")
+     * @AclAncestor("oro_segment_create")
      *
      * @param Segment $entity
+     * @param Request $request
      * @return array
-     * @AclAncestor("oro_segment_update")
      */
-    public function refreshAction(Segment $entity)
+    public function cloneAction(Segment $entity, Request $request)
+    {
+        $this->checkSegment($entity);
+
+        $clonedEntity = clone $entity;
+        $clonedEntity->setName(
+            $this->get(TranslatorInterface::class)->trans(
+                'oro.segment.action.clone.name_format',
+                [
+                    '{name}' => $clonedEntity->getName()
+                ]
+            )
+        );
+
+        return $this->update($clonedEntity, $request);
+    }
+
+    /**
+     * @Route("/refresh/{id}", name="oro_segment_refresh", requirements={"id"="\d+"})
+     * @AclAncestor("oro_segment_update")
+     *
+     * @param Segment $entity
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function refreshAction(Segment $entity, Request $request)
     {
         $this->checkSegment($entity);
 
         if ($entity->isStaticType()) {
-            $this->get('oro_segment.static_segment_manager')->run($entity);
+            $this->get(StaticSegmentManager::class)->run($entity);
 
-            $this->get('session')->getFlashBag()->add(
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.segment.refresh_dialog.success')
+                $this->get(TranslatorInterface::class)->trans('oro.segment.refresh_dialog.success')
             );
         }
 
@@ -122,45 +169,60 @@ class SegmentController extends Controller
 
     /**
      * @param Segment $entity
+     * @param Request $request
      *
      * @return array
      */
-    protected function update(Segment $entity)
+    protected function update(Segment $entity, Request $request)
     {
-        if ($this->get('oro_segment.form.handler.segment')->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+        $form = $this->get('form.factory')
+            ->createNamed('oro_segment_form', SegmentType::class);
+
+        if ($this->get(SegmentHandler::class)->process($form, $entity)) {
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.segment.entity.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.segment.entity.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity'   => $entity,
-            'form'     => $this->get('oro_segment.form.segment')->createView(),
-            'entities' => $this->get('oro_segment.entity_provider')->getEntities(),
-            'metadata' => $this->get('oro_query_designer.query_designer.manager')->getMetadata('segment')
+            'form'     => $form->createView(),
+            'entities' => $this->get(EntityProvider::class)->getEntities(),
+            'metadata' => $this->get(Manager::class)->getMetadata('segment')
         ];
     }
 
-    /**
-     * @param Segment $segment
-     */
     protected function checkSegment(Segment $segment)
     {
         if ($segment->getEntity() &&
-            !$this->getFeatureChecker()->isResourceEnabled($segment->getEntity(), 'entities')
+            !$this->get(FeatureChecker::class)->isResourceEnabled($segment->getEntity(), 'entities')
         ) {
             throw $this->createNotFoundException();
         }
     }
 
     /**
-     * @return FeatureChecker
+     * {@inheritdoc}
      */
-    protected function getFeatureChecker()
+    public static function getSubscribedServices()
     {
-        return $this->get('oro_featuretoggle.checker.feature_checker');
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                EntityProvider::class,
+                ConfigManager::class,
+                FeatureChecker::class,
+                ConfigurationProvider::class,
+                TranslatorInterface::class,
+                Router::class,
+                StaticSegmentManager::class,
+                SegmentHandler::class,
+                Manager::class,
+                EntityNameProvider::class,
+            ]
+        );
     }
 }

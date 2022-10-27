@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Audit;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -24,10 +24,6 @@ class AuditManager
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param TokenStorageInterface $securityTokenStorage
-     * @param ManagerRegistry       $doctrine
-     */
     public function __construct(TokenStorageInterface $securityTokenStorage, ManagerRegistry $doctrine)
     {
         $this->securityTokenStorage = $securityTokenStorage;
@@ -65,9 +61,6 @@ class AuditManager
         return $log;
     }
 
-    /**
-     * @param ConfigLog $entity
-     */
     public function save(ConfigLog $entity)
     {
         $this->getEntityManager()->persist($entity);

@@ -12,9 +12,6 @@ interface RemindableInterface
      */
     public function getReminders();
 
-    /**
-     * @param Collection $reminders
-     */
     public function setReminders(Collection $reminders);
 
     /**

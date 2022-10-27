@@ -6,47 +6,54 @@ use Oro\Bundle\LayoutBundle\Model\ThemeImageTypeDimension;
 
 class ThemeImageTypeDimensionTest extends \PHPUnit\Framework\TestCase
 {
-    const NAME = 'dim';
-    const WIDTH = 100;
-    const HEIGHT = 200;
-    const OPTION_1 = 'option1';
-    const OPTION_2 = 'option2';
+    private const NAME = 'dim';
+    private const WIDTH = 100;
+    private const HEIGHT = 200;
+    private const OPTION_1 = 'option1';
+    private const OPTION_2 = 'option2';
 
-    /**
-     * @var ThemeImageTypeDimension
-     */
-    protected $imageTypeDimension;
+    private ThemeImageTypeDimension $imageTypeDimension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->imageTypeDimension = new ThemeImageTypeDimension(self::NAME, self::WIDTH, self::HEIGHT);
     }
 
-    public function testAccessors()
+    public function testAccessors(): void
     {
-        $this->assertEquals(self::NAME, $this->imageTypeDimension->getName());
-        $this->assertEquals(self::WIDTH, $this->imageTypeDimension->getWidth());
-        $this->assertEquals(self::HEIGHT, $this->imageTypeDimension->getHeight());
+        self::assertEquals(self::NAME, $this->imageTypeDimension->getName());
+        self::assertEquals(self::WIDTH, $this->imageTypeDimension->getWidth());
+        self::assertEquals(self::HEIGHT, $this->imageTypeDimension->getHeight());
     }
 
-    public function testHasOption()
+    public function testHasOption(): void
     {
         $this->imageTypeDimension = new ThemeImageTypeDimension(self::NAME, self::WIDTH, self::HEIGHT, [
-            self::OPTION_1 => 1
+            self::OPTION_1 => 1,
         ]);
 
-        $this->assertTrue($this->imageTypeDimension->hasOption(self::OPTION_1));
-        $this->assertFalse($this->imageTypeDimension->hasOption(self::OPTION_2));
+        self::assertTrue($this->imageTypeDimension->hasOption(self::OPTION_1));
+        self::assertFalse($this->imageTypeDimension->hasOption(self::OPTION_2));
     }
 
-    public function testGetOption()
+    public function testGetOption(): void
     {
         $optionValue = 1;
         $this->imageTypeDimension = new ThemeImageTypeDimension(self::NAME, self::WIDTH, self::HEIGHT, [
-            self::OPTION_1 => $optionValue
+            self::OPTION_1 => $optionValue,
         ]);
 
-        $this->assertEquals($optionValue, $this->imageTypeDimension->getOption(self::OPTION_1));
-        $this->assertNull($this->imageTypeDimension->getOption(self::OPTION_2));
+        self::assertEquals($optionValue, $this->imageTypeDimension->getOption(self::OPTION_1));
+        self::assertNull($this->imageTypeDimension->getOption(self::OPTION_2));
+    }
+
+    public function testGetOptions(): void
+    {
+        $optionValue = 1;
+        $this->imageTypeDimension = new ThemeImageTypeDimension(self::NAME, self::WIDTH, self::HEIGHT, [
+            self::OPTION_1 => $optionValue,
+        ]);
+
+        self::assertEquals([self::OPTION_1 => $optionValue], $this->imageTypeDimension->getOptions());
     }
 }

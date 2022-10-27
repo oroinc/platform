@@ -2,22 +2,42 @@
 
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
-class PermissionConfigurationProvider extends AbstractPermissionsConfigurationProvider
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
+use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
+use Oro\Component\Config\Merger\ConfigurationMerger;
+use Oro\Component\Config\ResourcesContainerInterface;
+
+/**
+ * The provider for security permissions configuration
+ * that is loaded from "Resources/config/oro/permissions.yml" files.
+ */
+class PermissionConfigurationProvider extends PhpArrayConfigProvider
 {
-    const CONFIG_PATH = 'Resources/config/oro/permissions.yml';
+    private const CONFIG_FILE = 'Resources/config/oro/permissions.yml';
+
+    /**
+     * @param string   $cacheFile
+     * @param bool     $debug
+     */
+    public function __construct(string $cacheFile, bool $debug)
+    {
+        parent::__construct($cacheFile, $debug);
+    }
 
     /**
      * @param array $acceptedPermissions
+     *
      * @return array
      */
-    public function getPermissionConfiguration(array $acceptedPermissions = null)
+    public function getPermissionConfiguration(array $acceptedPermissions = null): array
     {
-        $permissions = $this->parseConfiguration($this->loadConfiguration());
-
-        if ($acceptedPermissions !== null) {
+        $permissions = $this->doGetConfig();
+        if (null !== $acceptedPermissions) {
             foreach ($permissions as $permissionName => $permissionConfiguration) {
                 // skip not used permissions
-                if (!in_array($permissionName, $acceptedPermissions, true)) {
+                if (!\in_array($permissionName, $acceptedPermissions, true)) {
                     unset($permissions[$permissionName]);
                 }
             }
@@ -29,16 +49,28 @@ class PermissionConfigurationProvider extends AbstractPermissionsConfigurationPr
     /**
      * {@inheritdoc}
      */
-    protected function getRootName()
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
-        return PermissionListConfiguration::ROOT_NODE_NAME;
+        $configs = [];
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_security_permissions', self::CONFIG_FILE);
+        $resources = $configLoader->load($resourcesContainer);
+        foreach ($resources as $resource) {
+            if (\array_key_exists(PermissionConfiguration::ROOT_NODE, $resource->data)) {
+                $configs[$resource->bundleClass] = $resource->data;
+            }
+        }
+        $merger = new ConfigurationMerger($this->getBundles());
+        $mergedConfig = $merger->mergeConfiguration($configs);
+
+        return CumulativeConfigProcessorUtil::processConfiguration(
+            self::CONFIG_FILE,
+            new PermissionConfiguration(),
+            $mergedConfig
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getConfigPath()
+    protected function getBundles(): array
     {
-        return self::CONFIG_PATH;
+        return CumulativeResourceManager::getInstance()->getBundles();
     }
 }

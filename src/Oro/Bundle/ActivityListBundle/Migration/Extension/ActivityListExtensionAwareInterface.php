@@ -9,8 +9,6 @@ interface ActivityListExtensionAwareInterface
 {
     /**
      * Sets the ActivityExtension
-     *
-     * @param ActivityListExtension $activityListListExtension
      */
     public function setActivityListExtension(ActivityListExtension $activityListListExtension);
 }

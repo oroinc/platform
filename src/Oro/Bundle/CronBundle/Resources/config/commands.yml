@@ -1,12 +1,21 @@
 services:
-    Oro\Bundle\CronBundle\Command\CronCommand:
+    _defaults:
         public: false
-        class: Oro\Bundle\CronBundle\Command\CronCommand
+
+    Oro\Bundle\CronBundle\Command\CronCommand:
+        arguments:
+            - '@doctrine'
+            - '@oro_maintenance.maintenance'
+            - '@oro_cron.cron_helper'
+            - '@oro_cron.async.command_runner'
+            - '@oro_cron.command_feature_checker'
+            - '@logger'
+            - '%kernel.environment%'
         tags:
             - { name: console.command }
 
     Oro\Bundle\CronBundle\Command\CronDefinitionsLoadCommand:
-        public: false
-        class: Oro\Bundle\CronBundle\Command\CronDefinitionsLoadCommand
+        arguments:
+            - '@doctrine'
         tags:
             - { name: console.command }

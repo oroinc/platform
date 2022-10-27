@@ -23,14 +23,12 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const ENTITY_CLASS = 'stdClass';
-    const WORKFLOW_NAME = 'test_workflow';
-    const TRANSITION_NAME = 'test_transition';
+    private const ENTITY_CLASS = 'stdClass';
+    private const WORKFLOW_NAME = 'test_workflow';
+    private const TRANSITION_NAME = 'test_transition';
 
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowManager;
@@ -44,17 +42,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionCronTrigger */
     private $trigger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
-
-        $this->helper = $this->getMockBuilder(TransitionCronTriggerHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
+        $this->helper = $this->createMock(TransitionCronTriggerHelper::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->handler = new TransitionCronTriggerHandler($this->workflowManager, $this->helper, $this->featureChecker);
 
@@ -76,10 +68,11 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     public function testProcessException()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(
-            'Trigger should be instance of Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger, ' .
-            'Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger instace given'
-        );
+        $this->expectExceptionMessage(\sprintf(
+            'Cron trigger should be an instance of %s, %s instance given',
+            TransitionCronTrigger::class,
+            TransitionEventTrigger::class
+        ));
 
         $trigger = new TransitionEventTrigger();
 
@@ -96,9 +89,13 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
             ->with(self::WORKFLOW_NAME, FeatureConfigurationExtension::WORKFLOWS_NODE_NAME)
             ->willReturn(true);
 
-        $this->workflowManager->expects($this->once())->method('getWorkflow')->with(self::WORKFLOW_NAME);
-        $this->workflowManager->expects($this->never())->method('massStartWorkflow');
-        $this->workflowManager->expects($this->never())->method('massTransit');
+        $this->workflowManager->expects($this->once())
+            ->method('getWorkflow')
+            ->with(self::WORKFLOW_NAME);
+        $this->workflowManager->expects($this->never())
+            ->method('massStartWorkflow');
+        $this->workflowManager->expects($this->never())
+            ->method('massTransit');
 
         $this->assertFalse($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
     }
@@ -119,8 +116,10 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getWorkflow')
             ->with(self::WORKFLOW_NAME)
             ->willReturn($workflow);
-        $this->workflowManager->expects($this->never())->method('massStartWorkflow');
-        $this->workflowManager->expects($this->never())->method('massTransit');
+        $this->workflowManager->expects($this->never())
+            ->method('massStartWorkflow');
+        $this->workflowManager->expects($this->never())
+            ->method('massTransit');
 
         $this->assertFalse($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
     }
@@ -211,7 +210,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
      * @param Transition $transition
      * @return Workflow
      */
-    protected function getWorkflowMock(Transition $transition = null)
+    private function getWorkflowMock(Transition $transition = null)
     {
         $transitions = [];
 
@@ -219,8 +218,10 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
             $transitions[] = $transition;
         }
 
-        $workflow = $this->getMockBuilder(Workflow::class)->disableOriginalConstructor()->getMock();
-        $workflow->expects($this->any())->method('getName')->willReturn(self::WORKFLOW_NAME);
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->any())
+            ->method('getName')
+            ->willReturn(self::WORKFLOW_NAME);
         $workflow->expects($this->any())
             ->method('getTransitionManager')
             ->willReturn(new TransitionManager($transitions));
@@ -232,7 +233,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
      * @param bool $isStart
      * @return Transition
      */
-    protected function getTransition($isStart = false)
+    private function getTransition($isStart = false)
     {
         $transition = new Transition($this->createMock(TransitionOptionsResolver::class));
 

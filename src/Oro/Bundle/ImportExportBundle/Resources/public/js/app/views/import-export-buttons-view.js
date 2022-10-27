@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var ImportExportButtonsView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var ImportExportManager = require('oroimportexport/js/importexport-manager');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const ImportExportManager = require('oroimportexport/js/importexport-manager');
 
     // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11701
-    ImportExportButtonsView = BaseView.extend({
+    const ImportExportButtonsView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -39,14 +38,14 @@ define(function(require) {
         importExportManager: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ImportExportButtonsView() {
-            ImportExportButtonsView.__super__.constructor.apply(this, arguments);
+        constructor: function ImportExportButtonsView(options) {
+            ImportExportButtonsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -61,13 +60,13 @@ define(function(require) {
             this.$exportButton = this.$container.find(this.options.selectors.exportButton);
             this.$templateButton = this.$container.find(this.options.selectors.templateButton);
 
-            this.$importButton.on('click' + this.eventNamespace(), _.bind(this.onImportClick, this));
+            this.$importButton.on('click' + this.eventNamespace(), this.onImportClick.bind(this));
             this.$importValidationButton.on(
                 'click' + this.eventNamespace(),
-                _.bind(this.onImportValidationClick, this)
+                this.onImportValidationClick.bind(this)
             );
-            this.$exportButton.on('click' + this.eventNamespace(), _.bind(this.onExportClick, this));
-            this.$templateButton.on('click' + this.eventNamespace(), _.bind(this.onTemplateClick, this));
+            this.$exportButton.on('click' + this.eventNamespace(), this.onExportClick.bind(this));
+            this.$templateButton.on('click' + this.eventNamespace(), this.onTemplateClick.bind(this));
 
             this.importExportManager = new ImportExportManager(this.options.data);
         },
@@ -109,7 +108,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

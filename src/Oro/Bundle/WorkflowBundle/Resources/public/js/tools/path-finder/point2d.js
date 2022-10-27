@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var draw = require('./draw');
+    const draw = require('./draw');
 
     /**
      * Constructs Points on 2d surface
@@ -30,8 +30,8 @@ define(function(require) {
      * @returns {number}
      */
     Point2d.prototype.simpleDistanceTo = function(point) {
-        var dx = point.x - this.x;
-        var dy = point.y - this.y;
+        const dx = point.x - this.x;
+        const dy = point.y - this.y;
         return Math.abs(dx) + Math.abs(dy);
     };
 
@@ -42,8 +42,8 @@ define(function(require) {
      * @returns {number}
      */
     Point2d.prototype.distanceTo = function(point) {
-        var dx = point.x - this.x;
-        var dy = point.y - this.y;
+        const dx = point.x - this.x;
+        const dy = point.y - this.y;
         return Math.sqrt(dx * dx + dy * dy);
     };
 
@@ -113,7 +113,7 @@ define(function(require) {
             if (this.y === 0) {
                 return new Point2d(Math.sign(this.x), this.y);
             }
-            var len = this.length;
+            const len = this.length;
             return new Point2d(this.x / len, this.y / len);
         },
         enumerable: true,

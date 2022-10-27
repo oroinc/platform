@@ -1,0 +1,44 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\EmailBundle\Controller\AutoResponseRuleController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_email.autoresponserule_manager }
+
+    Oro\Bundle\EmailBundle\Controller\Dashboard\DashboardController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\EmailBundle\Controller\EmailController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_entity_config.provider.attachment }
+
+    Oro\Bundle\EmailBundle\Controller\EmailTemplateController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_email.form.emailtemplate }
+
+    Oro\Bundle\EmailBundle\Controller\Configuration\MailboxController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_email.form.handler.mailbox, key: Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler }
+            - { name: container.service_subscriber, id: oro_email.autocomplete.mailbox_user_search_handler, key: Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler }
+
+    Oro\Bundle\EmailBundle\Controller\OriginController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\ImportExport;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 /**
@@ -14,20 +14,18 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class ImportExportTest extends WebTestCase
 {
-    const CLASS_NAME = 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
-
     /** @var EntityConfigModel */
-    protected $entity;
+    private $entity;
 
-    /** @var array|FieldConfigModel[] */
-    protected $fields;
+    /** @var FieldConfigModel[] */
+    private $fields;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $this->entity = $this->getRepository('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
-            ->findOneBy(['className' => 'Oro\Bundle\UserBundle\Entity\Role']);
+        $this->entity = $this->getRepository(EntityConfigModel::class)
+            ->findOneBy(['className' => Role::class]);
 
         $this->fields = $this->getEntityFields();
     }
@@ -57,7 +55,7 @@ class ImportExportTest extends WebTestCase
 
         $this->assertErrors(
             '@OroEntityConfigBundle/Tests/Functional/ImportExport/data/change_field_type.csv',
-            'Error in row #1. Changing type of existing fields is not allowed.'
+            'Error in row #1. Changing name or type of existing fields is not allowed.'
         );
     }
 
@@ -93,10 +91,7 @@ class ImportExportTest extends WebTestCase
         );
     }
 
-    /**
-     * @return string
-     */
-    protected function doExportTemplate()
+    private function doExportTemplate(): string
     {
         $this->client->followRedirects(true);
         $this->client->request(
@@ -119,10 +114,7 @@ class ImportExportTest extends WebTestCase
         return $result->getFile()->getRealPath();
     }
 
-    /**
-     * @param string $filePath
-     */
-    protected function validateImportFile($filePath, $errorsCount = 0)
+    private function validateImportFile(string $filePath, int $errorsCount = 0): void
     {
         $crawler = $this->client->request(
             'GET',
@@ -130,7 +122,7 @@ class ImportExportTest extends WebTestCase
                 'oro_importexport_import_form',
                 [
                     '_widgetContainer' => 'dialog',
-                    'entity' => self::CLASS_NAME,
+                    'entity' => FieldConfigModel::class,
                     'importJob' => 'entity_fields_import_from_csv',
                     'options[entity_id]' => $this->entity->getId(),
                     'fileName' => $filePath,
@@ -144,13 +136,13 @@ class ImportExportTest extends WebTestCase
         $form = $crawler->selectButton('Submit')->form();
         $form['oro_importexport_import[file]']->upload($filePath);
 
-        /** TODO Change after BAP-1813 */
+        /** Change after BAP-1813 */
         $form->getFormNode()->setAttribute(
             'action',
             sprintf(
                 '%s&entity=%s&importJob=entity_fields_import_from_csv&options[entity_id]=%d&_widgetContainer=dialog',
                 $form->getFormNode()->getAttribute('action'),
-                self::CLASS_NAME,
+                FieldConfigModel::class,
                 $this->entity->getId()
             )
         );
@@ -163,15 +155,11 @@ class ImportExportTest extends WebTestCase
         $this->assertEquals($errorsCount, $this->client->getCrawler()->filter('.import-errors')->count());
     }
 
-    /**
-     * @param int $added
-     * @param int $replaced
-     */
-    protected function doImport($added, $replaced)
+    private function doImport(int $added, int $replaced): void
     {
         $this->client->followRedirects(false);
-        $this->client->request(
-            'GET',
+        $this->ajaxRequest(
+            'POST',
             $this->getUrl(
                 'oro_importexport_import_process',
                 [
@@ -194,28 +182,24 @@ class ImportExportTest extends WebTestCase
         );
     }
 
-    /**
-     * @param string $path
-     * @param string|array $errorMessages
-     */
-    protected function assertErrors($path, $errorMessages)
+    private function assertErrors(string $path, array|string $errorMessages): void
     {
         $this->validateImportFile($this->getFilePath($path), 1);
 
         $errors = $this->client->getCrawler()->filter('.import-errors')->html();
 
         foreach ((array)$errorMessages as $message) {
-            $this->assertContains($message, $errors);
+            self::assertStringContainsString($message, $errors);
         }
     }
 
     /**
-     * @return array|FieldConfigModel[]
+     * @return FieldConfigModel[]
      */
-    protected function getEntityFields()
+    private function getEntityFields(): array
     {
-        /** @var array|FieldConfigModel[] $fields */
-        $fields = $this->getRepository(self::CLASS_NAME)->findBy(['entity' => $this->entity]);
+        /** @var FieldConfigModel[] $fields */
+        $fields = $this->getRepository(FieldConfigModel::class)->findBy(['entity' => $this->entity]);
         $result = [];
 
         foreach ($fields as $field) {
@@ -225,29 +209,12 @@ class ImportExportTest extends WebTestCase
         return $result;
     }
 
-    /**
-     * @param string $className
-     * @return ObjectManager
-     */
-    protected function getManager($className)
+    private function getRepository(string $className): EntityRepository
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+        return $this->getContainer()->get('doctrine')->getRepository($className);
     }
 
-    /**
-     * @param string $className
-     * @return ObjectRepository
-     */
-    protected function getRepository($className)
-    {
-        return $this->getManager($className)->getRepository($className);
-    }
-
-    /**
-     * @param string $file
-     * @return string
-     */
-    protected function getFilePath($file)
+    private function getFilePath(string $file): string
     {
         return $this->getContainer()->get('file_locator')->locate($file);
     }

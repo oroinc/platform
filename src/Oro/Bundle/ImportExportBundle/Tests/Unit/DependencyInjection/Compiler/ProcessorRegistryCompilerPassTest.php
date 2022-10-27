@@ -3,213 +3,119 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class ProcessorRegistryCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessorRegistryCompilerPass
-     */
-    protected $compiler;
+    /** @var ProcessorRegistryCompilerPass */
+    private $compiler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new ProcessorRegistryCompilerPass();
     }
 
-    /**
-     * @dataProvider processDataProvider
-     *
-     * @param array $taggedProcessorIds
-     * @param array $definitionsExpectations
-     */
-    public function testProcess(array $taggedProcessorIds, array $definitionsExpectations)
+    public function testProcess(): void
     {
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getDefinition', 'findTaggedServiceIds'))
-            ->getMock();
+        $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_importexport.processor.registry');
 
-        $containerBuilder->expects($this->at(0))
-            ->method('findTaggedServiceIds')
-            ->with(ProcessorRegistryCompilerPass::PROCESSOR_TAG)
-            ->will($this->returnValue($taggedProcessorIds));
+        $container->register('oro_test.foo_import_processor')
+            ->addTag(
+                'oro_importexport.processor',
+                ['type' => 'import', 'entity' => \stdClass::class, 'alias' => 'foo_import']
+            );
+        $container->register('oro_test.foo_export_processor')
+            ->addTag(
+                'oro_importexport.processor',
+                ['type' => 'export', 'entity' => \stdClass::class, 'alias' => 'foo_export']
+            );
+        $container->register('oro_test.bar_import_processor')
+            ->addTag(
+                'oro_importexport.processor',
+                ['type' => 'import', 'entity' => 'BarEntity', 'alias' => 'bar_import']
+            );
+        $container->register('oro_test.bar_export_processor')
+            ->addTag(
+                'oro_importexport.processor',
+                ['type' => 'export', 'entity' => 'BarEntity', 'alias' => 'bar_export']
+            );
 
-        $registryDefinition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
-        $containerBuilder->expects($this->at(1))
-            ->method('getDefinition')
-            ->with(ProcessorRegistryCompilerPass::PROCESSOR_REGISTRY_SERVICE)
-            ->will($this->returnValue($registryDefinition));
+        $this->compiler->process($container);
 
-        $callIndex = 0;
-        foreach ($definitionsExpectations as $expectation) {
-            list($method, $withArguments) = $expectation;
-            $mock = $registryDefinition->expects($this->at($callIndex++))->method($method);
-            call_user_func_array(array($mock, 'with'), $withArguments);
-        }
-
-        $this->compiler->process($containerBuilder);
-    }
-
-    public function processDataProvider()
-    {
-        return array(
-            'register_processors' => array(
-                'taggedProcessorIds' => array(
-                    'oro_test.foo_import_processor' => array(
-                        array(
-                            'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
-                            'type' => 'import',
-                            'entity' => \stdClass::class,
-                            'alias' => 'foo_import'
-                        )
-                    ),
-                    'oro_test.foo_export_processor' => array(
-                        array(
-                            'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
-                            'type' => 'export',
-                            'entity' => \stdClass::class,
-                            'alias' => 'foo_export'
-                        )
-                    ),
-                    'oro_test.bar_import_processor' => array(
-                        array(
-                            'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
-                            'type' => 'import',
-                            'entity' => 'BarEntity',
-                            'alias' => 'bar_import'
-                        )
-                    ),
-                    'oro_test.bar_export_processor' => array(
-                        array(
-                            'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
-                            'type' => 'export',
-                            'entity' => 'BarEntity',
-                            'alias' => 'bar_export'
-                        )
-                    ),
-                ),
-                'definitionsExpectations' => array(
-                    array(
-                        'addMethodCall',
-                        array(
-                            'registerProcessor',
-                            array(
-                                new Reference('oro_test.foo_import_processor'),
-                                'import',
-                                \stdClass::class,
-                                'foo_import'
-                            )
-                        ),
-                    ),
-                    array(
-                        'addMethodCall',
-                        array(
-                            'registerProcessor',
-                            array(
-                                new Reference('oro_test.foo_export_processor'),
-                                'export',
-                                \stdClass::class,
-                                'foo_export'
-                            )
-                        ),
-                    ),
-                    array(
-                        'addMethodCall',
-                        array(
-                            'registerProcessor',
-                            array(new Reference('oro_test.bar_import_processor'), 'import', 'BarEntity', 'bar_import')
-                        ),
-                    ),
-                    array(
-                        'addMethodCall',
-                        array(
-                            'registerProcessor',
-                            array(new Reference('oro_test.bar_export_processor'), 'export', 'BarEntity', 'bar_export')
-                        )
-                    )
-                )
-            ),
+        self::assertEquals(
+            [
+                [
+                    'registerProcessor',
+                    [new Reference('oro_test.foo_import_processor'), 'import', \stdClass::class, 'foo_import']
+                ],
+                [
+                    'registerProcessor',
+                    [new Reference('oro_test.foo_export_processor'), 'export', \stdClass::class, 'foo_export']
+                ],
+                [
+                    'registerProcessor',
+                    [new Reference('oro_test.bar_import_processor'), 'import', 'BarEntity', 'bar_import']
+                ],
+                [
+                    'registerProcessor',
+                    [new Reference('oro_test.bar_export_processor'), 'export', 'BarEntity', 'bar_export']
+                ]
+            ],
+            $registryDef->getMethodCalls()
         );
     }
 
-    /**
-     * @dataProvider processFailsDataProvider
-     *
-     * @param array $taggedProcessorIds
-     * @param string $expectedException
-     * @param string $expectedExceptionMessage
-     */
-    public function testProcessFails(
-        array $taggedProcessorIds,
-        $expectedException,
-        $expectedExceptionMessage = null
-    ) {
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getDefinition', 'findTaggedServiceIds'))
-            ->getMock();
+    public function testProcessWhenTypeAttributeIsMissing()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Tag "oro_importexport.processor" for service "processor1" must have attribute "type"'
+        );
 
-        $containerBuilder->expects($this->atLeastOnce())
-            ->method('findTaggedServiceIds')
-            ->with(ProcessorRegistryCompilerPass::PROCESSOR_TAG)
-            ->will($this->returnValue($taggedProcessorIds));
+        $container = new ContainerBuilder();
+        $container->register('processor1')
+            ->addTag(
+                'oro_importexport.processor',
+                ['alias' => 'foo_import', 'entity' => \stdClass::class]
+            );
 
-        $containerBuilder->expects($this->never())->method('getDefinition');
-
-        $this->expectException($expectedException);
-        $this->expectExceptionMessage($expectedExceptionMessage);
-        $this->compiler->process($containerBuilder);
+        $this->compiler->process($container);
     }
 
-    public function processFailsDataProvider()
+    public function testProcessWhenEntityAttributeIsMissing()
     {
-        return array(
-            'type attribute required' => array(
-                'taggedProcessorIds' => array(
-                    'oro_test.foo_import_processor' => array(
-                        array(
-                            'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
-                            'alias' => 'foo_import',
-                            'entity' => \stdClass::class
-                        )
-                    )
-                ),
-                'Symfony\Component\DependencyInjection\Exception\LogicException',
-                // @codingStandardsIgnoreStart
-                'Tag "oro_importexport.processor" for service "oro_test.foo_import_processor" must have attribute "type"'
-                // @codingStandardsIgnoreEnd
-            ),
-            'entity attribute required' => array(
-                'taggedProcessorIds' => array(
-                    'oro_test.foo_import_processor' => array(
-                        array(
-                            'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
-                            'type' => 'import',
-                            'alias' => 'foo_import'
-                        )
-                    )
-                ),
-                'Symfony\Component\DependencyInjection\Exception\LogicException',
-                // @codingStandardsIgnoreStart
-                'Tag "oro_importexport.processor" for service "oro_test.foo_import_processor" must have attribute "entity"'
-                // @codingStandardsIgnoreEnd
-            ),
-            'alias attribute required' => array(
-                'taggedProcessorIds' => array(
-                    'oro_test.foo_import_processor' => array(
-                        array(
-                            'name' => ProcessorRegistryCompilerPass::PROCESSOR_TAG,
-                            'type' => 'import',
-                            'entity' => \stdClass::class
-                        )
-                    )
-                ),
-                'Symfony\Component\DependencyInjection\Exception\LogicException',
-                // @codingStandardsIgnoreStart
-                'Tag "oro_importexport.processor" for service "oro_test.foo_import_processor" must have attribute "alias"'
-                // @codingStandardsIgnoreEnd
-            ),
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Tag "oro_importexport.processor" for service "processor1" must have attribute "entity"'
         );
+
+        $container = new ContainerBuilder();
+        $container->register('processor1')
+            ->addTag(
+                'oro_importexport.processor',
+                ['type' => 'import', 'alias' => 'foo_import']
+            );
+
+        $this->compiler->process($container);
+    }
+
+    public function testProcessWhenAliasAttributeIsMissing()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'Tag "oro_importexport.processor" for service "processor1" must have attribute "alias"'
+        );
+
+        $container = new ContainerBuilder();
+        $container->register('processor1')
+            ->addTag(
+                'oro_importexport.processor',
+                ['type' => 'import', 'entity' => \stdClass::class]
+            );
+
+        $this->compiler->process($container);
     }
 }

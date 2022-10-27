@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\DistributionBundle\Tests\Unit\Error;
 
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
@@ -9,70 +9,70 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var ErrorHandler
      */
-    protected $handler;
+    private $handler;
 
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->handler = new ErrorHandler();
-        $this->handler->registerHandlers();
+        $this->handler = ErrorHandler::register();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->handler);
-        restore_error_handler();
         restore_error_handler();
         restore_exception_handler();
     }
 
     /**
-     * @param string $message
-     * @param bool $silenced
-     * @dataProvider warningDataProvider
+     * @throws \ErrorException
      */
-    public function testHandleWarning($message, $silenced = true)
+    public function testSilenceGetaddresses(): void
     {
-        $this->assertEquals($silenced, $this->handler->handleWarning(E_WARNING, $message));
+        $this->assertTrue(
+            $this->handler->handleError(
+                E_WARNING,
+                'PDO::__construct(): php_network_getaddresses: getaddrinfo failed: No such host is known',
+                '',
+                0
+            )
+        );
+
+        trigger_error(
+            'PDO::__construct(): php_network_getaddresses: getaddrinfo failed: No such host is known',
+            E_USER_WARNING
+        );
     }
 
     /**
-     * @expectedException \ErrorException
-     * @expectedExceptionMessage Test error
+     * @dataProvider silinceDataProvider
      */
-    public function testHandleErrors()
+    public function testSilenceReflectionToString(string $message): void
     {
-        trigger_error('Test error', E_USER_ERROR);
+        $this->assertTrue($this->handler->handleError(E_DEPRECATED, $message, '', 0));
+
+        // This error must not logged
+        trigger_error($message, E_USER_DEPRECATED);
     }
 
-    public function testHandleIgnoredErrorsIfErrorsSuppressed()
-    {
-        @$this->handler->handleErrors(E_ERROR, 'test', '', 0);
-    }
-
-    public function testHandleIgnoreWarnings()
-    {
-        $this->assertFalse($this->handler->handleErrors(E_WARNING, 'Test warning', '', 0));
-    }
-
-    /**
-     * @return array
-     */
-    public function warningDataProvider()
+    public function silinceDataProvider(): array
     {
         return [
-            'silenced php_network_getaddresses' => [
-                'message' => 'PDO::__construct(): php_network_getaddresses: getaddrinfo failed: No such host is known'
-            ],
-            'passed warning' => [
-                'message' => 'Some regualar warning',
-                'silenced' => false,
-            ]
+            ['Function ReflectionType::__toString() is deprecated'],
+            ['Unparenthesized `a ? b : c ? d : e` is deprecated`'],
         ];
+    }
+
+    public function testHandleErrors()
+    {
+        $this->expectException(\ErrorException::class);
+        $this->expectExceptionMessage('Test error');
+
+        trigger_error('Test error', E_USER_ERROR);
     }
 }

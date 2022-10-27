@@ -1,4 +1,5 @@
-{% import 'OroEmailBundle::macros.html.twig' as EA %}
+{% import '@OroEmail/macros.html.twig' as EA %}
+{% import _self as emailContacts %}
 
 {% set isNew = record.getValue('is_new') %}
 
@@ -7,12 +8,12 @@
         <i class="{{ record.getValue('incoming') ? 'fa-sign-in' : 'fa-sign-out' }}"></i>
     </span>
     {% if record.getValue('incoming') %}
-        {{ _self.renderEmailAddressCell(record.getValue('fromName'), isNew, 22) }}
+        {{ emailContacts.renderEmailAddressCell(record.getValue('fromName'), isNew, 22) }}
     {% else %}
         {% set recipients = record.getValue('recipients') %}
         {% if recipients|length > 0 %}
             {% if recipients|length < 3 %}
-                {{ _self.renderEmailAddressCell(EA.email_participants_name(recipients, true, false), isNew) }}
+                {{ emailContacts.renderEmailAddressCell(EA.email_participants_name(recipients, true, false), isNew) }}
             {% else %}
                 {% set firstEmail = recipients|first %}
                 {% set lastEmail = recipients|last %}
@@ -21,21 +22,21 @@
                     ~ ' .. ' ~
                     EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
                     %}
-                {{ _self.renderEmailAddressCell(firstLastRecipients, isNew) }}
+                {{ emailContacts.renderEmailAddressCell(firstLastRecipients, isNew) }}
             {% endif %}
         {% endif %}
     {% endif %}
     {% if oro_config_value('oro_email.threads_grouping') %}
         {% set threadEmailCount = record.getValue('thread_email_count') %}
         {% if threadEmailCount > 1 %}
-            {{ _self.renderEmailAddressCell('(' ~ threadEmailCount ~ ')', isNew) }}
+            {{ emailContacts.renderEmailAddressCell('(' ~ threadEmailCount ~ ')', isNew) }}
         {% endif %}
     {% endif %}
 </span>
 
 {% macro renderEmailAddressCell(label, isNew, maxLength) %}
     {% if maxLength and label|length > maxLength %}
-        {% set title, label = label, label|truncate(maxLength) %}
+        {% set title, label = label, label|slice(0, maxLength)|trim(side='right') ~ '...' %}
     {% endif %}
     {%- if isNew -%}
         <strong{% if title is defined %} title="{{ title }}"{% endif %}>{{ label|oro_html_strip_tags }}</strong>

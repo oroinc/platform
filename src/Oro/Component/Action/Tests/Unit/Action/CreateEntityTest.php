@@ -2,8 +2,11 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Component\Action\Action\CreateEntity;
+use Oro\Component\Action\Exception\ActionException;
+use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -11,52 +14,26 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CreateEntityTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CreateEntity
-     */
-    protected $action;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var ContextAccessor
-     */
-    protected $contextAccessor;
+    /** @var CreateEntity */
+    private $action;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
-    protected $registry;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->contextAccessor = new ContextAccessor();
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->action = new CreateEntity($this->contextAccessor, $this->registry);
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->contextAccessor, $this->registry, $this->action);
+        $this->action = new CreateEntity(new ContextAccessor(), $this->registry);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
-     * @param array $options
      * @dataProvider executeDataProvider
      */
     public function testExecute(array $options)
     {
-        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(ObjectManager::class);
         $em->expects($this->once())
             ->method('persist')
             ->with($this->isInstanceOf($options[CreateEntity::OPTION_KEY_CLASS]));
@@ -66,113 +43,92 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
                 ->method('flush')
                 ->with($this->isInstanceOf($options[CreateEntity::OPTION_KEY_CLASS]));
         } else {
-            $em->expects($this->never())->method('flush');
+            $em->expects($this->never())
+                ->method('flush');
         }
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with($options[CreateEntity::OPTION_KEY_CLASS])
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
-        $context = new ItemStub(array());
+        $context = new ItemStub([]);
         $attributeName = (string)$options[CreateEntity::OPTION_KEY_ATTRIBUTE];
         $this->action->initialize($options);
         $this->action->execute($context);
-        $this->assertNotNull($context->$attributeName);
-        $this->assertInstanceOf($options[CreateEntity::OPTION_KEY_CLASS], $context->$attributeName);
+        $this->assertNotNull($context->{$attributeName});
+        $this->assertInstanceOf($options[CreateEntity::OPTION_KEY_CLASS], $context->{$attributeName});
 
         /** @var ItemStub $entity */
-        $entity = $context->$attributeName;
+        $entity = $context->{$attributeName};
         $expectedData = !empty($options[CreateEntity::OPTION_KEY_DATA]) ?
             $options[CreateEntity::OPTION_KEY_DATA] :
-            array();
+            [];
         $this->assertInstanceOf($options[CreateEntity::OPTION_KEY_CLASS], $entity);
         $this->assertEquals($expectedData, $entity->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
-        $stubStorageClass = 'Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub';
-
-        return array(
-            'without data' => array(
-                'options' => array(
-                    CreateEntity::OPTION_KEY_CLASS     => $stubStorageClass,
+        return [
+            'without data' => [
+                'options' => [
+                    CreateEntity::OPTION_KEY_CLASS     => ItemStub::class,
                     CreateEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
-                )
-            ),
-            'with data' => array(
-                'options' => array(
-                    CreateEntity::OPTION_KEY_CLASS     => $stubStorageClass,
+                ]
+            ],
+            'with data' => [
+                'options' => [
+                    CreateEntity::OPTION_KEY_CLASS     => ItemStub::class,
                     CreateEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
-                    CreateEntity::OPTION_KEY_DATA      => array('key1' => 'value1', 'key2' => 'value2'),
-                )
-            ),
-            'without flush' => array(
-                'options' => array(
-                    CreateEntity::OPTION_KEY_CLASS     => $stubStorageClass,
+                    CreateEntity::OPTION_KEY_DATA      => ['key1' => 'value1', 'key2' => 'value2'],
+                ]
+            ],
+            'without flush' => [
+                'options' => [
+                    CreateEntity::OPTION_KEY_CLASS     => ItemStub::class,
                     CreateEntity::OPTION_KEY_ATTRIBUTE => new PropertyPath('test_attribute'),
-                    CreateEntity::OPTION_KEY_DATA      => array('key1' => 'value1', 'key2' => 'value2'),
+                    CreateEntity::OPTION_KEY_DATA      => ['key1' => 'value1', 'key2' => 'value2'],
                     CreateEntity::OPTION_KEY_FLUSH     => false
-                )
-            ),
-        );
+                ]
+            ],
+        ];
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\NotManageableEntityException
-     * @expectedExceptionMessage Entity class "stdClass" is not manageable.
-     */
     public function testExecuteEntityNotManageable()
     {
-        $options = array(
-            CreateEntity::OPTION_KEY_CLASS     => 'stdClass',
-            CreateEntity::OPTION_KEY_ATTRIBUTE => $this->getPropertyPath()
-        );
-        $context = array();
+        $this->expectException(NotManageableEntityException::class);
+        $this->expectExceptionMessage(sprintf('Entity class "%s" is not manageable.', \stdClass::class));
+
+        $options = [
+            CreateEntity::OPTION_KEY_CLASS     => \stdClass::class,
+            CreateEntity::OPTION_KEY_ATTRIBUTE => $this->createMock(PropertyPath::class)
+        ];
+        $context = [];
         $this->action->initialize($options);
         $this->action->execute($context);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\ActionException
-     * @expectedExceptionMessage Can't create entity stdClass. Test exception.
-     */
     public function testExecuteCantCreateEntity()
     {
-        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->expectException(ActionException::class);
+        $this->expectExceptionMessage(sprintf("Can't create entity %s. Test exception.", \stdClass::class));
+
+        $em = $this->createMock(ObjectManager::class);
         $em->expects($this->once())
             ->method('persist')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        throw new \Exception('Test exception.');
-                    }
-                )
-            );
+            ->willThrowException(new \Exception('Test exception.'));
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
-        $options = array(
-            CreateEntity::OPTION_KEY_CLASS     => 'stdClass',
-            CreateEntity::OPTION_KEY_ATTRIBUTE => $this->getPropertyPath()
-        );
-        $context = array();
+        $options = [
+            CreateEntity::OPTION_KEY_CLASS     => \stdClass::class,
+            CreateEntity::OPTION_KEY_ATTRIBUTE => $this->createMock(PropertyPath::class)
+        ];
+        $context = [];
         $this->action->initialize($options);
         $this->action->execute($context);
-    }
-
-    protected function getPropertyPath()
-    {
-        return $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyPath')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

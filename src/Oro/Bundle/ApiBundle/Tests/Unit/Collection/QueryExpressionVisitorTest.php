@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Value;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr as QueryExpr;
 use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
@@ -19,9 +19,19 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class QueryExpressionVisitorTest extends OrmRelatedTestCase
 {
+    private function buildExistsSql(QueryBuilder $query, QueryBuilder $subquery): string
+    {
+        return $query
+            ->andWhere($query->expr()->exists($subquery->getQuery()->getDQL()))
+            ->getQuery()
+            ->getSQL();
+    }
+
     public function testGetEmptyParameters()
     {
         $expressionVisitor = new QueryExpressionVisitor(
@@ -138,12 +148,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertSame($value, $expressionVisitor->walkValue(new Value($value)));
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Unknown composite NOT SUPPORTED
-     */
     public function testWalkCompositeExpressionOnNonSupportedExpressionType()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Unknown composite NOT SUPPORTED');
+
         $expressionVisitor = new QueryExpressionVisitor(
             ['AND' => new AndCompositeExpression()],
             ['IN' => new InComparisonExpression()],
@@ -182,20 +191,19 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter('e_test', 1, 'integer'),
-                new Parameter('e_id', 12, 'integer'),
-                new Parameter('e_id_2', 25, 'integer')
+                new Parameter('e_test', 1),
+                new Parameter('e_id', 12),
+                new Parameter('e_id_2', 25)
             ],
             $expressionVisitor->getParameters()
         );
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage No aliases are set before invoking walkComparison().
-     */
     public function testWalkComparisonWithoutAliases()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('No aliases are set before invoking walkComparison().');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -224,18 +232,55 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
         self::assertEquals(
             [
-                new Parameter('e_test', [1, 2, 3], Connection::PARAM_INT_ARRAY)
+                new Parameter('e_test', [1, 2, 3])
             ],
             $expressionVisitor->getParameters()
         );
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Unknown comparison operator "NOT SUPPORTED".
-     */
+    public function testWalkComparisonWithEmptyFieldName()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            ['IN' => new InComparisonExpression()],
+            $this->createMock(EntityClassResolver::class)
+        );
+
+        $expressionVisitor->setQueryAliases(['e']);
+
+        $comparison = new Comparison('', 'IN', [1, 2, 3]);
+        $result = $expressionVisitor->walkComparison($comparison);
+        self::assertEquals(
+            new QueryExpr\Func(' IN', [':e']),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter('e', [1, 2, 3])
+            ],
+            $expressionVisitor->getParameters()
+        );
+
+        $comparison = new Comparison('', 'IN', [1, 2, 3]);
+        $result = $expressionVisitor->walkComparison($comparison);
+        self::assertEquals(
+            new QueryExpr\Func(' IN', [':e_1']),
+            $result
+        );
+        self::assertEquals(
+            [
+                new Parameter('e', [1, 2, 3]),
+                new Parameter('e_1', [1, 2, 3])
+            ],
+            $expressionVisitor->getParameters()
+        );
+    }
+
     public function testWalkComparisonWithUnknownOperator()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Unknown comparison operator "NOT SUPPORTED".');
+
         $expressionVisitor = new QueryExpressionVisitor(
             ['AND' => new AndCompositeExpression()],
             ['IN' => new InComparisonExpression(), '=' => new EqComparisonExpression()],
@@ -247,12 +292,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Unknown modifier "a" for comparison operator "=".
-     */
     public function testWalkComparisonWithUnknownModifierOfOperator()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('Unknown modifier "a" for comparison operator "=".');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['=' => new EqComparisonExpression()],
@@ -281,19 +325,16 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             $result
         );
         self::assertEquals(
-            [
-                new Parameter('e_test', 'test value', \PDO::PARAM_STR)
-            ],
+            [new Parameter('e_test', 'test value')],
             $expressionVisitor->getParameters()
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsafe value passed 1=1 OR e
-     */
     public function testWalkComparisonWithUnsafeFieldName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsafe value passed 1=1 OR e');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             ['=' => new EqComparisonExpression()],
@@ -305,26 +346,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->walkComparison($comparison);
     }
 
-    /**
-     * @param QueryBuilder $query
-     * @param QueryBuilder $subquery
-     *
-     * @return string
-     */
-    private function buildExistsSql(QueryBuilder $query, QueryBuilder $subquery)
-    {
-        return $query
-            ->andWhere($query->expr()->exists($subquery->getQuery()->getDQL()))
-            ->getQuery()
-            ->getSQL();
-    }
-
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage No query is set before invoking createSubquery().
-     */
     public function testCreateSubqueryWithoutQuery()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('No query is set before invoking createSubquery().');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -334,12 +360,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('e.test');
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage No join map is set before invoking createSubquery().
-     */
     public function testCreateSubqueryWithoutJoinMap()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('No join map is set before invoking createSubquery().');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -352,12 +377,11 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('e.test');
     }
 
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage No aliases are set before invoking createSubquery().
-     */
     public function testCreateSubqueryWithoutAliases()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('No aliases are set before invoking createSubquery().');
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -369,6 +393,43 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->setQuery($qb);
         $expressionVisitor->setQueryJoinMap([]);
         $expressionVisitor->createSubquery('e.test');
+    }
+
+    public function testCreateSubqueryWithoutField()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\User::class, 'e')
+            ->leftJoin('e.groups', 'groups');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryJoinMap(['groups' => 'groups']);
+        $expressionVisitor->setQueryAliases(['e', 'groups']);
+        $subquery = $expressionVisitor->createSubquery();
+
+        $expectedSubquery = 'SELECT e_subquery1'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e_subquery1'
+            . ' WHERE e_subquery1 = e';
+        self::assertEquals($expectedSubquery, $subquery->getDQL());
+
+        // test that the subquery has valid SQL
+        $expectedSql = 'SELECT u0_.id AS id_0, u0_.name AS name_1,'
+            . ' u0_.category_name AS category_name_2, u0_.owner_id AS owner_id_3'
+            . ' FROM user_table u0_'
+            . ' LEFT JOIN user_to_group_table u2_ ON u0_.id = u2_.user_id'
+            . ' LEFT JOIN group_table g1_ ON g1_.id = u2_.user_group_id'
+            . ' WHERE EXISTS ('
+            . 'SELECT u3_.id'
+            . ' FROM user_table u3_'
+            . ' WHERE u3_.id = u0_.id)';
+        self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
     public function testCreateSubqueryForJoinedRootEntityAssociation()
@@ -483,14 +544,14 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Cannot build subquery for the field "user.groups". Reason: The join "user_groups" does not exist in the query.
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateSubqueryWhenJoinExistsInJoinMapButDoesNotExistInQuery()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage(
+            'Cannot build subquery for the field "user.groups". Reason:'
+            . ' The join "user_groups" does not exist in the query.'
+        );
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -509,14 +570,13 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.groups');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Cannot build subquery for the field "user.groups". Reason: The join "user" does not exist in the query.
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateSubqueryWhenParentJoinExistsInJoinMapButDoesNotExistInQuery()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage(
+            'Cannot build subquery for the field "user.groups". Reason: The join "user" does not exist in the query.'
+        );
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -535,14 +595,13 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.groups');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Cannot build subquery for the field "user.groups". Reason: The join "user" does not exist in the query.
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateSubqueryWhenParentJoinDoesNotExistsInBothJoinMapAndQuery()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage(
+            'Cannot build subquery for the field "user.groups". Reason: The join "user" does not exist in the query.'
+        );
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -561,14 +620,14 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         $expressionVisitor->createSubquery('user.groups');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Doctrine\ORM\Query\QueryException
-     * @expectedExceptionMessage Cannot build subquery for the field "user.unknownAssociation". Reason: Association name expected, 'unknownAssociation' is not an association.
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateSubqueryForUnknownAssociation()
     {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage(
+            'Cannot build subquery for the field "user.unknownAssociation".'
+            . " Reason: Association name expected, 'unknownAssociation' is not an association."
+        );
+
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
@@ -618,12 +677,8 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             . ' LEFT JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1'
             . ' FROM user_to_group_table u2_'
-            . ' INNER JOIN group_table g3_ ON u2_.user_group_id = g3_.id'
-            . ' WHERE u2_.user_id = u1_.id AND g3_.id IN (g0_.id)))'
-            . ' WHERE EXISTS ('
-            . 'SELECT u4_.id'
-            . ' FROM user_table u4_'
-            . ' WHERE u4_.id = u1_.id)';
+            . ' WHERE u2_.user_id = u1_.id AND u2_.user_group_id IN (g0_.id)))'
+            . ' WHERE EXISTS (SELECT u3_.id FROM user_table u3_ WHERE u3_.id = u1_.id)';
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
@@ -696,12 +751,8 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             . ' LEFT JOIN user_table u1_ ON (EXISTS ('
             . 'SELECT 1'
             . ' FROM user_to_group_table u2_'
-            . ' INNER JOIN group_table g3_ ON u2_.user_group_id = g3_.id'
-            . ' WHERE u2_.user_id = u1_.id AND g3_.id IN (u0_.id)))'
-            . ' WHERE EXISTS ('
-            . 'SELECT u4_.id'
-            . ' FROM user_table u4_'
-            . ' WHERE u4_.id = u1_.id)';
+            . ' WHERE u2_.user_id = u1_.id AND u2_.user_group_id IN (u0_.id)))'
+            . ' WHERE EXISTS (SELECT u3_.id FROM user_table u3_ WHERE u3_.id = u1_.id)';
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
@@ -775,8 +826,7 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             . ' FROM group_table g1_'
             . ' WHERE EXISTS ('
             . 'SELECT 1 FROM user_to_group_table u2_'
-            . ' INNER JOIN group_table g3_ ON u2_.user_group_id = g3_.id'
-            . ' WHERE u2_.user_id = u0_.id AND g3_.id IN (g1_.id)))';
+            . ' WHERE u2_.user_id = u0_.id AND u2_.user_group_id IN (g1_.id)))';
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 
@@ -1009,6 +1059,54 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
             . ' INNER JOIN user_to_group_table u8_ ON u7_.id = u8_.user_id'
             . ' INNER JOIN group_table g6_ ON g6_.id = u8_.user_group_id'
             . ' WHERE u7_.id = u3_.id))';
+        self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
+    }
+
+    public function testCreateSubqueryForNotJoinedSeveralAssociationsAndLastElementInPathIsField()
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\Account::class, 'e')
+            ->leftJoin('e.roles', 'roles');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryJoinMap(['roles' => 'roles']);
+        $expressionVisitor->setQueryAliases(['e', 'roles']);
+        $subquery = $expressionVisitor->createSubquery('roles.users.groups.name');
+
+        $expectedSubquery = 'SELECT groups_subquery1.name'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group groups_subquery1'
+            . ' WHERE groups_subquery1 IN('
+            . 'SELECT groups_1_subquery2'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Role roles_subquery2'
+            . ' INNER JOIN roles_subquery2.users users_0_subquery2'
+            . ' INNER JOIN users_0_subquery2.groups groups_1_subquery2'
+            . ' WHERE roles_subquery2 = roles)';
+        self::assertEquals($expectedSubquery, $subquery->getDQL());
+
+        // test that the subquery has valid SQL
+        $expectedSql = 'SELECT a0_.id AS id_0, a0_.name AS name_1'
+            . ' FROM account_table a0_'
+            . ' LEFT JOIN account_to_role_table a2_ ON a0_.id = a2_.group_id'
+            . ' LEFT JOIN role_table r1_ ON r1_.id = a2_.role_id'
+            . ' WHERE EXISTS ('
+            . 'SELECT g3_.name'
+            . ' FROM group_table g3_'
+            . ' WHERE g3_.id IN ('
+            . 'SELECT g4_.id'
+            . ' FROM role_table r5_'
+            . ' INNER JOIN role_to_user_table r7_ ON r5_.id = r7_.role_id'
+            . ' INNER JOIN user_table u6_ ON u6_.id = r7_.user_role_id'
+            . ' INNER JOIN user_to_group_table u8_ ON u6_.id = u8_.user_id'
+            . ' INNER JOIN group_table g4_ ON g4_.id = u8_.user_group_id'
+            . ' WHERE r5_.id = r1_.id))';
         self::assertEquals($expectedSql, $this->buildExistsSql($qb, $subquery));
     }
 }

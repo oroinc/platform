@@ -6,12 +6,10 @@ use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessObjectNormalizer;
 
 class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessObjectNormalizer
-     */
-    protected $normalizer;
+    /** @var ProcessObjectNormalizer */
+    private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new ProcessObjectNormalizer();
     }
@@ -22,73 +20,68 @@ class ProcessObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $serializedObject = base64_encode(serialize($object));
 
         $this->assertEquals(
-            array(ProcessObjectNormalizer::SERIALIZED => $serializedObject),
+            [ProcessObjectNormalizer::SERIALIZED => $serializedObject],
             $this->normalizer->normalize($object)
         );
     }
 
     /**
-     * @param mixed $data
-     * @param bool $expected
      * @dataProvider denormalizeDataProvider
      */
-    public function testDenormalize($data, $expected)
+    public function testDenormalize(mixed $data, ?\DateTime $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->denormalize($data, null));
+        $this->assertEquals($expected, $this->normalizer->denormalize($data, ''));
     }
 
-    /**
-     * @return array
-     */
-    public function denormalizeDataProvider()
+    public function denormalizeDataProvider(): array
     {
         $object = new \DateTime();
         $serializedObject = base64_encode(serialize($object));
 
-        return array(
-            'invalid value' => array(
-                'data' => array(ProcessObjectNormalizer::SERIALIZED => null),
+        return [
+            'invalid value' => [
+                'data' => [ProcessObjectNormalizer::SERIALIZED => null],
                 'expected' => null,
-            ),
-            'valid object' => array(
-                'data' => array(ProcessObjectNormalizer::SERIALIZED => $serializedObject),
+            ],
+            'valid object' => [
+                'data' => [ProcessObjectNormalizer::SERIALIZED => $serializedObject],
                 'expected' => $object,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected)
     {
         $this->assertEquals($expected, $this->normalizer->supportsNormalization($data));
     }
 
-    public function supportsNormalizationDataProvider()
+    public function supportsNormalizationDataProvider(): array
     {
-        return array(
-            'null'   => array(null, false),
-            'scalar' => array('scalar', false),
-            'object' => array(new \DateTime(), true),
-        );
+        return [
+            'null' => [null, false],
+            'scalar' => ['scalar', false],
+            'object' => [new \DateTime(), true],
+        ];
     }
 
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($data, $expected)
+    public function testSupportsDenormalization(mixed $data, bool $expected)
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, null));
+        $this->assertEquals($expected, $this->normalizer->supportsDenormalization($data, ''));
     }
 
-    public function supportsDenormalizationDataProvider()
+    public function supportsDenormalizationDataProvider(): array
     {
-        return array(
-            'null'   => array(null, false),
-            'scalar' => array('scalar', false),
-            'array'  => array(array('key' => 'value'), false),
-            'object' => array(array(ProcessObjectNormalizer::SERIALIZED => 'serialised_data'), true),
-        );
+        return [
+            'null' => [null, false],
+            'scalar' => ['scalar', false],
+            'array' => [['key' => 'value'], false],
+            'object' => [[ProcessObjectNormalizer::SERIALIZED => 'serialised_data'], true],
+        ];
     }
 }

@@ -6,7 +6,6 @@ use Behat\Testwork\Specification\Locator\SpecificationLocator;
 use Behat\Testwork\Specification\NoSpecificationsIterator;
 use Behat\Testwork\Specification\SpecificationArrayIterator;
 use Behat\Testwork\Suite\Suite;
-use Symfony\Component\Finder\Tests\Iterator\Iterator;
 
 class SpecificationLocatorStub implements SpecificationLocator
 {
@@ -15,9 +14,6 @@ class SpecificationLocatorStub implements SpecificationLocator
      */
     protected $suiteNames;
 
-    /**
-     * @param array $suiteNames
-     */
     public function __construct(array $suiteNames)
     {
         $this->suiteNames = $suiteNames;

@@ -1,7 +1,7 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 {% form_theme form with [
-    'OroFormBundle:Form:fields.html.twig',
-    'OroEntityBundle:Form:fields.html.twig'
+    '@OroForm/Form/fields.html.twig',
+    '@OroEntity/Form/fields.html.twig'
 ] %}
 
 {% oro_title_set({params : {
@@ -9,13 +9,15 @@
     "%fieldName%": field.fieldName|default('N/A')|trans,
 }}) %}
 
-{% set audit_entity_class = field.entity.className|replace('\\', '_') %}
+{% set audit_entity_class = field.entity.className|replace({'\\':'_'}) %}
 {% set audit_title = field.fieldName|default('N/A')|trans ~ ' - ' ~ entity_config.get('label')|default('N/A')|trans %}
 {% set audit_path = 'oro_entityconfig_audit_field' %}
 {% set audit_entity_id = field.id %}
 {% set audit_show_change_history = true %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_entityconfig_manage') %}
         {{ UI.cancelButton(path('oro_entityconfig_view', {id: field.entity.id})) }}
         {% set html = UI.saveAndCloseButton({
@@ -61,9 +63,9 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% if require_js is defined and require_js|length %}
-        <script type="text/javascript">
-            require({{ require_js|json_encode|raw }})
+    {% if jsmodules is defined and jsmodules|length %}
+        <script>
+            loadModules({{ jsmodules|json_encode|raw }})
         </script>
     {% endif %}
 

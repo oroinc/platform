@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;

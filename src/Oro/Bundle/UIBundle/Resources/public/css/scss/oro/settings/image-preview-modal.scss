@@ -1,0 +1,16 @@
+/* @theme: admin.oro; */
+
+$oro-modal-image-preview-blank-image-bg: linear-gradient(45deg, #e8e8e8 25%, transparent 25%),
+    linear-gradient(-45deg, #e8e8e8 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e8e8e8 75%),
+    linear-gradient(-45deg, transparent 75%, #e8e8e8 75%) !default;
+$oro-modal-image-preview-blank-image-bg-size: 12px 12px !default;
+$oro-modal-image-preview-blank-image-bg-position: 0 0, 0 6px, 6px -6px, -6px 0 !default;
+
+$oro-modal-image-preview-transition: transform .35s cubic-bezier(0, 0, .25, 1) 0s,
+    opacity .35s cubic-bezier(0, 0, .25, 1) 0s, color .2s linear !default;
+
+$oro-modal-image-preview-backdrop-bg: #000 !default;
+$oro-modal-image-preview-toolbar-btn-font-suze: 24px !default;
+
+$oro-modal-image-preview-toolbar-btn-bg: rgba(#000, .45) !default;

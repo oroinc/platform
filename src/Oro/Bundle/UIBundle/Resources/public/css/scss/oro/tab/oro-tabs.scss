@@ -2,8 +2,6 @@
 
 .oro-tabs {
     .tab-pane {
-        min-height: $oro-tabs-tab-pane-min-height;
-
         .fill-tab {
             border: $oro-tabs-fill-tab-border;
             box-shadow: $oro-tabs-fill-tab-box-shadow;
@@ -24,14 +22,14 @@
             width: $oro-tabs-head-width;
             flex-shrink: $oro-tabs-head-flex-shrink;
             flex-grow: $oro-tabs-head-flex-grow;
-            margin-#{$end}: $oro-tabs-head-outer-offset-right;
+            margin-right: $oro-tabs-head-outer-offset-right;
             position: $oro-tabs-head-position;
         }
 
         > .oro-tabs__content {
             flex-grow: $oro-tabs-content-flex-grow;
-            border-#{$start}: $oro-tabs-content-border-left;
-            padding-#{$start}: $horizontal-padding;
+            border-left: $oro-tabs-content-border-left;
+            padding-left: $horizontal-padding;
         }
     }
 }

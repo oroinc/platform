@@ -4,9 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -18,31 +19,27 @@ use Oro\Component\ChainProcessor\ContextInterface;
 class RegisterConfiguredFilters extends RegisterFilters
 {
     private const ASSOCIATION_ALLOWED_OPERATORS            = [
-        ComparisonFilter::EQ,
-        ComparisonFilter::NEQ,
-        ComparisonFilter::EXISTS,
-        ComparisonFilter::NEQ_OR_NULL
+        FilterOperator::EQ,
+        FilterOperator::NEQ,
+        FilterOperator::EXISTS,
+        FilterOperator::NEQ_OR_NULL
     ];
     private const COLLECTION_ASSOCIATION_ALLOWED_OPERATORS = [
-        ComparisonFilter::EQ,
-        ComparisonFilter::NEQ,
-        ComparisonFilter::EXISTS,
-        ComparisonFilter::NEQ_OR_NULL,
-        ComparisonFilter::CONTAINS,
-        ComparisonFilter::NOT_CONTAINS
+        FilterOperator::EQ,
+        FilterOperator::NEQ,
+        FilterOperator::EXISTS,
+        FilterOperator::NEQ_OR_NULL,
+        FilterOperator::CONTAINS,
+        FilterOperator::NOT_CONTAINS
     ];
     private const SINGLE_IDENTIFIER_EXCLUDED_OPERATORS     = [
-        ComparisonFilter::EXISTS,
-        ComparisonFilter::NEQ_OR_NULL
+        FilterOperator::EXISTS,
+        FilterOperator::NEQ_OR_NULL
     ];
 
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param FilterFactoryInterface $filterFactory
-     * @param DoctrineHelper         $doctrineHelper
-     */
     public function __construct(
         FilterFactoryInterface $filterFactory,
         DoctrineHelper $doctrineHelper
@@ -54,6 +51,7 @@ class RegisterConfiguredFilters extends RegisterFilters
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContextInterface $context)
     {
@@ -66,16 +64,14 @@ class RegisterConfiguredFilters extends RegisterFilters
         }
 
         $metadata = null;
-        $entityClass = $this->doctrineHelper->getManageableEntityClass(
-            $context->getClassName(),
-            $context->getConfig()
-        );
+        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
         if ($entityClass) {
             // only manageable entities or resources based on manageable entities can have the metadata
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         }
 
-        $idFieldName = $this->getSingleIdentifierFieldName($context->getConfig());
+        $configs = $context->getConfig();
+        $idFieldName = $this->getSingleIdentifierFieldName($configs);
         $associationNames = $this->getAssociationNames($metadata);
         $filters = $context->getFilters();
         $fields = $configOfFilters->getFields();
@@ -93,6 +89,9 @@ class RegisterConfiguredFilters extends RegisterFilters
                     if (\in_array($propertyPath, $associationNames, true)) {
                         $this->updateAssociationOperators($filter, $field->isCollection());
                     }
+                    if ($configs->hasField($propertyPath) && $configs->getField($propertyPath)?->getTargetEntity()) {
+                        $this->updateAssociationFieldPropertyPath($filter, $configs->getField($propertyPath));
+                    }
                 }
 
                 $filters->add($filterKey, $filter);
@@ -105,7 +104,7 @@ class RegisterConfiguredFilters extends RegisterFilters
      *
      * @return string|null
      */
-    private function getSingleIdentifierFieldName(EntityDefinitionConfig $config = null)
+    private function getSingleIdentifierFieldName(?EntityDefinitionConfig $config = null)
     {
         if (null === $config) {
             return null;
@@ -130,9 +129,6 @@ class RegisterConfiguredFilters extends RegisterFilters
             : [];
     }
 
-    /**
-     * @param StandaloneFilter $filter
-     */
     private function updateSingleIdentifierOperators(StandaloneFilter $filter)
     {
         $filter->setSupportedOperators(
@@ -140,10 +136,6 @@ class RegisterConfiguredFilters extends RegisterFilters
         );
     }
 
-    /**
-     * @param StandaloneFilter $filter
-     * @param bool             $isCollection
-     */
     private function updateAssociationOperators(StandaloneFilter $filter, bool $isCollection)
     {
         $allowedOperators = $isCollection
@@ -151,6 +143,23 @@ class RegisterConfiguredFilters extends RegisterFilters
             : self::ASSOCIATION_ALLOWED_OPERATORS;
         if ([] !== \array_diff($filter->getSupportedOperators(), $allowedOperators)) {
             $filter->setSupportedOperators($allowedOperators);
+        }
+    }
+
+    private function updateAssociationFieldPropertyPath(
+        FieldAwareFilterInterface|StandaloneFilter $filter,
+        ?EntityDefinitionFieldConfig $config
+    ): void {
+        if ($config) {
+            $path = $filter->getField();
+            $singleIdName = $this->getSingleIdentifierFieldName($config?->getTargetEntity());
+            if ($singleIdName) {
+                $targetEntityConfig = $config->getTargetEntity();
+                $pathProperty = $targetEntityConfig?->getField($singleIdName)?->getPropertyPath();
+                if ($pathProperty && $pathProperty !== $singleIdName) {
+                    $filter->setField(sprintf('%s.%s', $path, $pathProperty));
+                }
+            }
         }
     }
 }

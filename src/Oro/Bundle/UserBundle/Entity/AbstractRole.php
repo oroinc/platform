@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+use Oro\Bundle\SecurityBundle\Model\Role;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
-use Symfony\Component\Security\Core\Role\Role as BaseRole;
 
-abstract class AbstractRole extends BaseRole
+/**
+ * Abstract class for the any Role.
+ */
+abstract class AbstractRole extends Role
 {
     /**
      * @var string
@@ -38,12 +41,9 @@ abstract class AbstractRole extends BaseRole
      */
     abstract public function getLabel();
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
-        return (string)$this->getLabel();
+        return (string)$this->getRole();
     }
 
     /**
@@ -52,9 +52,9 @@ abstract class AbstractRole extends BaseRole
      */
     public function generateUniqueRole($role = '')
     {
+        $role = $this->addUniqueSuffix($role);
         $role = $this->normalize($role);
         $role = $this->addPrefix($role);
-        $role = $this->addUniqueSuffix($role);
 
         return $role;
     }
@@ -65,7 +65,9 @@ abstract class AbstractRole extends BaseRole
      */
     protected function normalize($role)
     {
-        return strtoupper(preg_replace('/[^\w\-]/i', '_', $role));
+        return null !== $role
+            ? strtoupper(preg_replace('/[^\w\-]/i', '_', $role))
+            : '';
     }
 
     /**
@@ -74,7 +76,7 @@ abstract class AbstractRole extends BaseRole
      */
     protected function addUniqueSuffix($role)
     {
-        return uniqid(rtrim($role, '_') . '_');
+        return uniqid((null !== $role ? rtrim($role, '_') : '') . '_');
     }
 
     /**
@@ -83,8 +85,12 @@ abstract class AbstractRole extends BaseRole
      */
     protected function addPrefix($role)
     {
-        if ($role !== AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY && strpos($role, $this->getPrefix()) !== 0) {
-            $role = $this->getPrefix() . $role;
+        if (AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY !== $role) {
+            if (!$role) {
+                $role = $this->getPrefix();
+            } elseif (!str_starts_with($role, $this->getPrefix())) {
+                $role = $this->getPrefix() . $role;
+            }
         }
 
         return $role;

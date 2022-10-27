@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\FormType as SymfonyFormType;
 use Symfony\Component\Form\FormBuilder;
@@ -13,22 +15,22 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 class FormTypeTest extends TypeTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $subscriber;
+    /** @var ConfigSubscriber|\PHPUnit\Framework\MockObject\MockObject */
+    private $subscriber;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
     /** @var FormType */
-    protected $form;
+    private $form;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->subscriber = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
-            ->setMethods(['__construct', 'preSubmit'])
+        $this->subscriber = $this->getMockBuilder(ConfigSubscriber::class)
+            ->onlyMethods(['__construct', 'preSubmit'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
 
         $this->form = new FormType($this->subscriber, $this->container);
 
@@ -76,14 +78,13 @@ class FormTypeTest extends TypeTestCase
         $this->assertTrue($form->getConfig()->getAttribute('isConfiguratorApplied'));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected that "Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type\FormTypeTest::undefinedMethod" is a callable.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAdditionalStaticConfiguratorWithUndefinedMethodName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Expected that "Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type\FormTypeTest::undefinedMethod" is a callable.'
+        );
+
         $form = $this->factory->create(
             FormType::class,
             null,
@@ -119,12 +120,11 @@ class FormTypeTest extends TypeTestCase
         $this->assertTrue($form->getConfig()->getAttribute('isConfiguratorApplied'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected that "@test_service::undefinedMethodName" is a callable.
-     */
     public function testAdditionalServiceConfiguratorWithUndefinedMethodName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected that "@test_service::undefinedMethodName" is a callable.');
+
         $this->container->expects(self::once())
             ->method('get')
             ->with('test_service')
@@ -144,12 +144,11 @@ class FormTypeTest extends TypeTestCase
         $this->assertFalse($form->getConfig()->hasAttribute('isConfiguratorApplied'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected that "@test_service" is a callable.
-     */
     public function testAdditionalServiceConfiguratorWithUnspecifiedMethod()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected that "@test_service" is a callable.');
+
         $this->container->expects(self::never())
             ->method('get');
 
@@ -167,12 +166,11 @@ class FormTypeTest extends TypeTestCase
         $this->assertFalse($form->getConfig()->hasAttribute('isConfiguratorApplied'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "string", "integer" given.
-     */
     public function testInvalidTypeOfAdditionalConfigurator()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
+
         $form = $this->factory->create(
             FormType::class,
             null,

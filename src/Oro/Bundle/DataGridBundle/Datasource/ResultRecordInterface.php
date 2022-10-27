@@ -4,6 +4,9 @@ namespace Oro\Bundle\DataGridBundle\Datasource;
 
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
+/**
+ * Interface represents datagrid result rows
+ */
 interface ResultRecordInterface
 {
     /**
@@ -22,4 +25,12 @@ interface ResultRecordInterface
      * @return object|null
      */
     public function getRootEntity();
+
+    /**
+     * Set value of property by name
+     *
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setValue($name, $value);
 }

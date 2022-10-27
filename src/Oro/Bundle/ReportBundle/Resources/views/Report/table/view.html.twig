@@ -1,14 +1,25 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 {% oro_title_set({params : {"%report.name%": entity.name, "%report.group%": reportGroup|trans} }) %}
 {% set pageTitle = entity.name %}
+{% set displaySQL = oro_config_value('oro_report.display_sql_query') and isDesktopVersion() %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if isDesktopVersion() and is_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path': path('oro_report_update', {'id': entity.id}),
             'entity_label': 'oro.report.entity_label'|trans
+        }) }}
+    {% endif %}
+    {% if isDesktopVersion() and is_granted('CREATE', entity) %}
+        {{ UI.button({
+            'path' : path('oro_report_clone', {'id': entity.id}),
+            'iCss': 'fa-files-o',
+            'title': 'oro.report.action.clone.button.title'|trans,
+            'label': 'oro.report.action.clone.button.label'|trans,
         }) }}
     {% endif %}
     {% if isDesktopVersion() and is_granted('DELETE', entity) %}
@@ -40,6 +51,8 @@
 {% endblock %}
 
 {% block content_data %}
+    {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+
     {% if gridName is defined %}
         {% if chartView is defined %}
             <div class="chart-wrapper">
@@ -47,7 +60,7 @@
             </div>
         {% endif %}
         {% set renderParams = renderParams|default({})|merge({
-            enableFullScreenLayout: true,
+            enableFullScreenLayout: not displaySQL,
             enableViews: true,
             showViewsInCustomElement: '.page-title > .navbar-extra .pull-left-extra .grid-views-holder'
         }) %}
@@ -55,7 +68,7 @@
             '_grid_view': {},
             '_tags'     : {'_disabled': true},
         } %}
-        {% if oro_config_value('oro_report.display_sql_query') %}
+        {% if displaySQL %}
             {% set gridParams = gridParams|merge({'display_sql_query': true}) %}
         {% endif %}
         {% set params = params|default({})|merge(gridParams)
@@ -65,9 +78,16 @@
         <div class="container-fluid">
             <div class="grid-container">
                 <div class="no-data">
-                    <span>{{ 'Invalid report configuration'|trans }}</span>
+                    {{ 'Invalid report configuration'|trans }}
                 </div>
             </div>
         </div>
     {% endif %}
 {% endblock content_data %}
+
+{% block content %}
+    {{ parent() }}
+    {% if displaySQL %}
+        <div class="sql-query-panel" data-role="sql-query-panel"></div>
+    {% endif %}
+{% endblock content %}

@@ -18,11 +18,6 @@ class MailboxChoiceList
     /** @var MailboxNameHelper */
     private $mailboxNameHelper;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param MailboxManager         $mailboxManager
-     * @param MailboxNameHelper      $mailboxNameHelper
-     */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         MailboxManager $mailboxManager,

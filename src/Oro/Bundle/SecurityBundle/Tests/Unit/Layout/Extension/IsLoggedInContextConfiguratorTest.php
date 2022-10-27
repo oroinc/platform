@@ -8,18 +8,16 @@ use Oro\Component\Layout\LayoutContext;
 
 class IsLoggedInContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var IsLoggedInContextConfigurator */
-    protected $contextConfigurator;
-
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    /** @var IsLoggedInContextConfigurator */
+    private $contextConfigurator;
+
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+
         $this->contextConfigurator = new IsLoggedInContextConfigurator($this->tokenAccessor);
     }
 
@@ -27,7 +25,7 @@ class IsLoggedInContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $context = new LayoutContext();
         $this->contextConfigurator->configureContext($context);
@@ -40,7 +38,7 @@ class IsLoggedInContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $context = new LayoutContext();
         $this->contextConfigurator->configureContext($context);

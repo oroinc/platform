@@ -2,32 +2,43 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseRelationsTopic;
+use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
+use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
+use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Processes inverse relation that should be added to data audit.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
-    /** @var EntityChangesToAuditEntryConverter */
-    private $entityChangesToAuditEntryConverter;
+    private EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter;
 
-    /**
-     * @param ManagerRegistry                    $doctrine
-     * @param EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
-     */
+    private AuditConfigProvider $auditConfigProvider;
+
+    private EntityAuditStrategyProcessorInterface $strategyProcessor;
+
     public function __construct(
         ManagerRegistry $doctrine,
-        EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
+        EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
+        AuditConfigProvider $auditConfigProvider,
+        EntityAuditStrategyProcessorInterface $strategyProcessor
     ) {
         $this->doctrine = $doctrine;
         $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
+        $this->auditConfigProvider = $auditConfigProvider;
+        $this->strategyProcessor = $strategyProcessor;
     }
 
     /**
@@ -35,8 +46,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
-
+        $body = $message->getBody();
         $loggedAt = $this->getLoggedAt($body);
         $transactionId = $this->getTransactionId($body);
         $user = $this->getUserReference($body);
@@ -46,31 +56,36 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
 
         $map = [];
 
-        $this->processBidirectionalAssociations($body['entities_inserted'], $map);
-        $this->processBidirectionalAssociations($body['entities_updated'], $map);
-        $this->processBidirectionalAssociations($body['entities_deleted'], $map);
-        $this->processBidirectionalAssociations($body['collections_updated'], $map);
+        $this->processFields($body['entities_inserted'], $map);
+        $this->processFields($body['entities_updated'], $map);
+        $this->processFields($body['entities_deleted'], $map);
 
-        $this->processEntityFromCollectionUpdated($body['entities_updated'], $map);
+        $this->processAssociations($body['entities_inserted'], $map);
+        $this->processAssociations($body['entities_updated'], $map);
+        $this->processAssociations($body['entities_deleted'], $map);
+        $this->processAssociations($body['collections_updated'], $map);
 
-        $this->entityChangesToAuditEntryConverter->convert(
-            $map,
-            $transactionId,
-            $loggedAt,
-            $user,
-            $organization,
-            $impersonation,
-            $ownerDescription
-        );
+        try {
+            $this->entityChangesToAuditEntryConverter->convert(
+                $map,
+                $transactionId,
+                $loggedAt,
+                $user,
+                $organization,
+                $impersonation,
+                $ownerDescription
+            );
+        } catch (WrongDataAuditEntryStateException $e) {
+            return self::REQUEUE;
+        }
 
         return self::ACK;
     }
 
     /**
-     * @param array $sourceEntitiesData
-     * @param array $map
+     * Add fields from change sets to the map
      */
-    private function processBidirectionalAssociations(array $sourceEntitiesData, array &$map)
+    private function processFields(array $sourceEntitiesData, array &$map)
     {
         foreach ($sourceEntitiesData as $sourceEntityData) {
             $sourceEntityClass = $sourceEntityData['entity_class'];
@@ -79,21 +94,73 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             $sourceEntityManager = $this->doctrine->getManagerForClass($sourceEntityClass);
             $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
 
+            if (empty($sourceEntityData['change_set'])) {
+                continue;
+            }
+
+            $strategy = $this->strategyProcessor->processInverseRelations($sourceEntityData);
+            if (empty($strategy)) {
+                continue;
+            }
+
             foreach ($sourceEntityData['change_set'] as $sourceFieldName => $sourceChange) {
-                if (!isset($sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy'])) {
+                if (!$sourceEntityMeta->hasField($sourceFieldName) &&
+                    !$sourceEntityMeta->hasAssociation($sourceFieldName)
+                ) {
+                    continue;
+                }
+
+                $this->addChangeSetToMap(
+                    $map,
+                    $sourceEntityClass,
+                    $sourceEntityId,
+                    $sourceFieldName,
+                    $sourceChange
+                );
+            }
+        }
+    }
+
+    /**
+     * Add to one and to many associations from change sets to the map
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function processAssociations(array $sourceEntitiesData, array &$map)
+    {
+        foreach ($sourceEntitiesData as $sourceEntityData) {
+            $sourceEntityClass = $sourceEntityData['entity_class'];
+            $sourceEntityId = $sourceEntityData['entity_id'];
+            /** @var EntityManagerInterface $sourceEntityManager */
+            $sourceEntityManager = $this->doctrine->getManagerForClass($sourceEntityClass);
+            $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
+
+            if (empty($sourceEntityData['change_set'])) {
+                continue;
+            }
+
+            foreach ($sourceEntityData['change_set'] as $sourceFieldName => $sourceChange) {
+                if (!$sourceEntityMeta->hasAssociation($sourceFieldName)) {
+                    continue;
+                }
+
+                if (!$this->auditConfigProvider->isPropagateField($sourceEntityClass, $sourceFieldName)) {
+                    continue;
+                }
+
+                $fieldName = $this->getTargetFieldName($sourceEntityMeta, $sourceFieldName);
+                if (!$fieldName) {
+                    // the unidirectional relation
                     continue;
                 }
 
                 $entityClass = $sourceEntityMeta->associationMappings[$sourceFieldName]['targetEntity'];
-                $fieldName = $sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy'];
-                $entityManager = $this->doctrine->getManagerForClass($entityClass);
-                $entityMeta = $entityManager->getClassMetadata($entityClass);
 
-                if ($sourceEntityMeta->isSingleValuedAssociation($sourceFieldName) &&
-                    $entityMeta->isCollectionValuedAssociation($fieldName)
-                ) {
-                    // many to one
-                    $this->processManyToOneAssociation(
+                $targetEntityManager = $this->doctrine->getManagerForClass($entityClass);
+                $targetEntityMeta = $targetEntityManager->getClassMetadata($entityClass);
+
+                if ($targetEntityMeta->isSingleValuedAssociation($fieldName)) {
+                    $this->processOneToAnyAssociations(
                         $sourceChange,
                         $entityClass,
                         $fieldName,
@@ -101,23 +168,8 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
                         $sourceEntityId,
                         $map
                     );
-                } elseif ($sourceEntityMeta->isCollectionValuedAssociation($sourceFieldName) &&
-                    $entityMeta->isCollectionValuedAssociation($fieldName)
-                ) {
-                    // many to many
-                    $this->processManyToManyAssociation(
-                        $sourceChange,
-                        $entityClass,
-                        $fieldName,
-                        $sourceEntityClass,
-                        $sourceEntityId,
-                        $map
-                    );
-                } elseif ($sourceEntityMeta->isSingleValuedAssociation($sourceFieldName) &&
-                    $entityMeta->isSingleValuedAssociation($fieldName)
-                ) {
-                    // one to one
-                    $this->processOneToOneAssociations(
+                } elseif ($targetEntityMeta->isCollectionValuedAssociation($fieldName)) {
+                    $this->processManyToAnyAssociation(
                         $sourceChange,
                         $entityClass,
                         $fieldName,
@@ -126,13 +178,17 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
                         $map
                     );
                 } else {
-                    throw new \LogicException('Unexpected old value');
+                    throw new \LogicException(
+                        sprintf('Unknown field name "%s::%s"', $sourceEntityClass, $sourceFieldName)
+                    );
                 }
             }
         }
     }
 
     /**
+     * Add many to * relations to the map
+     *
      * @param array $sourceChange
      * @param string $entityClass
      * @param string $fieldName
@@ -140,7 +196,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      * @param int $sourceEntityId
      * @param array $map
      */
-    private function processManyToOneAssociation(
+    private function processManyToAnyAssociation(
         $sourceChange,
         $entityClass,
         $fieldName,
@@ -148,87 +204,92 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         $sourceEntityId,
         &$map
     ) {
-        list($old, $new) = $sourceChange;
+        [$old, $new] = $sourceChange;
 
-        if ($old) {
-            $entityId = $old['entity_id'];
-
-            $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-            $change[1]['deleted'][] = [
-                'entity_class' => $sourceEntityClass,
-                'entity_id' => $sourceEntityId,
-                'change_set' => [],
-            ];
-
-            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+        $new = $this->extractValue($new, 'inserted');
+        foreach ($new['inserted'] as $insert) {
+            $this->processInsert($map, $insert, $entityClass, $fieldName, $sourceEntityClass, $sourceEntityId);
         }
 
-        if ($new) {
-            $entityId = $new['entity_id'];
-
-            $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-            $change[1]['inserted'][] = [
-                'entity_class' => $sourceEntityClass,
-                'entity_id' => $sourceEntityId,
-                'change_set' => [],
-            ];
-
-            $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+        $old = $this->extractValue($old, 'deleted');
+        foreach ($old['deleted'] as $delete) {
+            $this->processDelete($map, $delete, $entityClass, $fieldName, $sourceEntityClass, $sourceEntityId);
         }
     }
 
     /**
-     * @param array $sourceChange
-     * @param string $entityClass
-     * @param string $fieldName
-     * @param string $sourceEntityClass
-     * @param int $sourceEntityId
-     * @param array $map
+     * @param mixed $value
+     * @param string $key
+     * @return array
      */
-    private function processManyToManyAssociation(
-        $sourceChange,
-        $entityClass,
-        $fieldName,
-        $sourceEntityClass,
-        $sourceEntityId,
-        &$map
-    ) {
-        list($old, $new) = $sourceChange;
-
-        unset($old);
-
-        if (is_array($new) && array_key_exists('inserted', $new) && is_array($new['inserted'])) {
-            foreach ($new['inserted'] as $insertedEntityData) {
-                $entityId = $insertedEntityData['entity_id'];
-
-                $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                $change[1]['inserted'][] = [
-                    'entity_class' => $sourceEntityClass,
-                    'entity_id' => $sourceEntityId,
-                    'change_set' => [],
-                ];
-
-                $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-            }
+    private function extractValue($value, string $key): array
+    {
+        if (!$value) {
+            return [$key => []];
         }
 
-        if (is_array($new) && array_key_exists('deleted', $new) && is_array($new['deleted'])) {
-            foreach ($new['deleted'] as $deletedEntityData) {
-                $entityId = $deletedEntityData['entity_id'];
-
-                $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                $change[1]['deleted'][] = [
-                    'entity_class' => $sourceEntityClass,
-                    'entity_id' => $sourceEntityId,
-                    'change_set' => [],
-                ];
-
-                $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-            }
+        if (is_array($value) && array_key_exists($key, $value)) {
+            return $value;
         }
+
+        return [$key => [$value]];
     }
 
     /**
+     * Add inserted entities to the map
+     */
+    private function processInsert(
+        array &$map,
+        array $new,
+        string $entityClass,
+        string $fieldName,
+        string $sourceEntityClass,
+        string $sourceEntityId
+    ) {
+        $entityId = $new['entity_id'] ?? null;
+        if (!$entityId) {
+            return;
+        }
+
+        $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+        $change[1]['inserted'][$sourceEntityClass.$sourceEntityId] = [
+            'entity_class' => $sourceEntityClass,
+            'entity_id' => $sourceEntityId,
+            'change_set' => $this->getChangeSetFromMap($map, $sourceEntityClass, $sourceEntityId),
+        ];
+
+        $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+    }
+
+    /**
+     * Add deleted entities to the map
+     */
+    private function processDelete(
+        array &$map,
+        array $old,
+        string $entityClass,
+        string $fieldName,
+        string $sourceEntityClass,
+        string $sourceEntityId
+    ) {
+        $entityId = $old['entity_id'] ?? null;
+        if (!$entityId) {
+            return;
+        }
+
+        $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
+        $change[0]['deleted'][$sourceEntityClass.$sourceEntityId] = [
+            'entity_class' => $sourceEntityClass,
+            'entity_id' => $sourceEntityId,
+            'change_set' => $this->getChangeSetFromMap($map, $sourceEntityClass, $sourceEntityId),
+        ];
+
+        $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
+    }
+
+    /**
+     * Add one to * relations to the map
+     *
      * @param array $sourceChange
      * @param string $entityClass
      * @param string $fieldName
@@ -236,7 +297,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      * @param int $sourceEntityId
      * @param array $map
      */
-    private function processOneToOneAssociations(
+    private function processOneToAnyAssociations(
         $sourceChange,
         $entityClass,
         $fieldName,
@@ -244,29 +305,29 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         $sourceEntityId,
         &$map
     ) {
-        list($old, $new) = $sourceChange;
+        [$old, $new] = $sourceChange;
 
-        if ($old) {
+        if (isset($old['entity_id']) && $this->notEmpty($old['entity_id'])) {
             $entityId = $old['entity_id'];
 
             $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
             $change[0] = [
                 'entity_class' => $sourceEntityClass,
                 'entity_id' => $sourceEntityId,
-                'change_set' => [],
+                'change_set' => $this->getChangeSetFromMap($map, $sourceEntityClass, $sourceEntityId),
             ];
 
             $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
         }
 
-        if ($new) {
+        if (isset($new['entity_id']) && $this->notEmpty($new['entity_id'])) {
             $entityId = $new['entity_id'];
 
             $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
             $change[1] = [
                 'entity_class' => $sourceEntityClass,
                 'entity_id' => $sourceEntityId,
-                'change_set' => [],
+                'change_set' => $this->getChangeSetFromMap($map, $sourceEntityClass, $sourceEntityId),
             ];
 
             $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
@@ -274,58 +335,16 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
     }
 
     /**
-     * @param array $sourceEntitiesData
-     * @param array $map
+     * @param ClassMetadata $sourceEntityMeta
+     * @param string $sourceFieldName
+     *
+     * @return string
      */
-    private function processEntityFromCollectionUpdated(array $sourceEntitiesData, array &$map)
+    private function getTargetFieldName(ClassMetadata $sourceEntityMeta, string $sourceFieldName)
     {
-        // many to one. updated entity is part of a collection on inversed side of association.
-        foreach ($sourceEntitiesData as $sourceEntityData) {
-            $sourceEntityClass = $sourceEntityData['entity_class'];
-            $sourceEntityId = $sourceEntityData['entity_id'];
-            /** @var EntityManagerInterface $sourceEntityManager */
-            $sourceEntityManager = $this->doctrine->getManagerForClass($sourceEntityClass);
-            $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
-
-            foreach ($sourceEntityMeta->associationMappings as $sourceFieldName => $associationMapping) {
-                if (false == isset($associationMapping['inversedBy'])) {
-                    continue;
-                }
-
-                $entityClass = $sourceEntityMeta->associationMappings[$sourceFieldName]['targetEntity'];
-                $fieldName = $sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy'];
-                $entityManager = $this->doctrine->getManagerForClass($entityClass);
-                $entityMeta = $entityManager->getClassMetadata($entityClass);
-
-                if ($sourceEntityMeta->isSingleValuedAssociation($sourceFieldName) &&
-                    $entityMeta->isCollectionValuedAssociation($fieldName)
-                ) {
-                    $sourceEntity = $sourceEntityManager->find($sourceEntityClass, $sourceEntityId);
-                    if (!$sourceEntity) {
-                        // the entity may be removed after update and since we are processing stuff in background
-                        // it is possible that the update is processed after the real remove was performed.
-                        continue;
-                    }
-
-                    $entity = $sourceEntityMeta->getFieldValue($sourceEntity, $sourceFieldName);
-                    if (!$entity) {
-                        // this the case where source entity does not belong to any collections
-                        continue;
-                    }
-
-                    $entityId = $this->getEntityId($entityManager, $entity);
-
-                    $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                    $change[1]['changed'][] = [
-                        'entity_class' => $sourceEntityClass,
-                        'entity_id' => $sourceEntityId,
-                        'change_set' => [],
-                    ];
-
-                    $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-                }
-            }
-        }
+        return $sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy']
+            ?? $sourceEntityMeta->associationMappings[$sourceFieldName]['mappedBy']
+            ?? null;
     }
 
     /**
@@ -334,12 +353,21 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      * @param int $entityId
      * @param string $fieldName
      * @param array $change
-     *
-     * @return array
      */
     private function addChangeSetToMap(array &$map, $entityClass, $entityId, $fieldName, array $change)
     {
-        $map[$entityClass.$entityId]['change_set'][$fieldName] = $change;
+        if (empty($entityClass) || !$this->notEmpty($entityId)) {
+            throw new \LogicException('Entity class either entity id cannot be empty');
+        }
+
+        if (empty($fieldName)) {
+            throw new \LogicException('Field name cannot be empty');
+        }
+
+        $key = $entityClass . $entityId;
+        $map[$key]['entity_class'] = $entityClass;
+        $map[$key]['entity_id'] = $entityId;
+        $map[$key]['change_set'][$fieldName] = $change;
     }
 
     /**
@@ -350,24 +378,26 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      *
      * @return array
      */
-    private function getChangeSetFromMap(array &$map, $entityClass, $entityId, $fieldName)
+    private function getChangeSetFromMap(array &$map, $entityClass, $entityId, $fieldName = null)
     {
-        if (empty($entityClass) || empty($entityId)) {
+        if (empty($entityClass) || !$this->notEmpty($entityId)) {
             throw new \LogicException('Entity class either entity id cannot be empty');
         }
 
-        if (false == isset($map[$entityClass.$entityId])) {
-            $map[$entityClass.$entityId] = [
+        $key = $entityClass . $entityId;
+        if (!$fieldName) {
+            return $map[$key]['change_set'] ?? [];
+        }
+
+        if (!isset($map[$key])) {
+            $map[$key] = [
                 'entity_class' => $entityClass,
                 'entity_id' => $entityId,
                 'change_set' => [],
             ];
         }
 
-        return isset($map[$entityClass.$entityId]['change_set'][$fieldName]) ?
-            $map[$entityClass.$entityId]['change_set'][$fieldName] :
-            [null, null]
-        ;
+        return $map[$key]['change_set'][$fieldName] ?? [null, null];
     }
 
     /**
@@ -382,25 +412,15 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
     {
         $change = $this->getChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
 
-        if (null === $change[1]) {
-            $change[1] = ['inserted' => [], 'deleted' => [], 'changed' => []];
+        if (!isset($change[0])) {
+            $change[0] = ['deleted' => []];
+        }
+
+        if (!isset($change[1])) {
+            $change[1] = ['inserted' => [], 'changed' => []];
         }
 
         return $change;
-    }
-
-    /**
-     * @param EntityManagerInterface $em
-     * @param object $entity
-     *
-     * @return int|string
-     */
-    private function getEntityId(EntityManagerInterface $em, $entity)
-    {
-        $entityMeta = $em->getClassMetadata(get_class($entity));
-        $idFieldName = $entityMeta->getSingleIdentifierFieldName();
-
-        return $entityMeta->getReflectionProperty($idFieldName)->getValue($entity);
     }
 
     /**
@@ -408,6 +428,18 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::ENTITIES_INVERSED_RELATIONS_CHANGED];
+        return [AuditChangedEntitiesInverseRelationsTopic::getName()];
+    }
+
+    /**
+     * @param mixed $val
+     * @return bool
+     */
+    private function notEmpty($val): bool
+    {
+        return $val !== null
+            && $val !== false
+            && $val !== []
+            && $val !== '';
     }
 }

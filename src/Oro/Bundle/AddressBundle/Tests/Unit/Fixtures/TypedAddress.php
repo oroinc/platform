@@ -19,9 +19,6 @@ class TypedAddress extends AbstractTypedAddress
         return $this->owner;
     }
 
-    /**
-     * @param TypedAddressOwner $owner
-     */
     public function setOwner(TypedAddressOwner $owner)
     {
         $this->owner = $owner;

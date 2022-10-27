@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Validator\Constraints;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowPermissionRegistry;
@@ -13,8 +14,10 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * Validates if entity can be changed taking into account workflow.
+ */
 class WorkflowEntityValidator extends ConstraintValidator
 {
     /** @var EntityManager */
@@ -35,13 +38,6 @@ class WorkflowEntityValidator extends ConstraintValidator
     /** @var FieldHelper */
     protected $fieldHelper;
 
-    /**
-     * @param EntityManager $entityManager
-     * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowPermissionRegistry $permissionRegistry
-     * @param RestrictionManager $restrictionManager
-     * @param FieldHelper $fieldHelper
-     */
     public function __construct(
         EntityManager $entityManager,
         DoctrineHelper $doctrineHelper,
@@ -169,7 +165,7 @@ class WorkflowEntityValidator extends ConstraintValidator
         $originalData = $unitOfWork->getOriginalEntityData($object);
 
         $class =  $this->doctrineHelper->getEntityClass($object);
-        $fieldList = $this->fieldHelper->getFields($class, true);
+        $fieldList = $this->fieldHelper->getEntityFields($class, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
         foreach ($fieldList as $field) {
             $fieldName = $field['name'];
@@ -218,9 +214,7 @@ class WorkflowEntityValidator extends ConstraintValidator
      */
     protected function addFieldViolation($field, $message)
     {
-        /** @var ExecutionContextInterface $context */
-        $context = $this->context;
-        $context
+        $this->context
             ->buildViolation($message)
             ->atPath($field)
             ->addViolation();

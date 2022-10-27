@@ -6,11 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField; // for date fields
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
 
 /**
+ * Store Language in a database
+ *
  * @ORM\Table(name="oro_language")
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -69,6 +70,13 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
     protected $installedBuildDate;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="local_files_language", type="boolean", options={"default"=false})
+     */
+    private $localFilesLanguage = false;
+
+    /**
      * @return int
      */
     public function getId()
@@ -76,12 +84,7 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
         return $this->id;
     }
 
-    /**
-     * @param string $code
-     *
-     * @return $this
-     */
-    public function setCode($code)
+    public function setCode(string $code): Language
     {
         $this->code = $code;
 
@@ -132,6 +135,18 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
     public function setEnabled($enabled)
     {
         $this->enabled = (bool)$enabled;
+
+        return $this;
+    }
+
+    public function isLocalFilesLanguage(): bool
+    {
+        return (bool) $this->localFilesLanguage;
+    }
+
+    public function setLocalFilesLanguage(bool $localFilesLanguage): Language
+    {
+        $this->localFilesLanguage = $localFilesLanguage;
 
         return $this;
     }

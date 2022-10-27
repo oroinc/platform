@@ -1,44 +1,46 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var mediator = require('oroui/js/mediator');
-    var routing = require('routing');
-    var tools = require('oroui/js/tools');
-    var mapFilterModuleName = require('orofilter/js/map-filter-module-name');
-    var FiltersManager = require('orofilter/js/collection-filters-manager');
-    var FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
-    var module = require('module');
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var config = module.config();
-    var cachedFilters = {};
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const mapFilterModuleName = require('orofilter/js/map-filter-module-name');
+    let FiltersManager = require('orofilter/js/collection-filters-manager');
+    const FiltersNavigationComponent = require('orofilter/js/filters-navigation-component.js').default;
+    const FiltersTogglePlugin = require('orofilter/js/plugins/filters-toggle-plugin');
+    let config = require('module-config').default(module.id);
+    const cachedFilters = {};
 
     config = _.extend({
         FiltersManager: FiltersManager
     }, config);
 
-    var methods = {
+    const methods = {
         /**
          * Reads data from container, collects required modules and runs filters builder
          */
         initBuilder: function() {
-            var modules;
+            const deferred = $.Deferred();
+
             _.defaults(this.metadata, {filters: {}});
-            modules = methods.collectModules.call(this);
-            tools.loadModules(modules, function(modules) {
+            const modules = methods.collectModules.call(this);
+            loadModules(modules, function(modules) {
                 this.modules = modules;
-                methods.build.call(this);
+                deferred.resolve();
             }, this);
+
+            return deferred.promise();
         },
 
         /**
          * Collects required modules
          */
         collectModules: function() {
-            var modules = {};
+            const modules = {};
             _.each(this.metadata.filters || {}, function(filter) {
-                var type = filter.type;
+                const type = filter.type;
                 modules[type] = mapFilterModuleName(type);
             });
 
@@ -55,39 +57,58 @@ define(function(require) {
 
             FiltersManager = this.modules.FiltersManager || FiltersManager;
 
-            var filtersList;
-            var $filterContainer;
-            var options = methods.combineOptions.call(this);
+            const options = _.extend(
+                methods.combineOptions.call(this),
+                _.pick(this, 'collection'),
+                _.pick(this.metadata.options, 'defaultFiltersViewMode', 'filtersStateStorageKey',
+                    'useFiltersStateAnimationOnInit', 'enableFiltersNavigation'),
+                this.metadata.options.filtersManager
+            );
 
-            if (this.filterContainerSelector && this.$el.find(this.filterContainerSelector).length) {
-                $filterContainer = this.$el.find(this.filterContainerSelector);
-            } else {
-                $filterContainer = this.$el;
+            let filterContainer;
+
+            if (this.filterContainerSelector) {
+                // Since potentially filter container can be moved outside grid container by another component
+                // we try to find it everywhere before deciding to use grid container instead
+                filterContainer = this.$el.find(this.filterContainerSelector)[0] ||
+                    $(this.filterContainerSelector)[0];
             }
 
-            options.collection = this.collection;
-            if (_.result(this.metadata.options.toolbarOptions, 'hide') === true) {
-                options.viewMode = FiltersManager.MANAGE_VIEW_MODE;
-            } else {
-                var storedMode = persistentStorage.getItem(FiltersManager.STORAGE_KEY);
-                options.viewMode = storedMode !== null ? Number(storedMode) : FiltersManager.STATE_VIEW_MODE;
-                if (this.enableToggleFilters) {
-                    options.filtersStateElement = this.filtersStateElement || $('<div/>').prependTo($filterContainer);
-                }
+            if (!filterContainer) {
+                filterContainer = this.$el[0];
             }
 
-            filtersList = new FiltersManager(options);
+            if (!this.enableToggleFilters || _.result(this.metadata.options.toolbarOptions, 'hide') === true) {
+                options.forcedViewMode = FiltersManager.MANAGE_VIEW_MODE;
+            } else if (this.filtersStateElement) {
+                options.filtersStateElement = this.filtersStateElement;
+            } else {
+                const $container = this.$el.closest('body, .ui-dialog').find(options.filtersStateElement).first();
+
+                options.filtersStateElement = $container.length
+                    ? $container : $('<div/>').prependTo(filterContainer);
+            }
+
+            options.filterContainer = filterContainer;
+            const filtersList = new FiltersManager(options);
+            this.grid.filterManager = filtersList;
+            this.grid.trigger('filters:beforeRender');
             filtersList.render();
-            filtersList.$el.prependTo($filterContainer);
 
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
             if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
-                filtersList.$el.hide();
+                filtersList.hide();
             }
 
-            this.grid.filterManager = filtersList;
             this.grid.trigger('filterManager:connected');
+
+            const {enableFiltersNavigation = true} = options;
+            if (enableFiltersNavigation) {
+                this.grid.filtersNavigationComponent = new FiltersNavigationComponent({
+                    filters: options.filters
+                });
+            }
 
             this.deferred.resolve(filtersList);
         },
@@ -98,19 +119,14 @@ define(function(require) {
          * @returns {Object}
          */
         combineOptions: function() {
-            var filters = {};
-            var modules = this.modules;
-            var collection = this.collection;
+            const filters = {};
+            const modules = this.modules;
             _.each(this.metadata.filters, function(options) {
                 if (_.has(options, 'name') && _.has(options, 'type')) {
-                    // @TODO pass collection only for specific filters
-                    if (options.type === 'selectrow') {
-                        options.collection = collection;
-                    }
                     if (options.lazy) {
                         options.loader = methods.createFilterLoader.call(this, options);
                     }
-                    var Filter = modules[options.type].extend(options);
+                    const Filter = modules[options.type].extend(options);
                     filters[options.name] = new Filter();
                 }
             }, this);
@@ -122,7 +138,7 @@ define(function(require) {
         },
 
         loadFilters: function(gridName) {
-            var filterNames = _.map(this.filterLoaders, _.property('name'));
+            const filterNames = _.map(this.filterLoaders, _.property('name'));
             if (!filterNames.length) {
                 return;
             }
@@ -133,15 +149,15 @@ define(function(require) {
                     loader.success.call(this, cachedFilters[loader.cacheId]);
                 });
 
-            var params = {
+            const params = {
                 gridName: gridName,
                 filterNames: _.map(this.filterLoaders, _.property('name'))
             };
             params[this.metadata.options.gridName] = this.metadata.gridParams;
 
-            var url = routing.generate('oro_datagrid_filter_metadata', params);
+            const url = routing.generate('oro_datagrid_filter_metadata', params);
 
-            var self = this;
+            const self = this;
             $.get(url)
                 .done(function(data) {
                     _.each(self.filterLoaders, function(loader) {
@@ -154,14 +170,14 @@ define(function(require) {
         },
 
         createFilterLoader: function(filterOptions) {
-            return _.bind(function(success) {
+            return success => {
                 this.filterLoaders.push({
                     name: filterOptions.name,
                     cacheId: filterOptions.cacheId,
                     success: success,
                     useCache: filterOptions.cacheId && cachedFilters[filterOptions.cacheId]
                 });
-            }, this);
+            };
         }
     };
 
@@ -178,8 +194,7 @@ define(function(require) {
          * @param {Object} [options.metadata] configuration for the grid
          */
         init: function(deferred, options) {
-            var self;
-            self = {
+            const self = {
                 filterLoaders: [],
                 deferred: deferred,
                 $el: options.$el,
@@ -191,9 +206,7 @@ define(function(require) {
 
             _.extend(self, _.pick(options, 'filtersStateElement', 'filterContainerSelector', 'enableToggleFilters'));
 
-            methods.initBuilder.call(self);
-
-            options.gridPromise.done(function(grid) {
+            $.when(options.gridPromise, methods.initBuilder.call(self)).done(function(grid) {
                 self.collection = grid.collection;
                 self.grid = grid;
                 methods.build.call(self);
@@ -206,12 +219,19 @@ define(function(require) {
             if (!_.isArray(options.metadata.plugins)) {
                 options.metadata.plugins = [];
             }
+
             if (_.result(config, 'enableToggleFilters') === false) {
                 options.enableToggleFilters = false;
             }
+
             if (options.enableToggleFilters) {
                 options.metadata.plugins.push(FiltersTogglePlugin);
             }
+
+            if (_.isFunction(FiltersTogglePlugin.isApplicable) && FiltersTogglePlugin.isApplicable(options) === false) {
+                options.enableToggleFilters = false;
+            }
+
             deferred.resolve();
         }
     };

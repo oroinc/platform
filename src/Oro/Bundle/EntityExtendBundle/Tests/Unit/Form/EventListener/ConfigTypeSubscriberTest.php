@@ -17,55 +17,46 @@ use Symfony\Component\Form\Test\FormInterface;
 
 class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_NAME = 'oro_config_type';
-    const SCOPE = 'extend';
-    const CLASS_NAME = 'stdClass';
+    private const FORM_NAME = 'oro_config_type';
+    private const SCOPE = 'extend';
+    private const CLASS_NAME = 'stdClass';
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManger;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManger;
 
-    /**
-     * @var EntityConfigId
-     */
-    protected $entityConfigId;
+    /** @var EntityConfigId */
+    private $entityConfigId;
 
-    /**
-     * @var FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $formConfig;
+    /** @var FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formConfig;
 
-    /**
-     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $form;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
-    /**
-     * @var PropertyConfigContainer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $propertyConfigContainer;
+    /** @var PropertyConfigContainer|\PHPUnit\Framework\MockObject\MockObject */
+    private $propertyConfigContainer;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->entityConfigId = new EntityConfigId(self::SCOPE, self::CLASS_NAME);
 
         $this->formConfig = $this->createMock(FormConfigInterface::class);
-        $this->formConfig->expects($this->any())->method('getOptions')->willReturn([
-            'config_id' => $this->entityConfigId,
-        ]);
+        $this->formConfig->expects($this->any())
+            ->method('getOptions')
+            ->willReturn(['config_id' => $this->entityConfigId]);
 
         $this->form = $this->createMock(FormInterface::class);
-        $this->form->expects($this->any())->method('getConfig')->willReturn($this->formConfig);
-        $this->form->expects($this->any())->method('getName')->willReturn(self::FORM_NAME);
+        $this->form->expects($this->any())
+            ->method('getConfig')
+            ->willReturn($this->formConfig);
+        $this->form->expects($this->any())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
 
         $this->configManger = $this->createMock(ConfigManager::class);
-
         $this->configProvider = $this->createMock(ConfigProvider::class);
 
         $this->propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
@@ -76,8 +67,11 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitWithInvalidForm()
     {
-        $this->form->expects($this->once())->method('isValid')->willReturn(false);
-        $this->configManger->expects($this->never())->method('getProvider');
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(false);
+        $this->configManger->expects($this->never())
+            ->method('getProvider');
 
         $subscriber = new ConfigTypeSubscriber($this->configManger, [$this, 'isSchemaUpdateRequiredCallable']);
         $event = new FormEvent($this->form, []);
@@ -86,13 +80,19 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitWhenSchemaUpdateIsntRequired()
     {
-        $this->form->expects($this->once())->method('isValid')->willReturn(true);
-        $this->configManger->expects($this->once())->method('getProvider')->willReturn($this->configProvider);
-        $this->propertyConfigContainer->expects($this->once())->method('isSchemaUpdateRequired')
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+        $this->configManger->expects($this->once())
+            ->method('getProvider')
+            ->willReturn($this->configProvider);
+        $this->propertyConfigContainer->expects($this->once())
+            ->method('isSchemaUpdateRequired')
             ->with(self::FORM_NAME, $this->entityConfigId)
             ->willReturn(false);
 
-        $this->configManger->expects($this->never())->method('persist');
+        $this->configManger->expects($this->never())
+            ->method('persist');
         $subscriber = new ConfigTypeSubscriber($this->configManger, [$this, 'isSchemaUpdateRequiredCallable']);
         $event = new FormEvent($this->form, []);
         $subscriber->postSubmit($event);
@@ -100,29 +100,39 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitWithFalseSchemaUpdateRequiredCallback()
     {
-        $this->form->expects($this->once())->method('isValid')->willReturn(true);
-        $this->configManger->expects($this->at(0))->method('getProvider')->willReturn($this->configProvider);
-        $this->propertyConfigContainer->expects($this->once())->method('isSchemaUpdateRequired')
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+        $this->configManger->expects($this->once())
+            ->method('getProvider')
+            ->willReturn($this->configProvider);
+        $this->propertyConfigContainer->expects($this->once())
+            ->method('isSchemaUpdateRequired')
             ->with(self::FORM_NAME, $this->entityConfigId)
             ->willReturn(true);
 
         $newVal = 'new_value';
         $oldVal = 'old_value';
 
-        $this->form->expects($this->once())->method('getData')->willReturn($newVal);
+        $this->form->expects($this->once())
+            ->method('getData')
+            ->willReturn($newVal);
         $config = new Config($this->entityConfigId, [self::FORM_NAME => $oldVal]);
-        $this->configManger->expects($this->at(1))->method('getConfig')
+        $this->configManger->expects($this->once())
+            ->method('getConfig')
             ->with($this->entityConfigId)
             ->willReturn($config);
 
-        $this->configManger->expects($this->never())->method('persist');
+        $this->configManger->expects($this->never())
+            ->method('persist');
         $subscriber = new ConfigTypeSubscriber($this->configManger, function ($newValue, $oldValue) {
             $this->assertEquals('old_value', $oldValue);
             $this->assertEquals('new_value', $newValue);
             return false;
         });
 
-        $this->configManger->expects($this->never())->method('persist');
+        $this->configManger->expects($this->never())
+            ->method('persist');
 
         $event = new FormEvent($this->form, []);
         $subscriber->postSubmit($event);
@@ -133,46 +143,49 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         $newVal = 'new_value';
         $oldVal = 'old_value';
 
-        $this->form->expects($this->once())->method('isValid')->willReturn(true);
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
 
         $config = new Config($this->entityConfigId, [self::FORM_NAME => $oldVal]);
 
-        $this->configManger->expects($this->at(0))->method('getProvider')->willReturn($this->configProvider);
-        $this->configManger->expects($this->at(1))->method('getConfig')
+        $this->configManger->expects($this->once())
+            ->method('getConfig')
             ->with($this->entityConfigId)
             ->willReturn($config);
 
-        $this->propertyConfigContainer->expects($this->once())->method('isSchemaUpdateRequired')
+        $this->propertyConfigContainer->expects($this->once())
+            ->method('isSchemaUpdateRequired')
             ->with(self::FORM_NAME, $this->entityConfigId)
             ->willReturn(true);
 
-        $subscriber = new ConfigTypeSubscriber($this->configManger, [$this, 'isSchemaUpdateRequiredCallable']);
-
-        $this->form->expects($this->once())->method('getData')->willReturn($newVal);
+        $this->form->expects($this->once())
+            ->method('getData')
+            ->willReturn($newVal);
 
         $extendConfig = new Config($this->entityConfigId, ['state' => ExtendScope::STATE_ACTIVE]);
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
-        $extendConfigProvider
-            ->expects($this->once())
+        $extendConfigProvider->expects($this->once())
             ->method('getConfigById')
             ->with($this->entityConfigId)
             ->willReturn($extendConfig);
 
-        $this->configManger->expects($this->at(2))->method('getProvider')
+        $this->configManger->expects($this->exactly(2))
+            ->method('getProvider')
             ->with(self::SCOPE)
-            ->willReturn($extendConfigProvider);
+            ->willReturnOnConsecutiveCalls($this->configProvider, $extendConfigProvider);
 
-        $this->configManger->expects($this->once())->method('persist')->with($extendConfig);
-        $event = new FormEvent($this->form, []);
-        $subscriber->postSubmit($event);
+        $this->configManger->expects($this->once())
+            ->method('persist')
+            ->with($extendConfig);
 
-        $this->assertArraySubset([
-            'pending_changes' => [
-                self::SCOPE => [self::FORM_NAME => [$oldVal, $newVal]],
-            ],
-            'state' => ExtendScope::STATE_UPDATE
-        ], $extendConfig->getValues());
+        $subscriber = new ConfigTypeSubscriber($this->configManger, [$this, 'isSchemaUpdateRequiredCallable']);
+        $subscriber->postSubmit(new FormEvent($this->form, []));
+
+        $values = $extendConfig->getValues();
+        $this->assertSame([self::SCOPE => [self::FORM_NAME => [$oldVal, $newVal]]], $values['pending_changes']);
+        $this->assertSame(ExtendScope::STATE_UPDATE, $values['state']);
     }
 
     public function testPostSubmitWithFieldConfig()
@@ -189,35 +202,43 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $formConfig->expects($this->once())->method('getOptions')->willReturn([
-            'config_id' => $fieldConfigId,
-        ]);
+        $formConfig->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(['config_id' => $fieldConfigId]);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('getConfig')->willReturn($formConfig);
-        $form->expects($this->atLeastOnce())->method('getName')->willReturn(self::FORM_NAME);
+        $form->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+        $form->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
 
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManger */
         $configManger = $this->createMock(ConfigManager::class);
 
         $configProvider = $this->createMock(ConfigProvider::class);
 
         $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
-        $propertyConfigContainer->expects($this->once())->method('isSchemaUpdateRequired')->willReturn(true);
+        $propertyConfigContainer->expects($this->once())
+            ->method('isSchemaUpdateRequired')
+            ->willReturn(true);
         $configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->willReturn($propertyConfigContainer);
 
-        $form->expects($this->once())->method('isValid')->willReturn(true);
-        $configManger->expects($this->at(0))->method('getProvider')->willReturn($configProvider);
-        $configManger->expects($this->at(1))->method('getConfig')
+        $form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+        $configManger->expects($this->once())
+            ->method('getConfig')
             ->with($fieldConfigId)
             ->willReturn($config);
 
         $subscriber = new ConfigTypeSubscriber($configManger, [$this, 'isSchemaUpdateRequiredCallable']);
 
-        $form->expects($this->once())->method('getData')->willReturn($newVal);
+        $form->expects($this->once())
+            ->method('getData')
+            ->willReturn($newVal);
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
 
@@ -225,24 +246,29 @@ class ConfigTypeSubscriberTest extends \PHPUnit\Framework\TestCase
             'owner' => ExtendScope::OWNER_CUSTOM,
             'state' => ExtendScope::STATE_ACTIVE
         ]);
-        $extendConfigProvider->expects($this->once())->method('getConfigById')
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfigById')
             ->with($fieldConfigId)
             ->willReturn($extendConfig);
 
-        $configManger->expects($this->at(2))->method('getProvider')
+        $configManger->expects($this->exactly(2))
+            ->method('getProvider')
             ->with(self::SCOPE)
-            ->willReturn($extendConfigProvider);
+            ->willReturnOnConsecutiveCalls($configProvider, $extendConfigProvider);
 
-        $configManger->expects($this->once())->method('persist')->with($extendConfig);
+        $configManger->expects($this->once())
+            ->method('persist')
+            ->with($extendConfig);
         $event = new FormEvent($form, []);
         $subscriber->postSubmit($event);
     }
 
     public function testGetSubscribedEvents()
     {
-        $this->assertEquals([
-            FormEvents::POST_SUBMIT => 'postSubmit',
-        ], ConfigTypeSubscriber::getSubscribedEvents());
+        $this->assertEquals(
+            [FormEvents::POST_SUBMIT => 'postSubmit'],
+            ConfigTypeSubscriber::getSubscribedEvents()
+        );
     }
 
     /**

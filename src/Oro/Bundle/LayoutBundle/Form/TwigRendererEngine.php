@@ -4,7 +4,11 @@ namespace Oro\Bundle\LayoutBundle\Form;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\FormView;
+use Twig\Template;
 
+/**
+ * A rendering engine that uses Twig for Oro layout component.
+ */
 class TwigRendererEngine extends BaseTwigRendererEngine
 {
     /** @var ConfigManager */
@@ -19,7 +23,7 @@ class TwigRendererEngine extends BaseTwigRendererEngine
     public function renderBlock(FormView $view, $resource, $blockName, array $variables = [])
     {
         $twigTemplate = current($resource);
-        if ($this->isProfilerEnabled() && $twigTemplate instanceof \Twig_Template) {
+        if ($this->isProfilerEnabled() && $twigTemplate instanceof Template) {
             $variables['attr']['data-layout-debug-block-id'] = $variables['id'];
             $variables['attr']['data-layout-debug-block-template'] = $twigTemplate->getTemplateName();
         }
@@ -27,9 +31,6 @@ class TwigRendererEngine extends BaseTwigRendererEngine
         return parent::renderBlock($view, $resource, $blockName, $variables);
     }
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function setConfigManager(ConfigManager $configManager)
     {
         $this->configManager = $configManager;

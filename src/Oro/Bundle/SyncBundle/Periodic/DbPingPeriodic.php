@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SyncBundle\Periodic;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\Persistence\ManagerRegistry;
 use Gos\Bundle\WebSocketBundle\Periodic\PeriodicInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -23,10 +23,6 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
     /** @var int */
     private $timeout;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param int $timeout
-     */
     public function __construct(ManagerRegistry $doctrine, int $timeout = 20)
     {
         $this->doctrine = $doctrine;
@@ -37,6 +33,7 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
 
     /**
      * {@inheritdoc}
+     * @throws DBALException
      */
     public function tick(): void
     {
@@ -47,6 +44,8 @@ class DbPingPeriodic implements PeriodicInterface, LoggerAwareInterface
                 $stmt->execute();
             } catch (DBALException $e) {
                 $this->logger->error('Can\'t ping database connection', ['exception' => $e]);
+
+                throw $e;
             }
         }
     }

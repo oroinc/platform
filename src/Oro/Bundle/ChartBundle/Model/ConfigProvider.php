@@ -3,58 +3,65 @@
 namespace Oro\Bundle\ChartBundle\Model;
 
 use Oro\Bundle\ChartBundle\Exception\InvalidConfigurationException;
+use Oro\Component\Config\Cache\PhpArrayConfigProvider;
+use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
+use Oro\Component\Config\ResourcesContainerInterface;
 
-class ConfigProvider
+/**
+ * The provider for charts configuration
+ * that is loaded from "Resources/config/oro/charts.yml" files.
+ */
+class ConfigProvider extends PhpArrayConfigProvider
 {
-    /**
-     * @var array
-     */
-    protected $configs;
+    private const CONFIG_FILE = 'Resources/config/oro/charts.yml';
 
     /**
-     * @param array $configs
+     * @return string[]
      */
-    public function __construct(array $configs)
+    public function getChartNames(): array
     {
-        $this->configs = $configs;
+        return array_keys($this->doGetConfig());
+    }
+
+    public function hasChartConfig(string $chartName): bool
+    {
+        $config = $this->doGetConfig();
+
+        return isset($config[$chartName]);
     }
 
     /**
-     * @return array
+     * @throws InvalidConfigurationException
      */
-    public function getConfigs()
+    public function getChartConfig(string $chartName): array
     {
-        return $this->configs;
-    }
-
-    /**
-     * @param string $chartName
-     * @throws \Oro\Bundle\ChartBundle\Exception\InvalidConfigurationException
-     * @return array
-     */
-    public function getChartConfig($chartName)
-    {
-        if (!$this->hasChartConfig($chartName)) {
+        $config = $this->doGetConfig();
+        if (!isset($config[$chartName])) {
             throw new InvalidConfigurationException($chartName);
         }
 
-        return $this->configs[$chartName];
+        return $config[$chartName];
     }
 
     /**
-     * @return array
+     * {@inheritdoc}
      */
-    public function getChartConfigs()
+    protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
-        return $this->configs;
-    }
+        $configs = [];
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_chart', self::CONFIG_FILE);
+        $resources = $configLoader->load($resourcesContainer);
+        foreach ($resources as $resource) {
+            if (!empty($resource->data[Configuration::ROOT_NODE_NAME])) {
+                $configs[] = $resource->data[Configuration::ROOT_NODE_NAME];
+            }
+        }
 
-    /**
-     * @param string $chartName
-     * @return bool
-     */
-    public function hasChartConfig($chartName)
-    {
-        return isset($this->configs[$chartName]);
+        return CumulativeConfigProcessorUtil::processConfiguration(
+            self::CONFIG_FILE,
+            new Configuration(),
+            [\array_replace_recursive(...$configs)]
+        );
     }
 }

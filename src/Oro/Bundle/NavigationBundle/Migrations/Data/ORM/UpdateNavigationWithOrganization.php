@@ -1,12 +1,18 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Migrations\Data\ORM;
+namespace Oro\Bundle\NavigationBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 
-class UpdateNavigationWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
+/**
+ * Loads organizations for NavigationItem and NavigationHistoryItem entities.
+ */
+class UpdateNavigationWithOrganization extends UpdateWithOrganization implements
+    DependentFixtureInterface,
+    RenamedFixtureInterface
 {
     /**
      * {@inheritdoc}
@@ -17,9 +23,16 @@ class UpdateNavigationWithOrganization extends UpdateWithOrganization implements
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getPreviousClassNames(): array
+    {
+        return [
+            'Oro\\Bundle\\UserBundle\\Migrations\\Data\\ORM\\UpdateNavigationWithOrganization',
+        ];
+    }
+    /**
      * Update navigation with organization
-     *
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

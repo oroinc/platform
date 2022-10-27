@@ -14,7 +14,7 @@
     {% if form.vars.group_fallback_fields %}
         <div class="fallback-item-fallback-line">
             <div nowrap="true" class="fallback-item-use-fallback">
-                {{ form_widget(form.use_fallback) }} {{ form.use_fallback.vars.label|trans }}
+                {{ form_widget(form.use_fallback) }}{{ form.use_fallback.vars.label|trans }}
             </div>
             <div class="fallback-item-fallback">
                 {{ form_widget(form.fallback, {'attr': {'class': 'fallback'}}) }}
@@ -28,7 +28,7 @@
         {% if not form.vars.group_fallback_fields %}
             <div class="fallback-item-fallback-line">
                 <div nowrap="true" class="fallback-item-use-fallback">
-                    {{ form_widget(form.use_fallback) }} {{ form.use_fallback.vars.label|trans }}
+                    {{ form_widget(form.use_fallback) }}{{ form.use_fallback.vars.label|trans }}
                 </div>
                 <div class="fallback-item-fallback {% if form.vars.exclude_parent_localization %}hide{% endif %}">
                     {{ form_widget(form.fallback, {'attr': {'class': 'fallback'}}) }}
@@ -41,6 +41,19 @@
     {{ form_errors(form.fallback) }}
 {% endblock %}
 
+{% block oro_locale_fallback_value_tabs_widget %}
+    <div class="fallback-item-fallback">
+        {{ form_row(form.fallback, {'attr': {'class': 'fallback'}}) }}
+    </div>
+    <div class="fallback-item-value">
+        {{ form_widget(form.value, {'attr': {'class' : 'fallback-item-value-input'}}) }}
+    </div>
+    <div class="fallback-item-use-fallback hide">
+        {{ form_widget(form.use_fallback) }}
+    </div>
+    {{ form_errors(form.value) }}
+{% endblock %}
+
 {% block oro_locale_localized_property_widget %}
     <div class="fallback-container"
             data-page-component-module="oroui/js/app/components/view-component"
@@ -49,9 +62,15 @@
             >
         <div class="fallback-item">
             <div class="fallback-item-value fallback-item-value--first">
-                {{ form_widget(form.default) }}
-                {{ form_errors(form.default) }}
-                <span class="fallback-status"></span>
+                <div class="input-append">
+                    <div class="input-group">
+                        {{ form_widget(form.default) }}
+                        {{ form_errors(form.default) }}
+                    </div>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-icon btn-square-default fallback-status"></button>
+                    </div>
+                </div>
             </div>
             <div class="fallback-item-label">{{ form.default.vars.label|trans }}</div>
         </div>
@@ -67,41 +86,116 @@
     </div>
 {% endblock %}
 
+{% block oro_locale_localized_property_tabs_widget %}
+    {% import _self as fields %}
+
+    {% import '@OroUI/macros.html.twig' as UI %}
+    <div class="fallback-container oro-tabs tabbable"
+         data-layout="separate"
+         {{ UI.renderPageComponentAttributes({
+            view: 'orolocale/js/app/views/localizable-collection-tabs-view'
+         }) }}
+    >
+        {% set tabId = 'fallback-container-'|uniqid %}
+
+        <div class="oro-tabs__head" {{ UI.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/tabs-component'
+        }) }}>
+            <ul class="nav nav-tabs" role="tablist">
+                {% apply spaceless %}
+                    {{ fields.renderTabNavItem(form.default, true, tabId ~ '-' ~ 0) }}
+                    {% for localization in form.localizations %}
+                        {{ fields.renderTabNavItem(localization, false, tabId ~ '-' ~ loop.index) }}
+                    {% endfor %}
+                {% endapply %}
+            </ul>
+        </div>
+        <div class="oro-tabs__content">
+            <div class="tab-content">
+                {% apply spaceless %}
+                    {{ fields.renderTab(form.default, true, tabId ~ '-' ~ 0) }}
+                    {% for localization in form.localizations %}
+                        {{ fields.renderTab(localization, false, tabId ~ '-' ~ loop.index) }}
+                    {% endfor %}
+                {% endapply %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
 {% block oro_locale_localized_fallback_value_collection_widget %}
+    <div class="control-group">
+        {{ form_widget(form.values) }}
+        {{ form_errors(form.values) }}
+        {{ form_widget(form.ids) }}
+        {{ form_errors(form.ids) }}
+    </div>
+{% endblock %}
+
+{% block oro_locale_localized_fallback_value_collection_tabs_widget %}
     {{ form_widget(form.values) }}
     {{ form_errors(form.values) }}
     {{ form_widget(form.ids) }}
     {{ form_errors(form.ids) }}
 {% endblock %}
 
-{% block _language_settings_oro_locale___language_value_widget %}
+{% block _localization_oro_locale___default_localization_widget %}
     <span data-page-component-module="oroui/js/app/components/view-component"
-       data-page-component-options="{{ {view: 'orolocale/js/app/views/language-select-view'}|json_encode }}"
+          data-page-component-options="{{ {
+              view: 'orolocale/js/app/views/localization-select-view',
+              selectSelector: '#' ~ form.value.vars.id,
+              useParentSelector: '#' ~ form.use_parent_scope_value.vars.id
+          }|json_encode }}"
     >
         {{ form_widget(form) }}
     </span>
 {% endblock %}
 
-{% block _language_settings_oro_locale___languages_value_widget %}
+{% block _localization_oro_locale___enabled_localizations_widget %}
     <span data-page-component-module="oroui/js/app/components/view-component"
-          data-page-component-options="{{ {view: 'orolocale/js/app/views/languages-select-view'}|json_encode }}"
+          data-page-component-options="{{ {
+              view: 'orolocale/js/app/views/localizations-select-view',
+              selectSelector: '#' ~ form.value.vars.id,
+              useParentSelector: '#' ~ form.use_parent_scope_value.vars.id
+          }|json_encode }}"
     >
         {{ form_widget(form) }}
     </span>
 {% endblock %}
 
-{% block _localization_oro_locale___default_localization_value_widget %}
-    <span data-page-component-module="oroui/js/app/components/view-component"
-          data-page-component-options="{{ {view: 'orolocale/js/app/views/localization-select-view'}|json_encode }}"
-    >
-        {{ form_widget(form) }}
+{% block _localization_oro_locale___enabled_localizations_use_parent_scope_value_row %}
+    <span class="hide">
+        {{ form_row(form, {'attr': attr}) }}
     </span>
 {% endblock %}
 
-{% block _localization_oro_locale___enabled_localizations_value_widget %}
-    <span data-page-component-module="oroui/js/app/components/view-component"
-          data-page-component-options="{{ {view: 'orolocale/js/app/views/localizations-select-view'}|json_encode }}"
+{% macro renderTabNavItem(form, isDefault, uniqid) %}
+    <li class="nav-item">
+        <a id="{{ uniqid ~ '-tab'}}"
+           class="nav-link {% if isDefault %}active{% endif %}"
+           role="tab"
+           href="#"
+           aria-controls="{{ uniqid }}"
+           aria-selected="{% if isDefault %}true{% else %}false{% endif %}"
+           data-role="change-localization"
+           data-target=".localization-fields-{{ uniqid }}-{{ form.vars.name }}"
+           data-toggle="tab"
+           data-related="{{ form.vars.name }}"
+        >
+            {{ form.vars.label|trans }}
+        </a>
+    </li>
+{% endmacro %}
+
+{% macro renderTab(form, isDefault, uniqid) %}
+    <div id="{{ uniqid }}"
+         class="fallback-item localization-fields-{{ uniqid }}-{{ form.vars.name }} tab-pane{% if isDefault %} active{% endif %}"
+         role="tabpanel"
+         aria-labelledby="{{ uniqid ~ '-tab' }}"
     >
+        {% if isDefault %}<div class="fallback-item-value">{% endif %}
         {{ form_widget(form) }}
-    </span>
-{% endblock %}
+        {{ form_errors(form) }}
+        {% if isDefault %}</div>{% endif %}
+    </div>
+{% endmacro %}

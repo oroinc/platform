@@ -1,3 +1,4 @@
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set first_route = first_route|default('oro_entity_pagination_first') %}
 {% set previous_route = previous_route|default('oro_entity_pagination_previous') %}
 {% set next_route = next_route|default('oro_entity_pagination_next') %}
@@ -19,7 +20,17 @@
         {% set componentName = 'oroui/js/app/components/hidden-redirect-component' %}
         {% set componentOptions = {type: 'warning'} %}
         
-        <div id="entity-pagination" class="entity-pagination">
+        <div id="entity-pagination" class="entity-pagination" {% if isMobileVersion() %}
+            {{ UI.renderPageComponentAttributes({
+                view: 'oroui/js/app/views/sticky-element/sticky-element-view',
+                options: {
+                    stickyOptions: {
+                        enabled: true,
+                        relativeTo: 'body'
+                    }
+                }
+            }) }}
+        {% endif %}>
             <ul class="pagination pagination--mini">
                 <li class="page-item{% if pager.current == 1 %} disabled{% endif %}">
                     <a href="{{ path(first_route, allParams) }}"
@@ -59,7 +70,7 @@
             </ul>
 
             <div class="entity-pagination_total">
-                {{ 'oro.entity_pagination.pager_of_%total%_record|pager_of_%total%_records'|transchoice(pager.total, {'%total%': pager.total}) }}
+                {{ 'oro.entity_pagination.pager_of_%count%_record|pager_of_%count%_records'|trans({'%count%': pager.total}) }}
             </div>
         </div>
     {% endif %}

@@ -28,4 +28,10 @@ class MenuUpdateTest extends \PHPUnit\Framework\TestCase
             $update->getExtras()
         );
     }
+
+    public function testGetLinkAttributes(): void
+    {
+        $update = new MenuUpdate();
+        $this->assertSame([], $update->getLinkAttributes());
+    }
 }

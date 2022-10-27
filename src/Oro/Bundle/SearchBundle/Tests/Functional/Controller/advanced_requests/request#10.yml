@@ -9,17 +9,6 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 entity_label: "oro.testframework.item.entity_label"
-                record_string: "item1@mail.com 0123-456100"
                 record_url: http://localhost%oro_default_prefix%search/
                 selected_data:
                     notExistingValue: ''
-    soap:
-        data:
-            -
-                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
-                recordTitle: "item1@mail.com 0123-456100"
-                recordUrl: http://localhost%oro_default_prefix%search/
-                selectedData:
-                    item:
-                        key: notExistingValue
-                        value: ''

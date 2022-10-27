@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var NotesView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
-    var DialogWidget = require('oro/dialog-widget');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    const DialogWidget = require('oro/dialog-widget');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
-    NotesView = BaseCollectionView.extend({
+    const NotesView = BaseCollectionView.extend({
         options: {
             template: null,
             itemTemplate: null,
@@ -34,14 +33,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function NotesView() {
-            NotesView.__super__.constructor.apply(this, arguments);
+        constructor: function NotesView(options) {
+            NotesView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -66,7 +65,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -93,9 +92,9 @@ define(function(require) {
         },
 
         toggleSorting: function(e) {
-            var $el = $(e.currentTarget);
-            var titleAlt = $el.data('title-alt');
-            var iconAlt = $el.data('icon-alt');
+            const $el = $(e.currentTarget);
+            const titleAlt = $el.data('title-alt');
+            const iconAlt = $el.data('icon-alt');
             $el.data('title-alt', $el.attr('title'));
             $el.attr('title', titleAlt);
             $el.data('icon-alt', $el.find('i').attr('class').replace(/ hide-text/, ''));
@@ -105,7 +104,7 @@ define(function(require) {
         },
 
         _reload: function(sorting) {
-            var state = {};
+            const state = {};
             if (!_.isUndefined(sorting)) {
                 this.collection.setSorting(sorting);
             }
@@ -116,16 +115,16 @@ define(function(require) {
                 });
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(function() {
+                    success: () => {
                         _.each(this.getItemViews(), function(itemView) {
                             itemView.toggle(state[itemView.model.get('id')]);
                         });
                         this._hideLoading();
-                    }, this),
+                    },
                     errorHandlerMessage: false,
-                    error: _.bind(function(collection, response) {
+                    error: (collection, response) => {
                         this._showLoadItemsError(response.responseJSON || {});
-                    }, this)
+                    }
                 });
             } catch (err) {
                 this._showLoadItemsError(err);
@@ -133,8 +132,8 @@ define(function(require) {
         },
 
         _addItem: function(e) {
-            var url = this._getUrl('createItem');
-            var routeAdditionalParams = $(e).data('route_additional_params') || {};
+            let url = this._getUrl('createItem');
+            const routeAdditionalParams = $(e).data('route_additional_params') || {};
 
             if (!_.isEmpty(routeAdditionalParams)) {
                 url += (url.indexOf('?') === -1 ? '?' : '&') + $.param(routeAdditionalParams);
@@ -148,12 +147,12 @@ define(function(require) {
         },
 
         _deleteItem: function(model) {
-            var confirm = new DeleteConfirmation({
+            const confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 this._onItemDelete(model);
-            }, this));
+            });
             confirm.open();
         },
 
@@ -163,18 +162,18 @@ define(function(require) {
                 model.destroy({
                     wait: true,
                     url: this._getUrl('deleteItem', model),
-                    success: _.bind(function() {
+                    success: () => {
                         this._hideLoading();
                         mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
-                    }, this),
+                    },
                     errorHandlerMessage: false,
-                    error: _.bind(function(model, response) {
+                    error: (model, response) => {
                         if (!_.isUndefined(response.status) && response.status === 403) {
                             this._showForbiddenError(response.responseJSON || {});
                         } else {
                             this._showDeleteItemError(response.responseJSON || {});
                         }
-                    }, this)
+                    }
                 });
             } catch (err) {
                 this._showDeleteItemError(err);
@@ -212,24 +211,24 @@ define(function(require) {
                         resizable: false,
                         width: 675,
                         autoResize: true,
-                        close: _.bind(function() {
+                        close: () => {
                             delete this.itemEditDialog;
-                        }, this)
+                        }
                     }
                 });
                 this.itemEditDialog.render();
-                this.itemEditDialog.on('formSave', _.bind(function(response) {
+                this.itemEditDialog.on('formSave', response => {
                     this.itemEditDialog.remove();
                     mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
-                    var insertPosition;
-                    var model = this.collection.get(response.id);
+                    let insertPosition;
+                    const model = this.collection.get(response.id);
                     if (model) {
                         model.set(response);
                     } else {
                         insertPosition = this.collection.sorting === 'DESC' ? 0 : this.collection.length;
                         this.collection.add(response, {at: insertPosition});
                     }
-                }, this));
+                });
             }
         },
 

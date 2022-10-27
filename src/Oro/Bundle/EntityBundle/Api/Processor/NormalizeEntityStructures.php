@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\EntityBundle\Api\EntityStructureNormalizer;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -15,9 +16,6 @@ class NormalizeEntityStructures implements ProcessorInterface
     /** @var EntityStructureNormalizer */
     private $normalizer;
 
-    /**
-     * @param EntityStructureNormalizer $normalizer
-     */
     public function __construct(EntityStructureNormalizer $normalizer)
     {
         $this->normalizer = $normalizer;
@@ -49,6 +47,6 @@ class NormalizeEntityStructures implements ProcessorInterface
         $context->setResult($normalizedData);
 
         // skip default normalization
-        $context->skipGroup('normalize_data');
+        $context->skipGroup(ApiActionGroup::NORMALIZE_DATA);
     }
 }

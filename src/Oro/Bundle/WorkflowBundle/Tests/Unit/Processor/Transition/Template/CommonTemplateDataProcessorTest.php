@@ -13,28 +13,26 @@ use Symfony\Component\Form\FormView;
 
 class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  CommonTemplateDataProcessor */
-    protected $processor;
+    /** @var CommonTemplateDataProcessor */
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new CommonTemplateDataProcessor();
     }
 
     public function testDataProcessing()
     {
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
         $formView = $this->createMock(FormView::class);
 
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
 
         $context = new TransitionContext();
         $context->setForm($form);
@@ -42,8 +40,13 @@ class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
         $context->setWorkflowItem($workflowItem);
         $context->setResultType(new TemplateResultType());
 
-        $form->expects($this->once())->method('createView')->willReturn($formView);
-        $form->expects($this->once())->method('getErrors')->with(true)->willReturn(['error1', 'error2']);
+        $form->expects($this->once())
+            ->method('createView')
+            ->willReturn($formView);
+        $form->expects($this->once())
+            ->method('getErrors')
+            ->with(true)
+            ->willReturn(['error1', 'error2']);
 
         $this->processor->process($context);
 
@@ -61,27 +64,29 @@ class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSkipNonTemplateResponseTypeContext()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')
             ->willReturn($this->createMock(TransitActionResultTypeInterface::class));
 
-        $context->expects($this->never())->method('getForm');
+        $context->expects($this->never())
+            ->method('getForm');
 
         $this->processor->process($context);
     }
 
     public function testSkipSavedContext()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')
             ->willReturn(new TemplateResultType());
 
-        $context->expects($this->once())->method('isSaved')->willReturn(true);
-        $context->expects($this->never())->method('getForm');
+        $context->expects($this->once())
+            ->method('isSaved')
+            ->willReturn(true);
+        $context->expects($this->never())
+            ->method('getForm');
 
         $this->processor->process($context);
     }

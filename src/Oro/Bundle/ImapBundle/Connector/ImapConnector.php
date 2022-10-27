@@ -34,10 +34,6 @@ class ImapConnector
      */
     protected $searchStringManager;
 
-    /**
-     * @param ImapConfig          $config
-     * @param ImapServicesFactory $factory
-     */
     public function __construct(ImapConfig $config, ImapServicesFactory $factory)
     {
         $this->config  = $config;

@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Doctrine\ORM\Query;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
 {
@@ -13,10 +12,10 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
      */
     public function testVirtualColumns()
     {
-        $en                    = 'Acme\Entity\TestEntity';
-        $en1                   = 'Acme\Entity\TestEntity1';
-        $en2                   = 'Acme\Entity\TestEntity2';
-        $definition            = [
+        $en = 'Acme\Entity\TestEntity';
+        $en1 = 'Acme\Entity\TestEntity1';
+        $en2 = 'Acme\Entity\TestEntity2';
+        $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
                 ['name' => 'vc1', 'label' => 'lbl2', 'sorting' => 'DESC'],
@@ -37,7 +36,7 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                 ]
             ]
         ];
-        $doctrine              = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en  => [
                     'column1' => 'string',
@@ -114,11 +113,9 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, null, $virtualColumnProvider);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'name'    => 'test_grid',
@@ -212,13 +209,7 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                         'vc3'                                  => 'c5',
                     ]
                 ],
-                'type'         => 'orm',
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
-                ]
+                'type'         => 'orm'
             ],
             'fields_acl' => [
                 'columns' => [
@@ -239,8 +230,8 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
      */
     public function testVirtualColumnsForEnum()
     {
-        $en                    = 'Acme\Entity\TestEntity';
-        $definition            = [
+        $en = 'Acme\Entity\TestEntity';
+        $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
                 ['name' => 'vc1', 'label' => 'lbl2', 'sorting' => 'DESC'],
@@ -261,7 +252,7 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                 ],
             ]
         ];
-        $doctrine              = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => [
                     'column1' => 'string',
@@ -292,11 +283,9 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, null, $virtualColumnProvider);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -341,12 +330,6 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                             'columnAlias' => 'c2'
                         ],
                     ]
-                ],
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
@@ -383,14 +366,14 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
      */
     public function testVirtualColumnsForDictionary()
     {
-        $en                    = 'Acme\Entity\TestEntity';
-        $definition            = [
+        $en = 'Acme\Entity\TestEntity';
+        $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
                 ['name' => 'vc1', 'label' => 'lbl2', 'sorting' => 'DESC'],
             ],
         ];
-        $doctrine              = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => [
                     'column1' => 'string',
@@ -421,14 +404,9 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
 
-        $entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $entityNameResolver = $this->getEntityNameResolver();
         $entityNameResolver->expects($this->once())
             ->method('getNameDQL')
             ->willReturn('testName');
@@ -438,10 +416,11 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
             $doctrine,
             null,
             $virtualColumnProvider,
+            null,
             [],
             $entityNameResolver
         );
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -472,12 +451,6 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
                         'column1' => 'c1',
                         'vc1'     => 'c2',
                     ],
-                ],
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [

@@ -1,0 +1,10 @@
+{% if record.rootEntity.sourceFile %}
+    {% include '@OroAttachment/Twig/picture.html.twig' with {
+        file: record.rootEntity.sourceFile,
+        filter: 'digital_asset_in_dialog',
+        img_attrs: {
+            class: 'digital-asset-thumbnail',
+            alt: oro_file_title(record.rootEntity.sourceFile),
+        }
+    } %}
+{% endif %}

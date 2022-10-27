@@ -4,9 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub;
 
 class EntityWithWorkflow
 {
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $id;
 
     /**

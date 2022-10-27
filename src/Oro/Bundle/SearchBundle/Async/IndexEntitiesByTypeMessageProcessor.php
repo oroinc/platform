@@ -1,7 +1,11 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Async;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByRangeTopic;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByTypeTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -9,16 +13,17 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
+/**
+ * Message queue processor that indexes entities by class name.
+ */
 class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     const BATCH_SIZE = 1000;
 
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
@@ -37,14 +42,8 @@ class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, 
      */
     private $logger;
 
-    /**
-     * @param RegistryInterface $doctrine
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
-     */
     public function __construct(
-        RegistryInterface $doctrine,
+        ManagerRegistry $doctrine,
         JobRunner $jobRunner,
         MessageProducerInterface $producer,
         LoggerInterface $logger
@@ -60,7 +59,7 @@ class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, 
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $payload = JSON::decode($message->getBody());
+        $payload = $message->getBody();
 
         $result = $this->jobRunner->runDelayed($payload['jobId'], function (JobRunner $jobRunner) use ($payload) {
             /** @var EntityManager $em */
@@ -82,9 +81,9 @@ class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, 
             $batches = (int) ceil($entityCount / self::BATCH_SIZE);
             for ($i = 0; $i < $batches; $i++) {
                 $jobRunner->createDelayed(
-                    sprintf('%s:%s:%s', Topics::INDEX_ENTITY_BY_RANGE, $payload['entityClass'], $i),
+                    sprintf('%s:%s:%s', IndexEntitiesByRangeTopic::getName(), $payload['entityClass'], $i),
                     function (JobRunner $jobRunner, Job $child) use ($i, $payload) {
-                        $this->producer->send(Topics::INDEX_ENTITY_BY_RANGE, [
+                        $this->producer->send(IndexEntitiesByRangeTopic::getName(), [
                             'entityClass' => $payload['entityClass'],
                             'offset' => $i * self::BATCH_SIZE,
                             'limit' => self::BATCH_SIZE,
@@ -105,6 +104,6 @@ class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, 
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::INDEX_ENTITY_TYPE];
+        return [IndexEntitiesByTypeTopic::getName()];
     }
 }

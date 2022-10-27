@@ -1,0 +1,51 @@
+aliases:
+    asap$: asap/asap
+    backbone$: backbone/backbone
+    bootstrap$: oroviewswitcher/js/bootstrap
+    bootstrap-alert$: '@oroinc/bootstrap/js/dist/alert'
+    chaplin$: oroui/lib/chaplin
+    cryptojs/sha256$: crypto-js/sha256
+    jquery$: jquery/dist/jquery
+    jquery-ui: jquery-ui/ui
+    module-config$: oroui/js/app/services/module-config
+    oroui/js/app$: oroviewswitcher/js/app/views/demo/demo
+    routing$: fosjsrouting/js/router
+    slick$: slick-carousel/slick/slick
+    underscore$: underscore/underscore
+configs:
+    orotranslation/js/translator: {}
+    oroui/js/component-shortcuts-manager: {}
+    oroui/js/messenger: {}
+    oroviewswitcher/js/app/views/demo/demo: {}
+    oroviewswitcher/js/app/views/device-switcher-view: {}
+dynamic-imports:
+    oroviewswitcher:
+        - orotranslation/js/translator
+        - oroui/js/messenger
+entry:
+    app:
+        - oroui/js/app
+        - oroui/js/app/services/app-ready-load-modules
+map:
+    '*':
+        backbone: oroui/js/extend/backbone
+        chaplin: oroui/js/extend/chaplin
+        jquery: oroui/js/extend/jquery
+        underscore: oroui/js/extend/underscore
+    chaplin:
+        backbone: backbone
+    oroui/js/app/components/base/component:
+        backbone: backbone
+        chaplin: chaplin
+    oroui/js/extend/backbone:
+        backbone: backbone
+    oroui/js/extend/chaplin:
+        chaplin: chaplin
+    oroui/js/extend/jquery:
+        jquery: jquery
+    oroui/js/extend/underscore:
+        underscore: underscore
+    oroui/js/mediator:
+        chaplin: chaplin
+    oroui/js/tools:
+        chaplin: chaplin

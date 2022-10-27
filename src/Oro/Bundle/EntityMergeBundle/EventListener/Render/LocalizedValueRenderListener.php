@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\EventListener\Render;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent;
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
@@ -14,6 +14,9 @@ use Oro\Bundle\LocaleBundle\Model\MiddleNameInterface;
 use Oro\Bundle\LocaleBundle\Model\NamePrefixInterface;
 use Oro\Bundle\LocaleBundle\Model\NameSuffixInterface;
 
+/**
+ * The event listener responsible for converting value before rendering.
+ */
 class LocalizedValueRenderListener
 {
     /**
@@ -22,7 +25,7 @@ class LocalizedValueRenderListener
     protected $addressFormatter;
 
     /**
-     * @var DateTimeFormatter
+     * @var DateTimeFormatterInterface
      */
     protected $dateTimeFormatter;
 
@@ -36,15 +39,9 @@ class LocalizedValueRenderListener
      */
     protected $numberFormatter;
 
-    /**
-     * @param AddressFormatter $addressFormatter
-     * @param DateTimeFormatter $dateTimeFormatter
-     * @param EntityNameResolver $entityNameResolver
-     * @param NumberFormatter $numberFormatter
-     */
     public function __construct(
         AddressFormatter $addressFormatter,
-        DateTimeFormatter $dateTimeFormatter,
+        DateTimeFormatterInterface $dateTimeFormatter,
         EntityNameResolver $entityNameResolver,
         NumberFormatter $numberFormatter
     ) {
@@ -55,7 +52,7 @@ class LocalizedValueRenderListener
     }
 
     /**
-     * @param ValueRenderEvent $fieldValueEvent
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function beforeValueRender(ValueRenderEvent $fieldValueEvent)
     {

@@ -3,50 +3,36 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 /**
  * The factory to create ExtendedAssociationFilter.
  */
 class ExtendedAssociationFilterFactory
 {
-    /** @var ValueNormalizer */
-    protected $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
+    private ExtendedAssociationProvider $extendedAssociationProvider;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
 
-    /** @var AssociationManager */
-    protected $associationManager;
-
-    /** @var EntityOverrideProviderRegistry */
-    protected $entityOverrideProviderRegistry;
-
-    /**
-     * @param ValueNormalizer                $valueNormalizer
-     * @param AssociationManager             $associationManager
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(
         ValueNormalizer $valueNormalizer,
-        AssociationManager $associationManager,
+        ExtendedAssociationProvider $extendedAssociationProvider,
         EntityOverrideProviderRegistry $entityOverrideProviderRegistry
     ) {
         $this->valueNormalizer = $valueNormalizer;
-        $this->associationManager = $associationManager;
+        $this->extendedAssociationProvider = $extendedAssociationProvider;
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
     /**
      * Creates a new instance of ExtendedAssociationFilter.
-     *
-     * @param string $dataType
-     *
-     * @return ExtendedAssociationFilter
      */
-    public function createFilter($dataType)
+    public function createFilter(string $dataType): ExtendedAssociationFilter
     {
         $filter = new ExtendedAssociationFilter($dataType);
         $filter->setValueNormalizer($this->valueNormalizer);
-        $filter->setAssociationManager($this->associationManager);
+        $filter->setExtendedAssociationProvider($this->extendedAssociationProvider);
         $filter->setEntityOverrideProviderRegistry($this->entityOverrideProviderRegistry);
 
         return $filter;

@@ -2,275 +2,415 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider as Provider;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\SecurityBundle\Metadata\Label;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $cache;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $securityConfigProvider;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
+    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
+    /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheItem;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    /** @var EntitySecurityMetadata */
-    protected $entity;
+    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclGroupProvider;
 
-    /**
-     * @var Config
-     */
-    protected $extendConfig;
+    /** @var EntitySecurityMetadataProvider */
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->securityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->extendConfig = new Config(new EntityConfigId('extend', \stdClass::class));
-        $this->extendConfig->set('state', ExtendScope::STATE_ACTIVE);
-        $this->cache = $this->getMockForAbstractClass(
-            'Doctrine\Common\Cache\CacheProvider',
-            array(),
-            '',
-            false,
-            true,
-            true,
-            array('fetch', 'save', 'delete', 'deleteAll')
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
+        $this->cacheItem = $this->createMock(CacheItemInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->aclGroupProvider = $this->createMock(AclGroupProviderInterface::class);
+
+        $this->provider = new EntitySecurityMetadataProvider(
+            $this->configManager,
+            $this->doctrine,
+            $this->cache,
+            $this->eventDispatcher,
+            $this->aclGroupProvider
         );
+    }
 
-        $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entity = new EntitySecurityMetadata(
-            Provider::ACL_SECURITY_TYPE,
+    private function getEntitySecurityMetadata(): EntitySecurityMetadata
+    {
+        return new EntitySecurityMetadata(
+            EntitySecurityMetadataProvider::ACL_SECURITY_TYPE,
             \stdClass::class,
             'SomeGroup',
-            'translated: SomeLabel',
+            new Label('entity.label'),
             [],
             null,
             '',
             [
                 'cityName'  => new FieldSecurityMetadata(
                     'cityName',
-                    'translated: stdclass.city_name.label',
+                    new Label('stdclass.city_name.label'),
                     []
                 ),
                 'firstName' => new FieldSecurityMetadata(
                     'firstName',
-                    'translated: stdclass.first_name.label',
+                    new Label('stdclass.first_name.label'),
                     ['VIEW', 'CREATE']
                 ),
                 'lastName'  => new FieldSecurityMetadata(
                     'lastName',
-                    'translated: stdclass.last_name.label',
-                    []
+                    new Label('stdclass.last_name.label'),
+                    [],
+                    null,
+                    'lastNameAlias'
                 )
             ]
         );
-
-        $this->extendConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->will($this->returnValue($this->extendConfig));
     }
 
-    public function testIsProtectedEntity()
+    private function getEntityConfig(string $scope, string $entityClass, array $values = []): Config
     {
-        $this->cache->expects($this->any())
-            ->method('fetch')
-            ->with(Provider::ACL_SECURITY_TYPE)
-            ->will($this->returnValue(array(\stdClass::class => new EntitySecurityMetadata())));
-
-        $eventDispatcher = $this->getMockForAbstractClass(
-            'Symfony\Component\EventDispatcher\EventDispatcherInterface'
+        return new Config(
+            new EntityConfigId($scope, $entityClass),
+            $values
         );
-
-        $provider = new Provider(
-            $this->securityConfigProvider,
-            $this->entityConfigProvider,
-            $this->extendConfigProvider,
-            $this->doctrine,
-            $this->createMock(TranslatorInterface::class),
-            $this->cache,
-            $eventDispatcher
-        );
-
-        $this->assertTrue($provider->isProtectedEntity(\stdClass::class));
-        $this->assertFalse($provider->isProtectedEntity('UnknownClass'));
     }
 
-    public function testGetEntities()
+    private function getFieldConfig(string $scope, string $entityClass, string $fieldName, array $values = []): Config
     {
-        $entityConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $entityConfig->expects($this->at(0))
-            ->method('get')
-            ->with('label')
-            ->will($this->returnValue('SomeLabel'));
+        return new Config(
+            new FieldConfigId($scope, $entityClass, $fieldName, 'string'),
+            $values
+        );
+    }
 
-        $this->entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(\stdClass::class)
-            ->will($this->returnValue($entityConfig));
-
-        $this->setTestConfig();
-
-        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()->getMock();
-        $metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
-            ->disableOriginalConstructor()->getMock();
-        $manager->expects($this->any())->method('getMetadataFactory')->willReturn($metadataFactory);
-        $metadata = new ClassMetadata(\stdClass::class);
+    private function expectClassMetadata(string $entityClass): void
+    {
+        $metadata = new ClassMetadata($entityClass);
         $metadata->identifier = ['id'];
-        $metadataFactory->expects($this->any())->method('getMetadataFor')->willReturn($metadata);
-        $this->doctrine->expects($this->any())->method('getManagerForClass')->willReturn($manager);
 
-        $this->cache->expects($this->at(0))
-            ->method('fetch')
-            ->with(Provider::ACL_SECURITY_TYPE)
-            ->will($this->returnValue(false));
-        $this->cache->expects($this->at(2))
-            ->method('fetch')
-            ->with(Provider::ACL_SECURITY_TYPE)
-            ->will($this->returnValue(array(\stdClass::class => $this->entity)));
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with(Provider::ACL_SECURITY_TYPE, array(\stdClass::class => $this->entity));
+        $manager = $this->createMock(EntityManagerInterface::class);
+        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $manager->expects($this->any())
+            ->method('getMetadataFactory')
+            ->willReturn($metadataFactory);
+        $metadataFactory->expects($this->any())
+            ->method('getMetadataFor')
+            ->willReturn($metadata);
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($manager);
+    }
 
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects(self::any())
-            ->method('trans')
-            ->willReturnCallback(function ($value) {
-                return 'translated: ' . $value;
+    private function expectLoadMetadata(CacheItemInterface $cacheItem): EntitySecurityMetadata
+    {
+        $entitySecurityMetadata = $this->getEntitySecurityMetadata();
+
+        $securityConfig = $this->getEntityConfig(
+            'security',
+            \stdClass::class,
+            [
+                'type'                => EntitySecurityMetadataProvider::ACL_SECURITY_TYPE,
+                'permissions'         => 'All',
+                'group_name'          => 'SomeGroup',
+                'category'            => '',
+                'field_acl_supported' => true,
+                'field_acl_enabled'   => true
+            ]
+        );
+        $entityConfig = $this->getEntityConfig('entity', \stdClass::class, ['label' => 'entity.label']);
+        $extendConfig = $this->getEntityConfig('extend', \stdClass::class, ['state' => ExtendScope::STATE_ACTIVE]);
+        $fieldsConfigs = [
+            $this->getFieldConfig('security', \stdClass::class, 'id'),
+            $this->getFieldConfig('security', \stdClass::class, 'firstName', ['permissions' => 'VIEW;CREATE']),
+            $this->getFieldConfig('security', \stdClass::class, 'lastName', ['permissions' => 'All']),
+            $this->getFieldConfig('security', \stdClass::class, 'cityName')
+        ];
+
+        $this->configManager->expects($this->any())
+            ->method('getConfigs')
+            ->willReturnMap([
+                ['security', null, true, [$securityConfig]],
+                ['security', \stdClass::class, false, $fieldsConfigs]
+            ]);
+        $this->configManager->expects($this->any())
+            ->method('getEntityConfig')
+            ->willReturnMap([
+                ['entity', \stdClass::class, $entityConfig],
+                ['extend', \stdClass::class, $extendConfig]
+            ]);
+
+        $this->expectClassMetadata(\stdClass::class);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($this->isInstanceOf(LoadFieldsMetadata::class), LoadFieldsMetadata::NAME)
+            ->willReturnCallback(function (LoadFieldsMetadata $event) {
+                $fields = $event->getFields();
+                $lastNameField = $fields['lastName'];
+                $fields['lastName'] = new FieldSecurityMetadata(
+                    $lastNameField->getFieldName(),
+                    $lastNameField->getLabel(),
+                    $lastNameField->getPermissions(),
+                    $lastNameField->getDescription(),
+                    'lastNameAlias',
+                    $lastNameField->isHidden()
+                );
+                $event->setFields($fields);
+
+                return $event;
             });
 
-        $eventDispatcher = $this->getMockForAbstractClass(
-            'Symfony\Component\EventDispatcher\EventDispatcherInterface'
-        );
+        $this->cache->expects($this->exactly(2))
+            ->method('save')
+            ->with($cacheItem);
 
-        $provider = new Provider(
-            $this->securityConfigProvider,
-            $this->entityConfigProvider,
-            $this->extendConfigProvider,
-            $this->doctrine,
-            $translator,
-            $this->cache,
-            $eventDispatcher
-        );
-
-        // call without cache
-        $result = $provider->getEntities();
-        $this->assertCount(1, $result);
-        $this->assertContainsOnlyInstancesOf('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata', $result);
-        $this->assertEquals(serialize($result), serialize(array($this->entity)));
-
-        // call with local cache
-        $result = $provider->getEntities();
-        $this->assertCount(1, $result);
-        $this->assertContainsOnlyInstancesOf('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata', $result);
-        $this->assertEquals(serialize($result), serialize(array($this->entity)));
-
-        // call with cache
-        $provider = new Provider(
-            $this->securityConfigProvider,
-            $this->entityConfigProvider,
-            $this->extendConfigProvider,
-            $this->doctrine,
-            $this->createMock(TranslatorInterface::class),
-            $this->cache,
-            $eventDispatcher
-        );
-        $result = $provider->getEntities();
-        $this->assertCount(1, $result);
-        $this->assertContains($this->entity, $result);
+        return $entitySecurityMetadata;
     }
 
-    public function testClearCache()
+    public function testIsProtectedEntityWithoutCache(): void
     {
-        $this->cache->expects($this->once())
-            ->method('delete')
-            ->with('SomeType');
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->withConsecutive(
+                ['short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE],
+                ['full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE]
+            )
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(false);
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('set')
+            ->willReturn($this->cacheItem);
 
-        $this->cache->expects($this->once())
-            ->method('deleteAll');
+        $entitySecurityMetadata = $this->expectLoadMetadata($this->cacheItem);
 
-        $eventDispatcher = $this->getMockForAbstractClass(
-            'Symfony\Component\EventDispatcher\EventDispatcherInterface'
-        );
+        $this->aclGroupProvider->expects($this->any())
+            ->method('getGroup')
+            ->willReturn($entitySecurityMetadata->getGroup());
 
-        $provider = new Provider(
-            $this->securityConfigProvider,
-            $this->entityConfigProvider,
-            $this->extendConfigProvider,
-            $this->doctrine,
-            $this->createMock(TranslatorInterface::class),
-            $this->cache,
-            $eventDispatcher
-        );
-
-        $provider->clearCache('SomeType');
-        $provider->clearCache();
+        $this->assertTrue($this->provider->isProtectedEntity($entitySecurityMetadata->getClassName()));
+        // test local cache
+        $this->assertTrue($this->provider->isProtectedEntity($entitySecurityMetadata->getClassName()));
     }
 
-    protected function setTestConfig()
+    /**
+     * @dataProvider isProtectedEntityDataProvider
+     */
+    public function testIsProtectedEntity(
+        string $entityClass,
+        string $entityGroup,
+        string $group,
+        bool $expected
+    ): void {
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with('short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
+            ->willReturn([\stdClass::class => [$entityGroup, []]]);
+
+        $this->aclGroupProvider->expects($this->any())
+            ->method('getGroup')
+            ->willReturn($group);
+
+        $this->assertSame($expected, $this->provider->isProtectedEntity($entityClass));
+        // test local cache
+        $this->assertSame($expected, $this->provider->isProtectedEntity($entityClass));
+    }
+
+    public function isProtectedEntityDataProvider(): array
     {
-        $securityConfigId = new EntityConfigId('security', \stdClass::class);
-        $securityConfig = new Config($securityConfigId);
-        $securityConfig->set('type', Provider::ACL_SECURITY_TYPE);
-        $securityConfig->set('permissions', 'All');
-        $securityConfig->set('group_name', 'SomeGroup');
-        $securityConfig->set('category', '');
-        $securityConfig->set('field_acl_supported', true);
-        $securityConfig->set('field_acl_enabled', true);
+        return [
+            'no group, supported entity'          => [
+                'entityClass' => \stdClass::class,
+                'entityGroup' => '',
+                'group'       => '',
+                'expected'    => true
+            ],
+            'no group, unsupported entity'        => [
+                'entityClass' => 'UnknownClass',
+                'entityGroup' => '',
+                'group'       => '',
+                'expected'    => false
+            ],
+            'supported group, supported entity'   => [
+                'entityClass' => \stdClass::class,
+                'entityGroup' => 'SomeGroup',
+                'group'       => 'SomeGroup',
+                'expected'    => true
+            ],
+            'supported group, unsupported entity' => [
+                'entityClass' => 'UnknownClass',
+                'entityGroup' => 'SomeGroup',
+                'group'       => 'SomeGroup',
+                'expected'    => false
+            ],
+            'unsupported group, supported entity' => [
+                'entityClass' => \stdClass::class,
+                'entityGroup' => 'SomeGroup',
+                'group'       => 'AnotherGroup',
+                'expected'    => false
+            ]
+        ];
+    }
 
-        $securityConfigs = array($securityConfig);
+    public function testGetProtectedFieldNameWithoutCache(): void
+    {
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->withConsecutive(
+                ['short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE],
+                ['full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE]
+            )
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(false);
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('set')
+            ->willReturn($this->cacheItem);
 
-        $idFieldConfigId = new FieldConfigId('security', \stdClass::class, 'id');
-        $idFieldConfig = new Config($idFieldConfigId);
+        $entitySecurityMetadata = $this->expectLoadMetadata($this->cacheItem);
 
-        $firstNameConfigId = new FieldConfigId('security', \stdClass::class, 'firstName');
-        $firstNameFieldConfig = new Config($firstNameConfigId);
-        $firstNameFieldConfig->set('permissions', 'VIEW;CREATE');
+        $this->assertEquals(
+            'lastNameAlias',
+            $this->provider->getProtectedFieldName($entitySecurityMetadata->getClassName(), 'lastName')
+        );
+        // test local cache
+        $this->assertEquals(
+            'lastNameAlias',
+            $this->provider->getProtectedFieldName($entitySecurityMetadata->getClassName(), 'lastName')
+        );
+    }
 
-        $lastNameConfigId = new FieldConfigId('security', \stdClass::class, 'lastName');
-        $lastNameFieldConfig = new Config($lastNameConfigId);
-        $lastNameFieldConfig->set('permissions', 'All');
+    /**
+     * @dataProvider getProtectedFieldNameDataProvider
+     */
+    public function testGetProtectedFieldName(
+        string $entityClass,
+        string $fieldName,
+        array $fieldAliases,
+        string $expected
+    ): void {
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with('short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
+            ->willReturn([\stdClass::class => ['', $fieldAliases]]);
 
-        $cityNameConfigId = new FieldConfigId('security', \stdClass::class, 'cityName');
-        $cityNameFieldConfig = new Config($cityNameConfigId);
+        $this->assertEquals($expected, $this->provider->getProtectedFieldName($entityClass, $fieldName));
+        // test local cache
+        $this->assertEquals($expected, $this->provider->getProtectedFieldName($entityClass, $fieldName));
+    }
 
-        $fieldsConfig = [$idFieldConfig, $firstNameFieldConfig, $lastNameFieldConfig, $cityNameFieldConfig];
+    public function getProtectedFieldNameDataProvider(): array
+    {
+        return [
+            'no field alias, supported entity'    => [
+                'entityClass'  => \stdClass::class,
+                'fieldName'    => 'field',
+                'fieldAliases' => [],
+                'expected'     => 'field'
+            ],
+            'no field alias, unsupported entity'  => [
+                'entityClass'  => 'UnknownClass',
+                'fieldName'    => 'field',
+                'fieldAliases' => [],
+                'expected'     => 'field'
+            ],
+            'has field alias, supported entity'   => [
+                'entityClass'  => \stdClass::class,
+                'fieldName'    => 'field',
+                'fieldAliases' => ['field' => 'alias'],
+                'expected'     => 'alias'
+            ],
+            'has field alias, unsupported entity' => [
+                'entityClass'  => 'UnknownClass',
+                'fieldName'    => 'field',
+                'fieldAliases' => ['field' => 'alias'],
+                'expected'     => 'field'
+            ]
+        ];
+    }
 
-        $this->securityConfigProvider->expects($this->any())
-            ->method('getConfigs')
-            ->willReturnMap(
-                [
-                    [null, true, $securityConfigs],
-                    [\stdClass::class, false, $fieldsConfig]
-                ]
-            );
+    public function testGetEntitiesWithoutCache(): void
+    {
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->withConsecutive(
+                ['full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE],
+                ['short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE]
+            )
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(false);
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('set')
+            ->willReturn($this->cacheItem);
+
+        $entitySecurityMetadata = $this->expectLoadMetadata($this->cacheItem);
+
+        $this->assertEquals([$entitySecurityMetadata], $this->provider->getEntities());
+        // test local cache
+        $this->assertEquals([$entitySecurityMetadata], $this->provider->getEntities());
+    }
+
+    public function testGetEntitiesWithCache(): void
+    {
+        $entitySecurityMetadata = $this->getEntitySecurityMetadata();
+
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with('full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
+            ->willReturn([\stdClass::class => $entitySecurityMetadata]);
+
+
+        $this->assertEquals([$entitySecurityMetadata], $this->provider->getEntities());
+        // test local cache
+        $this->assertEquals([$entitySecurityMetadata], $this->provider->getEntities());
     }
 }

@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\FormContext;
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Converts the parent entity to a model and adds the model to the context instead of the entity.
+ * Converts the parent ORM entity to a model and adds the model to the context instead of the entity.
  */
 class ConvertParentEntityToModel implements ProcessorInterface
 {
@@ -17,7 +16,7 @@ class ConvertParentEntityToModel implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var SubresourceContext|FormContext $context */
+        /** @var ChangeRelationshipContext $context */
 
         $parentEntity = $context->getParentEntity();
         if (!\is_object($parentEntity)) {

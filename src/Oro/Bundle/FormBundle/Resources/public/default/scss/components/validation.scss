@@ -3,30 +3,49 @@
 .validation-failed,
 .validation-error,
 .validation-passed,
-.validation-warning{
+.validation-warning {
     @extend .notification;
+
+    display: block;
+    color: $validation-failed-color;
+
+    &--lite {
+        @extend .notification--lite;
+    }
 }
 
 .validation-failed,
 .validation-error {
     @extend .notification--error;
 
-    @include fa-icon($fa-var-warning);
+    &__icon {
+        @include fa-icon($fa-var-warning, before, true) {
+            display: inline-block;
+            margin-right: 6px;
+        }
+    }
 
-    &:before {
-        display: inline-block;
-        margin-right: 6px;
+    &--flex {
+        display: flex;
+        align-items: baseline;
+    }
+
+    /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).
+     * `id` is used to cover only auto-generated jQuery.validate labels and leave posibility to show a few messages
+     * when it rendered intentionally */
+    & + &[id] {
+        display: none;
     }
 }
 
 .validation-warning {
     @extend .notification--warning;
 
-    @include fa-icon($fa-var-warning);
-
-    &:before {
-        display: inline-block;
-        margin-right: 6px;
+    &__icon {
+        @include fa-icon($fa-var-warning, before, true) {
+            display: inline-block;
+            margin-right: 6px;
+        }
     }
 }
 
@@ -36,7 +55,7 @@
 
 .controls {
     &.validation-error {
-        &:before {
+        &::before {
             content: none;
         }
     }
@@ -44,7 +63,7 @@
 
 .input-widget-select {
     &.error {
-        border: 1px solid get-color('ui', 'error-dark');
-        box-shadow: 0 1px 7px 0 rgba(223,96,96,.6);
+        border: $input-widget-select-error-border;
+        box-shadow: $input-widget-select-error-box-shadow;
     }
 }

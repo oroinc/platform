@@ -2,33 +2,44 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProvider;
 
 class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityAliasConfigBag */
-    protected $entityAliasConfigBag;
-
     /** @var EntityAliasProvider */
-    protected $entityAliasProvider;
+    private $entityAliasProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityAliasConfigBag = new EntityAliasConfigBag(
-            [
-                'Test\EntityWithCustomAlias' => [
-                    'alias'        => 'my_alias',
-                    'plural_alias' => 'my_plural_alias'
+        $configProvider = $this->createMock(EntityConfigurationProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturnMap([
+                [
+                    EntityConfiguration::ENTITY_ALIASES,
+                    [
+                        'Test\EntityWithCustomAlias' => [
+                            'alias'        => 'my_alias',
+                            'plural_alias' => 'my_plural_alias'
+                        ]
+                    ]
+                ],
+                [
+                    EntityConfiguration::ENTITY_ALIAS_EXCLUSIONS,
+                    [
+                        'Test\ExcludedEntity'
+                    ]
                 ]
-            ],
-            [
-                'Test\ExcludedEntity'
-            ]
-        );
+            ]);
+
         $this->entityAliasProvider  = new EntityAliasProvider(
-            $this->entityAliasConfigBag
+            new EntityAliasConfigBag($configProvider),
+            (new InflectorFactory())->build()
         );
     }
 
@@ -49,7 +60,7 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEntityAlias($expectedAlias, $result);
     }
 
-    public function getEntityAliasDataProvider()
+    public function getEntityAliasDataProvider(): array
     {
         $translationNamespace = 'Oro\Bundle\EntityBundle\Tests\Unit\Provider\Fixtures\Translation';
 
@@ -71,40 +82,40 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
                 'expectedAlias' => false
             ],
             'bap_entity_eq_bundle_name'             => [
-                'entityClass'   => 'Oro\Bundle\ProductBundle\Entity\Product',
-                'expectedAlias' => new EntityAlias('product', 'products')
+                'entityClass'   => 'Oro\Bundle\BarBundle\Entity\Bar',
+                'expectedAlias' => new EntityAlias('bar', 'bars')
             ],
             'bap_entity_starts_with_bundle_name'    => [
-                'entityClass'   => 'Oro\Bundle\ProductBundle\Entity\ProductType',
-                'expectedAlias' => new EntityAlias('producttype', 'producttypes')
+                'entityClass'   => 'Oro\Bundle\BarBundle\Entity\BarType',
+                'expectedAlias' => new EntityAlias('bartype', 'bartypes')
             ],
             'bap_entity'                            => [
-                'entityClass'   => 'Oro\Bundle\ProductBundle\Entity\Type',
+                'entityClass'   => 'Oro\Bundle\BarBundle\Entity\Type',
                 'expectedAlias' => new EntityAlias('type', 'types')
             ],
             'oro_entity_eq_bundle_name'             => [
-                'entityClass'   => 'OroAPP\Bundle\ProductBundle\Entity\Product',
-                'expectedAlias' => new EntityAlias('product', 'products')
+                'entityClass'   => 'OroAPP\Bundle\BarBundle\Entity\Bar',
+                'expectedAlias' => new EntityAlias('bar', 'bars')
             ],
             'oro_entity_starts_with_bundle_name'    => [
-                'entityClass'   => 'OroAPP\Bundle\ProductBundle\Entity\ProductType',
-                'expectedAlias' => new EntityAlias('producttype', 'producttypes')
+                'entityClass'   => 'OroAPP\Bundle\BarBundle\Entity\BarType',
+                'expectedAlias' => new EntityAlias('bartype', 'bartypes')
             ],
             'oro_entity'                            => [
-                'entityClass'   => 'OroAPP\Bundle\ProductBundle\Entity\Type',
+                'entityClass'   => 'OroAPP\Bundle\BarBundle\Entity\Type',
                 'expectedAlias' => new EntityAlias('type', 'types')
             ],
             'vendor_entity_eq_bundle_name'          => [
-                'entityClass'   => 'Acme\Bundle\ProductBundle\Entity\Product',
-                'expectedAlias' => new EntityAlias('product', 'products')
+                'entityClass'   => 'Acme\Bundle\BarBundle\Entity\Bar',
+                'expectedAlias' => new EntityAlias('bar', 'bars')
             ],
             'vendor_entity_starts_with_bundle_name' => [
-                'entityClass'   => 'Acme\Bundle\ProductBundle\Entity\ProductType',
-                'expectedAlias' => new EntityAlias('producttype', 'producttypes')
+                'entityClass'   => 'Acme\Bundle\BarBundle\Entity\BarType',
+                'expectedAlias' => new EntityAlias('bartype', 'bartypes')
             ],
             'vendor_entity'                         => [
-                'entityClass'   => 'Acme\Bundle\ProductBundle\Entity\Type',
-                'expectedAlias' => new EntityAlias('producttype', 'producttypes')
+                'entityClass'   => 'Acme\Bundle\BarBundle\Entity\Type',
+                'expectedAlias' => new EntityAlias('bartype', 'bartypes')
             ],
             'other_entity'                          => [
                 'entityClass'   => 'Test\Entity',
@@ -113,7 +124,7 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function assertEntityAlias($expected, $actual)
+    private function assertEntityAlias($expected, $actual)
     {
         if ($expected instanceof EntityAlias) {
             $this->assertEquals($expected, $actual);

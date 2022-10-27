@@ -65,7 +65,7 @@ class ParametrizedSqlMigrationQuery extends ParametrizedMigrationQuery
         foreach ($this->queries as $query) {
             $this->logQuery($logger, $query[0], $query[1], $query[2]);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query[0], $query[1], $query[2]);
+                $this->connection->executeStatement($query[0], $query[1], $query[2]);
             }
         }
     }

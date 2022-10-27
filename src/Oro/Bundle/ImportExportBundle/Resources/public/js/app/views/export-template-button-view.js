@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var ExportTemplateButtonView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var routing = require('routing');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const routing = require('routing');
 
-    ExportTemplateButtonView = BaseView.extend({
+    const ExportTemplateButtonView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -21,21 +20,21 @@ define(function(require) {
         $exportTemplateButton: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ExportTemplateButtonView() {
-            ExportTemplateButtonView.__super__.constructor.apply(this, arguments);
+        constructor: function ExportTemplateButtonView(options) {
+            ExportTemplateButtonView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
             this.$exportTemplateButton = this.$el;
 
-            this.$exportTemplateButton.on('click' + this.eventNamespace(), _.bind(this.onExportTemplateClick, this));
+            this.$exportTemplateButton.on('click' + this.eventNamespace(), this.onExportTemplateClick.bind(this));
 
             this.routeOptions = {
                 options: this.options.routeOptions,
@@ -44,7 +43,7 @@ define(function(require) {
         },
 
         onExportTemplateClick: function() {
-            var exportTemplateUrl = routing.generate(
+            const exportTemplateUrl = routing.generate(
                 this.options.exportTemplateRoute,
                 $.extend({}, this.routeOptions, {
                     processorAlias: this.options.exportTemplateProcessor
@@ -55,7 +54,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

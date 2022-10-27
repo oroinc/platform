@@ -1,3 +1,0 @@
-config:
-    paths:
-        'oroembeddedform/js/embedded-form-watcher': 'bundles/oroembeddedform/js/embedded-form-watcher.js'

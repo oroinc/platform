@@ -19,10 +19,6 @@ class EntityIdAccessor
     /** @var EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
-    /**
-     * @param ObjectPropertyAccessorInterface $propertyAccessor
-     * @param EntityIdTransformerRegistry     $entityIdTransformerRegistry
-     */
     public function __construct(
         ObjectPropertyAccessorInterface $propertyAccessor,
         EntityIdTransformerRegistry $entityIdTransformerRegistry
@@ -39,6 +35,7 @@ class EntityIdAccessor
      * @param RequestType    $requestType
      *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getEntityId($entity, EntityMetadata $metadata, RequestType $requestType): string
     {
@@ -46,6 +43,12 @@ class EntityIdAccessor
 
         $idFieldNames = $metadata->getIdentifierFieldNames();
         $idFieldNamesCount = \count($idFieldNames);
+
+        if (null !== $entity && !\is_array($entity) && !\is_object($entity) && $idFieldNamesCount === 1) {
+            $fieldName = \reset($idFieldNames);
+            $entity = [$fieldName => $entity];
+        }
+
         if ($idFieldNamesCount === 1) {
             $fieldName = \reset($idFieldNames);
             if (!$this->propertyAccessor->hasProperty($entity, $fieldName)) {
@@ -85,7 +88,7 @@ class EntityIdAccessor
             );
         }
 
-        if (empty($result)) {
+        if (null === $result || '' === $result) {
             throw new RuntimeException(
                 \sprintf(
                     'The identifier value for "%s" entity must not be empty.',
@@ -97,11 +100,6 @@ class EntityIdAccessor
         return $result;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);

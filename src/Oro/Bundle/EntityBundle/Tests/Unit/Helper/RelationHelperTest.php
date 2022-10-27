@@ -5,20 +5,16 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Helper;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Helper\RelationHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
-use Oro\Bundle\EntityBundle\Tests\Unit\Helper\Stub;
 
 class RelationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $relationProvider;
+    private $relationProvider;
 
     /** @var RelationHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->relationProvider = $this->createMock(VirtualRelationProviderInterface::class);
 
@@ -29,19 +25,16 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->relationProvider->expects($this->any())
             ->method('getVirtualRelations')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 [Stub\Entity1::class, $this->getRelations()],
                 [Stub\Entity2::class, []],
-            ]));
+            ]);
 
         $this->assertTrue($this->helper->hasVirtualRelations(Stub\Entity1::class));
         $this->assertFalse($this->helper->hasVirtualRelations(Stub\Entity2::class));
     }
 
     /**
-     * @param string $targetEntityClass
-     * @param int $expectedResult
-     *
      * @dataProvider getMetadataTypeForVirtualJoin
      */
     public function testGetMetadataTypeForVirtualJoin(string $targetEntityClass, int $expectedResult)
@@ -57,9 +50,6 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function getMetadataTypeForVirtualJoin(): array
     {
         return [
@@ -90,10 +80,7 @@ class RelationHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getRelations(): array
+    private function getRelations(): array
     {
         return [
             'r1' => [],

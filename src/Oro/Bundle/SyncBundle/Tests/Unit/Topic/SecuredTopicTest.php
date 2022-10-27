@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Topic;
 
+use Gos\Bundle\PubSubRouterBundle\Router\Route;
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Oro\Bundle\SyncBundle\Topic\SecuredTopic;
@@ -33,7 +34,7 @@ class SecuredTopicTest extends \PHPUnit\Framework\TestCase
     /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject */
     private $request;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->clientManipulator = $this->createMock(ClientManipulatorInterface::class);
 
@@ -51,11 +52,7 @@ class SecuredTopicTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new \ArrayIterator([$this->connection]));
 
         $this->parameterBag = $this->createMock(ParameterBag::class);
-
-        $this->request = $this->createMock(WampRequest::class);
-        $this->request->expects(self::any())
-            ->method('getAttributes')
-            ->willReturn($this->parameterBag);
+        $this->request = new WampRequest('route', $this->createMock(Route::class), $this->parameterBag, 'matched');
     }
 
     public function testOnSubscribeWithoutUserId(): void
@@ -87,7 +84,7 @@ class SecuredTopicTest extends \PHPUnit\Framework\TestCase
             ->willReturn(2002);
 
         $this->clientManipulator->expects(self::once())
-            ->method('getClient')
+            ->method('getUser')
             ->with($this->connection)
             ->willReturn($this->getEntity(User::class, ['id' => 1001]));
 
@@ -110,7 +107,7 @@ class SecuredTopicTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1001);
 
         $this->clientManipulator->expects(self::once())
-            ->method('getClient')
+            ->method('getUser')
             ->with($this->connection)
             ->willReturn($this->getEntity(User::class, ['id' => 1001]));
 

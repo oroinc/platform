@@ -1,32 +1,31 @@
-parameters:
-    oro_help.model.help_link_provider.class: Oro\Bundle\HelpBundle\Model\HelpLinkProvider
-    oro_help.listener.help_link.class: Oro\Bundle\HelpBundle\EventListener\HelpLinkRequestListener
-
 services:
-    oro_help.help_link.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_help_link' ] ]
-
-    oro_help.model.help_link_provider:
-        class: '%oro_help.model.help_link_provider.class%'
-        calls:
-            - [ setCache, [ '@oro_help.help_link.cache' ] ]
+    oro_help.configuration.provider:
+        class: Oro\Bundle\HelpBundle\Configuration\ConfigurationProvider
+        public: false
+        parent: oro.static_config_provider.abstract
         arguments:
-            - '@controller_name_converter'
+            - '%kernel.cache_dir%/oro/help.php'
+            - '%kernel.debug%'
+
+    oro_help.help_link.cache:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_help_link' }
+
+    oro_help.help_link_provider:
+        class: Oro\Bundle\HelpBundle\Provider\HelpLinkProvider
+        arguments:
+            - [] # default configuration. Set by Oro\Bundle\HelpBundle\DependencyInjection\OroHelpExtension
+            - '@oro_help.configuration.provider'
+            - '@request_stack'
+            - '@oro_ui.controller_class_provider'
             - '@oro_platform.composer.version_helper'
+            - '@oro_help.help_link.cache'
 
     oro_help.twig.extension:
         class: Oro\Bundle\HelpBundle\Twig\HelpExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-
-    oro_help.listener.help_link:
-        class: '%oro_help.listener.help_link.class%'
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: kernel.event_listener, priority: -200, event: kernel.controller, method: onKernelController }

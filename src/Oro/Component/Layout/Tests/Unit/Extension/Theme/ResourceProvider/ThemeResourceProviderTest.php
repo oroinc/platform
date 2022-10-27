@@ -2,38 +2,62 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\ResourceProvider;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Layout\BlockViewCache;
+use Oro\Component\Layout\Extension\Theme\ResourceProvider\LastModificationDateProvider;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\Loader\LayoutUpdateLoaderInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Bundle\TestBundle\TestBundle;
+use Oro\Component\Testing\TempDirExtension;
 
 class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var ThemeResourceProvider */
-    protected $provider;
+    private $provider;
+
+    /** @var string */
+    private $cacheFile;
+
+    /** @var LastModificationDateProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $lastModificationDateProvider;
 
     /** @var LayoutUpdateLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $loader;
+    private $loader;
 
     /** @var BlockViewCache|\PHPUnit\Framework\MockObject\MockObject */
-    protected $blockViewCache;
+    private $blockViewCache;
 
-    /** @var array */
-    protected $excludedPaths = [];
+    protected function setUp(): void
+    {
+        $this->lastModificationDateProvider = $this->createMock(LastModificationDateProvider::class);
+        $this->loader = $this->createMock(LayoutUpdateLoaderInterface::class);
+        $this->blockViewCache = $this->createMock(BlockViewCache::class);
+
+        $this->cacheFile = $this->getTempFile('ThemeResourceProvider');
+
+        $this->provider = new ThemeResourceProvider(
+            $this->cacheFile,
+            false,
+            $this->lastModificationDateProvider,
+            $this->loader,
+            $this->blockViewCache,
+            [
+                '#Resources/views/layouts/[\w\-]+/theme.yml$#',
+                '#Resources/views/layouts/[\w\-]+/config/[^/]+.yml$#'
+            ]
+        );
+    }
 
     /**
-     * {@inheritdoc}
+     * @param string $path
+     *
+     * @return string
      */
-    protected function setUp()
+    private function getPath($path)
     {
-        $this->loader = $this->createMock(LayoutUpdateLoaderInterface::class);
-        $this->blockViewCache = $this->getMockBuilder(BlockViewCache::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->provider = new ThemeResourceProvider($this->loader, $this->blockViewCache, $this->excludedPaths);
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
     }
 
     public function testFindApplicableResources()
@@ -46,10 +70,9 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
             ->setBundles(['TestBundle' => TestBundle::class])
             ->setAppRootDir($appRootDir);
 
-        $this->loader
-            ->expects($this->once())
+        $this->loader->expects($this->once())
             ->method('getUpdateFileNamePatterns')
-            ->will($this->returnValue(['/\.yml$/']));
+            ->willReturn(['/\.yml$/']);
 
         $paths = [
             'oro-default',
@@ -60,14 +83,14 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             [
-                str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/oro-default/resource1.yml'),
-                str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/oro-default/page/resource2.yml')
+                $this->getPath($resourcePath . '/oro-default/resource1.yml'),
+                $this->getPath($resourcePath . '/oro-default/page/resource2.yml')
             ],
             $this->provider->findApplicableResources($paths)
         );
     }
 
-    public function testGetResources()
+    public function testGetResourcesWhenCachedDataDoesNotExist()
     {
         $bundleDir = dirname((new \ReflectionClass(TestBundle::class))->getFileName());
         $appRootDir = realpath($bundleDir . '/../../app');
@@ -77,17 +100,23 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
             ->setBundles(['TestBundle' => TestBundle::class])
             ->setAppRootDir($appRootDir);
 
-        $this->loader
-            ->expects($this->once())
+        $this->loader->expects($this->once())
             ->method('getUpdateFileNamePatterns')
-            ->will($this->returnValue(['/\.yml$/']));
+            ->willReturn(['/\.yml$/']);
+
+        $this->lastModificationDateProvider->expects($this->once())
+            ->method('updateLastModificationDate')
+            ->with($this->isInstanceOf(\DateTime::class));
+
+        $this->blockViewCache->expects($this->once())
+            ->method('reset');
 
         $resourcePath = $appRootDir . $bundleDir . '/Resources/views/layouts/oro-default';
         $result = [
             'oro-default' => [
-                str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/resource1.yml'),
+                $this->getPath($resourcePath . '/resource1.yml'),
                 'page' => [
-                    str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/page/resource2.yml')
+                    $this->getPath($resourcePath . '/page/resource2.yml')
                 ]
             ]
         ];
@@ -95,7 +124,7 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $this->provider->getResources());
     }
 
-    public function testLoadResources()
+    public function testGetResourcesWhenCachedDataExist()
     {
         $bundleDir = dirname((new \ReflectionClass(TestBundle::class))->getFileName());
         $appRootDir = realpath($bundleDir . '/../../app');
@@ -105,48 +134,22 @@ class ThemeResourceProviderTest extends \PHPUnit\Framework\TestCase
             ->setBundles(['TestBundle' => TestBundle::class])
             ->setAppRootDir($appRootDir);
 
-        $this->loader
-            ->expects($this->once())
-            ->method('getUpdateFileNamePatterns')
-            ->will($this->returnValue(['/\.yml$/']));
+        $this->loader->expects($this->never())
+            ->method('getUpdateFileNamePatterns');
 
-        $this->provider->loadResources();
-    }
+        $this->lastModificationDateProvider->expects($this->never())
+            ->method('updateLastModificationDate');
 
-    public function testLoadResourcesWithCache()
-    {
-        $bundleDir = dirname((new \ReflectionClass(TestBundle::class))->getFileName());
-        $appRootDir = realpath($bundleDir . '/../../app');
-
-        CumulativeResourceManager::getInstance()
-            ->clear()
-            ->setBundles(['TestBundle' => TestBundle::class])
-            ->setAppRootDir($appRootDir);
-
-        $this->loader
-            ->expects($this->once())
-            ->method('getUpdateFileNamePatterns')
-            ->will($this->returnValue(['/\.yml$/']));
-
-        $resourcePath = $appRootDir . $bundleDir . '/Resources/views/layouts/oro-default';
-        $result = [
-            'oro-default' => [
-                str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/resource1.yml'),
-                'page' => [
-                    str_replace('/', DIRECTORY_SEPARATOR, $resourcePath . '/page/resource2.yml')
-                ]
-            ]
-        ];
-
-        /** @var Cache|\PHPUnit\Framework\MockObject\MockObject $cache */
-        $cache = $this->createMock(Cache::class);
-        $cache->expects($this->exactly(2))
-            ->method('save');
-
-        $this->blockViewCache->expects($this->exactly(1))
+        $this->blockViewCache->expects($this->never())
             ->method('reset');
 
-        $this->provider->setCache($cache);
-        $this->provider->loadResources();
+        $cachedResources = [
+            'oro-default' => [
+                '/Resources/views/layouts/oro-default/resource1.yml'
+            ]
+        ];
+        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedResources, true)));
+
+        $this->assertEquals($cachedResources, $this->provider->getResources());
     }
 }

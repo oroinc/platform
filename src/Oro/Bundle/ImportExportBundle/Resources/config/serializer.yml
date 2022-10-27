@@ -1,37 +1,34 @@
-parameters:
-    oro_importexport.serializer.class: Oro\Bundle\ImportExportBundle\Serializer\Serializer
-    oro_importexport.serializer.dummy_encoder.class: Oro\Bundle\ImportExportBundle\Serializer\Encoder\DummyEncoder
-    oro_importexport.serializer.datetime_normalizer.class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer
-    oro_importexport.serializer.collection_normalizer.class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer
-    oro_importexport.serializer.configurable_entity_normalizer.class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer
-
 services:
     oro_importexport.serializer:
-        class: '%oro_importexport.serializer.class%'
+        class: Oro\Bundle\ImportExportBundle\Serializer\Serializer
         arguments:
           - []
           - ['@oro_importexport.serializer.dummy_encoder']
 
     oro_importexport.serializer.dummy_encoder:
-        class: '%oro_importexport.serializer.dummy_encoder.class%'
+        class: Oro\Bundle\ImportExportBundle\Serializer\Encoder\DummyEncoder
 
     oro_importexport.serializer.datetime_normalizer:
-        class: '%oro_importexport.serializer.datetime_normalizer.class%'
+        class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DateTimeNormalizer
         calls:
             - [setFormatter, ['@oro_importexport.formatter.excel_datetime']]
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
 
     oro_importexport.serializer.collection_normalizer:
-        class: '%oro_importexport.serializer.collection_normalizer.class%'
+        class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\CollectionNormalizer
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
 
     oro_importexport.serializer.configurable_entity_normalizer:
-        class: '%oro_importexport.serializer.configurable_entity_normalizer.class%'
+        class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer
         arguments:
             - '@oro_entity.helper.field_helper'
         calls:
             - [setDispatcher, ['@event_dispatcher']]
+            - [setScalarFieldDenormalizer, ['@oro_importexport.serializer.scalar_field_denormalizer']]
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
+
+    oro_importexport.serializer.scalar_field_denormalizer:
+        class: Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer

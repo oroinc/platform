@@ -17,7 +17,7 @@ processes:
                             method: incrementUnsyncedFlagCount
                         - '@assign_constant_value':
                             attribute: '$.topic'
-                            value: 'Oro\Bundle\EmailBundle\Async\Topics::SYNC_EMAIL_SEEN_FLAG'
+                            value: 'Oro\Bundle\EmailBundle\Async\Topic\SyncEmailSeenFlagTopic::NAME'
                         - '@call_service_method':
                             service: 'oro_message_queue.message_producer'
                             method: 'send'

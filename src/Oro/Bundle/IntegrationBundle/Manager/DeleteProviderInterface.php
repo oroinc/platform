@@ -17,8 +17,6 @@ interface DeleteProviderInterface
 
     /**
      * Process delete of integration related data
-     *
-     * @param Integration $integration
      */
     public function deleteRelatedData(Integration $integration);
 }

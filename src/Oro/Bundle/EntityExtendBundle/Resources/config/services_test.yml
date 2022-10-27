@@ -1,0 +1,4 @@
+services:
+    oro_entity_extend.migration.options_manager.test:
+        alias: oro_entity_extend.migration.options_manager
+        public: false

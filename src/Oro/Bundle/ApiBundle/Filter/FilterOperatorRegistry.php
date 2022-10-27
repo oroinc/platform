@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 /**
- * The container for all registered operators for Data API filters.
+ * The container for all registered operators for API filters.
  */
 class FilterOperatorRegistry
 {

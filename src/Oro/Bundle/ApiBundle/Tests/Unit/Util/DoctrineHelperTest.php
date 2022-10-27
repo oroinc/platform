@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DoctrineHelperTest extends OrmRelatedTestCase
 {
-    /**
-     * @param string $entityClass
-     *
-     * @return ClassMetadata
-     */
-    protected function getClassMetadata($entityClass)
+    private function getClassMetadata(string $entityClass): ClassMetadata
     {
         return $this->doctrineHelper->getEntityMetadataForClass($entityClass);
     }

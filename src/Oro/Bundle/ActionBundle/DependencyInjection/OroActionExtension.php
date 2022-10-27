@@ -4,10 +4,11 @@ namespace Oro\Bundle\ActionBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class OroActionExtension extends Extension
+class OroActionExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritDoc}
@@ -17,7 +18,6 @@ class OroActionExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('assemblers.yml');
         $loader->load('block_types.yml');
-        $loader->load('cache.yml');
         $loader->load('conditions.yml');
         $loader->load('configuration.yml');
         $loader->load('form_types.yml');
@@ -25,9 +25,18 @@ class OroActionExtension extends Extension
         $loader->load('services.yml');
         $loader->load('duplicator.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
 
-        if ($container->getParameter('kernel.debug')) {
-            $loader->load('debug.yml');
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
+    }
+
+    public function prepend(ContainerBuilder $container)
+    {
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $path = dirname(__DIR__) . '/Tests/Functional/Stub/views';
+            $container->prependExtensionConfig('twig', ['paths' => [$path => 'OroActionStub']]);
         }
     }
 }

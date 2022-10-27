@@ -5,11 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 class ProcessTraversableNormalizer extends AbstractProcessNormalizer
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
-        $normalizedData = array();
+        $normalizedData = [];
 
         foreach ($object as $key => $value) {
             $normalizedData[$key] = $this->serializer->normalize($value, $format, $context);
@@ -19,31 +19,31 @@ class ProcessTraversableNormalizer extends AbstractProcessNormalizer
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        $denormalizedData = array();
+        $denormalizedData = [];
 
         foreach ($data as $key => $value) {
-            $denormalizedData[$key] = $this->serializer->denormalize($value, null, $format, $context);
+            $denormalizedData[$key] = $this->serializer->denormalize($value, $type, $format, $context);
         }
 
         return $denormalizedData;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, string $format = null): bool
     {
         return is_array($data) || $data instanceof \Traversable;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return is_array($data);
     }

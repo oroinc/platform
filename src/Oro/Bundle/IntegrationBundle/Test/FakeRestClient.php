@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Test;
 
+use GuzzleHttp\Utils;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestResponseInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
+/**
+ * Fake REST client to not send real requests in tests
+ */
 class FakeRestClient implements RestClientInterface
 {
     /** @var RestResponseInterface */
@@ -20,7 +24,7 @@ class FakeRestClient implements RestClientInterface
     /**
      * {@inheritdoc}
      */
-    public function get($resource, array $params = array(), array $headers = array(), array $options = array())
+    public function get($resource, array $params = [], array $headers = [], array $options = [])
     {
         return $this->createFakeResponse($resource);
     }
@@ -28,15 +32,29 @@ class FakeRestClient implements RestClientInterface
     /**
      * {@inheritdoc}
      */
-    public function getJSON($resource, array $params = array(), array $headers = array(), array $options = array())
+    public function getJSON($resource, array $params = [], array $headers = [], array $options = [])
     {
-        return $this->get($resource, $params, $headers, $options)->json();
+        $response = $this->get($resource, $params, $headers, $options);
+
+        return Utils::jsonDecode($response->getBodyAsString(), true);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function post($resource, $data, array $headers = array(), array $options = array())
+    public function post(
+        $resource,
+        $data,
+        array $headers = [],
+        array $options = []
+    ) {
+        return $this->createFakeResponse($resource);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete($resource, array $headers = [], array $options = [])
     {
         return $this->createFakeResponse($resource);
     }
@@ -44,15 +62,7 @@ class FakeRestClient implements RestClientInterface
     /**
      * {@inheritdoc}
      */
-    public function delete($resource, array $headers = array(), array $options = array())
-    {
-        return $this->createFakeResponse($resource);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function put($resource, $data, array $headers = array(), array $options = array())
+    public function put($resource, $data, array $headers = [], array $options = [])
     {
         return $this->createFakeResponse($resource);
     }
@@ -65,11 +75,8 @@ class FakeRestClient implements RestClientInterface
         return $this->lastResponse;
     }
 
-
     /**
      * Allows set any response to fake client in case you need stub some data
-     *
-     * @param RestResponseInterface $fakeResponse
      */
     public function setDefaultResponse(RestResponseInterface $fakeResponse)
     {
@@ -85,7 +92,6 @@ class FakeRestClient implements RestClientInterface
     {
         $this->fakeResponseList = $responseList;
     }
-
 
     /**
      * Creates fake response for all CRUD methods

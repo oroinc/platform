@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Connector\Search;
 
-use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprInterface;
-
 /**
  * Represents the search query expression
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAccess
 {
@@ -22,9 +21,6 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
         $this->position = 0;
     }
 
-    /**
-     * @param SearchQueryExprInterface $item
-     */
     public function add(SearchQueryExprInterface $item)
     {
         $this->items[] = $item;
@@ -106,7 +102,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): SearchQueryExprInterface
     {
         return $this->items[$this->position];
     }
@@ -114,7 +110,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         ++$this->position;
     }
@@ -122,7 +118,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -130,7 +126,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->items[$this->position]);
     }
@@ -138,7 +134,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->position = 0;
     }
@@ -146,7 +142,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->items[$offset]);
     }
@@ -154,7 +150,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): SearchQueryExprInterface
     {
         return $this->items[$offset];
     }
@@ -162,7 +158,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (is_null($offset)) {
             $this->items[] = $value;
@@ -174,7 +170,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->items[$offset]);
     }

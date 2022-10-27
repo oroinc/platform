@@ -3,26 +3,30 @@
     * entity       - user entity Oro\Bundle\UserBundle\Entity\User or null
     * indexer_item - indexer item Oro\Bundle\SearchBundle\Query\Result\Item
 #}
-{% extends 'OroSearchBundle:Search:searchResultItem.html.twig' %}
+{% extends '@OroSearch/Search/searchResultItem.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set showImage = true %}
-
-{% set recordUrl = indexer_item.recordUrl %}
+{% set iconType = 'user' %}
 {% set image = entity ? entity.avatar : null %}
 
-{% if entity %}
-    {% block additional_info %}
-        <div class="pull-left">
-            {% if entity.enabled %}
-                <div class="badge badge-pill badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}</div>
-            {% else %}
-                <div class="badge badge-pill badge-disabled status-disabled"><i class="icon-status-disabled fa-circle"></i>{{ 'Inactive'|trans }}</div>
-            {% endif %}
-        </div>
-    {% endblock %}
-{% endif %}
+{% set recordUrl = indexer_item.recordUrl %}
 
-{% set title = entity ? entity|oro_format_name : indexer_item.recordTitle %}
+{% block additional_info %}
+    {% if entity %}
+        <span class="page-title__status">
+            {% if entity.enabled %}
+                {{ UI.badge('Active'|trans, 'enabled') }}
+            {% else %}
+                {{ UI.badge('Inactive'|trans, 'disabled') }}
+            {% endif %}
+        </span>
+    {% else %}
+        {{ parent() }}
+    {% endif %}
+{% endblock %}
+
+{% set title = indexer_item.selectedData.name %}
 {% set entityType = oro_entity_config_value(indexer_item.entityName, 'label')|trans %}
 
 {% set entityInfo = [

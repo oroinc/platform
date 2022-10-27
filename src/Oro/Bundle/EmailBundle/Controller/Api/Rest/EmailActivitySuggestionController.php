@@ -2,18 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("activity_email_suggestion")
- * @NamePrefix("oro_api_")
+ * REST API controller to find suggested entities associated with the email activity.
  */
 class EmailActivitySuggestionController extends RestGetController
 {
@@ -21,8 +17,6 @@ class EmailActivitySuggestionController extends RestGetController
      * Suggests entities associated with the email activity.
      *
      * @param int $id The id of the email entity.
-     *
-     * @Get("/activities/emails/{id}/suggestions", requirements={"id"="\d+"})
      *
      * @QueryParam(
      *      name="page",

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Functional\Controller\Api\Rest;
 
-use FOS\RestBundle\Util\Codes;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ResponseExtension;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
@@ -16,7 +16,7 @@ class EntityDataControllerTest extends WebTestCase
 {
     use ResponseExtension;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures([
@@ -38,7 +38,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"id": 1}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_FORBIDDEN);
+        $this->assertLastResponseStatus(Response::HTTP_FORBIDDEN);
         $this->assertLastResponseContentTypeJson();
     }
 
@@ -52,7 +52,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"id": 1}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_INTERNAL_SERVER_ERROR);
+        $this->assertLastResponseStatus(Response::HTTP_INTERNAL_SERVER_ERROR);
         $this->assertLastResponseContentTypeJson();
     }
 
@@ -69,7 +69,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"firstName": "Test1"}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_OK);
+        $this->assertLastResponseStatus(Response::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertEquals('Test1', $user->getFirstName());
@@ -88,7 +88,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"loginCount": 10}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_OK);
+        $this->assertLastResponseStatus(Response::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertEquals(10, $user->getLoginCount());
@@ -107,7 +107,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"enabled": false}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_OK);
+        $this->assertLastResponseStatus(Response::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertFalse($user->isEnabled());
@@ -126,7 +126,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"birthday": "2000-05-05T00:00:00+0000"}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_OK);
+        $this->assertLastResponseStatus(Response::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertEquals(new \DateTime('2000-05-05T00:00:00+0000'), $user->getBirthday());
@@ -145,7 +145,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"lastLogin":"2000-05-05T01:05:05+0000"}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_OK);
+        $this->assertLastResponseStatus(Response::HTTP_OK);
 
         $this->refreshEntity($user);
         $this->assertEquals(new \DateTime('2000-05-05T01:05:05+0000'), $user->getLastLogin());
@@ -164,7 +164,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"email": "test"}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_BAD_REQUEST);
+        $this->assertLastResponseStatus(Response::HTTP_BAD_REQUEST);
         $this->assertLastResponseContentTypeJson();
 
         $content = $this->getLastResponseJsonContent();
@@ -184,7 +184,7 @@ class EntityDataControllerTest extends WebTestCase
             '{"username": ""}'
         );
 
-        $this->assertLastResponseStatus(Codes::HTTP_BAD_REQUEST);
+        $this->assertLastResponseStatus(Response::HTTP_BAD_REQUEST);
         $this->assertLastResponseContentTypeJson();
 
         $content = $this->getLastResponseJsonContent();
@@ -234,7 +234,7 @@ class EntityDataControllerTest extends WebTestCase
 
         $this->assertEquals($responseCode, $this->client->getResponse()->getStatusCode());
 
-        if ($responseCode === Codes::HTTP_OK) {
+        if ($responseCode === Response::HTTP_OK) {
             $this->getContainer()->get('doctrine')->getManager()->clear();
             $repository = $this->getContainer()->get('doctrine')->getRepository($className);
             $object = $repository->find($id);
@@ -246,7 +246,7 @@ class EntityDataControllerTest extends WebTestCase
                 $this->assertEquals($reference->getId(), $accessor->getValue($object, $field)->getId());
             }
         }
-        if ($responseCode === Codes::HTTP_BAD_REQUEST) {
+        if ($responseCode === Response::HTTP_BAD_REQUEST) {
             $response = $this->getJsonResponseContent(
                 $this->client->getResponse(),
                 $this->client->getResponse()->getStatusCode()
@@ -259,7 +259,7 @@ class EntityDataControllerTest extends WebTestCase
      * @param string $url
      * @param string $content
      */
-    protected function sendPatch($url, $content)
+    private function sendPatch($url, $content)
     {
         $this->client->request('PATCH', $url, [], [], [], $content);
     }
@@ -267,9 +267,9 @@ class EntityDataControllerTest extends WebTestCase
     /**
      * @param object $entity
      */
-    protected function refreshEntity($entity)
+    private function refreshEntity($entity)
     {
-        /** @var RegistryInterface $registry */
+        /** @var ManagerRegistry $registry */
         $registry = $this->getContainer()->get('doctrine');
 
         $registry->getManager()->clear();
@@ -282,29 +282,17 @@ class EntityDataControllerTest extends WebTestCase
     public function setAssociationDataProvider()
     {
         return [
-            'entity one to one' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'currentStatus',
-                'status1',
-                Codes::HTTP_OK
-            ],
-            'entity one to many' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'groups',
-                'status1',
-                Codes::HTTP_BAD_REQUEST
-            ],
             'entity many to many' => [
                 'Oro\Bundle\UserBundle\Entity\User',
-                'roles',
+                'userRoles',
                 ['ROLE_TEST_1', 'ROLE_TEST_2'],
-                Codes::HTTP_OK
+                Response::HTTP_OK
             ],
             'entity many to one' => [
                 'Oro\Bundle\UserBundle\Entity\User',
                 'owner',
                 'TestBusinessUnit',
-                Codes::HTTP_OK
+                Response::HTTP_OK
             ]
         ];
     }

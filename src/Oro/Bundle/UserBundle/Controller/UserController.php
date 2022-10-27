@@ -2,33 +2,39 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Form\Handler\UserHandler;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\UserBundle\Form\Type\UserType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * This controller covers basic CRUD functionality for User entity.
+ * This controller covers CRUD functionality for User entity.
  * Also includes user profile management functionality.
  */
-class UserController extends Controller
+class UserController extends AbstractController
 {
     /**
      * @Route("/view/{id}", name="oro_user_view", requirements={"id"="\d+"})
-     * @Template
+     * @Template("@OroUser/User/view.html.twig")
      * @Acl(
      *      id="oro_user_user_view",
      *      type="entity",
@@ -43,33 +49,33 @@ class UserController extends Controller
     {
         return $this->view(
             $user,
-            $this->get('oro_security.token_accessor')->getUserId() === $user->getId()
+            $this->get(TokenAccessorInterface::class)->getUserId() === $user->getId()
         );
     }
 
     /**
      * @Route("/profile/view", name="oro_user_profile_view")
-     * @Template("OroUserBundle:User:view.html.twig")
-     * @AclAncestor("oro_user_user_view")
+     * @Template("@OroUser/User/view.html.twig")
      */
     public function viewProfileAction()
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+
         return $this->view($this->getUser(), true);
     }
 
     /**
      * @Route("/profile/edit", name="oro_user_profile_update")
-     * @Template("OroUserBundle:User/Profile:update.html.twig")
+     * @Template("@OroUser/User/Profile/update.html.twig")
      * @AclAncestor("update_own_profile")
      */
-    public function updateProfileAction()
+    public function updateProfileAction(Request $request)
     {
-        return $this->update($this->getUser());
+        return $this->update($this->getUser(), $request);
     }
 
     /**
-     * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"})
-     * @Method({"GET","POST"})
+     * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"}, methods={"GET", "POST"})
      *
      * @param User $user
      * @return JsonResponse|Response
@@ -101,10 +107,9 @@ class UserController extends Controller
 
             return new JsonResponse($responseData, $status);
         }
-        $view = $form->createView();
 
         return $this->render(
-            'OroUserBundle:User/widget:apiKeyGen.html.twig',
+            '@OroUser/User/widget/apiKeyGen.html.twig',
             ['form' => $form->createView(), 'user' => $user]
         );
     }
@@ -113,7 +118,7 @@ class UserController extends Controller
      * Create user form
      *
      * @Route("/create", name="oro_user_create")
-     * @Template("OroUserBundle:User:update.html.twig")
+     * @Template("@OroUser/User/update.html.twig")
      * @Acl(
      *      id="oro_user_user_create",
      *      type="entity",
@@ -121,18 +126,18 @@ class UserController extends Controller
      *      permission="CREATE"
      * )
      */
-    public function createAction()
+    public function createAction(Request $request)
     {
-        $user = $this->get('oro_user.manager')->createUser();
+        $user = $this->get(UserManager::class)->createUser();
 
-        return $this->update($user);
+        return $this->update($user, $request);
     }
 
     /**
      * Edit user form
      *
      * @Route("/update/{id}", name="oro_user_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template("OroUserBundle:User:update.html.twig")
+     * @Template("@OroUser/User/update.html.twig")
      * @Acl(
      *      id="oro_user_user_update",
      *      type="entity",
@@ -141,11 +146,12 @@ class UserController extends Controller
      * )
      *
      * @param User $entity
+     * @param Request $request
      * @return array|RedirectResponse
      */
-    public function updateAction(User $entity)
+    public function updateAction(User $entity, Request $request)
     {
-        return $this->update($entity);
+        return $this->update($entity, $request);
     }
 
     /**
@@ -155,38 +161,37 @@ class UserController extends Controller
      *      requirements={"_format"="html|json"},
      *      defaults={"_format" = "html"}
      * )
-     * @Template
+     * @Template("@OroUser/User/index.html.twig")
      * @AclAncestor("oro_user_user_view")
      */
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_user.entity.class')
+            'entity_class' => User::class
         ];
     }
 
     /**
-     * @param User  $entity
+     * @param User $entity
+     * @param Request $request
      *
      * @return RedirectResponse|array
      */
-    protected function update(User $entity)
+    private function update(User $entity, Request $request)
     {
-        if ($this->get('oro_user.form.handler.user')->process($entity)) {
-            $this->get('session')->getFlashBag()->add(
+        if ($this->get(UserHandler::class)->process($entity)) {
+            $request->getSession()->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.user.controller.user.message.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.user.controller.user.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity'       => $entity,
-            'form'         => $this->get('oro_user.form.user')->createView(),
-            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-            // completely delete an owner and related entities or reassign related entities to another owner before
-            'allow_delete' => $this->isUserDeleteAllowed($entity)
+            'form'         => $this->get(UserType::class)->createView(),
+            'allow_delete' => $entity->getId() && $this->isDeleteGranted($entity)
         ];
     }
 
@@ -195,29 +200,18 @@ class UserController extends Controller
      * @param bool $isProfileView
      * @return array
      */
-    protected function view(User $entity, $isProfileView = false)
+    private function view(User $entity, $isProfileView = false)
     {
-        // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
-        // completely delete an owner and related entities or reassign related entities to another owner before
-
         return [
-            'entity' => $entity,
-            'allow_delete' => $this->isUserDeleteAllowed($entity),
+            'entity'        => $entity,
+            'allow_delete'  => $this->isDeleteGranted($entity),
             'isProfileView' => $isProfileView
         ];
     }
 
     /**
-     * @return BusinessUnitManager
-     */
-    protected function getBusinessUnitManager()
-    {
-        return $this->get('oro_organization.business_unit_manager');
-    }
-
-    /**
      * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
-     * @Template
+     * @Template("@OroUser/User/widget/info.html.twig")
      * @param Request $request
      * @param User $user
      * @return array
@@ -240,15 +234,25 @@ class UserController extends Controller
     }
 
     /**
+     * @Route("/login-attempts", name="oro_user_login_attempts")
+     * @Template("@OroUser/User/loginAttempts.html.twig")
+     * @AclAncestor("oro_view_user_login_attempt")
+     */
+    public function loginAttemptsAction()
+    {
+        return [];
+    }
+
+    /**
      * Returns current UserApi or creates new one
      *
      * @param User $user
      *
      * @return UserApi
      */
-    protected function getUserApi(User $user)
+    private function getUserApi(User $user)
     {
-        $userManager  = $this->get('oro_user.manager');
+        $userManager  = $this->get(UserManager::class);
         if (!$userApi = $userManager->getApi($user, $this->getOrganization())) {
             $userApi = new UserApi();
             $userApi->setUser($user);
@@ -262,11 +266,19 @@ class UserController extends Controller
      *
      * @return Organization
      */
-    protected function getOrganization()
+    private function getOrganization()
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->get('security.token_storage')->getToken();
-        return $token->getOrganizationContext();
+        $token = $this->get(TokenStorageInterface::class)->getToken();
+
+        return $token->getOrganization();
+    }
+
+    private function isDeleteGranted(User $entity): bool
+    {
+        return $this->get(EntityDeleteHandlerRegistry::class)
+            ->getHandler(User::class)
+            ->isDeleteGranted($entity);
     }
 
     /**
@@ -274,31 +286,13 @@ class UserController extends Controller
      *
      * @return bool
      */
-    protected function isUserDeleteAllowed(User $entity)
+    private function isUserApiGenAllowed(User $entity)
     {
-        $isDeleteAllowed = $entity->getId()
-            && $this->getUser()->getId() !== $entity->getId()
-            && !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity);
-
-        return $isDeleteAllowed;
-    }
-
-    /**
-     * @param User $entity
-     *
-     * @return bool
-     */
-    protected function isUserApiGenAllowed(User $entity)
-    {
-        return $this->get('oro_security.token_accessor')->getUserId() === $entity->getId()
+        return $this->get(TokenAccessorInterface::class)->getUserId() === $entity->getId()
                || $this->isGranted('MANAGE_API_KEY', $entity);
     }
 
-    /**
-     * @param User    $user
-     * @param UserApi $userApi
-     */
-    protected function saveUserApi(User $user, UserApi $userApi)
+    private function saveUserApi(User $user, UserApi $userApi)
     {
         $em = $this->getDoctrine()->getManagerForClass(User::class);
 
@@ -308,5 +302,25 @@ class UserController extends Controller
 
         $em->persist($userApi);
         $em->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                TokenAccessorInterface::class,
+                UserManager::class,
+                EntityDeleteHandlerRegistry::class,
+                UserType::class,
+                UserHandler::class,
+                TokenStorageInterface::class
+            ]
+        );
     }
 }

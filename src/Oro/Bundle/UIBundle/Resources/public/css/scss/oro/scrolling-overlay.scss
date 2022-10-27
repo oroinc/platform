@@ -1,0 +1,78 @@
+/* @theme: admin.oro; */
+
+.scrolling-overlay {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+
+    &-content {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        min-width: 100%;
+
+        overflow-y: auto;
+
+        -webkit-overflow-scrolling: touch;
+
+        // Hide platform native scroll bar
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar,
+        &::-webkit-scrollbar-corner {
+            width: 0;
+            height: 0;
+        }
+    }
+
+    &-btn {
+        position: absolute;
+        left: 0;
+        z-index: 1;
+
+        width: 100%;
+        height: 17px;
+
+        background-color: $primary-500;
+
+        opacity: .85;
+
+        @extend %main-menu-trigger;
+
+        &:hover,
+        &:focus {
+            background-color: $primary-700;
+
+            opacity: 1;
+        }
+
+        &--light {
+            background-color: $primary-750;
+
+            &::before {
+                color: $primary-200;
+            }
+
+            &:hover,
+            &:focus {
+                background-color: $primary-800;
+
+                opacity: 1;
+            }
+        }
+
+        &--up {
+            top: 0;
+
+            @include fa-icon($menu-icon-up);
+        }
+
+        &--down {
+            bottom: 0;
+
+            @include fa-icon($menu-icon-down);
+        }
+    }
+}

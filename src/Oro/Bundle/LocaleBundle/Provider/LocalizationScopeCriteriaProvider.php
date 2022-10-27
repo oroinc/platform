@@ -3,20 +3,18 @@
 namespace Oro\Bundle\LocaleBundle\Provider;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider;
+use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 
-class LocalizationScopeCriteriaProvider extends AbstractScopeCriteriaProvider
+/**
+ * The scope criteria provider for the current localization.
+ */
+class LocalizationScopeCriteriaProvider implements ScopeCriteriaProviderInterface
 {
-    const LOCALIZATION = 'localization';
+    public const LOCALIZATION = 'localization';
 
-    /**
-     * @var CurrentLocalizationProvider
-     */
-    protected $currentLocalizationProvider;
+    /** @var CurrentLocalizationProvider */
+    private $currentLocalizationProvider;
 
-    /**
-     * @param CurrentLocalizationProvider $currentLocalizationProvider
-     */
     public function __construct(CurrentLocalizationProvider $currentLocalizationProvider)
     {
         $this->currentLocalizationProvider = $currentLocalizationProvider;
@@ -25,21 +23,21 @@ class LocalizationScopeCriteriaProvider extends AbstractScopeCriteriaProvider
     /**
      * {@inheritdoc}
      */
-    public function getCriteriaForCurrentScope()
-    {
-        return [static::LOCALIZATION => $this->currentLocalizationProvider->getCurrentLocalization()];
-    }
-
-    /**
-     * @return string
-     */
     public function getCriteriaField()
     {
         return self::LOCALIZATION;
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
+     */
+    public function getCriteriaValue()
+    {
+        return $this->currentLocalizationProvider->getCurrentLocalization();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getCriteriaValueType()
     {

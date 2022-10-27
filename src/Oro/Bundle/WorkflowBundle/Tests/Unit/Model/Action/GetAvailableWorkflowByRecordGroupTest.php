@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Action\GetAvailableWorkflowByRecordGroup;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -13,58 +14,50 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 class GetAvailableWorkflowByRecordGroupTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowManager;
+    private $workflowManager;
 
     /** @var GetAvailableWorkflowByRecordGroup */
-    protected $action;
+    private $action;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);
 
-        /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = $this->createMock(EventDispatcher::class);
 
         $this->action = new GetAvailableWorkflowByRecordGroup(new ContextAccessor(), $this->workflowManager);
         $this->action->setDispatcher($eventDispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Group name parameter is required
-     */
     public function testInitializeWithoutGroupName()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Group name parameter is required');
+
         $this->action->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Entity class parameter is required
-     */
     public function testInitializeWithoutEntityClass()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Entity class parameter is required');
+
         $this->action->initialize(['group_name' => 'group1']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute parameter is required
-     */
     public function testInitializeWithoutAttribute()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute parameter is required');
+
         $this->action->initialize(['group_name' => 'group1', 'entity_class' => 'class1']);
     }
 
-    /**
-     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
-     * @expectedExceptionMessage Attribute must be valid property
-     */
     public function testInitializeWithInvalidAttribute()
     {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Attribute must be valid property');
+
         $this->action->initialize(['group_name' => 'group1', 'entity_class' => 'class1', 'attribute' => 'attribute1']);
     }
 
@@ -116,17 +109,15 @@ class GetAvailableWorkflowByRecordGroupTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals((object)['attribute1' => null], $context);
     }
 
-    /**
-     * @param array $recordGroups
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createWorkflow(array $recordGroups)
+    private function createWorkflow(array $recordGroups): Workflow
     {
         $definition = new WorkflowDefinition();
         $definition->setExclusiveRecordGroups($recordGroups);
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $workflow->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($definition);
 
         return $workflow;
     }

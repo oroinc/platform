@@ -12,17 +12,15 @@ use Oro\Bundle\EmailBundle\EventListener\ReplaceEmbeddedAttachmentsListener;
 class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ReplaceEmbeddedAttachmentsListener */
-    protected $listener;
+    private $listener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->listener = new ReplaceEmbeddedAttachmentsListener();
     }
 
     /**
      * @dataProvider replaceDataProvider
-     * @param       $bodyTemplate
-     * @param array $attachments
      */
     public function testReplace($bodyTemplate, array $attachments)
     {
@@ -65,10 +63,7 @@ class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function replaceDataProvider()
+    public function replaceDataProvider(): array
     {
         return [
             'one embedded attachment'                 => [

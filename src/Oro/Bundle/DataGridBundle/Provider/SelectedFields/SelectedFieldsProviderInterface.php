@@ -11,12 +11,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
  */
 interface SelectedFieldsProviderInterface
 {
-    /**
-     * @param DatagridConfiguration $datagridConfiguration
-     * @param ParameterBag $datagridParameters
-     *
-     * @return array
-     */
     public function getSelectedFields(
         DatagridConfiguration $datagridConfiguration,
         ParameterBag $datagridParameters

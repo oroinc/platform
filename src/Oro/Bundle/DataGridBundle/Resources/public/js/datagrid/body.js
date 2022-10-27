@@ -1,14 +1,11 @@
-define([
-    'underscore',
-    'oroui/js/mediator',
-    'backbone',
-    'chaplin',
-    'backgrid',
-    './row'
-], function(_, mediator, Backbone, Chaplin, Backgrid, Row) {
+define(function(require) {
     'use strict';
 
-    var Body;
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
+    const Chaplin = require('chaplin');
+    const Backgrid = require('backgrid');
+    const Row = require('./row');
 
     /**
      * Grid body widget
@@ -20,7 +17,7 @@ define([
      * @class   orodatagrid.datagrid.Body
      * @extends Backgrid.Body
      */
-    Body = Chaplin.CollectionView.extend({
+    const Body = Chaplin.CollectionView.extend({
 
         tagName: 'tbody',
         autoRender: false,
@@ -38,26 +35,27 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function Body() {
-            Body.__super__.constructor.apply(this, arguments);
+        constructor: function Body(options) {
+            Body.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText']));
+            _.extend(this, _.pick(options, ['rowClassName', 'columns', 'filteredColumns', 'emptyText',
+                'gridRowsCounter']));
             this.rows = this.subviews;
             if ('rowView' in options.themeOptions) {
                 this.itemView = options.themeOptions.rowView;
             }
-            Body.__super__.initialize.apply(this, arguments);
+            Body.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -65,39 +63,39 @@ define([
             }
             delete this.columns;
             delete this.filteredColumns;
+            delete this.gridRowsCounter;
 
             Body.__super__.dispose.call(this);
         },
 
         renderAllItems: function() {
-            var result = Body.__super__.renderAllItems.call(this, arguments);
+            const result = Body.__super__.renderAllItems.call(this);
             mediator.trigger('layout:adjustHeight');
             return result;
         },
 
         initItemView: function(model) {
-            Row = this.row || this.itemView;
-            if (Row) {
-                var rowOptions = {
+            const RowView = this.row || this.itemView;
+            if (RowView) {
+                const rowOptions = {
                     autoRender: false,
                     model: model,
+                    dataCollection: this.collection,
                     collection: this.filteredColumns,
-                    columns: this.columns
+                    columns: this.columns,
+                    rowClassName: this.rowClassName,
+                    ariaRowsIndexShift: this.gridRowsCounter.getHeaderRowsCount()
                 };
-                this.columns.trigger('configureInitializeOptions', Row, rowOptions);
-                return new Row(rowOptions);
+                this.columns.trigger('configureInitializeOptions', RowView, rowOptions);
+
+                const row = new RowView(rowOptions);
+                this.attachListenerToSingleRow(row);
+
+                return row;
             } else {
                 throw new Error('The one of Body#row or Body#itemView properties ' +
                     'must be defined or the initItemView() must be overridden.');
             }
-        },
-
-        /**
-         * @inheritDoc
-         */
-        insertView: function(model, view) {
-            Body.__super__.insertView.apply(this, arguments);
-            this.attachListenerToSingleRow(view);
         },
 
         /**
@@ -114,7 +112,7 @@ define([
 
         initFallback: function() {
             if (!this.fallbackSelector && this.emptyText) {
-                var fallbackElement = new Backgrid.EmptyRow({
+                const fallbackElement = new Backgrid.EmptyRow({
                     emptyText: this.emptyText,
                     columns: this.columns
                 }).render().el;
@@ -123,18 +121,15 @@ define([
                 }).join('');
                 this.$el.append(fallbackElement);
             }
-            Body.__super__.initFallback.apply(this, arguments);
+            Body.__super__.initFallback.call(this);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             this._deferredRender();
-            Body.__super__.render.apply(this, arguments);
-            if (this.rowClassName) {
-                this.$('> *').addClass(this.rowClassName);
-            }
+            Body.__super__.render.call(this);
             this._resolveDeferredRender();
             return this;
         }

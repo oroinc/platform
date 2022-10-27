@@ -1,24 +1,17 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractPhone;
 
 class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AbstractPhone
-     */
-    protected $phone;
+    /** @var AbstractPhone */
+    private $phone;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->phone = $this->createPhone();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->phone);
     }
 
     public function testConstructor()
@@ -64,51 +57,35 @@ class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isEqualDataProvider
-     *
-     * @param AbstractPhone $first
-     * @param mixed $second
-     * @param bool $expectedResult
      */
-    public function testIsEqual(AbstractPhone $first, $second, $expectedResult)
+    public function testIsEqual(AbstractPhone $first, ?AbstractPhone $second, bool $expectedResult)
     {
         $this->assertEquals($expectedResult, $first->isEqual($second));
     }
 
-    /**
-     * @return array
-     */
-    public function isEqualDataProvider()
+    public function isEqualDataProvider(): array
     {
-        $phoneEmpty  = $this->createPhone();
+        $phoneEmpty = $this->createPhone();
         $phoneSimple = $this->createPhone('123');
 
-        return array(
-            'both empty'           => array($phoneEmpty, $phoneEmpty, true),
-            'one empty'            => array($this->createPhone(100), $phoneEmpty, false),
-            'one empty one unset'  => array($phoneEmpty, null, false),
-            'both with same id'    => array($this->createPhone('123', 100), $this->createPhone('789', 100), true),
-            'equals not empty'     => array($phoneSimple, $phoneSimple, true),
-            'not equals not empty' => array($phoneSimple, $this->createPhone('789'), false),
-        );
+        return [
+            'both empty'           => [$phoneEmpty, $phoneEmpty, true],
+            'one empty'            => [$this->createPhone(100), $phoneEmpty, false],
+            'one empty one unset'  => [$phoneEmpty, null, false],
+            'both with same id'    => [$this->createPhone('123', 100), $this->createPhone('789', 100), true],
+            'equals not empty'     => [$phoneSimple, $phoneSimple, true],
+            'not equals not empty' => [$phoneSimple, $this->createPhone('789'), false],
+        ];
     }
 
-
-    /**
-     * @param string|null $phone
-     * @param int $id
-     * @return AbstractPhone|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createPhone($phone = null, $id = null)
+    private function createPhone(string $phone = null, int $id = null): AbstractPhone
     {
-        $arguments = array();
-
+        $arguments = [];
         if ($phone) {
             $arguments[] = $phone;
         }
 
-        /** @var AbstractPhone $phone */
-        $phone = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractPhone', $arguments);
-
+        $phone = $this->getMockForAbstractClass(AbstractPhone::class, $arguments);
         if ($id) {
             $phone->setId($id);
         }

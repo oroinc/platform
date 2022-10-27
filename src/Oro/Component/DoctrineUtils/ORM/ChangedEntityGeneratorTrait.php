@@ -4,6 +4,9 @@ namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\ORM\UnitOfWork;
 
+/**
+ * Handy methods for working with changed entities in UnitOfWork.
+ */
 trait ChangedEntityGeneratorTrait
 {
     /**
@@ -38,6 +41,17 @@ trait ChangedEntityGeneratorTrait
         }
 
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
+            yield $entity;
+        }
+    }
+
+    protected function getInsertedAndUpdatedEntities(UnitOfWork $uow): \Generator
+    {
+        foreach ($uow->getScheduledEntityInsertions() as $entity) {
+            yield $entity;
+        }
+
+        foreach ($uow->getScheduledEntityUpdates() as $entity) {
             yield $entity;
         }
     }

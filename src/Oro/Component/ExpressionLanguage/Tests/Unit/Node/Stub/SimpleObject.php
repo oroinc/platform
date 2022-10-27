@@ -4,23 +4,14 @@ namespace Oro\Component\ExpressionLanguage\Tests\Unit\Node\Stub;
 
 class SimpleObject
 {
-    /**
-     * @var string
-     */
-    public $foo = 'baz';
+    public string $foo = 'baz';
 
-    /**
-     * @return string
-     */
-    public function foo()
+    public function foo(): string
     {
         return 'bar';
     }
 
-    /**
-     * @return array
-     */
-    public function values()
+    public function values(): array
     {
         return [['index' => 11]];
     }

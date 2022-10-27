@@ -2,62 +2,41 @@
 
 namespace Oro\Bundle\AddressBundle\Validator\Constraints;
 
-use Oro\Bundle\AddressBundle\Entity\Country;
-use Oro\Bundle\AddressBundle\Entity\Region;
+use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+/**
+ * The validator for ValidRegion constraint.
+ */
 class ValidRegionValidator extends ConstraintValidator
 {
-    const ALIAS = 'oro_address_valid_region';
-
     /**
      * {@inheritdoc}
-     * @param ValidRegion $constraint
+     * @param AbstractAddress $entity
+     * @param ValidRegion     $constraint
      */
     public function validate($entity, Constraint $constraint)
     {
-        $country = $entity->getCountry();
-        $region = $entity->getRegion();
-
-        if ($country && $country->hasRegions() &&
-            !$region && !$entity->getRegionText()
-        ) {
-            // do not allow saving text region in case when region was checked from list
-            // except when in base data region text existed
-            // another way region_text field will be null, logic are placed in form listener
-            $this->context->buildViolation($constraint->message)
-                ->atPath('region')
-                ->setParameters(['{{ country }}' => $country->getName()])
-                ->addViolation();
+        if (null === $entity) {
+            return;
+        }
+        if (!$entity instanceof AbstractAddress) {
+            throw new UnexpectedTypeException($entity, AbstractAddress::class);
         }
 
-        if (!$this->regionBelongsToCountry($country, $region)) {
+        $country = $entity->getCountry();
+        $region = $entity->getRegion();
+        if (null !== $country && null !== $region && !$country->getRegions()->contains($region)) {
+            // prevent setting for example region Berlin to country Romania
             $this->context->addViolation(
-                'oro.address.validation.invalid_country_region',
+                $constraint->message,
                 [
-                    '{{ region }}' => $region->getName(),
-                    '{{ country }}' => $country->getName(),
+                    '{{ region }}'  => $region->getName(),
+                    '{{ country }}' => $country->getName()
                 ]
             );
         }
-    }
-
-    /**
-     * This is needed to prevent setting for example region Berlin to country Romania
-     *
-     * @param Country|null $country
-     * @param Region|null $region
-     * @return bool
-     */
-    private function regionBelongsToCountry($country, $region)
-    {
-        // we can make this check only if elements are of the correct type
-        if ($country instanceof Country &&
-            $region instanceof Region) {
-            return $country->getRegions()->contains($region);
-        }
-
-        return true;
     }
 }

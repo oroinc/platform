@@ -74,9 +74,6 @@ class TemplateMassNotification implements TemplateEmailNotificationInterface, Se
         return null;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSubject(): ?string
     {
         return $this->subject;

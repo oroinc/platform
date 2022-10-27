@@ -11,27 +11,22 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     public function testGetConfigTreeBuilder()
     {
         $configuration = new Configuration();
-        $builder       = $configuration->getConfigTreeBuilder();
+        $builder = $configuration->getConfigTreeBuilder();
 
         $this->assertInstanceOf(TreeBuilder::class, $builder);
     }
 
     /**
      * @dataProvider processConfigurationDataProvider
-     * @param array $configs
-     * @param array $expected
      */
     public function testProcessConfiguration(array $configs, array $expected)
     {
         $configuration = new Configuration();
-        $processor     = new Processor();
+        $processor = new Processor();
         $this->assertEquals($expected, $processor->processConfiguration($configuration, $configs));
     }
 
-    /**
-     * @return array
-     */
-    public function processConfigurationDataProvider()
+    public function processConfigurationDataProvider(): array
     {
         return [
             'empty'                => [

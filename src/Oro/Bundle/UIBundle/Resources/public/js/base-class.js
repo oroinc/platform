@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var Chaplin = require('chaplin');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Chaplin = require('chaplin');
 
     /**
      * Base class that implement extending in backbone way.

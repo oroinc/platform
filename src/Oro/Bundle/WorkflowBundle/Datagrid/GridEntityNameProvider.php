@@ -5,8 +5,11 @@ namespace Oro\Bundle\WorkflowBundle\Datagrid;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides workflow definition related entities.
+ */
 class GridEntityNameProvider
 {
     /**
@@ -33,11 +36,6 @@ class GridEntityNameProvider
      */
     protected $translator;
 
-    /**
-     * @param ConfigProvider      $configProvider
-     * @param EntityManager       $entityManager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         ConfigProvider $configProvider,
         EntityManager $entityManager,
@@ -73,7 +71,7 @@ class GridEntityNameProvider
                 $label = $className;
                 if ($this->configProvider->hasConfig($className)) {
                     $config = $this->configProvider->getConfig($className);
-                    $label = $this->translator->trans($config->get('label'));
+                    $label = $this->translator->trans((string) $config->get('label'));
                 }
 
                 $this->relatedEntities[$label] = $className;

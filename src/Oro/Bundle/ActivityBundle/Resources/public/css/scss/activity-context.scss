@@ -1,76 +1,26 @@
 /* @theme: admin.oro; */
 
-.activity-list-widget {
-    .activity-context-activity-list {
-        padding: 0 $horizontal-padding;
-    }
-}
-
 .activity-context-activity {
     display: none;
+
+    @include clearfix();
 }
 
 .activity-context-activity-list {
-    margin-bottom: 5px;
-}
-
-.activity-context-activity-items .context-item {
-    background: $activity-context-item-background;
-    color: $activity-context-item-color;
-    display: $activity-context-item-display;
-    margin: $activity-context-item-offset;
-    padding: $activity-context-item-inner-offset;
-    font-size: $activity-context-item-font-size;
-}
-
-.cell-context-item,
-.context-item {
-    .context-label {
-        max-width: 180px;
-        display: inline-block;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        vertical-align: bottom;
-    }
-}
-
-.context-item {
-    background: $context-item-background;
-    color: $context-item-color;
-    padding: $context-item-inner-offset;
-    border-radius: $context-item-border-radius;
-    list-style: none;
-    cursor: pointer;
-    white-space: nowrap;
-
-    &.active,
-    .dropdown-menu &:hover {
-        background: $primary-860;
-        color: #444;
-    }
-}
-
-.cell-context-item {
-    display: inline-block;
-    white-space: nowrap;
-}
-
-.customer-content .context-item .fa-close {
-    cursor: pointer;
+    margin-bottom: $activity-context-activity-list-offset;
 }
 
 .activity-context-activity-label {
-    float: $activity-context-activity-label-float;
+    float: left;
     margin: $activity-context-activity-label-offset;
-    font-size: $activity-context-activity-label-font-size;
-    line-height: $activity-context-activity-label-line-height;
+
     color: $activity-context-activity-label-color;
 }
 
 .activity-context-activity-items {
-    margin-left: 55px;
-    font-size: 11px;
-    line-height: 14px;
+    .activity-context-activity-label + & {
+        margin-left: $activity-context-activity-items-offset;
+    }
 }
 
 .activity-context-activity-block {
@@ -78,46 +28,20 @@
         margin-top: 5px;
         width: 720px;
     }
-}
 
-.context-items-dropdown {
-    top: 38px;
-    left: 14px;
-    border-color: #d3d3d3;
+    @at-root .page-title {
+        .activity-context-activity-block {
+            // stylelint-disable-next-line declaration-no-important
+            display: block !important;
 
-    .context-item {
-        padding: 2px 8px;
-        font-size: 13px;
-    }
-}
+            .activity-context-activity {
+                margin-top: 0;
+                width: auto;
+            }
+        }
 
-.activity-context-current-block {
-    cursor: pointer;
-    background-color: #fff;
-    border: none;
-    outline: none;
-    margin: 10px 10px 15px 10px;
-    box-shadow: none;
-
-    .btn-group.open & {
-        box-shadow: none;
-    }
-}
-
-.activity-context-current-item {
-    font-size: 18px;
-    font-weight: bold;
-    color: #666;
-}
-
-.control-group .controls .activity-context-activity-items {
-    padding-top: 5px;
-    margin-left: 0;
-
-    .context-item {
-        color: #777;
-        font-size: 13px;
-        line-height: 20px;
-        padding: 0 2px;
+        .context-item .fa-close {
+            cursor: pointer;
+        }
     }
 }

@@ -7,19 +7,12 @@ use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 
 class ConfigGetEventTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject*/
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->configManager);
+        $this->configManager = $this->createMock(ConfigManager::class);
     }
 
     public function testEvent()

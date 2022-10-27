@@ -3,99 +3,132 @@
 namespace Oro\Bundle\SegmentBundle\Query;
 
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryBuilderGroupingOrmQueryConverter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Oro\Bundle\SegmentBundle\Model\SegmentIdentityAwareInterface;
 
-class SegmentQueryConverter extends GroupingOrmQueryConverter
+/**
+ * Converts a segment query definition created by the query designer to an ORM query.
+ */
+class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
 {
-    /*
-     * Override to prevent naming conflicts
-     */
-    const COLUMN_ALIAS_TEMPLATE = 'cs%d';
-    const TABLE_ALIAS_TEMPLATE  = 'ts%d';
-
-    /** @var QueryBuilder */
-    protected $qb;
-
     /** @var RestrictionBuilderInterface */
-    protected $restrictionBuilder;
+    private $restrictionBuilder;
 
-    /**
-     * Constructor
-     *
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ManagerRegistry               $doctrine
-     * @param RestrictionBuilderInterface   $restrictionBuilder
-     */
+    /** @var SegmentQueryConverterState|null */
+    private $state;
+
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
-        ManagerRegistry $doctrine,
-        RestrictionBuilderInterface $restrictionBuilder
+        VirtualRelationProviderInterface $virtualRelationProvider,
+        DoctrineHelper $doctrineHelper,
+        RestrictionBuilderInterface $restrictionBuilder,
+        SegmentQueryConverterState $state = null
     ) {
+        parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider, $doctrineHelper);
         $this->restrictionBuilder = $restrictionBuilder;
-        parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
+        $this->state = $state;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function saveTableAliases($tableAliases)
+    public function convert(AbstractQueryDesigner $source): QueryBuilder
     {
-        // nothing to do
+        if (null === $this->state) {
+            return $this->convertToQueryBuilder($source);
+        }
+
+        $segmentId = $this->getSegmentId($source);
+        if (!$segmentId) {
+            return $this->convertToQueryBuilder($source);
+        }
+
+        $this->state->registerQuery($segmentId);
+        try {
+            // the cache can be used only for a root segment query (not a filter),
+            // otherwise table alias conflicts may occur
+            if ($this->state->isRootQuery($segmentId)) {
+                $qb = $this->state->getQueryFromCache($segmentId);
+                if (null !== $qb) {
+                    return $qb;
+                }
+            }
+
+            $this->context()->setAliasPrefix($this->state->buildQueryAlias($segmentId, $source));
+            $qb = $this->convertToQueryBuilder($source);
+            $this->state->saveQueryToCache($segmentId, $qb);
+
+            return $qb;
+        } finally {
+            $this->state->unregisterQuery($segmentId);
+        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function saveColumnAliases($columnAliases)
+    protected function convertToQueryBuilder(AbstractQueryDesigner $source): QueryBuilder
     {
-        // nothing to do
+        $qb = $this->doctrineHelper->getEntityManagerForClass($source->getEntity())->createQueryBuilder();
+        $this->doConvertToQueryBuilder($source, $qb);
+
+        return $qb;
     }
 
-    /**
-     * Process convert
-     *
-     * @param AbstractQueryDesigner $source
-     *
-     * @return \Doctrine\ORM\QueryBuilder
-     */
-    public function convert(AbstractQueryDesigner $source)
+    protected function doConvertToQueryBuilder(AbstractQueryDesigner $source, QueryBuilder $qb): void
     {
-        $this->qb = $this->doctrine->getManagerForClass($source->getEntity())->createQueryBuilder();
+        $this->context()->setQueryBuilder($qb);
         $this->doConvert($source);
-
-        return $this->qb;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function generateTableAlias($offset = 1)
+    protected function createContext(): SegmentQueryConverterContext
     {
-        return sprintf(static::TABLE_ALIAS_TEMPLATE, mt_rand());
+        return new SegmentQueryConverterContext();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function context(): SegmentQueryConverterContext
+    {
+        return parent::context();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function saveTableAliases(array $tableAliases): void
+    {
+        // nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function saveColumnAliases(array $columnAliases): void
+    {
+        // nothing to do
     }
 
     /**
      * {@inheritdoc}
      */
     protected function addSelectColumn(
-        $entityClassName,
-        $tableAlias,
-        $fieldName,
-        $columnExpr,
-        $columnAlias,
-        $columnLabel,
+        string $entityClass,
+        string $tableAlias,
+        string $fieldName,
+        string $columnExpr,
+        string $columnAlias,
+        string $columnLabel,
         $functionExpr,
-        $functionReturnType,
-        $isDistinct = false
-    ) {
+        ?string $functionReturnType,
+        bool $isDistinct
+    ): void {
         if ($functionExpr !== null) {
             $functionExpr = $this->prepareFunctionExpression(
                 $functionExpr,
@@ -106,42 +139,21 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
             );
         }
 
-        // @TODO find solution for aliases before generalizing this converter
         // column aliases are not used here, because of parser error
-        $select = $functionExpr !== null ? $functionExpr : $columnExpr;
-        $this->qb->addSelect($select);
+        $this->context()->getQueryBuilder()->addSelect($functionExpr ?? $columnExpr);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addFromStatement($entityClassName, $tableAlias)
-    {
-        $this->qb->from($entityClassName, $tableAlias);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function addJoinStatement($joinType, $join, $joinAlias, $joinConditionType, $joinCondition)
-    {
-        if (self::LEFT_JOIN === $joinType) {
-            $this->qb->leftJoin($join, $joinAlias, $joinConditionType, $joinCondition);
-        } else {
-            $this->qb->innerJoin($join, $joinAlias, $joinConditionType, $joinCondition);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function addWhereStatement()
+    protected function addWhereStatement(): void
     {
         parent::addWhereStatement();
-        if (!empty($this->filters)) {
+        $filters = $this->context()->getFilters();
+        if ($filters) {
             $this->restrictionBuilder->buildRestrictions(
-                $this->filters,
-                new GroupingOrmFilterDatasourceAdapter($this->qb)
+                $filters,
+                new GroupingOrmFilterDatasourceAdapter($this->context()->getQueryBuilder())
             );
         }
     }
@@ -149,7 +161,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addGroupByColumn($columnAlias)
+    protected function addGroupByStatement(): void
     {
         // do nothing, grouping is not allowed
     }
@@ -157,29 +169,39 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addOrderByColumn($columnAlias, $columnSorting)
+    protected function addGroupByColumn(string $columnAlias): void
     {
-        if ($this->columnAliases && $columnAlias) {
-            $columnNames = array_flip($this->columnAliases);
-            $columnName = $columnNames[$columnAlias];
-            $prefixedColumnName = $this->getPrefixedColumnName($columnName);
-            $this->qb->addOrderBy($prefixedColumnName, $columnSorting);
-        }
+        // do nothing, grouping is not allowed
     }
 
     /**
-     * @param string $columnName
-     * @return string
+     * {@inheritdoc}
      */
-    protected function getPrefixedColumnName($columnName)
+    protected function addOrderByColumn(string $columnAlias, string $columnSorting): void
     {
-        $joinId =  $this->joinIdHelper->buildColumnJoinIdentifier($columnName);
-        if (array_key_exists($joinId, $this->virtualColumnOptions)
-            && array_key_exists($columnName, $this->virtualColumnExpressions)
+        $this->context()->getQueryBuilder()->addOrderBy(
+            $this->getOrderByColumnExpr($columnAlias),
+            $columnSorting
+        );
+    }
+
+    private function getOrderByColumnExpr(string $columnAlias): string
+    {
+        $columnName = $this->context()->getColumnName($this->context()->getColumnId($columnAlias));
+        $columnJoinId = $this->buildColumnJoinIdentifier($columnName);
+        if ($this->context()->hasVirtualColumnExpression($columnName)
+            && $this->context()->hasVirtualColumnOptions($columnJoinId)
         ) {
-            return $this->virtualColumnExpressions[$columnName];
+            return $this->context()->getVirtualColumnExpression($columnName);
         }
 
         return $this->getTableAliasForColumn($columnName) . '.' . $columnName;
+    }
+
+    private function getSegmentId(AbstractQueryDesigner $source): ?int
+    {
+        return $source instanceof SegmentIdentityAwareInterface
+            ? $source->getSegmentId()
+            : null;
     }
 }

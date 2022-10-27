@@ -6,9 +6,6 @@ api:
 
         Oro\Bundle\EmailBundle\Entity\Email:
             documentation_resource: '@OroEmailBundle/Resources/doc/api/email.md'
-            fields:
-                activityTargets:
-                    data_type: association:manyToMany:activity
             actions:
                 get: false
                 get_list: false

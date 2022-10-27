@@ -5,10 +5,12 @@ namespace Oro\Bundle\FormBundle\Tests\Behat\Context;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select;
+use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entities;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select2Entity;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField;
@@ -20,10 +22,33 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class FormContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
+
+    private Inflector $inflector;
+
+    public function __construct()
+    {
+        $this->inflector = (new InflectorFactory())->build();
+    }
+
+    /**
+     * Focus on the specified id|name|title|alt|value field
+     *
+     * Example: And I focus on "Some" field
+     *
+     * @When /^(?:|I )focus on "(?P<fieldName>[^"]*)" field$/
+     * @param string $fieldName
+     */
+    public function focusOnField($fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        $field->focus();
+    }
 
     /**
      * Fill form with data
@@ -38,6 +63,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function iFillFormWith(TableNode $table, $formName = "OroForm")
     {
         /** @var Form $form */
+        $this->waitForAjax();
         $form = $this->createElement($formName);
         $form->fill($table);
     }
@@ -117,13 +143,13 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And Description field should has Our new partner value
      *
      * @When /^(?P<fieldName>[\w\s]*) field should has (?P<fieldValue>.+) value$/
+     * @When /^(?P<fieldName>[\w\s]*) field should have "(?P<fieldValue>(?:[^"]|\\")*)" value$/
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
     {
         $possibleElementName = $this->fixStepArgument($fieldName);
         if ($this->elementFactory->hasElement($possibleElementName)) {
-            $value = $this->createElement($possibleElementName)->getValue();
-            self::assertSame($fieldValue, $value);
+            self::assertSame($fieldValue, $this->createElement($possibleElementName)->getValue());
 
             return;
         }
@@ -142,7 +168,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
                 }
 
                 $value = $label->getParent()->find('css', 'div.control-label')->getText();
-                self::assertRegExp(sprintf('/%s/i', $fieldValue), $value);
+                self::assertMatchesRegularExpression(sprintf('/%s/i', $fieldValue), $value);
 
                 return;
             }
@@ -172,7 +198,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function setFieldWithValueAsPrimary($field, $value)
     {
         /** @var CollectionField $collection */
-        $collection = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($field)));
+        $collection = $this->createOroForm()->findField(ucfirst($this->inflector->pluralize($field)));
         $collection->setFieldAsPrimary($value);
     }
 
@@ -204,12 +230,12 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             $form = $this->createElement($formName);
 
             foreach ($table->getRows() as $row) {
-                list($label, $value) = $row;
+                [$label, $value] = $row;
                 $error = $form->getFieldValidationErrors($label);
                 self::assertEquals(
                     $value,
                     $error,
-                    "Failed asserting that $label has error $value"
+                    "Failed asserting that $label has error $value. Actual value: $error"
                 );
             }
         });
@@ -234,7 +260,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             $form = $this->createElement($formName);
 
             foreach ($table->getRows() as $row) {
-                list($label, $value) = $row;
+                [$label, $value] = $row;
                 $errors = $form->getAllFieldValidationErrors($label);
                 self::assertFalse(
                     in_array($value, $errors),
@@ -257,7 +283,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function iFillInFieldSet($fieldSetLabel, TableNode $table)
     {
         /** @var Form $fieldSet */
-        $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
+        $fieldSet = $this->createOroForm()->findField(ucfirst($this->inflector->pluralize($fieldSetLabel)));
         $fieldSet->fill($table);
     }
 
@@ -276,6 +302,48 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Check that the field contains the following values.
+     *
+     * Example: Then I should see values in field "Reminders":
+     *            | Value 1 |
+     *            | Value 2 |
+     *
+     * @Then /^(?:|I )should see values in field "(?P<field>(?:[^"]|\\")*)":$/
+     */
+    public function collectionFieldHasValues($field, TableNode $table)
+    {
+        $form = $this->createOroForm();
+        $field = $form->findField($field);
+
+        $value = $field->getValue();
+        $expectedValues = $table->getColumn(0);
+        foreach ($expectedValues as $expectedValue) {
+            self::assertContains($expectedValue, $value);
+        }
+    }
+
+    /**
+     * Check that the field does not contain the following values.
+     *
+     * Example: Then I should not see values in field "Reminders":
+     *            | Value 1 |
+     *            | Value 2 |
+     *
+     * @Then /^(?:|I )should not see values in field "(?P<field>(?:[^"]|\\")*)":$/
+     */
+    public function collectionFieldHasNoValues($field, TableNode $table)
+    {
+        $form = $this->createOroForm();
+        $field = $form->findField($field);
+
+        $value = $field->getValue();
+        $expectedValues = $table->getColumn(0);
+        foreach ($expectedValues as $expectedValue) {
+            self::assertNotContains($expectedValue, $value);
+        }
+    }
+
+    /**
      * Add new embed form with data
      * Example: And add new address with:
      *            | Primary         | check               |
@@ -290,7 +358,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function addNewFieldSetWith($fieldSetLabel, TableNode $table)
     {
         /** @var Form $fieldSet */
-        $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
+        $fieldSet = $this->createOroForm()->findField(ucfirst($this->inflector->pluralize($fieldSetLabel)));
         $fieldSet->clickLink('Add');
         $this->waitForAjax();
         $form = $fieldSet->getLastSet();
@@ -329,7 +397,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * Assert that field is not required
-     * Example: Then Opportunity Name is not required field
      * Example: Then Opportunity Name is not required field
      *
      * @Then /^(?P<label>[\w\s]+) is not required field$/
@@ -400,7 +467,48 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * This step used for system configuration field
+     * Go to System/Configuration and see the fields with default checkboxes
+     * Example: And uncheck "Use default" for "Position" field in section "Section"
+     *
+     * @Given uncheck :checkbox for :label field in section :section
+     */
+    public function uncheckUseDefaultForFieldInSection($label, $checkbox, $section)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        $form->uncheckCheckboxByLabel($label, $checkbox, $section);
+    }
+
+    /**
+     * This step used for system configuration field
+     * Example: And I should not see "Use default" for "Position" field
+     *
+     * @Given I should not see :checkbox for :label field
+     */
+    public function shouldNotSeeUseDefaultForField($label, $checkbox)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        self::assertFalse($form->isUseDefaultCheckboxExists($label, $checkbox));
+    }
+
+    /**
+     * This step used for system configuration field
+     * Example: And I should see "Use default" for "Position" field
+     *
+     * @Given I should see :checkbox for :label field
+     */
+    public function shouldSeeUseDefaultForField($label, $checkbox)
+    {
+        /** @var SystemConfigForm $form */
+        $form = $this->createElement('SystemConfigForm');
+        self::assertTrue($form->isUseDefaultCheckboxExists($label, $checkbox));
+    }
+
+    /**
      * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/
+     * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" checkbox$/
      */
     public function iUncheckElement($elementName)
     {
@@ -412,6 +520,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )check "(?P<value>[^"]*)" element$/
+     * @Given /^(?:|I )check "(?P<value>[^"]*)" checkbox$/
      */
     public function iCheckElement($elementName)
     {
@@ -422,45 +531,152 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
-     *
-     * @param string    $field
-     * @param TableNode $options
-     * @param string    $formName
+     * @Given /^(?:|I )uncheck "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field$/
      */
-    public function shouldSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
+    public function uncheckElementForField(string $elementName, string $fieldName): void
     {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        $field->uncheckField($elementName);
+    }
+
+    /**
+     * @Given /^(?:|I )check "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field$/
+     */
+    public function checkElementForField(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        $field->checkField($elementName);
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field should be unchecked$/
+     */
+    public function elementForFieldShouldBeUnchecked(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue($field->hasUncheckedField($elementName));
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field should be checked$/
+     */
+    public function elementForFieldShouldBeChecked(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue($field->hasCheckedField($elementName));
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)" pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
+     *
+     * @param string $field
+     * @param TableNode $options
+     * @param string $formName
+     * @param string $value
+     * @throws ElementNotFoundException
+     */
+    //@codingStandardsIgnoreEnd
+    public function shouldSeeTheFollowingOptionsForSelect(
+        $field,
+        TableNode $options,
+        $formName = 'OroForm',
+        $value = ''
+    ) {
         $optionLabels = array_merge(...$options->getRows());
 
         /** @var Select2Entity|Select $element */
         $element = $this->getFieldInForm($field, $formName);
         if ($element instanceof Select2Entity) {
-            $options = $element->getSuggestedValues();
+            $options = $element->getSuggestedValues($value);
             foreach ($optionLabels as $optionLabel) {
                 static::assertContains($optionLabel, $options);
+            }
+        } elseif ($element instanceof Select2Entities) {
+            $element->focus();
+            $options = $element->getSearchResults();
+            $optionsValue = [];
+            /** @var Element $option */
+            foreach ($options as $option) {
+                $optionsValue[] = $option->getText();
+            }
+            foreach ($optionLabels as $optionLabel) {
+                static::assertContains($optionLabel, $optionsValue);
+            }
+            $element->close();
+        } elseif ($element instanceof Select) {
+            /** @var NodeElement[] $options */
+            $options = $element->findAll('css', 'option');
+            $optionsValue = [];
+            /** @var Element $element */
+            foreach ($options as $element) {
+                $optionsValue[] = $element->getText();
+            }
+            foreach ($optionLabels as $optionLabel) {
+                static::assertContains($optionLabel, $optionsValue);
             }
         } else {
             $this->assertSelectContainsOptions($field, $optionLabels);
         }
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
+     * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
+     * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
+     * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)" pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      *
-     * @param string    $field
+     * @param string $field
      * @param TableNode $options
-     * @param string    $formName
+     * @param string $formName
+     * @param string $value
+     * @throws ElementNotFoundException
      */
-    public function shouldNotSeeTheFollowingOptionsForSelect($field, TableNode $options, $formName = 'OroForm')
-    {
+    //@codingStandardsIgnoreEnd
+    public function shouldNotSeeTheFollowingOptionsForSelect(
+        $field,
+        TableNode $options,
+        $formName = 'OroForm',
+        $value = ''
+    ) {
         $optionLabels = array_merge(...$options->getRows());
 
         /** @var Select2Entity|Select $element */
         $element = $this->getFieldInForm($field, $formName);
         if ($element instanceof Select2Entity) {
-            $options = $element->getSuggestedValues();
+            $options = $element->getSuggestedValues($value);
             foreach ($optionLabels as $optionLabel) {
                 static::assertNotContains($optionLabel, $options);
+            }
+        } elseif ($element instanceof Select2Entities) {
+            $element->focus();
+            $options = $element->getSearchResults();
+            $optionsValue = [];
+            /** @var Element $element */
+            foreach ($options as $element) {
+                $optionsValue[] = $element->getText();
+            }
+            foreach ($optionLabels as $optionLabel) {
+                static::assertNotContains($optionLabel, $optionsValue);
+            }
+        } elseif ($element instanceof Select) {
+            /** @var NodeElement[] $options */
+            $options = $element->findAll('css', 'option');
+            $optionsValue = [];
+            /** @var Element $element */
+            foreach ($options as $element) {
+                $optionsValue[] = $element->getText();
+            }
+            foreach ($optionLabels as $optionLabel) {
+                static::assertNotContains($optionLabel, $optionsValue);
             }
         } else {
             $this->assertSelectNotContainsOptions($field, $optionLabels);
@@ -478,6 +694,25 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^(?:|I )should see that option "([^"]*)" is selected in "([^"]*)" select$/
+     * @param string $label
+     * @param string $field
+     */
+    public function iShouldSeeThatOptionIsSelected($label, $field)
+    {
+        $selectedOptionText = $this->getSelectedOptionText($field);
+        static::assertStringContainsString(
+            $label,
+            $selectedOptionText,
+            \sprintf(
+                'Selected option with label "%s" doesn\'t contain text "%s" !',
+                $selectedOptionText,
+                $label
+            )
+        );
+    }
+
+    /**
      * @Then /^I should not see "([^"]*)" for "([^"]*)" select$/
      * @param string $label
      * @param string $field
@@ -488,8 +723,72 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^(?:|I )should not see any selected option in "([^"]*)" select$/
+     */
+    public function iShouldNotSeeAnySelectedOption(string $field)
+    {
+        try {
+            $selectedOptionText = $this->getSelectedOptionText($field);
+        } catch (ElementNotFoundException $e) {
+            return;
+        }
+
+        self::fail(sprintf('Not expect to find a selected option, but was found "%s".', $selectedOptionText));
+    }
+
+    /**
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be enabled$/
+     */
+    public function fieldShouldBeEnabled(string $fieldName): void
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
+        self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
+        self::assertFalse($field->hasAttribute('disabled'), sprintf('Field "%s" is disabled', $fieldName));
+    }
+
+    /**
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be disabled$/
+     */
+    public function fieldShouldBeDisabled(string $fieldName): void
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
+        self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue($field->hasAttribute('disabled'), sprintf('Field "%s" is enabled', $fieldName));
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>(?:[^"]|\\")*)" field should be checked$/
+     */
+    public function checkboxShouldBeChecked(string $fieldName)
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
+        self::assertTrue($field->isChecked());
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>(?:[^"]|\\")*)" field should be unchecked$/
+     */
+    public function checkboxShouldBeUnchecked(string $fieldName)
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
+        self::assertFalse($field->isChecked());
+    }
+
+    /**
      * @param string $selectField
-     * @param array  $optionLabels
+     * @param array $optionLabels
      */
     protected function assertSelectContainsOptions($selectField, array $optionLabels)
     {
@@ -502,7 +801,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @param string $selectField
-     * @param array  $optionLabels
+     * @param array $optionLabels
      */
     protected function assertSelectNotContainsOptions($selectField, array $optionLabels)
     {
@@ -530,6 +829,31 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }, $options);
     }
 
+    /**
+     * @param $selectField
+     * @return string
+     * @throws ElementNotFoundException
+     */
+    protected function getSelectedOptionText($selectField)
+    {
+        /** @var Select $element */
+        $element = $this->createElement($selectField);
+        /** @var NodeElement[] $options */
+        $option = $element->getSelectedOption();
+
+        if (null === $option) {
+            $driver = $this->getSession()->getDriver();
+            throw new ElementNotFoundException(
+                $driver,
+                'select option',
+                'css',
+                'option[selected]'
+            );
+        }
+
+        return $option->getText();
+    }
+
     /**.
      * @return OroForm
      */
@@ -548,7 +872,18 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     {
         /** @var Form $form */
         $form = $this->createElement($formName);
-        $field = $form->findField($fieldName);
+        $mapping = $form->getOption('mapping');
+        if ($mapping && isset($mapping[$fieldName])) {
+            $field = $form->findField($mapping[$fieldName]);
+            if (isset($mapping[$fieldName]['element'])) {
+                $field = $this->elementFactory->wrapElement(
+                    $mapping[$fieldName]['element'],
+                    $field
+                );
+            }
+        } else {
+            $field = $form->findField($fieldName);
+        }
 
         if (null === $field) {
             $driver = $this->getSession()->getDriver();
@@ -567,7 +902,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * This method introduces delay to wait for validation errors to appear.
      * It's useful when dealing with js validation errors as it can take some time for them to be rendered.
      *
-     * @param callable $assertionFunction
      * @throws \Exception
      */
     private function waitForValidationErrorsAssertion(callable $assertionFunction)
@@ -580,15 +914,38 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
                 $assertionFunction();
             } catch (\Exception $exception) {
                 $failureException = $exception;
+
                 return null;
             }
 
             $failureException = null;
+
             return true;
         }, 5);
 
         if ($failureException) {
             throw $failureException;
         }
+    }
+
+    /**
+     * @When /^(?:|I )upload "(?P<fileName>.*)" file to "(?P<fileElement>.*)"/
+     */
+    public function iUploadFileToElement(string $fileName, string $element)
+    {
+        $uploadFile = $this->createElement($element);
+        $uploadFile->setValue($fileName);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @When /^(?:|I )fill "(?P<fieldName>(?:[^"]|\\")*)" with absolute URL "(?P<url>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )fill "(?P<fieldName>(?:[^"]|\\")*)" with absolute URL "(?P<url>(?:[^"]|\\")*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iFillAbsoluteUrl(string $fieldName, string $url, string $formName = 'OroForm'): void
+    {
+        $element = $this->getFieldInForm($fieldName, $formName);
+        $element->setValue($this->locatePath($url));
     }
 }

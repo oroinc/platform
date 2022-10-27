@@ -1,17 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var EntityRelationshipCollection;
-    var _ = require('underscore');
-    var routing = require('routing');
-    var registry = require('oroui/js/app/services/registry');
-    var EntityCollection = require('oroentity/js/app/models/entity-collection');
+    const _ = require('underscore');
+    const routing = require('routing');
+    const registry = require('oroui/js/app/services/registry');
+    const EntityCollection = require('oroentity/js/app/models/entity-collection');
 
     /**
      * @class EntityRelationshipCollection
      * @extends EntityCollection
      */
-    EntityRelationshipCollection = EntityCollection.extend(/** @lends EntityCollection.prototype */{
+    const EntityRelationshipCollection = EntityCollection.extend(/** @lends EntityCollection.prototype */{
         ROUTE: {
             // adds, updates or deletes the specified entity identifier (for to-one association)
             // or a list of entity identifiers (for to-many association)
@@ -55,7 +54,7 @@ define(function(require) {
          * @return {Object<string, {data: Array<EntityModel.identifier>}>}
          */
         toJSON: function(options) {
-            var identifiers = this.map(function(model) {
+            const identifiers = this.map(function(model) {
                 return model.identifier;
             });
             return {data: identifiers};
@@ -71,11 +70,11 @@ define(function(require) {
 
         save: function(options) {
             options = _.extend({parse: true}, options);
-            var success = options.success;
-            var error = options.error;
-            var collection = this;
+            const success = options.success;
+            const error = options.error;
+            const collection = this;
             options.success = function(resp) {
-                var method = options.reset ? 'reset' : 'set';
+                const method = options.reset ? 'reset' : 'set';
                 collection[method](resp, options);
                 if (success) {
                     success.call(options.context, collection, resp, options);
@@ -124,16 +123,16 @@ define(function(require) {
          * @return {EntityRelationshipCollection}
          */
         getEntityRelationshipCollection: function(params, applicant) {
-            var identifier = _.pick(params, 'type', 'id', 'association');
+            const identifier = _.pick(params, 'type', 'id', 'association');
             if (!EntityRelationshipCollection.isValidIdentifier(identifier)) {
                 throw new TypeError('params should contain valid name of association, type and id of an entity');
             }
 
-            var globalId = EntityRelationshipCollection.globalId(identifier);
-            var collection = registry.fetch(globalId, applicant);
+            const globalId = EntityRelationshipCollection.globalId(identifier);
+            let collection = registry.fetch(globalId, applicant);
 
-            var options = _.omit(params, 'data');
-            var rawData = params.data ? {data: params.data} : null;
+            const options = _.omit(params, 'data');
+            const rawData = params.data ? {data: params.data} : null;
             if (!collection) {
                 collection = new EntityRelationshipCollection(rawData, options);
                 registry.put(collection, applicant);

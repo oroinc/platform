@@ -2,15 +2,13 @@
 
 namespace Oro\Bundle\NotificationBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
-use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
-use Oro\Bundle\NotificationBundle\Exception\NotificationSendException;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -19,56 +17,47 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class MassNotificationSender
 {
-    const MAINTENANCE_VARIABLE  = 'maintenance_message';
-    const NOTIFICATION_LOG_TYPE = 'mass';
+    public const MAINTENANCE_VARIABLE  = 'maintenance_message';
+    public const NOTIFICATION_LOG_TYPE = 'mass';
 
     /** @var EmailNotificationManager */
-    protected $emailNotificationManager;
+    private $emailNotificationManager;
 
     /** @var NotificationSettings */
-    protected $notificationSettings;
+    private $notificationSettings;
 
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /** @var EntityPool */
-    protected $entityPool;
+    private $entityPool;
 
-    /** @var DQLNameFormatter */
-    protected $dqlNameFormatter;
-
-    /**
-     * @param EmailNotificationManager $emailNotificationManager
-     * @param NotificationSettings     $notificationSettings
-     * @param EntityManager            $em
-     * @param EntityPool               $entityPool
-     * @param DQLNameFormatter         $dqlNameFormatter
-     */
     public function __construct(
         EmailNotificationManager $emailNotificationManager,
         NotificationSettings $notificationSettings,
-        EntityManager $em,
-        EntityPool $entityPool,
-        DQLNameFormatter $dqlNameFormatter
+        ManagerRegistry $doctrine,
+        EntityPool $entityPool
     ) {
         $this->emailNotificationManager = $emailNotificationManager;
         $this->notificationSettings = $notificationSettings;
-        $this->em = $em;
+        $this->doctrine = $doctrine;
         $this->entityPool = $entityPool;
-        $this->dqlNameFormatter = $dqlNameFormatter;
     }
 
     /**
-     * @param string $body
+     * @param string      $body
      * @param string|null $subject
-     * @param From|null $sender
+     * @param From|null   $sender
+     *
      * @return int
-     * @throws NotificationSendException
      */
     public function send($body, $subject = null, From $sender = null)
     {
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManager();
+
         $sender = $sender ?? $this->notificationSettings->getSender();
-        $recipients = $this->getRecipients();
+        $recipients = $this->getRecipients($em);
 
         $massNotification = new TemplateMassNotification(
             $sender,
@@ -78,16 +67,17 @@ class MassNotificationSender
         );
 
         $this->emailNotificationManager->process([$massNotification], null, [self::MAINTENANCE_VARIABLE => $body]);
-        //persist and flush sending job entity
-        $this->entityPool->persistAndFlush($this->em);
+        $this->entityPool->persistAndFlush($em);
 
         return count($recipients);
     }
 
     /**
+     * @param EntityManagerInterface $em
+     *
      * @return EmailHolderInterface[]
      */
-    private function getRecipients(): array
+    private function getRecipients(EntityManagerInterface $em): array
     {
         $recipients = [];
         $recipientEmails = $this->notificationSettings->getMassNotificationRecipientEmails();
@@ -99,21 +89,14 @@ class MassNotificationSender
             return $recipients;
         }
 
-        foreach ($this->getUserRepository()->findEnabledUserEmails() as $item) {
+        $enabledUserEmails = $em->getRepository(User::class)->findEnabledUserEmails();
+        foreach ($enabledUserEmails as $item) {
             $recipients[] = new EmailAddressWithContext(
                 $item['email'],
-                $this->em->getReference(User::class, $item['id'])
+                $em->getReference(User::class, $item['id'])
             );
         }
 
         return $recipients;
-    }
-
-    /**
-     * @return UserRepository
-     */
-    private function getUserRepository()
-    {
-        return $this->em->getRepository('OroUserBundle:User');
     }
 }

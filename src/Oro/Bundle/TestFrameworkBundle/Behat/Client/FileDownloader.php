@@ -3,10 +3,9 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Client;
 
 use Behat\Mink\Session;
-use Guzzle\Http\Client;
-use Guzzle\Plugin\Cookie\Cookie;
-use Guzzle\Plugin\Cookie\CookieJar\ArrayCookieJar;
-use Guzzle\Plugin\Cookie\CookiePlugin;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\SetCookie;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 
 /**
@@ -25,11 +24,9 @@ class FileDownloader
      */
     public function download($url, $filePath, Session $session)
     {
-        $cookieJar = $this->getCookieJar($session);
-        $client = new Client($session->getCurrentUrl());
-        $client->addSubscriber(new CookiePlugin($cookieJar));
-        $request = $client->get($url, null, ['save_to' => $filePath]);
-        $response = $request->send();
+        $cookieJar = $this->getCookieJar($session, $url);
+        $client = new Client(['base_uri' => $session->getCurrentUrl()]);
+        $response = $client->get($url, ['sink' => $filePath, 'cookies' => $cookieJar]);
 
         self::assertEquals(200, $response->getStatusCode());
 
@@ -39,14 +36,32 @@ class FileDownloader
     /**
      * @param Session $session
      *
-     * @return ArrayCookieJar
+     * @param string  $url
+     * @return CookieJar
      */
-    private function getCookieJar(Session $session)
+    private function getCookieJar(Session $session, string $url)
     {
-        $cookies = $session->getDriver()->getWebDriverSession()->getCookie();
-        $cookieJar = new ArrayCookieJar();
-        foreach ($cookies as $cookie) {
-            $cookieJar->add(new Cookie($cookie));
+        $cookies = $session->getDriver()->getWebDriverSession()->getAllCookies();
+        $cookieJar = new CookieJar(true, $cookies);
+        foreach ($cookies as $cookieData) {
+            $data = [];
+            if (isset($cookieData['sameSite'])) {
+                // Sets SameSite via $data constructor argument because setSameSite() is not present in SetCookie.
+                $data['SameSite'] = $cookieData['sameSite'];
+                unset($cookieData['sameSite']);
+            }
+            $setCookie = new SetCookie($data);
+            foreach ($cookieData as $name => $value) {
+                if ($name === 'expiry') {
+                    # The "expiry" option in Selenium matches "expires" option in Guzzle
+                    $name = 'expires';
+                }
+                # Property names in Selenium cookie start with a lowercase character, but they start with the uppercase
+                # character in Guzzle, so we can't pass the Selenium cookie to the \GuzzleHttp\Cookie\SetCookie
+                # constructor, and calling setters is more reliable.
+                call_user_func([$setCookie, 'set'.ucfirst($name)], $value);
+            }
+            $cookieJar->setCookie($setCookie);
         }
 
         return $cookieJar;

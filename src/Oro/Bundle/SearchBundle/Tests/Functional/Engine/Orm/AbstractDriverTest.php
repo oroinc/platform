@@ -5,12 +5,11 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine\Orm;
 use Doctrine\ORM\Configuration;
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
-use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 abstract class AbstractDriverTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
@@ -19,11 +18,10 @@ abstract class AbstractDriverTest extends WebTestCase
         }
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testOnlyItemIsAccepted()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $entityManager = $this->getContainer()->get('doctrine')->getManager('search');
         $classMetadata = $entityManager->getClassMetadata('Oro\Bundle\SearchBundle\Entity\IndexText');
 
@@ -65,14 +63,8 @@ abstract class AbstractDriverTest extends WebTestCase
         $this->assertTruncateQueries($queries);
     }
 
-    /**
-     * @param Configuration $configuration
-     */
     abstract protected function assertInitConfiguration(Configuration $configuration);
 
-    /**
-     * @param array $queries
-     */
     abstract protected function assertTruncateQueries(array $queries);
 
     /**

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
 use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
@@ -23,6 +22,10 @@ class DatagridConfiguration extends ConfigObject
     const DATASOURCE_PATH = '[source]';
     const DATASOURCE_TYPE_PATH = '[source][type]';
     const BASE_DATAGRID_CLASS_PATH  = '[options][base_datagrid_class]';
+    const FROM_PATH = '[source][query][from]';
+    const ENTITY_HINT_PATH = '[options][entityHint]';
+    const EMPTY_GRID_MESSAGE_PATH = '[options][noDataMessages][emptyGrid]';
+    const EMPTY_FILTERED_GRID_MESSAGE_PATH = '[options][noDataMessages][emptyFilteredGrid]';
 
     const EXTENDED_ENTITY_NAME = 'extended_entity_name';
 
@@ -139,36 +142,18 @@ class DatagridConfiguration extends ConfigObject
 
     /**
      * Get value of "acl_resource" option from datagrid configuration.
-     *
-     * @return string|null
      */
-    public function getAclResource()
+    public function getAclResource(): ?string
     {
-        if ($this->offsetExistByPath(self::ACL_RESOURCE_PATH)) {
-            $result = $this->offsetGetByPath(self::ACL_RESOURCE_PATH);
-        } else {
-            // Support backward compatibility until 1.11 to get this option from deprecated path.
-            $result = $this->offsetGetByPath(Builder::DATASOURCE_ACL_PATH, false);
-        }
-
-        return $result;
+        return $this->offsetGetByPath(self::ACL_RESOURCE_PATH);
     }
 
     /**
      * Check if ACL apply to source query of datagrid should be skipped
-     *
-     * @return bool
      */
-    public function isDatasourceSkipAclApply()
+    public function isDatasourceSkipAclApply(): bool
     {
-        if ($this->offsetExistByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH)) {
-            $result = $this->offsetGetByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH);
-        } else {
-            // Support backward compatibility until 1.11 to get this option from deprecated path.
-            $result = $this->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
-        }
-
-        return (bool)$result;
+        return (bool)$this->offsetGetByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH);
     }
 
     /**
@@ -240,44 +225,6 @@ class DatagridConfiguration extends ConfigObject
         if (!empty($filter)) {
             $this->addFilter($name, $filter);
         }
-
-        return $this;
-    }
-
-    /**
-     * @param string $select
-     *
-     * @return self
-     * @deprecated since 2.0. Use config->getOrmQuery()->addSelect() instead
-     */
-    public function addSelect($select)
-    {
-        if (empty($select)) {
-            throw new \BadMethodCallException('DatagridConfiguration::addSelect: select should not be empty');
-        }
-
-        $this->offsetAddToArrayByPath(
-            '[source][query][select]',
-            [$select]
-        );
-
-        return $this;
-    }
-
-    /**
-     * @param string $type
-     * @param array  $definition
-     *
-     * @return self
-     * @deprecated since 2.0. Use config->getOrmQuery()->addInnerJoin() or config->getOrmQuery()->addLeftJoin() instead
-     */
-    public function joinTable($type, array $definition)
-    {
-        $this
-            ->offsetAddToArrayByPath(
-                sprintf('[source][query][join][%s]', $type),
-                [$definition]
-            );
 
         return $this;
     }

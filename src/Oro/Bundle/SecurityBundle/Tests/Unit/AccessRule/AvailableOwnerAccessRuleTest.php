@@ -15,27 +15,21 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class AvailableOwnerAccessRuleTest extends TestCase
+class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var AclConditionDataBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $builder;
+
     /** @var AvailableOwnerAccessRule */
     private $rule;
 
-    /** @var MockObject */
-    private $builder;
-
-    /** @var MockObject */
-    private $ownershipMetadataProvider;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);
-        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProvider::class);
-        $this->rule = new AvailableOwnerAccessRule($this->builder, $this->ownershipMetadataProvider);
 
-        $this->ownershipMetadataProvider->expects($this->any())
+        $ownershipMetadataProvider = $this->createMock(OwnershipMetadataProvider::class);
+        $ownershipMetadataProvider->expects($this->any())
             ->method('getMetadata')
             ->with(CmsUser::class)
             ->willReturn(new OwnershipMetadata(
@@ -45,52 +39,28 @@ class AvailableOwnerAccessRuleTest extends TestCase
                 'organization',
                 'organization_id'
             ));
-    }
 
-    public function testIsApplicableWithNotEnabledRule()
-    {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e');
-        $this->assertFalse($this->rule->isApplicable($criteria));
-    }
-
-    public function testIsApplicableWithoutOptionsInCriteriaAndNotSupportedPermission()
-    {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e');
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
-        $this->assertFalse($this->rule->isApplicable($criteria));
-    }
-
-    public function testIsApplicableWithNotSupportedPermission()
-    {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e');
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
-        $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
-
-        $this->assertFalse($this->rule->isApplicable($criteria));
+        $this->rule = new AvailableOwnerAccessRule($this->builder, $ownershipMetadataProvider);
     }
 
     public function testIsApplicableWithNotRootEntity()
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE', false);
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
 
         $this->assertFalse($this->rule->isApplicable($criteria));
     }
 
-    public function testIsApplicableWithEditPermission()
+    public function testIsApplicableWithRootEntityButWithoutTargetEntityClass()
     {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE');
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
-        $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
+        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE', true);
 
-        $this->assertTrue($this->rule->isApplicable($criteria));
+        $this->assertFalse($this->rule->isApplicable($criteria));
     }
 
-    public function testIsApplicableWithAssignPermission()
+    public function testIsApplicableWithRootEntityAndTargetEntityClass()
     {
-        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'ASSIGN');
-        $criteria->setOption(AvailableOwnerAccessRule::ENABLE_RULE, true);
+        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, \stdClass::class, 'e', 'CREATE', true);
         $criteria->setOption(AvailableOwnerAccessRule::TARGET_ENTITY_CLASS, CmsAddress::class);
 
         $this->assertTrue($this->rule->isApplicable($criteria));

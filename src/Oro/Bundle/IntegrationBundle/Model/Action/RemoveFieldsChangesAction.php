@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Model\Action;
 
 /**
  * actions:
- *    - @remove_fields_changes:
+ *    - `@remove_fields_changes`:
  *        entity: $.data
  */
 class RemoveFieldsChangesAction extends AbstractFieldsChangesAction

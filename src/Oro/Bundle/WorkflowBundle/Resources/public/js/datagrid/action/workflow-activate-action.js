@@ -5,8 +5,6 @@ define([
 ], function(ModelAction, ActivationHandler, messenger) {
     'use strict';
 
-    var WorkflowActivateAction;
-
     /**
      * Activate AJAX action, triggers confirmation dialog and activate workflow definition
      *
@@ -14,9 +12,9 @@ define([
      * @class   oro.datagrid.action.WorkflowActivateAction
      * @extends oro.datagrid.action.ModelAction
      */
-    WorkflowActivateAction = ModelAction.extend({
+    const WorkflowActivateAction = ModelAction.extend({
         execute: function() {
-            var datagrid = this.datagrid;
+            const datagrid = this.datagrid;
 
             this.on('activation_success', function(response) {
                 messenger.notificationFlashMessage('success', response.message);

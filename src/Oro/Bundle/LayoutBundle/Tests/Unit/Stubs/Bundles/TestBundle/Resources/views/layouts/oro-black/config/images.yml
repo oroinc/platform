@@ -1,0 +1,18 @@
+types:
+    main:
+        label: main image type
+        dimensions:
+            - original
+            - popup
+        max_number: 1
+dimensions:
+    original:
+        width: ~
+        height: ~
+        options:
+            applyProductImageWatermark: true
+    popup:
+        width: 610
+        height: 610
+        options:
+            applyProductImageWatermark: false

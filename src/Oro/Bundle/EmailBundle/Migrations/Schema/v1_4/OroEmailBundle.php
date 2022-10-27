@@ -18,8 +18,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Add fields
-     *
-     * @param Schema $schema
      */
     public static function addColumns(Schema $schema)
     {

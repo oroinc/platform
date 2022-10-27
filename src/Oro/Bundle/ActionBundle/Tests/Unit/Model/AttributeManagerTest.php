@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 
@@ -10,31 +11,29 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSetAttributes()
     {
-        $attributeOne = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->getMock();
+        $attributeOne = $this->createMock(Attribute::class);
         $attributeOne->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('attr1'));
+            ->willReturn('attr1');
 
-        $attributeTwo = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->getMock();
+        $attributeTwo = $this->createMock(Attribute::class);
         $attributeTwo->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('attr2'));
+            ->willReturn('attr2');
 
         $attributeManager = new AttributeManager();
 
-        $attributeManager->setAttributes(array($attributeOne, $attributeTwo));
+        $attributeManager->setAttributes([$attributeOne, $attributeTwo]);
         $attributes = $attributeManager->getAttributes();
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $attributes);
-        $expected = array('attr1' => $attributeOne, 'attr2' => $attributeTwo);
+        $this->assertInstanceOf(ArrayCollection::class, $attributes);
+        $expected = ['attr1' => $attributeOne, 'attr2' => $attributeTwo];
         $this->assertEquals($expected, $attributes->toArray());
 
-        $attributeCollection = new ArrayCollection(array('attr1' => $attributeOne, 'attr2' => $attributeTwo));
+        $attributeCollection = new ArrayCollection(['attr1' => $attributeOne, 'attr2' => $attributeTwo]);
         $attributeManager->setAttributes($attributeCollection);
         $attributes = $attributeManager->getAttributes();
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $attributes);
-        $expected = array('attr1' => $attributeOne, 'attr2' => $attributeTwo);
+        $this->assertInstanceOf(ArrayCollection::class, $attributes);
+        $expected = ['attr1' => $attributeOne, 'attr2' => $attributeTwo];
         $this->assertEquals($expected, $attributes->toArray());
     }
 
@@ -48,13 +47,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAttribute()
     {
-        $attribute = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attribute = $this->createMock(Attribute::class);
         $attribute->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('test'));
-        $attributes = new ArrayCollection(array('test' => $attribute));
+            ->willReturn('test');
+        $attributes = new ArrayCollection(['test' => $attribute]);
 
         $attributeManager = new AttributeManager();
         $attributeManager->setAttributes($attributes);
@@ -68,22 +65,19 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($attributeManager, $attributeManager->setEntityAttributeName($entityAttributeName));
         $this->assertEquals($entityAttributeName, $attributeManager->getEntityAttributeName());
 
-        $attribute = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $attribute = $this->createMock(Attribute::class);
         $attribute->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($entityAttributeName));
-        $attributeManager->setAttributes(new ArrayCollection(array($attribute)));
+            ->willReturn($entityAttributeName);
+        $attributeManager->setAttributes(new ArrayCollection([$attribute]));
         $this->assertSame($attribute, $attributeManager->getEntityAttribute());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\UnknownAttributeException
-     * @expectedExceptionMessage There is no entity attribute
-     */
     public function testEntityAttributeException()
     {
+        $this->expectException(UnknownAttributeException::class);
+        $this->expectExceptionMessage('There is no entity attribute');
+
         $attributeManager = new AttributeManager();
         $entityAttributeName = 'test';
         $attributeManager->setEntityAttributeName($entityAttributeName);
@@ -113,12 +107,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedAttributes, $stringTypeAttributes);
     }
 
-    /**
-     * @param string $name
-     * @param string $type
-     * @return Attribute
-     */
-    private function getAttributeObject($name, $type)
+    private function getAttributeObject(string $name, string $type): Attribute
     {
         $attribute = new Attribute();
         $attribute

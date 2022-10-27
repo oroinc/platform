@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat;
+namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\AfterStepTested;
 use Behat\Behat\Tester\Result\StepResult;
@@ -10,48 +10,52 @@ use Behat\Mink\Mink;
 use Behat\Testwork\Environment\Environment;
 use Behat\Testwork\Tester\Setup\Teardown;
 use Oro\Bundle\TestFrameworkBundle\Behat\Listener\JsLogSubscriber;
-use WebDriver\Session;
+use Oro\Component\Testing\TempDirExtension;
 
 class JsLogSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /**
      * @dataProvider logProvider
-     * @param array $logs
-     * @param string $expectedContent
      */
-    public function testLog(array $logs, $expectedContent)
+    public function testLog(array $logs, string $expectedContent)
     {
-        /** @var JsLogSubscriber|\PHPUnit\Framework\MockObject\MockObject $jsLogSubscriber */
-        $jsLogSubscriber = $this
-            ->getMockBuilder(JsLogSubscriber::class)
-            ->setConstructorArgs([new Mink(), sys_get_temp_dir()])
-            ->setMethods(['getLogs', 'getUrl'])
+        $tempDir = $this->getTempDir('behat_js_log');
+        $jsLogSubscriber = $this->getMockBuilder(JsLogSubscriber::class)
+            ->setConstructorArgs([new Mink(), $tempDir])
+            ->onlyMethods(['getLogs', 'getUrl'])
             ->getMock();
-        $jsLogSubscriber->method('getLogs')->willReturn($logs);
-        $jsLogSubscriber->method('getUrl')->willReturn('example.com');
-        $jsLogSubscriber->log($this->getEventMock());
+        $jsLogSubscriber->expects($this->any())
+            ->method('getLogs')
+            ->willReturn($logs);
+        $jsLogSubscriber->expects($this->any())
+            ->method('getUrl')
+            ->willReturn('example.com');
+        $jsLogSubscriber->log($this->getEvent());
 
-        $expectedLogFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'behat_browser.log';
+        $expectedLogFile = $tempDir . DIRECTORY_SEPARATOR . 'behat_browser.log';
         $this->assertFileExists($expectedLogFile);
         $this->assertStringEqualsFile($expectedLogFile, $expectedContent);
     }
 
     public function testEmptyLog()
     {
-        /** @var JsLogSubscriber|\PHPUnit\Framework\MockObject\MockObject $jsLogSubscriber */
-        $jsLogSubscriber = $this
-            ->getMockBuilder(JsLogSubscriber::class)
-            ->setConstructorArgs([new Mink(), sys_get_temp_dir()])
-            ->setMethods(['getLogs'])
+        $tempDir = $this->getTempDir('behat_js_log');
+        $jsLogSubscriber = $this->getMockBuilder(JsLogSubscriber::class)
+            ->setConstructorArgs([new Mink(), $tempDir])
+            ->onlyMethods(['getLogs'])
             ->getMock();
-        $jsLogSubscriber->method('getLogs')->willReturn([]);
-        $jsLogSubscriber->log($this->getEventMock());
+        $jsLogSubscriber->expects($this->any())
+            ->method('getLogs')
+            ->willReturn([]);
+        $jsLogSubscriber->log($this->getEvent());
 
-        $expectedLogFile = sys_get_temp_dir().DIRECTORY_SEPARATOR.'behat_browser.log';
-        $this->assertFileNotExists($expectedLogFile);
+        $expectedLogFile = $tempDir . DIRECTORY_SEPARATOR . 'behat_browser.log';
+        $this->assertFileDoesNotExist($expectedLogFile);
     }
 
-    public function logProvider()
+    public function logProvider(): array
     {
         return [
             'regular log' => [
@@ -89,26 +93,11 @@ class JsLogSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @after
-     */
-    public function removeLog()
-    {
-        $log = sys_get_temp_dir().DIRECTORY_SEPARATOR.'behat_browser.log';
-
-        if (file_exists($log)) {
-            unlink($log);
-        }
-    }
-
-    /**
-     * @return AfterStepTested
-     */
-    private function getEventMock()
+    private function getEvent(): AfterStepTested
     {
         return new AfterStepTested(
             $this->createMock(Environment::class),
-            new FeatureNode("Feature Example", null, [], null, [], null, null, null, 0),
+            new FeatureNode('Feature Example', null, [], null, [], null, null, null, 0),
             new StepNode('', 'Test JsLogger Mock Step', [], 0, null),
             $this->createMock(StepResult::class),
             $this->createMock(Teardown::class)

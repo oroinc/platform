@@ -2,14 +2,34 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension;
 
+use Oro\Component\Layout\BlockTypeExtensionInterface;
+use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\Extension\PreloadedExtension;
+use Oro\Component\Layout\LayoutItemInterface;
+use Oro\Component\Layout\LayoutUpdateInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testTypes()
+    public function testTypeNames()
+    {
+        $extension = new PreloadedExtension(
+            [
+                'test' => $this->createMock(BlockTypeInterface::class)
+            ]
+        );
+
+        $this->assertEquals(['test'], $extension->getTypeNames());
+    }
+
+    public function testType()
     {
         $name = 'test';
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
 
         $extension = new PreloadedExtension(
             [
@@ -23,12 +43,11 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($type, $extension->getType($name));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The type "unknown" can not be loaded by this extension.
-     */
     public function testGetUnknownType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The type "unknown" can not be loaded by this extension.');
+
         $extension = new PreloadedExtension([]);
 
         $extension->getType('unknown');
@@ -37,7 +56,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
     public function testBlockTypeExtensions()
     {
         $name          = 'test';
-        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
 
         $extension = new PreloadedExtension(
             [],
@@ -58,7 +77,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetLayoutUpdates()
     {
         $id           = 'test';
-        $layoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $layoutUpdate = $this->createMock(LayoutUpdateInterface::class);
 
         $extension = new PreloadedExtension(
             [],
@@ -68,13 +87,20 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $layoutItem = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItem->expects($this->once())->method('getId')->willReturn($id);
-        $layoutItemUnknown = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItemUnknown->expects($this->once())->method('getId')->willReturn('unknown');
-        $layoutItemAlias = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItemAlias->expects($this->never())->method('getId');
-        $layoutItemAlias->expects($this->once())->method('getAlias')->willReturn($id);
+        $layoutItem = $this->createMock(LayoutItemInterface::class);
+        $layoutItem->expects($this->once())
+            ->method('getId')
+            ->willReturn($id);
+        $layoutItemUnknown = $this->createMock(LayoutItemInterface::class);
+        $layoutItemUnknown->expects($this->once())
+            ->method('getId')
+            ->willReturn('unknown');
+        $layoutItemAlias = $this->createMock(LayoutItemInterface::class);
+        $layoutItemAlias->expects($this->never())
+            ->method('getId');
+        $layoutItemAlias->expects($this->once())
+            ->method('getAlias')
+            ->willReturn($id);
 
         $layoutUpdates = $extension->getLayoutUpdates($layoutItem);
         $this->assertCount(1, $layoutUpdates);
@@ -90,7 +116,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
     public function testHasLayoutUpdates()
     {
         $id           = 'test';
-        $layoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $layoutUpdate = $this->createMock(LayoutUpdateInterface::class);
 
         $extension = new PreloadedExtension(
             [],
@@ -100,13 +126,20 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $layoutItem = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItem->expects($this->once())->method('getId')->willReturn($id);
-        $layoutItemUnknown = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItemUnknown->expects($this->once())->method('getId')->willReturn('unknown');
-        $layoutItemAlias = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItemAlias->expects($this->never())->method('getId');
-        $layoutItemAlias->expects($this->once())->method('getAlias')->willReturn($id);
+        $layoutItem = $this->createMock(LayoutItemInterface::class);
+        $layoutItem->expects($this->once())
+            ->method('getId')
+            ->willReturn($id);
+        $layoutItemUnknown = $this->createMock(LayoutItemInterface::class);
+        $layoutItemUnknown->expects($this->once())
+            ->method('getId')
+            ->willReturn('unknown');
+        $layoutItemAlias = $this->createMock(LayoutItemInterface::class);
+        $layoutItemAlias->expects($this->never())
+            ->method('getId');
+        $layoutItemAlias->expects($this->once())
+            ->method('getAlias')
+            ->willReturn($id);
 
         $this->assertTrue($extension->hasLayoutUpdates($layoutItem));
         $this->assertFalse($extension->hasLayoutUpdates($layoutItemUnknown));
@@ -115,7 +148,7 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testContextConfigurators()
     {
-        $configurator = $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface');
+        $configurator = $this->createMock(ContextConfiguratorInterface::class);
 
         $extension = new PreloadedExtension(
             [],
@@ -160,159 +193,152 @@ class PreloadedExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($dataProvider, $extension->getDataProvider($name));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The data provider "unknown" can not be loaded by this extension.
-     */
     public function testGetUnknownDataProvider()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data provider "unknown" can not be loaded by this extension.');
+
         $extension = new PreloadedExtension([], [], [], [], []);
 
         $extension->getDataProvider('unknown');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $types array must be strings.
-     */
     public function testConstructWithInvalidKeysForBlockTypes()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keys of $types array must be strings.');
+
         new PreloadedExtension(
             [
-                'test' => $this->createMock('Oro\Component\Layout\BlockTypeInterface'),
-                $this->createMock('Oro\Component\Layout\BlockTypeInterface')
+                'test' => $this->createMock(BlockTypeInterface::class),
+                $this->createMock(BlockTypeInterface::class)
             ]
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $types array must be BlockTypeInterface.
-     */
     public function testConstructWithInvalidBlockTypes()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each item of $types array must be BlockTypeInterface.');
+
         new PreloadedExtension(
             [
-                'test1' => $this->createMock('Oro\Component\Layout\BlockTypeInterface'),
+                'test1' => $this->createMock(BlockTypeInterface::class),
                 'test2' => new \stdClass()
             ]
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $typeExtensions array must be strings.
-     */
     public function testConstructWithInvalidKeysForBlockTypeExtensions()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keys of $typeExtensions array must be strings.');
+
         new PreloadedExtension(
             [],
             [
-                'test' => [$this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface')],
-                [$this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface')]
+                'test' => [$this->createMock(BlockTypeExtensionInterface::class)],
+                [$this->createMock(BlockTypeExtensionInterface::class)]
             ]
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $typeExtensions[] array must be BlockTypeExtensionInterface.
-     */
     public function testConstructWithInvalidBlockTypeExtensions()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each item of $typeExtensions[] array must be BlockTypeExtensionInterface.');
+
         new PreloadedExtension(
             [],
             [
-                'test1' => [$this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface')],
+                'test1' => [$this->createMock(BlockTypeExtensionInterface::class)],
                 'test2' => [new \stdClass()]
             ]
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $typeExtensions array must be array of BlockTypeExtensionInterface.
-     */
     public function testConstructWithSingleBlockTypeExtensions()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Each item of $typeExtensions array must be array of BlockTypeExtensionInterface.'
+        );
+
         new PreloadedExtension(
             [],
             [
-                'test' => $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface')
+                'test' => $this->createMock(BlockTypeExtensionInterface::class)
             ]
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $layoutUpdates array must be strings.
-     */
     public function testConstructWithInvalidKeysForLayoutUpdates()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keys of $layoutUpdates array must be strings.');
+
         new PreloadedExtension(
             [],
             [],
             [
-                'test' => [$this->createMock('Oro\Component\Layout\LayoutUpdateInterface')],
-                [$this->createMock('Oro\Component\Layout\LayoutUpdateInterface')]
+                'test' => [$this->createMock(LayoutUpdateInterface::class)],
+                [$this->createMock(LayoutUpdateInterface::class)]
             ]
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $layoutUpdates[] array must be LayoutUpdateInterface.
-     */
     public function testConstructWithInvalidLayoutUpdates()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each item of $layoutUpdates[] array must be LayoutUpdateInterface.');
+
         new PreloadedExtension(
             [],
             [],
             [
-                'test1' => [$this->createMock('Oro\Component\Layout\LayoutUpdateInterface')],
+                'test1' => [$this->createMock(LayoutUpdateInterface::class)],
                 'test2' => [new \stdClass()]
             ]
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $layoutUpdates array must be array of LayoutUpdateInterface.
-     */
     public function testConstructWithSingleLayoutUpdates()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each item of $layoutUpdates array must be array of LayoutUpdateInterface.');
+
         new PreloadedExtension(
             [],
             [],
             [
-                'test' => $this->createMock('Oro\Component\Layout\LayoutUpdateInterface')
+                'test' => $this->createMock(LayoutUpdateInterface::class)
             ]
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $contextConfigurators array must be ContextConfiguratorInterface.
-     */
     public function testConstructWithInvalidContextConfiguratorType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Each item of $contextConfigurators array must be ContextConfiguratorInterface.'
+        );
+
         new PreloadedExtension(
             [],
             [],
             [],
             [
-                $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface'),
+                $this->createMock(ContextConfiguratorInterface::class),
                 new \stdClass()
             ]
         );
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $dataProviders array must be strings.
-     */
     public function testConstructWithInvalidKeysForDataProviders()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Keys of $dataProviders array must be strings.');
+
         new PreloadedExtension(
             [],
             [],

@@ -3,11 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadWorkflowEmailTemplates extends AbstractFixture
@@ -59,7 +59,7 @@ class LoadWorkflowEmailTemplates extends AbstractFixture
             return $this->organization;
         }
 
-        $this->organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $this->organization = $manager->getRepository(Organization::class)->getFirst();
 
         return $this->organization;
     }
@@ -70,8 +70,6 @@ class LoadWorkflowEmailTemplates extends AbstractFixture
      * @param ObjectManager $manager
      *
      * @return User
-     *
-     * @throws \RuntimeException
      */
     protected function getAdminUser(ObjectManager $manager)
     {
@@ -79,7 +77,7 @@ class LoadWorkflowEmailTemplates extends AbstractFixture
             return $this->adminUser;
         }
 
-        $repository = $manager->getRepository('OroUserBundle:Role');
+        $repository = $manager->getRepository(Role::class);
         $role = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
 
         if (!$role) {

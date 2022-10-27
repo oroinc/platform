@@ -8,6 +8,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowTranslations;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -16,12 +17,9 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowTranslat
 class WorkflowTranslationHelperTest extends WebTestCase
 {
     /** @var WorkflowTranslationHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowTranslations::class, LoadWorkflowDefinitions::class]);
@@ -30,21 +28,14 @@ class WorkflowTranslationHelperTest extends WebTestCase
     }
 
     /**
-     * @param string $workflowName
-     * @param string $locale
-     * @param array $translations
-     *
      * @dataProvider findWorkflowTranslationsProvider
      */
-    public function testFindWorkflowTranslations($workflowName, $locale, array $translations)
+    public function testFindWorkflowTranslations(string $workflowName, ?string $locale, array $translations)
     {
         $this->assertEquals($translations, $this->helper->findWorkflowTranslations($workflowName, $locale));
     }
 
-    /**
-     * @return array
-     */
-    public function findWorkflowTranslationsProvider()
+    public function findWorkflowTranslationsProvider(): array
     {
         return [
             'workflow1' => [
@@ -71,22 +62,18 @@ class WorkflowTranslationHelperTest extends WebTestCase
     }
 
     /**
-     * @param string $key
-     * @param string $workflowName
-     * @param string $locale
-     * @param string $translation
-     *
      * @dataProvider findWorkflowTranslationProvider
      */
-    public function testFindWorkflowTranslation($key, $workflowName, $locale, $translation)
-    {
+    public function testFindWorkflowTranslation(
+        string $key,
+        string $workflowName,
+        ?string $locale,
+        string $translation
+    ) {
         $this->assertEquals($translation, $this->helper->findWorkflowTranslation($key, $workflowName, $locale));
     }
 
-    /**
-     * @return array
-     */
-    public function findWorkflowTranslationProvider()
+    public function findWorkflowTranslationProvider(): array
     {
         return [
             'workflow1 unknown_key' => [
@@ -117,21 +104,14 @@ class WorkflowTranslationHelperTest extends WebTestCase
     }
 
     /**
-     * @param string $key
-     * @param string $locale
-     * @param string $translation
-     *
      * @dataProvider findTranslationProvider
      */
-    public function testFindTranslation($key, $locale, $translation)
+    public function testFindTranslation(string $key, string $locale, string $translation)
     {
         $this->assertEquals($translation, $this->helper->findTranslation($key, $locale));
     }
 
-    /**
-     * @return array
-     */
-    public function findTranslationProvider()
+    public function findTranslationProvider(): array
     {
         return [
             'unknown key' => [
@@ -201,38 +181,30 @@ class WorkflowTranslationHelperTest extends WebTestCase
     }
 
     /**
-     * @param array $expected
-     * @param array $keys
-     * @param string|null $default
-     *
      * @dataProvider translationsDataProvider
      */
-    public function testGenerateDefinitionTranslations(array $expected, array $keys, $default)
+    public function testGenerateDefinitionTranslations(array $expected, array $keys, ?string $default)
     {
         $this->assertSame($expected, $this->helper->generateDefinitionTranslations($keys, 'cn', $default));
     }
 
-    /**
-     * @return \Generator
-     */
-    public function translationsDataProvider()
+    public function translationsDataProvider(): array
     {
-        yield [
+        return [
+            [
                 'expected' => ['oro.workflow.test_flow.label' => 'oro.workflow.test_flow.label'],
                 'keys' => ['oro.workflow.test_flow.label'],
                 'default' => 'oro.workflow.test_flow.label',
-        ];
-        yield [
+            ],
+            [
                 'expected' => ['oro.workflow.test_flow.label' => null],
                 'keys' => ['oro.workflow.test_flow.label'],
                 'default' => null,
+            ]
         ];
     }
 
-    /**
-     * @return Translator
-     */
-    protected function getTranslator()
+    private function getTranslator(): LocaleAwareInterface
     {
         return $this->getContainer()->get('translator');
     }

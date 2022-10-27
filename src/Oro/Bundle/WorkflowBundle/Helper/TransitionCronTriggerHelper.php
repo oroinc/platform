@@ -17,10 +17,6 @@ class TransitionCronTriggerHelper
     /** @var WorkflowAwareEntityFetcher */
     private $entityFetcher;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowAwareEntityFetcher $entityFetcher
-     */
     public function __construct(DoctrineHelper $doctrineHelper, WorkflowAwareEntityFetcher $entityFetcher)
     {
         $this->doctrineHelper = $doctrineHelper;

@@ -1,40 +1,73 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Command;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
-class OroLocalizationDumpCommand extends ContainerAwareCommand
+/**
+ * Dumps locale settings for use in JavaScript.
+ */
+class OroLocalizationDumpCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:localization:dump';
+
+    private LocaleSettings $localeSettings;
+    private Filesystem $filesystem;
+
+    private string $projectDir;
+
+    public function __construct(
+        LocaleSettings $localeSettings,
+        Filesystem $filesystem,
+        string $projectDir,
+        ?string $name = null
+    ) {
+        $this->localeSettings = $localeSettings;
+        $this->filesystem = $filesystem;
+        $this->projectDir = $projectDir;
+
+        parent::__construct($name);
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setName('oro:localization:dump')
-            ->setDescription('Dumps oro js-localization');
+        $this
+            ->setDescription('Dumps locale settings for use in JavaScript.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command dumps the locale settings used by JavaScript code
+into the predefined public resource file.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $targetDir = realpath($this->getContainer()->getParameter('kernel.project_dir') . '/public') . '/js';
-        /** @var LocaleSettings $localeSettings */
-        $localeSettings = $this->getContainer()->get('oro_locale.settings');
-        $addressFormats = $this->getAddressFormats($localeSettings);
-        $localeSettingsData = array(
-            'locale_data' => $localeSettings->getLocaleData(),
-            'currency_data' => $localeSettings->getCurrencyData(),
-            'format' => array(
+        $targetDir = realpath($this->projectDir . '/public') . '/js';
+
+        $addressFormats = $this->getAddressFormats($this->localeSettings);
+        $localeSettingsData = [
+            'locale_data' => $this->localeSettings->getLocaleData(),
+            'format' => [
                 'address' => $addressFormats,
-                'name' => $localeSettings->getNameFormats()
-            )
-        );
+                'name' => $this->localeSettings->getNameFormats()
+            ]
+        ];
 
         $file = $targetDir . '/oro.locale_data.js';
         $output->writeln(
@@ -46,21 +79,20 @@ class OroLocalizationDumpCommand extends ContainerAwareCommand
         );
 
         $content = 'define(' . json_encode($localeSettingsData) . ');';
-        $this->getContainer()->get('filesystem')->mkdir(dirname($file), 0777);
+        $this->filesystem->mkdir(dirname($file), 0777);
         if (false === @file_put_contents($file, $content)) {
             throw new \RuntimeException('Unable to write file ' . $file);
         }
+
+        return 0;
     }
 
     /**
      * Get address formats converted to simplified structure.
-     *
-     * @param LocaleSettings $localeSettings
-     * @return array
      */
-    protected function getAddressFormats(LocaleSettings $localeSettings)
+    protected function getAddressFormats(LocaleSettings $localeSettings): array
     {
-        $result = array();
+        $result = [];
         $formats = $localeSettings->getAddressFormats();
         foreach ($formats as $country => $formatData) {
             $result[$country] = $formatData[LocaleSettings::ADDRESS_FORMAT_KEY];

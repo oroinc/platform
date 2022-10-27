@@ -15,7 +15,7 @@
         {% for attachment in value %}
             <li>
                 {% set options = oro_type_is_image(attachment.file.mimeType) ? {'galleryId' : 'merge-attachments'} : {} %}
-                {{ oro_file_view(attachment, 'file', attachment.file, options) }}
+                {{ oro_file_view(attachment.file, options) }}
             </li>
         {% endfor %}
     </ul>

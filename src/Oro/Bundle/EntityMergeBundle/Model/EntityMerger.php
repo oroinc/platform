@@ -5,57 +5,39 @@ namespace Oro\Bundle\EntityMergeBundle\Model;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
-use Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface;
 use Oro\Bundle\EntityMergeBundle\Model\Step\StepSorter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Provides functionality to merge entities.
+ */
 class EntityMerger implements EntityMergerInterface
 {
-    /**
-     * @var MergeStepInterface[]
-     */
-    protected $steps = array();
+    private iterable $steps;
+    private ?array $sortedSteps = null;
+    private EventDispatcherInterface $eventDispatcher;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @param MergeStepInterface[] $steps
-     * @param EventDispatcherInterface $eventDispatcher
-     */
-    public function __construct(array $steps, EventDispatcherInterface $eventDispatcher)
+    public function __construct(iterable $steps, EventDispatcherInterface $eventDispatcher)
     {
-        foreach ($steps as $step) {
-            $this->addMergeStep($step);
-        }
+        $this->steps = $steps;
         $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     * Add merge step
-     *
-     * @param MergeStepInterface $step
+     * {@inheritDoc}
      */
-    protected function addMergeStep(MergeStepInterface $step)
+    public function merge(EntityData $data): void
     {
-        $this->steps[] = $step;
-    }
-
-    /**
-     * Merge entities
-     *
-     * @param EntityData $data
-     */
-    public function merge(EntityData $data)
-    {
-        $this->eventDispatcher->dispatch(MergeEvents::BEFORE_MERGE_ENTITY, new EntityDataEvent($data));
-
-        foreach (StepSorter::getOrderedSteps($this->steps) as $step) {
-            $step->run($data);
+        if (null === $this->sortedSteps) {
+            $this->sortedSteps = StepSorter::getOrderedSteps(
+                $this->steps instanceof \Traversable ? iterator_to_array($this->steps) : $this->steps
+            );
         }
 
-        $this->eventDispatcher->dispatch(MergeEvents::AFTER_MERGE_ENTITY, new EntityDataEvent($data));
+        $this->eventDispatcher->dispatch(new EntityDataEvent($data), MergeEvents::BEFORE_MERGE_ENTITY);
+        foreach ($this->sortedSteps as $step) {
+            $step->run($data);
+        }
+        $this->eventDispatcher->dispatch(new EntityDataEvent($data), MergeEvents::AFTER_MERGE_ENTITY);
     }
 }

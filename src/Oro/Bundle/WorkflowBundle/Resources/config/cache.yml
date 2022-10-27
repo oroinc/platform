@@ -1,13 +1,13 @@
 services:
     oro_workflow.cache.provider.process_trigger:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_process_trigger' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_process_trigger' }
 
     oro_workflow.cache.provider.transition_trigger_event:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_workflow_transition_trigger_event' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_workflow_transition_trigger_event' }
 
     oro_workflow.cache.trigger.abstract:
         abstract: true
@@ -16,32 +16,68 @@ services:
             - '@doctrine'
 
     oro_workflow.cache.entities_with_workflow:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_workflow_entities_with_workflow' ] ]
+        public: false
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_workflow_entities_with_workflow' }
 
     oro_workflow.cache.process_trigger:
         parent: oro_workflow.cache.trigger.abstract
         calls:
             - [ setProvider, [ '@oro_workflow.cache.provider.process_trigger' ] ]
-            - [ setTriggerClassName, [ '%oro_workflow.entity.process_trigger.class%' ] ]
+            - [ setTriggerClassName, [ 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger' ] ]
 
     oro_workflow.cache.transition_trigger_event:
         parent: oro_workflow.cache.trigger.abstract
         calls:
             - [ setProvider, [ '@oro_workflow.cache.provider.transition_trigger_event' ] ]
-            - [ setTriggerClassName, [ '%oro_workflow.entity.transition_trigger_event.class%' ] ]
+            - [ setTriggerClassName, [ 'Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger' ] ]
 
     oro_workflow.cache:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_workflow' ]]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_workflow' }
 
     oro_workflow.cache.entity_aware:
         class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache
+        public: true
         arguments:
             - '@oro_workflow.cache'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_workflow.changes.subscriber }
+
+    oro_workflow.cache_clearer.event_trigger_cache:
+        class: 'Oro\Bundle\WorkflowBundle\Cache\EventTriggerCacheClearer'
+        public: false
+        calls:
+            - [addEventTriggerCache, ['@oro_workflow.cache.process_trigger']]
+            - [addEventTriggerCache, ['@oro_workflow.cache.transition_trigger_event']]
+        tags:
+            - { name: kernel.cache_clearer }
+
+    oro_workflow.cache_warmer.event_trigger_cache:
+        class: 'Oro\Bundle\WorkflowBundle\Cache\EventTriggerCacheWarmer'
+        public: false
+        calls:
+            - [addEventTriggerCache, ['@oro_workflow.cache.process_trigger']]
+            - [addEventTriggerCache, ['@oro_workflow.cache.transition_trigger_event']]
+        tags:
+            - { name: kernel.cache_warmer }
+
+    oro_workflow.cache_clearer.workflow_aware_cache:
+        class: 'Oro\Bundle\WorkflowBundle\Cache\WorkflowAwareCacheClearer'
+        public: false
+        arguments:
+            - '@oro_workflow.cache.entity_aware'
+        tags:
+            - { name: kernel.cache_clearer }
+
+    oro_workflow.cache_warmer.workflow_aware_cache:
+        class: 'Oro\Bundle\WorkflowBundle\Cache\WorkflowAwareCacheWarmer'
+        public: false
+        arguments:
+            - '@oro_workflow.cache.entity_aware'
+        tags:
+            - { name: kernel.cache_warmer }

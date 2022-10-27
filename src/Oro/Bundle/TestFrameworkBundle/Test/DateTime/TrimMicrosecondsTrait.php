@@ -9,7 +9,6 @@ trait TrimMicrosecondsTrait
      * but database doesn't keep microsends in datetime fields.
      * This method allow us convert dynamic DateTime object to database format.
      *
-     *
      * @param $dateTimeObj
      *
      * @return \DateTime

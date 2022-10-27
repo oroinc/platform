@@ -12,9 +12,6 @@ abstract class AbstractFieldValidator extends ConstraintValidator
     /** @var FieldNameValidationHelper */
     protected $validationHelper;
 
-    /**
-     * @param FieldNameValidationHelper $validationHelper
-     */
     public function __construct(FieldNameValidationHelper $validationHelper)
     {
         $this->validationHelper = $validationHelper;

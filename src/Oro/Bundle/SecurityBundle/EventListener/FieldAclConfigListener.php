@@ -15,17 +15,11 @@ class FieldAclConfigListener
     /** @var EntitySecurityMetadataProvider */
     protected $metadataProvider;
 
-    /**
-     * @param EntitySecurityMetadataProvider $metadataProvider
-     */
     public function __construct(EntitySecurityMetadataProvider $metadataProvider)
     {
         $this->metadataProvider = $metadataProvider;
     }
 
-    /**
-     * @param PreFlushConfigEvent $event
-     */
     public function preFlush(PreFlushConfigEvent $event)
     {
         // supports only entities

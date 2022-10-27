@@ -47,7 +47,7 @@ class FormTest extends \PHPUnit\Framework\TestCase
                 'actual' => 'Daily every 5 days, end by <Date:2017-05-22>',
             ],
             [
-                'expected' => $dateTime,
+                'expected' => $dateTime->format(\DateTimeInterface::ATOM),
                 'actual' => '<DateTime:2017-05-22>',
             ],
         ];

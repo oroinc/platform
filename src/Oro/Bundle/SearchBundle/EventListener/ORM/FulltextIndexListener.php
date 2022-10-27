@@ -29,9 +29,6 @@ class FulltextIndexListener
         $this->connection = $connection;
     }
 
-    /**
-     * @param LoadClassMetadataEventArgs $event
-     */
     public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
         $driverName = $this->connection->getDriver()->getName();

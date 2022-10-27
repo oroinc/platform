@@ -1,0 +1,6 @@
+aliases:
+    oroworkflow/transition-dialog-widget$: oroworkflow/js/app/widget/transition-dialog-widget
+dynamic-imports:
+    commons:
+        - oroworkflow/js/app/components/button-component
+        - oroworkflow/transition-dialog-widget

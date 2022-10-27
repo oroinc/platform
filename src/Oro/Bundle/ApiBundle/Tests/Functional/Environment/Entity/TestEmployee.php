@@ -20,7 +20,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "field_acl_supported" = "true"
+ *              "field_acl_supported"=true
  *          }
  *      }
  * )

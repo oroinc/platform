@@ -1,11 +1,11 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/layout',
-    'jquery-ui'
-], function($, _, __, layout) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const layout = require('oroui/js/layout');
+    require('jquery-ui/widget');
 
     /**
      * Condition builder widget
@@ -20,7 +20,7 @@ define([
             tooltipTemplate: '<i class="fa-info-circle fa--offset-l fa--x-large" data-content="<%- content %>"' +
                 ' data-placement="top" data-toggle="popover" data-original-title="<%- title %>"></i>',
             htmlTemplate: '<div class="ui-datevariables-div <%- attributes %>">' +
-                '<b><%- title %></b><%= tooltipHTML %><ul>' +
+                '<span class="datevariables-title"><%- title %></span> <%= tooltipHTML %><ul>' +
                 '<% _.each(dateVars, function(dateVariable, varCode) { %>' +
                 '<li><a class="ui_date_variable" href="#" data-code="<%- varCode %>"><%- dateVariable %></a></li>' +
                 '<% }); %>' +
@@ -50,19 +50,19 @@ define([
         },
 
         onSelectVar: function(e) {
-            var variable = e.target.text;
+            const variable = e.target.text;
             this.options.onSelect(variable);
             e.preventDefault();
         },
 
         render: function() {
-            var o = this.options;
-            var currentDatePart = o.part;
-            var dateVars = this._getVariablesByPart(currentDatePart);
-            var tooltipTemplate = _.template(o.tooltipTemplate);
-            var htmlTemplate = _.template(o.htmlTemplate);
+            const o = this.options;
+            const currentDatePart = o.part;
+            const dateVars = this._getVariablesByPart(currentDatePart);
+            const tooltipTemplate = _.template(o.tooltipTemplate);
+            const htmlTemplate = _.template(o.htmlTemplate);
 
-            var $dv = $(htmlTemplate({
+            const $dv = $(htmlTemplate({
                 attributes: '',
                 title: __('oro.filter.date.variable.title'),
                 tooltipHTML: tooltipTemplate({
@@ -77,7 +77,7 @@ define([
         },
 
         _getVariablesByPart: function(datePart) {
-            var dateVars = this.options.dateVars;
+            const dateVars = this.options.dateVars;
             return dateVars[datePart] ? dateVars[datePart] : dateVars.value;
         }
     });

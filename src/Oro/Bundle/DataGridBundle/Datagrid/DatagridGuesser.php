@@ -3,8 +3,10 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * The registry of datagrid column options guessers.
+ */
 class DatagridGuesser
 {
     /** column formatting options key */
@@ -16,23 +18,18 @@ class DatagridGuesser
     /** column filtering options key */
     const FILTER = 'filter';
 
-    /** @var ContainerInterface */
-    protected $container;
+    /** @var iterable|ColumnOptionsGuesserInterface[] */
+    private $columnOptionsGuessers;
 
-    /** @var string[] */
-    protected $columnOptionsGuesserServiceIds;
-
-    /** @var ColumnOptionsGuesserInterface */
-    protected $columnOptionsGuesser;
+    /** @var ColumnOptionsGuesserInterface|null */
+    private $columnOptionsGuesser;
 
     /**
-     * @param ContainerInterface $container
-     * @param string[]           $columnOptionsGuesserServiceIds
+     * @param iterable|ColumnOptionsGuesserInterface[] $columnOptionsGuessers
      */
-    public function __construct(ContainerInterface $container, array $columnOptionsGuesserServiceIds)
+    public function __construct(iterable $columnOptionsGuessers)
     {
-        $this->container                      = $container;
-        $this->columnOptionsGuesserServiceIds = $columnOptionsGuesserServiceIds;
+        $this->columnOptionsGuessers = $columnOptionsGuessers;
     }
 
     /**
@@ -142,15 +139,12 @@ class DatagridGuesser
         }
     }
 
-    /**
-     * @return ColumnOptionsGuesserInterface
-     */
-    protected function getColumnOptionsGuesser()
+    private function getColumnOptionsGuesser(): ColumnOptionsGuesserInterface
     {
-        if ($this->columnOptionsGuesser === null) {
-            $guessers = array();
-            foreach ($this->columnOptionsGuesserServiceIds as $serviceId) {
-                $guessers[] = $this->container->get($serviceId);
+        if (null === $this->columnOptionsGuesser) {
+            $guessers = [];
+            foreach ($this->columnOptionsGuessers as $guesser) {
+                $guessers[] = $guesser;
             }
             $this->columnOptionsGuesser = new ColumnOptionsGuesserChain($guessers);
         }

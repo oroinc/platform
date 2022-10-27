@@ -2,73 +2,52 @@
 
 namespace Oro\Bundle\OrganizationBundle\DependencyInjection\Compiler;
 
+use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Finds all available owner assignment checkers and registers them in the registry.
+ */
 class OwnerDeletionManagerPass implements CompilerPassInterface
 {
-    const SERVICE_KEY            = 'oro_organization.owner_deletion_manager';
-    const ASSIGNMENT_CHECKER_TAG = 'oro_organization.owner_assignment_checker';
+    use TaggedServiceTrait;
+
+    private const MANAGER_SERVICE  = 'oro_organization.owner_deletion_manager';
+    private const CHECKER_TAG_NAME = 'oro_organization.owner_assignment_checker';
 
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::SERVICE_KEY)) {
-            return;
-        }
-        $managerDefinition = $container->getDefinition(self::SERVICE_KEY);
-
-        $assignmentCheckers = $this->loadAssignmentCheckers($container);
-        foreach ($assignmentCheckers as $entityClassName => $assignmentCheckerServiceId) {
-            $managerDefinition->addMethodCall(
-                'registerAssignmentChecker',
-                [$entityClassName, new Reference($assignmentCheckerServiceId)]
-            );
-        }
-    }
-
-    /**
-     * Load services which are owner assignment checkers
-     *
-     * @param ContainerBuilder $container
-     * @return array
-     */
-    protected function loadAssignmentCheckers(ContainerBuilder $container)
-    {
-        $assignmentCheckers = [];
-        $taggedServices     = $container->findTaggedServiceIds(self::ASSIGNMENT_CHECKER_TAG);
-        foreach ($taggedServices as $serviceId => $tags) {
-            foreach ($tags as $tagAttributes) {
-                $this->assertTagHasAttribute(
-                    $serviceId,
-                    self::ASSIGNMENT_CHECKER_TAG,
-                    $tagAttributes,
-                    'entity'
-                );
-                $assignmentCheckers[$tagAttributes['entity']] = $serviceId;
+        $services = [];
+        $serviceIds = [];
+        $taggedServices = $container->findTaggedServiceIds(self::CHECKER_TAG_NAME);
+        foreach ($taggedServices as $id => $tags) {
+            foreach ($tags as $attributes) {
+                $entityClass = $this->getRequiredAttribute($attributes, 'entity', $id, self::CHECKER_TAG_NAME);
+                if (isset($serviceIds[$entityClass])) {
+                    throw new InvalidArgumentException(sprintf(
+                        'The service "%1$s" must not have the tag "%2$s" and the entity "%3$s"'
+                        . ' because there is another service ("%4$s") with this tag and entity.'
+                        . ' Use a decoration of "%4$s" service to extend it or create a compiler pass'
+                        . ' for the dependency injection container to override "%4$s" service completely.',
+                        $id,
+                        self::CHECKER_TAG_NAME,
+                        $entityClass,
+                        $serviceIds[$entityClass]
+                    ));
+                }
+                $services[$entityClass] = new Reference($id);
+                $serviceIds[$entityClass] = $id;
             }
         }
 
-        return $assignmentCheckers;
-    }
-
-    /**
-     * @param string $serviceId
-     * @param string $tagName
-     * @param array  $tagAttributes
-     * @param string $requiredAttribute
-     * @throws LogicException
-     */
-    private function assertTagHasAttribute($serviceId, $tagName, array $tagAttributes, $requiredAttribute)
-    {
-        if (empty($tagAttributes[$requiredAttribute])) {
-            throw new LogicException(
-                sprintf('Tag "%s" for service "%s" must have attribute "%s"', $tagName, $serviceId, $requiredAttribute)
-            );
-        }
+        $container->findDefinition(self::MANAGER_SERVICE)
+            ->setArgument('$checkerContainer', ServiceLocatorTagPass::register($container, $services));
     }
 }

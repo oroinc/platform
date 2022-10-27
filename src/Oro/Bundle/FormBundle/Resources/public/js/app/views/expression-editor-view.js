@@ -1,15 +1,14 @@
 define(function(require) {
     'use strict';
 
-    var ExpressionEditorView;
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const $ = require('jquery');
+    const _ = require('underscore');
     require('bootstrap');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var ExpressionEditorUtil = require('oroform/js/expression-editor-util');
-    var Typeahead = $.fn.typeahead.Constructor;
+    const BaseView = require('oroui/js/app/views/base/view');
+    const ExpressionEditorUtil = require('oroform/js/expression-editor-util');
+    const Typeahead = $.fn.typeahead.Constructor;
 
-    ExpressionEditorView = BaseView.extend({
+    const ExpressionEditorView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat([
             'dataSource', 'delay'
         ]),
@@ -55,7 +54,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ExpressionEditorView(options) {
             this.debouncedAutocomplete = _.debounce(function(e) {
@@ -72,7 +71,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             var utilOptions = _.pick(options,
@@ -84,6 +83,10 @@ define(function(require) {
             this.dataSource = this.dataSource || {};
             this.dataSourceInstances = this.dataSourceInstances || {};
 
+            if (_.isRTL()) {
+                this.$el.attr('dir', 'ltr');
+            }
+
             return ExpressionEditorView.__super__.initialize.apply(this, arguments);
         },
 
@@ -91,11 +94,11 @@ define(function(require) {
             this.$el.typeahead({
                 minLength: 0,
                 items: 20,
-                select: _.bind(this._typeaheadSelect, this),
-                source: _.bind(this._typeaheadSource, this),
-                lookup: _.bind(this._typeaheadLookup, this),
-                highlighter: _.bind(this._typeaheadHighlighter, this),
-                updater: _.bind(this._typeaheadUpdater, this)
+                select: this._typeaheadSelect.bind(this),
+                source: this._typeaheadSource.bind(this),
+                lookup: this._typeaheadLookup.bind(this),
+                highlighter: this._typeaheadHighlighter.bind(this),
+                updater: this._typeaheadUpdater.bind(this)
             });
 
             this.typeahead = this.$el.data('typeahead');
@@ -103,7 +106,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -120,7 +123,7 @@ define(function(require) {
             delete this.dataSource;
             delete this.dataSourceInstances;
 
-            return ExpressionEditorView.__super__.dispose.apply(this, arguments);
+            return ExpressionEditorView.__super__.dispose.call(this);
         },
 
         /**
@@ -134,9 +137,9 @@ define(function(require) {
          * Validate expression
          */
         validate: function() {
-            var isValid = this.util.validate(this.$el.val());
+            const isValid = this.util.validate(this.$el.val());
             this.$el.toggleClass('error', !isValid);
-            this.$el.parent().toggleClass('validation-error', !isValid);
+            this.$el.parent().toggleClass('expression-error', !isValid);
         },
 
         /**
@@ -146,8 +149,8 @@ define(function(require) {
          * @private
          */
         _typeaheadSource: function() {
-            var expression = this.el.value;
-            var position = this.el.selectionStart;
+            const expression = this.el.value;
+            const position = this.el.selectionStart;
 
             this.autocompleteData = this.util.getAutocompleteData(expression, position);
             this._toggleDataSource();
@@ -173,8 +176,8 @@ define(function(require) {
          * @private
          */
         _typeaheadSelect: function() {
-            var original = Typeahead.prototype.select;
-            var result = original.call(this.typeahead);
+            const original = Typeahead.prototype.select;
+            const result = original.call(this.typeahead);
             this.typeahead.lookup();
             return result;
         },
@@ -187,8 +190,8 @@ define(function(require) {
          * @private
          */
         _typeaheadHighlighter: function(item) {
-            var original = Typeahead.prototype.highlighter;
-            var suffix = this.autocompleteData.items[item].hasChildren ? '&hellip;' : '';
+            const original = Typeahead.prototype.highlighter;
+            const suffix = this.autocompleteData.items[item].hasChildren ? '&hellip;' : '';
             return original.call(this.typeahead, item) + suffix;
         },
 
@@ -201,7 +204,7 @@ define(function(require) {
          */
         _typeaheadUpdater: function(item) {
             this.util.updateAutocompleteItem(this.autocompleteData, item);
-            var position = this.autocompleteData.position;
+            const position = this.autocompleteData.position;
             this.$el.one('change', function() {
                 // set correct position after typeahead call change event
                 this.selectionStart = this.selectionEnd = position;
@@ -228,7 +231,7 @@ define(function(require) {
          * @private
          */
         _initializeDataSource: function(dataSourceKey) {
-            var dataSource = this.dataSourceInstances[dataSourceKey] = {};
+            const dataSource = this.dataSourceInstances[dataSourceKey] = {};
 
             dataSource.$widget = $('<div>').addClass('expression-editor-data-source')
                 .html(this.dataSource[dataSourceKey]);
@@ -239,7 +242,7 @@ define(function(require) {
 
             this.$el.after(dataSource.$widget).trigger('content:changed');
 
-            dataSource.$field.on('change', _.bind(function(e) {
+            dataSource.$field.on('change', (e) => {
                 if (!dataSource.active) {
                     return;
                 }
@@ -249,7 +252,7 @@ define(function(require) {
                     .change().focus();
 
                 this.el.selectionStart = this.el.selectionEnd = this.autocompleteData.position;
-            }, this));
+            });
 
             return dataSource;
         },
@@ -275,7 +278,7 @@ define(function(require) {
 
             this.autocompleteData.items = {}; // hide autocomplete list
 
-            var dataSource = this.getDataSource(dataSourceKey);
+            const dataSource = this.getDataSource(dataSourceKey);
             dataSource.$field.val(dataSourceValue).change();
 
             this._showDataSource(dataSource);

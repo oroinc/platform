@@ -3,75 +3,94 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class EmailTemplateVariablesPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessNoServices()
-    {
-        $containerBuilder = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo(EmailTemplateVariablesPass::SERVICE_KEY))
-            ->will($this->returnValue(false));
-        $containerBuilder->expects($this->never())
-            ->method('getDefinition');
-        $containerBuilder->expects($this->never())
-            ->method('findTaggedServiceIds');
-
-        $pass = new EmailTemplateVariablesPass();
-        $pass->process($containerBuilder);
-    }
+    private const CHAIN_PROVIDER_SERVICE = 'oro_email.emailtemplate.variable_provider';
+    private const PROVIDER_TAG           = 'oro_email.emailtemplate.variable_provider';
 
     public function testProcess()
     {
-        $service = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = new ContainerBuilder();
+        $chainProvider = $container->register(self::CHAIN_PROVIDER_SERVICE)
+            ->setArguments([null, [], []]);
+        $container->register('system_provider1')
+            ->addTag(self::PROVIDER_TAG, ['scope' => 'system']);
+        $container->register('system_provider2')
+            ->addTag(self::PROVIDER_TAG, ['scope' => 'system', 'priority' => 100]);
+        $container->register('system_provider3')
+            ->addTag(self::PROVIDER_TAG, ['scope' => 'system', 'priority' => -100]);
+        $container->register('entity_provider1')
+            ->addTag(self::PROVIDER_TAG, ['scope' => 'entity']);
+        $container->register('entity_provider2')
+            ->addTag(self::PROVIDER_TAG, ['scope' => 'entity', 'priority' => 100]);
+        $container->register('entity_provider3')
+            ->addTag(self::PROVIDER_TAG, ['scope' => 'entity', 'priority' => -100]);
 
-        $containerBuilder = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $compiler = new EmailTemplateVariablesPass();
+        $compiler->process($container);
 
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with(EmailTemplateVariablesPass::SERVICE_KEY)
-            ->will($this->returnValue(true));
-        $containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with(EmailTemplateVariablesPass::SERVICE_KEY)
-            ->will($this->returnValue($service));
-        $containerBuilder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->will(
-                $this->returnValue(
-                    [
-                        'provider2' => [['scope' => 'system', 'priority' => 1]],
-                        'provider1' => [['scope' => 'system', 'priority' => 3]],
-                        'provider3' => [['scope' => 'entity']],
-                    ]
-                )
-            );
+        self::assertInstanceOf(Reference::class, $chainProvider->getArgument(0));
+        $providers = $container->getDefinition((string)$chainProvider->getArgument(0));
+        self::assertEquals(ServiceLocator::class, $providers->getClass());
+        $this->assertEquals(
+            [
+                'system_provider1' => new ServiceClosureArgument(new Reference('system_provider1')),
+                'system_provider2' => new ServiceClosureArgument(new Reference('system_provider2')),
+                'system_provider3' => new ServiceClosureArgument(new Reference('system_provider3')),
+                'entity_provider1' => new ServiceClosureArgument(new Reference('entity_provider1')),
+                'entity_provider2' => new ServiceClosureArgument(new Reference('entity_provider2')),
+                'entity_provider3' => new ServiceClosureArgument(new Reference('entity_provider3'))
+            ],
+            $providers->getArgument(0)
+        );
+        self::assertEquals(
+            ['system_provider2', 'system_provider1', 'system_provider3'],
+            $chainProvider->getArgument(1)
+        );
+        self::assertEquals(
+            ['entity_provider2', 'entity_provider1', 'entity_provider3'],
+            $chainProvider->getArgument(2)
+        );
+    }
 
-        $service->expects($this->at(0))
-            ->method('addMethodCall')
-            ->with(
-                'addSystemVariablesProvider',
-                [new Reference('provider1')]
-            );
-        $service->expects($this->at(1))
-            ->method('addMethodCall')
-            ->with(
-                'addSystemVariablesProvider',
-                [new Reference('provider2')]
-            );
-        $service->expects($this->at(2))
-            ->method('addMethodCall')
-            ->with(
-                'addEntityVariablesProvider',
-                [new Reference('provider3')]
-            );
+    public function testProcessForProviderWithoutScope()
+    {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The attribute "scope" is required for "oro_email.emailtemplate.variable_provider" tag.'
+            . ' Service: "system_provider1".'
+        );
 
-        $pass = new EmailTemplateVariablesPass();
-        $pass->process($containerBuilder);
+        $container = new ContainerBuilder();
+        $container->register(self::CHAIN_PROVIDER_SERVICE)
+            ->setArguments([null, [], []]);
+        $container->register('system_provider1')
+            ->addTag(self::PROVIDER_TAG);
+
+        $compiler = new EmailTemplateVariablesPass();
+        $compiler->process($container);
+    }
+
+    public function testProcessForProviderWithInvalidScope()
+    {
+        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The value "another" is invalid for the tag attribute "scope" for service "system_provider1",'
+            . ' expected "system" or "entity".'
+        );
+
+        $container = new ContainerBuilder();
+        $container->register(self::CHAIN_PROVIDER_SERVICE)
+            ->setArguments([null, [], []]);
+        $container->register('system_provider1')
+            ->addTag(self::PROVIDER_TAG, ['scope' => 'another']);
+
+        $compiler = new EmailTemplateVariablesPass();
+        $compiler->process($container);
     }
 }

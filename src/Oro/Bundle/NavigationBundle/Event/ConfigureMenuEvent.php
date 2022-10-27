@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Event;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ConfigureMenuEvent extends Event
 {
@@ -20,10 +20,6 @@ class ConfigureMenuEvent extends Event
      */
     private $menu;
 
-    /**
-     * @param FactoryInterface $factory
-     * @param ItemInterface    $menu
-     */
     public function __construct(FactoryInterface $factory, ItemInterface $menu)
     {
         $this->factory = $factory;

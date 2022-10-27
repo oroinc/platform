@@ -10,13 +10,15 @@
 #}
 
 {% if form %}
-    {% form_theme form with ['OroConfigBundle:Form:fields.html.twig', 'OroFormBundle:Form:fields.html.twig', 'OroLocaleBundle:Form:fields.html.twig'] %}
+    {% form_theme form with ['@OroConfig/Form/fields.html.twig', '@OroForm/Form/fields.html.twig', '@OroLocale/Form/fields.html.twig'] %}
 {% endif %}
-{% import 'OroSyncBundle:Include:contentTags.html.twig' as syncMacro %}
-{% import 'OroConfigBundle::macros.html.twig' as configUI %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroSync/Include/contentTags.html.twig' as syncMacro %}
+{% import '@OroConfig/macros.html.twig' as configUI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% block content %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if isDesktopVersion() %}
         {% set saveButton = UI.saveAndStayButton({
             'label': 'oro.config.actions.save_settings'|trans
@@ -33,6 +35,8 @@
             'action': formAction,
             'attr': {
                 'id': form.vars.id,
+                'data-scope-class': scopeEntityClass is defined ? scopeEntityClass : null,
+                'data-scope-id': scopeEntityId is defined ? scopeEntityId : null,
                 'data-collect': 'true',
                 'data-page-component-view': options|json_encode
             }
@@ -45,7 +49,7 @@
     {% else %}
         {# Mobile view #}
         <div class="no-data">
-            <span>{{ 'oro.config.system_configuration.desktop_only'|trans }}</span>
+            {{ 'oro.config.system_configuration.desktop_only'|trans }}
         </div>
     {% endif %}
 {% endblock content %}

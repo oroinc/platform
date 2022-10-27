@@ -10,14 +10,14 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * The form type for ACL privilege label.
+ */
 class ObjectLabelType extends AbstractType
 {
     /** @var EntityClassNameHelper */
     protected $classNameHelper;
 
-    /**
-     * @param EntityClassNameHelper $classNameHelper
-     */
     public function __construct(EntityClassNameHelper $classNameHelper)
     {
         $this->classNameHelper = $classNameHelper;
@@ -48,7 +48,7 @@ class ObjectLabelType extends AbstractType
         $className = str_replace('entity:', '', $identity);
 
         // add url params for field level aces
-        if (strpos($identity, 'entity:') === 0 && $className != ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+        if (str_starts_with($identity, 'entity:') && ObjectIdentityFactory::ROOT_IDENTITY_TYPE !== $className) {
             $role = $view->parent->parent->parent->parent->vars['value'];
             $view->vars['roleId'] = $role ? $role->getId() : null;
             $view->vars['urlSafeClassName'] = $this->classNameHelper->getUrlSafeClassName($className);

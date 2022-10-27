@@ -11,36 +11,36 @@ use Oro\Component\Action\Exception\AssemblerException;
 class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    protected $workflowAssembler;
+    private $workflowAssembler;
 
     /** @var WorkflowDefinitionValidateListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->workflowAssembler = $this->createMock(WorkflowAssembler::class);
         $this->listener = new WorkflowDefinitionValidateListener($this->workflowAssembler);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage test message
-     */
     public function testOnUpdateWorkflowDefinition()
     {
-        $this->workflowAssembler->method('assemble')
-            ->will($this->throwException(new AssemblerException('test message')));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('test message');
+
+        $this->workflowAssembler->expects(self::once())
+            ->method('assemble')
+            ->willThrowException(new AssemblerException('test message'));
         $this->listener->onCreateWorkflowDefinition($this->getEvent());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage test message
-     */
     public function testOnCreateWorkflowDefinition()
     {
-        $this->workflowAssembler->method('assemble')
-            ->will($this->throwException(new AssemblerException('test message')));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('test message');
+
+        $this->workflowAssembler->expects(self::once())
+            ->method('assemble')
+            ->willThrowException(new AssemblerException('test message'));
         $this->listener->onUpdateWorkflowDefinition($this->getEvent());
     }
 
@@ -50,9 +50,9 @@ class WorkflowDefinitionValidateListenerTest extends \PHPUnit\Framework\TestCase
     private function getEvent()
     {
         $event = $this->createMock(WorkflowChangesEvent::class);
-        $event->expects($this->any())->method('getDefinition')->willReturn(
-            $this->createMock(WorkflowDefinition::class)
-        );
+        $event->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($this->createMock(WorkflowDefinition::class));
 
         return $event;
     }

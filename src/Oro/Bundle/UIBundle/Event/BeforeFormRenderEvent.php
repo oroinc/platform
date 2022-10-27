@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\UIBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormView;
-use Twig_Environment;
+use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
+/**
+ * BeforeFormRenderEvent event is triggered by oro_form_process Twig function
+ * to allow for modification of the form data before it is rendered.
+ */
 class BeforeFormRenderEvent extends Event
 {
     /**
@@ -26,17 +30,17 @@ class BeforeFormRenderEvent extends Event
     protected $entity;
 
     /**
-     * @var \Twig_Environment
+     * @var Environment
      */
     protected $twigEnvironment;
 
     /**
      * @param FormView          $form
      * @param array             $formData
-     * @param \Twig_Environment $twigEnvironment
+     * @param Environment       $twigEnvironment
      * @param object|null       $entity
      */
-    public function __construct(FormView $form, array $formData, Twig_Environment $twigEnvironment, $entity)
+    public function __construct(FormView $form, array $formData, Environment $twigEnvironment, $entity)
     {
         $this->form = $form;
         $this->formData = $formData;
@@ -60,16 +64,13 @@ class BeforeFormRenderEvent extends Event
         return $this->formData;
     }
 
-    /**
-     * @param array $formData
-     */
     public function setFormData(array $formData)
     {
         $this->formData = $formData;
     }
 
     /**
-     * @return \Twig_Environment
+     * @return Environment
      */
     public function getTwigEnvironment()
     {

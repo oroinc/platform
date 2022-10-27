@@ -2,8 +2,21 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Model;
 
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
+/**
+ * Creates instance of Theme model based on given name and definition.
+ */
 class ThemeFactory implements ThemeFactoryInterface
 {
+    /** @var PropertyAccessor */
+    private $propertyAccessor;
+
+    public function __construct(PropertyAccessor $propertyAccessor)
+    {
+        $this->propertyAccessor = $propertyAccessor;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -11,7 +24,7 @@ class ThemeFactory implements ThemeFactoryInterface
     {
         $theme = new Theme(
             $themeName,
-            isset($themeDefinition['parent']) ? $themeDefinition['parent'] : null
+            $themeDefinition['parent'] ?? null
         );
 
         $this->applyThemeProperties($theme, $themeDefinition);
@@ -25,39 +38,27 @@ class ThemeFactory implements ThemeFactoryInterface
         return $theme;
     }
 
-    /**
-     * @param Theme $theme
-     * @param array $themeDefinition
-     */
     private function applyThemeProperties(Theme $theme, array $themeDefinition)
     {
-        if (isset($themeDefinition['label'])) {
-            $theme->setLabel($themeDefinition['label']);
-        }
-        if (isset($themeDefinition['screenshot'])) {
-            $theme->setScreenshot($themeDefinition['screenshot']);
-        }
-        if (isset($themeDefinition['icon'])) {
-            $theme->setIcon($themeDefinition['icon']);
-        }
-        if (isset($themeDefinition['logo'])) {
-            $theme->setLogo($themeDefinition['logo']);
-        }
-        if (isset($themeDefinition['directory'])) {
-            $theme->setDirectory($themeDefinition['directory']);
-        }
-        if (isset($themeDefinition['groups'])) {
-            $theme->setGroups((array)$themeDefinition['groups']);
-        }
-        if (isset($themeDefinition['description'])) {
-            $theme->setDescription($themeDefinition['description']);
+        $properties = [
+            'label',
+            'screenshot',
+            'icon',
+            'logo',
+            'image_placeholders',
+            'rtl_support',
+            'directory',
+            'groups',
+            'description',
+        ];
+
+        foreach ($properties as $property) {
+            if (isset($themeDefinition[$property])) {
+                $this->propertyAccessor->setValue($theme, $property, $themeDefinition[$property]);
+            }
         }
     }
 
-    /**
-     * @param array $themeDefinition
-     * @param Theme $theme
-     */
     private function addPageTemplatesConfig(array $themeDefinition, Theme $theme)
     {
         if (isset($themeDefinition['config']['page_templates']['titles'])) {

@@ -4,7 +4,6 @@
     @include fa-icon($email-inactive-mail-icon);
 
     font-style: normal;
-    line-height: 1;
 }
 
 .sidebar-widget-icon.mail-icon {
@@ -30,6 +29,8 @@
 
 .sidebar-widget-recent-emails {
     .sidebar-widget__content {
+        overflow: hidden;
+
         .header {
             padding: 2px 17px;
         }
@@ -42,10 +43,11 @@
         .more-unread {
             display: block;
             text-align: center;
-            font-size: 11px;
-            line-height: 11px;
-            padding-bottom: 8px;
-            color: #666;
+            font-size: $base-font-size--s;
+            line-height: $base-font-size--s;
+            padding-top: 6px;
+            padding-bottom: 6px;
+            color: $primary-550;
         }
     }
 
@@ -60,6 +62,7 @@
             }
         }
 
+        // stylelint-disable-next-line selector-max-compound-selectors
         .short-emails-list .items li .footer .reply-all-action,
         .short-emails-list .items li .footer .reply-action,
         .short-emails-list .items li .footer .forward-action {

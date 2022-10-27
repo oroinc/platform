@@ -2,23 +2,19 @@
 
 namespace Oro\Bundle\SearchBundle\Formatter;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 
+/**
+ * Group result entities by entity name with keeping list of actual entities in the same order
+ */
 class ResultFormatter
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
+    protected DoctrineHelper $doctrineHelper;
 
-    /**
-     * @param EntityManager $entityManager
-     */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        $this->entityManager = $entityManager;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -77,37 +73,18 @@ class ResultFormatter
     }
 
     /**
-     * @param  string $entityName
-     * @return ClassMetadata
-     */
-    protected function getEntityMetadata($entityName)
-    {
-        return $this->entityManager->getMetadataFactory()->getMetadataFor($entityName);
-    }
-
-    /**
-     * @param  string $entityName
-     * @return string
-     */
-    protected function getEntityIdentifier($entityName)
-    {
-        $idFields = $this->getEntityMetadata($entityName)->getIdentifierFieldNames();
-
-        return current($idFields);
-    }
-
-    /**
      * @param string $entityName
      * @param array $entityIds
      * @return array
      */
     protected function getEntities($entityName, array $entityIds)
     {
-        $classMetadata = $this->getEntityMetadata($entityName);
-        $idField = $this->getEntityIdentifier($entityName);
+        $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityName);
+        $idField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
 
-        $queryBuilder = $this->entityManager->getRepository($entityName)->createQueryBuilder('e');
-        $queryBuilder->where($queryBuilder->expr()->in('e.' . $idField, $entityIds));
+        $queryBuilder = $this->doctrineHelper->getEntityRepository($entityName)->createQueryBuilder('e');
+        $queryBuilder->where('e.' . $idField . ' IN (:entityIds)');
+        $queryBuilder->setParameter('entityIds', $entityIds);
         $currentEntities = $queryBuilder->getQuery()->getResult();
 
         $resultEntities = array();

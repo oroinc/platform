@@ -5,9 +5,11 @@ namespace Oro\Bundle\EntityPaginationBundle\Storage;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Stores pagination data.
+ */
 class EntityPaginationStorage
 {
     const STORAGE_NAME = 'entity_pagination_storage';
@@ -25,11 +27,6 @@ class EntityPaginationStorage
      */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityPaginationManager $paginationManager
-     * @param RequestStack $requestStack
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityPaginationManager $paginationManager,
@@ -156,20 +153,17 @@ class EntityPaginationStorage
     protected function getStorage()
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request && $request->getSession()) {
+        if ($request && $request->hasSession()) {
             return $request->getSession()->get(self::STORAGE_NAME, []);
         } else {
             return null;
         }
     }
 
-    /**
-     * @param array $storage
-     */
     protected function setStorage(array $storage)
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request && $request->getSession()) {
+        if ($request && $request->hasSession()) {
             $request->getSession()->set(self::STORAGE_NAME, $storage);
         }
     }

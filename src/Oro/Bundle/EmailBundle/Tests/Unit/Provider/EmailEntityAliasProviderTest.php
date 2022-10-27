@@ -2,29 +2,24 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider;
 
 class EmailEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const EMAIL_ADDRESS_PROXY_CLASS = 'Test\EmailAddressProxy';
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $emailAddressManager;
+    private const EMAIL_ADDRESS_PROXY_CLASS = 'Test\EmailAddressProxy';
 
     /** @var EmailEntityAliasProvider */
-    protected $entityAliasProvider;
+    private $entityAliasProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->emailAddressManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->emailAddressManager->expects($this->once())
+        $emailAddressManager = $this->createMock(EmailAddressManager::class);
+        $emailAddressManager->expects($this->once())
             ->method('getEmailAddressProxyClass')
             ->willReturn(self::EMAIL_ADDRESS_PROXY_CLASS);
 
-        $this->entityAliasProvider = new EmailEntityAliasProvider($this->emailAddressManager);
+        $this->entityAliasProvider = new EmailEntityAliasProvider($emailAddressManager);
     }
 
     public function testGetEntityAlias()

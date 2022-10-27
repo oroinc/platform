@@ -16,7 +16,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var NestedAssociationListener */
     private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $config = new EntityDefinitionFieldConfig();
         $targetConfig = $config->createAndSetTargetEntity();
@@ -26,13 +26,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new NestedAssociationListener(new PropertyAccessor(), $config);
     }
 
-    /**
-     * @param mixed $entity
-     * @param mixed $data
-     *
-     * @return FormEvent
-     */
-    private function getFormEvent($entity, $data)
+    private function getFormEvent(object $entity, mixed $data): FormEvent
     {
         $parentForm = $this->createMock(FormInterface::class);
         $parentForm->expects(self::once())
@@ -84,14 +78,13 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($entity->relatedObjectId);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\ApiBundle\Model\EntityIdentifier", "string" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testPostSubmitWithUnexpectedData()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Bundle\ApiBundle\Model\EntityIdentifier", "string" given.'
+        );
+
         $entity = new ObjectWithNestedAssociation();
 
         $this->listener->postSubmit(
@@ -99,14 +92,13 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Expected argument of type "Oro\Bundle\ApiBundle\Model\EntityIdentifier", "stdClass" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testPostSubmitWithUnexpectedObjectData()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'Expected argument of type "Oro\Bundle\ApiBundle\Model\EntityIdentifier", "stdClass" given.'
+        );
+
         $entity = new ObjectWithNestedAssociation();
 
         $this->listener->postSubmit(

@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\UIBundle\Fallback;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The base listener which should be extended by class which will manipulate scroll data blocks.
+ */
 abstract class AbstractFallbackFieldsFormView
 {
     /**
@@ -26,11 +29,6 @@ abstract class AbstractFallbackFieldsFormView
      */
     protected $translator;
 
-    /**
-     * @param RequestStack $requestStack
-     * @param ManagerRegistry $doctrineHelper
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
@@ -111,13 +109,6 @@ abstract class AbstractFallbackFieldsFormView
         return $em->getReference($entityPath, $entityId);
     }
 
-    /**
-     * @param ScrollData $scrollData
-     * @param $sectionTitle
-     * @param $blockId
-     * @param $subBlockId
-     * @param $template
-     */
     protected function addBlockWithSectionTitle(
         ScrollData $scrollData,
         $sectionTitle,

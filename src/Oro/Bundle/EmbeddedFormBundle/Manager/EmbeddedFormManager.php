@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface;
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistryInterface;
+use Symfony\Component\Form\FormTypeInterface;
 
 /**
  * Handles logic for creating and manipulation with embedded forms
@@ -24,13 +23,9 @@ class EmbeddedFormManager
     /** @var array */
     protected $formTypes = [];
 
-    /**
-     * @param FormRegistryInterface $formRegistry
-     * @param FormFactoryInterface $formFactory
-     */
     public function __construct(FormRegistryInterface $formRegistry, FormFactoryInterface $formFactory)
     {
-        $this->formRegistry   = $formRegistry;
+        $this->formRegistry = $formRegistry;
         $this->formFactory = $formFactory;
     }
 
@@ -128,36 +123,17 @@ class EmbeddedFormManager
     }
 
     /**
-     * @param string $type
+     * Gets FormType instance by its name from Form Registry if name is passed
      *
-     * @return string
-     *
-     * @deprecated since 1.7. Please implement LayoutUpdateInterface in your form type instead.
-     */
-    public function getCustomFormLayoutByFormType($type)
-    {
-        $typeInstance = $this->getTypeInstance($type);
-
-        if ($typeInstance instanceof CustomLayoutFormTypeInterface) {
-            return $typeInstance->geFormLayout();
-        }
-
-        if ($typeInstance instanceof CustomLayoutFormInterface) {
-            return $typeInstance->getFormLayout();
-        }
-
-        return '';
-    }
-
-    /**
-     * Gets FormType instance by its name from  Form Registry
-     * if name is passed
      * @param string|null $type
-     *
-     * @return EmbeddedFormInterface|AbstractType|null
+     * @return FormTypeInterface|AbstractType|null
      */
     public function getTypeInstance($type)
     {
-        return ($type ? $this->formRegistry->getType($type) : $type);
+        if (!$type) {
+            return null;
+        }
+        $resolvedFormType = $this->formRegistry->getType($type);
+        return $resolvedFormType ? $resolvedFormType->getInnerType() : null;
     }
 }

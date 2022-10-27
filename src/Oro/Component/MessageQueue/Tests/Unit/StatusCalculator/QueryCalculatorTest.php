@@ -2,9 +2,10 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\StatusCalculator;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
 
 class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
@@ -12,33 +13,41 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
     /** @var QueryCalculator */
     private $queryCalculator;
 
-    /** @var JobStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobStorage;
+    /** @var JobRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobRepository;
 
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->jobStorage = $this->createMock(JobStorage::class);
+        $this->jobRepository = $this->createMock(JobRepositoryInterface::class);
+        $entityClass = Job::class;
+        $manager = $this->createMock(ManagerRegistry::class);
+        $manager->expects($this->any())
+            ->method('getRepository')
+            ->with($entityClass)
+            ->willReturn($this->jobRepository);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn($manager);
 
         $jobStatusChecker = new JobStatusChecker();
-        $this->queryCalculator = new QueryCalculator($this->jobStorage);
+        $this->queryCalculator = new QueryCalculator($doctrine, $entityClass);
         $this->queryCalculator->setJobStatusChecker($jobStatusChecker);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         unset($this->queryCalculator);
     }
 
-    /**
-     * @return array
-     */
-    public function calculateProgressProvider()
+    public function calculateProgressProvider(): array
     {
         return [
             [
@@ -104,14 +113,11 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider calculateProgressProvider
-     *
-     * @param array   $statuses
-     * @param float  $expectedStatusProgress
      */
-    public function testCalculateRootJobProgress(array $statuses, $expectedStatusProgress)
+    public function testCalculateRootJobProgress(array $statuses, float $expectedStatusProgress): void
     {
         $rootJob = new Job();
-        $this->jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('getChildStatusesWithJobCountByRootJob')
             ->with($rootJob)
@@ -122,10 +128,7 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedStatusProgress, $statusProgress);
     }
 
-    /**
-     * @return array
-     */
-    public function statusCalculateProvider()
+    public function statusCalculateProvider(): array
     {
         return [
             [
@@ -184,14 +187,11 @@ class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider statusCalculateProvider
-     *
-     * @param array   $statuses
-     * @param string  $expectedStatus
      */
-    public function testCalculateRootJobStatus(array $statuses, $expectedStatus)
+    public function testCalculateRootJobStatus(array $statuses, string $expectedStatus): void
     {
         $rootJob = new Job();
-        $this->jobStorage
+        $this->jobRepository
             ->expects($this->once())
             ->method('getChildStatusesWithJobCountByRootJob')
             ->with($rootJob)

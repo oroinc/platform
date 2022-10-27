@@ -9,9 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType as BaseTextareaType;
 class TextareaTypeTest extends AbstractConfigTypeTestCase
 {
     /** @var TextareaType */
-    protected $type;
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

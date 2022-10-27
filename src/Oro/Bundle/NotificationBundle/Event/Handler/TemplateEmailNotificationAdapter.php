@@ -10,6 +10,8 @@ use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Event\NotificationProcessRecipientsEvent;
 use Oro\Bundle\NotificationBundle\Model\EmailAddressWithContext;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -44,25 +46,31 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
      */
     private $eventDispatcher;
 
+    /** @var ChainAdditionalEmailAssociationProvider */
+    private $additionalEmailAssociationProvider;
+
     /**
-     * @param object $entity
-     * @param EmailNotification $notification
-     * @param EntityManager $entityManager
-     * @param PropertyAccessor $propertyAccessor
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param object                                  $entity
+     * @param EmailNotification                       $notification
+     * @param EntityManager                           $entityManager
+     * @param PropertyAccessor                        $propertyAccessor
+     * @param EventDispatcherInterface                $eventDispatcher
+     * @param ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
      */
     public function __construct(
         $entity,
         EmailNotification $notification,
         EntityManager $entityManager,
         PropertyAccessor $propertyAccessor,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
     ) {
         $this->entity = $entity;
         $this->notification = $notification;
         $this->entityManager = $entityManager;
         $this->propertyAccessor = $propertyAccessor;
         $this->eventDispatcher = $eventDispatcher;
+        $this->additionalEmailAssociationProvider = $additionalEmailAssociationProvider;
     }
 
     /**
@@ -105,10 +113,25 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
             $this->getRecipientsFromEntityEmails($this->entity, $recipientList)
         ));
 
+        $this->removeDisabledUsers($recipients);
+
         $event = new NotificationProcessRecipientsEvent($this->entity, $recipients);
-        $this->eventDispatcher->dispatch(NotificationProcessRecipientsEvent::NAME, $event);
+        $this->eventDispatcher->dispatch($event, NotificationProcessRecipientsEvent::NAME);
 
         return $event->getRecipients();
+    }
+
+    protected function removeDisabledUsers(array &$recipients)
+    {
+        foreach ($recipients as $key => $recipient) {
+            if (($recipient instanceof AbstractUser && !$recipient->isEnabled())
+                || ($recipient instanceof EmailAddressWithContext
+                    && $recipient->getContext() instanceof AbstractUser
+                    && !$recipient->getContext()->isEnabled())
+            ) {
+                unset($recipients[$key]);
+            }
+        }
     }
 
     /**
@@ -177,9 +200,11 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
             foreach ($associationComponents as $associationComponent) {
                 $newEntities = [];
                 foreach ($associationEntities as $associationEntity) {
-                    $subEntities = $this->propertyAccessor->getValue($associationEntity, $associationComponent);
-                    $subEntities = is_array($subEntities) || $subEntities instanceof \Traversable ?
-                        $subEntities : [$subEntities];
+                    $subEntities = $this->additionalEmailAssociationProvider
+                        ->getAssociationValue($associationEntity, $associationComponent);
+                    $subEntities = is_array($subEntities) || $subEntities instanceof \Traversable
+                        ? $subEntities
+                        : [$subEntities];
                     if (!is_array($subEntities)) {
                         $subEntities = iterator_to_array($subEntities);
                     }

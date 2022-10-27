@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 
 /**
+ * This constraint is used to check whether an to-many association has methods to add and to remove elements.
+ *
  * @Annotation
  */
 class HasAdderAndRemover extends Constraint implements ConstraintWithStatusCodeInterface
@@ -19,7 +21,7 @@ class HasAdderAndRemover extends Constraint implements ConstraintWithStatusCodeI
     /**
      * {@inheritdoc}
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return Response::HTTP_NOT_IMPLEMENTED;
     }

@@ -8,7 +8,8 @@
             formatSelectionTemplateSelector: params.column_chain_template_selector|default(null),
         },
     },
-}|merge_recursive(params.dataAuditConditionOptions|default({})) %}
+}|merge_recursive(params.dataAuditConditionOptions|default({}))
+|merge_recursive(params.fieldConditionOptions|default({})) %}
 
 <li class="option condition-data-audit" data-criteria="condition-data-audit"
     data-module="orodataaudit/js/app/views/data-audit-condition-view"

@@ -12,41 +12,31 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchNumberRangeFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
+use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SearchNumberRangeFilter
-     */
+    /** @var SearchNumberRangeFilter */
     private $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        /* @var $formFactory FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
         $formFactory = $this->createMock(FormFactoryInterface::class);
-        /* @var $filterUtility FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
-        $filterUtility = $this->createMock(FilterUtility::class);
 
-        $this->filter = new SearchNumberRangeFilter($formFactory, $filterUtility);
+        $this->filter = new SearchNumberRangeFilter($formFactory, new FilterUtility());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Invalid filter datasource adapter provided
-     */
     public function testThrowsExceptionForWrongFilterDatasourceAdapter()
     {
-        $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
+        $this->expectException(UnexpectedTypeException::class);
+
         $this->filter->apply(
-            $ds,
+            $this->createMock(FilterDatasourceAdapterInterface::class),
             [
                 'type' => NumberRangeFilterType::TYPE_BETWEEN,
                 'value' => 123,
-                'value_end' => 155,
+                'value_end' => 155
             ]
         );
     }
@@ -55,9 +45,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'decimal.field';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
         $ds->expects($this->exactly(2))
             ->method('addRestriction')
@@ -79,15 +67,36 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testApplyBetweenWithoutValueEnd(): void
+    {
+        $fieldName = 'decimal.field';
+
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
+
+        $ds->expects($this->once())
+            ->method('addRestriction')
+            ->with(new BaseComparison($fieldName, Comparison::GTE, 123), FilterUtility::CONDITION_AND, false);
+
+        $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => $fieldName]);
+        $this->assertTrue(
+            $this->filter->apply(
+                $ds,
+                [
+                    'type' => NumberRangeFilterType::TYPE_BETWEEN,
+                    'value' => 123,
+                    'value_end' => null,
+                ]
+            )
+        );
+    }
+
     public function testApplyNotBetween()
     {
         $fieldName = 'decimal.field';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
-        $ds->expects($this->exactly(1))
+        $ds->expects($this->once())
             ->method('addRestriction')
             ->with(
                 new CompositeExpression(
@@ -118,5 +127,11 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
                 ]
             )
         );
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

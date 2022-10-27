@@ -1,12 +1,16 @@
-# we should add application/vnd.api+json content type as "json" type to be able to receive JSON.API data from the Request
 fos_rest:
     view:
+        # add application/vnd.api+json content type as "json" type to be able to receive JSON:API data from the request
         mime_types: {'json': ['application/json', 'application/x-json', 'application/vnd.api+json']}
+    exception:
+        # add BadRequestHttpException message to be able to return detailed info about the bad request
+        messages:
+            'Symfony\Component\HttpKernel\Exception\BadRequestHttpException': true
 
 nelmio_api_doc:
     name: 'REST API'
     motd:
-        template: OroApiBundle::ApiDoc/motd.html.twig
+        template: '@OroApi/ApiDoc/motd.html.twig'
     default_sections_opened: false
     request_listener:
         enabled: false
@@ -23,21 +27,101 @@ security:
             anonymous: false
         api_wsse_secured:
             pattern: '%oro_api.rest.pattern%'
+            provider: oro_user
             stateless: true
             wsse:
                 lifetime: 3600
                 realm:    "Secured API"
                 profile:  "UsernameToken"
             context: main
-            logout_on_user_change: true
+            organization-remember-me: # should be the same as for "main" firewall except "csrf_protected_mode" option
+                token_provider:             oro_security.token.provider.rememberme
+                secret:                     '%secret%'
+                name:                       BAPRM
+                lifetime:                   1209600   # stay logged for two weeks
+                httponly:                   true
+                csrf_protected_mode:        true
+            guard: # see "main" firewall
+                authenticators:
+                    - oro_user.impersonation_authenticator
+
+knp_gaufrette:
+    adapters:
+        api:
+            doctrine_dbal:
+                connection_name: message_queue
+                table: oro_api_async_data
+                columns:
+                    key: name
+                    content: content
+                    mtime: updated_at
+                    checksum: checksum
+    filesystems:
+        api_source_data:
+            adapter: private
+            alias: api_source_data_filesystem
+        api:
+            adapter: api
+            alias: api_filesystem
 
 oro_api:
+    api_firewalls:
+        api_wsse_secured:
+            feature_name: web_api
+            feature_firewall_listeners:
+                - Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall\WsseAuthenticationListener
+        wsse_secured:
+            feature_name: web_api
+            feature_firewall_listeners:
+                - Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall\WsseAuthenticationListener
+        api_options:
+            feature_name: web_api
+
+    config_files:
+        plain:
+            file_name: [api_plain.yml, api.yml]
+            request_type: ['rest', '!json_api']
+
     api_doc_views:
         rest_json_api:
-            label: JSON.API
+            label: 'JSON:API'
             default: true
             headers:
-                Content-Type: application/vnd.api+json
+                Accept: application/vnd.api+json
+                Content-Type:
+                    -
+                        value: application/vnd.api+json
+                        actions:
+                            - create
+                            - update
+                            - update_list
+                            - delete
+                            - delete_list
+                            - add_subresource
+                            - update_subresource
+                            - delete_subresource
+                            - add_relationship
+                            - update_relationship
+                            - delete_relationship
+                X-Include:
+                    -
+                        value: noHateoas
+                        actions:
+                            - get
+                            - get_list
+                            - create
+                            - update
+                            - get_relationship
+                            - get_subresource
+                            - add_subresource
+                            - update_subresource
+                            - delete_subresource
+                    -
+                        value: totalCount
+                        actions: [get_list, delete_list, get_relationship, get_subresource]
+                    -
+                        value: deletedCount
+                        actions: [delete_list]
             request_type: ['rest', 'json_api']
         rest_plain:
             request_type: ['rest']
@@ -46,14 +130,59 @@ oro_api:
             label: plain (deprecated)
             html_formatter: oro_api.api_doc.formatter.html_formatter.nelmio
             documentation_path: ~ # no documentation for this view
+
     # default documentation for all views
-    documentation_path: https://oroinc.com/orocrm/doc/current/dev-guide/web-api
+    documentation_path: https://doc.oroinc.com/api/
+
+    # default data-type mapping for all views
+    api_doc_data_types:
+        unsignedInteger: integer
+        unsignedInteger[]: array of integers
+        text: string
+        text[]: array of strings
+        guid: string
+        guid[]: array of strings
+        json_array: object
+        simple_array: array
+        percent: float
+        percent[]: array of floats
+        percent_100: float
+        percent_100[]: array of floats
+        currency: string
+        currency[]: array of strings
+        money_value: money
+        money_value[]: array of moneys
+        duration: integer
+        duration[]: array of integers
+        entityType: string
+        entityType[]: array of strings
+        objects: array of objects
+        object[]: array of objects
+        strings: array of strings
+        string[]: array of strings
+        integer[]: array of integers
+        smallint[]: array of smallints
+        bigint[]: array of bigints
+        boolean[]: array of booleans
+        decimal[]: array of decimals
+        float[]: array of floats
+        datetime[]: array of datetimes
+        date[]: array of dates
+        time[]: array of times
+        money[]: array of moneys
+        scalar[]: array of scalars
+        nestedObject: object
+
+    api_doc_cache:
+        excluded_features: [ web_api ]
 
     config_extensions:
         - oro_api.config_extension.filters
         - oro_api.config_extension.sorters
         - oro_api.config_extension.actions
         - oro_api.config_extension.subresources
+        - oro_api.config_extension.post_processor
+        - oro_api.config_extension.post_processor.twig
 
     filter_operators:
         eq:  '='  # equal to
@@ -62,11 +191,11 @@ oro_api:
         lt:  '<'  # less than
         gte: '>=' # greater than or equal to
         lte: '<=' # less than or equal to
-        exists: '*' # exists (IS NOT NULL for fields and to-one associations and check whether a collection
-                    # is not empty for to-many associations)
-                    # and not exists (IS NULL for fields and to-one associations and check whether a collection
-                    # is empty for to-many associations),
-                    # value is true = exists, value is false = not exists
+        exists:           '*' # exists (IS NOT NULL for fields and to-one associations
+                              # and check whether a collection is not empty for to-many associations)
+                              # and not exists (IS NULL for fields and to-one associations
+                              # and check whether a collection is empty for to-many associations),
+                              # value is true = exists, value is false = not exists
         neq_or_null:     '!*' # not equal to or IS NULL for fields and to-one associations
                               # for to-many associations checks whether a collection
                               # does not contain any of specific values or a collection is empty
@@ -115,6 +244,8 @@ oro_api:
             supported_operators: ['*']
         percent:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
+        percent_100:
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         money:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         money_value:
@@ -124,10 +255,20 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         composite_identifier:
             factory: ['@oro_api.filter_factory.composite_identifier', 'createFilter']
+            supported_operators: ['=', '!=']
+        association_composite_identifier:
+            factory: ['@oro_api.filter_factory.association_composite_identifier', 'createFilter']
+            supported_operators: ['=', '!=']
         association:
             factory: ['@oro_api.filter_factory.extended_association', 'createFilter']
         primaryField:
             class: Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter
+        nestedTree:
+            class: Oro\Bundle\ApiBundle\Filter\NestedTreeFilter
+            supported_operators: ['>', '>=']
+
+    error_title_overrides:
+        'percent range constraint': 'range constraint'
 
     form_types:
         - Symfony\Component\Form\Extension\Core\Type\FormType
@@ -136,11 +277,6 @@ oro_api:
         - Symfony\Component\Form\Extension\Core\Type\IntegerType
         - Symfony\Component\Form\Extension\Core\Type\NumberType
         - Symfony\Component\Form\Extension\Core\Type\MoneyType
-        - Symfony\Component\Form\Extension\Core\Type\DateType
-        - Symfony\Component\Form\Extension\Core\Type\TimeType
-        - Symfony\Component\Form\Extension\Core\Type\DateTimeType
-        - Symfony\Component\Form\Extension\Core\Type\TimezoneType
-        - Symfony\Component\Form\Extension\Core\Type\BirthdayType
         - Symfony\Component\Form\Extension\Core\Type\TextType
         - Symfony\Component\Form\Extension\Core\Type\TextareaType
         - Symfony\Component\Form\Extension\Core\Type\EmailType
@@ -148,10 +284,11 @@ oro_api:
         - Symfony\Component\Form\Extension\Core\Type\RepeatedType
         - Oro\Bundle\ApiBundle\Form\Type\BooleanType
         - Oro\Bundle\ApiBundle\Form\Type\NumberType
+        - Oro\Bundle\ApiBundle\Form\Type\DateTimeType
+        - Oro\Bundle\ApiBundle\Form\Type\ArrayType
         - Oro\Bundle\ApiBundle\Form\Type\CollectionType
         - Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
-        - Oro\Bundle\ApiBundle\Form\Type\ScalarCollectionType
-        - Oro\Bundle\ApiBundle\Form\Type\EntityScalarCollectionType
+        - Oro\Bundle\ApiBundle\Form\Type\Percent100Type
         - Oro\Bundle\FormBundle\Form\Type\OroDurationType
 
     form_type_extensions:
@@ -177,39 +314,23 @@ oro_api:
         float:
             form_type: Symfony\Component\Form\Extension\Core\Type\NumberType
         date:
-            form_type: Symfony\Component\Form\Extension\Core\Type\DateType
+            form_type: Oro\Bundle\ApiBundle\Form\Type\DateTimeType
             options:
-                model_timezone: UTC
-                view_timezone: UTC
-                widget: single_text
-                format: "yyyy-MM-dd" # HTML5
+                with_time: false
         time:
-            form_type: Symfony\Component\Form\Extension\Core\Type\TimeType
+            form_type: Oro\Bundle\ApiBundle\Form\Type\DateTimeType
             options:
-                model_timezone: UTC
-                view_timezone: UTC
-                with_seconds: true
-                widget: single_text
+                with_date: false
         datetime:
-            form_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType
-            options:
-                model_timezone: UTC
-                view_timezone: UTC
-                with_seconds: true
-                widget: single_text
-                format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
+            form_type: Oro\Bundle\ApiBundle\Form\Type\DateTimeType
         datetimetz:
-            form_type: Symfony\Component\Form\Extension\Core\Type\DateTimeType
-            options:
-                model_timezone: UTC
-                view_timezone: UTC
-                with_seconds: true
-                widget: single_text
-                format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
+            form_type: Oro\Bundle\ApiBundle\Form\Type\DateTimeType
         text:
             form_type: Symfony\Component\Form\Extension\Core\Type\TextareaType
         percent:
             form_type: Symfony\Component\Form\Extension\Core\Type\NumberType
+        percent_100:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\Percent100Type
         money:
             form_type: Oro\Bundle\ApiBundle\Form\Type\NumberType
             options:
@@ -220,6 +341,14 @@ oro_api:
                 scale: 4
         duration:
             form_type: Oro\Bundle\FormBundle\Form\Type\OroDurationType
+        object:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
+        array:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
+        simple_array:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
+        json_array:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
 
     actions:
         options:
@@ -371,6 +500,25 @@ oro_api:
                     priority: -80
                 normalize_result:
                     priority: -90
+        update_list:
+            processor_service_id: oro_api.update_list.processor
+            processing_groups:
+                initialize:
+                    priority: -10
+                resource_check:
+                    priority: -15
+                normalize_input:
+                    priority: -20
+                security_check:
+                    priority: -30
+                load_data:
+                    priority: -40
+                save_data:
+                    priority: -50
+                finalize:
+                    priority: -60
+                normalize_result:
+                    priority: -70
         get_subresource:
             processor_service_id: oro_api.get_subresource.processor
             processing_groups:
@@ -569,3 +717,23 @@ oro_api:
                     priority: -20
                 normalize_result:
                     priority: -30
+        unhandled_error:
+            processing_groups:
+                initialize:
+                    priority: -10
+                normalize_result:
+                    priority: -20
+        batch_update:
+            processing_groups:
+                # the priorities of groups are not matter because each group is executed separately
+                initialize: ~
+                finalize: ~
+                save_data: ~
+                save_errors: ~
+                normalize_result: ~
+        batch_update_item:
+            processing_groups:
+                # the priorities of groups are not matter because each group is executed separately
+                initialize: ~
+                transform_data: ~
+                normalize_result: ~

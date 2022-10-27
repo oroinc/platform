@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Model\Strategy;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -12,38 +15,29 @@ use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ReplaceStrategy $strategy
-     */
-    protected $strategy;
+    /** @var ReplaceStrategy */
+    private $strategy;
 
     /** @var ActivityListManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $activityListManager;
+    private $activityListManager;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $activityManager;
+    private $activityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $activityListManager = 'Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager';
-        $this->activityListManager = $this->getMockBuilder($activityListManager)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $activityListManager = ActivityListManager::class;
+        $this->activityListManager = $this->createMock($activityListManager);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->activityManager = $this->createMock(ActivityManager::class);
 
         $this->strategy = new ReplaceStrategy(
             $this->activityListManager,
@@ -72,8 +66,8 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
     {
         $account1 = new User();
         $account2 = new User();
-        $this->setId($account1, 1);
-        $this->setId($account2, 2);
+        ReflectionUtil::setId($account1, 1);
+        ReflectionUtil::setId($account2, 2);
         $entityMetadata = new EntityMetadata(['type' => ClassUtils::getRealClass($account1)]);
         $entityData = new EntityData($entityMetadata, [$account1, $account2]);
         $entityData->setMasterEntity($account1);
@@ -81,37 +75,31 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
         $fieldData->setMode(MergeModes::ACTIVITY_REPLACE);
         $fieldData->setSourceEntity($account2);
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['getQuery', 'getResult'])
-            ->getMock();
+        $query = $this->createMock(AbstractQuery::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects($this->any())
             ->method('getQuery')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->any())
+            ->willReturn($query);
+        $query->expects($this->any())
             ->method('getResult')
-            ->will($this->returnValue([
+            ->willReturn([
                 ['id' => 1, 'relatedActivityId' => 11],
                 ['id' => 3, 'relatedActivityId' => 2]
-            ]));
+            ]);
 
-        $repository = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(ActivityListRepository::class);
         $repository->expects($this->any())
             ->method('getActivityListQueryBuilderByActivityClass')
             ->willReturn($queryBuilder);
         $repository->expects($this->any())
             ->method('findBy')
-            ->willReturn($this->returnValue([]));
+            ->willReturn([]);
 
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->willReturn($repository);
 
-        $this->activityListManager
-            ->expects($this->exactly(2))
+        $this->activityListManager->expects($this->exactly(2))
             ->method('replaceActivityTargetWithPlainQuery');
 
         $this->strategy->merge($fieldData);
@@ -120,18 +108,5 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
     public function testGetName()
     {
         $this->assertEquals('activity_replace', $this->strategy->getName());
-    }
-
-    /**
-     * @param $object
-     * @param $value
-     */
-    protected function setId($object, $value)
-    {
-        $class = new \ReflectionClass($object);
-        $property  = $class->getProperty('id');
-        $property->setAccessible(true);
-
-        $property->setValue($object, $value);
     }
 }

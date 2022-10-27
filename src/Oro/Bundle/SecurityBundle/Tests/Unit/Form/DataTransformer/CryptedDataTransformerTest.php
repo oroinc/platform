@@ -10,8 +10,8 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    const ENCRYPTED_STRING = 'encryptedSample';
-    const DECRYPTED_STRING = 'sample';
+    private const ENCRYPTED_STRING = 'encryptedSample';
+    private const DECRYPTED_STRING = 'sample';
 
     /**
      * @var CryptedDataTransformer
@@ -23,10 +23,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
      */
     private $crypter;
 
-    /**
-     * {@inheritDoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->crypter = $this->createMock(SymmetricCrypterInterface::class);
         $this->transformer = new CryptedDataTransformer($this->crypter);
@@ -42,14 +39,14 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
      */
     public function testTransform($value, $expected)
     {
-        $this->crypter
+        $this->crypter->expects(self::any())
             ->method('decryptData')
             ->with(self::ENCRYPTED_STRING)
             ->willReturn(self::DECRYPTED_STRING);
 
         $actual = $this->transformer->transform($value);
 
-        static::assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**
@@ -65,8 +62,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testTransformWithException()
     {
-        $this->crypter
-            ->expects(static::once())
+        $this->crypter->expects(self::once())
             ->method('decryptData')
             ->willThrowException(new \Exception());
 
@@ -74,7 +70,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 
         $actual = $this->transformer->transform(self::ENCRYPTED_STRING);
 
-        static::assertNull($actual);
+        self::assertNull($actual);
     }
 
     /**
@@ -85,14 +81,14 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
      */
     public function testReverseTransform($value, $expected)
     {
-        $this->crypter
+        $this->crypter->expects(self::any())
             ->method('encryptData')
             ->with(self::DECRYPTED_STRING)
             ->willReturn(self::ENCRYPTED_STRING);
 
         $actual = $this->transformer->reverseTransform($value);
 
-        static::assertSame($expected, $actual);
+        self::assertSame($expected, $actual);
     }
 
     /**

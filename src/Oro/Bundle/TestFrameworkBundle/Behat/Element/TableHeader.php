@@ -4,6 +4,9 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Symfony\Component\DomCrawler\Crawler;
 
+/**
+ * This class represents table header in behat contexts
+ */
 class TableHeader extends Element
 {
     /**
@@ -21,7 +24,7 @@ class TableHeader extends Element
 
         /** @var \DOMElement $th */
         foreach ($crawler->filter('th') as $th) {
-            $currentHeader = trim($th->textContent);
+            $currentHeader = preg_replace('/[\\n\\r]+/', ' ', trim($th->textContent));
             if (strtolower($currentHeader) === strtolower($headerText)) {
                 return $i;
             }
@@ -49,7 +52,7 @@ class TableHeader extends Element
 
         /** @var \DOMElement $th */
         foreach ($crawler->filter('th') as $th) {
-            if (strtolower($th->textContent) === strtolower($columnName)) {
+            if (strtolower(trim($th->textContent)) === strtolower($columnName)) {
                 return true;
             }
         }
@@ -64,5 +67,14 @@ class TableHeader extends Element
     public function hasMassActionColumn()
     {
         return $this->has('css', 'th.grid-header-cell-massAction');
+    }
+
+    /**
+     * Total columns number, NOT including action & mass action columns
+     */
+    public function getColumnsCount(): int
+    {
+        $crawler = new Crawler($this->getHtml());
+        return $crawler->filter('th.grid-header-cell:not(.action-column):not(.grid-header-cell-massAction)')->count();
     }
 }

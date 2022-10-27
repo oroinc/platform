@@ -22,6 +22,9 @@ trait FormContextTrait
     /** @var IncludedEntityCollection|null */
     private $includedEntities;
 
+    /** @var array [entity hash => entity, ...] */
+    private $additionalEntities = [];
+
     /** @var EntityMapper|null */
     private $entityMapper;
 
@@ -32,7 +35,7 @@ trait FormContextTrait
     private $form;
 
     /** @var bool */
-    protected $skipFormValidation = false;
+    private $skipFormValidation = false;
 
     /**
      * Returns request data.
@@ -46,8 +49,6 @@ trait FormContextTrait
 
     /**
      * Sets request data to the context.
-     *
-     * @param array $requestData
      */
     public function setRequestData(array $requestData)
     {
@@ -66,8 +67,6 @@ trait FormContextTrait
 
     /**
      * Sets additional data included into the request.
-     *
-     * @param array $includedData
      */
     public function setIncludedData(array $includedData)
     {
@@ -86,12 +85,43 @@ trait FormContextTrait
 
     /**
      * Sets a collection contains additional entities included into the request data.
-     *
-     * @param IncludedEntityCollection|null $includedEntities
      */
     public function setIncludedEntities(IncludedEntityCollection $includedEntities = null)
     {
         $this->includedEntities = $includedEntities;
+    }
+
+    /**
+     * Gets the list of additional entities involved to the request processing.
+     *
+     * @return object[]
+     */
+    public function getAdditionalEntities(): array
+    {
+        return array_values($this->additionalEntities);
+    }
+
+    /**
+     * Adds the entity to a list of additional entities involved to the request processing.
+     * For example when an association is represented as a field,
+     * a target entity of this association does not exist in the list of included entities
+     * and need to be persisted manually, so, it should be added to the list of additional entities.
+     *
+     * @param object $entity
+     */
+    public function addAdditionalEntity($entity): void
+    {
+        $this->additionalEntities[spl_object_hash($entity)] = $entity;
+    }
+
+    /**
+     * Removes an entity from the list of additional entities involved to the request processing.
+     *
+     * @param object $entity
+     */
+    public function removeAdditionalEntity($entity): void
+    {
+        unset($this->additionalEntities[spl_object_hash($entity)]);
     }
 
     /**
@@ -106,8 +136,6 @@ trait FormContextTrait
 
     /**
      * Sets a service that can be used to convert an entity object to a model object and vise versa.
-     *
-     * @param EntityMapper|null $entityMapper
      */
     public function setEntityMapper(EntityMapper $entityMapper = null)
     {
@@ -136,8 +164,6 @@ trait FormContextTrait
 
     /**
      * Sets the form builder.
-     *
-     * @param FormBuilderInterface|null $formBuilder
      */
     public function setFormBuilder(FormBuilderInterface $formBuilder = null)
     {
@@ -166,8 +192,6 @@ trait FormContextTrait
 
     /**
      * Sets the form.
-     *
-     * @param FormInterface|null $form
      */
     public function setForm(FormInterface $form = null)
     {
@@ -192,5 +216,27 @@ trait FormContextTrait
     public function skipFormValidation($skipFormValidation)
     {
         $this->skipFormValidation = $skipFormValidation;
+    }
+
+    /**
+     * Gets all entities, primary and included ones, that are processing by an action.
+     *
+     * @param bool $mainOnly Whether only main entity(ies) for this request
+     *                       or all, primary and included entities should be returned
+     *
+     * @return object[]
+     */
+    public function getAllEntities(bool $mainOnly = false): array
+    {
+        $entity = $this->getResult();
+        $entities = null !== $entity ? [$entity] : [];
+        if (!$mainOnly) {
+            $includedEntities = $this->getIncludedEntities();
+            if (null !== $includedEntities) {
+                $entities = array_merge($entities, $includedEntities->getAll());
+            }
+        }
+
+        return $entities;
     }
 }

@@ -7,6 +7,9 @@ use Oro\Bundle\CacheBundle\Command\InvalidateCacheScheduleCommand;
 use Oro\Bundle\CacheBundle\DataStorage\DataStorageInterface;
 use Oro\Bundle\CronBundle\Entity\Manager\DeferredScheduler;
 
+/**
+ * Action handler for adding to schedule caching invalidation.
+ */
 class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHandlerInterface
 {
     const PARAM_INVALIDATE_TIME = 'invalidateTime';
@@ -27,11 +30,6 @@ class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHand
      */
     private $cronFormatTransformer;
 
-    /**
-     * @param DeferredScheduler                                $deferredScheduler
-     * @param InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgumentsBuilder
-     * @param DateTimeToStringTransformerInterface             $cronFormatTransformer
-     */
     public function __construct(
         DeferredScheduler $deferredScheduler,
         InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgumentsBuilder,
@@ -42,13 +40,10 @@ class InvalidateCacheActionScheduledHandler implements InvalidateCacheActionHand
         $this->cronFormatTransformer = $cronFormatTransformer;
     }
 
-    /**
-     * @param DataStorageInterface $dataStorage
-     */
     public function handle(DataStorageInterface $dataStorage)
     {
         $scheduleTime = $dataStorage->get(self::PARAM_INVALIDATE_TIME);
-        $command = InvalidateCacheScheduleCommand::NAME;
+        $command = InvalidateCacheScheduleCommand::getDefaultName();
         $args = $this->scheduleArgumentsBuilder->build($dataStorage);
 
         $this->deferredScheduler->removeScheduleForCommand($command, $args);

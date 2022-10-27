@@ -31,9 +31,6 @@ class DynamicAssetVersionStrategy implements VersionStrategyInterface
         $this->format        = $format ?: '%s?%s';
     }
 
-    /**
-     * @param DynamicAssetVersionManager $assetVersionManager
-     */
     public function setAssetVersionManager(DynamicAssetVersionManager $assetVersionManager)
     {
         $this->assetVersionManager = $assetVersionManager;

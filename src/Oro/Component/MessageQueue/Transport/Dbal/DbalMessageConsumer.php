@@ -3,23 +3,26 @@
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\DriverException;
+use Doctrine\DBAL\Driver\Exception as DbalDriverException;
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Transport\Exception\InvalidMessageException;
+use Oro\Component\MessageQueue\Transport\Exception\RuntimeException;
 use Oro\Component\MessageQueue\Transport\MessageConsumerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Transport\QueueInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
 /**
- * Consume messages from DBAL
+ * Message consumer for DBAL connection.
+ * Receives all messages from the database.
  */
 class DbalMessageConsumer implements MessageConsumerInterface
 {
     /**
-     * @var DbalSession
+     * @var DbalSessionInterface
      */
     private $session;
 
@@ -34,7 +37,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
     private $dbal;
 
     /**
-     * @var DbalDestination
+     * @var QueueInterface
      */
     private $queue;
 
@@ -63,11 +66,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
      */
     private $deleteStatement;
 
-    /**
-     * @param DbalSession $session
-     * @param DbalDestination $queue
-     */
-    public function __construct(DbalSession $session, DbalDestination $queue)
+    public function __construct(DbalSessionInterface $session, QueueInterface $queue)
     {
         $this->session = $session;
         $this->queue = $queue;
@@ -76,50 +75,31 @@ class DbalMessageConsumer implements MessageConsumerInterface
         $this->consumerId = uniqid('', true);
     }
 
-    /**
-     * @return string
-     */
-    public function getConsumerId()
+    public function getConsumerId(): string
     {
         return $this->consumerId;
     }
 
     /**
      * Set polling interval in milliseconds
-     *
-     * @param int $msec
      */
-    public function setPollingInterval($msec)
+    public function setPollingInterval(int $msec): void
     {
         $this->pollingInterval = $msec * 1000;
     }
 
     /**
      * Get polling interval in milliseconds
-     *
-     * @return int
      */
-    public function getPollingInterval()
+    public function getPollingInterval(): int
     {
-        return (int)$this->pollingInterval / 1000;
+        return $this->pollingInterval / 1000;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @return DbalDestination
      */
-    public function getQueue()
-    {
-        return $this->queue;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return DbalMessage|null
-     */
-    public function receive($timeout = 0)
+    public function receive($timeout = 0): ?MessageInterface
     {
         $startAt = microtime(true);
 
@@ -146,60 +126,33 @@ class DbalMessageConsumer implements MessageConsumerInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @return DbalMessage|null
      */
-    public function receiveNoWait()
+    public function acknowledge(MessageInterface $message): void
     {
-        return $this->receiveMessage();
-    }
+        if (!$message instanceof DbalMessageInterface) {
+            throw new InvalidMessageException(
+                sprintf('The transport message must be instance of "%s".', DbalMessageInterface::class)
+            );
+        }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @param DbalMessage $message
-     */
-    public function acknowledge(MessageInterface $message)
-    {
-        InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
         $this->deleteMessageWithRetry($message);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param DbalMessage $message
      */
-    public function reject(MessageInterface $message, $requeue = false)
+    public function reject(MessageInterface $message, $requeue = false): void
     {
-        InvalidMessageException::assertMessageInstanceOf($message, DbalMessage::class);
-        $this->deleteMessageWithRetry($message);
+        if (!$message instanceof DbalMessageInterface) {
+            throw new InvalidMessageException(
+                sprintf('The transport message must be instance of "%s".', DbalMessageInterface::class)
+            );
+        }
 
         if ($requeue) {
-            $dbalMessage = [
-                'body' => $message->getBody(),
-                'headers' => JSON::encode($message->getHeaders()),
-                'properties' => JSON::encode($message->getProperties()),
-                'priority' => $message->getPriority(),
-                'queue' => $this->queue->getQueueName(),
-                'redelivered' => true,
-            ];
-
-            $affectedRows = $this->dbal->insert($this->connection->getTableName(), $dbalMessage, [
-                'body' => Type::TEXT,
-                'headers' => Type::TEXT,
-                'properties' => Type::TEXT,
-                'priority' => Type::SMALLINT,
-                'queue' => Type::STRING,
-                'redelivered' => Type::BOOLEAN,
-            ]);
-
-            if (1 !== $affectedRows) {
-                throw new \LogicException(sprintf(
-                    'Expected record was inserted but it is not. message: "%s"',
-                    JSON::encode($dbalMessage)
-                ));
-            }
+            $this->requeueMessageWithRetry($message);
+        } else {
+            $this->deleteMessageWithRetry($message);
         }
     }
 
@@ -207,10 +160,9 @@ class DbalMessageConsumer implements MessageConsumerInterface
      * Receive message, set consumer for message assigned to current queue
      * Return data of received message.
      *
-     * @return DbalMessage|null
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
-    protected function receiveMessage()
+    private function receiveMessage(): ?MessageInterface
     {
         $now = time();
         $this->getUpdateStatement()->execute([
@@ -243,17 +195,12 @@ class DbalMessageConsumer implements MessageConsumerInterface
         return null;
     }
 
-    /**
-     * @param array $dbalMessage
-     *
-     * @return DbalMessage
-     */
-    protected function convertMessage(array $dbalMessage)
+    private function convertMessage(array $dbalMessage): MessageInterface
     {
         $message = $this->session->createMessage();
 
         $message->setId($dbalMessage['id']);
-        $message->setBody($dbalMessage['body']);
+        $message->setBody(JSON::decode($dbalMessage['body'], false) ?? $dbalMessage['body']);
         $message->setPriority((int)$dbalMessage['priority']);
         $message->setRedelivered((bool)$dbalMessage['redelivered']);
 
@@ -269,10 +216,9 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @return Statement
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
-    private function getSelectStatement()
+    private function getSelectStatement(): Statement
     {
         if (!$this->selectStatement) {
             $this->selectStatement = $this->dbal->prepare(
@@ -287,10 +233,9 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @return Statement
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
-    private function getUpdateStatement()
+    private function getUpdateStatement(): Statement
     {
         if (!$this->updateStatement) {
             $databasePlatform = $this->dbal->getDatabasePlatform();
@@ -319,10 +264,9 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @return Statement
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
-    private function getDeleteStatement()
+    private function getDeleteStatement(): Statement
     {
         if (!$this->deleteStatement) {
             $databasePlatform = $this->dbal->getDatabasePlatform();
@@ -343,11 +287,9 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * @param DbalMessage|MessageInterface $message
-     * @return int
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
-    private function deleteMessage(MessageInterface $message)
+    private function deleteMessage(DbalMessageInterface $message): int
     {
         $deleteStatement = $this->getDeleteStatement();
         $deleteStatement->execute(['messageId' => $message->getId()]);
@@ -356,25 +298,80 @@ class DbalMessageConsumer implements MessageConsumerInterface
     }
 
     /**
-     * Try to delete message from queue
-     * retry once with delay of 1 second if DB query failed
-     *
-     * @param DbalMessage|MessageInterface $message
-     * @throws \Doctrine\DBAL\DBALException|\LogicException
+     * @throws \Doctrine\DBAL\Exception
      */
-    private function deleteMessageWithRetry(MessageInterface $message)
+    private function requeueMessage(DbalMessageInterface $message): int
     {
-        try {
-            $affectedRows = $this->deleteMessage($message);
-        } catch (DriverException $e) {
-            sleep(1);
-            $affectedRows = $this->deleteMessage($message);
-        }
+        return $this->dbal->update(
+            $this->connection->getTableName(),
+            ['consumer_id' => null, 'redelivered' => true],
+            ['id' => $message->getId()],
+            [
+                'redelivered' => Types::BOOLEAN,
+                'id' => Types::INTEGER,
+            ]
+        );
+    }
+
+    /**
+     * Executes a closure with DBAL query.
+     * Makes 3 tries with 1 second interval if {@see DbalDriverException} occurs.
+     *
+     * @param \Closure $closure Closure that executes DBAL query and returns a number of affected rows.
+     *
+     * @return int Number of affected rows
+     *
+     * @throws \Doctrine\DBAL\Exception|DbalDriverException
+     */
+    private function executeWithRetry(\Closure $closure): int
+    {
+        $try = 0;
+        do {
+            try {
+                return $closure();
+            } catch (DbalDriverException $driverException) {
+                $try ++;
+                sleep(1);
+            }
+        } while ($try < 3);
+
+        throw $driverException;
+    }
+
+    /**
+     * Deletes a message from queue.
+     * Makes 3 tries with 1 second interval if {@see DbalDriverException} occurs.
+     *
+     * @throws \Doctrine\DBAL\Exception|DbalDriverException|RuntimeException
+     */
+    private function deleteMessageWithRetry(DbalMessageInterface $message): void
+    {
+        $affectedRows = $this->executeWithRetry(fn () => $this->deleteMessage($message));
 
         if (1 !== $affectedRows) {
-            throw new \LogicException(sprintf(
-                'Expected record was removed but it is not. id: "%s"',
-                $message->getId()
+            throw new RuntimeException(sprintf(
+                'Failed to delete a message with id "%s". Expected 1 affected row, got %d.',
+                $message->getId(),
+                $affectedRows
+            ));
+        }
+    }
+
+    /**
+     * Requeues a message in queue.
+     * Makes 3 tries with 1 second interval if {@see DbalDriverException} occurs.
+     *
+     * @throws \Doctrine\DBAL\Exception|DbalDriverException|RuntimeException
+     */
+    private function requeueMessageWithRetry(DbalMessageInterface $message): void
+    {
+        $affectedRows = $this->executeWithRetry(fn () => $this->requeueMessage($message));
+
+        if (1 !== $affectedRows) {
+            throw new RuntimeException(sprintf(
+                'Failed to requeue a message with id "%s". Expected 1 affected row, got %d.',
+                $message->getId(),
+                $affectedRows
             ));
         }
     }

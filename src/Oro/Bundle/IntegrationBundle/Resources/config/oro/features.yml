@@ -1,0 +1,26 @@
+features:
+    manage_integrations:
+        label: oro.integration.feature.manage.label
+        description: oro.integration.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_integration_index
+            - oro_integration_create
+            - oro_integration_update
+            - oro_integration_schedule
+        commands:
+            - oro:cron:integration:cleanup
+            - oro:cron:integration:sync
+        entities:
+            - Oro\Bundle\IntegrationBundle\Entity\Channel
+        api_resources:
+            - Oro\Bundle\IntegrationBundle\Entity\Channel
+        operations:
+            - oro_integration_activate
+            - oro_integration_deactivate
+            - oro_integration_delete
+        navigation_items:
+            - application_menu.system_tab.integrations_submenu.integrations_list
+        placeholder_items:
+            - force_sync_button
+            - sync_button

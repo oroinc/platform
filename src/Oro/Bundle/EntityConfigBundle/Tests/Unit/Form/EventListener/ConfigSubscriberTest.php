@@ -10,30 +10,33 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Form\Button;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationHelper;
+    private ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject $translationHelper;
 
-    /** @var ConfigSubscriber */
-    protected $subscriber;
+    private ConfigSubscriber $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translationHelper = $this->createMock(ConfigTranslationHelper::class);
 
         $this->subscriber = new ConfigSubscriber(
@@ -43,12 +46,12 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             [
-                FormEvents::POST_SUBMIT  => ['postSubmit', -10],
-                FormEvents::PRE_SET_DATA => 'preSetData'
+                FormEvents::POST_SUBMIT => ['postSubmit', -10],
+                FormEvents::PRE_SET_DATA => 'preSetData',
             ],
             ConfigSubscriber::getSubscribedEvents()
         );
@@ -56,42 +59,38 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider preSetDataProvider
-     * @param array $data
-     * @param ConfigModel $model
-     * @param array $trans
-     * @param array $expectedData
      */
-    public function testPreSetData(array $data, ConfigModel $model, array $trans, array $expectedData = null)
+    public function testPreSetData(array $data, ConfigModel $model, array $trans, array $expectedData = null): void
     {
         $provider1 = $this->getConfigProvider(
             'entity',
             [
                 'entity' => [
                     'items' => [
-                        'icon'  => [],
-                        'label' => ['options' => ['translatable' => true]]
-                    ]
+                        'icon' => [],
+                        'label' => ['options' => ['translatable' => true]],
+                    ],
                 ],
-                'field'  => [
+                'field' => [
                     'items' => [
-                        'attr'  => [],
-                        'label' => ['options' => ['translatable' => true]]
-                    ]
-                ]
+                        'attr' => [],
+                        'label' => ['options' => ['translatable' => true]],
+                    ],
+                ],
             ],
             isset($data['entity'])
         );
-        $provider1->expects($this->once())
+        $provider1->expects(self::once())
             ->method('getConfigById')
-            ->will($this->returnValue(new Config(new EntityConfigId('extend'))));
+            ->willReturn(new Config(new EntityConfigId('extend')));
         $provider2 = $this->getConfigProvider(
             'test',
             [
                 'entity' => [
                     'items' => [
-                        'attr1' => []
-                    ]
-                ]
+                        'attr1' => [],
+                    ],
+                ],
             ],
             isset($data['test'])
         );
@@ -99,44 +98,27 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $providers->add($provider1);
         $providers->add($provider2);
 
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getConfigIdByModel')
-            ->will(
-                $this->returnCallback(
-                    function ($configModel, $scope) {
-                        return new EntityConfigId($scope, 'Entity\Test');
-                    }
-                )
-            );
-        $this->configManager->expects($this->once())
+            ->willReturnCallback(function ($configModel, $scope) {
+                return new EntityConfigId($scope, 'Entity\Test');
+            });
+        $this->configManager->expects(self::once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($provider1));
-        $this->translator->expects($this->any())
-            ->method('hasTrans')
-            ->will(
-                $this->returnCallback(
-                    function ($id) use (&$trans) {
-                        return isset($trans[$id]);
-                    }
-                )
-            );
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($id) use (&$trans) {
-                        return $trans[$id];
-                    }
-                )
-            );
+            ->willReturn($provider1);
+        $this->translationHelper->expects(self::any())
+            ->method('translateWithFallback')
+            ->willReturnCallback(function ($id, $fallback) use (&$trans) {
+                return $trans[$id] ?? $fallback;
+            });
+
+        $this->configManager->expects(self::once())
+            ->method('getProviders')
+            ->willReturn($providers);
 
         $event = $this->getFormEvent($data, $model);
-        $this->configManager->expects($this->once())
-            ->method('getProviders')
-            ->will($this->returnValue($providers));
-
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('setData')
             ->with($expectedData ?: $data);
 
@@ -144,179 +126,56 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider postSubmitProvider
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @param array $data
-     * @param bool $isValid
-     * @param ConfigModel $model
-     * @param array $trans
-     * @param array|null $expectedConfigData
-     * @param array $expectedTrans
-     */
-    public function testPostSubmit(
-        array $data,
-        $isValid,
-        ConfigModel $model,
-        array $trans,
-        $expectedConfigData,
-        array $expectedTrans
-    ) {
-        $extendProvider = $this->getConfigProvider('extend', [], false);
-        $config = new Config(new EntityConfigId('extend'));
-        $extendProvider->expects($this->once())
-            ->method('getConfigById')
-            ->will($this->returnValue($config));
-
-        $provider1 = $this->getConfigProvider(
-            'entity',
-            [
-                'entity' => [
-                    'items' => [
-                        'icon'  => [],
-                        'label' => ['options' => ['translatable' => true]]
-                    ]
-                ]
-            ],
-            isset($data['entity'])
-        );
-        $config1   = new Config(new EntityConfigId('entity', 'Entity\Test'));
-        $config1->set('label', 'label_key');
-        if (isset($data['entity'])) {
-            $provider1->expects($this->once())
-                ->method('getConfigById')
-                ->with($config1->getId())
-                ->will($this->returnValue($config1));
-        } else {
-            $provider1->expects($this->never())
-                ->method('getConfigById');
-        }
-        $providers = new ArrayCollection();
-        $providers->add($provider1);
-
-        $this->configManager->expects($this->any())
-            ->method('getConfigIdByModel')
-            ->will(
-                $this->returnCallback(
-                    function ($configModel, $scope) {
-                        return new EntityConfigId($scope, 'Entity\Test');
-                    }
-                )
-            );
-        $this->configManager->expects($this->once())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($extendProvider));
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($id) use (&$trans) {
-                        if (isset($trans[$id])) {
-                            return $trans[$id];
-                        } else {
-                            return $id;
-                        }
-                    }
-                )
-            );
-
-        $form  = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $event = $this->getFormEvent($data, $model, $form);
-        $this->configManager->expects($this->once())
-            ->method('getProviders')
-            ->will($this->returnValue($providers));
-
-        if (null === $expectedConfigData) {
-            $this->configManager->expects($this->never())
-                ->method('persist');
-        } else {
-            $expectedConfig = new Config(new EntityConfigId('entity', 'Entity\Test'));
-            foreach ($expectedConfigData as $code => $val) {
-                $expectedConfig->set($code, $val);
-            }
-            $this->configManager->expects($this->exactly(1))
-                ->method('persist')
-                ->withConsecutive(
-                    [$expectedConfig]
-                );
-        }
-
-        $form->expects($this->once())
-            ->method('isValid')
-            ->will($this->returnValue($isValid));
-
-        if ($isValid) {
-            $this->translationHelper->expects($this->once())
-                ->method('saveTranslations')
-                ->with($expectedTrans);
-            $this->configManager->expects($this->once())
-                ->method('flush');
-        } else {
-            $this->translationHelper->expects($this->never())
-                ->method('saveTranslations');
-            $this->configManager->expects($this->never())
-                ->method('flush');
-        }
-
-        $this->configManager->expects($this->any())->method('calculateConfigChangeSet')->with($config1);
-        $this->configManager->expects($this->any())->method('getConfigChangeSet')->with($config1)->willReturn([
-            'state' => ['Active', 'Requires update']
-        ]);
-
-        $this->subscriber->postSubmit($event);
-    }
-
-    /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function preSetDataProvider()
+    public function preSetDataProvider(): array
     {
         $existingFieldConfigModel = new FieldConfigModel('testField', 'string');
         ReflectionUtil::setId($existingFieldConfigModel, 1);
 
         return [
-            'empty data (entity)'                                => [
+            'empty data (entity)' => [
                 [],
                 new EntityConfigModel('Entity\Test'),
                 [],
-                null
+                null,
             ],
-            'empty data (field)'                                 => [
+            'empty data (field)' => [
                 [],
                 new FieldConfigModel('testField', 'string'),
                 [],
-                null
+                null,
             ],
-            'new model without trans (entity)'                   => [
+            'new model without trans (entity)' => [
                 [
                     'entity' => [
                         'label' => 'testLabel',
-                        'icon'  => 'testIcon'
+                        'icon' => 'testIcon',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
                 new EntityConfigModel('Entity\Test'),
                 [],
                 [
                     'entity' => [
                         'label' => '',
-                        'icon'  => 'testIcon'
+                        'icon' => 'testIcon',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
             ],
-            'new model without trans (field)'                    => [
+            'new model without trans (field)' => [
                 [
                     'entity' => [
-                        'label' => 'testLabel'
+                        'label' => 'testLabel',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
                 new FieldConfigModel('testField', 'string'),
                 [],
@@ -324,19 +183,19 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
                     'entity' => [
                         'label' => 'testField',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
             ],
-            'existing model without trans (field)'               => [
+            'existing model without trans (field)' => [
                 [
                     'entity' => [
-                        'label' => 'testLabel'
+                        'label' => 'testLabel',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
                 $existingFieldConfigModel,
                 [],
@@ -344,95 +203,95 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
                     'entity' => [
                         'label' => '',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
             ],
             'new model without translatable attributes (entity)' => [
                 [
                     'entity' => [
-                        'icon' => 'testIcon'
+                        'icon' => 'testIcon',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
                 new EntityConfigModel('Entity\Test'),
                 [],
-                null
+                null,
             ],
-            'new model with trans (entity)'                      => [
+            'new model with trans (entity)' => [
                 [
                     'entity' => [
                         'label' => 'testLabel',
-                        'icon'  => 'testIcon'
+                        'icon' => 'testIcon',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
                 new EntityConfigModel('Entity\Test'),
                 [
-                    'testLabel' => 'translated label'
+                    'testLabel' => 'translated label',
                 ],
                 [
                     'entity' => [
                         'label' => 'translated label',
-                        'icon'  => 'testIcon'
+                        'icon' => 'testIcon',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
-                ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
+                ],
             ],
-            'new model with trans (field)'                       => [
+            'new model with trans (field)' => [
                 [
                     'entity' => [
                         'label' => 'testLabel',
-                        'icon'  => 'testIcon'
+                        'icon' => 'testIcon',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
                 new FieldConfigModel('testField', 'string'),
                 [
-                    'testLabel' => 'translated label'
+                    'testLabel' => 'translated label',
                 ],
                 [
                     'entity' => [
                         'label' => 'translated label',
-                        'icon'  => 'testIcon'
+                        'icon' => 'testIcon',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
-                ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
+                ],
             ],
-            'existing model with trans (field)'                  => [
+            'existing model with trans (field)' => [
                 [
                     'entity' => [
                         'label' => 'testLabel',
-                        'icon'  => 'testIcon'
+                        'icon' => 'testIcon',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
                 ],
                 $existingFieldConfigModel,
                 [
-                    'testLabel' => 'translated label'
+                    'testLabel' => 'translated label',
                 ],
                 [
                     'entity' => [
                         'label' => 'translated label',
-                        'icon'  => 'testIcon'
+                        'icon' => 'testIcon',
                     ],
-                    'test'   => [
-                        'attr1' => 'testAttr'
-                    ]
-                ]
+                    'test' => [
+                        'attr1' => 'testAttr',
+                    ],
+                ],
             ],
         ];
     }
@@ -440,208 +299,542 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function postSubmitProvider()
+    public function testPostSubmitWhenInvalid(): void
+    {
+        $data = [
+            'entity' => [
+                'label' => 'translated label',
+                'icon' => 'testIcon',
+            ],
+        ];
+        $model = new EntityConfigModel('Entity\Test');
+        $trans = [];
+        $expectedConfigData = [
+            'label' => 'label_key',
+            'icon' => 'testIcon',
+        ];
+
+        $extendProvider = $this->getConfigProvider('extend', [], false);
+        $config = new Config(new EntityConfigId('extend'));
+        $extendProvider->expects(self::once())
+            ->method('getConfigById')
+            ->willReturn($config);
+
+        $provider1 = $this->getConfigProvider(
+            'entity',
+            [
+                'entity' => [
+                    'items' => [
+                        'icon' => [],
+                        'label' => ['options' => ['translatable' => true]],
+                    ],
+                ],
+            ],
+            true
+        );
+        $config1 = new Config(new EntityConfigId('entity', 'Entity\Test'));
+        $config1->set('label', 'label_key');
+        $provider1->expects(self::once())
+            ->method('getConfigById')
+            ->with($config1->getId())
+            ->willReturn($config1);
+        $providers = new ArrayCollection();
+        $providers->add($provider1);
+
+        $this->configManager->expects(self::any())
+            ->method('getConfigIdByModel')
+            ->willReturnCallback(function ($configModel, $scope) {
+                return new EntityConfigId($scope, 'Entity\Test');
+            });
+        $this->configManager->expects(self::once())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($extendProvider);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($id) use (&$trans) {
+                return $trans[$id] ?? $id;
+            });
+
+        $form = $this->createMock(FormInterface::class);
+
+        $this->configManager->expects(self::once())
+            ->method('getProviders')
+            ->willReturn($providers);
+
+        $expectedConfig = new Config(new EntityConfigId('entity', 'Entity\Test'));
+        foreach ($expectedConfigData as $code => $val) {
+            $expectedConfig->set($code, $val);
+        }
+        $this->configManager->expects(self::once())
+            ->method('persist')
+            ->with($expectedConfig);
+
+        $form->expects(self::once())
+            ->method('isValid')
+            ->willReturn(false);
+
+        $this->translationHelper->expects(self::never())
+            ->method('saveTranslations');
+        $this->configManager->expects(self::never())
+            ->method('flush');
+
+        $this->configManager->expects(self::any())
+            ->method('calculateConfigChangeSet')
+            ->with($config1);
+        $this->configManager->expects(self::any())
+            ->method('getConfigChangeSet')
+            ->with($config1)
+            ->willReturn(['state' => ['Active', 'Requires update']]);
+
+        $event = $this->getFormEvent($data, $model, $form);
+
+        $this->subscriber->postSubmit($event);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testPostSubmitWhenValidButPartial(): void
+    {
+        $data = [
+            'entity' => [
+                'label' => 'translated label',
+                'icon' => 'testIcon',
+            ],
+        ];
+        $model = new EntityConfigModel('Entity\Test');
+        $trans = [];
+        $expectedConfigData = [
+            'label' => 'label_key',
+            'icon' => 'testIcon',
+        ];
+
+        $extendProvider = $this->getConfigProvider('extend', [], false);
+        $config = new Config(new EntityConfigId('extend'));
+        $extendProvider->expects(self::once())
+            ->method('getConfigById')
+            ->willReturn($config);
+
+        $provider1 = $this->getConfigProvider(
+            'entity',
+            [
+                'entity' => [
+                    'items' => [
+                        'icon' => [],
+                        'label' => ['options' => ['translatable' => true]],
+                    ],
+                ],
+            ],
+            true
+        );
+        $config1 = new Config(new EntityConfigId('entity', 'Entity\Test'));
+        $config1->set('label', 'label_key');
+        $provider1->expects(self::once())
+            ->method('getConfigById')
+            ->with($config1->getId())
+            ->willReturn($config1);
+        $providers = new ArrayCollection();
+        $providers->add($provider1);
+
+        $this->configManager->expects(self::any())
+            ->method('getConfigIdByModel')
+            ->willReturnCallback(function ($configModel, $scope) {
+                return new EntityConfigId($scope, 'Entity\Test');
+            });
+        $this->configManager->expects(self::once())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($extendProvider);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($id) use (&$trans) {
+                return $trans[$id] ?? $id;
+            });
+
+        $form = $this->createMock(Form::class);
+
+        $this->configManager->expects(self::once())
+            ->method('getProviders')
+            ->willReturn($providers);
+
+        $expectedConfig = new Config(new EntityConfigId('entity', 'Entity\Test'));
+        foreach ($expectedConfigData as $code => $val) {
+            $expectedConfig->set($code, $val);
+        }
+        $this->configManager->expects(self::once())
+            ->method('persist')
+            ->with($expectedConfig);
+
+        $form->expects(self::once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $button = $this->createMock(Button::class);
+        $form->expects(self::once())
+            ->method('getClickedButton')
+            ->willReturn($button);
+        $button
+            ->expects(self::once())
+            ->method('getName')
+            ->willReturn(ConfigType::PARTIAL_SUBMIT);
+
+        $this->translationHelper->expects(self::never())
+            ->method('saveTranslations');
+        $this->configManager->expects(self::never())
+            ->method('flush');
+
+        $this->configManager->expects(self::any())
+            ->method('calculateConfigChangeSet')
+            ->with($config1);
+        $this->configManager->expects(self::any())
+            ->method('getConfigChangeSet')
+            ->with($config1)
+            ->willReturn(['state' => ['Active', 'Requires update']]);
+
+        $event = $this->getFormEvent($data, $model, $form);
+
+        $this->subscriber->postSubmit($event);
+    }
+
+    /**
+     * @dataProvider postSubmitWhenValidProvider
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testPostSubmitWhenValid(
+        array $data,
+        ConfigModel $model,
+        array $trans,
+        ?array $expectedConfigData,
+        array $expectedTrans
+    ): void {
+        $extendProvider = $this->getConfigProvider('extend', [], false);
+        $config = new Config(new EntityConfigId('extend'));
+        $extendProvider->expects(self::once())
+            ->method('getConfigById')
+            ->willReturn($config);
+
+        $provider1 = $this->getConfigProvider(
+            'entity',
+            [
+                'entity' => [
+                    'items' => [
+                        'icon' => [],
+                        'label' => ['options' => ['translatable' => true]],
+                    ],
+                ],
+            ],
+            true
+        );
+        $config1 = new Config(new EntityConfigId('entity', 'Entity\Test'));
+        $config1->set('label', 'label_key');
+        $provider1->expects(self::once())
+            ->method('getConfigById')
+            ->with($config1->getId())
+            ->willReturn($config1);
+        $providers = new ArrayCollection();
+        $providers->add($provider1);
+
+        $this->configManager->expects(self::any())
+            ->method('getConfigIdByModel')
+            ->willReturnCallback(function ($configModel, $scope) {
+                return new EntityConfigId($scope, 'Entity\Test');
+            });
+        $this->configManager->expects(self::once())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($extendProvider);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($id) use (&$trans) {
+                return $trans[$id] ?? $id;
+            });
+
+        $form = $this->createMock(FormInterface::class);
+
+        $this->configManager->expects(self::once())
+            ->method('getProviders')
+            ->willReturn($providers);
+
+        $expectedConfig = new Config(new EntityConfigId('entity', 'Entity\Test'));
+        foreach ($expectedConfigData as $code => $val) {
+            $expectedConfig->set($code, $val);
+        }
+        $this->configManager->expects(self::once())
+            ->method('persist')
+            ->with($expectedConfig);
+
+        $form->expects(self::once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->translationHelper->expects(self::once())
+            ->method('saveTranslations')
+            ->with($expectedTrans);
+        $this->configManager->expects(self::once())
+            ->method('flush');
+
+        $this->configManager->expects(self::any())
+            ->method('calculateConfigChangeSet')
+            ->with($config1);
+        $this->configManager->expects(self::any())
+            ->method('getConfigChangeSet')
+            ->with($config1)
+            ->willReturn(['state' => ['Active', 'Requires update']]);
+
+        $event = $this->getFormEvent($data, $model, $form);
+
+        $this->subscriber->postSubmit($event);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function postSubmitWhenValidProvider(): array
     {
         $existingConfigModel = new EntityConfigModel('Entity\Test');
         ReflectionUtil::setId($existingConfigModel, 1);
 
         return [
-            'empty data'                                         => [
-                [],
-                false,
-                new EntityConfigModel('Entity\Test'),
-                [],
-                null,
-                []
-            ],
-            'new model without trans (isValid=false)'            => [
+            'new model without trans (isValid=true)' => [
                 [
                     'entity' => [
                         'label' => 'translated label',
-                        'icon'  => 'testIcon'
-                    ]
+                        'icon' => 'testIcon',
+                    ],
                 ],
-                false,
                 new EntityConfigModel('Entity\Test'),
                 [],
                 [
                     'label' => 'label_key',
-                    'icon'  => 'testIcon'
-                ],
-                []
-            ],
-            'new model without trans (isValid=true)'             => [
-                [
-                    'entity' => [
-                        'label' => 'translated label',
-                        'icon'  => 'testIcon'
-                    ]
-                ],
-                true,
-                new EntityConfigModel('Entity\Test'),
-                [],
-                [
-                    'label' => 'label_key',
-                    'icon'  => 'testIcon'
+                    'icon' => 'testIcon',
                 ],
                 [
                     'label_key' => 'translated label',
-                ]
+                ],
             ],
-            'existing model without trans (isValid=true)'        => [
+            'existing model without trans (isValid=true)' => [
                 [
                     'entity' => [
                         'label' => 'translated label',
-                        'icon'  => 'testIcon'
-                    ]
+                        'icon' => 'testIcon',
+                    ],
                 ],
-                true,
                 $existingConfigModel,
                 [],
                 [
                     'label' => 'label_key',
-                    'icon'  => 'testIcon'
+                    'icon' => 'testIcon',
                 ],
                 [
                     'label_key' => 'translated label',
-                ]
+                ],
             ],
-            'new model with trans (isValid=true)'                => [
+            'new model with trans (isValid=true)' => [
                 [
                     'entity' => [
                         'label' => 'translated label',
-                        'icon'  => 'testIcon'
-                    ]
+                        'icon' => 'testIcon',
+                    ],
                 ],
-                true,
                 new EntityConfigModel('Entity\Test'),
                 [
-                    'label_key' => 'translated label'
+                    'label_key' => 'translated label',
                 ],
                 [
                     'label' => 'label_key',
-                    'icon'  => 'testIcon'
+                    'icon' => 'testIcon',
                 ],
                 [
                     'label_key' => 'translated label',
-                ]
+                ],
             ],
-            'existing model with trans (isValid=true)'           => [
+            'existing model with trans (isValid=true)' => [
                 [
                     'entity' => [
                         'label' => 'translated label',
-                        'icon'  => 'testIcon'
-                    ]
+                        'icon' => 'testIcon',
+                    ],
                 ],
-                true,
                 $existingConfigModel,
                 [
-                    'label_key' => 'translated label'
+                    'label_key' => 'translated label',
                 ],
                 [
                     'label' => 'label_key',
-                    'icon'  => 'testIcon'
+                    'icon' => 'testIcon',
                 ],
-                []
+                [],
             ],
             'existing model with different trans (isValid=true)' => [
                 [
                     'entity' => [
                         'label' => 'translated label',
-                        'icon'  => 'testIcon'
-                    ]
+                        'icon' => 'testIcon',
+                    ],
                 ],
-                true,
                 $existingConfigModel,
                 [
-                    'label_key' => 'translated label 1'
+                    'label_key' => 'translated label 1',
                 ],
                 [
                     'label' => 'label_key',
-                    'icon'  => 'testIcon',
+                    'icon' => 'testIcon',
                 ],
                 [
                     'label_key' => 'translated label',
-                ]
+                ],
             ],
             'existing model updated field' => [
                 [
                     'entity' => [
                         'label' => 'translated label',
-                        'icon'  => 'testIcon',
+                        'icon' => 'testIcon',
                         'state' => 'Active',
-                    ]
+                    ],
                 ],
-                true,
                 $existingConfigModel,
                 [
-                    'label_key' => 'translated label'
+                    'label_key' => 'translated label',
                 ],
                 [
                     'label' => 'label_key',
-                    'icon'  => 'testIcon',
-                    'state' => 'Requires update',
+                    'icon' => 'testIcon',
+                    'state' => 'Active',
                 ],
-                []
+                [],
             ],
         ];
     }
 
-    /**
-     * @param array                                    $data
-     * @param ConfigModel                              $model
-     * @param \PHPUnit\Framework\MockObject\MockObject $form
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFormEvent($data, $model, $form = null)
+    public function testPostSubmitWhenEmptyData(): void
     {
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $formConfig->expects($this->once())
+        $data = [];
+        $model = new EntityConfigModel('Entity\Test');
+        $trans = [];
+
+        $extendProvider = $this->getConfigProvider('extend', [], false);
+        $config = new Config(new EntityConfigId('extend'));
+        $extendProvider->expects(self::once())
+            ->method('getConfigById')
+            ->willReturn($config);
+
+        $provider1 = $this->getConfigProvider(
+            'entity',
+            [
+                'entity' => [
+                    'items' => [
+                        'icon' => [],
+                        'label' => ['options' => ['translatable' => true]],
+                    ],
+                ],
+            ],
+            false
+        );
+        $config1 = new Config(new EntityConfigId('entity', 'Entity\Test'));
+        $config1->set('label', 'label_key');
+        $provider1->expects(self::never())
+            ->method('getConfigById');
+
+        $providers = new ArrayCollection();
+        $providers->add($provider1);
+
+        $this->configManager->expects(self::any())
+            ->method('getConfigIdByModel')
+            ->willReturnCallback(function ($configModel, $scope) {
+                return new EntityConfigId($scope, 'Entity\Test');
+            });
+        $this->configManager->expects(self::once())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($extendProvider);
+        $this->translator->expects(self::any())
+            ->method('trans')
+            ->willReturnCallback(function ($id) use (&$trans) {
+                return $trans[$id] ?? $id;
+            });
+
+        $form = $this->createMock(FormInterface::class);
+
+        $this->configManager->expects(self::once())
+            ->method('getProviders')
+            ->willReturn($providers);
+
+        $this->configManager->expects(self::never())
+            ->method('persist');
+
+        $form->expects(self::once())
+            ->method('isValid')
+            ->willReturn(false);
+
+        $this->translationHelper->expects(self::never())
+            ->method('saveTranslations');
+        $this->configManager->expects(self::never())
+            ->method('flush');
+
+        $this->configManager->expects(self::any())
+            ->method('calculateConfigChangeSet')
+            ->with($config1);
+        $this->configManager->expects(self::any())
+            ->method('getConfigChangeSet')
+            ->with($config1)
+            ->willReturn(['state' => ['Active', 'Requires update']]);
+
+        $event = $this->getFormEvent($data, $model, $form);
+
+        $this->subscriber->postSubmit($event);
+    }
+
+    private function getFormEvent(
+        array $data,
+        ConfigModel $model,
+        FormInterface|Form $form = null
+    ): \PHPUnit\Framework\MockObject\MockObject|FormEvent {
+        $fieldName = '';
+        if ($model instanceof FieldConfigModel && !$model->getId()) {
+            $fieldName = $model->getFieldName();
+        }
+
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formConfig->expects(self::any())
             ->method('getOption')
-            ->with('config_model')
-            ->will($this->returnValue($model));
+            ->withConsecutive(['config_model'], ['field_name'])
+            ->willReturnOnConsecutiveCalls($model, $fieldName);
 
         if (null === $form) {
-            $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+            $form = $this->createMock(FormInterface::class);
         }
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->willReturn($formConfig);
 
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $event->expects($this->once())
+        $event = $this->createMock(FormEvent::class);
+        $event->expects(self::once())
             ->method('getForm')
-            ->will($this->returnValue($form));
-        $event->expects($this->once())
+            ->willReturn($form);
+        $event->expects(self::once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->willReturn($data);
 
         return $event;
     }
 
-    /**
-     * @param string $scope
-     * @param array  $configs
-     * @param bool   $isGetPropertyConfigExpected
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProvider($scope, $configs, $isGetPropertyConfigExpected)
-    {
-        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $provider->expects($this->any())
+    private function getConfigProvider(
+        string $scope,
+        array $configs,
+        bool $isGetPropertyConfigExpected
+    ): \PHPUnit\Framework\MockObject\MockObject|ConfigProvider {
+        $provider = $this->createMock(ConfigProvider::class);
+        $provider->expects(self::any())
             ->method('getScope')
-            ->will($this->returnValue($scope));
+            ->willReturn($scope);
         if ($isGetPropertyConfigExpected) {
             $propertyConfig = new PropertyConfigContainer($configs);
-            $provider->expects($this->once())
+            $provider->expects(self::once())
                 ->method('getPropertyConfig')
-                ->will($this->returnValue($propertyConfig));
+                ->willReturn($propertyConfig);
         } else {
-            $provider->expects($this->never())
+            $provider->expects(self::never())
                 ->method('getPropertyConfig');
         }
 

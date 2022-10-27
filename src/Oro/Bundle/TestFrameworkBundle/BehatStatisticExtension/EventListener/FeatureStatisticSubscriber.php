@@ -5,16 +5,16 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\EventListener;
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Testwork\Counter\Timer;
+use Behat\Testwork\Event\Event;
 use Behat\Testwork\EventDispatcher\Event\AfterExerciseCompleted;
 use Behat\Testwork\Output\Formatter;
 use Behat\Testwork\Output\Node\EventListener\EventListener;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\CriteriaArrayCollection;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\BatchRepositoryInterface;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatisticManager;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * Collects statistic information and stores it to DB.
+ */
 final class FeatureStatisticSubscriber implements EventListener
 {
     /**
@@ -23,29 +23,9 @@ final class FeatureStatisticSubscriber implements EventListener
     private $timer;
 
     /**
-     * @var BatchRepositoryInterface
+     * @var FeatureStatisticManager
      */
-    private $featureRepository;
-
-    /**
-     * @var FeaturePathLocator
-     */
-    private $featurePathLocator;
-
-    /**
-     * @var string
-     */
-    private $buildId;
-
-    /**
-     * @var string
-     */
-    private $gitBranch;
-
-    /**
-     * @var string
-     */
-    private $gitTarget;
+    private $statisticManager;
 
     /**
      * @var bool
@@ -57,22 +37,9 @@ final class FeatureStatisticSubscriber implements EventListener
      */
     private $output;
 
-    /**
-     * FeatureStatisticSubscriber constructor.
-     * @param BatchRepositoryInterface $featureRepository
-     * @param FeaturePathLocator $featurePathLocator
-     * @param CriteriaArrayCollection $criteria
-     */
-    public function __construct(
-        BatchRepositoryInterface $featureRepository,
-        FeaturePathLocator $featurePathLocator,
-        CriteriaArrayCollection $criteria
-    ) {
-        $this->featureRepository = $featureRepository;
-        $this->featurePathLocator = $featurePathLocator;
-        $this->buildId = $criteria->get('build_id');
-        $this->gitBranch = $criteria->get('branch_name') ?: $criteria->get('single_branch_name');
-        $this->gitTarget = $criteria->get('target_branch');
+    public function __construct(FeatureStatisticManager $statisticManager)
+    {
+        $this->statisticManager = $statisticManager;
     }
 
     /**
@@ -90,6 +57,7 @@ final class FeatureStatisticSubscriber implements EventListener
 
         if ($event instanceof AfterFeatureTested) {
             $this->captureStats($event);
+            $this->saveStats();
         }
 
         if ($event instanceof AfterExerciseCompleted) {
@@ -108,7 +76,6 @@ final class FeatureStatisticSubscriber implements EventListener
 
     /**
      * Finish tracking and save stats
-     * @param AfterFeatureTested $event
      */
     public function captureStats(AfterFeatureTested $event)
     {
@@ -118,22 +85,15 @@ final class FeatureStatisticSubscriber implements EventListener
 
         $this->timer->stop();
 
-        $stat = new FeatureStatistic();
-        $stat
-            ->setPath($this->featurePathLocator->getRelativePath($event->getFeature()->getFile()))
-            ->setTime(round($this->timer->getTime()))
-            ->setGitBranch($this->gitBranch)
-            ->setGitTarget($this->gitTarget)
-            ->setBuildId($this->buildId)
-        ;
-
-        $this->featureRepository->add($stat);
+        $this->statisticManager->addStatistic($event->getFeature(), round($this->timer->getTime()));
     }
 
     public function saveStats()
     {
         try {
-            $this->featureRepository->flush();
+            $this->statisticManager->saveStatistics();
+
+            $this->output->writeln('<info>Statistics was recorded successfully.</info>');
         } catch (\Exception $e) {
             // We should pass the tests even if we are unavailable record the statistics
             if ($this->output) {
@@ -146,17 +106,11 @@ final class FeatureStatisticSubscriber implements EventListener
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
     }
 
-    /**
-     * @param bool $skip
-     */
     public function setSkip(bool $skip)
     {
         $this->skip = $skip;

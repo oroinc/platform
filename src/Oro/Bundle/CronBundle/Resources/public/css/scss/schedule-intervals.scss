@@ -2,14 +2,18 @@
 
 .schedule-intervals {
     .schedule-interval__row {
-        input[type="text"] {
+        .fields-row {
+            display: flex;
+        }
+
+        input[type='text'] {
             width: 40%;
         }
     }
 
     .schedule-interval__row.has-row-error {
-        input[type="text"] {
-            border-color: #f00;
+        input[type='text'] {
+            border-color: $danger;
         }
     }
 

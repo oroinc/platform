@@ -9,19 +9,20 @@ use Oro\Component\Layout\RawLayoutBuilder;
 class LayoutItemTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RawLayoutBuilder */
-    protected $rawLayoutBuilder;
+    private $rawLayoutBuilder;
 
     /** @var LayoutContext */
-    protected $context;
+    private $context;
 
     /** @var LayoutItem */
-    protected $item;
+    private $item;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->rawLayoutBuilder = new RawLayoutBuilder();
-        $this->context          = new LayoutContext();
-        $this->item             = new LayoutItem(
+        $this->context = new LayoutContext();
+
+        $this->item = new LayoutItem(
             $this->rawLayoutBuilder,
             $this->context
         );

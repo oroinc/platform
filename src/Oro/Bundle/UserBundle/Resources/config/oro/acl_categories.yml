@@ -1,0 +1,16 @@
+acl_categories:
+    account_management:
+        label: oro.user.privilege.category.account_management.label
+        tab: true
+    address:
+        label: oro.user.privilege.category.address.label
+        priority: 10
+    application:
+        label: oro.user.privilege.category.application.label
+        priority: 20
+    calendar:
+        label: oro.user.privilege.category.calendar.label
+        priority: 30
+    entity:
+        label: oro.user.privilege.category.entity.label
+        priority: 40

@@ -1,50 +1,90 @@
 /* @theme: admin.oro; */
 
-@import "../mixins/direction";
-@import "../colors";
-
-// Global variables
-$content-padding: 24px;
-$content-padding-medium: 16px;
-$content-padding-small: $content-padding-medium / 2;
-$horizontal-padding: $content-padding;
-$vertical-padding: $content-padding;
-$top-padding: $content-padding;
-$bottom-padding: $content-padding;
-$margin-bottom-box: $content-padding;
-
 // Your variable overrides
 $border-radius: 4px;
 $btn-border-radius: 16px;
 $btn-border-width: 0;
-$font-family-sans-serif: Helvetica, Arial, sans-serif;
+$btn-square-border-radius: 2px;
+$btn-square-border-width: 2px;
+$font-family-sans-serif: arial, helvetica, sans-serif;
 $font-size-base: 14px;
 $line-height-base: 1.57;
 $link-hover-decoration: none;
-$btn-font-weight: bold;
-$btn-font-size: 12px;
-$btn-text-transform: uppercase;
+$btn-font-weight: null;
+$btn-font-size: $base-font-size;
+$btn-text-transform: null;
+
+$btn-link-font-weight: null;
+$btn-link-text-transform: null;
+
+$btn-padding-y-sm: 0;
+$btn-padding-x-sm: 12px;
+$btn-in-group-padding-x-sm: 8px;
+$btn-font-size-sm: $base-font-size--s;
+$btn-icon-font-size-sm: $base-font-size;
+$btn-line-height-sm: 24px;
+$btn-icon-line-height-sm: $btn-line-height-sm - 1px;
+$btn-border-radius-sm: 16px;
+
+$btn-mobile-font-size: $base-font-size--m;
+$btn-mobile-border-radius: 20px;
+$btn-square-mobile-border-radius: 2px;
+$btn-icon-mobile-fa-icon-font-size: 18px;
+
+$content-title-font-size: 20px;
+$content-title-font-weight: font-weight('bold');
+$content-title-line-height: 1.2;
+$content-title-inner-offset-bottom: 6px;
+
+$label-margin-bottom: 0;
 
 // Buttons + Forms
-//
 // Shared variables that are reassigned to `$input-` and `$btn-` specific variables.
 $border-width: 2px;
 
+$input-color: $primary-200;
+$input-border-width: 2px;
+$input-border-color: $primary-750;
+
 $input-btn-padding-y: 0;
 $input-btn-padding-x: 16px;
+$input-btn-padding-y-sm: $content-padding-small;
+$input-btn-padding-y-lg: $content-padding;
 $input-box-shadow: none;
 $input-focus-box-shadow: none;
 $input-focus-border-color: $secondary;
 
-$btn-padding-y-mini: 0;
-$btn-padding-x-mini: 16px;
+$input-btn-mobile-padding-y: 0;
+$input-btn-mobile-padding-x: 16px;
+
+// set original bootstrap value because chain value in 'px'
+$custom-select-padding-x: .375rem;
+// default 1rem it is equal to default font size 16px;
+$custom-control-indicator-size: 16px;
+// default .5rem it is equal to half of default font size 16px;
+$custom-control-gutter: 8px;
+
 $btn-line-height: 32px;
-$btn-line-height-mini: 20px;
-$btn-border-radius-mini: $btn-border-radius;
+$btn-square-line-height: 28px;
 
-$btn-group-divider-width: 1px;
-$btn-group-divider-color: rgba($primary-inverse, .4);
+$btn-mobile-line-height: 40px;
+$btn-square-mobile-line-height: 36px;
+$btn-mobile-padding-y: $input-btn-mobile-padding-y;
+$btn-mobile-padding-x: $input-btn-mobile-padding-x;
 
+// Navbar
+$nav-tabs-link-hover-border-color: $primary-750;
+$nav-divider-margin-y: 4px;
+$nav-link-padding-y: 8px;
+$nav-link-padding-x: 16px;
+
+// Alert
+$alert-border-radius: 2px;
+$alert-border-width: 1px;
+$alert-padding-y: $content-padding-small * .5;
+$alert-padding-x: $content-padding-small;
+
+// Pagination
 $pagination-padding-x: 12px;
 $pagination-padding-y: 5.5px;
 $pagination-mini-padding-x: 4px;
@@ -57,10 +97,11 @@ $breadcrumb-bg: transparent;
 $breadcrumb-font-size: 13px;
 $breadcrumb-padding-y: $content-padding-small;
 $breadcrumb-padding-x: $content-padding;
-$breadcrumb-color: $primary-550;
-$breadcrumb-divider-color: $primary-550;
-$breadcrumb-active-color: $primary-550;
+$breadcrumb-color: $primary-300;
+$breadcrumb-divider-color: $primary-300;
+$breadcrumb-active-color: $primary-300;
 $breadcrumb-margin-bottom: 0;
+$breadcrumb-item-padding: .2em !default;
 
 $pagination-bg: transparent;
 $pagination-hover-bg: transparent;
@@ -79,53 +120,84 @@ $caret-width: 4px;
 
 $dropdown-border-width: 0;
 
+$dropdown-spacer: 0;
+$dropdown-min-width: 112px;
+$dropdown-padding-y: 8px;
 $dropdown-item-padding-x: 16px;
-$dropdown-item-padding-y: 3px;
-$dropdown-item-icon-fa-offset: 0 6px 0 0;
-$dropdown-link-color: $primary-300;
+$dropdown-item-padding-y: 2px;
+$dropdown-item-line-height: 1.75;
+$dropdown-item-icon-fa-size: 18px;
+$dropdown-item-icon-fa-font-size: $base-font-size--m;
+$dropdown-item-icon-fa-offset: 4px;
+$dropdown-link-color: $primary-200;
 $dropdown-link-hover-color: $primary-300;
 $dropdown-link-hover-bg: $primary-900;
-
 $dropdown-link-active-color: $primary-300;
 $dropdown-link-active-bg: $primary-900;
 
+$dropdown-divider-bg: $primary-860 !default;
+
 $modal-backdrop-bg: $primary-inverse;
 $modal-backdrop-opacity: .9;
-$modal-header-bg: $primary-300;
-$modal-header-padding: 18px;
+$modal-content-border-radius: 4px;
+$modal-header-bg: $primary-200;
+$modal-header-padding: 16px 18px 14px 20px;
 $modal-header-color: $primary-inverse;
 $modal-header-close-padding: 0;
 $modal-header-close-margin: 0;
-$modal-header-close-color: $primary-830;
+$modal-header-close-color: $primary-inverse;
 $modal-header-close-text-shadow: none;
 $modal-header-close-opacity: 1;
 $modal-header-close-hover-opacity: 1;
+$modal-header-close-size: 18px;
+$modal-header-close-font-size: $base-font-size--l;
 $modal-title-font-size: 18px;
+$modal-title-font-weight: font-weight('bold');
 $modal-title-line-height: 1;
 $modal-inner-padding: 28px;
 $modal-content-border-width: 0;
-$modal-dialog-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
+$modal-dialog-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%);
 $modal-footer-bg: $primary-900;
-$modal-footer-padding: 14px 24px;
+$modal-footer-padding: 8px;
 
-$popover-z-index: 991;
+$modal-md: 560px;
+
+// Progress bars
+$progress-height: 22px;
+$progress-font-size: 22px;
+$progress-bg: $primary-860;
+$progress-border-radius: 0;
+$progress-box-shadow: null;
+$progress-bar-color: $additional-dark;
+$progress-bar-bg: $primary-600;
+
+$tooltip-arrow-width: 10px;
+$tooltip-arrow-height: 5px;
+
+// Alert
+$alert-padding-x: $content-padding;
+
+// Popover
+$popover-font-size: 14px;
+$popover-max-width: 250px;
+$popover-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%);
 $popover-border-width: 0px; /* stylelint-disable-line length-zero-no-unit */
-$popover-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
-$popover-body-bg: #fff;
-$popover-body-padding-y: 10px;
-$popover-body-padding-x: 12px;
-$popover-body-offset-right: 28px;
-$popover-body-offset-right-no-close: 12px;
-
-$popover-max-width: 310px;
 $popover-border-radius: 2px;
 $popover-border: none;
+
+$popover-body-padding-y: 10px;
+$popover-body-padding-x: 12px;
+$popover-body-bg: #fff;
+$popover-body-offset-right: 28px;
+
+$popover-body-offset-right-no-close: 12px;
 
 $popover-close-position: absolute;
 $popover-close-position-x: 7px;
 $popover-close-position-y: 7px;
 $popover-close-cursor: pointer;
 $popover-close-color: $primary-700;
+$popover-close-before-font-size: $base-font-size--m;
 
 $popover-arrow-color: #fff;
 $popover-arrow-size: 12px;
@@ -134,104 +206,97 @@ $popover-arrow-width: 12px;
 $popover-arrow-height: 10px;
 $popover-arrow-offset: 4px;
 
-$popover-arrow-top-shadow: 2px 3px 9px 0 rgba(0, 0, 0, .08);
-$popover-arrow-bottom-shadow: -2px -3px 9px 0 rgba(0, 0, 0, .08);
-$popover-arrow-left-shadow: 2px -3px 9px 0 rgba(0, 0, 0, .08);
-$popover-arrow-right-shadow: -2px 3px 9px 0 rgba(0, 0, 0, .08);
+$popover-arrow-top-shadow: 2px 3px 9px 0 rgba(0 0 0 / 8%);
+$popover-arrow-bottom-shadow: -2px -3px 9px 0 rgba(0 0 0 / 8%);
+$popover-arrow-left-shadow: 2px -3px 9px 0 rgba(0 0 0 / 8%);
+$popover-arrow-right-shadow: -2px 3px 9px 0 rgba(0 0 0 / 8%);
 
 $badge-font-size: 13px;
-$badge-font-weight: normal;
+$badge-font-weight: font-weight('light');
 $badge-padding-y: 4px;
 $badge-padding-x: 8px;
-$badge-pill-padding-x: 8px;
-$badge-icon-offset: 5px;
+$badge-pill-padding-x: 10px;
+$badge-icon-offset: 8px;
+$badge-icon-height: 12px !default;
+$badge-line-height: 16px !default;
+$badge-vertical-align: middle;
 
 // Oro Variables
-$general-border-color:                  #ddd;
-$width-page:                            960px;
-$width-body-page:                       980px;
-$width-popup:                           480px;
-$width-close-panel:                     25px;
-$width-left-panel:                      230px;
-$width-left-panel2:                     210;
-$width-input:                           280px;
-$body-color:                            $primary-200;
-$body-background:                       #3e434a;
-$well-background:                       $primary-900;
-$base-gradient-color-start:             #39464f;
-$base-gradient-color-end:               #333e48;
-$base-gradient-color-border:            #1e2833;
-$logo-background-color:                 #2d333b;
-$header-icon-button-text-color:         #2a313a;
-$header-text-color:                     #cad2da;
-$inline-action-color:                   #94b4c9;
-$inline-action-background:              #edf5fb;
-$cell-selected-background:              $inline-action-background;
-$row-selected-background:               $extra-300;
-$row-highlight-background:              darken($row-selected-background, 2%);
-$cell-success-background:               #f1f8dc;
-$cell-success-color:                    #96b76d;
-$cell-error-background:                 #fcd4d3;
-$cell-loading-background:               #f5f5f5;
+$general-border-color: #ddd;
+$width-page: 960px;
+$width-body-page: 980px;
+$width-popup: 480px;
+$width-close-panel: 25px;
+$width-left-panel: 230px;
+$width-left-panel2: 210;
+$width-input: 280px;
+$body-color: $primary-200;
+$body-background: #3e434a;
+$well-background: $primary-900;
+$base-gradient-color-start: #39464f;
+$base-gradient-color-end: #333e48;
+$base-gradient-color-border: #1e2833;
+$logo-background-color: #2d333b;
+$header-icon-button-text-color: #2a313a;
+$header-text-color: #cad2da;
+$inline-action-color: #94b4c9;
+$inline-action-background: $secondary-300;
+$cell-selected-background: $inline-action-background;
+$row-selected-background: $extra-300;
+$row-highlight-background: darken($row-selected-background, 2%);
+$cell-success-background: #f1f8dc;
+$cell-success-color: #96b76d;
+$cell-error-background: #fcd4d3;
+$cell-loading-background: #f5f5f5;
 
-$progress-bar-gradient-start:           #dcdcdc;
-$progress-bar-gradient-end:             #d3d3d3;
+$progress-bar-gradient-start: #dcdcdc;
+$progress-bar-gradient-end: #d3d3d3;
 
-$page-border-color:                     #ccc;
-$navigation-background-color:           $primary-900;
-$page-sidebar-background-color:         $navigation-background-color;
+$page-border-color: #ccc;
+$navigation-background-color: $primary-900;
+$page-sidebar-background-color: $navigation-background-color;
 
-$base-font-size:                        14px;
-$base-font-size--xxl:                   32px;
-$base-font-size--xl:                    24px;
-$base-font-size--l:                     18px;
-$base-font-size--m:                     16px;
-$base-font-size--s:                     12px;
-$base-font-size--xs:                    11px;
+$input-border-radius: 3px;
+$window-border-radius: 3px;
 
-$input-border-radius:                   3px;
-$window-border-radius:                  3px;
+$base-text-color: $primary-200;
+$btn-text-color: $primary-400;
 
-$base-text-color:                       $primary-200;
-$btn-text-color:                        $primary-400;
+$accordion-heading-background-color: #eaeaea;
 
-$accordion-heading-background-color:    #eaeaea;
+$success-background: $success-ultra-light;
+$success-border: $success-ultra-light;
+$success-text: $success-darken;
+$success-close: $success-darken;
 
-$success-background:                    $success-ultra-light;
-$success-border:                        $success-ultra-light;
-$success-text:                          $success-darken;
-$success-close:                         $success-darken;
+$error-background: $danger-ultra-light;
+$error-border: $danger-ultra-light;
+$error-text: $danger-ultra-dark;
+$error-close: $danger-darken;
 
-$error-background:                      $danger-ultra-light;
-$error-border:                          $danger-ultra-light;
-$error-text:                            $danger-ultra-dark;
-$error-close:                           $danger-darken;
+$warning-background: $warning-light;
+$warning-border: $warning-light;
+$warning-text: $warning-darken;
+$warning-close: $warning-dark;
 
-$warning-background:                    $warning-light;
-$warning-border:                        $warning-light;
-$warning-text:                          $warning-darken;
-$warning-close:                         $warning-dark;
+$info-text: $info-ultra-dark;
+$info-background: $info-lighten;
+$info-border: $info-lighten;
+$info-close: $info-dark;
 
-$info-text:                             $info-ultra-dark;
-$info-background:                       $info-lighten;
-$info-border:                           $info-lighten;
-$info-close:                            $info-dark;
+$error-message-balloon-background: lighten($error-text, 20%);
 
-$tag-item-color:                        $secondary;
-$tag-item-background:                   $secondary-300;
-$tag-my-item-background:                $secondary;
-
-$error-message-balloon-background:      lighten($error-text, 20%);
+$hover-transition: all 230ms ease-out !default;
 
 // Links
-$link-color:                            $secondary;
-$link-color-hover:                      darken($link-color, 10%);
-$menu-item-color:                       $primary-200;
+$link-color: $secondary;
+$link-color-hover: darken($link-color, 10%);
+$menu-item-color: $primary-200;
 
 // Screen sizes
-$small-screen:                          1024px;
-$medium-screen:                         1340px;
-$large-screen:                          1920px;
+$small-screen: 1024px;
+$medium-screen: 1340px;
+$large-screen: 1920px;
 
 // $theme-colors: (
 //     "primary": #0074d9,
@@ -239,10 +304,13 @@ $large-screen:                          1920px;
 // );
 
 // Bootstrap and its default variables
-@import "bowerassets/bootstrap/scss/_variables";
+@import '~@oroinc/bootstrap/scss/variables';
 
 // Remove unnecessary default theme colors
 // $theme-colors: map-remove($theme-colors, "info", "light", "dark");
 
-@import "variables/buttons";
-@import "variables/badge";
+@import 'variables/alert';
+@import 'variables/buttons';
+@import 'variables/button-group';
+@import 'variables/badge';
+@import 'variables/dropdown';

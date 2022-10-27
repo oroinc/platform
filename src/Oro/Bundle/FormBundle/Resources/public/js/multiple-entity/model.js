@@ -3,14 +3,12 @@ define([
 ], function(Backbone) {
     'use strict';
 
-    var EntityModel;
-
     /**
      * @export  oroform/js/multiple-entity/model
      * @class   oroform.MultipleEntity.Model
      * @extends Backbone.Model
      */
-    EntityModel = Backbone.Model.extend({
+    const EntityModel = Backbone.Model.extend({
         defaults: {
             id: null,
             link: null,
@@ -20,10 +18,10 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EntityModel() {
-            EntityModel.__super__.constructor.apply(this, arguments);
+        constructor: function EntityModel(attrs, options) {
+            EntityModel.__super__.constructor.call(this, attrs, options);
         }
     });
 

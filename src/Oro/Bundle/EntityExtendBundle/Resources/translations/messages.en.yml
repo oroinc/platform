@@ -36,7 +36,7 @@ oro:
                 time:               Time
                 text:               Text
                 float:              Float
-                money:              Currency
+                money:              Money
                 percent:            Percent
                 duration:           Duration
                 oneToOne:           One to one
@@ -45,7 +45,8 @@ oro:
                 manyToMany:         Many to many
                 enum:               Select
                 multiEnum:          Multi-Select
-                html_escaped:       HTML
+                multiFile:          Multiple Files
+                multiImage:         Multiple Images
 
                 ref-one:            System relation
                 ref-many:           System relation
@@ -57,6 +58,8 @@ oro:
                 inverse_relation:   Reuse "%field_name%" of %entity_name%
                 currency:           Currency
                 money_value:        Money Value
+                guid:               GUID
+                json:               JSON
             field_name.label:       Field name
             name.label:             Name
             key.label:              Key
@@ -66,6 +69,7 @@ oro:
                 entity_data_fields: Related entity data fields
                 entity_info_title:  Related entity info title
                 entity_detailed:    Related entity detailed
+            field_exists: Extend field "%fieldName%" cannot be added to the form. A field with the same name already exists or was added by other extensions.
 
         enum_name:    Option Set Name
         enum_public:  Public
@@ -136,8 +140,6 @@ oro:
                     items:
                         searchable: "Searchable"
                         searchable.tooltip: The field will appear in search results after the completion of reindex job that might take some time.
-                        title_field: "The search result title (deprecated)"
-                        title_field.tooltip: This setting is deprecated since 2.0. Create table-column string fields instead to be used as human-readable title.
                 entity:
                     items:
                         searchable.tooltip: The entity will appear in search results after the completion of reindex job that might take some time.

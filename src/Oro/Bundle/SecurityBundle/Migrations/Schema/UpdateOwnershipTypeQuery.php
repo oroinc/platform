@@ -18,11 +18,7 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
      */
     protected $ownershipData;
 
-    /**
-     * @param string $className
-     * @param array  $ownershipData
-     */
-    public function __construct($className, $ownershipData)
+    public function __construct(string $className, array $ownershipData)
     {
         $this->className = $className;
         $this->ownershipData = $ownershipData;
@@ -64,7 +60,7 @@ class UpdateOwnershipTypeQuery extends ParametrizedMigrationQuery
             $types  = ['data' => 'array', 'id' => 'integer'];
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
         }
     }

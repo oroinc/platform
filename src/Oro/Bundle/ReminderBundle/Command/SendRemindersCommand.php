@@ -1,69 +1,91 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ReminderBundle\Command;
 
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\CronBundle\Command\CronCommandActivationInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
-use Oro\Bundle\ReminderBundle\Model\ReminderSender;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\ReminderBundle\Model\ReminderSenderInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Command to send all reminders
+ * Sends reminders that are due now.
  */
-class SendRemindersCommand extends ContainerAwareCommand implements CronCommandInterface
+class SendRemindersCommand extends Command implements
+    CronCommandScheduleDefinitionInterface,
+    CronCommandActivationInterface
 {
+    /** @var string */
+    protected static $defaultName = 'oro:cron:send-reminders';
+
+    private ManagerRegistry $doctrine;
+    private ReminderSenderInterface $sender;
+
+    public function __construct(ManagerRegistry $doctrine, ReminderSenderInterface $sender)
+    {
+        parent::__construct();
+        $this->doctrine = $doctrine;
+        $this->sender = $sender;
+    }
+
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDefaultDefinition()
+    public function getDefaultDefinition(): string
     {
         return '*/1 * * * *';
     }
 
     /**
-     * @return bool
+     * {@inheritDoc}
      */
-    public function isActive()
+    public function isActive(): bool
     {
         $count = $this->getReminderRepository()->countRemindersToSend();
 
         return ($count > 0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:cron:send-reminders')
-            ->setDescription('Send reminders');
+            ->setDescription('Sends reminders that are due now.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command sends reminders that are due now.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $reminders = $this->getReminderRepository()->findRemindersToSend();
-
         if (!$reminders) {
             $output->writeln('<info>No reminders to sent</info>');
-            return;
+            return 0;
         }
 
         $output->writeln(
             sprintf('<comment>Reminders to send:</comment> %d', count($reminders))
         );
 
-        $em = $this->getEntityManager();
+        $em = $this->doctrine->getManager();
+        $em->beginTransaction();
         try {
-            $em->beginTransaction();
-
             $sentCount = $this->sendReminders($output, $reminders);
 
             $output->writeln(sprintf('<info>Reminders sent:</info> %d', $sentCount));
@@ -74,32 +96,25 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
             $em->rollback();
             throw $e;
         }
+
+        return 0;
     }
 
-    /**
-     * Send reminders
-     *
-     * @param OutputInterface $output
-     * @param Reminder[]      $reminders
-     * @return int Count of sent reminders
-     */
-    protected function sendReminders($output, array $reminders)
+    private function sendReminders(OutputInterface $output, array $reminders): int
     {
-        $result = 0;
-        $sender = $this->getReminderSender();
-
         foreach ($reminders as $reminder) {
-            $sender->push($reminder);
+            $this->sender->push($reminder);
         }
+        $this->sender->send();
 
-        $sender->send();
-
+        $result = 0;
+        /** @var Reminder $reminder */
         foreach ($reminders as $reminder) {
-            if (Reminder::STATE_SENT == $reminder->getState()) {
-                $result += 1;
+            if (Reminder::STATE_SENT === $reminder->getState()) {
+                $result++;
             }
 
-            if (Reminder::STATE_FAIL == $reminder->getState()) {
+            if (Reminder::STATE_FAIL === $reminder->getState()) {
                 $exception = $reminder->getFailureException();
                 $output->writeln(sprintf('<error>Failed to send reminder with id=%d</error>', $reminder->getId()));
                 $output->writeln(sprintf('<info>%s</info>: %s', $exception['class'], $exception['message']));
@@ -109,27 +124,8 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
         return $result;
     }
 
-    /**
-     * @return ReminderSender
-     */
-    protected function getReminderSender()
+    private function getReminderRepository(): ReminderRepository
     {
-        return $this->getContainer()->get('oro_reminder.sender');
-    }
-
-    /**
-     * @return ReminderRepository
-     */
-    protected function getReminderRepository()
-    {
-        return $this->getContainer()->get('doctrine')->getRepository('OroReminderBundle:Reminder');
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->getContainer()->get('doctrine')->getManager();
+        return $this->doctrine->getRepository(Reminder::class);
     }
 }

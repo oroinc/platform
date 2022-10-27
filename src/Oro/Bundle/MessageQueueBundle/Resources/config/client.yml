@@ -9,18 +9,32 @@ services:
         arguments:
             - []
 
+    oro_message_queue.client.security_token_provider:
+        class: Oro\Bundle\MessageQueueBundle\Security\SecurityTokenProvider
+        arguments:
+            - '@security.token_storage'
+
     oro_message_queue.client.security_aware_driver_factory:
-        class: 'Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriverFactory'
-        public: false
+        class: Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriverFactory
         decorates: oro_message_queue.client.driver_factory
         arguments:
-            - '@oro_message_queue.client.security_aware_driver_factory.inner'
+            - '@.inner'
             - [] # security agnostic topics
-            - '@security.token_storage'
+            - '@oro_message_queue.client.security_token_provider'
             - '@oro_security.token_serializer'
+
+    oro_message_queue.platform.optional_listener_driver_factory:
+        class: Oro\Bundle\MessageQueueBundle\Platform\OptionalListenerDriverFactory
+        public: false
+        decorates: oro_message_queue.client.driver_factory
+        decoration_priority: -255
+        arguments:
+            - '@.inner'
+            - '@oro_platform.optional_listeners.manager'
 
     oro_message_queue.client.driver:
         class: 'Oro\Component\MessageQueue\Client\DriverInterface'
+        public: true
         factory: ['@oro_message_queue.client.driver_factory', 'create']
         arguments:
             - '@oro_message_queue.transport.connection'
@@ -28,66 +42,84 @@ services:
 
     oro_message_queue.client.message_producer:
         class: 'Oro\Component\MessageQueue\Client\MessageProducer'
-        arguments: ['@oro_message_queue.client.driver']
+        lazy: true
+        arguments:
+            - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.router.message_router'
+            - '%kernel.debug%'
+        calls:
+            - [setLogger, ['@logger']]
+
+    Oro\Component\MessageQueue\Client\MessageProducerInterface:
+        alias: 'oro_message_queue.client.message_producer'
 
     oro_message_queue.message_producer:
         alias: 'oro_message_queue.client.message_producer'
+        public: true
 
-    oro_message_queue.client.router:
-        class: 'Oro\Component\MessageQueue\Client\Router'
-        public: false
+    oro_message_queue.router.message_router:
+        class: 'Oro\Component\MessageQueue\Client\Router\MessageRouter'
         arguments:
             - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.topic.registry'
+            - '@oro_message_queue.client.meta.topic_meta_registry'
             - '@oro_message_queue.client.meta.destination_meta_registry'
-            - []
-
-    oro_message_queue.client.route_message_processor:
-        class: 'Oro\Component\MessageQueue\Router\RouteRecipientListProcessor'
-        arguments:
-            - '@oro_message_queue.client.router'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_message_queue.route_message' }
 
     oro_message_queue.client.message_processor_registry:
-        class: 'Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry'
+        class: 'Oro\Component\MessageQueue\Client\MessageProcessorRegistry'
         arguments:
-            - []
-            - '@service_container'
+            - !abstract message processors defined in BuildMessageProcessorRegistryPass
+        tags: ['container.service_locator']
 
     oro_message_queue.client.meta.topic_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry'
         arguments:
-            - []
+            - $queuesByTopic: defined in BuildTopicMetaRegistryPass
+            - $messageProcessorsByTopicAndQueue: defined in BuildTopicMetaRegistryPass
 
     oro_message_queue.client.meta.destination_meta_registry:
         class: 'Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry'
+        public: true
         arguments:
             - '@oro_message_queue.client.config'
-            - []
-            - 'default'
+            - $messageProcessorsByQueue: !abstract defined in BuildDestinationMetaRegistryPass
 
-    oro_message_queue.client.delegate_message_processor:
-        class: 'Oro\Component\MessageQueue\Client\DelegateMessageProcessor'
+    oro_message_queue.client.meta.topic_description_provider:
+        class: 'Oro\Component\MessageQueue\Client\Meta\TopicDescriptionProvider'
         arguments:
-            - '@oro_message_queue.client.message_processor_registry'
+            - '@oro_message_queue.topic.registry'
+
+    oro_message_queue.client.noop_message_processor:
+        class: 'Oro\Component\MessageQueue\Client\NoopMessageProcessor'
+        arguments:
+            - '%oro_message_queue.client.noop_status%'
 
     oro_message_queue.client.extension.create_queue:
         class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\CreateQueueExtension'
-        public: false
         arguments:
             - '@oro_message_queue.client.driver'
             - '@oro_message_queue.client.created_queues'
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: -10 }
 
-    oro_message_queue.client.delay_redelivered_message_extension:
-        class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\DelayRedeliveredMessageExtension'
-        public: false
+    oro_message_queue.client.extension.message_body_resolver:
+        class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageBodyResolverExtension'
         arguments:
-            - '@oro_message_queue.client.driver'
-            - ~
+            - '@oro_message_queue.topic.registry'
+            - '@oro_message_queue.client.message_body_resolver'
         tags:
-            - { name: 'oro_message_queue.consumption.extension' }
+            # Priority should be high enough to ensure that extensions which need message body are called later.
+            - { name: 'oro_message_queue.consumption.extension', persistent: true, priority: 250 }
+
+    oro_message_queue.client.extension.message_processor_router:
+        class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageProcessorRouterExtension'
+        arguments:
+            - '@oro_message_queue.client.meta.topic_meta_registry'
+            - '@oro_message_queue.client.meta.destination_meta_registry'
+            - 'oro_message_queue.client.noop_message_processor'
+        tags:
+            # Priority should be high enough to ensure that extensions which need message processor are called later.
+            - { name: 'oro_message_queue.consumption.extension', persistent: true, priority: 128 }
 
     oro_message_queue.client.queue_consumer:
         class: 'Oro\Component\MessageQueue\Consumption\QueueConsumer'
@@ -95,44 +127,76 @@ services:
             - '@oro_message_queue.transport.connection'
             - '@oro_message_queue.consumption.extensions'
             - '@oro_message_queue.log.consumer_state'
+            - '@oro_message_queue.client.message_processor_registry'
 
     oro_message_queue.client.created_queues:
         class: 'Oro\Component\MessageQueue\Transport\QueueCollection'
 
-    oro_message_queue.client.meta.topics_command:
-        class: 'Oro\Component\MessageQueue\Client\Meta\TopicsCommand'
-        tags:
-            - { name: console.command }
-
-    oro_message_queue.client.meta.destinations_command:
-        class: 'Oro\Component\MessageQueue\Client\Meta\DestinationsCommand'
-        tags:
-            - { name: console.command }
-
-    oro_message_queue.client.create_queues_command:
-        class: 'Oro\Component\MessageQueue\Client\CreateQueuesCommand'
-        tags:
-            - { name: console.command }
-
     oro_message_queue.profiler.message_queue_collector:
-        class: 'Oro\Bundle\MessageQueueBundle\Profiler\MessageQueueCollector'
-        public: false
-        arguments: ['@oro_message_queue.message_producer']
+        class: Oro\Bundle\MessageQueueBundle\Profiler\MessageQueueCollector
+        arguments:
+            - '@oro_message_queue.message_producer'
         tags:
-            - { name: data_collector, template: 'OroMessageQueueBundle:Collector:message_queue.html.twig', id: message_queue }
+            - { name: data_collector, template: '@OroMessageQueue/Collector/message_queue.html.twig', id: message_queue }
 
     oro_message_queue.client.buffered_message_producer:
         class: Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer
-        public: false
         decorates: oro_message_queue.client.message_producer
         decoration_priority: -255 # the buffered producer should be at the top of the decoration chain
         arguments:
-            - '@oro_message_queue.client.buffered_message_producer.inner'
+            - '@.inner'
+            - '@logger'
+            - '@oro_message_queue.client.message_filter'
+
+    oro_message_queue.client.message_buffer_manager:
+        class: Oro\Bundle\MessageQueueBundle\Client\MessageBufferManager
+        arguments:
+            - '@oro_message_queue.client.buffered_message_producer'
+            - '@doctrine'
+            - 'default'
+
+    oro_message_queue.client.message_filter:
+        class: Oro\Bundle\MessageQueueBundle\Client\ChainMessageFilter
+        arguments:
+            - [] # filters
+            - ~ # container
 
     oro_message_queue.client.dbal_transaction_watcher:
         class: Oro\Bundle\MessageQueueBundle\Client\DbalTransactionWatcher
-        public: false
         arguments:
             - '@oro_message_queue.client.buffered_message_producer'
         tags:
             - { name: oro.doctrine.connection.transaction_watcher }
+
+    oro_message_queue.client.request_watcher:
+        class: Oro\Bundle\MessageQueueBundle\Client\RequestWatcher
+        arguments:
+            - '@oro_message_queue.client.buffered_message_producer'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    oro_message_queue.client.command_watcher:
+        class: Oro\Bundle\MessageQueueBundle\Client\CommandWatcher
+        arguments:
+            - '@oro_message_queue.client.buffered_message_producer'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    oro_message_queue.client.processor_watcher:
+        class: Oro\Bundle\MessageQueueBundle\Client\ProcessorWatcher
+        arguments:
+            - '@oro_message_queue.client.buffered_message_producer'
+        tags:
+            - { name: oro_message_queue.consumption.extension, priority: 255 }
+
+    oro_message_queue.client.message_body_resolver:
+        class: Oro\Component\MessageQueue\Client\MessageBodyResolver
+        arguments:
+            - '@oro_message_queue.topic.registry'
+
+    oro_message_queue.client.extension.child_job_failing:
+        class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\ChildJobFailingExtension'
+        arguments:
+            - '@oro_message_queue.job.processor'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }

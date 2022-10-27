@@ -4,6 +4,9 @@ namespace Oro\Bundle\AddressBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CountryTest extends RestJsonApiTestCase
 {
     public function testGetList()

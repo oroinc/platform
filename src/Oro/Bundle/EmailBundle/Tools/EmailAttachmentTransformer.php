@@ -2,75 +2,66 @@
 
 namespace Oro\Bundle\EmailBundle\Tools;
 
-use Oro\Bundle\AttachmentBundle\Entity\Attachment as AttachmentOro;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-use Oro\Bundle\EmailBundle\Entity\EmailAttachment as AttachmentEntity;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Provides methods to do the following transformation:
+ * * EmailAttachment entity to EmailAttachment model
+ * * Attachment entity to EmailAttachment model
+ * * Attachment entity to EmailAttachment entity
+ * * UploadedFile object to EmailAttachment entity
+ */
 class EmailAttachmentTransformer
 {
-    /**
-     * @var Factory
-     */
-    protected $factory;
+    /** @var Factory */
+    private $factory;
 
-    /**
-     * @var FileManager
-     */
-    protected $fileManager;
+    /** @var FileManager */
+    private $fileManager;
 
-    /**
-     * @var AttachmentManager
-     */
-    protected $manager;
+    /** @var AttachmentManager */
+    private $manager;
 
-    /**
-     * @var EmailAttachmentManager
-     */
-    protected $emailAttachmentManager;
+    /** @var EmailAttachmentManager */
+    private $emailAttachmentManager;
 
-    /**
-     * @param Factory                $factory
-     * @param FileManager            $fileManager
-     * @param AttachmentManager      $manager
-     * @param EmailAttachmentManager $emailAttachmentManager
-     */
     public function __construct(
         Factory $factory,
         FileManager $fileManager,
         AttachmentManager $manager,
         EmailAttachmentManager $emailAttachmentManager
     ) {
-        $this->factory                = $factory;
-        $this->fileManager            = $fileManager;
-        $this->manager                = $manager;
+        $this->factory = $factory;
+        $this->fileManager = $fileManager;
+        $this->manager = $manager;
         $this->emailAttachmentManager = $emailAttachmentManager;
     }
 
-    /**
-     * @param AttachmentEntity $attachmentEntity
-     *
-     * @return AttachmentModel
-     */
-    public function entityToModel(AttachmentEntity $attachmentEntity)
+    public function entityToModel(EmailAttachment $emailAttachment): EmailAttachmentModel
     {
         $attachmentModel = $this->factory->getEmailAttachment();
 
-        $attachmentModel->setEmailAttachment($attachmentEntity);
-        $attachmentModel->setType(AttachmentModel::TYPE_EMAIL_ATTACHMENT);
-        $attachmentModel->setId($attachmentEntity->getId());
-        $attachmentModel->setFileSize($attachmentEntity->getSize());
-        $attachmentModel->setModified($attachmentEntity->getEmailBody()->getCreated());
-        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachmentEntity));
-        if ($this->manager->isImageType($attachmentEntity->getContentType())) {
+        $mimeType = $emailAttachment->getContentType();
+
+        $attachmentModel->setEmailAttachment($emailAttachment);
+        $attachmentModel->setType(EmailAttachmentModel::TYPE_EMAIL_ATTACHMENT);
+        $attachmentModel->setId($emailAttachment->getId());
+        $attachmentModel->setFileSize($emailAttachment->getSize());
+        $attachmentModel->setMimeType($mimeType);
+        $attachmentModel->setModified($emailAttachment->getEmailBody()->getCreated());
+        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($emailAttachment));
+        if ($this->manager->isImageType($mimeType)) {
             $attachmentModel->setPreview(
                 $this->emailAttachmentManager->getResizedImageUrl(
-                    $attachmentEntity,
+                    $emailAttachment,
                     AttachmentManager::THUMBNAIL_WIDTH,
                     AttachmentManager::THUMBNAIL_HEIGHT
                 )
@@ -80,71 +71,57 @@ class EmailAttachmentTransformer
         return $attachmentModel;
     }
 
-    /**
-     * @param AttachmentOro $attachmentOro
-     *
-     * @return AttachmentModel
-     */
-    public function oroToModel(AttachmentOro $attachmentOro)
+    public function attachmentEntityToModel(Attachment $attachment): EmailAttachmentModel
     {
         $attachmentModel = $this->factory->getEmailAttachment();
 
-        $attachmentModel->setType(AttachmentModel::TYPE_ATTACHMENT);
-        $attachmentModel->setId($attachmentOro->getId());
-        $attachmentModel->setFileName($attachmentOro->getFile()->getOriginalFilename());
-        $attachmentModel->setFileSize($attachmentOro->getFile()->getFileSize());
-        $attachmentModel->setModified($attachmentOro->getCreatedAt());
-        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachmentOro->getFile()));
-        if ($this->manager->isImageType($attachmentOro->getFile()->getMimeType())) {
+        $mimeType = $attachment->getFile()->getMimeType();
+
+        $attachmentModel->setType(EmailAttachmentModel::TYPE_ATTACHMENT);
+        $attachmentModel->setId($attachment->getId());
+        $attachmentModel->setFileName($attachment->getFile()->getOriginalFilename());
+        $attachmentModel->setFileSize($attachment->getFile()->getFileSize());
+        $attachmentModel->setMimeType($mimeType);
+        $attachmentModel->setModified($attachment->getCreatedAt());
+        $attachmentModel->setIcon($this->manager->getAttachmentIconClass($attachment->getFile()));
+        if ($this->manager->isImageType($mimeType)) {
             $attachmentModel->setPreview(
                 $this->manager->getResizedImageUrl(
-                    $attachmentOro->getFile(),
+                    $attachment->getFile(),
                     AttachmentManager::THUMBNAIL_WIDTH,
                     AttachmentManager::THUMBNAIL_HEIGHT
                 )
             );
         }
-        
+
         return $attachmentModel;
     }
 
-    /**
-     * @param AttachmentOro $attachmentOro
-     *
-     * @return AttachmentEntity
-     */
-    public function oroToEntity(AttachmentOro $attachmentOro)
+    public function attachmentEntityToEntity(Attachment $attachment): EmailAttachment
     {
-        $emailAttachmentEntity = new AttachmentEntity();
+        $emailAttachment = new EmailAttachment();
 
-        $emailAttachmentEntity->setFileName($attachmentOro->getFile()->getFilename());
+        $emailAttachment->setFileName($attachment->getFile()->getFilename());
 
         $emailAttachmentContent = new EmailAttachmentContent();
         $emailAttachmentContent->setContent(
-            base64_encode($this->fileManager->getContent($attachmentOro->getFile()))
+            base64_encode($this->fileManager->getContent($attachment->getFile()))
         );
 
         $emailAttachmentContent->setContentTransferEncoding('base64');
-        $emailAttachmentContent->setEmailAttachment($emailAttachmentEntity);
+        $emailAttachmentContent->setEmailAttachment($emailAttachment);
 
-        $emailAttachmentEntity->setContent($emailAttachmentContent);
-        $emailAttachmentEntity->setContentType($attachmentOro->getFile()->getMimeType());
-        $emailAttachmentEntity->setFile($attachmentOro->getFile());
-        $emailAttachmentEntity->setFileName(
-            $attachmentOro->getFile()->getOriginalFilename()
-        );
+        $emailAttachment->setContent($emailAttachmentContent);
+        $emailAttachment->setContentType($attachment->getFile()->getMimeType());
+        $emailAttachment->setFile($attachment->getFile());
+        $emailAttachment->setFileName($attachment->getFile()->getOriginalFilename());
 
-        return $emailAttachmentEntity;
+        return $emailAttachment;
     }
 
-    /**
-     * @param UploadedFile $uploadedFile
-     *
-     * @return AttachmentEntity
-     */
-    public function entityFromUploadedFile(UploadedFile $uploadedFile)
+    public function entityFromUploadedFile(UploadedFile $uploadedFile): EmailAttachment
     {
-        $emailAttachment = new AttachmentEntity();
+        $emailAttachment = new EmailAttachment();
 
         $attachmentContent = new EmailAttachmentContent();
         $attachmentContent->setContent(

@@ -3,16 +3,21 @@
 namespace Oro\Bundle\FeatureToggleBundle\Twig;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class FeatureExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to check feature status:
+ *   - feature_enabled
+ *   - feature_resource_enabled
+ */
+class FeatureExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -23,7 +28,7 @@ class FeatureExtension extends \Twig_Extension
      */
     protected function getFeatureChecker()
     {
-        return $this->container->get('oro_featuretoggle.checker.feature_checker');
+        return $this->container->get(FeatureChecker::class);
     }
 
     /**
@@ -32,17 +37,9 @@ class FeatureExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('feature_enabled', [$this, 'isFeatureEnabled']),
-            new \Twig_SimpleFunction('feature_resource_enabled', [$this, 'isResourceEnabled']),
+            new TwigFunction('feature_enabled', [$this, 'isFeatureEnabled']),
+            new TwigFunction('feature_resource_enabled', [$this, 'isResourceEnabled']),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_featuretoggle_extension';
     }
 
     /**
@@ -64,5 +61,15 @@ class FeatureExtension extends \Twig_Extension
     public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)
     {
         return $this->getFeatureChecker()->isResourceEnabled($resource, $resourceType, $scopeIdentifier);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            FeatureChecker::class,
+        ];
     }
 }

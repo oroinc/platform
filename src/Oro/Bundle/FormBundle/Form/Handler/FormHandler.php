@@ -20,10 +20,6 @@ class FormHandler implements FormHandlerInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(EventDispatcherInterface $eventDispatcher, DoctrineHelper $doctrineHelper)
     {
         $this->eventDispatcher = $eventDispatcher;
@@ -36,7 +32,7 @@ class FormHandler implements FormHandlerInterface
     public function process($data, FormInterface $form, Request $request)
     {
         $event = new FormProcessEvent($form, $data);
-        $this->eventDispatcher->dispatch(Events::BEFORE_FORM_DATA_SET, $event);
+        $this->eventDispatcher->dispatch($event, Events::BEFORE_FORM_DATA_SET);
 
         if ($event->isFormProcessInterrupted()) {
             return false;
@@ -46,7 +42,7 @@ class FormHandler implements FormHandlerInterface
 
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
             $event = new FormProcessEvent($form, $data);
-            $this->eventDispatcher->dispatch(Events::BEFORE_FORM_SUBMIT, $event);
+            $this->eventDispatcher->dispatch($event, Events::BEFORE_FORM_SUBMIT);
 
             if ($event->isFormProcessInterrupted()) {
                 return false;
@@ -73,16 +69,12 @@ class FormHandler implements FormHandlerInterface
         return false;
     }
 
-    /**
-     * @param $data
-     * @param FormInterface $form
-     */
     protected function saveData($data, FormInterface $form)
     {
         $manager = $this->doctrineHelper->getEntityManager($data);
         $manager->persist($data);
-        $this->eventDispatcher->dispatch(Events::BEFORE_FLUSH, new AfterFormProcessEvent($form, $data));
+        $this->eventDispatcher->dispatch(new AfterFormProcessEvent($form, $data), Events::BEFORE_FLUSH);
         $manager->flush();
-        $this->eventDispatcher->dispatch(Events::AFTER_FLUSH, new AfterFormProcessEvent($form, $data));
+        $this->eventDispatcher->dispatch(new AfterFormProcessEvent($form, $data), Events::AFTER_FLUSH);
     }
 }

@@ -2,7 +2,7 @@ datagrids:
     # Entity config entities grid
     entityconfig-grid:
         options:
-            entityHint: entities
+            entityHint: oro.entity_config.entity.plural_label
         acl_resource: oro_entityconfig_manage
         features:
             entity_class_name_path: ce.className
@@ -15,7 +15,7 @@ datagrids:
                     - ce.mode
                     - ce.data
                 from:
-                    - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
+                    - { table: Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel, alias: ce }
                 where:
                     and:
                         - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_HIDDEN'
@@ -63,7 +63,7 @@ datagrids:
     base-entityfields-grid:
         options:
             mode: client
-            entityHint: fields
+            entityHint: oro.entity_config.field_config.entity_plural_label
             toolbarOptions:
                 pageSize:
                     default_per_page: 50
@@ -79,7 +79,7 @@ datagrids:
                     - ce.id as entity_id
                     - cf.data
                 from:
-                    - { table: OroEntityConfigBundle:FieldConfigModel, alias: cf }
+                    - { table: Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel, alias: cf }
                 join:
                     inner:
                         - { join: cf.entity, alias: ce }
@@ -95,7 +95,7 @@ datagrids:
                 label: oro.entity_config.field_config.type.label
                 frontend_type: html
                 type: twig
-                template: OroEntityConfigBundle:Config:fieldType.html.twig
+                template: '@OroEntityConfig/Config/fieldType.html.twig'
 
         actions:
             # @TODO check why those actions dont have ACL
@@ -131,6 +131,8 @@ datagrids:
     attributes-grid:
         extends: base-entityfields-grid
         acl_resource: oro_attributes_manage
+        options:
+            entityHint: oro.entity_config.attribute.entity_plural_label
         source:
             type: orm
             query:
@@ -148,8 +150,10 @@ datagrids:
                 label: oro.entity_config.attribute_family.entity_plural_label
                 frontend_type: html
                 type: twig
-                template: OroEntityConfigBundle:Datagrid:Column/attributeFamilies.html.twig
+                template: '@OroEntityConfig/Datagrid/Column/attributeFamilies.html.twig'
                 order: 99
+            organization_applicable:
+                renderable: false
         actions:
             update:
                 acl_resource: oro_attribute_update
@@ -171,7 +175,7 @@ datagrids:
     # Audit entity log grid
     entity-audit-grid:
         options:
-            entityHint: histories
+            entityHint: oro.entity_config.config_log.entity_plural_label
         acl_resource: oro_entityconfig_manage
         source:
             type: orm
@@ -207,7 +211,7 @@ datagrids:
             diffs:
                 label: oro.entity_config.config_log.diffs.label
                 type: twig
-                template: OroEntityConfigBundle:Audit:data.html.twig
+                template: '@OroEntityConfig/Audit/data.html.twig'
                 frontend_type: html
                 context:
                     config_manager: '@oro_entity_config.config_manager'
@@ -223,7 +227,7 @@ datagrids:
                 loggedAt:
                     data_name: log.loggedAt
             default:
-                loggedAt: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                loggedAt: DESC
 
     audit-log-grid:
         extends: entity-audit-grid
@@ -339,12 +343,9 @@ datagrids:
                     - attributeGroup.isVisible
                 from:
                     - { table: 'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup', alias: attributeGroup }
-                join:
-                    inner:
-                        - { join: attributeGroup.attributeFamily, alias: attributeFamily }
                 where:
                     and:
-                        - attributeFamily.id = :family_id
+                        - attributeGroup.attributeFamily = :family_id
             bind_parameters:
                 - family_id
         columns:
@@ -359,7 +360,7 @@ datagrids:
                 label: oro.entity_config.attribute_group.attribute_relations.label
                 renderable: true
                 type: twig
-                template: 'OroEntityConfigBundle:Datagrid:Property/attributes.html.twig'
+                template: '@OroEntityConfig/Datagrid/Property/attributes.html.twig'
                 frontend_type: html
         properties:
             id: ~

@@ -6,6 +6,7 @@ use Behat\Testwork\Suite\Generator\SuiteGenerator;
 use Behat\Testwork\Suite\GenericSuite;
 use Behat\Testwork\Suite\SuiteRegistry;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli\SuiteController;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatisticManager;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Suite\SuiteConfigurationRegistry;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Stub\InputStub;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Tests\Stub\OutputStub;
@@ -13,22 +14,35 @@ use Symfony\Component\Console\Command\Command;
 
 class SuiteControllerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var FeatureStatisticManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureStatisticManager;
+
+    /** @var array */
     private $suites = [
         'AcmeDemo1',
         'AcmeDemo2',
         'AcmeDemo3',
     ];
 
+    /** @var array */
     private $suiteSets = [
         'First' => ['AcmeDemo1', 'AcmeDemo2'],
         'Second' => ['AcmeDemo3'],
     ];
 
+    protected function setUp(): void
+    {
+        $this->featureStatisticManager = $this->createMock(FeatureStatisticManager::class);
+    }
 
     public function testConfigure()
     {
         $suiteRegistry = new SuiteRegistry();
-        $controller = new SuiteController($this->getSuiteConfigurationRegistryMock(), $suiteRegistry);
+        $controller = new SuiteController(
+            $this->getSuiteConfigurationRegistryMock(),
+            $suiteRegistry,
+            $this->featureStatisticManager
+        );
         $command = new Command('test');
 
         $controller->configure($command);
@@ -47,14 +61,18 @@ class SuiteControllerTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecute($suite, $suiteSet, array $expectedRegisteredSuites)
     {
-        $generator = $this->getMockBuilder(SuiteGenerator::class)->getMock();
+        $generator = $this->createMock(SuiteGenerator::class);
         $generator->method('supportsTypeAndSettings')->willReturn(true);
         $generator->method('generateSuite')->willReturnArgument(0);
 
         $suiteRegistry = new SuiteRegistry();
         $suiteRegistry->registerSuiteGenerator($generator);
 
-        $controller = new SuiteController($this->getSuiteConfigurationRegistryMock(), $suiteRegistry);
+        $controller = new SuiteController(
+            $this->getSuiteConfigurationRegistryMock(),
+            $suiteRegistry,
+            $this->featureStatisticManager
+        );
         $options = [
             'suite' => $suite,
             'suite-set' => $suiteSet,
@@ -64,6 +82,9 @@ class SuiteControllerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedRegisteredSuites, $suiteRegistry->getSuites());
     }
 
+    /**
+     * @return array
+     */
     public function executeData()
     {
         return [
@@ -91,27 +112,24 @@ class SuiteControllerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return SuiteConfigurationRegistry
+     * @return SuiteConfigurationRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getSuiteConfigurationRegistryMock()
     {
-        $suiteConfigRegistry = $this
-            ->getMockBuilder(SuiteConfigurationRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $suiteConfigRegistry = $this->createMock(SuiteConfigurationRegistry::class);
 
         $suiteConfigRegistry->method('getSuiteConfig')->willReturnCallback(function ($name) {
-            return new GenericSuite($name, ['type' => null]);
+            return new GenericSuite($name, ['type' => null, 'paths' => []]);
         });
 
         $suiteConfigRegistry->method('getSet')->willReturnCallback(function ($set) {
             return array_map(function ($name) {
-                return new GenericSuite($name, ['type' => null]);
+                return new GenericSuite($name, ['type' => null, 'paths' => []]);
             }, $this->suiteSets[$set]);
         });
 
         $suiteConfigRegistry->method('getSuites')->willReturn(array_map(function ($name) {
-            return new GenericSuite($name, ['type' => null]);
+            return new GenericSuite($name, ['type' => null, 'paths' => []]);
         }, $this->suites));
 
         return $suiteConfigRegistry;

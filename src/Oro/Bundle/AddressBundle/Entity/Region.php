@@ -5,12 +5,11 @@ namespace Oro\Bundle\AddressBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * Region
+ * Address region entity
  *
  * @ORM\Table("oro_dictionary_region", indexes={
  *      @ORM\Index(name="region_name_idx", columns={"name"})
@@ -27,7 +26,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          }
  *      }
  * )
- * @JMS\ExclusionPolicy("ALL")
  */
 class Region implements Translatable
 {
@@ -38,9 +36,6 @@ class Region implements Translatable
      *
      * @ORM\Id
      * @ORM\Column(name="combined_code", type="string", length=16)
-     * @JMS\Type("string")
-     * @JMS\SerializedName("combinedCode")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={
@@ -56,9 +51,6 @@ class Region implements Translatable
      *
      * @ORM\ManyToOne(targetEntity="Country", inversedBy="regions", cascade={"persist"})
      * @ORM\JoinColumn(name="country_code", referencedColumnName="iso2_code")
-     * @JMS\Type("string")
-     * @JMS\Accessor(getter="getCountryIso2Code")
-     * @JMS\Expose
      */
     protected $country;
 
@@ -66,8 +58,6 @@ class Region implements Translatable
      * @var string
      *
      * @ORM\Column(name="code", type="string", length=32)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $code;
 
@@ -76,8 +66,6 @@ class Region implements Translatable
      *
      * @ORM\Column(name="name", type="string", length=255)
      * @Gedmo\Translatable
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $name;
 
@@ -141,7 +129,7 @@ class Region implements Translatable
     /**
      * Get country ISO2 code
      *
-     * @return Country
+     * @return string|null
      */
     public function getCountryIso2Code()
     {

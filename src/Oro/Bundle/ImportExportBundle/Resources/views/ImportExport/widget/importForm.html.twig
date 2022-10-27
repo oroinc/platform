@@ -19,10 +19,10 @@
         }) }}
 
             <fieldset class="form">
-                <div class="import-file">
+                <div class="control-group-container import-file">
                     {{ form_row(form.file, {'label': 'oro.importexport.import.file'}) }}
                 </div>
-                <div {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
+                <div class="control-group-container" {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
                     {{ form_row(form.processorAlias, {'label': 'oro.importexport.import.strategy'}) }}
                 </div>
                 {{ form_rest(form) }}

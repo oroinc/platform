@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Grid;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -14,22 +14,16 @@ class AttributeGroupGridListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var AttributeGroupGridListener
-     */
-    protected $listener;
+    /** @var AttributeGroupGridListener */
+    private $listener;
 
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $attributeManager;
+    private $attributeManager;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->attributeManager = $this->getMockBuilder(AttributeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->attributeManager = $this->createMock(AttributeManager::class);
+
         $this->listener = new AttributeGroupGridListener($this->attributeManager);
     }
 

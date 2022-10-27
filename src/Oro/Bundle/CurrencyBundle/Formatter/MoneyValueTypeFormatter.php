@@ -15,9 +15,6 @@ class MoneyValueTypeFormatter implements TypeFormatterInterface
 
     /**
      * MoneyValueProperty constructor.
-     *
-     * @param BaseFormatter         $formatter
-     * @param AbstractRoundingService $roundingService
      */
     public function __construct(BaseFormatter $formatter, AbstractRoundingService $roundingService)
     {

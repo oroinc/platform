@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable selector-max-compound-selectors */
+
 .notes {
     .list-box {
         .list-item {
@@ -17,7 +19,7 @@
                 position: relative;
                 white-space: normal;
 
-                &:before {
+                &::before {
                     content: '';
                     float: right;
                     width: 43px;
@@ -90,5 +92,11 @@
                 }
             }
         }
+    }
+}
+
+.note-attachments {
+    .attachment-item {
+        margin: 0;
     }
 }

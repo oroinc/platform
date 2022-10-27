@@ -3,12 +3,15 @@
 namespace Oro\Bundle\TestFrameworkBundle\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
-class ItemController extends Controller
+/**
+ * The CRUD controller for Item entity.
+ */
+class ItemController extends AbstractController
 {
     /**
      * @Route("/", name="oro_test_item_index")
@@ -19,7 +22,7 @@ class ItemController extends Controller
     public function indexAction()
     {
         return [
-            'entity_class' => $this->container->getParameter('oro_test.entity.item.class'),
+            'entity_class' => Item::class
         ];
     }
 

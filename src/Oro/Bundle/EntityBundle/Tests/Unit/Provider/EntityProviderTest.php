@@ -2,69 +2,59 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $extendConfigProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityClassResolver;
+
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
+
+    /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $exclusionProvider;
+
+    /** @var Config */
+    private $extendConfig;
 
     /** @var EntityProvider */
     private $provider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /**
-     * @var Config
-     */
-    protected $extendConfig;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->extendConfig        = new Config(new EntityConfigId('extend', 'testClass'));
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+        $this->exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+
         $this->entityClassResolver->expects($this->any())
             ->method('getEntityClass')
-            ->will(
-                $this->returnCallback(
-                    function ($entityName) {
-                        return str_replace(':', '\\Entity\\', $entityName);
-                    }
-                )
-            );
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturnCallback(function ($entityName) {
+                return str_replace(':', '\\Entity\\', $entityName);
+            });
+
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnArgument(0));
-
-        $exclusionProvider = $this->createMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
-
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->setMethods(['isResourceEnabled'])
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturnArgument(0);
 
         $this->provider = new EntityProvider(
             $this->entityConfigProvider,
@@ -73,14 +63,25 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
             $translator,
             $this->featureChecker
         );
-        $this->provider->setExclusionProvider($exclusionProvider);
+        $this->provider->setExclusionProvider($this->exclusionProvider);
+
+        $this->extendConfig = new Config(new EntityConfigId('extend', 'testClass'));
+    }
+
+    private function getEntityConfig(string $entityClassName, array $values, string $scope = 'entity'): Config
+    {
+        $entityConfigId = new EntityConfigId($scope, $entityClassName);
+        $entityConfig = new Config($entityConfigId);
+        $entityConfig->setValues($values);
+
+        return $entityConfig;
     }
 
     public function testGetEntity()
     {
-        $entityName      = 'Acme:Test';
+        $entityName = 'Acme:Test';
         $entityClassName = 'Acme\Entity\Test';
-        $entityConfig    = $this->getEntityConfig(
+        $entityConfig = $this->getEntityConfig(
             $entityClassName,
             [
                 'label'        => 'Test Label',
@@ -91,7 +92,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with($entityClassName)
-            ->will($this->returnValue($entityConfig));
+            ->willReturn($entityConfig);
 
         $result = $this->provider->getEntity($entityName);
 
@@ -150,11 +151,10 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\RuntimeException
-     */
     public function testGetEnabledEntityWhenEntityIsNotAccessibleYet()
     {
+        $this->expectException(RuntimeException::class);
+
         $entityName = 'Acme:Test';
         $entityClassName = 'Acme\Entity\Test';
         $entityConfig = $this->getEntityConfig(
@@ -184,7 +184,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->featureChecker->expects($this->never())
             ->method('isResourceEnabled');
 
-        $result = $this->provider->getEnabledEntity($entityName);
+        $this->provider->getEnabledEntity($entityName);
     }
 
     /**
@@ -249,66 +249,45 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfigById')
-            ->will(
-                $this->returnCallback(
-                    function (EntityConfigId $configId) use ($map) {
-                        $className = $configId->getClassName();
+            ->willReturnCallback(function (EntityConfigId $configId) use ($map) {
+                $className = $configId->getClassName();
 
-                        /** @var ConfigInterface $config */
-                        $config = $map[$className];
-                        $config->set('state', ExtendScope::STATE_ACTIVE);
+                /** @var ConfigInterface $config */
+                $config = $map[$className];
+                $config->set('state', ExtendScope::STATE_ACTIVE);
 
-                        return $config;
-                    }
-                )
-            );
+                return $config;
+            });
 
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$entityClassName1, $entityConfig1],
-                        [$entityClassName2, $entityConfig2],
-                        [$entityClassName3, $entityConfig3],
-                        [$entityClassName4, $entityConfig4],
-                        [$entityClassName5, $entityConfig5],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$entityClassName1, $entityConfig1],
+                [$entityClassName2, $entityConfig2],
+                [$entityClassName3, $entityConfig3],
+                [$entityClassName4, $entityConfig4],
+                [$entityClassName5, $entityConfig5],
+            ]);
 
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfigs')
-            ->will(
-                $this->returnValue(
-                    [
-                        $entityConfig1,
-                        $entityConfig2,
-                        $entityConfig3,
-                    ]
-                )
-            );
-
+            ->willReturn([$entityConfig1, $entityConfig2, $entityConfig3]);
 
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnCallback(
-                    function ($param) {
-                        $this->extendConfig->set('state', ExtendScope::STATE_ACTIVE);
-                        if ($param == 'Acme\Entity\Test4') {
-                            $this->extendConfig->set('state', ExtendScope::STATE_NEW);
-                        }
-                        if ($param == 'Acme\Entity\Test4') {
-                            $this->extendConfig->set('state', ExtendScope::STATE_DELETE);
-                        }
-                        return $this->extendConfig;
-                    }
-                )
-            );
+            ->willReturnCallback(function ($param) {
+                $this->extendConfig->set('state', ExtendScope::STATE_ACTIVE);
+                if ('Acme\Entity\Test4' === $param) {
+                    $this->extendConfig->set('state', ExtendScope::STATE_NEW);
+                }
+                if ('Acme\Entity\Test4' === $param) {
+                    $this->extendConfig->set('state', ExtendScope::STATE_DELETE);
+                }
+                return $this->extendConfig;
+            });
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($this->extendConfig));
+            ->willReturn($this->extendConfig);
 
         $this->featureChecker->expects($this->any())
             ->method('isResourceEnabled')
@@ -407,61 +386,36 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfigById')
-            ->will(
-                $this->returnCallback(
-                    function (EntityConfigId $configId) use ($map) {
-                        $className = $configId->getClassName();
+            ->willReturnCallback(function (EntityConfigId $configId) use ($map) {
+                $className = $configId->getClassName();
 
-                        /** @var ConfigInterface $config */
-                        $config = $map[$className];
-                        $config->set('state', ExtendScope::STATE_ACTIVE);
+                /** @var ConfigInterface $config */
+                $config = $map[$className];
+                $config->set('state', ExtendScope::STATE_ACTIVE);
 
-                        return $config;
-                    }
-                )
-            );
+                return $config;
+            });
 
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$entityClassName1, $entityConfig1],
-                        [$entityClassName2, $entityConfig2],
-                        [$entityClassName3, $entityConfig3],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$entityClassName1, $entityConfig1],
+                [$entityClassName2, $entityConfig2],
+                [$entityClassName3, $entityConfig3],
+            ]);
 
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfigs')
-            ->will(
-                $this->returnValue(
-                    [
-                        $entityConfig1,
-                        $entityConfig2,
-                        $entityConfig3,
-                    ]
-                )
-            );
+            ->willReturn([$entityConfig1, $entityConfig2, $entityConfig3]);
 
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($this->extendConfig));
+            ->willReturn($this->extendConfig);
 
-
-        $this->featureChecker->expects($this->at(0))
+        $this->featureChecker->expects($this->exactly(3))
             ->method('isResourceEnabled')
-            ->with($entityClassName1)
-            ->willReturn(true);
-        $this->featureChecker->expects($this->at(1))
-            ->method('isResourceEnabled')
-            ->with($entityClassName2)
-            ->willReturn(false);
-        $this->featureChecker->expects($this->at(2))
-            ->method('isResourceEnabled')
-            ->with($entityClassName3)
-            ->willReturn(true);
+            ->withConsecutive([$entityClassName1], [$entityClassName2], [$entityClassName3])
+            ->willReturnOnConsecutiveCalls(true, false, true);
 
         // sort by plural label
         $result = $this->provider->getEntities();
@@ -483,19 +437,12 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @param string $entityClassName
-     * @param array  $values
-     * @param string $scope
-     *
-     * @return Config
-     */
-    protected function getEntityConfig($entityClassName, $values, $scope = 'entity')
+    public function testIsIgnoredEntity()
     {
-        $entityConfigId = new EntityConfigId($scope, $entityClassName);
-        $entityConfig   = new Config($entityConfigId);
-        $entityConfig->setValues($values);
+        $this->exclusionProvider->expects($this->once())
+            ->method('isIgnoredEntity')
+            ->willReturn(true);
 
-        return $entityConfig;
+        $this->assertTrue($this->provider->isIgnoredEntity(\stdClass::class));
     }
 }

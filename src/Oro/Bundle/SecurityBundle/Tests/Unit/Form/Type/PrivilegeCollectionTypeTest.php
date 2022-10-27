@@ -5,13 +5,14 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormInterface;
 
 class PrivilegeCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PrivilegeCollectionType */
-    protected $formType;
+    private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formType = new PrivilegeCollectionType();
     }
@@ -24,17 +25,15 @@ class PrivilegeCollectionTypeTest extends \PHPUnit\Framework\TestCase
     public function testBuildView()
     {
         $view = new FormView();
-        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $privilegesConfig = array('permissions' => array('VIEW', 'CREATE'));
-        $options = array(
-            'entry_options' => array(
+        $form = $this->createMock(FormInterface::class);
+        $privilegesConfig = ['permissions' => ['VIEW', 'CREATE']];
+        $options = [
+            'entry_options' => [
                 'privileges_config' => $privilegesConfig
-            ),
+            ],
             'page_component_module' => 'component_name',
             'page_component_options' => ['component' => 'options'],
-        );
+        ];
 
         $expectedVars = [
             'privileges_config' => $privilegesConfig,

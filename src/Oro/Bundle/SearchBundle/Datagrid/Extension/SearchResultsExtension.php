@@ -13,6 +13,9 @@ use Oro\Bundle\SearchBundle\Formatter\ResultFormatter;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Grid extension that prepares data for search results grid
+ */
 class SearchResultsExtension extends AbstractExtension
 {
     const TYPE_PATH  = '[columns][entity][type]';
@@ -27,11 +30,6 @@ class SearchResultsExtension extends AbstractExtension
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
-    /**
-     * @param ResultFormatter          $formatter
-     * @param ObjectMapper             $mapper
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(
         ResultFormatter $formatter,
         ObjectMapper $mapper,
@@ -73,8 +71,6 @@ class SearchResultsExtension extends AbstractExtension
                         $entityName,
                         $recordId,
                         null,
-                        null,
-                        null,
                         [],
                         $this->mapper->getEntityConfig($entityName)
                     );
@@ -98,7 +94,7 @@ class SearchResultsExtension extends AbstractExtension
 
             $entity = $entities[$entityName][$entityId];
 
-            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item, $entity));
+            $this->dispatcher->dispatch(new PrepareResultItemEvent($item, $entity), PrepareResultItemEvent::EVENT_NAME);
 
             $resultRows[] = new ResultRecord(['entity' => $entity, 'indexer_item' => $item]);
         }

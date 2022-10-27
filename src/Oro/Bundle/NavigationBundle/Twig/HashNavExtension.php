@@ -4,10 +4,17 @@ namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class HashNavExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to support hash navigation:
+ *   - oro_is_hash_navigation
+ *   - oro_hash_navigation_header
+ */
+class HashNavExtension extends AbstractExtension
 {
     /** @var Request */
     protected $request;
@@ -16,10 +23,8 @@ class HashNavExtension extends \Twig_Extension
      * Listen to the 'kernel.request' event to get the main request.
      * The request can not be injected directly into a Twig extension,
      * this causes a ScopeWideningInjectionException
-     *
-     * @param GetResponseEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if ($event->getRequestType() === HttpKernel::MASTER_REQUEST) {
             $this->request = $event->getRequest();
@@ -29,28 +34,24 @@ class HashNavExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_is_hash_navigation',
-                [$this, 'checkIsHashNavigation'],
-                ['is_safe' => ['html']]
+                [$this, 'checkIsHashNavigation']
             ),
-            new \Twig_SimpleFunction(
+            new TwigFunction(
                 'oro_hash_navigation_header',
-                [$this, 'getHashNavigationHeaderConst'],
-                ['is_safe' => ['html']]
+                [$this, 'getHashNavigationHeaderConst']
             ),
         ];
     }
 
     /**
      * Check for hash navigation
-     *
-     * @return bool
      */
-    public function checkIsHashNavigation()
+    public function checkIsHashNavigation(): bool
     {
         return
             is_object($this->request)
@@ -62,21 +63,9 @@ class HashNavExtension extends \Twig_Extension
 
     /**
      * Get hash navigation header string
-     *
-     * @return string
      */
-    public function getHashNavigationHeaderConst()
+    public function getHashNavigationHeaderConst(): string
     {
         return ResponseHashnavListener::HASH_NAVIGATION_HEADER;
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'oro_hash_nav';
     }
 }

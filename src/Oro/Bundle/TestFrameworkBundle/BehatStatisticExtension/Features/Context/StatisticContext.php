@@ -3,16 +3,19 @@
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Features\Context;
 
 use Behat\Behat\Context\Context;
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Doctrine\DBAL\DriverManager;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\ServiceContainer\BehatStatisticExtension;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Context object for Behat statistics collection.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class StatisticContext implements Context
 {
     /**
@@ -48,7 +51,6 @@ class StatisticContext implements Context
             throw new \RuntimeException('Unable to find the PHP executable.');
         }
         $this->phpBin = $php;
-        $this->process = new Process(null);
     }
 
     /** @BeforeScenario */
@@ -74,17 +76,15 @@ class StatisticContext implements Context
     {
         $argumentsString = strtr($argumentsString, ['\'' => '"']);
 
-        $this->process->setWorkingDirectory($this->testAppPath);
-        $this->process->setCommandLine(
-            sprintf(
-                '%s %s %s %s -c %s',
-                $this->phpBin,
-                escapeshellarg(BEHAT_BIN_PATH),
-                $argumentsString,
-                strtr('--format-settings=\'{"timer": false}\'', ['\'' => '"', '"' => '\"']),
-                $this->testAppPath.'/behat.yml'
-            )
+        $command = sprintf(
+            '%s %s %s %s -c %s',
+            $this->phpBin,
+            escapeshellarg(BEHAT_BIN_PATH),
+            $argumentsString,
+            strtr('--format-settings=\'{"timer": false}\'', ['\'' => '"', '"' => '\"']),
+            $this->testAppPath.'/behat.yml'
         );
+        $this->process = Process::fromShellCommandline($command, $this->testAppPath);
         $this->process->start();
         $this->process->wait();
     }
@@ -121,7 +121,7 @@ class StatisticContext implements Context
     {
         $rows = $table->getRows();
         foreach ($rows as $row) {
-            list($env, $value) = $row;
+            [$env, $value] = $row;
             putenv("$env=$value");
         }
     }
@@ -222,7 +222,7 @@ class StatisticContext implements Context
     public function databaseExists()
     {
         if (!isset($this->dbConfig['dbname'])) {
-            throw new RuntimeException('No db name in configuration');
+            throw new \RuntimeException('No db name in configuration');
         }
 
         $dbName =  $this->dbConfig['dbname'];
@@ -320,7 +320,7 @@ class StatisticContext implements Context
     public function tableHasData($tableName, TableNode $dataTable)
     {
         $conn = DriverManager::getConnection($this->dbConfig);
-        list($headers, $data) = [$dataTable->getRow(0), $dataTable->getHash()];
+        [$headers, $data] = [$dataTable->getRow(0), $dataTable->getHash()];
 
         do {
             $row = array_shift($data);

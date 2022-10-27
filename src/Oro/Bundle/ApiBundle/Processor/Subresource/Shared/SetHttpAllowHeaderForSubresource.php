@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Request\ApiActions;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -17,11 +17,11 @@ class SetHttpAllowHeaderForSubresource extends SetHttpAllowHeader
     protected function getHttpMethodToActionsMap()
     {
         return [
-            Request::METHOD_OPTIONS => ApiActions::OPTIONS,
-            Request::METHOD_GET     => ApiActions::GET_SUBRESOURCE,
-            Request::METHOD_PATCH   => ApiActions::UPDATE_SUBRESOURCE,
-            Request::METHOD_POST    => ApiActions::ADD_SUBRESOURCE,
-            Request::METHOD_DELETE  => ApiActions::DELETE_SUBRESOURCE
+            Request::METHOD_OPTIONS => ApiAction::OPTIONS,
+            Request::METHOD_GET     => ApiAction::GET_SUBRESOURCE,
+            Request::METHOD_PATCH   => ApiAction::UPDATE_SUBRESOURCE,
+            Request::METHOD_POST    => ApiAction::ADD_SUBRESOURCE,
+            Request::METHOD_DELETE  => ApiAction::DELETE_SUBRESOURCE
         ];
     }
 }

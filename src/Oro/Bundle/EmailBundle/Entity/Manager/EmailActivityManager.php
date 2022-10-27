@@ -9,9 +9,9 @@ use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Provides a set of methods to simplify managing associations between the Email as the activity entity
@@ -28,7 +28,7 @@ class EmailActivityManager
     /** @var EmailThreadProvider */
     protected $emailThreadProvider;
 
-    /** @var TokenStorage */
+    /** @var TokenStorageInterface */
     protected $tokenStorage;
 
     /** @var ServiceLink */
@@ -37,19 +37,11 @@ class EmailActivityManager
     /** @var EntityManager */
     protected $em;
 
-    /**
-     * @param ActivityManager           $activityManager
-     * @param EmailActivityListProvider $activityListProvider
-     * @param EmailThreadProvider       $emailThreadProvider
-     * @param TokenStorage              $tokenStorage
-     * @param ServiceLink               $entityOwnerAccessorLink
-     * @param EntityManager             $em
-     */
     public function __construct(
         ActivityManager $activityManager,
         EmailActivityListProvider $activityListProvider,
         EmailThreadProvider $emailThreadProvider,
-        TokenStorage $tokenStorage,
+        TokenStorageInterface $tokenStorage,
         ServiceLink $entityOwnerAccessorLink,
         EntityManager $em
     ) {
@@ -61,9 +53,6 @@ class EmailActivityManager
         $this->em                      = $em;
     }
 
-    /**
-     * @param array $createdEmails
-     */
     public function updateActivities(array $createdEmails)
     {
         foreach ($createdEmails as $email) {
@@ -114,13 +103,12 @@ class EmailActivityManager
             return;
         }
 
-        // @todo: Should be deleted after email sync process will be refactored
         $token = $this->tokenStorage->getToken();
         if ($token) {
             $ownerOrganization = $this->entityOwnerAccessorLink->getService()->getOrganization($owner);
             if ($ownerOrganization
-                && $token instanceof OrganizationContextTokenInterface
-                && $token->getOrganizationContext()->getId() !== $ownerOrganization->getId()
+                && $token instanceof OrganizationAwareTokenInterface
+                && $token->getOrganization()->getId() !== $ownerOrganization->getId()
             ) {
                 return;
             }
@@ -162,9 +150,6 @@ class EmailActivityManager
         }
     }
 
-    /**
-     * @param Email $email
-     */
     protected function copyContexts(Email $email)
     {
         $thread = $email->getThread();
@@ -172,7 +157,7 @@ class EmailActivityManager
             $contexts = $this->emailActivityListProvider->getTargetEntities($email);
             if (count($contexts) > 0) {
                 // from email to thread emails
-                $relatedEmails = $this->em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
+                $relatedEmails = $this->em->getRepository(Email::class)->findByThread($thread);
                 foreach ($relatedEmails as $relatedEmail) {
                     if ($email->getId() !== $relatedEmail->getId()) {
                         $this->changeContexts($relatedEmail, $contexts);
@@ -187,7 +172,6 @@ class EmailActivityManager
             }
         }
     }
-
 
     /**
      * Returns contexts of all referenced emails excluding contexts
@@ -215,10 +199,6 @@ class EmailActivityManager
         return $referencedContexts;
     }
 
-    /**
-     * @param Email         $email
-     * @param [] $contexts
-     */
     protected function addContextsToThread(Email $email, $contexts)
     {
         $relatedEmails = [$email];
@@ -231,10 +211,6 @@ class EmailActivityManager
         }
     }
 
-    /**
-     * @param Email         $email
-     * @param [] $contexts
-     */
     protected function changeContexts(Email $email, $contexts)
     {
         $oldContexts    = $this->emailActivityListProvider->getTargetEntities($email);

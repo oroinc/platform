@@ -23,7 +23,10 @@ trait MessageQueueAssertTrait
         return self::getContainer()->get('oro_message_queue.test.message_collector');
     }
 
-    public function clearMessageCollector()
+    /**
+     * Removes all collected sent messages.
+     */
+    protected static function clearMessageCollector()
     {
         if (null === self::getContainer()) {
             return;

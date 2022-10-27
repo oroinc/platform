@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\CronBundle\Async;
 
+use Oro\Bundle\CronBundle\Async\Topic\RunCommandTopic;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * Sends a {@see RunCommandTopic} message to message queue.
+ */
 class CommandRunner implements CommandRunnerInterface
 {
-    /**
-     * @var MessageProducerInterface
-     */
-    private $producer;
+    private MessageProducerInterface $producer;
 
-    /**
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(MessageProducerInterface $producer)
     {
         $this->producer = $producer;
@@ -27,7 +25,7 @@ class CommandRunner implements CommandRunnerInterface
     public function run($commandName, $commandArguments = [])
     {
         $this->producer->send(
-            Topics::RUN_COMMAND,
+            RunCommandTopic::getName(),
             [
                 'command' => $commandName,
                 'arguments' => $commandArguments

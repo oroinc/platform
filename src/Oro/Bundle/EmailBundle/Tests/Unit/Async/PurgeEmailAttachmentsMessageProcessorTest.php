@@ -1,30 +1,33 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Oro\Component\Testing\ReflectionUtil;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
+        $this->expectNotToPerformAssertions();
+
         new PurgeEmailAttachmentsMessageProcessor(
-            $this->createRegistryInterfaceMock(),
-            $this->createMessageProducerMock(),
-            $this->createJobRunnerMock(),
-            $this->createConfigManagerMock()
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(MessageProducerInterface::class),
+            $this->createMock(JobRunner::class),
+            $this->createMock(ConfigManager::class)
         );
     }
 
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals(
-            [ Topics::PURGE_EMAIL_ATTACHMENTS ],
+            [PurgeEmailAttachmentsTopic::getName()],
             PurgeEmailAttachmentsMessageProcessor::getSubscribedTopics()
         );
     }
@@ -32,28 +35,30 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
     /**
      * @dataProvider getSizeDataProvider
      */
-    public function testShouldReturnCorrectAttachmentSizeByPayload($payload, $parameterSize, $expectedResult)
-    {
-        $configManager = $this->createConfigManagerMock();
+    public function testShouldReturnCorrectAttachmentSizeByPayload(
+        array $payload,
+        int $parameterSize,
+        int $expectedResult
+    ) {
+        $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())
             ->method('get')
             ->with('oro_email.attachment_sync_max_size')
-            ->willReturn($parameterSize)
-        ;
+            ->willReturn($parameterSize);
 
         $processor = new PurgeEmailAttachmentsMessageProcessor(
-            $this->createRegistryInterfaceMock(),
-            $this->createMessageProducerMock(),
-            $this->createJobRunnerMock(),
+            $this->createMock(ManagerRegistry::class),
+            $this->createMock(MessageProducerInterface::class),
+            $this->createMock(JobRunner::class),
             $configManager
         );
 
-        $actualResult = ReflectionUtil::callProtectedMethod($processor, 'getSize', [$payload]);
+        $actualResult = ReflectionUtil::callMethod($processor, 'getSize', [$payload]);
 
         $this->assertEquals($expectedResult, $actualResult);
     }
 
-    public function getSizeDataProvider()
+    public function getSizeDataProvider(): array
     {
         return [
             [
@@ -72,39 +77,5 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
                 'result' => 3000000,
             ],
         ];
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigManager
-     */
-    private function createConfigManagerMock()
-    {
-        return $this->createMock(ConfigManager::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
-     */
-    private function createRegistryInterfaceMock()
-    {
-        return $this->createMock(RegistryInterface::class);
-    }
-
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
-    }
-
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
-     */
-    private function createMessageProducerMock()
-    {
-        return $this->createMock(MessageProducerInterface::class);
     }
 }

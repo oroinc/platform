@@ -1,0 +1,8 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTopic: ~
+    Oro\Bundle\NotificationBundle\Async\Topic\SendMassEmailNotificationTopic: ~
+    Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic: ~

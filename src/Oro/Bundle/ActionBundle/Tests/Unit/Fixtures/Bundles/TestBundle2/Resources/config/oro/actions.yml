@@ -1,10 +1,19 @@
-skipped_config:
-    test_operation3:
-        label: Test Operation 3
-
 operations:
-    test_operation4:
-        label: Test Operation 4
+    test_action1:
+        replace:
+            - routes
+
+    test_action4:
+        label: Test Action4
+        datagrid_options:
+            data:
+                replace:
+                    - sub_config1
+                    - sub_config3
+                sub_config3: replaced data
+        button_options:
+            data:
+                'custom key with %%percent escaped string%% parameter': 'value'
 
 action_groups:
     group2:

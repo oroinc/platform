@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var NumberFormatter = require('orolocale/js/formatter/number');
+    const NumberFormatter = require('orolocale/js/formatter/number');
 
     describe('orolocale/js/formatter/number', function() {
         describe('check custom options', function() {
@@ -29,7 +29,7 @@ define(function(require) {
                 })).toEqual('123,456');
                 expect(NumberFormatter.formatDecimal(123456.0789, {
                     max_fraction_digits: 3
-                })).toEqual('123,456.079');
+                })).toEqual('123,456.0789');
             });
         });
     });

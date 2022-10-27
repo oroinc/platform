@@ -1,17 +1,15 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Entity;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 
 class AddressTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AddressType
-     */
-    protected $type;
+    /** @var AddressType */
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new AddressType('billing');
     }

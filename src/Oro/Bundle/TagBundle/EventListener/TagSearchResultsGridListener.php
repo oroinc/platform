@@ -16,10 +16,6 @@ class TagSearchResultsGridListener
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
-    /**
-     * @param SecurityProvider    $securityProvider
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(SecurityProvider $securityProvider, EntityAliasResolver $entityAliasResolver)
     {
         $this->securityProvider    = $securityProvider;
@@ -29,8 +25,6 @@ class TagSearchResultsGridListener
     /**
      * Adjust query for tag-results-grid (tag search result grid)
      * after datasource has been built
-     *
-     * @param BuildAfter $event
      */
     public function onBuildAfter(BuildAfter $event)
     {

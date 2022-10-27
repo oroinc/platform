@@ -1,201 +1,111 @@
-parameters:
-    oro_translation.entity.language.class:                      Oro\Bundle\TranslationBundle\Entity\Language
-    oro_translation.entity.translation.class:                   Oro\Bundle\TranslationBundle\Entity\Translation
-    oro_translation.entity.translation_key.class:               Oro\Bundle\TranslationBundle\Entity\TranslationKey
-
-    translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
-    oro_translation.translation_walker.class:                   Gedmo\Translatable\Query\TreeWalker\TranslationWalker
-    oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
-    oro_translation.extractor.php_code_extractor.class:         Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
-    oro_translation.empty_array.loader.class:                   Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader
-
-    oro_translation.dynamic_translation.metadata.cache.class:   Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache
-
-    oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
-    oro_translation.statistic_provider.class:                   Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider
-    oro_translation.crowdin.adapter.class:                      Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
-    oro_translation.oro_translation.adapter.class:              Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter
-    oro_translation.guzzle_client.class:                        Guzzle\Http\Client
-
-    oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
-
-    oro_translation.strategy.provider.class:                    Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider
-    oro_translation.strategy.default.class:                     Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy
-
 services:
-    oro_translation.controller:
-        class: '%oro_translation.controller.class%'
+    Oro\Bundle\TranslationBundle\Download\TranslationDownloader:
         arguments:
-            - '@translator.default'
-            - '@templating'
-            - OroTranslationBundle:Translation:translation.js.twig
-            - ""
-        lazy: true
-
-    oro_translation.extractor.php_code_extractor:
-        class: '%oro_translation.extractor.php_code_extractor.class%'
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: translation.extractor, alias: oro_translation_php_extractor }
-
-    oro_translation.service_provider:
-        class: '%oro_translation.service_provider.class%'
-        arguments:
-            - '@oro_translation.uploader.default_adapter'
+            - '@Oro\Bundle\TranslationBundle\Download\OroTranslationServiceAdapter'
+            - '@Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider'
             - '@oro_translation.js_dumper'
             - '@translation.reader'
             - '@oro_translation.database_translation.persister'
-            - '%kernel.cache_dir%'
+            - '@doctrine'
         lazy: true
 
-    oro_translation.statistic_provider:
-        class: '%oro_translation.statistic_provider.class%'
+    Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider:
         arguments:
+            - '@Oro\Bundle\TranslationBundle\Download\OroTranslationServiceAdapter'
             - '@oro_translation.cache'
-            - '@oro_translation.oro_translation_adapter'
-            - '@oro_translation.packages_provider'
             - '@logger'
         tags:
             - { name: monolog.logger, channel: oro_translation }
 
-    # guzzle http client for crowdin
-    oro_translation.guzzle_crowdin_client:
-        class: '%oro_translation.guzzle_client.class%'
+    Oro\Bundle\TranslationBundle\Download\OroTranslationServiceAdapter:
         arguments:
-            - '%oro_translation.api.crowdin.endpoint%'
-        lazy: true
-
-    # guzzle http client for oro proxy
-    oro_translation.guzzle_oro_client:
-        class: '%oro_translation.guzzle_client.class%'
-        arguments:
-            - '%oro_translation.api.oro_service.endpoint%'
-        lazy: true
-
-    oro_translation.uploader.crowdin_adapter:
-        class: '%oro_translation.crowdin.adapter.class%'
-        arguments:
-            - '@oro_translation.guzzle_crowdin_client'
-
-    oro_translation.oro_translation_adapter:
-        class: '%oro_translation.oro_translation.adapter.class%'
-        arguments:
-            - '@oro_translation.guzzle_oro_client'
-        calls:
-            - [ setApiKey, [ '%oro_translation.api.oro_service.key%' ] ]
-            - [ setLogger, [ '@logger' ] ]
+            - !service { class: GuzzleHttp\Client }
+            - '@logger'
+            - '%oro_translation.package_names%'
+            - { apikey: '%oro_translation.translation_service.apikey%' }
         tags:
             - { name: monolog.logger, channel: oro_translation }
 
-    oro_translation.database_translation.metadata.cache:
-        class: '%oro_translation.dynamic_translation.metadata.cache.class%'
-        arguments:
-            - '@oro_translation.database_translation.metadata.cache_impl'
-
-    oro_translation.database_translation.metadata.cache_impl:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_db_trans_metadata' ] ]
-
     oro_translation.database_translation.persister:
-        class: 'Oro\Bundle\TranslationBundle\Translation\DatabasePersister'
+        class: Oro\Bundle\TranslationBundle\Translation\DatabasePersister
         arguments:
             - '@doctrine'
             - '@oro_translation.manager.translation'
+            - '@oro_translation.helper.file_based_language'
 
-    oro_translation.database_translation.loader:
-        class: 'Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader'
+    oro_translation.dynamic_translation_provider:
+        class: Oro\Bundle\TranslationBundle\Translation\DynamicTranslationProvider
+        arguments:
+            - '@oro_translation.dynamic_translation_loader'
+            - '@oro_translation.dynamic_translation_cache'
+        tags:
+            - { name: kernel.event_listener, event: oro_translation.invalidate_dynamic_translation_cache, method: onClearCache }
+
+    oro_translation.dynamic_translation_loader:
+        class: Oro\Bundle\TranslationBundle\Translation\DynamicTranslationLoader
         arguments:
             - '@doctrine'
-            - '@oro_translation.database_checker'
-        tags:
-            - { name: translation.loader, alias: oro_database_translation }
 
-    oro_translation.database_checker:
-        public: false
-        class: Oro\Bundle\EntityBundle\Tools\DatabaseChecker
+    oro_translation.cacheable_dynamic_translation_loader:
+        class: Oro\Bundle\TranslationBundle\Translation\CacheableDynamicTranslationLoader
+        decorates: oro_translation.dynamic_translation_loader
+        decoration_priority: -255
         arguments:
-            - '@doctrine'
-            - ['oro_translation']
-            - '%installed%'
-        tags:
-            - { name: oro_entity.database_checker }
+            - '@.inner'
+            - '@oro_translation.dynamic_translation_cache'
+            - '@oro_translation.translations_sanitizer'
+            - '@oro_translation.translation_message_sanitization_errors'
+
+    oro_translation.dynamic_translation_cache:
+        class: Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache
+        public: true
+        arguments:
+            - '@oro_translation.cache'
+            - '@event_dispatcher'
 
     oro_translation.empty_array.loader:
-        class: '%oro_translation.empty_array.loader.class%'
+        class: Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader
 
-    oro_translation.selector:
-        class: Oro\Bundle\TranslationBundle\Translation\MessageSelector
-        decorates: translator.selector
-        arguments:
-            - '@logger'
+    oro_translation.identity_translator:
+        class: Oro\Bundle\TranslationBundle\Translation\IdentityTranslator
+        decorates: identity_translator
+        calls:
+            - [setLogger, ['@logger']]
 
     oro_translation.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [setNamespace, [ 'oro_trans' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: cache.pool, namespace: oro_translation }
 
     oro_translation.resource.cache:
-        public: false
-        class: Doctrine\Common\Cache\ArrayCache
-        
-    oro_translation.cache.translation_cache_warmer:
-        class: 'Oro\Bundle\TranslationBundle\Cache\TranslationCacheWarmer'
-        public: false
-        decorates: 'translation.warmer'
-        decoration_inner_name: 'translation.warmer.default'
+        class: Oro\Bundle\CacheBundle\Provider\MemoryCache
+
+    oro_translation.js_generator:
+        class: Oro\Bundle\TranslationBundle\Provider\JsTranslationGenerator
         arguments:
-            - '@translation.warmer.default'
-            - '@oro_translation.strategy.provider'
+            - '@translator.default'
+            - '@twig'
+            - '@@OroTranslation/Translation/translation.js.twig'
+            - !abstract '$domains defined in Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension'
 
     oro_translation.js_dumper:
-        class: 'Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper'
+        class: Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper
         arguments:
-            - '@oro_translation.controller'
-            - '@router'
-            - '%oro_translation.js_translation.domains%'
-            - '%kernel.project_dir%'
+            - '@oro_translation.js_generator'
             - '@oro_translation.provider.language'
+            - '@oro_navigation.file_manager.public_js'
         lazy: true
+        public: true
 
     oro_translation.twig.translation.extension:
-        class: 'Oro\Bundle\TranslationBundle\Twig\TranslationExtension'
+        class: Oro\Bundle\TranslationBundle\Twig\TranslationExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
+            - '%oro_translation.debug_translator%'
+            - !abstract '$isDebugJsTranslations defined in Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension'
         tags:
             - { name: twig.extension }
-
-    oro_translation.packages_provider:
-        class: '%oro_translation.packages_provider.class%'
-        arguments:
-            - '@oro_distribution.package_manager'
-            - '%kernel.bundles%'
-            - '%kernel.project_dir%'
-            - '%oro_distribution.composer_cache_home%'
-            - ['@oro_translation.packages_provider.translation']
-
-    oro_translation.packages_provider.translation:
-        class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider'
-
-    oro_translation.extension.transtation_packages_provider.abstract:
-        class: 'Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtension'
-        abstract: true
-        public: false
-        arguments:
-            - '@oro_platform.composer.local_repo_factory'
-            - '@oro_distribution.composer'
-
-    oro_translation.extension.transtation_packages_provider:
-        parent: oro_translation.extension.transtation_packages_provider.abstract
-        calls:
-            - ['addPackage', ['Oro', 'oro/platform', '/src']]
-            - ['addPackage', ['Oro', 'oro/calendar-bundle']]
-            - ['addPackage', ['Oro', 'oro/platform-serialised-fields']]
-        tags:
-            - {name: oro_translation.extension.packages_provider}
 
     oro_translation.query_hint.translatable:
         public: false
@@ -205,153 +115,277 @@ services:
                 name: oro_entity.query_hint
                 hint: oro_translation.translatable
                 alias: HINT_TRANSLATABLE
-                output_walker: '%oro_translation.translation_walker.class%'
+                output_walker: Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker
 
-    oro_translation.event_listener.translation:
-        class: 'Oro\Bundle\TranslationBundle\EventListener\TranslationListener'
+    oro_translation.event_listener.clear_dynamic_translation_cache:
+        class: Oro\Bundle\TranslationBundle\EventListener\ClearDynamicTranslationCacheListener
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+        tags:
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Translation, event: postPersist, method: onTranslationChanged }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Translation, event: postUpdate, method: onTranslationChanged }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Translation, event: postRemove, method: onTranslationChanged }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Language, event: postPersist, method: onLanguageChanged }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Language, event: postUpdate, method: onLanguageChanged }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Language, event: postRemove, method: onLanguageChanged }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\LocaleBundle\Entity\Localization, event: postPersist, method: onLocalizationChanged }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\LocaleBundle\Entity\Localization, event: postUpdate, method: onLocalizationChanged }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\LocaleBundle\Entity\Localization, event: postRemove, method: onLocalizationChanged }
+            - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: onClear }
+            - { name: container.service_subscriber, id: oro_translation.dynamic_translation_cache, key: Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache }
+
+    oro_translation.event_listener.import.clear_dynamic_translation_cache:
+        class: Oro\Bundle\TranslationBundle\EventListener\ClearDynamicTranslationCacheImportListener
         lazy: true
         arguments:
-            - '@oro_translation.database_translation.metadata.cache'
+            - '@oro_translation.dynamic_translation_cache'
             - 'import.language_translations_import_from_csv'
         tags:
             - {name: kernel.event_listener, event: oro.import_export.after_job_execution, method: onAfterImportTranslations}
 
-    oro_organization_config.event_listener.languages_change:
-        class: 'Oro\Bundle\TranslationBundle\EventListener\LanguagesChangeListener'
-        arguments:
-            - '@oro_config.user'
-            - '@doctrine'
+    oro_translation.event_listener.update_translatable_dictionaries:
+        class: Oro\Bundle\TranslationBundle\EventListener\UpdateTranslatableDictionariesListener
         tags:
-            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Translation, event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Translation, event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\TranslationBundle\Entity\Translation, event: postRemove }
+            - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: onClear }
 
     oro_translation.strategy.default:
-        class: '%oro_translation.strategy.default.class%'
+        class: Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy
         public: false
         arguments:
-            - '@oro_translation.provider.language'
-            - '%installed%'
+            - '@oro_locale.translation.strategy.localization_fallback_strategy'
+            - '@oro_distribution.handler.application_status'
         tags:
-            - { name: oro_translation.extension.translation_strategy, priority: 0 }
+            - { name: oro_translation.extension.translation_strategy }
 
     oro_translation.strategy.provider:
-        class: '%oro_translation.strategy.provider.class%'
-
-    oro_translation.listener.datagrid.language:
-        class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageListener'
+        class: Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider
         arguments:
-            - '@oro_translation.helper.language'
-            - '@oro_entity.doctrine_helper'
+            - !tagged_iterator oro_translation.extension.translation_strategy
+
+    Oro\Bundle\TranslationBundle\EventListener\Datagrid\LanguageTranslationCompletenessAndAvailabilityListener:
+        arguments:
+            - '@Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider'
+            - '@doctrine'
         tags:
-            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-translation-language-grid, method: onResultAfter }
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-language-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-translation-language-grid }
 
     oro_translation.listener.datagrid.translation:
-        class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslationListener'
+        class: Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslationListener
         arguments:
             - '@oro_translation.provider.language'
+            - '@translator'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-translation-translations-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.oro-translation-translations-grid, method: onResultAfter }
 
     oro_translation.listener.datagrid.translatable:
-        class: 'Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslatableListener'
+        class: Oro\Bundle\TranslationBundle\EventListener\Datagrid\TranslatableListener
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before, method: onResultBefore }
 
     oro_translation.repository.language:
-        class: 'Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository'
+        alias: Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository
+
+    Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository:
         parent: oro_entity.abstract_repository
         arguments:
-            - '%oro_translation.entity.language.class%'
+            - 'Oro\Bundle\TranslationBundle\Entity\Language'
+        tags:
+            - { name: doctrine.repository_service }
 
     oro_translation.provider.translation_context:
-        class: 'Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider'
+        class: Oro\Bundle\TranslationBundle\Provider\TranslationContextProvider
+        public: true
+        arguments:
+            - !tagged_iterator oro_translation.extension.translation_context_resolver
 
     oro_translation.extension.translation_context_resolver:
-        class: 'Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver'
+        class: Oro\Bundle\TranslationBundle\Extension\TranslationContextResolver
         arguments:
             - '@translator'
         tags:
-            - { name: oro_translation.extension.translation_context_resolver, priority: 100 }
+            - { name: oro_translation.extension.translation_context_resolver, priority: -100 }
 
     oro_translation.provider.language:
-        class: 'Oro\Bundle\TranslationBundle\Provider\LanguageProvider'
+        class: Oro\Bundle\TranslationBundle\Provider\LanguageProvider
         arguments:
             - '@doctrine'
             - '@oro_locale.settings'
             - '@oro_security.acl_helper'
 
-    oro_translation.helper.language:
-        class: 'Oro\Bundle\TranslationBundle\Helper\LanguageHelper'
-        arguments:
-            - '@oro_translation.statistic_provider'
-            - '@oro_translation.packages_provider'
-            - '@oro_translation.oro_translation_adapter'
-            - '@oro_translation.service_provider'
-            - '@oro_config.global'
-
     oro_translation.manager.translation:
-        class: 'Oro\Bundle\TranslationBundle\Manager\TranslationManager'
+        class: Oro\Bundle\TranslationBundle\Manager\TranslationManager
+        public: true
         arguments:
             - '@doctrine'
             - '@oro_translation.provider.translation_domain'
-            - '@oro_translation.database_translation.metadata.cache'
-            - '@event_dispatcher'
-
-    oro_translation.cache.provider.domains:
-        parent: oro.cache.abstract
-        public: false
-        calls:
-            - [ setNamespace, [ 'oro_translation_domains' ] ]
+            - '@oro_translation.dynamic_translation_cache'
+            - '@oro_message_queue.client.message_producer'
+            - !abstract '$jsTranslationDomains defined in Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension'
 
     oro_translation.provider.translation_domain:
-        class: 'Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider'
+        class: Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider
+        public: true
         arguments:
             - '@doctrine'
-            - '@oro_translation.cache.provider.domains'
+            - '@oro_translation.cache'
+
+    oro_translation.provider.translation:
+        class: Oro\Bundle\TranslationBundle\Provider\TranslationProvider
+        arguments:
+            - '@doctrine'
 
     oro_translation.helper.translation:
-        class: 'Oro\Bundle\TranslationBundle\Helper\TranslationHelper'
+        class: Oro\Bundle\TranslationBundle\Helper\TranslationHelper
         arguments:
             - '@doctrine'
 
     oro_translation.filter.language:
-        class: 'Oro\Bundle\TranslationBundle\Filter\LanguageFilter'
-        parent: oro_filter.entity_filter
+        class: Oro\Bundle\TranslationBundle\Filter\LanguageFilter
+        public: false
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@doctrine'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: language, datasource: orm }
+            - { name: oro_filter.extension.orm_filter.filter, type: language }
 
     oro_translation.helper.translation_route:
-        class: 'Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper'
+        class: Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper
         arguments:
             - '@oro_datagrid.helper.route'
 
     oro_translation.layout.data_provider.translator:
-        class: 'Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider'
+        class: Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider
         arguments:
             - '@translator'
         tags:
             - { name: layout.data_provider, alias: translator }
 
+    oro_translation.rebuild_translation_cache_processor:
+        class: Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheProcessor
+        arguments:
+            - '@translator.default'
+            - '@oro_translation.provider.translation_domain'
+            - '@oro_translation.js_dumper'
+            - '@oro_ui.dynamic_asset_version_manager'
+            - '@logger'
+
+    Oro\Bundle\TranslationBundle\Action\DownloadUpdateLanguageTranslationAction:
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@Oro\Bundle\TranslationBundle\Download\TranslationDownloader'
+            - '@logger'
+        tags:
+            - { name: oro_action.action, alias: download_update_language_translation }
+            - { name: monolog.logger, channel: oro_translation }
+
+    Oro\Bundle\TranslationBundle\Action\GetLanguageTranslationMetricsAction:
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider'
+        tags:
+            - { name: oro_action.action, alias: get_language_translation_metrics }
+
+    Oro\Bundle\TranslationBundle\Action\IsLanguageTranslationInstallAvailableCondition:
+        arguments:
+            - '@Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider'
+            - '@doctrine'
+        tags:
+            - { name: oro_action.condition, alias: is_language_translation_install_available }
+
+    Oro\Bundle\TranslationBundle\Action\IsLanguageTranslationUpdateAvailableCondition:
+        arguments:
+            - '@Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider'
+            - '@doctrine'
+        tags:
+            - { name: oro_action.condition, alias: is_language_translation_update_available }
+
     oro_translation.mass_action.reset_translation:
-        class: 'Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction'
+        class: Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction
         shared: false
         tags:
             - { name: oro_datagrid.extension.mass_action.type, type: reset_translations }
 
     oro_translation.mass_action.reset_translation_handler:
-        class: 'Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassActionHandler'
+        class: Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassActionHandler
+        public: true
         arguments:
            - '@oro_translation.manager.translation'
            - '@translator'
            - '@oro_security.acl_helper'
+           - '@oro_message_queue.client.message_producer'
 
-    oro_translation.provider.external_translations:
-        class: 'Oro\Bundle\TranslationBundle\Provider\ExternalTranslationsProvider'
+    oro_translation.migration.demo_data_fixtures_listener.js_translation_dump:
+        class: Oro\Bundle\TranslationBundle\EventListener\JsTranslationDumpDemoDataListener
         arguments:
-           - '@oro_translation.service_provider'
-           - '@oro_translation.helper.language'
-           - '@oro_entity.doctrine_helper'
-
-    oro_translation.strategy.provider_link:
+            - '@oro_translation.js_dumper'
+            - '@oro_translation.provider.language'
+            - '@oro_distribution.handler.application_status'
         tags:
-            - { name: oro_service_link, service: oro_translation.strategy.provider }
+            - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
+
+    oro_translation.async.message_filter.dump_js_translations:
+        class: Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageFilter
+        tags:
+            - { name: oro_message_queue.message_filter, topic: oro.translation.dump_js_translations }
+
+    oro_translation.async.dump_js_translations_processor:
+        class: Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageProcessor
+        arguments:
+            - '@oro_translation.js_dumper'
+            - '@logger'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_translation.message_catalogue_sanitizer:
+        class: Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizer
+        arguments:
+            - '@oro_translation.translations_sanitizer'
+            - '@oro_translation.translation_message_sanitization_errors'
+
+    oro_translation.translations_sanitizer:
+        class: Oro\Bundle\TranslationBundle\Translation\TranslationsSanitizer
+        arguments:
+            - '@oro_translation.translation_message_sanitizer'
+
+    oro_translation.translation_message_sanitizer:
+        class: Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizer
+        arguments:
+            - '@oro_ui.html_tag_helper'
+
+    oro_translation.translation_message_sanitization_errors:
+        class: Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationErrorCollection
+
+    oro_translation.formatter.translator_formatter:
+        class: Oro\Bundle\TranslationBundle\Formatter\TranslatorFormatter
+        public: false
+        arguments:
+            - '@translator'
+        tags:
+            - { name: oro_formatter, formatter: oro_translation.translator_formatter }
+
+    oro_translation.catalogue_loader.database:
+        class: Oro\Bundle\TranslationBundle\Provider\Catalogue\DatabaseCatalogueLoader
+        arguments:
+            - '@oro_translation.provider.translation'
+        tags:
+            - { name: 'oro_translation.catalogue_loader' }
+
+    oro_translation.catalogue_loader.crowdin:
+        class: Oro\Bundle\TranslationBundle\Provider\Catalogue\CrowdinCatalogueLoader
+        arguments:
+            - '@Oro\Bundle\TranslationBundle\Download\OroTranslationServiceAdapter'
+            - '@translation.reader'
+        tags:
+            - { name: 'oro_translation.catalogue_loader' }
+
+    oro_translation.helper.file_based_language:
+        class: Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper
+        arguments:
+            - '%translator.default_path%'

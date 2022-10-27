@@ -4,19 +4,21 @@ namespace Oro\Bundle\SyncBundle\Twig;
 
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 /**
- * Adds TWIG functions for interaction with websocket server
+ * Provides Twig functions to interact with the websocket server:
+ *   - check_ws
+ *   - oro_sync_get_content_tags
  */
-class OroSyncExtension extends \Twig_Extension
+class OroSyncExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -44,8 +46,8 @@ class OroSyncExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('check_ws', [$this, 'checkWsConnected']),
-            new \Twig_SimpleFunction('oro_sync_get_content_tags', [$this, 'generate'])
+            new TwigFunction('check_ws', [$this, 'checkWsConnected']),
+            new TwigFunction('oro_sync_get_content_tags', [$this, 'generate'])
         ];
     }
 
@@ -73,12 +75,13 @@ class OroSyncExtension extends \Twig_Extension
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return 'sync_extension';
+        return [
+            'oro_sync.content.tag_generator' => TagGeneratorInterface::class,
+            'oro_sync.client.connection_checker' => ConnectionChecker::class,
+        ];
     }
 }

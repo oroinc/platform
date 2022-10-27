@@ -4,23 +4,28 @@ namespace Oro\Component\Config\Merger;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * This class provides a way to merge configurations.
+ * For details see Resources/doc/configuration_merger.md
+ */
 class ConfigurationMerger
 {
     const EXTENDS_NODE_NAME = 'extends';
     const REPLACES_NODE_NAME = 'replace';
 
-    /** @var array */
-    protected $kernelBundles;
+    /** @var array [bundle class name => bundle index, ...] */
+    protected $bundles;
 
     /** @var array */
     protected $processedConfigs = [];
 
     /**
-     * @param array $kernelBundles Must be passed value of container`s parameter %kernel.bundles%
+     * @param string[] $bundles An array contains class names of bundles,
+     *                          usually a value of "%kernel.bundles%" DIC parameter
      */
-    public function __construct(array $kernelBundles)
+    public function __construct(array $bundles)
     {
-        $this->kernelBundles = array_flip(array_values($kernelBundles));
+        $this->bundles = array_flip(array_values($bundles));
     }
 
     /**
@@ -60,9 +65,8 @@ class ConfigurationMerger
         $actionConfigs = [];
 
         foreach ($rawConfigurationByBundles as $bundle => $actions) {
-            if (array_key_exists($bundle, $this->kernelBundles)) {
-                $bundleNumber = $this->kernelBundles[$bundle];
-
+            if (array_key_exists($bundle, $this->bundles)) {
+                $bundleNumber = $this->bundles[$bundle];
                 foreach ($actions as $actionName => $config) {
                     $actionConfigs[$actionName][$bundleNumber] = $config;
                 }

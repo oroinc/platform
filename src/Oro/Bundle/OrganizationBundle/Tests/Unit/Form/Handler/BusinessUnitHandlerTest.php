@@ -1,57 +1,54 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_DATA = ['field' => 'value'];
+    private const FORM_DATA = ['field' => 'value'];
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    /** @var Request */
+    private $request;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|FormInterface
-     */
-    protected $form;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    /**
-     * @var BusinessUnitHandler
-     */
-    protected $handler;
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager
-     */
-    protected $manager;
+    /** @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownerTreeProvider;
 
-    /**
-     * @var BusinessUnit
-     */
-    protected $entity;
+    /** @var BusinessUnit */
+    private $entity;
 
-    protected function setUp()
+    /** @var BusinessUnitHandler */
+    private $handler;
+
+    protected function setUp(): void
     {
-        $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
-        $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->manager = $this->createMock(ObjectManager::class);
+        $this->form = $this->createMock(Form::class);
+        $this->ownerTreeProvider = $this->createMock(OwnerTreeProviderInterface::class);
         $this->entity  = new BusinessUnit();
-        $this->handler = new BusinessUnitHandler($this->form, $requestStack, $this->manager);
+
+        $this->handler = new BusinessUnitHandler(
+            $this->form,
+            $requestStack,
+            $this->manager,
+            $this->ownerTreeProvider
+        );
     }
 
     public function testProcessValidData()
@@ -77,44 +74,37 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $appendForm = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $appendForm = $this->createMock(Form::class);
         $appendForm->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue(array($appendedUser)));
-        $this->form->expects($this->at(5))
-            ->method('get')
-            ->with('appendUsers')
-            ->will($this->returnValue($appendForm));
+            ->willReturn([$appendedUser]);
 
-        $removeForm = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $removeForm = $this->createMock(Form::class);
         $removeForm->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue(array($removedUser)));
-        $this->form->expects($this->at(6))
+            ->willReturn([$removedUser]);
+
+        $this->form->expects($this->exactly(2))
             ->method('get')
-            ->with('removeUsers')
-            ->will($this->returnValue($removeForm));
+            ->willReturnMap([
+                ['appendUsers', $appendForm],
+                ['removeUsers', $removeForm]
+            ]);
 
-        $this->manager->expects($this->at(0))
+        $this->manager->expects($this->exactly(3))
             ->method('persist')
-            ->with($appendedUser);
-
-        $this->manager->expects($this->at(1))
-            ->method('persist')
-            ->with($removedUser);
-
-        $this->manager->expects($this->at(2))
-            ->method('persist')
-            ->with($this->entity);
-
+            ->withConsecutive(
+                [$appendedUser],
+                [$removedUser],
+                [$this->entity]
+            );
         $this->manager->expects($this->once())
             ->method('flush');
+
+        $this->ownerTreeProvider->expects($this->once())
+            ->method('clearCache');
 
         $this->assertTrue($this->handler->process($this->entity));
 

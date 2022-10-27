@@ -13,9 +13,6 @@ class ValidateStep implements MergeStepInterface
      */
     protected $validator;
 
-    /**
-     * @param ValidatorInterface $validator
-     */
     public function __construct(ValidatorInterface $validator)
     {
         $this->validator = $validator;
@@ -24,7 +21,6 @@ class ValidateStep implements MergeStepInterface
     /**
      * Validate data
      *
-     * @param EntityData $data
      * @throws ValidationException
      */
     public function run(EntityData $data)

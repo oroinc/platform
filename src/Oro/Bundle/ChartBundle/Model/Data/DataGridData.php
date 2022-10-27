@@ -16,9 +16,6 @@ class DataGridData implements DataInterface
      */
     protected $datagrid;
 
-    /**
-     * @param DatagridInterface $datagrid
-     */
     public function __construct(DatagridInterface $datagrid)
     {
         $this->datagrid = $datagrid;

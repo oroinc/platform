@@ -3,16 +3,16 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var RequiredAttributesListener
-     */
-    protected $listener;
+    /** @var RequiredAttributesListener */
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listener = new RequiredAttributesListener();
     }
@@ -28,19 +28,14 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnSubmitNoWorkflowData()
     {
-        $data = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $data = $this->createMock(WorkflowData::class);
         $data->expects($this->never())
             ->method($this->anything());
 
-
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->willReturn($data);
         $event->expects($this->never())
             ->method('setData');
 
@@ -51,12 +46,10 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
     {
         $data = new \stdClass();
 
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->willReturn($data);
         $event->expects($this->never())
             ->method('setData');
 
@@ -65,50 +58,42 @@ class RequiredAttributesListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testEvents()
     {
-        $attributeNames = array('test');
-        $values = array('test' => 'value');
+        $attributeNames = ['test'];
+        $values = ['test' => 'value'];
 
-        $data = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $data = $this->createMock(WorkflowData::class);
         $data->expects($this->once())
             ->method('getValues')
             ->with($attributeNames)
-            ->will($this->returnValue($values));
+            ->willReturn($values);
 
-        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(FormEvent::class);
         $event->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($data));
+            ->willReturn($data);
         $event->expects($this->once())
             ->method('setData')
-            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Model\WorkflowData'));
+            ->with($this->isInstanceOf(WorkflowData::class));
 
         $this->listener->initialize($attributeNames);
         $this->listener->onPreSetData($event);
 
         // Test submit data
-        $formData = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formData = $this->createMock(WorkflowData::class);
         $formData->expects($this->once())
             ->method('getValues')
-            ->will($this->returnValue($values));
+            ->willReturn($values);
         $data->expects($this->once())
             ->method('add')
             ->with($values);
 
-        $submitEvent = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $submitEvent = $this->createMock(FormEvent::class);
         $submitEvent->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($formData));
+            ->willReturn($formData);
         $submitEvent->expects($this->once())
             ->method('setData')
-            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Model\WorkflowData'));
+            ->with($this->isInstanceOf(WorkflowData::class));
 
         $this->listener->onSubmit($submitEvent);
     }

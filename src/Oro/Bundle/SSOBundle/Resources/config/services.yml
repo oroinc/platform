@@ -1,18 +1,10 @@
-parameters:
-    oro_sso.oauth_provider.class: Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider
-    hwi_oauth.authentication.provider.oauth.class: Oro\Bundle\SSOBundle\Security\OAuthProvider
-    hwi_oauth.resource_owner.google.class: Oro\Bundle\SSOBundle\OAuth\ResourceOwner\GoogleResourceOwner
-    oro_sso.token.factory.oauth.class: Oro\Bundle\SSOBundle\Security\OAuthTokenFactory
-
 services:
-    oro_sso.oauth_provider:
-        class:     '%oro_sso.oauth_provider.class%'
-        arguments: ['@oro_user.manager', '@oro_config.global']
-
-    oro_sso.event_listener.user_email_change_listener:
-        class: Oro\Bundle\SSOBundle\EventListener\UserEmailChangeListener
-        tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_user.entity.class%', event: preUpdate }
+    oro_sso.oauth_user_provider:
+        class: Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider
+        public: true
+        arguments:
+            - ~ # service locator for user providers
+            - '@security.user_checker'
 
     oro_sso.token.factory.oauth:
-        class: '%oro_sso.token.factory.oauth.class%'
+        class: Oro\Bundle\SSOBundle\Security\OAuthTokenFactory

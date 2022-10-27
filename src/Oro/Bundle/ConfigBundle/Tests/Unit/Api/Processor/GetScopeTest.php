@@ -7,26 +7,23 @@ use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
-use Oro\Bundle\ApiBundle\Tests\Unit\Filter\TestFilterValueAccessor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ConfigBundle\Api\Processor\GetScope;
+use Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository;
 
 class GetScopeTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configRepository;
+    /** @var ConfigurationRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $configRepository;
 
     /** @var GetScope */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->configRepository = $this
-            ->getMockBuilder('Oro\Bundle\ConfigBundle\Api\Repository\ConfigurationRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configRepository = $this->createMock(ConfigurationRepository::class);
 
         $this->processor = new GetScope($this->configRepository);
     }
@@ -67,7 +64,6 @@ class GetScopeTest extends GetListProcessorTestCase
                     'default_scope'
                 )
             );
-        $this->context->setFilterValues(new TestFilterValueAccessor());
         $this->context->getFilterValues()->set('scope', new FilterValue('scope', $scope));
         $this->processor->process($this->context);
 
@@ -92,7 +88,6 @@ class GetScopeTest extends GetListProcessorTestCase
                     'default_scope'
                 )
             );
-        $this->context->setFilterValues(new TestFilterValueAccessor());
         $this->context->getFilterValues()->set('scope', new FilterValue('scope', $scope));
         $this->processor->process($this->context);
 

@@ -2,40 +2,26 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Async\Topic\ExportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Class create message and generate list of records for export which are later used in child job.
+ * Responsible for running the main export job.
+ */
 class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
 {
-    /**
-     * @var ExportHandler
-     */
-    protected $exportHandler;
-
     /**
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
 
-    /**
-     * @param ExportHandler $exportHandler
-     */
-    public function setExportHandler(ExportHandler $exportHandler)
-    {
-        $this->exportHandler = $exportHandler;
-    }
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -46,7 +32,7 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::PRE_EXPORT];
+        return [PreExportTopic::getName()];
     }
 
     /**
@@ -83,13 +69,13 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
      */
     protected function getDelayedJobCallback(array $body, array $ids = [])
     {
-        if (! empty($ids)) {
+        if (!empty($ids)) {
             $body['options']['ids'] = $ids;
         }
 
         return function (JobRunner $jobRunner, Job $child) use ($body) {
             $this->producer->send(
-                Topics::EXPORT,
+                ExportTopic::getName(),
                 new Message(
                     array_merge($body, ['jobId' => $child->getId()]),
                     MessagePriority::LOW
@@ -103,22 +89,12 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
      */
     protected function getMessageBody(MessageInterface $message)
     {
-        $body = JSON::decode($message->getBody());
-        $body = array_replace_recursive([
-            'jobName' => null,
-            'processorAlias' => null,
-            'outputFormat' => 'csv',
-            'organizationId' => null,
-            'exportType' => ProcessorRegistry::TYPE_EXPORT,
-            'options' => [],
-        ], $body);
+        $messageBody = $message->getBody();
+        $messageBody['entity'] = $this->exportHandler->getEntityName(
+            $messageBody['exportType'],
+            $messageBody['processorAlias']
+        );
 
-        if (! isset($body['jobName'], $body['processorAlias'])) {
-            $this->logger->critical('Got invalid message');
-
-            return false;
-        }
-
-        return $body;
+        return $messageBody;
     }
 }

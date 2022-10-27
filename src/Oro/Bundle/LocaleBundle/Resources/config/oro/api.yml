@@ -7,6 +7,7 @@ api:
                 update: false
                 delete_list: false
                 delete: false
+
         Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
             documentation_resource: '@OroLocaleBundle/Resources/doc/api/localization.md'
             actions:

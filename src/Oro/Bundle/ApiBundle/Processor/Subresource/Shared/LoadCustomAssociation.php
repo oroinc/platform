@@ -4,8 +4,11 @@ namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -13,6 +16,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
+/**
+ * The base class for processors that load data for different kind of custom associations.
+ */
 abstract class LoadCustomAssociation implements ProcessorInterface
 {
     /** @var EntitySerializer */
@@ -24,19 +30,19 @@ abstract class LoadCustomAssociation implements ProcessorInterface
     /** @var EntityIdHelper */
     protected $entityIdHelper;
 
-    /**
-     * @param EntitySerializer $entitySerializer
-     * @param DoctrineHelper   $doctrineHelper
-     * @param EntityIdHelper   $entityIdHelper
-     */
+    /** @var ConfigProvider */
+    private $configProvider;
+
     public function __construct(
         EntitySerializer $entitySerializer,
         DoctrineHelper $doctrineHelper,
-        EntityIdHelper $entityIdHelper
+        EntityIdHelper $entityIdHelper,
+        ConfigProvider $configProvider
     ) {
         $this->entitySerializer = $entitySerializer;
         $this->doctrineHelper = $doctrineHelper;
         $this->entityIdHelper = $entityIdHelper;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -81,7 +87,7 @@ abstract class LoadCustomAssociation implements ProcessorInterface
         $context->setResult($data);
 
         // data returned by the EntitySerializer are already normalized
-        $context->skipGroup('normalize_data');
+        $context->skipGroup(ApiActionGroup::NORMALIZE_DATA);
     }
 
     /**
@@ -113,10 +119,40 @@ abstract class LoadCustomAssociation implements ProcessorInterface
                 $context->getParentId(),
                 $context->getParentMetadata()
             ),
-            $context->getParentConfig()
+            $this->getLoadParentEntityDataConfig($context),
+            $context->getNormalizationContext()
         );
 
         return reset($data);
+    }
+
+    /**
+     * @param SubresourceContext $context
+     *
+     * @return EntityDefinitionConfig
+     */
+    protected function getLoadParentEntityDataConfig(SubresourceContext $context)
+    {
+        $configExtras = TargetConfigExtraBuilder::buildParentConfigExtras(
+            $context->getConfigExtras(),
+            $context->getParentClassName(),
+            $context->getAssociationName()
+        );
+        $config = $this->configProvider
+            ->getConfig(
+                $context->getParentClassName(),
+                $context->getVersion(),
+                $context->getRequestType(),
+                $configExtras
+            )
+            ->getDefinition();
+        TargetConfigExtraBuilder::normalizeParentConfig(
+            $config,
+            $context->getAssociationName(),
+            $configExtras
+        );
+
+        return $config;
     }
 
     /**
@@ -149,7 +185,7 @@ abstract class LoadCustomAssociation implements ProcessorInterface
      */
     protected function getQueryBuilder($parentEntityClass, $parentEntityId, EntityMetadata $parentEntityMetadata)
     {
-        $query = $this->doctrineHelper->getEntityRepositoryForClass($parentEntityClass)->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder($parentEntityClass, 'e');
         $this->entityIdHelper->applyEntityIdentifierRestriction(
             $query,
             $parentEntityId,

@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ActionConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testIsEmpty()
@@ -348,6 +351,32 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
+    public function testRemoveFormConstraint()
+    {
+        $config = new ActionConfig();
+
+        self::assertNull($config->getFormOptions());
+        self::assertNull($config->getFormConstraints());
+
+        $config->removeFormConstraint(NotNull::class);
+        self::assertNull($config->getFormConstraints());
+
+        $config->setFormOption(
+            'constraints',
+            [
+                new NotNull(),
+                new NotBlank(),
+                [NotNull::class => ['message' => 'test']]
+            ]
+        );
+
+        $config->removeFormConstraint(NotNull::class);
+        self::assertEquals(['constraints' => [new NotBlank()]], $config->getFormOptions());
+
+        $config->removeFormConstraint(NotBlank::class);
+        self::assertNull($config->getFormOptions());
+    }
+
     public function testFormEventSubscribers()
     {
         $config = new ActionConfig();
@@ -372,11 +401,9 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    /**
-     * @expectedException \TypeError
-     */
     public function testSetInvalidValueToFormEventSubscribers()
     {
+        $this->expectException(\TypeError::class);
         $config = new ActionConfig();
         $config->setFormEventSubscribers('subscriber1');
     }

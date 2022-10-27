@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions\Ajax\MassDelete;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\MassAction\Actions\Ajax\MassAction;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
@@ -11,73 +11,50 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $helper;
+
     /** @var MassDeleteLimiter */
-    protected $limiter;
+    private $limiter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
-    protected $helper;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->helper = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->helper = $this->createMock(AclHelper::class);
+
         $this->limiter = new MassDeleteLimiter($this->helper);
     }
 
     /**
      * @dataProvider getLimitationCodeDataProvider
-     *
-     * @param MassDeleteLimitResult $limitResult
-     * @param int                   $result
      */
-    public function testGetLimitationCode(MassDeleteLimitResult $limitResult, $result)
+    public function testGetLimitationCode(MassDeleteLimitResult $limitResult, int $result)
     {
         $this->assertEquals($result, $this->limiter->getLimitationCode($limitResult));
     }
 
     /**
      * @dataProvider getLimitQueryDataProvider
-     *
-     * @param MassDeleteLimitResult $limitResult
-     * @param bool                  $accessRestriction
-     * @param bool                  $maxLimitRestriction
-     *
-     * @internal     param $MassDeleteLimitResult $
      */
     public function testLimitQuery(
         MassDeleteLimitResult $limitResult,
-        $accessRestriction = false,
-        $maxLimitRestriction = false
+        bool $accessRestriction = false,
+        bool $maxLimitRestriction = false
     ) {
-        /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $queryBuilder */
-        $queryBuilder = $this
-            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        /** @var MassActionHandlerArgs|\PHPUnit\Framework\MockObject\MockObject $args */
-        $args = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $args
-            ->expects($this->once())
+        $args = $this->createMock(MassActionHandlerArgs::class);
+        $args->expects($this->once())
             ->method('getResults')
             ->willReturn(new IterableResult($queryBuilder));
 
         if ($accessRestriction) {
-            $this->helper
-                ->expects($this->once())
+            $this->helper->expects($this->once())
                 ->method('apply')
                 ->with($queryBuilder, 'DELETE');
         }
 
         if ($maxLimitRestriction) {
-            $queryBuilder
-                ->expects($this->once())
+            $queryBuilder->expects($this->once())
                 ->method('setMaxResults')
                 ->with($limitResult->getMaxLimit());
         }
@@ -85,7 +62,7 @@ class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
         $this->limiter->limitQuery($limitResult, $args);
     }
 
-    public function getLimitQueryDataProvider()
+    public function getLimitQueryDataProvider(): array
     {
         return [
             'no limits' => [
@@ -108,7 +85,7 @@ class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function getLimitationCodeDataProvider()
+    public function getLimitationCodeDataProvider(): array
     {
         return [
             'no limits code' => [
@@ -130,7 +107,7 @@ class MassDeleteLimiterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getMassDeleteResult($code)
+    private function getMassDeleteResult($code)
     {
         switch ($code) {
             case MassDeleteLimiter::LIMIT_ACCESS:

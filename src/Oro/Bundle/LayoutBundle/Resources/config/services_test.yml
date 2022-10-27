@@ -1,0 +1,17 @@
+services:
+    oro_layout.tests.theme_extension.resource_provider.theme:
+        alias: oro_layout.theme_extension.resource_provider.theme
+        public: true
+
+    oro_layout.tests.theme_extension.configuration.provider:
+        class: Oro\Bundle\LayoutBundle\Tests\Functional\Stub\Layout\Extension\ThemeConfigurationTestProvider
+        decorates: oro_layout.theme_extension.configuration.provider
+        parent: oro_layout.theme_extension.configuration.provider
+        public: true
+
+    oro_layout.tests.form.type.oro_layout_form_stub:
+        class: Oro\Bundle\LayoutBundle\Tests\Functional\Layout\DataProvider\Stubs\LayoutFormStub
+        arguments:
+            - 'layout_form_stub'
+        tags:
+            - { name: form.type, alias: oro_layout_form_stub }

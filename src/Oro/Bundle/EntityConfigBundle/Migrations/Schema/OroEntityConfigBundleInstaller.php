@@ -21,7 +21,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
      */
     public function getMigrationVersion()
     {
-        return 'v1_14_2';
+        return 'v1_16';
     }
 
     /**
@@ -47,7 +47,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $this->createOroAttributeGroupTable($schema);
         $this->createOroAttributeGroupLabelTable($schema);
         $this->createOroAttributeGroupRelTable($schema);
-        $this->addOroAttributeFamilyForeignKeys($schema);
         $this->addOroAttributeFamilyLabelForeignKeys($schema);
         $this->addOroAttributeGroupLabelForeignKeys($schema);
         $this->addOroAttributeGroupRelForeignKeys($schema);
@@ -58,8 +57,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Create oro_entity_config table
-     *
-     * @param Schema $schema
      */
     protected function createOroEntityConfigTable(Schema $schema)
     {
@@ -76,8 +73,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Create oro_entity_config_field table
-     *
-     * @param Schema $schema
      */
     protected function createOroEntityConfigFieldTable(Schema $schema)
     {
@@ -96,8 +91,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Create oro_entity_config_index_value table
-     *
-     * @param Schema $schema
      */
     protected function createOroEntityConfigIndexValueTable(Schema $schema)
     {
@@ -117,8 +110,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Create oro_entity_config_log table
-     *
-     * @param Schema $schema
      */
     protected function createOroEntityConfigLogTable(Schema $schema)
     {
@@ -132,8 +123,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Create oro_entity_config_log_diff table
-     *
-     * @param Schema $schema
      */
     protected function createOroEntityConfigLogDiffTable(Schema $schema)
     {
@@ -150,8 +139,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Add oro_entity_config_field foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEntityConfigFieldForeignKeys(Schema $schema)
     {
@@ -166,8 +153,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Add oro_entity_config_index_value foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEntityConfigIndexValueForeignKeys(Schema $schema)
     {
@@ -188,8 +173,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Add oro_entity_config_log foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEntityConfigLogForeignKeys(Schema $schema)
     {
@@ -204,8 +187,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Add oro_entity_config_log_diff foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEntityConfigLogDiffForeignKeys(Schema $schema)
     {
@@ -220,14 +201,11 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Create oro_attribute_family table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeFamilyTable(Schema $schema)
     {
         $table = $schema->createTable('oro_attribute_family');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('code', 'string', ['length' => 255]);
         $table->addColumn('entity_class', 'string', ['length' => 255]);
@@ -235,15 +213,12 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['code']);
-        $table->addIndex(['user_owner_id']);
+        $table->addUniqueIndex(['code', 'organization_id'], 'oro_attribute_family_code_org_uidx');
         $table->addIndex(['organization_id']);
     }
 
     /**
      * Create oro_attribute_family_label table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeFamilyLabelTable(Schema $schema)
     {
@@ -257,8 +232,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Create oro_attribute_group table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeGroupTable(Schema $schema)
     {
@@ -275,8 +248,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Create oro_attribute_group_label table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeGroupLabelTable(Schema $schema)
     {
@@ -290,8 +261,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Create oro_attribute_group_rel table
-     *
-     * @param Schema $schema
      */
     protected function createOroAttributeGroupRelTable(Schema $schema)
     {
@@ -305,25 +274,7 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
     }
 
     /**
-     * Add oro_attribute_family foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addOroAttributeFamilyForeignKeys(Schema $schema)
-    {
-        $table = $schema->getTable('oro_attribute_family');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['user_owner_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
-        );
-    }
-
-    /**
      * Add oro_attribute_family_label foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttributeFamilyLabelForeignKeys(Schema $schema)
     {
@@ -344,8 +295,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Add oro_attribute_group foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttributeGroupForeignKeys(Schema $schema)
     {
@@ -360,8 +309,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Add oro_attribute_group_label foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttributeGroupLabelForeignKeys(Schema $schema)
     {
@@ -382,8 +329,6 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 
     /**
      * Add oro_attribute_group_rel foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAttributeGroupRelForeignKeys(Schema $schema)
     {
@@ -396,25 +341,23 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function addAttributeFamilyImageAssociation(Schema $schema)
     {
         $this->attachmentExtension->addImageRelation(
             $schema,
             'oro_attribute_family',
             'image',
-            [],
+            [
+                'attachment' => [
+                    'acl_protected' => false,
+                ]
+            ],
             self::MAX_IMAGE_SIZE_IN_MB,
             self::THUMBNAIL_WIDTH_SIZE_IN_PX,
             self::THUMBNAIL_HEIGHT_SIZE_IN_PX
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     public function addOrganizationForeignKey(Schema $schema)
     {
         $table = $schema->getTable('oro_attribute_family');

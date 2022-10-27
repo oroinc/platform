@@ -1,15 +1,15 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var ComponentShortcutsManager;
+    const _ = require('underscore');
+    const $ = require('jquery');
 
-    var _ = require('underscore');
-    var config = require('module').config();
+    let config = require('module-config').default(module.id);
     config = _.extend({
         reservedKeys: ['options']
     }, config);
 
-    ComponentShortcutsManager = {
+    const ComponentShortcutsManager = {
         reservedKeys: config.reservedKeys,
 
         shortcuts: {},
@@ -19,8 +19,6 @@ define(function(require) {
          * @param {Object} shortcut
          */
         add: function(key, shortcut) {
-            var capitalizeKey;
-
             if (this.reservedKeys.indexOf(key) !== -1) {
                 throw new Error('Component shortcut `' + key + '` is reserved!');
             }
@@ -29,7 +27,7 @@ define(function(require) {
                 throw new Error('Component shortcut `' + key + '` already exists!');
             }
 
-            capitalizeKey = _.map(key.split('-'), function(item) {
+            const capitalizeKey = _.map(key.split('-'), function(item) {
                 return _.capitalize(item);
             }).join('');
 
@@ -56,21 +54,28 @@ define(function(require) {
         /**
          * Prepare component data by element attributes and shortcut config
          *
-         * @param {object} shortcut
-         * @param {object|string} dataOptions
-         * @return {object}
+         * @param {Object} shortcut
+         * @param {Object} elemData
+         * @return {Object}
          */
-        getComponentData: function(shortcut, dataOptions) {
-            var module = shortcut.moduleName || dataOptions;
+        getComponentData: function(shortcut, elemData) {
+            let dataOptions = elemData[shortcut.dataKey];
+            const module = shortcut.moduleName || dataOptions;
 
-            var options = dataOptions;
-            if (!_.isObject(options)) {
-                options = {};
+            if (!_.isObject(dataOptions)) {
+                dataOptions = {};
                 if (shortcut.scalarOption) {
-                    options[shortcut.scalarOption] = dataOptions;
+                    dataOptions[shortcut.scalarOption] = elemData[shortcut.dataKey];
                 }
             }
-            options = _.defaults({}, options, shortcut.options);
+
+            const options = $.extend(
+                true,
+                {},
+                shortcut.options,
+                dataOptions,
+                elemData.pageComponentOptions
+            );
 
             return {
                 pageComponentModule: module,

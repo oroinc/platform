@@ -1,6 +1,8 @@
-define(function(require) {
-    'use strict';
+import viewportManager from 'oroui/js/viewport-manager';
+import cssVariablesManager from 'oroui/js/css-variables-manager';
 
-    var viewportManager = require('oroui/js/viewport-manager');
-    viewportManager.initialize();
+cssVariablesManager.onReady(function(cssVariables) {
+    viewportManager.initialize({
+        cssVariables: cssVariables
+    });
 });

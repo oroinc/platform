@@ -5,20 +5,24 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
-use Oro\Component\ChainProcessor\ProcessorFactoryInterface;
+use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorBagConfigBuilder */
-    protected $builder;
+    private $builder;
 
     /** @var ProcessorBag */
-    protected $processorBag;
+    private $processorBag;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $factory = $this->createMock(ProcessorFactoryInterface::class);
-        $factory->expects(self::any())
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects(self::any())
             ->method('getProcessor')
             ->willReturnCallback(
                 function ($processorId) {
@@ -27,12 +31,13 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->builder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->builder, $factory);
+        $this->processorBag = new ProcessorBag($this->builder, $processorRegistry);
     }
 
     public function testEmptyBag()
     {
         $context = new Context();
+        $context->setAction('action1');
 
         self::assertProcessors(
             [],
@@ -110,19 +115,18 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The priority 1 cannot be used for the group "group3" because the group with this priority already exists. Existing group: "group1". Action: "action1".
-     */
-    // @codingStandardsIgnoreEnd
     public function testActionGroupsWithIdenticalPriority()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The priority 1 cannot be used for the group "group3" because the group with this priority already exists.'
+            . ' Existing group: "group1". Action: "action1".'
+        );
+
         $this->builder->addGroup('group1', 'action1', 1);
         $this->builder->addGroup('group2', 'action2', 1);
         $this->builder->addGroup('group3', 'action1', 1);
     }
-
 
     public function testBagWithoutGroups()
     {
@@ -394,12 +398,13 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The group "group2" is not defined. Processor: "processor2".
-     */
     public function testUndefinedGroup()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The group "group2" is not defined. Processor: "processor2". Action: "action1".'
+        );
+
         $context = new Context();
 
         $this->builder->addProcessor('processor1', [], 'action1', 'group1');
@@ -412,24 +417,26 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The ProcessorBag is frozen.
-     */
     public function testAddProcessorToFrozenBag()
     {
-        $this->processorBag->getProcessors(new Context());
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The ProcessorBag is frozen.');
+
+        $context = new Context();
+        $context->setAction('action1');
+        $this->processorBag->getProcessors($context);
 
         $this->builder->addProcessor('processor1', [], 'action1');
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The ProcessorBag is frozen.
-     */
     public function testAddGroupToFrozenBag()
     {
-        $this->processorBag->getProcessors(new Context());
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The ProcessorBag is frozen.');
+
+        $context = new Context();
+        $context->setAction('action1');
+        $this->processorBag->getProcessors($context);
 
         $this->builder->addGroup('group1', 'action1');
     }
@@ -452,12 +459,13 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         self::assertCount(1, $this->processorBag->getProcessors($context));
     }
 
-    /**
-     * @expectedException \RangeException
-     * @expectedExceptionMessage The value 256 is not valid priority of a group. It must be between -255 and 255.
-     */
     public function testMaxGroupPriority()
     {
+        $this->expectException(\RangeException::class);
+        $this->expectExceptionMessage(
+            'The value 256 is not valid priority of a group. It must be between -255 and 255.'
+        );
+
         $this->builder->addGroup('group1', 'action1', 256);
         $this->builder->addProcessor('processor1', [], 'action1', 'group1');
 
@@ -466,12 +474,13 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    /**
-     * @expectedException \RangeException
-     * @expectedExceptionMessage The value -256 is not valid priority of a group. It must be between -255 and 255.
-     */
     public function testMinGroupPriority()
     {
+        $this->expectException(\RangeException::class);
+        $this->expectExceptionMessage(
+            'The value -256 is not valid priority of a group. It must be between -255 and 255.'
+        );
+
         $this->builder->addGroup('group1', 'action1', -256);
         $this->builder->addProcessor('processor1', [], 'action1', 'group1');
 
@@ -480,12 +489,13 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    /**
-     * @expectedException \RangeException
-     * @expectedExceptionMessage The value 256 is not valid priority of a processor. It must be between -255 and 255.
-     */
     public function testMaxProcessorPriority()
     {
+        $this->expectException(\RangeException::class);
+        $this->expectExceptionMessage(
+            'The value 256 is not valid priority of a processor. It must be between -255 and 255.'
+        );
+
         $this->builder->addGroup('group1', 'action1');
         $this->builder->addProcessor('processor1', [], 'action1', 'group1', 256);
 
@@ -494,12 +504,13 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    /**
-     * @expectedException \RangeException
-     * @expectedExceptionMessage The value -256 is not valid priority of a processor. It must be between -255 and 255.
-     */
     public function testMinProcessorPriority()
     {
+        $this->expectException(\RangeException::class);
+        $this->expectExceptionMessage(
+            'The value -256 is not valid priority of a processor. It must be between -255 and 255.'
+        );
+
         $this->builder->addGroup('group1', 'action1');
         $this->builder->addProcessor('processor1', [], 'action1', 'group1', -256);
 
@@ -610,20 +621,19 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
      *
      * @return int
      */
-    protected function callCalculatePriority($processorPriority, $groupPriority = null)
+    private function callCalculatePriority($processorPriority, $groupPriority = null)
     {
-        $class  = new \ReflectionClass($this->builder);
-        $method = $class->getMethod('calculatePriority');
+        $method = new \ReflectionMethod($this->builder, 'calculatePriority');
         $method->setAccessible(true);
 
-        return $method->invokeArgs($this->processorBag, [$processorPriority, $groupPriority]);
+        return $method->invokeArgs(null, [$processorPriority, $groupPriority]);
     }
 
     /**
      * @param string[]  $expectedProcessorIds
      * @param \Iterator $processors
      */
-    protected static function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
+    private static function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
     {
         $processorIds = [];
         /** @var ProcessorMock $processor */

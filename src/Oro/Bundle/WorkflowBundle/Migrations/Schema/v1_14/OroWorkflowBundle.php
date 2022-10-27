@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_14;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -41,7 +41,7 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
             new ParametrizedSqlMigrationQuery(
                 'UPDATE oro_workflow_definition SET groups = :groups WHERE groups IS NULL',
                 ['groups' => []],
-                ['groups' => Type::TARRAY]
+                ['groups' => Types::ARRAY]
             )
         );
 
@@ -61,9 +61,6 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         $this->removeScheduledTransitions($queries);
     }
 
-    /**
-     * @param QueryBag $queries
-     */
     protected function updateReportsDefinitions(QueryBag $queries)
     {
         $queries->addPostQuery(
@@ -94,13 +91,10 @@ class OroWorkflowBundle implements Migration, DatabasePlatformAwareInterface
         return $comparator->compare($schema, $toSchema)->toSql($this->platform);
     }
 
-    /**
-     * @param QueryBag $queries
-     */
     protected function removeScheduledTransitions(QueryBag $queries)
     {
         $params = ['stpn_name' => 'stpn__%'];
-        $types = ['stpn_name' => Type::STRING];
+        $types = ['stpn_name' => Types::STRING];
 
         $queries->addQuery(
             new ParametrizedSqlMigrationQuery(

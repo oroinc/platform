@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SyncBundle\Tests\Unit\Periodic;
+namespace Oro\Bundle\SyncBundle\Tests\Unit\Topic;
 
 use Gos\Bundle\WebSocketBundle\Topic\TopicPeriodicTimer;
 use Oro\Bundle\SyncBundle\Topic\WebsocketPingTopic;
@@ -19,13 +19,12 @@ class WebsocketPingTopicTest extends \PHPUnit\Framework\TestCase
     /** @var WebsocketPingTopic */
     private $websocketPing;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->periodicTimer = $this->createMock(TopicPeriodicTimer::class);
 
         $this->websocketPing = new WebsocketPingTopic('oro_sync.ping', self::TIMEOUT);
         $this->websocketPing->setPeriodicTimer($this->periodicTimer);
-
         $this->setUpLoggerMock($this->websocketPing);
     }
 

@@ -2,94 +2,112 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Filter;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
-use Oro\Component\TestUtils\Mocks\ServiceLink;
+use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
+use Oro\Bundle\ActivityListBundle\Filter\RelatedActivityDatagridFactory;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\Query;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
+use Oro\Component\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
 {
-    protected $em;
-    protected $qb;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    protected $formFactory;
-    protected $filterUtility;
-    protected $activityAssociationHelper;
-    protected $activityListChaingProvider;
-    protected $activityListFilterHelper;
-    protected $entityRouterHelper;
-    protected $queryDesignerManager;
-    protected $datagridHelper;
+    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $qb;
 
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formFactory;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var FilterExecutionContext|\PHPUnit\Framework\MockObject\MockObject */
+    private $filterExecutionContext;
+
+    /** @var ActivityAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $activityAssociationHelper;
+
+    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $activityListChainProvider;
+
+    /** @var ActivityListFilterHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $activityListFilterHelper;
+
+    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityRouterHelper;
+
+    /** @var QueryDesignerManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $queryDesignerManager;
+
+    /** @var RelatedActivityDatagridFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $relatedActivityDatagridFactory;
+
+    /** @var ActivityListFilter */
     private $activityListFilter;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManager::class);
+        $this->qb = $this->createMock(QueryBuilder::class);
         $this->qb->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
-        $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
-        $this->filterUtility = $this->getMockBuilder('Oro\Bundle\FilterBundle\Filter\FilterUtility')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->activityAssociationHelper = $this
-            ->getMockBuilder('Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->activityListChaingProvider =
-            $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $this->activityListFilterHelper =
-            $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $this->entityRouterHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->activityAssociationHelper = $this->createMock(ActivityAssociationHelper::class);
+        $this->activityListChainProvider = $this->createMock(ActivityListChainProvider::class);
+        $this->activityListFilterHelper = $this->createMock(ActivityListFilterHelper::class);
+        $this->entityRouterHelper = $this->createMock(EntityRoutingHelper::class);
+        $this->queryDesignerManager = $this->createMock(QueryDesignerManager::class);
+        $this->filterExecutionContext = $this->createMock(FilterExecutionContext::class);
+        $this->relatedActivityDatagridFactory = $this->createMock(RelatedActivityDatagridFactory::class);
+
         $this->entityRouterHelper->expects($this->any())
-            ->method('decodeClassName')
-            ->will($this->returnCallback(function ($className) {
-                return $className;
-            }));
-        $this->queryDesignerManager = $this->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->datagridHelper = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Filter\DatagridHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->method('resolveEntityClass')
+            ->willReturnArgument(0);
 
         $this->activityListFilter = new ActivityListFilter(
             $this->formFactory,
-            $this->filterUtility,
+            new FilterUtility(),
+            $this->doctrine,
+            $this->filterExecutionContext,
             $this->activityAssociationHelper,
-            $this->activityListChaingProvider,
+            $this->activityListChainProvider,
             $this->activityListFilterHelper,
             $this->entityRouterHelper,
-            new ServiceLink($this->queryDesignerManager),
-            new ServiceLink($this->datagridHelper)
+            $this->queryDesignerManager,
+            $this->relatedActivityDatagridFactory
         );
     }
 
-    /**
-     * @expectedException LogicException
-     */
     public function testApplyShouldThrowExceptionIfWrongDatasourceTypeIsGiven()
     {
-        $ds = $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
-        $this->activityListFilter->apply($ds, []);
+        $this->expectException(UnexpectedTypeException::class);
+
+        $this->activityListFilter->apply($this->createMock(FilterDatasourceAdapterInterface::class), []);
     }
 
     public function testApply()
     {
-        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(OrmFilterDatasourceAdapter::class);
 
         $data = [
             'filterType'      => ActivityListFilter::TYPE_HAS_ACTIVITY,
@@ -99,79 +117,68 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata->expects($this->once())
             ->method('getIdentifier')
-            ->will($this->returnValue(['id']));
+            ->willReturn(['id']);
 
-        $activityQuery = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\Query')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $activityQuery = $this->createMock(Query::class);
         $activityQuery->expects($this->once())
             ->method('getDQL')
-            ->will($this->returnValue('activity dql'));
+            ->willReturn('activity dql');
 
-        $activityQb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $activityQb = $this->createMock(QueryBuilder::class);
         $activityQb->expects($this->once())
             ->method('select')
             ->with('1')
-            ->will($this->returnValue($activityQb));
+            ->willReturn($activityQb);
         $activityQb->expects($this->once())
             ->method('setMaxResults')
             ->with(1)
-            ->will($this->returnValue($activityQb));
+            ->willReturn($activityQb);
         $activityQb->expects($this->once())
             ->method('andWhere')
             ->with('1 = 0')
-            ->will($this->returnValue($activityQb));
+            ->willReturn($activityQb);
         $activityQb->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($activityQuery));
+            ->willReturn($activityQuery);
         $activityQb->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
-        $activityListRepository =
-            $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $activityListRepository = $this->createMock(ActivityListRepository::class);
         $activityListRepository->expects($this->once())
             ->method('createQueryBuilder')
-            ->will($this->returnValue($activityQb));
+            ->willReturn($activityQb);
 
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with('entity')
-            ->will($this->returnValue($classMetadata));
+            ->willReturn($classMetadata);
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->with('OroActivityListBundle:ActivityList')
-            ->will($this->returnValue($activityListRepository));
+            ->with(ActivityList::class)
+            ->willReturn($activityListRepository);
 
         $this->activityAssociationHelper->expects($this->once())
             ->method('hasActivityAssociations')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $expressionBuilder = $this->createMock(OrmExpressionBuilder::class);
 
         $expressionBuilder->expects($this->once())
             ->method('exists')
             ->with('activity dql')
-            ->will($this->returnValue($expressionBuilder));
+            ->willReturn($expressionBuilder);
 
         $ds->expects($this->any())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($this->qb));
+            ->willReturn($this->qb);
 
         $ds->expects($this->once())
             ->method('expr')
-            ->will($this->returnValue($expressionBuilder));
+            ->willReturn($expressionBuilder);
 
         $this->activityListFilter->apply($ds, $data);
     }

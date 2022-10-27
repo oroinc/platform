@@ -4,9 +4,9 @@ services:
 
     oro_message_queue.log.consumption_extension:
         class: Oro\Component\MessageQueue\Consumption\Extension\ConsumptionExtension
-        public: false
         arguments:
             - '@oro_message_queue.log.consumer_state'
+            - '@oro_message_queue.log.message_processor_class_provider'
         tags:
             - { name: oro_message_queue.consumption.extension, persistent: true }
 
@@ -20,25 +20,20 @@ services:
 
     oro_message_queue.log.message_processor_class_provider:
         class: Oro\Component\MessageQueue\Log\MessageProcessorClassProvider
+        lazy: true
         arguments:
             - '@oro_message_queue.client.message_processor_registry'
 
     oro_message_queue.log.message_to_array_converter:
         class: Oro\Component\MessageQueue\Log\Converter\ChainMessageToArrayConverter
         arguments:
-            - []
+            - !tagged_iterator oro_message_queue.log.message_to_array_converter
 
     oro_message_queue.log.message_to_array_converter.base:
         class: Oro\Component\MessageQueue\Log\Converter\MessageToArrayConverter
         public: false
         tags:
             - { name: oro_message_queue.log.message_to_array_converter, priority: 1 }
-
-    oro_message_queue.log.message_to_array_converter.dbal:
-        class: Oro\Component\MessageQueue\Log\Converter\DbalMessageToArrayConverter
-        public: false
-        tags:
-            - { name: oro_message_queue.log.message_to_array_converter }
 
     oro_message_queue.log.processor.restore_original_channel:
         class: Oro\Component\MessageQueue\Log\Processor\RestoreOriginalChannelProcessor
@@ -48,10 +43,8 @@ services:
 
     oro_message_queue.log.processor.add_consumer_state:
         class: Oro\Component\MessageQueue\Log\Processor\AddConsumerStateProcessor
-        public: false
         arguments:
             - '@oro_message_queue.log.consumer_state'
-            - '@oro_message_queue.log.message_processor_class_provider'
             - '@oro_message_queue.log.message_to_array_converter'
         tags:
             - { name: monolog.processor }
@@ -60,6 +53,15 @@ services:
         class: Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleHandler
         arguments:
             - '@oro_message_queue.log.consumer_state'
+        tags:
+            - { name: kernel.event_subscriber }
+
+    oro_message_queue.log.handler.verbosity_filter:
+        class: Oro\Bundle\MessageQueueBundle\Log\Handler\VerbosityFilterHandler
+        arguments:
+            - '@oro_message_queue.log.consumer_state'
+            - ~
+            - []
         tags:
             - { name: kernel.event_subscriber }
 

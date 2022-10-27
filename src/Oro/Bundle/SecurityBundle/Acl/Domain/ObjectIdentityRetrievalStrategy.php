@@ -13,9 +13,6 @@ class ObjectIdentityRetrievalStrategy implements ObjectIdentityRetrievalStrategy
     /** @var ObjectIdentityFactory */
     protected $objectIdentityFactory;
 
-    /**
-     * @param ObjectIdentityFactory $objectIdentityFactory
-     */
     public function __construct(ObjectIdentityFactory $objectIdentityFactory)
     {
         $this->objectIdentityFactory = $objectIdentityFactory;

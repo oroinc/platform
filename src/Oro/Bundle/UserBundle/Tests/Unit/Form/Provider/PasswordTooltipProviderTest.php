@@ -5,19 +5,19 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordTooltipProvider;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface */
-    protected $translator;
+    private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->getMockBuilder(TranslatorInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator->method('trans')->willReturnArgument(0);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
     }
 
     /**
@@ -34,10 +34,7 @@ class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $provider->getTooltip());
     }
 
-    /**
-     * @return array
-     */
-    public function getTooltipDataProvider()
+    public function getTooltipDataProvider(): array
     {
         return [
             'no rules enabled' => [
@@ -92,27 +89,13 @@ class PasswordTooltipProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $configMap
-     *
-     * @return PasswordComplexityConfigProvider
-     */
-    protected function getConfigProvider(array $configMap)
+    private function getConfigProvider(array $configMap): PasswordComplexityConfigProvider
     {
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->method('get')->willReturnMap($configMap);
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects($this->any())
+            ->method('get')
+            ->willReturnMap($configMap);
 
-        /** @var ConfigManager $configManager */
-        $configProvider = new PasswordComplexityConfigProvider($configManager);
-
-        /** @var PasswordComplexityConfigProvider $configManager */
-        return $configProvider;
-    }
-
-    protected function tearDown()
-    {
-        unset($this->translator);
+        return new PasswordComplexityConfigProvider($configManager);
     }
 }

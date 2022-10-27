@@ -2,33 +2,25 @@
 
 namespace Oro\Bundle\TranslationBundle\Strategy;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
-use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 
+/**
+ * This translation strategy has only one fallback - to the default locale.
+ */
 class DefaultTranslationStrategy implements TranslationStrategyInterface
 {
-    const NAME = 'default';
+    private TranslationStrategyInterface $strategy;
+    private ApplicationState $applicationState;
 
-    /**
-     * @var LanguageProvider
-     */
-    protected $languageProvider;
-
-    /** @var bool */
-    protected $installed = false;
-
-    /**
-     * @param LanguageProvider $languageProvider
-     * @param bool          $installed
-     */
-    public function __construct(LanguageProvider $languageProvider, $installed = false)
+    public function __construct(TranslationStrategyInterface $strategy, ApplicationState $applicationState)
     {
-        $this->languageProvider = $languageProvider;
-        $this->installed = (bool)$installed;
+        $this->strategy = $strategy;
+        $this->applicationState = $applicationState;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isApplicable()
     {
@@ -36,24 +28,29 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName()
     {
-        return self::NAME;
+        return 'default';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getLocaleFallbacks()
     {
         // default strategy has only one fallback to default locale
-        if ($this->installed) {
-            $locales = [];
-            $installedLocales = $this->languageProvider->getAvailableLanguages();
-            foreach ($installedLocales as $code => $installedLocale) {
-                $locales[Configuration::DEFAULT_LOCALE][$code] = [];
+        if ($this->applicationState->isInstalled()) {
+            $locales = $this->strategy->getLocaleFallbacks();
+            $nestedDefaultLocale = $locales[Configuration::DEFAULT_LOCALE][Configuration::DEFAULT_LOCALE] ?? [];
+            if ($nestedDefaultLocale) {
+                unset($locales[Configuration::DEFAULT_LOCALE][Configuration::DEFAULT_LOCALE]);
+                $locales[Configuration::DEFAULT_LOCALE] = array_merge(
+                    [Configuration::DEFAULT_LOCALE => []],
+                    $nestedDefaultLocale,
+                    $locales[Configuration::DEFAULT_LOCALE]
+                );
             }
         } else {
             $locales = [

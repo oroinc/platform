@@ -7,45 +7,36 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CommandRunnerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
 
-    public function testShouldAllowToTakeFromContainerAsService()
+    public function testShouldAllowToTakeFromContainerAsService(): void
     {
-        $runner = $this->getContainer()->get('oro_cron.engine.command_runner');
+        $runner = self::getContainer()->get('oro_cron.engine.command_runner');
 
         self::assertInstanceOf(CommandRunner::class, $runner);
     }
 
-    public function testShouldRunCommandAndReturnOutput()
+    public function testShouldRunCommandAndReturnOutput(): void
     {
-        /** @var CommandRunner $runner */
-        $runner = $this->getContainer()->get('oro_cron.engine.command_runner');
+        $runner = self::getContainer()->get('oro_cron.engine.command_runner');
 
-        $result = $runner->run('debug:router');
+        $result = $runner->run('about');
 
-        $this->assertContains('Name', $result);
-        $this->assertContains('Method', $result);
-        $this->assertContains('Scheme', $result);
-        $this->assertContains('Host', $result);
-        $this->assertContains('Path', $result);
+        self::assertStringContainsString('Symfony', $result);
+        self::assertStringContainsString('Kernel', $result);
+        self::assertStringContainsString('PHP', $result);
     }
 
-    public function testShouldAcceptCommandArguments()
+    public function testShouldAcceptCommandArguments(): void
     {
-        /** @var CommandRunner $runner */
-        $runner = $this->getContainer()->get('oro_cron.engine.command_runner');
+        $runner = self::getContainer()->get('oro_cron.engine.command_runner');
 
-        $result = $runner->run('debug:router', ['--help']);
+        $result = $runner->run('about', ['--help']);
 
-        $this->assertNotContains('Name', $result);
-        $this->assertNotContains('Method', $result);
-        $this->assertNotContains('Scheme', $result);
-        $this->assertNotContains('Host', $result);
-        $this->assertNotContains('Path', $result);
-        $this->assertContains('Help:', $result);
-        $this->assertContains('The debug:router displays the configured routes:', $result);
+        self::assertStringContainsString('Help:', $result);
+        self::assertStringContainsString('Display information about the current project', $result);
     }
 }

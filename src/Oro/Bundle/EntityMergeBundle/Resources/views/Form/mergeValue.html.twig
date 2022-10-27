@@ -17,11 +17,13 @@
     {% if isListValue %}
     {% set hasVisibleValues = false %}
     <ul>
-        {% for value in convertedValue if value|length %}
-            {% set hasVisibleValues = true %}
-            <li>
-                {{ macros.escape(value, escapeStrategy) }}
-            </li>
+        {% for value in convertedValue %}
+            {% if value|length %}
+                {% set hasVisibleValues = true %}
+                <li>
+                    {{ macros.escape(value, escapeStrategy) }}
+                </li>
+            {% endif %}
         {% endfor %}
 
         {% if not hasVisibleValues %}

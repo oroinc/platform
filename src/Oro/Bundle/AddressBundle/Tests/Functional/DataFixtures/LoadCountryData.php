@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Country;
 
 class LoadCountryData extends AbstractFixture
@@ -36,15 +36,13 @@ class LoadCountryData extends AbstractFixture
 
     /**
      * Load address types
-     *
-     * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {
         $repository = $manager->getRepository(Country::class);
 
         foreach ($this->countries as $reference => $data) {
-            /** @var $country Country */
+            /** @var Country $country */
             $country = $repository->find($data['iso2Code']);
             if (!$country) {
                 $country = new Country($data['iso2Code']);

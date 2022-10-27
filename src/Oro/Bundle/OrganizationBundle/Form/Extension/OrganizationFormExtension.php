@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Extension;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
@@ -15,6 +15,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Sets organization for entity if such field exists
+ */
 class OrganizationFormExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
@@ -31,11 +34,6 @@ class OrganizationFormExtension extends AbstractTypeExtension
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    /**
-     * @param ManagerRegistry        $registry
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param ServiceLink            $metadataProviderLink
-     */
     public function __construct(
         ManagerRegistry $registry,
         TokenAccessorInterface $tokenAccessor,
@@ -51,13 +49,12 @@ class OrganizationFormExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        //PRE_SUBMIT needed to set correct organization before other form extensions executes their logic
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPostSubmit'], 128);
         // listener must be executed before validation
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit'], 128);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPostSubmit(FormEvent $event)
     {
         $data = $event->getForm()->getData();

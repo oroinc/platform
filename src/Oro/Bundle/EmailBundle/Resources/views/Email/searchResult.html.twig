@@ -3,15 +3,15 @@
     * entity       - email entity Oro\Bundle\EmailBundle\Entity\EmailUser
     * indexer_item - indexer item Oro\Bundle\SearchBundle\Query\Result\Item
 #}
-{% extends 'OroSearchBundle:Search:searchResultItem.html.twig' %}
+{% extends '@OroSearch/Search/searchResultItem.html.twig' %}
 
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroEmailBundle::macros.html.twig' as EA %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroEmail/macros.html.twig' as EA %}
 
 {% set iconType = 'envelope' %}
 
 {% set recordUrl = indexer_item.recordUrl %}
-{% set title = entity ? entity.email.subject : indexer_item.recordTitle %}
+{% set title = indexer_item.selectedData.name %}
 
 {% set entityType = 'oro.email.entity_label'|trans %}
 

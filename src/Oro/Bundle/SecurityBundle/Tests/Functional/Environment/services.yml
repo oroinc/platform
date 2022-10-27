@@ -1,9 +1,0 @@
-services:
-    oro_security.tests.migration_listener:
-        class: Oro\Bundle\SecurityBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
-        tags:
-            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
-
-    tests.security.acl.cache.doctrine:
-        alias: security.acl.cache.doctrine
-        public: true

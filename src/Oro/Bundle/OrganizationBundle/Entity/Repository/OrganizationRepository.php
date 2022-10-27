@@ -1,6 +1,8 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Entity\Repository;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -21,7 +23,7 @@ class OrganizationRepository extends EntityRepository
     {
         return $this->createQueryBuilder('org')
             ->select('org')
-            ->orderBy('org.id')
+            ->orderBy('org.id', Criteria::ASC)
             ->getQuery()
             ->setMaxResults(1)
             ->getSingleResult();
@@ -201,5 +203,36 @@ class OrganizationRepository extends EntityRepository
         }
 
         return $queryBuilder->getQuery()->execute();
+    }
+
+    /**
+     * @param array $excludeIds
+     *
+     * @return Organization[]
+     */
+    public function getOrganizationIds(array $excludeIds = [])
+    {
+        $qb = $this->createQueryBuilder('org');
+        $qb->select('org.id');
+
+        if ($excludeIds) {
+            $qb->where($qb->expr()->notIn('org.id', ':ids'))
+                ->setParameter('ids', $excludeIds);
+        }
+
+        return array_column($qb->getQuery()->getArrayResult(), 'id');
+    }
+
+    /**
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getEnabledOrganizationCount(): int
+    {
+        $qb = $this->createQueryBuilder('organization');
+        $qb
+            ->select('COUNT(organization.id)')
+            ->where('organization.enabled = true');
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 }

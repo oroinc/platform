@@ -3,70 +3,55 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  */
 class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var array
-     */
-    protected $headerConversionRules = array(
+    private array $headerConversionRules = [
         'First Name' => 'firstName',
         'Last Name'  => 'lastName',
         'Job Title'  => 'jobTitle',
         'Email'      => 'emails:0',
-        'Numeric Email' => array(
-            AbstractTableDataConverter::FRONTEND_TO_BACKEND => array('Email (\d+)', 'emails:$1'),
-            AbstractTableDataConverter::BACKEND_TO_FRONTEND => array('emails:(\d+)', 'Email $1'),
-        ),
-        'Empty Regexp'   => array(), // invalid format, used to test all cases
-        'Ignored Regexp' => array(   // invalid format, used to test all cases
-            AbstractTableDataConverter::FRONTEND_TO_BACKEND => array('key' => 'value'),
-            AbstractTableDataConverter::BACKEND_TO_FRONTEND => array('key' => 'value'),
-        ),
-    );
+        'Numeric Email' => [
+            AbstractTableDataConverter::FRONTEND_TO_BACKEND => ['Email (\d+)', 'emails:$1'],
+            AbstractTableDataConverter::BACKEND_TO_FRONTEND => ['emails:(\d+)', 'Email $1'],
+        ],
+        'Empty Regexp'   => [], // invalid format, used to test all cases
+        'Ignored Regexp' => [   // invalid format, used to test all cases
+            AbstractTableDataConverter::FRONTEND_TO_BACKEND => ['key' => 'value'],
+            AbstractTableDataConverter::BACKEND_TO_FRONTEND => ['key' => 'value'],
+        ],
+    ];
 
-    /**
-     * @var array
-     */
-    protected $backendHeader = array(
+    private array $backendHeader = [
         'firstName',
         'lastName',
         'jobTitle',
         'emails:0',
         'emails:1',
         'emails:2',
-    );
+    ];
 
-    /**
-     * @var AbstractTableDataConverter
-     */
-    protected $dataConverter;
+    /** @var AbstractTableDataConverter */
+    private $dataConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $dataConverter = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter')
-            ->getMockForAbstractClass();
+        $dataConverter = $this->getMockForAbstractClass(AbstractTableDataConverter::class);
         $dataConverter->expects($this->any())
             ->method('getHeaderConversionRules')
-            ->will($this->returnValue($this->headerConversionRules));
+            ->willReturn($this->headerConversionRules);
         $dataConverter->expects($this->any())
             ->method('getBackendHeader')
-            ->will($this->returnValue($this->backendHeader));
+            ->willReturn($this->backendHeader);
 
         $this->dataConverter = $dataConverter;
     }
 
-    protected function tearDown()
-    {
-        unset($this->dataConverter);
-    }
-
     /**
-     * @param array $importedRecord
-     * @param array $result
      * @dataProvider convertToExportDataProvider
      */
     public function testConvertToExportFormat(array $importedRecord, array $result)
@@ -74,100 +59,91 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $this->dataConverter->convertToExportFormat($importedRecord));
     }
 
-    /**
-     * @return array
-     */
-    public function convertToExportDataProvider()
+    public function convertToExportDataProvider(): array
     {
-        return array(
-            'no data' => array(
-                'importedRecord' => array(),
-                'result' => array(
+        return [
+            'no data' => [
+                'importedRecord' => [],
+                'result' => [
                     'First Name' => '',
                     'Last Name'  => '',
                     'Job Title'  => '',
                     'Email'      => '',
                     'Email 1'    => '',
                     'Email 2'    => '',
-                )
-            ),
-            'plain data' => array(
-                'importedRecord' => array(
+                ]
+            ],
+            'plain data' => [
+                'importedRecord' => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe'
-                ),
-                'result' => array(
+                ],
+                'result' => [
                     'First Name' => 'John',
                     'Last Name'  => 'Doe',
                     'Job Title'  => '',
                     'Email'      => '',
                     'Email 1'    => '',
                     'Email 2'    => '',
-                )
-            ),
-            'complex data' => array(
-                array(
+                ]
+            ],
+            'complex data' => [
+                [
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
                     'jobTitle'  => 'Engineer',
-                    'emails' => array(
+                    'emails' => [
                         'john@qwerty.com',
                         'doe@qwerty.com',
                         'john.doe@qwerty.com',
-                    ),
-                ),
-                'result' => array(
+                    ],
+                ],
+                'result' => [
                     'First Name' => 'John',
                     'Last Name'  => 'Doe',
                     'Job Title'  => 'Engineer',
                     'Email'      => 'john@qwerty.com',
                     'Email 1'    => 'doe@qwerty.com',
                     'Email 2'    => 'john.doe@qwerty.com',
-                )
-            )
-        );
+                ]
+            ]
+        ];
     }
 
     /**
-     * @param array $exportedRecord
-     * @param array $result
-     * @param bool  $skipNull
      * @dataProvider convertToImportDataProvider
      */
-    public function testConvertToImportFormat(array $exportedRecord, array $result, $skipNull = true)
+    public function testConvertToImportFormat(array $exportedRecord, array $result, bool $skipNull = true)
     {
         $this->assertEquals($result, $this->dataConverter->convertToImportFormat($exportedRecord, $skipNull));
     }
 
-    /**
-     * @return array
-     */
-    public function convertToImportDataProvider()
+    public function convertToImportDataProvider(): array
     {
-        return array(
-            'no data' => array(
-                'exportedRecord' => array(),
-                'result'         => array(),
-            ),
-            'plain data skip null values' => array(
-                'exportedRecord' => array(
+        return [
+            'no data' => [
+                'exportedRecord' => [],
+                'result'         => [],
+            ],
+            'plain data skip null values' => [
+                'exportedRecord' => [
                     'First Name' => 'John',
                     'Last Name'  => 'Doe',
                     'Job Title'  => '',
                     'Email'      => '',
-                ),
-                'result' => array(
+                ],
+                'result' => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
-                )
-            ),
-            'plain data' => array(
-                'exportedRecord' => array(
+                ]
+            ],
+            'plain data' => [
+                'exportedRecord' => [
                     'First Name' => 'John',
                     'Last Name'  => 'Doe',
                     'Job Title'  => '',
                     'Email'      => '',
-                ),
+                ],
                 'result' => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
@@ -175,27 +151,27 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
                     'emails'    => [],
                 ],
                 'skipNull' => false
-            ),
-            'complex data' => array(
-                'exportedRecord' => array(
+            ],
+            'complex data' => [
+                'exportedRecord' => [
                     'First Name' => 'John',
                     'Last Name'  => 'Doe',
                     'Job Title'  => 'Engineer',
                     'Email'      => 'john@qwerty.com',
                     'Email 1'    => 'doe@qwerty.com',
                     'Email 2'    => 'john.doe@qwerty.com',
-                ),
-                'result' => array(
+                ],
+                'result' => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
                     'jobTitle'  => 'Engineer',
-                    'emails' => array(
+                    'emails' => [
                         'john@qwerty.com',
                         'doe@qwerty.com',
                         'john.doe@qwerty.com',
-                    ),
-                )
-            ),
+                    ],
+                ]
+            ],
             'multi-level array data'           => [
                 'exportedRecord' => [
                     'First Name'                    => 'John',
@@ -241,36 +217,35 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
                     'address'   => [],
                 ],
             ],
-            'no conversion rules' => array(
-                'exportedRecord' => array(
+            'no conversion rules' => [
+                'exportedRecord' => [
                     'First Name' => 'John',
                     'Last Name'  => 'Doe',
                     'phones:0'   => '12345',
                     'phones:1'   => '98765',
-                ),
-                'result' => array(
+                ],
+                'result' => [
                     'firstName' => 'John',
                     'lastName'  => 'Doe',
-                    'phones' => array(
+                    'phones' => [
                         '12345',
                         '98765'
-                    )
-                )
-            ),
-        );
+                    ]
+                ]
+            ],
+        ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Backend header doesn't contain fields: fax
-     */
     public function testConvertToExportFormatExtraFields()
     {
-        $importedRecordWithExtraData = array(
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage("Backend header doesn't contain fields: fax");
+
+        $importedRecordWithExtraData = [
             'firstName' => 'John',
             'lastName'  => 'Doe',
             'fax'       => '5555', // this field is not defined in backend header
-        );
+        ];
 
         $this->dataConverter->convertToExportFormat($importedRecordWithExtraData);
     }

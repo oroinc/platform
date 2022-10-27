@@ -5,8 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Model\Label;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ErrorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
@@ -108,14 +111,11 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         $error->setDetail(new Label('detail'));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects(self::at(0))
+        $translator->expects(self::exactly(2))
             ->method('trans')
-            ->with('title')
-            ->willReturn('translated_title');
-        $translator->expects(self::at(1))
-            ->method('trans')
-            ->with('detail')
-            ->willReturn('translated_detail');
+            ->willReturnCallback(function ($id) {
+                return 'translated_' . $id;
+            });
 
         $error->trans($translator);
         self::assertEquals('translated_title', $error->getTitle());

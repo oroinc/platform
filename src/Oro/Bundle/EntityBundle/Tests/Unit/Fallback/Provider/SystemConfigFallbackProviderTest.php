@@ -11,29 +11,23 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var SystemConfigFallbackProvider
-     */
-    protected $systemConfigFallbackProvider;
+    /** @var SystemConfigFallbackProvider */
+    private $systemConfigFallbackProvider;
 
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configInterface;
+    private $configInterface;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->systemConfigFallbackProvider = new SystemConfigFallbackProvider($this->configManager);
-        $this->configProvider = $this->getMockBuilder(ConfigProvider::class)->disableOriginalConstructor()->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->systemConfigFallbackProvider->setConfigProvider($this->configProvider);
         $this->configInterface = $this->createMock(ConfigInterface::class);
     }
@@ -50,6 +44,9 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
         $entityConfig[EntityFieldFallbackValue::FALLBACK_LIST][SystemConfigFallbackProvider::FALLBACK_ID] = [];
         $this->setUpFallbackConfig($entityConfig);
 
+        $this->systemConfigFallbackProvider->getFallbackHolderEntity(new \stdClass(), 'test');
+
+        // check the local entity config cache
         $this->systemConfigFallbackProvider->getFallbackHolderEntity(new \stdClass(), 'test');
     }
 
@@ -69,7 +66,7 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->systemConfigFallbackProvider->getFallbackEntityClass());
     }
 
-    protected function setUpFallbackConfig($entityConfig)
+    private function setUpFallbackConfig($entityConfig)
     {
         $this->configProvider->expects($this->once())
             ->method('getConfig')
@@ -79,7 +76,7 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityConfig);
     }
 
-    protected function getEntityConfiguration()
+    private function getEntityConfiguration(): array
     {
         return [
             EntityFieldFallbackValue::FALLBACK_LIST => [

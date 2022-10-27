@@ -2,53 +2,49 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Extend\Entity\EV_Test_Enum;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EnumFilterTypeTest extends TypeTestCase
 {
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
+    /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $provider;
+
     /** @var EnumFilterType */
-    protected $type;
+    private $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $provider;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->provider   = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->provider = $this->createMock(EnumValueProvider::class);
 
         $this->type = new EnumFilterType($this->translator, $this->provider);
     }
 
     /**
      * @dataProvider configureOptionsProvider
-     * @param string $enumCode
-     * @param string $class
-     * @param string $nullValue
-     * @param array $values
-     * @param array|null $fieldOptions
-     * @param array|null $expectedOptions
      */
     public function testConfigureOptions(
-        $enumCode,
-        $class,
-        $nullValue,
-        $values,
-        $fieldOptions,
-        $expectedOptions
+        ?string $enumCode,
+        ?string $class,
+        ?string $nullValue,
+        array $values,
+        ?array $fieldOptions,
+        ?array $expectedOptions
     ) {
-        $enumValueClassName = $class !== null ? $class : ExtendHelper::buildEnumValueClassName($enumCode);
+        $enumValueClassName = $class ?? ExtendHelper::buildEnumValueClassName($enumCode);
         if ($enumValueClassName) {
             // AbstractEnumType require class to be instance of AbstractEnumValue
             // This may be achieved with Stub. Stub namespace does not reflect Stub path.
@@ -64,7 +60,7 @@ class EnumFilterTypeTest extends TypeTestCase
             $this->provider->expects($this->once())
                 ->method('getEnumChoices')
                 ->with($enumValueClassName)
-                ->will($this->returnValue($values));
+                ->willReturn($values);
         }
 
         $this->translator->expects($this->any())
@@ -100,7 +96,7 @@ class EnumFilterTypeTest extends TypeTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function configureOptionsProvider()
+    public function configureOptionsProvider(): array
     {
         return [
             [
@@ -150,7 +146,7 @@ class EnumFilterTypeTest extends TypeTestCase
             ],
             [
                 'enumCode'        => null,
-                'class'           => 'Extend\Entity\EV_Test_Enum',
+                'class'           => EV_Test_Enum::class,
                 'nullValue'       => null,
                 'values'          => ['Value1' => 'val1'],
                 'fieldOptions'    => null,
@@ -160,7 +156,7 @@ class EnumFilterTypeTest extends TypeTestCase
                         'is not any of' => 2,
                     ],
                     'enum_code'     => null,
-                    'class'         => 'Extend\Entity\EV_Test_Enum',
+                    'class'         => EV_Test_Enum::class,
                     'null_value'    => null,
                     'field_options' => [
                         'multiple' => true,
@@ -172,7 +168,7 @@ class EnumFilterTypeTest extends TypeTestCase
             ],
             [
                 'enumCode'        => null,
-                'class'           => 'Extend\Entity\EV_Test_Enum',
+                'class'           => EV_Test_Enum::class,
                 'nullValue'       => ':empty:',
                 'values'          => ['Value1' => 'val1'],
                 'fieldOptions'    => null,
@@ -182,7 +178,7 @@ class EnumFilterTypeTest extends TypeTestCase
                         'is any of' => 1,
                         'is not any of' => 2,
                     ],
-                    'class'         => 'Extend\Entity\EV_Test_Enum',
+                    'class'         => EV_Test_Enum::class,
                     'null_value'    => ':empty:',
                     'field_options' => [
                         'multiple' => true,
@@ -195,7 +191,7 @@ class EnumFilterTypeTest extends TypeTestCase
             ],
             [
                 'enumCode'        => null,
-                'class'           => 'Extend\Entity\EV_Test_Enum',
+                'class'           => EV_Test_Enum::class,
                 'nullValue'       => null,
                 'values'          => ['Value1' => 'val1'],
                 'fieldOptions'    => [
@@ -207,7 +203,7 @@ class EnumFilterTypeTest extends TypeTestCase
                         'is any of' => 1,
                         'is not any of' => 2,
                     ],
-                    'class'         => 'Extend\Entity\EV_Test_Enum',
+                    'class'         => EV_Test_Enum::class,
                     'null_value'    => null,
                     'field_options' => [
                         'multiple' => false,
@@ -219,7 +215,7 @@ class EnumFilterTypeTest extends TypeTestCase
             ],
             'numeric choice keys' => [
                 'enumCode'        => null,
-                'class'           => 'Extend\Entity\EV_Test_Enum',
+                'class'           => EV_Test_Enum::class,
                 'nullValue'       => ':empty:',
                 'values'          => ['Value1' => 1],
                 'fieldOptions'    => [
@@ -231,7 +227,7 @@ class EnumFilterTypeTest extends TypeTestCase
                         'is any of' => 1,
                         'is not any of' => 2,
                     ],
-                    'class'         => 'Extend\Entity\EV_Test_Enum',
+                    'class'         => EV_Test_Enum::class,
                     'null_value'    => ':empty:',
                     'field_options' => [
                         'multiple' => false,
@@ -245,12 +241,11 @@ class EnumFilterTypeTest extends TypeTestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage Either "class" or "enum_code" must option must be set.
-     */
     public function testClassNormalizerOptionsException()
     {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('Either "class" or "enum_code" must option must be set.');
+
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([
@@ -260,12 +255,11 @@ class EnumFilterTypeTest extends TypeTestCase
         ]);
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage must be a child of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue"
-     */
     public function testClassNormalizerUnexpectedEnumException()
     {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('must be a child of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue"');
+
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
         $resolver->resolve([
@@ -274,17 +268,10 @@ class EnumFilterTypeTest extends TypeTestCase
         ]);
     }
 
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
+    private function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
-        $resolver->setDefaults(
-            [
-                'null_value' => null
-            ]
-        );
+        $resolver->setDefaults(['null_value' => null]);
 
         return $resolver;
     }

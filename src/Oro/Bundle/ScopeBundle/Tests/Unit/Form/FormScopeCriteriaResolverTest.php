@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form;
 
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Form\FormScopeCriteriaResolver;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
@@ -11,21 +12,16 @@ use Symfony\Component\Form\FormInterface;
 
 class FormScopeCriteriaResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $manager;
+    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
 
-    /**
-     * @var FormScopeCriteriaResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormScopeCriteriaResolver */
     private $resolver;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->manager = $this->getMockBuilder(ScopeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->manager = $this->createMock(ScopeManager::class);
+
         $this->resolver = new FormScopeCriteriaResolver($this->manager);
     }
 
@@ -43,7 +39,7 @@ class FormScopeCriteriaResolverTest extends \PHPUnit\Framework\TestCase
                         'field1' => 'parent_scope_value',
                         'field2' => 'parent_scope_value',
                     ],
-                    []
+                    $this->createMock(ClassMetadataFactory::class)
                 )
             );
         $parentFormConfig->method('hasOption')

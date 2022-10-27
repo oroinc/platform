@@ -2,50 +2,62 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetAlias()
-    {
-        $extension = new OroFeatureToggleExtension();
+    /** @var OroFeatureToggleExtension */
+    private $extension;
 
-        $this->assertEquals(OroFeatureToggleExtension::ALIAS, $extension->getAlias());
+    protected function setUp(): void
+    {
+        $this->extension = new OroFeatureToggleExtension();
     }
 
-    public function testLoad()
+    public function testGetAlias()
     {
-        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $featureChecker */
-        $featureCheckerDefinition = $this->getMockBuilder(Definition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->assertEquals('oro_featuretoggle', $this->extension->getAlias());
+    }
 
-        $featureCheckerDefinition
-            ->method('addArgument')
-            ->willReturnSelf();
-        $featureCheckerDefinition->expects($this->at(0))
-            ->method('addArgument')
-            ->with(FeatureChecker::STRATEGY_UNANIMOUS);
-        $featureCheckerDefinition->expects($this->at(1))
-            ->method('addArgument')
-            ->with(false);
-        $featureCheckerDefinition->expects($this->at(2))
-            ->method('addArgument')
-            ->with(true);
+    public function testLoadWithoutConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->getMockBuilder(ContainerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $container->expects($this->once())
-            ->method('getDefinition')
-            ->with('oro_featuretoggle.checker.feature_checker')
-            ->willReturn($featureCheckerDefinition);
+        $this->extension->load([], $container);
 
-        $extension = new OroFeatureToggleExtension();
-        $extension->load([], $container);
+        $featureDecisionManagerDef = $container->getDefinition('oro_featuretoggle.feature_decision_manager');
+        $this->assertEquals('unanimous', $featureDecisionManagerDef->getArgument('$strategy'));
+        $this->assertFalse($featureDecisionManagerDef->getArgument('$allowIfAllAbstainDecisions'));
+        $this->assertTrue($featureDecisionManagerDef->getArgument('$allowIfEqualGrantedDeniedDecisions'));
+    }
+
+    public function testLoadWithConfig()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
+        $config = [
+            'strategy'                      => 'affirmative',
+            'allow_if_all_abstain'          => true,
+            'allow_if_equal_granted_denied' => false
+        ];
+
+        $this->extension->load([$config], $container);
+
+        $featureDecisionManagerDef = $container->getDefinition('oro_featuretoggle.feature_decision_manager');
+        $this->assertEquals(
+            $config['strategy'],
+            $featureDecisionManagerDef->getArgument('$strategy')
+        );
+        $this->assertEquals(
+            $config['allow_if_all_abstain'],
+            $featureDecisionManagerDef->getArgument('$allowIfAllAbstainDecisions')
+        );
+        $this->assertEquals(
+            $config['allow_if_equal_granted_denied'],
+            $featureDecisionManagerDef->getArgument('$allowIfEqualGrantedDeniedDecisions')
+        );
     }
 }

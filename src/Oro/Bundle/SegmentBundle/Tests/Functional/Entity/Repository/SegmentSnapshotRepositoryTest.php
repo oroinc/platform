@@ -1,15 +1,16 @@
 <?php
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentData;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadSegmentSnapshotData;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -17,39 +18,54 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SegmentSnapshotRepositoryTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadSegmentSnapshotData::class]);
     }
 
+    private function getSegment(string $reference): Segment
+    {
+        return $this->getReference($reference);
+    }
+
+    private function getDoctrine(): ManagerRegistry
+    {
+        return self::getContainer()->get('doctrine');
+    }
+
+    private function getEntityRepository(string $entityClass): EntityRepository
+    {
+        return $this->getDoctrine()->getRepository($entityClass);
+    }
+
+    private function getSegmentSnapshotRepository(): SegmentSnapshotRepository
+    {
+        return $this->getDoctrine()->getRepository(SegmentSnapshot::class);
+    }
+
     public function testRemoveBySegment()
     {
-        $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+        $segment = $this->getSegment(LoadSegmentData::SEGMENT_STATIC);
 
-        $registry = $this->getContainer()->get('doctrine');
-        $segmentSnapshotRepository = $registry->getRepository('OroSegmentBundle:SegmentSnapshot');
+        $segmentSnapshotRepository = $this->getSegmentSnapshotRepository();
 
-        $this->assertNotEmpty($segmentSnapshotRepository->findBy(['segment' => $segment]));
+        self::assertNotEmpty($segmentSnapshotRepository->findBy(['segment' => $segment]));
 
         $segmentSnapshotRepository->removeBySegment($segment);
 
-        $this->assertEmpty($segmentSnapshotRepository->findBy(['segment' => $segment]));
+        self::assertEmpty($segmentSnapshotRepository->findBy(['segment' => $segment]));
     }
 
     public function testRemoveBySegmentWitIds()
     {
-        $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+        $segment = $this->getSegment(LoadSegmentData::SEGMENT_STATIC);
 
-        $registry = $this->getContainer()->get('doctrine');
-        $segmentSnapshotRepository = $registry->getRepository('OroSegmentBundle:SegmentSnapshot');
+        $segmentSnapshotRepository = $this->getSegmentSnapshotRepository();
 
         /** @var SegmentSnapshot[] $segmentEntities */
         $segmentEntities = $segmentSnapshotRepository->findBy(['segment' => $segment]);
-        $this->assertNotEmpty($segmentEntities);
+        self::assertNotEmpty($segmentEntities);
 
         $firstSnapshot = reset($segmentEntities);
         $entityId = $firstSnapshot->getIntegerEntityId();
@@ -57,28 +73,25 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
         $actualSegmentEntities = $segmentSnapshotRepository->findBy(['segment' => $segment]);
 
-        $this->assertNotEmpty($segmentSnapshotRepository->findBy(['segment' => $segment]));
-        $this->assertEquals(1, (count($segmentEntities) - count($actualSegmentEntities)));
+        self::assertNotEmpty($segmentSnapshotRepository->findBy(['segment' => $segment]));
+        self::assertEquals(1, (count($segmentEntities) - count($actualSegmentEntities)));
         $actualEntityIds = array_map(
             function (SegmentSnapshot $snapshot) {
                 return $snapshot->getIntegerEntityId();
             },
             $actualSegmentEntities
         );
-        $this->assertNotContains($entityId, $actualEntityIds);
+        self::assertNotContains($entityId, $actualEntityIds);
     }
 
     public function testRemoveByEntity()
     {
-        /** @var Registry $registry */
-        $registry = $this->getContainer()->get('doctrine');
-        /** @var SegmentSnapshotRepository $segmentSnapshotRepository */
-        $segmentSnapshotRepository = $registry->getRepository('OroSegmentBundle:SegmentSnapshot');
-
-        $entities = $this->getEntities($registry, 1, true);
+        $entities = $this->getEntities(1, true);
         $entity = reset($entities);
 
-        $expectedCondition = $this->getExpectedResult($registry, [$entity]);
+        $expectedCondition = $this->getExpectedResult([$entity]);
+
+        $segmentSnapshotRepository = $this->getSegmentSnapshotRepository();
 
         self::assertNotEmpty($this->findSegmentSnapshots($segmentSnapshotRepository, $expectedCondition));
         $segmentSnapshotRepository->removeByEntity($entity);
@@ -87,29 +100,21 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider massRemoveByEntitiesProvider
-     * @param integer $count
-     * @param boolean $withSegmentSnapshot
      */
-    public function testMassRemoveByEntities($count, $withSegmentSnapshot)
+    public function testMassRemoveByEntities(int $count, bool $withSegmentSnapshot)
     {
-        /** @var Registry $registry */
-        $registry = $this->getContainer()->get('doctrine');
-        /** @var SegmentSnapshotRepository $segmentSnapshotRepository */
-        $segmentSnapshotRepository = $registry->getRepository('OroSegmentBundle:SegmentSnapshot');
+        $entities = $this->getEntities($count, $withSegmentSnapshot);
 
-        $entities = $this->getEntities($registry, $count, $withSegmentSnapshot);
+        $expectedCondition = $this->getExpectedResult($entities);
 
-        $expectedCondition = $this->getExpectedResult($registry, $entities);
+        $segmentSnapshotRepository = $this->getSegmentSnapshotRepository();
 
         self::assertNotEmpty($this->findSegmentSnapshots($segmentSnapshotRepository, $expectedCondition));
         $segmentSnapshotRepository->massRemoveByEntities($entities);
         self::assertEmpty($this->findSegmentSnapshots($segmentSnapshotRepository, $expectedCondition));
     }
 
-    /**
-     * @return array
-     */
-    public function massRemoveByEntitiesProvider()
+    public function massRemoveByEntitiesProvider(): array
     {
         return [
             'one entity with related segment snapshot' => [
@@ -131,23 +136,16 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param Registry $registry
-     * @param array $entities
-     * @return array
-     */
-    protected function getExpectedResult($registry, $entities)
+    private function getExpectedResult(array $entities): array
     {
-        /** @var SegmentSnapshotRepository $segmentRepository */
-        $segmentRepository = $registry->getRepository('OroSegmentBundle:Segment');
-
-        $segmentQB = $segmentRepository->createQueryBuilder('s');
+        $doctrine = $this->getDoctrine();
+        $segmentQB = $this->getEntityRepository(Segment::class)->createQueryBuilder('s');
         $segmentQB->select('s.id, s.entity');
         $expectedCondition = [];
 
         foreach ($entities as $key => $entity) {
             $className = ClassUtils::getClass($entity);
-            $metadata  = $registry->getManager()->getClassMetadata($className);
+            $metadata  = $doctrine->getManager()->getClassMetadata($className);
             $entityIds = $metadata->getIdentifierValues($entity);
 
             if (!isset($deleteParams[$className])) {
@@ -168,13 +166,10 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         return $expectedCondition;
     }
 
-    /**
-     * @param SegmentSnapshotRepository $segmentSnapshotRepository
-     * @param array $expectedCondition
-     * @return array
-     */
-    protected function findSegmentSnapshots($segmentSnapshotRepository, $expectedCondition)
-    {
+    private function findSegmentSnapshots(
+        SegmentSnapshotRepository $segmentSnapshotRepository,
+        array $expectedCondition
+    ): array {
         $selectQB = $segmentSnapshotRepository->createQueryBuilder('snp');
 
         foreach ($expectedCondition as $params) {
@@ -192,28 +187,17 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
                 ->setParameter('integerEntityIds' . $suffix, $params['entityIds']);
         }
 
-        $entities = $selectQB->getQuery()->getResult();
-
-        return $entities;
+        return $selectQB->getQuery()->getResult();
     }
 
-    /**
-     * @param Registry $registry
-     * @param int $count
-     * @param boolean $withSegmentSnapshot
-     * @return array
-     */
-    protected function getEntities($registry, $count, $withSegmentSnapshot)
+    private function getEntities(int $count, bool $withSegmentSnapshot): array
     {
-        /** @var EntityRepository $entityRepository */
-        $entityRepository = $registry->getRepository('OroTestFrameworkBundle:WorkflowAwareEntity');
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $entityRepository->createQueryBuilder('entity');
+        $queryBuilder = $this->getEntityRepository(WorkflowAwareEntity::class)->createQueryBuilder('entity');
 
         if ($withSegmentSnapshot) {
             $queryBuilder
                 ->innerJoin(
-                    'OroSegmentBundle:SegmentSnapshot',
+                    SegmentSnapshot::class,
                     'snp',
                     Join::WITH,
                     'snp.entityId = CONCAT(entity.id, \'\') or snp.integerEntityId = entity.id'
@@ -221,7 +205,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         } else {
             $queryBuilder
                 ->leftJoin(
-                    'OroSegmentBundle:SegmentSnapshot',
+                    SegmentSnapshot::class,
                     'snp',
                     Join::WITH,
                     $queryBuilder->expr()->andX(
@@ -236,12 +220,10 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
 
     public function testGetIdentifiersSelectQueryBuilder()
     {
-        /** @var SegmentSnapshotRepository $repository */
-        $repository = $this->getContainer()->get('doctrine')->getRepository('OroSegmentBundle:SegmentSnapshot');
+        $segment = $this->getSegment(LoadSegmentData::SEGMENT_STATIC);
+        $repository = $this->getSegmentSnapshotRepository();
 
-        $segment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
-
-        $this->assertContains(
+        self::assertStringContainsString(
             'integerEntityId FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot snp',
             $repository->getIdentifiersSelectQueryBuilder($segment)->getDQL()
         );

@@ -2,23 +2,26 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Routing\Annotation\Route;
 
-class EmbedFormController extends Controller
+/**
+ * Handles a form represents an embed entity.
+ */
+class EmbedFormController extends AbstractController
 {
     use RequestHandlerTrait;
 
@@ -28,6 +31,7 @@ class EmbedFormController extends Controller
      * @param EmbeddedForm $formEntity
      * @param Request $request
      * @return Response
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function formAction(EmbeddedForm $formEntity, Request $request)
     {
@@ -42,11 +46,8 @@ class EmbedFormController extends Controller
 
         $isInline = $request->query->getBoolean('inline');
 
-        /** @var EntityManager $em */
-        $em = $this->get('doctrine.orm.entity_manager');
-        /** @var EmbeddedFormManager $formManager */
-        $formManager = $this->get('oro_embedded_form.manager');
-        $form        = $formManager->createForm($formEntity->getFormType());
+        $formManager = $this->get(EmbeddedFormManager::class);
+        $form = $formManager->createForm($formEntity->getFormType());
 
         if (in_array($request->getMethod(), ['POST', 'PUT'])) {
             $dataClass = $form->getConfig()->getOption('data_class');
@@ -62,12 +63,12 @@ class EmbedFormController extends Controller
                 $data = [];
             }
             $event = new EmbeddedFormSubmitBeforeEvent($data, $formEntity);
-            $eventDispatcher = $this->get('event_dispatcher');
-            $eventDispatcher->dispatch(EmbeddedFormSubmitBeforeEvent::EVENT_NAME, $event);
+            $eventDispatcher = $this->get(EventDispatcherInterface::class);
+            $eventDispatcher->dispatch($event, EmbeddedFormSubmitBeforeEvent::EVENT_NAME);
             $this->submitPostPutRequest($form, $request);
 
             $event = new EmbeddedFormSubmitAfterEvent($data, $formEntity, $form);
-            $eventDispatcher->dispatch(EmbeddedFormSubmitAfterEvent::EVENT_NAME, $event);
+            $eventDispatcher->dispatch($event, EmbeddedFormSubmitAfterEvent::EVENT_NAME);
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -76,10 +77,9 @@ class EmbedFormController extends Controller
             /**
              * Set owner ID (current organization) to concrete form entity
              */
-            $entityClass      = ClassUtils::getClass($entity);
-            $config           = $this->get('oro_entity_config.provider.ownership');
-            $entityConfig     = $config->getConfig($entityClass);
-            $formEntityConfig = $config->getConfig($formEntity);
+            $configProvider = $this->get(ConfigProvider::class);
+            $entityConfig = $configProvider->getConfig(get_class($entity));
+            $formEntityConfig = $configProvider->getConfig(get_class($formEntity));
 
             if ($entityConfig->get('owner_type') === OwnershipType::OWNER_TYPE_ORGANIZATION) {
                 $accessor = PropertyAccess::createPropertyAccessor();
@@ -89,6 +89,7 @@ class EmbedFormController extends Controller
                     $accessor->getValue($formEntity, $formEntityConfig->get('owner_field_name'))
                 );
             }
+            $em = $this->get('doctrine')->getManagerForClass(get_class($entity));
             $em->persist($entity);
             $em->flush();
 
@@ -103,8 +104,7 @@ class EmbedFormController extends Controller
             return $redirectResponse;
         }
 
-        /** @var EmbedFormLayoutManager $layoutManager */
-        $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+        $layoutManager = $this->get(EmbedFormLayoutManager::class);
 
         $layoutManager->setInline($isInline);
 
@@ -129,8 +129,7 @@ class EmbedFormController extends Controller
         );
         $this->setCorsHeaders($formEntity, $request, $response);
 
-        /** @var EmbedFormLayoutManager $layoutManager */
-        $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+        $layoutManager = $this->get(EmbedFormLayoutManager::class);
 
         $layoutManager->setInline($request->query->getBoolean('inline'));
 
@@ -142,10 +141,6 @@ class EmbedFormController extends Controller
     /**
      * Checks if Origin request header match any of the allowed domains
      * and set Access-Control-Allow-Origin
-     *
-     * @param EmbeddedForm $formEntity
-     * @param Request $request
-     * @param Response $response
      */
     protected function setCorsHeaders(EmbeddedForm $formEntity, Request $request, Response $response)
     {
@@ -175,5 +170,21 @@ class EmbedFormController extends Controller
                 break;
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                EmbeddedFormManager::class,
+                EventDispatcherInterface::class,
+                EmbedFormLayoutManager::class,
+                ConfigProvider::class,
+            ]
+        );
     }
 }

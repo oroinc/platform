@@ -19,10 +19,6 @@ class MaxNestedLevelValidator extends ConstraintValidator
     /** @var LocalizationHelper */
     private $localizationHelper;
 
-    /**
-     * @param BuilderChainProvider $builderChainProvider
-     * @param LocalizationHelper $localizationHelper
-     */
     public function __construct(BuilderChainProvider $builderChainProvider, LocalizationHelper $localizationHelper)
     {
         $this->builderChainProvider = $builderChainProvider;

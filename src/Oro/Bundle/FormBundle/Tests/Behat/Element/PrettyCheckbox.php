@@ -11,7 +11,7 @@ class PrettyCheckbox extends Element
      */
     public function setValue($value)
     {
-        $checkbox = $this->getParent()->find('css', 'input.custom-checkbox__input');
+        $checkbox = $this->find('css', 'input[type=checkbox]');
         self::assertNotNull($checkbox, 'Can not found actual checkbox element');
 
         if ('false' === $value || false === $value) {

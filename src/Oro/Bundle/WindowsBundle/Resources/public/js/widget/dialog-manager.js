@@ -10,18 +10,18 @@ define(function(require) {
             this.dialogs.push(dialog);
         },
         remove: function(dialog) {
-            var index = this.dialogs.indexOf(dialog);
+            const index = this.dialogs.indexOf(dialog);
             if (index === -1) {
                 throw new Error('Could not remove unexisting dialog');
             }
             this.dialogs.splice(index, 1);
         },
         getDialogPositionList: function(exclude) {
-            var positions = [];
-            for (var i = 0; i < this.dialogs.length; i++) {
-                var currentDialogWidget = this.dialogs[i];
+            const positions = [];
+            for (let i = 0; i < this.dialogs.length; i++) {
+                const currentDialogWidget = this.dialogs[i];
                 if (currentDialogWidget.widget && currentDialogWidget !== exclude) {
-                    var dialogEl = currentDialogWidget.widget[0];
+                    const dialogEl = currentDialogWidget.widget[0];
                     positions.push({
                         dialog: currentDialogWidget,
                         rect: dialogEl.getBoundingClientRect()
@@ -32,22 +32,22 @@ define(function(require) {
         },
         updateIncrementalPosition: function(dialogWidget) {
             dialogWidget.setPosition(this.preparePosition(0, 0));
-            var positions = this.getDialogPositionList(dialogWidget);
-            var baseRect = dialogWidget.widget[0].getBoundingClientRect();
-            var basePosition = {
+            const positions = this.getDialogPositionList(dialogWidget);
+            const baseRect = dialogWidget.widget[0].getBoundingClientRect();
+            const basePosition = {
                 top: baseRect.top,
                 left: baseRect.left,
                 width: baseRect.width,
                 height: baseRect.height
             };
-            var initialTop = basePosition.top;
-            var initialLeft = basePosition.left;
-            var exit = false;
-            var i;
+            const initialTop = basePosition.top;
+            const initialLeft = basePosition.left;
+            let exit = false;
+            let i;
             while (exit !== true) {
                 exit = true;
                 for (i = 0; i < positions.length; i++) {
-                    var position = positions[i];
+                    const position = positions[i];
                     if (this.getRectSimilarity(basePosition, position.rect) < this.POSITION_SHIFT) {
                         basePosition.top += this.POSITION_SHIFT;
                         basePosition.left += this.POSITION_SHIFT;

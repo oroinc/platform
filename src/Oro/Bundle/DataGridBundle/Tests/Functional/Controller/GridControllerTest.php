@@ -2,48 +2,21 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Security\Csrf\CsrfToken;
 
 class GridControllerTest extends WebTestCase
 {
     use MessageQueueAssertTrait;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
     }
 
-    public function testShouldSendExportMessageWithPageSizeParameter()
-    {
-        $this->client->request('GET', $this->getUrl('oro_datagrid_export_action', [
-            'gridName' => 'items-grid-with-export-page-size',
-            'format' => 'csv',
-            'items-grid' => [],
-        ]));
-
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertNotEmpty($result);
-        $this->assertCount(1, $result);
-        $this->assertTrue($result['successful']);
-
-        $this->assertMessageSent(Topics::PRE_EXPORT, [
-            'format' => 'csv',
-            'parameters' => [
-                'gridName' => 'items-grid-with-export-page-size',
-                'gridParameters' => [],
-                FormatterProvider::FORMAT_TYPE => 'excel',
-                'pageSize' => 499
-            ],
-            'notificationTemplate' => 'datagrid_export_result'
-        ]);
-    }
-
-    public function testShouldSendExportMessage()
+    public function testShouldSendExportMessage(): void
     {
         $this->client->request('GET', $this->getUrl('oro_datagrid_export_action', [
             'gridName' => 'audit-grid',
@@ -60,16 +33,15 @@ class GridControllerTest extends WebTestCase
             ],
         ]));
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
         $this->assertCount(1, $result);
         $this->assertTrue($result['successful']);
 
-        $this->assertMessageSent(Topics::PRE_EXPORT, [
-            'format' => 'csv',
-            'notificationTemplate' => 'datagrid_export_result',
-            'parameters' => [
+        self::assertMessageSent(DatagridPreExportTopic::getName(), [
+            'outputFormat' => 'csv',
+            'contextParameters' => [
                 'gridName' => 'audit-grid',
                 'gridParameters' => [
                     '_pager' => [
@@ -87,41 +59,24 @@ class GridControllerTest extends WebTestCase
         ]);
     }
 
-    public function testMassActionActionWithToken()
+    public function testMassActionActionWithToken(): void
     {
         $this->client->disableReboot();
 
-        /* @var $token CsrfToken */
-        $token = $this->getContainer()->get('security.csrf.token_manager')->getToken('action1');
-
-        $this->client->request(
+        $this->ajaxRequest(
             'GET',
             $this->getUrl(
                 'oro_datagrid_mass_action',
                 [
                     'gridName' => 'grid',
-                    'actionName' => 'action1',
-                    'token' => $token->getValue()
+                    'actionName' => 'action1'
                 ]
             )
         );
 
         $result = $this->client->getResponse();
 
-        $this->assertJsonResponseStatusCodeEquals($result, 403);
-        $this->assertEquals('{}', $result->getContent());
-    }
-
-    public function testMassActionActionWithInvalidToken()
-    {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_datagrid_mass_action', ['gridName' => 'grid', 'actionName' => 'action2'])
-        );
-
-        $result = $this->client->getResponse();
-
-        $this->assertJsonResponseStatusCodeEquals($result, 403);
-        $this->assertEquals('Invalid CSRF Token', json_decode($result->getContent()));
+        self::assertJsonResponseStatusCodeEquals($result, 403);
+        self::assertEquals('{}', $result->getContent());
     }
 }

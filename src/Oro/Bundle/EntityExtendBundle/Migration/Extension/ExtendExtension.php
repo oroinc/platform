@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
@@ -31,31 +31,14 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
  */
 class ExtendExtension implements NameGeneratorAwareInterface
 {
-    /**
-     * @var ExtendOptionsManager
-     */
-    protected $extendOptionsManager;
+    private const ALLOWED_IDENTITY_FIELDS = ['id', 'name'];
+    private const DEFAULT_IDENTITY_FIELDS = ['id'];
 
-    /**
-     * @var EntityMetadataHelper
-     */
-    protected $entityMetadataHelper;
+    protected ExtendOptionsManager $extendOptionsManager;
+    protected EntityMetadataHelper $entityMetadataHelper;
+    protected PropertyConfigBag $propertyConfigBag;
+    protected ExtendDbIdentifierNameGenerator $nameGenerator;
 
-    /**
-     * @var ExtendDbIdentifierNameGenerator
-     */
-    protected $nameGenerator;
-
-    /**
-     * @var PropertyConfigBag
-     */
-    protected $propertyConfigBag;
-
-    /**
-     * @param ExtendOptionsManager $extendOptionsManager
-     * @param EntityMetadataHelper $entityMetadataHelper
-     * @param PropertyConfigBag    $propertyConfigBag
-     */
     public function __construct(
         ExtendOptionsManager $extendOptionsManager,
         EntityMetadataHelper $entityMetadataHelper,
@@ -149,6 +132,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *                                  public flag is allowed or not. More details can be found
      *                                  in entity_config.yml
      * @param array         $options
+     * @param array         $identityFields
      *
      * @return Table A table that is used to store enum values
      *
@@ -162,13 +146,28 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $isMultiple = false,
         $isPublic = false,
         $immutable = false,
-        array $options = []
+        array $options = [],
+        array $identityFields = self::DEFAULT_IDENTITY_FIELDS
     ) {
         if ($enumCode !== ExtendHelper::buildEnumCode($enumCode)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'The enum code "%s" must contain only lower alphabetical symbols, numbers and underscore.',
                     $enumCode
+                )
+            );
+        }
+
+        if (empty($identityFields)) {
+            throw new \InvalidArgumentException('At least one identify field is required.');
+        }
+
+        if ($invalidIdentifyFields = array_diff($identityFields, self::ALLOWED_IDENTITY_FIELDS)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'The identification fields can only be: %s. Current invalid fields: %s.',
+                    implode(', ', self::ALLOWED_IDENTITY_FIELDS),
+                    implode(', ', $invalidIdentifyFields)
                 )
             );
         }
@@ -218,7 +217,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                     ],
                     'importexport' => [
-                        'identity' => true,
+                        'identity' => in_array('id', $identityFields, true),
                     ],
                 ]
             ]
@@ -235,6 +234,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     ],
                     'datagrid' => [
                         'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                    ],
+                    'importexport' => [
+                        'identity' => in_array('name', $identityFields, true),
                     ],
                 ],
             ]
@@ -291,6 +293,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
      *                                       public flag is allowed or not. More details can be found
      *                                       in entity_config.yml
      * @param array         $options
+     * @param array         $identityFields
      *
      * @return Table A table that is used to store enum values
      */
@@ -301,7 +304,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $enumCode,
         $isMultiple = false,
         $immutable = false,
-        array $options = []
+        array $options = [],
+        array $identityFields = self::DEFAULT_IDENTITY_FIELDS
     ) {
         $enumTableName = $this->nameGenerator->generateEnumTableName($enumCode);
         $selfTable     = $this->getTable($table, $schema);
@@ -309,7 +313,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         // make sure a table that is used to store enum values exists
         if (!$schema->hasTable($enumTableName)) {
-            $enumTable = $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable);
+            $enumTable = $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable, [], $identityFields);
         } else {
             $enumTable = $this->getTable($enumTableName, $schema);
         }
@@ -439,8 +443,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string       $targetAssociationName The name of a relation field on the inverse side
      * @param string       $titleColumnName       A column name is used to show owning side entity
      * @param array        $options               Entity config options. [scope => [name => value, ...], ...]
-     *
-     * @deprecated since 2.1, cause oneToMany relation has to be bidirectional always
      */
     public function addOneToManyInverseRelation(
         Schema $schema,
@@ -455,7 +457,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
-        $selfTable     = $this->getTable($selfTableName, $schema);
+        $selfTable     = $this->getTable($table, $schema);
         $selfClassName = $this->getEntityClassByTableName($selfTableName);
 
         $targetTableName = $this->getTableName($targetTable);
@@ -641,7 +643,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
-        $selfTable     = $this->getTable($selfTableName, $schema);
+        $selfTable     = $this->getTable($table, $schema);
         $selfClassName = $this->getEntityClassByTableName($selfTableName);
 
         $targetTableName = $this->getTableName($targetTable);
@@ -795,7 +797,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
-        $selfTable     = $this->getTable($selfTableName, $schema);
+        $selfTable     = $this->getTable($table, $schema);
         $selfClassName = $this->getEntityClassByTableName($selfTableName);
 
         $targetTableName = $this->getTableName($targetTable);
@@ -835,6 +837,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
         );
 
         $targetTableOptions['extend']['relation.' . $targetRelationKey . '.field_id'] = $targetFieldId;
+        if (isset($options['extend']['orphanRemoval'])) {
+            $targetTableOptions['extend']['relation.' . $targetRelationKey . '.orphanRemoval']
+                = $options['extend']['orphanRemoval'];
+        }
+
         $this->extendOptionsManager->setTableOptions(
             $targetTableName,
             $targetTableOptions
@@ -988,7 +995,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
     protected function addRelationColumn(Table $table, $columnName, Column $targetColumn, array $options = [])
     {
         $columnTypeName = $targetColumn->getType()->getName();
-        if (!in_array($columnTypeName, [Type::INTEGER, Type::STRING, Type::SMALLINT, Type::BIGINT], true)) {
+        if (!in_array($columnTypeName, [Types::INTEGER, Types::STRING, Types::SMALLINT, Types::BIGINT], true)) {
             throw new SchemaException(
                 sprintf(
                     'The type of relation column "%s::%s" must be an integer or string. "%s" type is not supported.',
@@ -999,7 +1006,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             );
         }
 
-        if ($columnTypeName === Type::STRING && $targetColumn->getLength() !== null) {
+        if ($columnTypeName === Types::STRING && $targetColumn->getLength() !== null) {
             $options['length'] = $targetColumn->getLength();
         }
 
@@ -1057,8 +1064,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
     /**
      * Makes sure that required for any extend field attributes are set
-     *
-     * @param array $options
      */
     protected function ensureExtendFieldSet(array &$options)
     {

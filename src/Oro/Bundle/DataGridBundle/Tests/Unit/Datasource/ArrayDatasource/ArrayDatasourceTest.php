@@ -8,10 +8,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
 class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ArrayDatasource */
-    protected $arrayDatasource;
-
-    protected $arraySource = [
+    private $arraySource = [
         [
             'priceListId' => 1,
             'priceListName' => 'PriceList 1',
@@ -46,16 +43,20 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    protected function setUp()
+    /** @var ArrayDatasource */
+    private $arrayDatasource;
+
+    protected function setUp(): void
     {
         $this->arrayDatasource = new ArrayDatasource();
     }
 
     public function testProcess()
     {
-        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $grid * */
         $grid = $this->createMock(DatagridInterface::class);
-        $grid->expects($this->once())->method('setDatasource')->with(clone $this->arrayDatasource);
+        $grid->expects($this->once())
+            ->method('setDatasource')
+            ->with(clone $this->arrayDatasource);
         $this->arrayDatasource->process($grid, []);
     }
 
@@ -63,7 +64,7 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
     {
         $this->arrayDatasource->setArraySource($this->arraySource);
 
-        $this->assertEquals(count($this->arraySource), count($this->arrayDatasource->getResults()));
+        $this->assertSameSize($this->arraySource, $this->arrayDatasource->getResults());
     }
 
     public function testResultsByType()

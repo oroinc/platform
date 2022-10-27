@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NoResultException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -17,9 +17,6 @@ class OrganizationManager
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
@@ -64,10 +61,10 @@ class OrganizationManager
      */
     public function updateOrganization(Organization $organization, $flush = true)
     {
-        $storageManager = $this->getStorageManager();
-        $storageManager->persist($organization);
+        $em = $this->getEntityManager();
+        $em->persist($organization);
         if ($flush) {
-            $storageManager->flush();
+            $em->flush();
         }
     }
 
@@ -83,18 +80,15 @@ class OrganizationManager
     }
 
     /**
-     * @return EntityManager
-     */
-    public function getStorageManager()
-    {
-        return $this->doctrine->getManagerForClass(Organization::class);
-    }
-
-    /**
      * @return OrganizationRepository
      */
-    public function getRepository()
+    protected function getRepository()
     {
-        return $this->getStorageManager()->getRepository(Organization::class);
+        return $this->getEntityManager()->getRepository(Organization::class);
+    }
+
+    protected function getEntityManager(): EntityManagerInterface
+    {
+        return $this->doctrine->getManagerForClass(Organization::class);
     }
 }

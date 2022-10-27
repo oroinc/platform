@@ -8,39 +8,32 @@ use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ThemesRelativePathGeneratorExtension
-     */
-    protected $extension;
+    /** @var ThemesRelativePathGeneratorExtension */
+    private $extension;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->extension = new ThemesRelativePathGeneratorExtension();
+        $this->extension = new ThemesRelativePathGeneratorExtension(DIRECTORY_SEPARATOR);
     }
 
     /**
      * @dataProvider prepareDataProvider
-     *
-     * @param array $source
-     * @param string|null $fileName
-     * @param array $expectedSource
      */
-    public function testPrepare(array $source, $fileName, array $expectedSource)
+    public function testPrepare(array $source, ?string $fileName, array $expectedSource): void
     {
         $data = new GeneratorData($source, $fileName);
 
         $visitorCollection = new VisitorCollection();
         $this->extension->prepare($data, $visitorCollection);
-        $this->assertEmpty($visitorCollection);
-        $this->assertEquals($fileName, $data->getFilename());
-        $this->assertEquals($expectedSource, $data->getSource());
+        self::assertEmpty($visitorCollection);
+        self::assertEquals($fileName, $data->getFilename());
+        self::assertEquals($expectedSource, $data->getSource());
     }
 
-    /**
-     * @return array
-     */
-    public function prepareDataProvider()
+    public function prepareDataProvider(): array
     {
+        $namespacedThemeName = '@OroLayout/Tests/Unit/Layout/Extension/Generator/data/sub/update.html.twig';
+
         return [
             'empty_actions' => [
                 'source' => [],
@@ -72,11 +65,11 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCa
             ],
             'twig_resource' => [
                 'source' => [
-                    'actions' => [['@setBlockTheme' => ['themes' => 'OroBundle:layouts:default/page.html.twig']]]
+                    'actions' => [['@setBlockTheme' => ['themes' => '@OroTest/layouts/default/page.html.twig']]]
                 ],
                 'filename' => '/path',
                 'expectedSource' => [
-                    'actions' => [['@setBlockTheme' => ['themes' => 'OroBundle:layouts:default/page.html.twig']]]
+                    'actions' => [['@setBlockTheme' => ['themes' => '@OroTest/layouts/default/page.html.twig']]]
                 ],
             ],
             'full_path' => [
@@ -106,33 +99,58 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCa
             'themes_null_and_relative' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => [null, 'sub/update.html.twig']]]]],
                 'filename' => __DIR__.'/data/layout.yml',
-                'expectedSource' => [
-                    'actions' => [
-                        [
-                            '@setBlockTheme' => [
-                                'themes' => [
-                                    null,
-                                    __DIR__.'/data/sub/update.html.twig',
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
+                'expectedSource' => ['actions' => [['@setBlockTheme' => ['themes' => [null, $namespacedThemeName]]]]],
             ],
             'themes_relative_with_cd' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => '../data/sub/update.html.twig']]]],
                 'filename' => __DIR__.'/data/layout.yml',
                 'expectedSource' => [
-                    'actions' => [['@setBlockTheme' => ['themes' => __DIR__.'/data/sub/update.html.twig']]]
+                    'actions' => [['@setBlockTheme' => ['themes' => $namespacedThemeName]]]
                 ],
             ],
             'themes_form' => [
                 'source' => ['actions' => [['@setFormTheme' => ['themes' => '../data/sub/update.html.twig']]]],
                 'filename' => __DIR__.'/data/layout.yml',
                 'expectedSource' => [
-                    'actions' => [['@setFormTheme' => ['themes' => __DIR__.'/data/sub/update.html.twig']]]
+                    'actions' => [['@setFormTheme' => ['themes' => $namespacedThemeName]]]
+                ],
+            ],
+            'themes_relative_in_resources_views' => [
+                'source' => ['actions' => [['@setBlockTheme' => ['themes' => 'Resources/views/sub/update.html.twig']]]],
+                'filename' => __DIR__.'/data/layout.yml',
+                'expectedSource' => [
+                    'actions' => [['@setBlockTheme' => ['themes' => $namespacedThemeName]]]
                 ],
             ],
         ];
+    }
+
+    public function testPrepareReturnAbsolutePath(): void
+    {
+        $fileName = __DIR__.'/data/layout.yml';
+        $source = [
+            'actions' => [
+                [
+                    '@setBlockTheme' => ['themes' => [null, 'sub/templates/update.html.twig']]
+                ]
+            ]
+        ];
+        $expectedSource = [
+            'actions' => [
+                [
+                    '@setBlockTheme' => ['themes' => [null, '/data/sub/update.html.twig']]
+                ]
+            ]
+        ];
+
+        $extension = new ThemesRelativePathGeneratorExtension(__DIR__);
+
+        $data = new GeneratorData($source, $fileName);
+        $visitorCollection = new VisitorCollection();
+        $extension->prepare($data, $visitorCollection);
+
+        self::assertEmpty($visitorCollection);
+        self::assertEquals($fileName, $data->getFilename());
+        self::assertEquals($expectedSource, $data->getSource());
     }
 }

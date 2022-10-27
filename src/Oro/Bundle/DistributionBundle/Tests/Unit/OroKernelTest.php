@@ -2,25 +2,50 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit;
 
-use Oro\Bundle\DistributionBundle\OroKernel;
+use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\BundleStub;
 use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\OroKernelStub;
 
 class OroKernelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OroKernel|OroKernelStub
-     */
-    protected $kernel;
+    private OroKernelStub $kernel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->kernel = new OroKernelStub('env', false);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->removeDir($this->kernel->getCacheDir());
+        $this->removeDir($this->kernel->getLogDir());
+    }
+
+    private function removeDir(string $dir)
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileInfo) {
+            if ($fileInfo->isDir()) {
+                rmdir($fileInfo->getRealPath());
+            } else {
+                unlink($fileInfo->getRealPath());
+            }
+        }
+
+        rmdir($dir);
     }
 
     /**
      * @dataProvider bundleList
      */
-    public function testCompareBundles($bundles, $expects)
+    public function testCompareBundles(array $bundles, array $expects)
     {
         uasort($bundles, [$this->kernel, 'compareBundles']);
         $id = 0;
@@ -30,7 +55,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function bundleList()
+    public function bundleList(): array
     {
         return [
             [
@@ -68,7 +93,7 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
                 [
                     ['name' => 'AcmeLastBundle', 'priority' => 100],
                     ['name' => 'OroSomeBundle', 'priority' => 30],
-                    ['name' => 'AcmeTestBundle', 'priority' => 1],
+                    ['name' => 'AcmeTestBundle'],
                     ['name' => 'OroAnotherBundle', 'priority' => 30],
                     ['name' => 'AcmeDemoBundle', 'priority' => 100],
                 ],
@@ -84,11 +109,9 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $bundles
-     *
      * @dataProvider bundlesDataProvider
      */
-    public function testCollectBundles(array $bundles)
+    public function testRegisterBundles(array $bundles)
     {
         $this->assertEquals(
             $bundles,
@@ -96,100 +119,59 @@ class OroKernelTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function bundlesDataProvider()
+    public function bundlesDataProvider(): array
     {
         return [
             [
                 [
-                    'Acme\Bundle\TestBundle\AcmeSimplifiedBundle'       => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeSimplifiedBundle',
-                        'kernel'   => null,
-                        'priority' => 0
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeDuplicateBundle'        => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeDuplicateBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle'  => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeRegisteredBundle'       => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeRegisteredBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeSecondRegisteredBundle' => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeSecondRegisteredBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ],
-                    'Acme\Bundle\TestBundle\AcmeThirdRegisteredBundle'  => [
-                        'name'     => 'Acme\Bundle\TestBundle\AcmeThirdRegisteredBundle',
-                        'kernel'   => null,
-                        'priority' => 50
-                    ]
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeSimplifiedBundle'),
+                    new BundleStub(BundleStub::class), // installed optional bundle
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeDuplicateBundle'),
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeFirstRegisteredBundle'),
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeRegisteredBundle'),
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeSecondRegisteredBundle'),
+                    new BundleStub('Acme\Bundle\TestBundle\AcmeThirdRegisteredBundle'),
                 ],
             ]
         ];
     }
 
-    /**
-     * @param string $name
-     * @param array $bundles
-     * @dataProvider getBundleDataProvider
-     */
-    public function testGetBundle($name, array $bundles)
+    public function testBootDeploymentWithoutParameters()
     {
-        // SingleInheritanceBundle extends NoInheritanceBundle
-        // DoubleInheritanceBundle extends SingleInheritanceBundle
-        $bundleMap = [
-            'NoInheritanceBundle'     => ['DoubleInheritanceBundle', 'SingleInheritanceBundle', 'NoInheritanceBundle'],
-            'SingleInheritanceBundle' => ['DoubleInheritanceBundle', 'SingleInheritanceBundle'],
-            'DoubleInheritanceBundle' => ['DoubleInheritanceBundle'],
-        ];
-        $this->kernel->setBundleMap($bundleMap);
+        $this->kernel->setAppDir('application/app1-without-parameters');
+        $this->kernel->boot();
 
-        $actualBundles = $this->kernel->getBundle($name, false);
-        $this->assertEquals($bundles, $actualBundles);
-        $this->assertEquals(current($actualBundles), $this->kernel->getBundle($name, true));
+        $container = $this->kernel->getContainer();
+        $this->assertFalse($container->hasParameter('deployment_type'));
+        $this->assertEquals('configParam1GlobalValue', $container->getParameter('configParam1'));
     }
 
-    /**
-     * @return array
-     */
-    public function getBundleDataProvider()
+    public function testBootDeploymentWithEmptyDeploymetType()
     {
-        return [
-            'bundle no inheritance' => [
-                'name'    => 'NoInheritanceBundle',
-                'bundles' => ['DoubleInheritanceBundle', 'SingleInheritanceBundle', 'NoInheritanceBundle'],
-            ],
-            'bundle single inheritance' => [
-                'name'    => 'SingleInheritanceBundle',
-                'bundles' => ['DoubleInheritanceBundle', 'SingleInheritanceBundle'],
-            ],
-            'bundle double inheritance' => [
-                'name'    => 'DoubleInheritanceBundle',
-                'bundles' => ['DoubleInheritanceBundle'],
-            ],
-            'precise bundle no inheritance' => [
-                'name'    => '!NoInheritanceBundle',
-                'bundles' => ['NoInheritanceBundle'],
-            ],
-            'precise bundle single inheritance' => [
-                'name'    => '!SingleInheritanceBundle',
-                'bundles' => ['SingleInheritanceBundle'],
-            ],
-            'precise bundle double inheritance' => [
-                'name'    => '!DoubleInheritanceBundle',
-                'bundles' => ['DoubleInheritanceBundle'],
-            ],
-        ];
+        $this->kernel->setAppDir('application/app2-without-deployment-type');
+        $this->kernel->boot();
+
+        $container = $this->kernel->getContainer();
+        $this->assertNull($container->getParameter('deployment_type'));
+        $this->assertEquals('configParam1GlobalValue', $container->getParameter('configParam1'));
+    }
+
+    public function testBootDeploymentWithoutDeploymentFile()
+    {
+        $this->kernel->setAppDir('application/app3-without-deployment-config');
+        $this->kernel->boot();
+
+        $container = $this->kernel->getContainer();
+        $this->assertFalse($container->hasParameter('deployment_type'));
+    }
+
+    public function testBootDeploymentWithLocalConfig()
+    {
+        $this->kernel->setAppDir('application/app4-with-deployment-config');
+        $this->kernel->boot();
+
+        $container = $this->kernel->getContainer();
+        $this->assertEquals('local', $container->getParameter('deployment_type'));
+        $this->assertEquals('configParam1DeploymentValue', $container->getParameter('configParam1'));
     }
 }

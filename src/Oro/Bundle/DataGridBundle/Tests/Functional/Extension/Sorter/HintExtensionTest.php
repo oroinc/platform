@@ -4,25 +4,25 @@ namespace Oro\Bundle\DataGridBundle\Tests\Functional\Extension\Sorter;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\DoctrineUtils\ORM\SqlWalker;
+use Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier;
 
 class HintExtensionTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->initClient([], static::generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->loadFixtures([]);
     }
 
     public function testHintDisableOrderByModificationNullsIsAppliedByDefault()
     {
         /** @var Manager $dataGridManager */
-        $dataGridManager = static::getContainer()->get('oro_datagrid.datagrid.manager');
+        $dataGridManager = self::getContainer()->get('oro_datagrid.datagrid.manager');
 
         $dataGrid = $dataGridManager->getDatagrid('items-grid');
 
-        static::assertArrayHasKey(
-            SqlWalker::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
+        self::assertArrayHasKey(
+            PostgreSqlOrderByNullsOutputResultModifier::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
             array_flip($dataGrid->getConfig()->getOrmQuery()->getHints())
         );
     }
@@ -30,12 +30,12 @@ class HintExtensionTest extends WebTestCase
     public function testHintDisableOrderByModificationNullsIsRemovedByGridConfiguration()
     {
         /** @var Manager $dataGridManager */
-        $dataGridManager = static::getContainer()->get('oro_datagrid.datagrid.manager');
+        $dataGridManager = self::getContainer()->get('oro_datagrid.datagrid.manager');
 
         $dataGrid = $dataGridManager->getDatagrid('items-values-grid');
 
-        static::assertArrayNotHasKey(
-            SqlWalker::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
+        self::assertArrayNotHasKey(
+            PostgreSqlOrderByNullsOutputResultModifier::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
             array_flip($dataGrid->getConfig()->getOrmQuery()->getHints())
         );
     }

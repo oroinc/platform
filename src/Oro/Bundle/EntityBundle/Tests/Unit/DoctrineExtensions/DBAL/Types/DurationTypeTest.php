@@ -8,32 +8,19 @@ use Oro\Bundle\EntityBundle\DoctrineExtensions\DBAL\Types\DurationType;
 class DurationTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DurationType */
-    protected $type;
+    private $type;
 
     /** @var AbstractPlatform */
-    protected $platform;
+    private $platform;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        // class has private constructor
-        $this->type = $this
-            ->getMockBuilder(
-                'Oro\Bundle\EntityBundle\DoctrineExtensions\DBAL\Types\DurationType'
-            )
-            ->setMethods(null)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->type = new DurationType();
 
-        $this->platform = $this
-            ->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->platform = $this->createMock(AbstractPlatform::class);
     }
 
     /**
-     * @param mixed $value
-     * @param mixed $expected
-     *
      * @dataProvider convertToDatabaseValueDataProvider
      */
     public function testConvertToDatabaseValue($value, $expected)
@@ -44,8 +31,7 @@ class DurationTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /** @return array */
-    public function convertToDatabaseValueDataProvider()
+    public function convertToDatabaseValueDataProvider(): array
     {
         return [
             'null' => [null, null],

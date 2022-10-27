@@ -3,110 +3,84 @@
 namespace Oro\Component\Config\Tests\Unit\Resolver;
 
 use Oro\Component\Config\Resolver\SystemAwareResolver;
+use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\Controller\InvokableController;
+use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\Controller\TestController;
 use Oro\Component\Config\Tests\Unit\Fixtures\TestService;
 use Oro\Component\Routing\Tests\Unit\Resolver\TestResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 {
-    const STATIC_CLASS = 'Oro\Component\Config\Tests\Unit\Resolver\SystemAwareResolverTest';
-    const CONST1 = 'const1';
-    const CONST2 = 'const2';
+    public const CONST1 = 'const1';
+    public const CONST2 = 'const2';
+
+    private const STATIC_CLASS = SystemAwareResolverTest::class;
 
     /** @var SystemAwareResolver */
-    protected $resolver;
+    private $resolver;
 
-    /**
-     * setup mock and test object
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock(ContainerInterface::class);
         $this->resolver = new SystemAwareResolver();
         $this->resolver->setContainer($container);
 
         $service1 = new TestService();
         $service2 = new TestResource('service2');
 
-        $container->expects($this->any())
+        $container->expects(self::any())
             ->method('getParameter')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['test.param1', 'val1'],
-                        ['test.other_param', ['val', 2]],
-                        ['test.class', 'Oro\Component\Config\Tests\Unit\Resolver\SystemAwareResolverTest'],
-                    ]
-                )
-            );
-        $container->expects($this->any())
+            ->willReturnMap([
+                ['test.param1', 'val1'],
+                ['test.other_param', ['val', 2]],
+                ['test.class', self::STATIC_CLASS],
+            ]);
+        $container->expects(self::any())
             ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['test.service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new \stdClass()],
-                        ['test.service1', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service1],
-                        ['test.other_service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service2],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['test.service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new \stdClass()],
+                ['test.service1', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service1],
+                ['test.other_service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service2],
+            ]);
     }
 
-    /**
-     * @return string
-     */
-    public static function func1()
+    public static function func1(): string
     {
         self::assertEmpty(func_get_args());
         return 'static_func1';
     }
 
-    /**
-     * @param mixed $val
-     * @return string
-     */
-    public static function func2($val)
+    public static function func2(mixed $val): string
     {
-        return 'static_func2 + ' . ((null === $val) ? 'NULL' : $val);
+        return 'static_func2 + ' . ($val ?? 'NULL');
     }
 
-    /**
-     * @param mixed $val1
-     * @param mixed $val2
-     * @return string
-     */
-    public static function func3($val1, $val2)
+    public static function func3(mixed $val1, mixed $val2): string
     {
-        return 'static_func2 + ' . ((null === $val1) ? 'NULL' : $val1) . ' + ' . ((null === $val2) ? 'NULL' : $val2);
+        return 'static_func2 + ' . ($val1 ?? 'NULL') . ' + ' . ($val2 ?? 'NULL');
     }
 
-    /**
-     * @return array
-     */
-    public static function otherFunc()
+    public static function otherFunc(): array
     {
         return ['static', 'func'];
     }
 
     /**
      * @dataProvider resolveProvider
-     * @param $config
-     * @param $expected
      */
-    public function testResolve($config, $expected)
+    public function testResolve(array $config, array $expected): void
     {
         $result = $this->resolver->resolve($config, [
             'testVar' => 'test context var',
             'testArray' => ['param' => 'param from array'],
         ]);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     /**
-     * Data provider for testResolve
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function resolveProvider()
+    public function resolveProvider(): array
     {
         return [
             'empty' => [
@@ -201,6 +175,10 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
                 ['root' => ['node' => '%test.class%::CONST1']],
                 ['root' => ['node' => 'const1']],
             ],
+            'namespaced template' => [
+                ['root' => ['node' => '@@OroBar/test.html.twig']],
+                ['root' => ['node' => '@OroBar/test.html.twig']],
+            ],
             'service' => [
                 ['root' => ['node' => '@test.service']],
                 ['root' => ['node' => new \stdClass()]],
@@ -263,7 +241,15 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 ['root' => ['node' => 'func2 + const1']],
-            ]
+            ],
+            'controller action' => [
+                ['root' => ['node' => TestController::class . '::test1Action']],
+                ['root' => ['node' => TestController::class . '::test1Action']],
+            ],
+            'invokable controller' => [
+                ['root' => ['node' => InvokableController::class]],
+                ['root' => ['node' => InvokableController::class]],
+            ],
         ];
     }
 }

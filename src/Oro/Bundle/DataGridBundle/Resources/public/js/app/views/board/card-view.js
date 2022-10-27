@@ -10,16 +10,15 @@ define(function(require) {
      * @param {Number} earlyTransitionStatusChangeTimeout - timeout for early transition status change detection
      * @augments {BaseView}
      */
-    var CardView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var numberFormatter = require('orolocale/js/formatter/number');
-    var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var scrollHelper = require('oroui/js/tools/scroll-helper');
-    var ActionsView = require('../grid/actions-view');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const numberFormatter = require('orolocale/js/formatter/number');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
+    const scrollHelper = require('oroui/js/tools/scroll-helper');
+    const ActionsView = require('../grid/actions-view');
 
-    CardView = BaseView.extend({
+    const CardView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'card-view',
 
@@ -31,12 +30,12 @@ define(function(require) {
         cardActionsElementSelector: '[data-placeholder-for="actions"]',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        template: require('tpl!../../../../templates/board/card-view.html'),
+        template: require('tpl-loader!../../../../templates/board/card-view.html'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         keepElement: false,
 
@@ -48,28 +47,28 @@ define(function(require) {
         earlyTransitionStatusChangeTimeout: 2000,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-action="navigate"]': 'navigate'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'change model': 'render'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function CardView() {
-            CardView.__super__.constructor.apply(this, arguments);
+        constructor: function CardView(options) {
+            CardView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             CardView.__super__.initialize.call(this, options);
@@ -83,10 +82,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
-            var templateData = CardView.__super__.getTemplateData.call(this, arguments);
+            const templateData = CardView.__super__.getTemplateData.call(this);
             templateData.numberFormatter = numberFormatter;
             templateData.datetimeFormatter = datetimeFormatter;
             templateData.readonly = this.readonly;
@@ -94,7 +93,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             CardView.__super__.render.call(this);
@@ -131,15 +130,15 @@ define(function(require) {
          * Tracks `transition-status-just-changed` class
          */
         trackEarlyTransitionStatusChange: function() {
-            var $el = this.$el;
+            const $el = this.$el;
             $el.removeClass('transition-status-just-changed');
             clearTimeout(this.transitionStatusUpdateTimeout);
             if (!this.model.get('transitionStatusUpdateTime')) {
                 return;
             }
-            var now = (new Date()).getTime();
-            var transitionStatusUpdateTime = this.model.get('transitionStatusUpdateTime').getTime();
-            var statusChangeTimeout = this.earlyTransitionStatusChangeTimeout - (now - transitionStatusUpdateTime);
+            const now = (new Date()).getTime();
+            const transitionStatusUpdateTime = this.model.get('transitionStatusUpdateTime').getTime();
+            const statusChangeTimeout = this.earlyTransitionStatusChangeTimeout - (now - transitionStatusUpdateTime);
             if (statusChangeTimeout > 0) {
                 $el.addClass('transition-status-just-changed');
                 this.transitionStatusUpdateTimeout = setTimeout(function() {
@@ -162,7 +161,7 @@ define(function(require) {
          * Renders card actions dropdown
          */
         renderCardActionsDropdown: function(selector) {
-            var $placeholder = this.$(selector);
+            const $placeholder = this.$(selector);
             if (!$placeholder.length) {
                 return;
             }

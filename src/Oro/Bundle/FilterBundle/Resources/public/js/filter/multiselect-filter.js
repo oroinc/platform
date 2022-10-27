@@ -1,14 +1,12 @@
 define(function(require) {
     'use strict';
 
-    // @const
-    var FILTER_EMPTY_VALUE = '';
+    const FILTER_EMPTY_VALUE = '';
 
-    var MultiSelectFilter;
-    var template = require('tpl!orofilter/templates/filter/multiselect-filter.html');
-    var _ = require('underscore');
-    var tools = require('oroui/js/tools');
-    var SelectFilter = require('./select-filter');
+    const template = require('tpl-loader!orofilter/templates/filter/multiselect-filter.html');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const SelectFilter = require('oro/filter/select-filter');
 
     /**
      * Multiple select filter: filter values as multiple select options
@@ -17,7 +15,7 @@ define(function(require) {
      * @class   oro.filter.MultiSelectFilter
      * @extends oro.filter.SelectFilter
      */
-    MultiSelectFilter = SelectFilter.extend({
+    const MultiSelectFilter = SelectFilter.extend({
         /**
          * Filter selector template
          *
@@ -44,14 +42,14 @@ define(function(require) {
         minimumDropdownWidth: 120,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function MultiSelectFilter() {
-            MultiSelectFilter.__super__.constructor.apply(this, arguments);
+        constructor: function MultiSelectFilter(options) {
+            MultiSelectFilter.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (_.isUndefined(this.emptyValue)) {
@@ -59,14 +57,14 @@ define(function(require) {
                     value: [FILTER_EMPTY_VALUE]
                 };
             }
-            MultiSelectFilter.__super__.initialize.apply(this, arguments);
+            MultiSelectFilter.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        _onSelectChange: function() {
-            MultiSelectFilter.__super__._onSelectChange.apply(this, arguments);
+        _onSelectChange: function(e) {
+            MultiSelectFilter.__super__._onSelectChange.call(this, e);
             this._setDropdownWidth();
         },
 
@@ -80,8 +78,8 @@ define(function(require) {
                 this.cachedMinimumWidth = Math.max(this.minimumDropdownWidth,
                     this.selectWidget.getMinimumDropdownWidth()) + 24;
             }
-            var widget = this.selectWidget.getWidget();
-            var requiredWidth = this.cachedMinimumWidth;
+            const widget = this.selectWidget.getWidget();
+            const requiredWidth = this.cachedMinimumWidth;
             // fix width
             widget.width(requiredWidth).css({
                 minWidth: requiredWidth,
@@ -96,8 +94,7 @@ define(function(require) {
          * @return {*}
          */
         setValue: function(value) {
-            var normValue;
-            normValue = this._normalizeValue(tools.deepClone(value));
+            const normValue = this._normalizeValue(tools.deepClone(value));
             // prevent uncheck 'Any' value
             if ((value.value === null || value.value === undefined) && tools.isEqualsLoosely(this.value, normValue)) {
                 this._updateDOMValue();
@@ -120,7 +117,7 @@ define(function(require) {
             if (this.isEmpty()) {
                 // need to uncheck it in new value
                 if (value.value.length > 1) {
-                    var indexOfEmptyOption = value.value.indexOf(FILTER_EMPTY_VALUE);
+                    const indexOfEmptyOption = value.value.indexOf(FILTER_EMPTY_VALUE);
                     if (indexOfEmptyOption !== -1) {
                         value.value.splice(indexOfEmptyOption, 1);
                     }
@@ -136,13 +133,22 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        _getCriteriaHint: function() {
-            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
-            var choices = this._getSelectedChoices(value, this.choices);
+        _getCriteriaHint: function(...args) {
+            const value = (args.length > 0) ? this._getDisplayValue(args[0]) : this._getDisplayValue();
+            const choices = this._getSelectedChoices(value, this.choices);
 
             return choices.length > 0 ? choices.join(', ') : this.placeholder;
+        },
+
+        /**
+         * @inheritdoc
+         */
+        _formatRawValue(value) {
+            const formatted = MultiSelectFilter.__super__._formatRawValue.call(this, value);
+
+            return this._normalizeValue(formatted);
         },
 
         /**
@@ -170,18 +176,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _isDOMValueChanged: function() {
-            var thisDOMValue = this._readDOMValue();
+            const thisDOMValue = this._readDOMValue();
             return (
                 !_.isUndefined(thisDOMValue.value) &&
                 _.isArray(thisDOMValue.value) &&
-                !_.isEqual(this.value, thisDOMValue) &&
-                (
-                    (!thisDOMValue.value.length && _.isEqual(this.value, [FILTER_EMPTY_VALUE])) ||
-                    thisDOMValue.value.length
-                )
+                !_.isEqual(this.value, thisDOMValue)
             );
         }
     });

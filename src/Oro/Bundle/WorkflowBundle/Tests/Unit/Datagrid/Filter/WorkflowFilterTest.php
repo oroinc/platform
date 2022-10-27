@@ -2,65 +2,72 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid\Filter;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formFactory;
+    private $formFactory;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationHelper;
+    private $translationHelper;
 
     /** @var WorkflowFilter */
-    protected $filter;
+    private $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);
 
-        $this->filter = new WorkflowFilter($this->formFactory, new FilterUtility(), $this->translationHelper);
+        $this->filter = new WorkflowFilter(
+            $this->formFactory,
+            new FilterUtility(),
+            $this->doctrine,
+            $this->translationHelper
+        );
     }
 
     public function testInit()
     {
         $this->filter->init('test', []);
 
-        $this->assertAttributeEquals(
-            [
-                FilterUtility::FORM_OPTIONS_KEY => [
-                    'field_options' => [
-                        'class' => WorkflowDefinition::class,
-                        'multiple' => true,
-                        'choice_label' => [$this->filter, 'getLabel'],
-                        'translatable_options' => false
-                    ],
-                ],
-                FilterUtility::FRONTEND_TYPE_KEY => 'choice',
-            ],
-            'params',
-            $this->filter
-        );
-    }
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
-    public function testGetLabel()
-    {
+        $choiceLabel = $params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['choice_label'];
+        unset($params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['choice_label']);
+        self::assertEquals(
+            [
+                FilterUtility::FORM_OPTIONS_KEY  => [
+                    'field_options' => [
+                        'class'                => WorkflowDefinition::class,
+                        'multiple'             => true,
+                        'translatable_options' => false
+                    ]
+                ],
+                FilterUtility::FRONTEND_TYPE_KEY => 'choice'
+            ],
+            $params
+        );
+
         $definition = new WorkflowDefinition();
         $definition->setLabel('label');
-
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('findTranslation')
             ->with('label')
             ->willReturn('translated-label');
 
-        $this->assertEquals('translated-label', $this->filter->getLabel($definition));
+        self::assertIsCallable($choiceLabel);
+        self::assertEquals('translated-label', $choiceLabel($definition));
     }
 }

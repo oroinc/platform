@@ -2,43 +2,39 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Helper;
 
-use DateTime;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
+use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DateHelperTest extends OrmTestCase
 {
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
+
     /** @var DateHelper */
-    protected $helper;
+    private $helper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $settings;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclHelper;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->settings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->settings->expects($this->any())
+        $settings = $this->createMock(LocaleSettings::class);
+        $settings->expects($this->any())
             ->method('getTimeZone')
             ->willReturn('UTC');
-        $this->doctrine  = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->helper    = new DateHelper($this->settings, $this->doctrine, $this->aclHelper);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->aclHelper = $this->createMock(AclHelper::class);
+
+        $this->helper = new DateHelper($settings, $this->doctrine, $this->aclHelper);
     }
 
     /**
@@ -52,7 +48,7 @@ class DateHelperTest extends OrmTestCase
         $this->assertEquals($expects, $this->helper->getDatePeriod($start, $end));
     }
 
-    public function datePeriodProvider()
+    public function datePeriodProvider(): array
     {
         return [
             'year'  => [
@@ -157,7 +153,7 @@ class DateHelperTest extends OrmTestCase
         $this->assertEquals($expects, $this->helper->getKey($start, $end, $row));
     }
 
-    public function keyProvider()
+    public function keyProvider(): array
     {
         return [
             'year'  => [
@@ -198,14 +194,14 @@ class DateHelperTest extends OrmTestCase
 
         $queryBuilder = new QueryBuilder($this->getTestEntityManager());
         $queryBuilder->select('id')
-            ->from('Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\FirstTestBundle\Entity\TestEntity', 't');
+            ->from(TestEntity::class, 't');
 
         $this->helper->addDatePartsSelect($start, $end, $queryBuilder, 't.createdAt');
 
         $this->assertEquals($expects, $queryBuilder->getDQL());
     }
 
-    public function addDatePartsSelectProvider()
+    public function addDatePartsSelectProvider(): array
     {
         return [
             'year'  => [
@@ -250,8 +246,8 @@ class DateHelperTest extends OrmTestCase
     public function testConvertToCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
     {
         $result = $this->helper->convertToCurrentPeriod(
-            new DateTime(),
-            new DateTime(),
+            new \DateTime(),
+            new \DateTime(),
             [],
             'row',
             'data'
@@ -262,8 +258,8 @@ class DateHelperTest extends OrmTestCase
 
     public function testConvertToCurrentPeriod()
     {
-        $from = new DateTime('2015-05-10');
-        $to   = new DateTime('2015-05-15');
+        $from = new \DateTime('2015-05-10');
+        $to   = new \DateTime('2015-05-15');
 
         $data         = [
             [
@@ -296,8 +292,8 @@ class DateHelperTest extends OrmTestCase
     public function testCombinePreviousDataWithCurrentPeriodShouldReturnEmptyArrayIfDataAreEmpty()
     {
         $result = $this->helper->combinePreviousDataWithCurrentPeriod(
-            new DateTime(),
-            new DateTime(),
+            new \DateTime(),
+            new \DateTime(),
             [],
             'row',
             'data'
@@ -306,12 +302,12 @@ class DateHelperTest extends OrmTestCase
         $this->assertSame([], $result);
     }
 
-    public function combinePreviousDataWithCurrentPeriodDataProvider()
+    public function combinePreviousDataWithCurrentPeriodDataProvider(): array
     {
         return [
             'general'                         => [
-                new DateTime('2015-05-05'),
-                new DateTime('2015-05-10'),
+                new \DateTime('2015-05-05'),
+                new \DateTime('2015-05-10'),
                 [
                     [
                         'yearCreated'  => '2015',
@@ -330,14 +326,14 @@ class DateHelperTest extends OrmTestCase
                 ]
             ],
             'empty_data_returns_empty_array'  => [
-                new DateTime(),
-                new DateTime(),
+                new \DateTime(),
+                new \DateTime(),
                 [],
                 []
             ],
             'long_period_last_days_of_month'  => [
-                new DateTime('2015-05-19 23:00:00'),
-                new DateTime('2015-08-30 00:00:00'),
+                new \DateTime('2015-05-19 23:00:00'),
+                new \DateTime('2015-08-30 00:00:00'),
                 [
                     [
                         'yearCreated'  => '2015',
@@ -355,8 +351,8 @@ class DateHelperTest extends OrmTestCase
                 ]
             ],
             'long_period_first_days_of_month' => [
-                new DateTime('2015-03-02 22:00:00'),
-                new DateTime('2015-08-01 00:00:00'),
+                new \DateTime('2015-03-02 22:00:00'),
+                new \DateTime('2015-08-01 00:00:00'),
                 [
                     [
                         'yearCreated'  => '2015',
@@ -400,7 +396,7 @@ class DateHelperTest extends OrmTestCase
         $this->assertEquals($expectedValue, $this->helper->getFormatStrings($start, $end));
     }
 
-    public function getFormatStringsProvider()
+    public function getFormatStringsProvider(): array
     {
         return [
             'year' => [
@@ -469,7 +465,7 @@ class DateHelperTest extends OrmTestCase
         );
     }
 
-    public function getKeyGeneratesKeysFromGetDatePeriod()
+    public function getKeyGeneratesKeysFromGetDatePeriod(): array
     {
         return [
             'year' => [

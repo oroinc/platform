@@ -1,10 +1,12 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
-{% set fullname = entity|oro_format_name|default('N/A') %}
+{% set fullname = entity|oro_format_name|default('N/A'|trans) %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% placeholder view_navButtons with {entity: entity} %}
     {% if isDesktopVersion() %}
         {% if is_granted('CONFIGURE', entity) and not isProfileView %}
@@ -50,45 +52,61 @@
 {% block pageHeader %}
     {% set breadcrumbs = {
         'entity':      entity,
-        'indexPath':   path('oro_user_index'),
         'indexLabel':  'oro.user.entity_plural_label'|trans,
         'entityTitle': fullname,
     } %}
-    {% set avatar = oro_configured_image_url(entity, 'avatar') %}
+    {% if (feature_resource_enabled('oro_user_index', 'routes')) %}
+        {% set breadcrumbs = breadcrumbs|merge({'indexPath':  path('oro_user_index')}) %}
+    {% endif %}
+
     {{ parent() }}
 {% endblock pageHeader %}
 
+{% block pageTitleIcon %}
+    <div class="page-title__icon">
+        {%- include '@OroAttachment/Twig/picture.html.twig' with {
+            file: entity.avatar,
+            filter: 'avatar_med',
+            img_attrs: { alt: entity|oro_format_name }
+        } -%}
+    </div>
+{% endblock %}
+
 {% block breadcrumbs %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {{ parent() }}
-    <div class="pull-left">
+    <span class="page-title__status">
         {% if entity.enabled %}
-            <div class="badge badge-pill badge-enabled status-enabled"><i class="icon-status-enabled fa-circle"></i>
-                {{- 'oro.user.enabled.enabled'|trans -}}
-            </div>
+            {{ UI.badge('oro.user.enabled.enabled'|trans, 'enabled') }}
         {% else %}
-            <div class="badge badge-pill badge-disabled status-disabled"><i class="icon-status-disabled fa-circle"></i>
-                {{- 'oro.user.enabled.disabled'|trans -}}
-            </div>
+            {{ UI.badge('oro.user.enabled.disabled'|trans, 'disabled') }}
         {% endif %}
-    </div>
-    <div class="pull-left">
+
         {% if entity.authStatus.id == 'expired' %}
-            <div class="badge badge-pill badge-disabled status-disabled"><i class="icon-status-disabled fa-unlock-alt"></i>
-                {{- entity.authStatus.name -}}</div>
+            {{ UI.badge(entity.authStatus.name, 'disabled', 'fa-unlock-alt') }}
         {% elseif entity.authStatus.id == 'active' %}
-            <div class="badge badge-pill badge-enabled status-enabled"><i class="icon-status-enabled fa-unlock"></i>
-                {{- entity.authStatus.name -}}</div>
+            {{ UI.badge(entity.authStatus.name, 'enabled', 'fa-unlock') }}
         {% else %}
-            <div class="badge badge-pill badge-tentatively status-tentatively"><i class="icon-status-tentatively fa-lock"></i>
-                {{- entity.authStatus.name -}}</div>
+            {{ UI.badge(entity.authStatus.name, 'tentatively', 'fa-lock') }}
         {% endif %}
-    </div>
+        {% placeholder view_page_title_status with {entity: entity} %}
+    </span>
 {% endblock breadcrumbs %}
 
 {% block stats %}
-    <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.user.last_login.label'|trans }}: {{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A' }}</li>
+    {% if is_granted('oro_view_user_login_attempt') %}
+        {% set loginAttempts %}
+            {{ 'oro.user.last_login.label'|trans }}: <a title="{{ 'oro.user.userloginattempt.entity_description'|trans }}" href="{{ oro_datagrid_link('oro_user_login_attempts', 'user-login-attempts-grid', {'f[user][value]': entity.id}) }}">{{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'|trans }}</a>
+        {% endset %}
+    {% else %}
+        {% set loginAttempts %}
+            {{ 'oro.user.last_login.label'|trans }}: {{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'|trans }}
+        {% endset %}
+    {% endif %}
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'|trans }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'|trans }}</li>
+    <li>{{ loginAttempts }}</li>
     <li>{{ 'oro.user.login_count.label'|trans }}: {{ entity.loginCount|default(0) }}</li>
 {% endblock stats %}
 
@@ -100,11 +118,23 @@
             'separateLayout': false
         }) }}
     {% endset %}
+    {% set apiKeyWidget %}
+        {% if isProfileView or app.user.id == entity.id or is_granted('MANAGE_API_KEY', entity) %}
+            {{ oro_widget_render({
+                'widgetType': 'block',
+                'url': path('oro_user_apigen', { id: entity.id }),
+                'alias': 'user-apikey-gen-widget',
+                'elementFirst': true,
+                'separateLayout': false
+            }) }}
+        {% endif %}
+    {% endset %}
     {% set dataBlocks = [
         {
             'title': 'General Information'|trans,
             'subblocks': [
-                {'data' : [userInformationWidget]}
+                {'data' : [userInformationWidget]},
+                {'data' : [apiKeyWidget]},
             ]
         }
     ] %}

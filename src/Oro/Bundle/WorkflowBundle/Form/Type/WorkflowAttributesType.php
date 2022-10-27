@@ -23,8 +23,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * This is used to edit workflow attributes in workflow configurator.
+ */
 class WorkflowAttributesType extends AbstractType
 {
     const NAME = 'oro_workflow_attributes';
@@ -123,9 +126,6 @@ class WorkflowAttributesType extends AbstractType
 
     /**
      * Adds required event listeners
-     *
-     * @param FormBuilderInterface $builder
-     * @param array $options
      */
     protected function addEventListeners(FormBuilderInterface $builder, array $options)
     {
@@ -154,9 +154,8 @@ class WorkflowAttributesType extends AbstractType
     /**
      * Add attributes to form
      *
-     * @param FormBuilderInterface $builder
-     * @param array $options
      * @throws InvalidConfigurationException When attribute is not found in given Workflow
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addAttributes(FormBuilderInterface $builder, array $options)
     {
@@ -232,11 +231,6 @@ class WorkflowAttributesType extends AbstractType
 
     /**
      * Adds form type of attribute to form builder
-     *
-     * @param FormBuilderInterface $builder
-     * @param Attribute $attribute
-     * @param array $attributeOptions
-     * @param array $options
      */
     protected function addAttributeField(
         FormBuilderInterface $builder,
@@ -247,7 +241,7 @@ class WorkflowAttributesType extends AbstractType
         $attributeOptions = $this->prepareAttributeOptions($attribute, $attributeOptions, $options);
 
         $event = new TransitionsAttributeEvent($attribute, $attributeOptions, $options);
-        $this->dispatcher->dispatch(TransitionsAttributeEvent::BEFORE_ADD, $event);
+        $this->dispatcher->dispatch($event, TransitionsAttributeEvent::BEFORE_ADD);
         $attributeOptions = $event->getAttributeOptions();
 
         $builder->add($attribute->getName(), $attributeOptions['form_type'], $attributeOptions['options']);
@@ -322,16 +316,16 @@ class WorkflowAttributesType extends AbstractType
                 $attributeOptions['options']['label'] = array_shift($attributeOptions['options']['label']);
             }
 
-
             $label = $attributeOptions['options']['label'];
-            if ($this->translator->trans($label, [], $domain) === $label) {
+            $translatedLabel =  $this->translator->trans((string) $label, [], $domain);
+            if ($translatedLabel === $label) {
                 $attributeOptions['options']['label'] = $attribute->getLabel();
             }
         } else {
             $attributeOptions['options']['label'] = $attribute->getLabel();
         }
 
-        if (strpos($attributeOptions['options']['label'], WorkflowTemplate::KEY_PREFIX) === 0) {
+        if (str_starts_with($attributeOptions['options']['label'], WorkflowTemplate::KEY_PREFIX)) {
             $attributeOptions['options']['translation_domain'] = $domain;
         }
 

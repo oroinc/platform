@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event is fired after all recipients are calculated for a given notification rule and is aimed to allow process
@@ -43,9 +43,6 @@ class NotificationProcessRecipientsEvent extends Event
         return $this;
     }
 
-    /**
-     * @return array
-     */
     public function getRecipients(): array
     {
         return $this->recipients;

@@ -15,9 +15,6 @@ class LoadDictionaries implements ProcessorInterface
     /** @var ChainDictionaryValueListProvider */
     protected $dictionaryProvider;
 
-    /**
-     * @param ChainDictionaryValueListProvider $dictionaryProvider
-     */
     public function __construct(ChainDictionaryValueListProvider $dictionaryProvider)
     {
         $this->dictionaryProvider = $dictionaryProvider;

@@ -9,8 +9,11 @@ use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides activity widgets.
+ */
 class ActivityWidgetProvider implements WidgetProviderInterface
 {
     /** @var ActivityManager */
@@ -28,13 +31,6 @@ class ActivityWidgetProvider implements WidgetProviderInterface
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
-    /**
-     * @param ActivityManager               $activityManager
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TranslatorInterface           $translator
-     * @param EntityIdAccessor              $entityIdAccessor
-     * @param EntityRoutingHelper           $entityRoutingHelper
-     */
     public function __construct(
         ActivityManager $activityManager,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -70,7 +66,7 @@ class ActivityWidgetProvider implements WidgetProviderInterface
         $items = $this->activityManager->getActivityAssociations($entityClass);
         foreach ($items as $item) {
             if (empty($item['acl']) || $this->authorizationChecker->isGranted($item['acl'])) {
-                $url    = $this->entityRoutingHelper->generateUrl($item['route'], $entityClass, $entityId);
+                $url    = $this->entityRoutingHelper->generateUrl((string) $item['route'], $entityClass, $entityId);
                 $alias  = sprintf(
                     '%s_%s_%s',
                     strtolower(ExtendHelper::getShortClassName($item['className'])),
@@ -80,7 +76,7 @@ class ActivityWidgetProvider implements WidgetProviderInterface
                 $widget = [
                     'widgetType' => 'block',
                     'alias'      => $alias,
-                    'label'      => $this->translator->trans($item['label']),
+                    'label'      => isset($item['label']) ? $this->translator->trans((string) $item['label']) : '',
                     'url'        => $url
                 ];
                 if (isset($item['priority'])) {

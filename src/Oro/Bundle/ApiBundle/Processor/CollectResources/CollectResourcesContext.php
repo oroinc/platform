@@ -13,7 +13,10 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
 class CollectResourcesContext extends ApiContext
 {
     /** @var string[] */
-    protected $accessibleResources = [];
+    private $accessibleResources = [];
+
+    /** @var string[] */
+    private $accessibleAsAssociationResources = [];
 
     /**
      * {@inheritdoc}
@@ -25,22 +28,42 @@ class CollectResourcesContext extends ApiContext
     }
 
     /**
-     * Gets a list of resources accessible through Data API.
+     * Gets a list of resources accessible through API.
      *
      * @return string[] The list of class names
      */
-    public function getAccessibleResources()
+    public function getAccessibleResources(): array
     {
         return $this->accessibleResources;
     }
 
     /**
-     * Sets a list of resources accessible through Data API.
+     * Sets a list of resources accessible through API.
      *
      * @param string[] $classNames
      */
-    public function setAccessibleResources(array $classNames)
+    public function setAccessibleResources(array $classNames): void
     {
         $this->accessibleResources = $classNames;
+    }
+
+    /**
+     * Gets a list of resources accessible as an association in API.
+     *
+     * @return string[] The list of class names
+     */
+    public function getAccessibleAsAssociationResources(): array
+    {
+        return $this->accessibleAsAssociationResources;
+    }
+
+    /**
+     * Sets a list of resources accessible as an association in API.
+     *
+     * @param string[] $classNames
+     */
+    public function setAccessibleAsAssociationResources(array $classNames): void
+    {
+        $this->accessibleAsAssociationResources = $classNames;
     }
 }

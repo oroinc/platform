@@ -3,13 +3,18 @@
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Cli;
 
 use Behat\Testwork\Cli\Controller;
+use Behat\Testwork\Suite\Suite;
 use Behat\Testwork\Suite\SuiteRegistry;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatisticManager;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Suite\SuiteConfigurationRegistry;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Provides possibility to set the specific suite-set or suite. Configures suite registry with given suites collection.
+ */
 class SuiteController implements Controller
 {
     /**
@@ -23,13 +28,18 @@ class SuiteController implements Controller
     protected $behatSuiteRegistry;
 
     /**
-     * @param SuiteConfigurationRegistry $suiteConfigRegistry
-     * @param SuiteRegistry $behatSuiteRegistry
+     * @var FeatureStatisticManager
      */
-    public function __construct(SuiteConfigurationRegistry $suiteConfigRegistry, SuiteRegistry $behatSuiteRegistry)
-    {
+    protected $featureStatisticManager;
+
+    public function __construct(
+        SuiteConfigurationRegistry $suiteConfigRegistry,
+        SuiteRegistry $behatSuiteRegistry,
+        FeatureStatisticManager $featureStatisticManager
+    ) {
         $this->suiteConfigRegistry = $suiteConfigRegistry;
         $this->behatSuiteRegistry = $behatSuiteRegistry;
+        $this->featureStatisticManager = $featureStatisticManager;
     }
 
     /**
@@ -59,48 +69,89 @@ class SuiteController implements Controller
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($suiteName = $input->getOption('suite')) {
-            $this->registerSuite($suiteName);
+        $tested = $input->getOption('available-suite-sets') ? [] : $this->featureStatisticManager->getTested();
+        $skipped = [];
+
+        $suiteName = $input->getOption('suite');
+        if ($suiteName) {
+            $suiteConfig = $this->suiteConfigRegistry->getSuiteConfig($suiteName);
+
+            $skipped[] = $this->registerSuiteConfigs([$suiteConfig], $tested);
         }
 
-        if ($suiteSet = $input->getOption('suite-set')) {
-            $this->registerSuiteSet($suiteSet);
+        $suiteSet = $input->getOption('suite-set');
+        if ($suiteSet) {
+            $suiteConfigs = $this->suiteConfigRegistry->getSet($suiteSet);
+
+            $skipped[] = $this->registerSuiteConfigs($suiteConfigs, $tested);
         }
 
         if (!$suiteName && !$suiteSet) {
-            $this->registerAll();
+            $suiteConfigs = $this->suiteConfigRegistry->getSuites();
+
+            $skipped[] = $this->registerSuiteConfigs($suiteConfigs, $tested);
         }
+
+        $skipped = \array_unique(\array_merge(...$skipped));
+        foreach ($skipped as $path) {
+            $parts = explode(DIRECTORY_SEPARATOR, $path);
+
+            $output->writeln(sprintf('<info>Feature "%s" already tested and skipped.</info>', array_pop($parts)));
+        }
+
+        return $this->exitIfNoAvailableFeatures($input);
     }
 
-    private function registerSuite($suiteName)
+    /**
+     * @param Suite[] $suiteConfigs
+     * @param array $tested
+     * @return array
+     */
+    private function registerSuiteConfigs(array $suiteConfigs, array $tested)
     {
-        $suiteConfig = $this->suiteConfigRegistry->getSuiteConfig($suiteName);
-        $this->behatSuiteRegistry->registerSuiteConfiguration(
-            $suiteConfig->getName(),
-            $suiteConfig->hasSetting('type') ? $suiteConfig->getSetting('type') : null,
-            $suiteConfig->getSettings()
-        );
-    }
+        $skipped = [[]];
 
-    private function registerSuiteSet($suiteSet)
-    {
-        foreach ($this->suiteConfigRegistry->getSet($suiteSet) as $suiteConfig) {
+        foreach ($suiteConfigs as $suiteConfig) {
+            $settings = $suiteConfig->getSettings();
+            $paths = array_filter(
+                $settings['paths'],
+                function (string $path) use ($tested) {
+                    return !\in_array($path, $tested, true);
+                }
+            );
+
+            $skipped[] = \array_diff($settings['paths'], $paths);
+            $settings['paths'] = $paths;
+
             $this->behatSuiteRegistry->registerSuiteConfiguration(
                 $suiteConfig->getName(),
                 $suiteConfig->hasSetting('type') ? $suiteConfig->getSetting('type') : null,
-                $suiteConfig->getSettings()
+                $settings
             );
         }
+
+        return \array_merge(...$skipped);
     }
 
-    private function registerAll()
+    /**
+     * @param InputInterface $input
+     * @return int|null
+     */
+    private function exitIfNoAvailableFeatures(InputInterface $input)
     {
-        foreach ($this->suiteConfigRegistry->getSuites() as $suiteConfig) {
-            $this->behatSuiteRegistry->registerSuiteConfiguration(
-                $suiteConfig->getName(),
-                $suiteConfig->hasSetting('type') ? $suiteConfig->getSetting('type') : null,
-                $suiteConfig->getSettings()
-            );
+        $suites = $this->behatSuiteRegistry->getSuites();
+        if ($suites) {
+            foreach ($suites as $key => $suite) {
+                if ($suite instanceof Suite && !$suite->getSetting('paths')) {
+                    unset($suites[$key]);
+                }
+            }
         }
+
+        if (!$suites) {
+            return 0;
+        }
+
+        return null;
     }
 }

@@ -13,9 +13,6 @@ class ExpressionFactory implements ExpressionFactoryInterface, FactoryWithTypesI
     /** @var ExtensionInterface[] */
     protected $extensions = [];
 
-    /**
-     * @param ContextAccessorInterface $contextAccessor
-     */
     public function __construct(ContextAccessorInterface $contextAccessor)
     {
         $this->contextAccessor = $contextAccessor;
@@ -52,8 +49,6 @@ class ExpressionFactory implements ExpressionFactoryInterface, FactoryWithTypesI
 
     /**
      * Registers new extension.
-     *
-     * @param ExtensionInterface $extension
      */
     public function addExtension(ExtensionInterface $extension)
     {

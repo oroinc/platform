@@ -5,34 +5,27 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Handler;
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_DATA = ['field' => 'value'];
+    private const FORM_DATA = ['field' => 'value'];
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $form;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    /** @var Request */
+    private $request;
 
-    /**
-     * @var ConfigHandler
-     */
-    protected $handler;
+    /** @var ConfigHandler */
+    private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
 
@@ -53,8 +46,8 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->once())
             ->method('getSettingsByForm')
-            ->with($this->isInstanceOf('Symfony\Component\Form\Test\FormInterface'))
-            ->will($this->returnValue($settings));
+            ->with($this->isInstanceOf(FormInterface::class))
+            ->willReturn($settings);
 
         $this->form->expects($this->once())
             ->method('setData')
@@ -69,16 +62,16 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->form->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($settings));
+            ->willReturn($settings);
 
         $this->configManager->expects($this->once())
             ->method('save');
 
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $this->form->expects($this->once())
             ->method('getConfig')
             ->willReturn($formConfig);
@@ -93,8 +86,8 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->once())
             ->method('getSettingsByForm')
-            ->with($this->isInstanceOf('Symfony\Component\Form\Test\FormInterface'))
-            ->will($this->returnValue($settings));
+            ->with($this->isInstanceOf(FormInterface::class))
+            ->willReturn($settings);
 
         $this->form->expects($this->once())
             ->method('setData')
@@ -109,18 +102,18 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->form->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($settings));
+            ->willReturn($settings);
 
         $this->configManager->expects($this->once())
             ->method('save')
             ->willReturn($changeSet);
 
         $isAdditionalHandlerCalled = false;
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $this->form->expects($this->once())
             ->method('getConfig')
             ->willReturn($formConfig);
@@ -145,8 +138,8 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->once())
             ->method('getSettingsByForm')
-            ->with($this->isInstanceOf('Symfony\Component\Form\Test\FormInterface'))
-            ->will($this->returnValue($settings));
+            ->with($this->isInstanceOf(FormInterface::class))
+            ->willReturn($settings);
 
         $this->form->expects($this->once())
             ->method('setData');
@@ -157,7 +150,7 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('submit');
         $this->form->expects($this->never())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->configManager->expects($this->never())
             ->method('save');
@@ -171,8 +164,8 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->once())
             ->method('getSettingsByForm')
-            ->with($this->isInstanceOf('Symfony\Component\Form\Test\FormInterface'))
-            ->will($this->returnValue($settings));
+            ->with($this->isInstanceOf(FormInterface::class))
+            ->willReturn($settings);
 
         $this->request->initialize([], self::FORM_DATA);
         $this->request->setMethod('POST');
@@ -187,7 +180,7 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->configManager->expects($this->never())
             ->method('save');

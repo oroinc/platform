@@ -18,10 +18,10 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
         templateMode,
         templateRouteParameters
     ) {
-        var setAltLabel = function(el, mode) {
-            var $labelHolder = el.find('span');
-            var altLabel = $labelHolder.data('alt-label-' + mode);
-            var regularLabel = $labelHolder.data('label');
+        const setAltLabel = function(el, mode) {
+            const $labelHolder = el.find('span');
+            const altLabel = $labelHolder.data('alt-label-' + mode);
+            const regularLabel = $labelHolder.data('label');
             if (altLabel) {
                 if (!regularLabel) {
                     $labelHolder.data('label', $labelHolder.html());
@@ -32,17 +32,17 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
             }
         };
 
-        var setCurrentMode = function(mode) {
-            var $btnContainer = $(btnContainer);
+        const setCurrentMode = function(mode) {
+            const $btnContainer = $(btnContainer);
             setAltLabel($btnContainer.find('.entity-select-btn'), mode);
             setAltLabel($btnContainer.find('.entity-create-btn'), mode);
             setAltLabel($btnContainer.find('.entity-cancel-btn'), mode);
 
-            var $viewContainer = $(viewContainer);
+            const $viewContainer = $(viewContainer);
             $viewContainer.removeClass('create grid view').addClass(mode);
             $(currentModeEl).val(mode);
 
-            var entityCreateBlock = $viewContainer.find('.entity-create-block');
+            const entityCreateBlock = $viewContainer.find('.entity-create-block');
             if (mode === 'create') {
                 entityCreateBlock.removeAttr('data-validation-ignore');
             } else {
@@ -50,17 +50,17 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
             }
         };
 
-        var getCurrentMode = function() {
+        const getCurrentMode = function() {
             return $(currentModeEl).val();
         };
 
         // Render grid and change current mode to grid
-        var $btnContainer = $(btnContainer);
-        var $selectBtn = $btnContainer.find('.entity-select-btn');
-        var $createBtn = $btnContainer.find('.entity-create-btn');
-        var $cancelBtn = $btnContainer.find('.entity-cancel-btn');
+        const $btnContainer = $(btnContainer);
+        const $selectBtn = $btnContainer.find('.entity-select-btn');
+        const $createBtn = $btnContainer.find('.entity-create-btn');
+        const $cancelBtn = $btnContainer.find('.entity-cancel-btn');
 
-        var drawGrid = function() {
+        const drawGrid = function() {
             widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function(widget) {
                 if (widget.firstRun) {
                     widget.render();
@@ -90,17 +90,17 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
             }
         });
 
-        var drawViewWidget = function(viewWidget, routeParameters) {
+        const drawViewWidget = function(viewWidget, routeParameters) {
             widgetManager.getWidgetInstanceByAlias(viewWidget.widget_alias, function(w) {
                 w.setUrl(routing.generate(viewWidget.route_name, routeParameters));
                 w.render();
             });
         };
 
-        var loadViewWidgets = function(model) {
-            var getRouteParameters = function(map, model) {
-                var parameters = {};
-                for (var routeParamName in map) {
+        const loadViewWidgets = function(model) {
+            const getRouteParameters = function(map, model) {
+                const parameters = {};
+                for (const routeParamName in map) {
                     if (map.hasOwnProperty(routeParamName)) {
                         parameters[routeParamName] = model.get(map[routeParamName]);
                     }
@@ -108,10 +108,10 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
                 return parameters;
             };
 
-            var allRouteParameters = {};
-            for (var i = 0; i < viewWidgets.length; i++) {
-                var routeParameters = getRouteParameters(viewWidgets[i].grid_row_to_route, model);
-                var widgetAlias = viewWidgets[i].widget_alias;
+            const allRouteParameters = {};
+            for (let i = 0; i < viewWidgets.length; i++) {
+                const routeParameters = getRouteParameters(viewWidgets[i].grid_row_to_route, model);
+                const widgetAlias = viewWidgets[i].widget_alias;
                 allRouteParameters[widgetAlias] = routeParameters;
                 drawViewWidget(viewWidgets[i], routeParameters);
             }
@@ -121,7 +121,7 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
         // On grid row select render widgets and change current mode to view
         widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function(widget) {
             widget.on('grid-row-select', function(data) {
-                var selectedId = data.model.get(gridModelId);
+                const selectedId = data.model.get(gridModelId);
                 if (selectedId !== $(existingEl).val()) {
                     $(existingEl).val(selectedId);
                     loadViewWidgets(data.model);
@@ -130,17 +130,17 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
             });
         });
 
-        var getCurrentRouteParameters = function() {
+        const getCurrentRouteParameters = function() {
             return JSON.parse($(routeParametersEl).val());
         };
 
-        var setMode = function(mode) {
+        const setMode = function(mode) {
             setCurrentMode(mode);
             switch (mode) {
                 case 'view':
-                    var allRouteParameters = getCurrentRouteParameters();
-                    for (var i = 0; i < viewWidgets.length; i++) {
-                        var widgetAlias = viewWidgets[i].widget_alias;
+                    const allRouteParameters = getCurrentRouteParameters();
+                    for (let i = 0; i < viewWidgets.length; i++) {
+                        const widgetAlias = viewWidgets[i].widget_alias;
                         if (allRouteParameters[widgetAlias]) {
                             drawViewWidget(viewWidgets[i], allRouteParameters[widgetAlias]);
                         }
@@ -153,8 +153,8 @@ define(['jquery', 'underscore', 'oroui/js/widget-manager', 'routing'
         };
 
         // update mode
-        var currentMode = getCurrentMode();
-        var currentRouteParameters = getCurrentRouteParameters();
+        const currentMode = getCurrentMode();
+        const currentRouteParameters = getCurrentRouteParameters();
         if (templateMode !== currentMode ||
             currentMode === 'view' && !_.isEqual(templateRouteParameters, currentRouteParameters)
         ) {

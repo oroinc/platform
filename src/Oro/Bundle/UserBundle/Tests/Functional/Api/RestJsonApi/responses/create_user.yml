@@ -1,0 +1,26 @@
+data:
+    type: users
+    id: new
+    attributes:
+        email: test2341@test.com
+        username: testapiuser
+        namePrefix: null
+        nameSuffix: null
+        firstName: Bob
+        middleName: null
+        lastName: Doo
+        birthday: null
+        enabled: false
+        loginCount: 0
+        lastLogin: null
+        passwordRequestedAt: null
+        passwordChangedAt: null
+    relationships:
+        owner:
+            data:
+                type: businessunits
+                id: '<toString(@business_unit_1->id)>'
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@organization->id)>'

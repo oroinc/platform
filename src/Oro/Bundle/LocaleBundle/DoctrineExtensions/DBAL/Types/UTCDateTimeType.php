@@ -6,6 +6,9 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
 
+/**
+ * Doctrine DBAL Type for UTC DateTime
+ */
 class UTCDateTimeType extends DateTimeType
 {
     /** @var null| \DateTimeZone  */
@@ -21,7 +24,7 @@ class UTCDateTimeType extends DateTimeType
         }
 
         /** @var \DateTime $value */
-        $timezone = (self::$utc) ? self::$utc : (self::$utc = new \DateTimeZone('UTC'));
+        $timezone = (self::$utc) ?: (self::$utc = new \DateTimeZone('UTC'));
         if ($value->getTimezone() !== $timezone) {
             $value->setTimezone($timezone);
         }
@@ -38,11 +41,14 @@ class UTCDateTimeType extends DateTimeType
             return null;
         }
 
-        $val = \DateTime::createFromFormat(
-            $platform->getDateTimeFormatString(),
-            $value,
-            (self::$utc) ? self::$utc : (self::$utc = new \DateTimeZone('UTC'))
-        );
+        $timezone = (self::$utc) ?: (self::$utc = new \DateTimeZone('UTC'));
+
+        if ($value instanceof \DateTimeInterface && $value->getTimezone() !== $timezone) {
+            $value->setTimezone($timezone);
+            return $value;
+        }
+
+        $val = \DateTime::createFromFormat($platform->getDateTimeFormatString(), $value, $timezone);
 
         if (!$val) {
             throw ConversionException::conversionFailed($value, $this->getName());

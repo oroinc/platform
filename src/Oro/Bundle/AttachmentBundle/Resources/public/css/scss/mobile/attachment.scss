@@ -1,0 +1,26 @@
+/* @theme: admin.oro; */
+
+.attachment-item {
+    width: 100%;
+    max-width: 100%;
+
+    &__note {
+        margin: 0;
+    }
+
+    &__remove {
+        width: $mobile-attachment-item-icon-size;
+        height: $mobile-attachment-item-icon-size;
+
+        [class^='fa-']::before {
+            font-size: inherit;
+        }
+    }
+}
+
+.attachment-file {
+    .uploader {
+        max-width: 100%;
+        width: 100%;
+    }
+}

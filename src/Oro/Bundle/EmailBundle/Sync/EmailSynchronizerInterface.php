@@ -5,19 +5,16 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Interface which must be implemented by email synchronizer.
+ */
 interface EmailSynchronizerInterface
 {
-    /**
-     * @param MessageProducerInterface $producer
-     */
     public function setMessageProducer(MessageProducerInterface $producer);
 
-    /**
-     * @param TokenStorage $tokenStorage
-     */
-    public function setTokenStorage(TokenStorage $tokenStorage);
+    public function setTokenStorage(TokenStorageInterface $tokenStorage);
 
     /**
      * Returns TRUE if this class supports synchronization of the given origin.

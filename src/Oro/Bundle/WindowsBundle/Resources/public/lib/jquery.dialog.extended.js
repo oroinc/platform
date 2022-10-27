@@ -12,69 +12,86 @@
  *   jQuery UI Dialog 1.10.2
  *
  */
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools', 'jquery-ui'], function ($, _, __, tools) {
+define(function (require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    var config = require('module-config').default(module.id);
+    require('jquery-ui/widgets/dialog');
+
+    config = $.extend(true, {}, {
+        minimizeTo: false,
+        maximizedHeightDecreaseBy: false,
+        allowClose: true,
+        allowMaximize: false,
+        allowMinimize: false,
+        dblclick: false,
+        titlebar: false,
+        icons: {
+            close: 'ui-icon-closethick',
+            maximize: 'ui-icon-extlink',
+            minimize: 'ui-icon-minus',
+            restore: 'ui-icon-newwin'
+        },
+        snapshot: null,
+        state: 'normal',
+        // Events
+        beforeCollapse: null,
+        beforeMaximize: null,
+        beforeMinimize: null,
+        beforeRestore: null,
+        collapse: null,
+        maximize: null,
+        minimize: null,
+        restore: null,
+        closeText: __('Close'),
+        btnCloseClass: 'close-dialog',
+        btnCloseAriaText: __('oro.orowindows.dialog.close.aria_label')
+    }, config);
+
     $.widget( 'ui.dialog', $.ui.dialog, {
         version: '2.0.0',
 
-        _limitToEl: false,
+        _limitToEl: null,
 
         _resizeTries: 0,
 
-        options: $.extend($.ui.dialog.options, {
-            minimizeTo: false,
-            maximizedHeightDecreaseBy: false,
-            allowClose: true,
-            allowMaximize: false,
-            allowMinimize: false,
-            dblclick: false,
-            titlebar: false,
-            icons: {
-                close: 'ui-icon-closethick',
-                maximize: 'ui-icon-extlink',
-                minimize: 'ui-icon-minus',
-                restore: 'ui-icon-newwin'
-            },
-            snapshot: null,
-            state: 'normal',
-            // Events
-            beforeCollapse: null,
-            beforeMaximize: null,
-            beforeMinimize: null,
-            beforeRestore: null,
-            collapse: null,
-            maximize: null,
-            minimize: null,
-            restore: null
-        }),
+        options: $.extend($.ui.dialog.options, config),
 
         _allowInteraction: function(e) {
-            return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .mce-window, ' +
+            return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .tox-dialog, ' +
                 '.dropdown-menu, .ui-multiselect-menu').length;
         },
 
         _create: function () {
             this._super();
-
             this._verifySettings();
+
             this._initBottomLine();
 
-            this._onBackspacePress = $.proxy(this._onBackspacePress, this);
-            this._windowResizeHandler = $.proxy(this._windowResizeHandler, this);
+            this.uiDialog.attr('data-skip-focus-decoration', '');
+
+            this._onBackspacePress = this._onBackspacePress.bind(this);
+            this._windowResizeHandler = this._windowResizeHandler.bind(this);
 
             // prevents history navigation over backspace while dialog is opened
-            $(document).bind('keydown.dialog', this._onBackspacePress);
+            $(document).on('keydown.dialog', this._onBackspacePress);
 
             // Handle window resize
-            $(window).bind('resize.dialog', this._windowResizeHandler);
+            $(window).on('resize.dialog', this._windowResizeHandler);
         },
 
         _limitTo: function() {
-            if (false === this._limitToEl) {
-                this._limitToEl = this.options.limitTo ? $(this.options.limitTo) : this._appendTo();
+            if (this.options.limitTo === 'viewport') {
+                return this._limitToEl = $(document.documentElement)
+            } else if (this.options.limitTo) {
+                return this._limitToEl = $(this.options.limitTo);
             }
 
-            return this._limitToEl;
+            return this._limitToEl = this._appendTo();
         },
 
         _init: function() {
@@ -90,8 +107,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             this._super();
 
             // remove custom handler
-            $(document).unbind('keydown.dialog', this._onBackspacePress);
-            $(window).unbind('resize.dialog', this._windowResizeHandler);
+            $(document).off('keydown.dialog', this._onBackspacePress);
+            $(window).off('resize.dialog', this._windowResizeHandler);
 
             // @TODO: Remove this fix when Apple fix caret placement bug
             this.iOScaretFixer(false);
@@ -99,7 +116,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
         _makeDraggable: function() {
             this._super();
-            this.uiDialog.draggable('option', 'containment', this.options.limitTo || 'parent');
+            this.uiDialog.draggable('option', 'containment',
+                this.options.limitTo === 'viewport' ? 'window': this._limitTo());
         },
 
         open: function() {
@@ -110,7 +128,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         },
 
         close: function() {
-            $(window).unbind('.dialog');
+            $(window).off('.dialog');
             this._removeMinimizedEl();
 
             this._super();
@@ -146,7 +164,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         showActionsContainer: function() {
             if (!this.uiDialogButtonPane.parent().length) {
                 this.uiDialog.addClass('ui-dialog-buttons');
-                this.uiDialogButtonPane.appendTo( this.uiDialog );
+                this.uiDialogButtonPane.appendTo(this.uiDialog);
             }
         },
 
@@ -242,11 +260,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
 
             this._trigger('beforeMaximize');
             this._saveSnapshot();
-            this._calculateNewMaximizedDimensions($.proxy(function() {
+            this._calculateNewMaximizedDimensions(function() {
                 this._setState('maximized');
                 this._toggleButtons();
                 this._trigger('maximize');
-            }, this));
+            }.bind(this));
 
             return this;
         },
@@ -325,13 +343,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     }
                 });
                 this.widget().css('position', _.isMobile() ? 'relative' : 'fixed'); // remove scroll when maximized
-                if ($.isFunction(onResizeCallback)) {
+                if (typeof onResizeCallback === 'function') {
                     onResizeCallback();
                 }
             } else {
                 this._resizeTries++;
                 if (this._resizeTries < 100) {
-                    setTimeout($.proxy(function() {this._calculateNewMaximizedDimensions(onResizeCallback);}, this), 500);
+                    setTimeout(function() {this._calculateNewMaximizedDimensions(onResizeCallback);}.bind(this), 500);
                 } else {
                     this._resizeTries = 0;
                 }
@@ -359,6 +377,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             return this;
         },
 
+        _position: function() {
+            // Need to show the dialog to get the actual offset in the position plugin
+            var isVisible = this.uiDialog.is(":visible");
+            var initialDisplay = this.uiDialog[0].style.display;
+            if (!isVisible) {
+                this.uiDialog.show();
+            }
+            this.uiDialog.position(this.options.position);
+            if (!isVisible) {
+                this.uiDialog.css('display', initialDisplay);
+            }
+        },
+
         _getTitleBarHeight: function() {
             return this.uiDialogTitlebar.height() + 15;
         },
@@ -366,7 +397,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         _getContainerHeight: function() {
             var heightDelta = 0;
             if (this.options.maximizedHeightDecreaseBy) {
-                if ($.isNumeric(this.options.maximizedHeightDecreaseBy)) {
+                if (tools.isNumeric(this.options.maximizedHeightDecreaseBy)) {
                     heightDelta = this.options.maximizedHeightDecreaseBy;
                 } else if (this.options.maximizedHeightDecreaseBy === 'minimize-bar') {
                     heightDelta = this._getMinimizeTo().height();
@@ -393,14 +424,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
             // move 'close' button to button-pane
             this._buttons = {};
             this.uiDialogTitlebarClose
+            .addClass(this.options.btnCloseClass)
             // override some unwanted jquery-ui styles
-            .css({ 'position': 'static', 'top': 'auto', 'right': 'auto', 'margin': 0 })
-            .attr('title', __('close'))
+            .css({ 'position': 'static', 'top': 'auto', 'right': 'auto' })
+            .attr({
+                'title': this.options.closeText,
+                'aria-label': this.options.btnCloseAriaText
+            })
             // change icon
             .find('.ui-icon').removeClass('ui-icon-closethick').addClass(this.options.icons.close).end()
             // move to button-pane
             .appendTo(buttonPane)
             .end();
+            this.uiDialogTitlebarClose.find('.ui-button-icon, .ui-button-icon-space').attr('aria-hidden', true)
             // append other buttons to button-pane
             var types =  ['maximize', 'restore', 'minimize'];
             for (var key in types) {
@@ -408,7 +444,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
                     var type = types[key];
                     var button = this.options.icons[type];
                     if (typeof this.options.icons[type] === 'string') {
-                        button = '<a class="ui-dialog-titlebar-' + type + ' ui-corner-all" href="#" title="' + __(type)+ '"><span class="ui-icon ' + this.options.icons[type] + '">' + type + '</span></a>';
+                        button = '<a class="ui-dialog-titlebar-' + type + ' ui-corner-all" href="#" title="'
+                            + _.escape(__(type)) + '"><span class="ui-icon ' + this.options.icons[type] + '">' + type + '</span></a>';
 
                     } else {
                         button.addClass('ui-dialog-titlebar-' + type);
@@ -608,7 +645,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         _restoreWithoutTriggerEvent: function () {
             var beforeState = this.state();
             var method = '_restoreFrom' + beforeState.charAt(0).toUpperCase() + beforeState.slice(1);
-            if ($.isFunction(this[method])) {
+            if (typeof this[method] === 'function') {
                 this[method]();
             } else {
                 $.error('jQuery.dialogExtend Error : Cannot restore dialog from unknown state "' + beforeState + '"');

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Engine\Orm;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
@@ -14,23 +14,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrmTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_CLASS = 'Stub\TestEntity';
-    const TEST_ALIAS = 'test_entity';
-    const TEST_INDEX = 'test_index';
+    private const TEST_CLASS = 'Stub\TestEntity';
+    private const TEST_ALIAS = 'test_entity';
 
     /** @var SearchIndexRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
+    private $repository;
 
     /** @var ObjectMapper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $mapper;
+    private $mapper;
 
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var Orm */
-    protected $engine;
+    private $engine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = $this->createMock(SearchIndexRepository::class);
 
@@ -40,7 +39,6 @@ class OrmTest extends \PHPUnit\Framework\TestCase
             ->with('OroSearchBundle:Item')
             ->willReturn($this->repository);
 
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
         $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManagerForClass')
@@ -54,14 +52,9 @@ class OrmTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $response
-     * @param array $items
-     * @param int $count
-     * @param array $aggregatedData
-     *
      * @dataProvider searchDataProvider
      */
-    public function testSearch(array $response, array $items, $count, array $aggregatedData = [])
+    public function testSearch(array $response, array $items, int $count, array $aggregatedData = [])
     {
         $query = new Query();
 
@@ -97,7 +90,6 @@ class OrmTest extends \PHPUnit\Framework\TestCase
                 $item['class'],
                 $item['id'],
                 null,
-                null,
                 [],
                 $entityConfiguration
             );
@@ -113,10 +105,7 @@ class OrmTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($aggregatedData, $result->getAggregatedData());
     }
 
-    /**
-     * @return array
-     */
-    public function searchDataProvider()
+    public function searchDataProvider(): array
     {
         return [
             'valid response' => [

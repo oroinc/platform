@@ -13,10 +13,6 @@ class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
     /** @var FieldHelper */
     protected $fieldHelper;
 
-    /**
-     * @param TemplateManager $templateManager
-     * @param FieldHelper     $fieldHelper
-     */
     public function __construct(TemplateManager $templateManager, FieldHelper $fieldHelper)
     {
         $this->templateManager = $templateManager;

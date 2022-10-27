@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints;
 
 class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
@@ -20,7 +21,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
     /** @var CollectFormErrors */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,8 +29,19 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
 
         $this->processor = new CollectFormErrors(
             new ConstraintTextExtractor(),
-            $this->errorCompleterRegistry
+            $this->errorCompleterRegistry,
+            PropertyAccess::createPropertyAccessor()
         );
+    }
+
+    private function createErrorObject(string $title, string $detail, string $propertyPath = null): Error
+    {
+        $error = Error::createValidationError($title, $detail);
+        if (null !== $propertyPath) {
+            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
+        }
+
+        return $error;
     }
 
     public function testErrorPropertyPathShouldBeEmptyStringForToOneAssociationRelatedError()
@@ -46,6 +58,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [$this->createErrorObject('not blank constraint', 'This value should not be blank.', '')],
@@ -75,27 +88,11 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($form->isValid());
+        self::assertTrue($form->isSynchronized());
         self::assertTrue($this->context->hasErrors());
         self::assertEquals(
             [$this->createErrorObject('not blank constraint', 'This value should not be blank.', '1')],
             $this->context->getErrors()
         );
-    }
-
-    /**
-     * @param string      $title
-     * @param string      $detail
-     * @param string|null $propertyPath
-     *
-     * @return Error
-     */
-    protected function createErrorObject($title, $detail, $propertyPath = null)
-    {
-        $error = Error::createValidationError($title, $detail);
-        if (null !== $propertyPath) {
-            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
-        }
-
-        return $error;
     }
 }

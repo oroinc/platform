@@ -13,11 +13,15 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides a way to add actions to datagrid rows.
+ */
 class ActionExtension extends AbstractExtension
 {
     const METADATA_ACTION_KEY               = 'rowActions';
@@ -38,9 +42,6 @@ class ActionExtension extends AbstractExtension
     /** @var OwnershipQueryHelper */
     protected $ownershipQueryHelper;
 
-    /** @var DatagridActionProviderInterface[] */
-    protected $actionsProviders = [];
-
     /** @var bool */
     protected $isMetadataVisited = false;
 
@@ -48,6 +49,9 @@ class ActionExtension extends AbstractExtension
     protected $excludedModes = [
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
+
+    /** @var iterable|DatagridActionProviderInterface[] */
+    private $actionProviders;
 
     /**
      * @var array [entity alias => [
@@ -62,17 +66,20 @@ class ActionExtension extends AbstractExtension
     private $ownershipFields = [];
 
     /**
-     * @param ActionFactory                 $actionFactory
-     * @param ActionMetadataFactory         $actionMetadataFactory
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param OwnershipQueryHelper          $ownershipQueryHelper
+     * @param iterable|DatagridActionProviderInterface[] $actionProviders
+     * @param ActionFactory                              $actionFactory
+     * @param ActionMetadataFactory                      $actionMetadataFactory
+     * @param AuthorizationCheckerInterface              $authorizationChecker
+     * @param OwnershipQueryHelper                       $ownershipQueryHelper
      */
     public function __construct(
+        iterable $actionProviders,
         ActionFactory $actionFactory,
         ActionMetadataFactory $actionMetadataFactory,
         AuthorizationCheckerInterface $authorizationChecker,
         OwnershipQueryHelper $ownershipQueryHelper
     ) {
+        $this->actionProviders = $actionProviders;
         $this->actionFactory = $actionFactory;
         $this->actionMetadataFactory = $actionMetadataFactory;
         $this->authorizationChecker = $authorizationChecker;
@@ -80,21 +87,11 @@ class ActionExtension extends AbstractExtension
     }
 
     /**
-     * Registers a provider of actions.
-     *
-     * @param DatagridActionProviderInterface $actionsProvider
-     */
-    public function addActionProvider(DatagridActionProviderInterface $actionsProvider)
-    {
-        $this->actionsProviders[] = $actionsProvider;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        foreach ($this->actionsProviders as $provider) {
+        foreach ($this->actionProviders as $provider) {
             if ($provider->hasActions($config)) {
                 $provider->applyActions($config);
             }
@@ -145,39 +142,27 @@ class ActionExtension extends AbstractExtension
         }
 
         if (!empty($this->ownershipFields)) {
-            $aclResources = $this->getActionsAclResources($config);
+            $aclResources = $this->getUniqueAclResources($config);
             if (!empty($aclResources)) {
                 $aliases = array_keys($this->ownershipFields);
                 $entityAlias = reset($aliases);
-                list(
+                [
                     $entityClass,
                     $entityIdFieldAlias,
                     $organizationIdFieldAlias,
                     $ownerIdFieldAlias
-                    ) = $this->ownershipFields[$entityAlias];
+                    ] = $this->ownershipFields[$entityAlias];
 
-                $disabledActions = [];
                 /** @var ResultRecord[] $records */
                 $records = $result->getData();
-                foreach ($records as $record) {
-                    $entityId = $record->getValue($entityIdFieldAlias);
-                    $entityReference = null;
-                    $ownerId = $record->getValue($ownerIdFieldAlias);
-                    if (null !== $ownerId) {
-                        $entityReference = new DomainObjectReference(
-                            $entityClass,
-                            $record->getValue($entityIdFieldAlias),
-                            $ownerId,
-                            $record->getValue($organizationIdFieldAlias)
-                        );
-                    }
-
-                    foreach ($aclResources as $actionName => $aclResource) {
-                        if (!$this->authorizationChecker->isGranted($aclResource, $entityReference)) {
-                            $disabledActions[$entityId][$actionName] = false;
-                        }
-                    }
-                }
+                $disabledActions = $this->getDisabledActions(
+                    $records,
+                    $entityClass,
+                    $entityIdFieldAlias,
+                    $organizationIdFieldAlias,
+                    $ownerIdFieldAlias,
+                    $aclResources
+                );
 
                 // set action_configuration callback only if there are some actions to disable.
                 if (!empty($disabledActions)) {
@@ -234,6 +219,10 @@ class ActionExtension extends AbstractExtension
      */
     protected function createAction($actionName, array $actionConfig)
     {
+        if ($actionConfig[PropertyInterface::DISABLED_KEY] ?? false) {
+            return null;
+        }
+
         $action = $this->actionFactory->createAction($actionName, $actionConfig);
 
         $aclResource = $action->getAclResource();
@@ -340,5 +329,62 @@ class ActionExtension extends AbstractExtension
 
             return $result;
         };
+    }
+
+    private function getUniqueAclResources(DatagridConfiguration $config): array
+    {
+        $aclResources = $this->getActionsAclResources($config);
+
+        $uniqueAclResources = [];
+        foreach ($aclResources as $actionName => $aclResource) {
+            $uniqueAclResources[$aclResource][] = $actionName;
+        }
+
+        return $uniqueAclResources;
+    }
+
+    /**
+     * @param ResultRecord[] $records
+     * @param string $entityClass
+     * @param string $entityIdFieldAlias
+     * @param string $organizationIdFieldAlias
+     * @param string $ownerIdFieldAlias
+     * @param array $aclResources
+     *
+     * @return array
+     */
+    private function getDisabledActions(
+        array $records,
+        string $entityClass,
+        string $entityIdFieldAlias,
+        string $organizationIdFieldAlias,
+        string $ownerIdFieldAlias,
+        array $aclResources
+    ): array {
+        $disabledActions = [];
+
+        foreach ($records as $record) {
+            $entityId = $record->getValue($entityIdFieldAlias);
+            $entityReference = null;
+            $ownerId = $record->getValue($ownerIdFieldAlias);
+            if (null !== $ownerId) {
+                $entityReference = new DomainObjectReference(
+                    $entityClass,
+                    $record->getValue($entityIdFieldAlias),
+                    $ownerId,
+                    $record->getValue($organizationIdFieldAlias)
+                );
+            }
+
+            foreach ($aclResources as $aclResource => $actionNames) {
+                if (!$this->authorizationChecker->isGranted($aclResource, $entityReference)) {
+                    foreach ($actionNames as $actionName) {
+                        $disabledActions[$entityId][$actionName] = false;
+                    }
+                }
+            }
+        }
+
+        return $disabledActions;
     }
 }

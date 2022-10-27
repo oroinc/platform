@@ -19,9 +19,6 @@ class NoteSubscriber implements EventSubscriberInterface
     /** @var  ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->entityConfigProvider = $configManager->getProvider('entity');
@@ -38,9 +35,6 @@ class NoteSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();

@@ -7,9 +7,6 @@ use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
 
 class PreUpMigrationListener
 {
-    /**
-     * @param PreMigrationEvent $event
-     */
     public function onPreUp(PreMigrationEvent $event)
     {
         if ($event->isTableExist(CreateMigrationTableMigration::MIGRATION_TABLE)) {

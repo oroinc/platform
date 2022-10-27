@@ -3,49 +3,31 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroMoneyType;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroMoneyTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroMoneyType
-     */
-    protected $formType;
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $localeSettings;
+    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
+    private $numberFormatter;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $numberFormatter;
+    /** @var OroMoneyType */
+    private $formType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getLocale', 'getCurrency', 'getCurrencySymbolByCurrency'))
-            ->getMock();
-
-        $this->numberFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
-            ->disableOriginalConstructor()
-            ->setMethods(array('isCurrencySymbolPrepend', 'getAttribute'))
-            ->getMock();
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->numberFormatter = $this->createMock(NumberFormatter::class);
 
         $this->formType = new OroMoneyType($this->localeSettings, $this->numberFormatter);
+
         parent::setUp();
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
-
-        unset($this->formType);
-        unset($this->localeSettings);
     }
 
     /**
@@ -73,90 +55,80 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
         $this->assertEquals(MoneyType::class, $this->formType->getParent());
     }
 
-    /**
-     * @return array
-     */
-    public function bindDataProvider()
+    public function bindDataProvider(): array
     {
-        return array(
-            'default en locale' => array(
+        return [
+            'default en locale' => [
                 'locale'         => 'en',
                 'currency'       => 'USD',
                 'currencySymbol' => '$',
                 'symbolPrepend'  => true,
                 'data'           => 11.22,
-                'viewData'       => array(
+                'viewData'       => [
                     'money_pattern' => '{{ currency }}{{ widget }}',
                     'currency_symbol' => '$',
                     'currency_symbol_prepend' => true
-                ),
-            ),
-            'default ru locale' => array(
+                ],
+            ],
+            'default ru locale' => [
                 'locale'         => 'ru',
                 'currency'       => 'RUR',
                 'currencySymbol' => 'руб.',
                 'symbolPrepend'  => false,
                 'data'           => 11.22,
-                'viewData'       => array(
+                'viewData'       => [
                     'money_pattern' => '{{ widget }}{{ currency }}',
                     'currency_symbol' => 'руб.',
                     'currency_symbol_prepend' => false
-                ),
-            ),
-            'custom currency' => array(
+                ],
+            ],
+            'custom currency' => [
                 'locale'         => 'en',
                 'currency'       => 'EUR',
                 'currencySymbol' => '€',
                 'symbolPrepend'  => true,
                 'data'           => 11.22,
-                'viewData'       => array(
+                'viewData'       => [
                     'money_pattern' => '{{ currency }}{{ widget }}',
                     'currency_symbol' => '€',
                     'currency_symbol_prepend' => true
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
-     * @param string $locale
-     * @param string $currency
-     * @param string $currencySymbol
-     * @param bool $symbolPrepend
-     * @param float $data
-     * @param array $viewData
-     * @param array $options
      * @dataProvider bindDataProvider
      */
     public function testBindData(
-        $locale,
-        $currency,
-        $currencySymbol,
-        $symbolPrepend,
-        $data,
+        string $locale,
+        string $currency,
+        string $currencySymbol,
+        bool $symbolPrepend,
+        float $data,
         array $viewData,
-        array $options = array()
+        array $options = []
     ) {
         $this->localeSettings->expects($this->any())
             ->method('getLocale')
-            ->will($this->returnValue($locale));
+            ->willReturn($locale);
         $this->localeSettings->expects($this->any())
             ->method('getCurrency')
-            ->will($this->returnValue($currency));
+            ->willReturn($currency);
         $this->localeSettings->expects($this->any())
             ->method('getCurrencySymbolByCurrency')
             ->with($currency)
-            ->will($this->returnValue($currencySymbol));
+            ->willReturn($currencySymbol);
 
         $this->numberFormatter->expects($this->any())
             ->method('isCurrencySymbolPrepend')
             ->with($currency)
-            ->will($this->returnValue($symbolPrepend));
+            ->willReturn($symbolPrepend);
 
         $this->numberFormatter->expects($this->any())
             ->method('getAttribute')
             ->with(\NumberFormatter::GROUPING_USED)
-            ->will($this->returnValue(1));
+            ->willReturn(1);
 
         $form = $this->factory->create(OroMoneyType::class, null, $options);
 

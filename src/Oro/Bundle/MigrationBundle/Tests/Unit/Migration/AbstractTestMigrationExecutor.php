@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
 
 class AbstractTestMigrationExecutor extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     protected $connection;
 
     /** @var ArrayLogger */
@@ -21,44 +24,37 @@ class AbstractTestMigrationExecutor extends \PHPUnit\Framework\TestCase
     /** @var OroDataCacheManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $cacheManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->connection = $this->createMock(Connection::class);
 
         $platform = new MySqlPlatform();
-        $sm       = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['listTables', 'createSchemaConfig'])
-            ->getMockForAbstractClass();
+        $sm = $this->createMock(AbstractSchemaManager::class);
         $sm->expects($this->once())
             ->method('listTables')
-            ->will($this->returnValue($this->getTables()));
+            ->willReturn($this->getTables());
         $sm->expects($this->once())
             ->method('createSchemaConfig')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $this->connection->expects($this->atLeastOnce())
             ->method('getSchemaManager')
-            ->will($this->returnValue($sm));
+            ->willReturn($sm);
         $this->connection->expects($this->atLeastOnce())
             ->method('getDatabasePlatform')
-            ->will($this->returnValue($platform));
+            ->willReturn($platform);
 
         $this->logger = new ArrayLogger();
 
         $this->queryExecutor = new MigrationQueryExecutor($this->connection);
         $this->queryExecutor->setLogger($this->logger);
 
-        $this->cacheManager = $this->getMockBuilder('Oro\Bundle\CacheBundle\Manager\OroDataCacheManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->cacheManager = $this->createMock(OroDataCacheManager::class);
     }
 
     /**
-     * @return array
+     * @return Table[]
      */
-    protected function getTables()
+    protected function getTables(): array
     {
         return [];
     }

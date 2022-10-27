@@ -33,10 +33,6 @@ class PriceType extends AbstractType
         $this->dataClass = $dataClass;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $isRequiredPrice = $this->isRequired($options);
@@ -50,6 +46,9 @@ class PriceType extends AbstractType
                 'compact' => $options['compact'],
                 'required' => $isRequiredPrice,
                 'placeholder' => $options['currency_empty_value'],
+                'attr' => [
+                    'data-validation-ignore-onblur' => true,
+                ],
             ];
         } else {
             $currencyType = HiddenType::class;
@@ -63,6 +62,7 @@ class PriceType extends AbstractType
                 'value',
                 NumberType::class,
                 [
+                    'grouping' => true,
                     'required' => $isRequiredPrice,
                     'scale' => Price::MAX_VALUE_SCALE,
                     'attr' => [

@@ -3,44 +3,39 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType;
 use Oro\Component\Config\Common\ConfigObject;
 
 class ConfigObjectTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigObjectType
-     */
-    protected $type;
+    /** @var ConfigObjectType */
+    private $type;
 
-    /**
-     * @var AbstractPlatform
-     */
-    protected $platform;
+    /** @var AbstractPlatform */
+    private $platform;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!Type::hasType(ConfigObjectType::TYPE)) {
-            Type::addType(ConfigObjectType::TYPE, 'Oro\Bundle\EntityBundle\DBAL\Types\ConfigObjectType');
+            Type::addType(ConfigObjectType::TYPE, ConfigObjectType::class);
         }
         $this->type = Type::getType(ConfigObjectType::TYPE);
-        $this->platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->platform = $this->createMock(AbstractPlatform::class);
     }
 
     /**
      * @dataProvider testConvertToPHPValueDataProvider
      *
-     * @param mixed $inputData
-     * @param null | string
-     * @param bool $exception
+     * @param mixed       $inputData
+     * @param null|string $expectedResult
+     * @param bool        $exception
      */
     public function testConvertToPHPValue($inputData, $expectedResult, $exception = false)
     {
         if ($exception) {
-            $this->expectException('Doctrine\DBAL\Types\ConversionException');
+            $this->expectException(ConversionException::class);
             $this->expectExceptionMessage(
                 'Could not convert database value "' . $inputData . '" to Doctrine Type config_object'
             );
@@ -56,15 +51,15 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
     {
         $testArray = ['name' => 'test'];
         $result = $this->type->convertToPHPValue(json_encode($testArray), $this->platform);
-        $this->assertInstanceOf('Oro\Component\Config\Common\ConfigObject', $result);
+        $this->assertInstanceOf(ConfigObject::class, $result);
         $this->assertSame($testArray, $result->toArray());
     }
 
     /**
      * @dataProvider testConvertToDatabaseValueDataProvider
      *
-     * @param mixed $inputData
-     * @param null | string
+     * @param mixed       $inputData
+     * @param null|string $expectedResult
      */
     public function testConvertToDatabaseValue($inputData, $expectedResult)
     {
@@ -74,7 +69,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertToPHPValueDataProvider()
+    public function testConvertToPHPValueDataProvider(): array
     {
         return [
             'null input' => [
@@ -89,7 +84,7 @@ class ConfigObjectTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertToDatabaseValueDataProvider()
+    public function testConvertToDatabaseValueDataProvider(): array
     {
         return [
             'null input' => [

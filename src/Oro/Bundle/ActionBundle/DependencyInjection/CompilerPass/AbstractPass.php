@@ -38,9 +38,6 @@ abstract class AbstractPass implements CompilerPassInterface
         $extensionDef->replaceArgument(1, $types);
     }
 
-    /**
-     * @param Definition $definition
-     */
     protected function prepareDefinition(Definition $definition)
     {
         $definition->setShared(false)->setPublic(false);

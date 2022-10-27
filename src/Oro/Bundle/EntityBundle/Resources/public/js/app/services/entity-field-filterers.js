@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var fieldFilterers;
-    var _ = require('underscore');
+    const _ = require('underscore');
 
-    fieldFilterers = {
+    const fieldFilterers = {
         /**
          * Check if the field is matched to any rule of set
          *
@@ -42,8 +41,8 @@ define(function(require) {
          * @this EntityStructureDataProvider
          */
         exclude: function(field, entityClassName) {
-            var expected = this.optionsFilter.exclude;
-            var entity = this.collection.getEntityModelByClassName(entityClassName);
+            const expected = this.optionsFilter.exclude;
+            const entity = this.collection.getEntityModelByClassName(entityClassName);
             return expected ===
                 Boolean(entity && _.result(entity.get('options'), 'exclude') || _.result(field.options, 'exclude'));
         },
@@ -56,7 +55,7 @@ define(function(require) {
          * @this EntityStructureDataProvider
          */
         unidirectional: function(field) {
-            var expected = this.optionsFilter.unidirectional;
+            const expected = this.optionsFilter.unidirectional;
             return expected === (field.name.indexOf('::') !== -1);
         },
 
@@ -69,14 +68,13 @@ define(function(require) {
          * @this EntityStructureDataProvider
          */
         auditable: function(field, entityClassName) {
-            var index;
-            var expected = this.optionsFilter.auditable;
-            var entity = this.collection.getEntityModelByClassName(entityClassName);
+            const expected = this.optionsFilter.auditable;
+            let entity = this.collection.getEntityModelByClassName(entityClassName);
             if (expected && !(entity && _.result(entity.get('options'), 'auditable'))) {
                 return false;
             }
 
-            index = field.name.indexOf('::');
+            const index = field.name.indexOf('::');
             if (index !== -1) {
                 // unidirectional field
                 entityClassName = field.name.substr(0, index);
@@ -100,7 +98,7 @@ define(function(require) {
          * @this EntityStructureDataProvider
          */
         relation: function(field) {
-            var expected = this.optionsFilter.relation;
+            const expected = this.optionsFilter.relation;
             return expected === Boolean(field.relatedEntityName);
         },
 
@@ -136,7 +134,7 @@ define(function(require) {
          * @this EntityStructureDataProvider
          */
         relationToAvailableEntity: function(field) {
-            var entityName = field.relatedEntityName;
+            const entityName = field.relatedEntityName;
             return Boolean(!entityName || !field.relationType || this.collection.getEntityModelByClassName(entityName));
         }
     };

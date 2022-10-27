@@ -3,86 +3,80 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Helper;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class DefaultOwnerHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const USER_OWNER_FIELD_NAME  = 'owner';
-    const USER_OWNER_COLUMN_NAME = 'owner';
-    const ORGANIZATION_FIELD_NAME = 'organization';
+    private const USER_OWNER_FIELD_NAME = 'owner';
+    private const USER_OWNER_COLUMN_NAME = 'owner';
+    private const ORGANIZATION_FIELD_NAME = 'organization';
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataProvider;
+    private $metadataProvider;
 
     /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
-    protected $uow;
+    private $uow;
 
     /** @var DefaultOwnerHelper */
-    protected $helper;
+    private $helper;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->em               = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->uow              = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()->getMock();
-        $this->metadataProvider =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
-                ->disableOriginalConstructor()->getMock();
+        $this->em = $this->createMock(EntityManager::class);
+        $this->uow = $this->createMock(UnitOfWork::class);
+        $this->metadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
 
-        $this->em->expects($this->any())->method('getUnitOfWork')
-            ->will($this->returnValue($this->uow));
+        $this->em->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($this->uow);
 
-        $registry = $this->createMock('Symfony\Bridge\Doctrine\RegistryInterface');
-        $registry->expects($this->any())->method('getManager')
-            ->will($this->returnValue($this->em));
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->em);
 
         $this->helper = new DefaultOwnerHelper($registry, $this->metadataProvider);
     }
 
-    public function tearDown()
-    {
-        unset($this->em, $this->uow, $this->metadataProvider, $this->helper);
-    }
-
     /**
      * @dataProvider defaultIntegrationOwnerProvider
-     *
-     * @param Integration $integration
-     * @param string      $ownerType
-     * @param bool        $expectedReload
-     * @param bool        $expectedSet
-     * @param bool        $expectedSetOrganization
      */
     public function testPopulateChannelOwner(
         Integration $integration,
-        $ownerType,
-        $expectedReload,
-        $expectedSet,
-        $expectedSetOrganization = false
+        string $ownerType,
+        bool $expectedReload,
+        bool $expectedSet,
+        bool $expectedSetOrganization = false
     ) {
         $entity = new \stdClass();
-        $owner  = $integration->getDefaultUserOwner();
+        $owner = $integration->getDefaultUserOwner();
         $organization = $integration->getOrganization();
 
-        $doctrineMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
-            ->disableOriginalConstructor()->getMock();
-        $this->em->expects($this->any())->method('getClassMetadata')
-            ->will($this->returnValue($doctrineMetadata));
+        $doctrineMetadata = $this->createMock(ClassMetadataInfo::class);
+        $this->em->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($doctrineMetadata);
 
         if ($expectedReload) {
-            $this->uow->expects($this->once())->method('getEntityState')->with($this->identicalTo($owner))
-                ->will($this->returnValue(UnitOfWork::STATE_DETACHED));
-            $this->em->expects($this->once())->method('find')
+            $this->uow->expects($this->once())
+                ->method('getEntityState')
+                ->with($this->identicalTo($owner))
+                ->willReturn(UnitOfWork::STATE_DETACHED);
+            $this->em->expects($this->once())
+                ->method('find')
                 ->with($this->equalTo(get_class($owner)))
-                ->will($this->returnValue($owner));
+                ->willReturn($owner);
         }
 
         $ownerMetadata = new OwnershipMetadata(
@@ -91,36 +85,37 @@ class DefaultOwnerHelperTest extends \PHPUnit\Framework\TestCase
             self::USER_OWNER_COLUMN_NAME,
             self::ORGANIZATION_FIELD_NAME
         );
-        $this->metadataProvider->expects($this->any())->method('getMetadata')
+        $this->metadataProvider->expects($this->any())
+            ->method('getMetadata')
             ->with(get_class($entity))
-            ->will($this->returnValue($ownerMetadata));
+            ->willReturn($ownerMetadata);
 
         if ($expectedSet) {
-            $doctrineMetadata->expects($this->once())->method('setFieldValue')
+            $doctrineMetadata->expects($this->once())
+                ->method('setFieldValue')
                 ->with($this->identicalTo($entity), self::USER_OWNER_FIELD_NAME, $this->identicalTo($owner));
         } elseif ($expectedSetOrganization) {
-            $doctrineMetadata->expects($this->once())->method('setFieldValue')
+            $doctrineMetadata->expects($this->once())
+                ->method('setFieldValue')
                 ->with(
                     $this->identicalTo($entity),
                     self::ORGANIZATION_FIELD_NAME,
                     $this->identicalTo($organization)
                 );
         } else {
-            $doctrineMetadata->expects($this->never())->method('setFieldValue');
+            $doctrineMetadata->expects($this->never())
+                ->method('setFieldValue');
         }
 
         $this->helper->populateChannelOwner($entity, $integration);
     }
 
-    /**
-     * @return array
-     */
-    public function defaultIntegrationOwnerProvider()
+    public function defaultIntegrationOwnerProvider(): array
     {
         $integrationEmptyOwner = new Integration();
 
-        $user                 = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-        $organization        = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $user = $this->createMock(User::class);
+        $organization = $this->createMock(Organization::class);
         $integrationWithOwner = new Integration();
         $integrationWithOwner->setDefaultUserOwner($user);
 

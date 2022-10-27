@@ -2,108 +2,63 @@
 
 namespace Oro\Bundle\SecurityBundle\Controller;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchAfter;
-use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchBefore;
-use Oro\Bundle\UserBundle\Entity\User;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Routing\Annotation\Route;
 
-class AclPermissionController extends Controller
+/**
+ * The controller that provides ACL access levels for a specific domain object.
+ */
+class AclPermissionController
 {
+    /** @var EntityRoutingHelper */
+    private $entityRoutingHelper;
+
+    /** @var AclManager */
+    private $aclManager;
+
+    public function __construct(EntityRoutingHelper $entityRoutingHelper, AclManager $aclManager)
+    {
+        $this->entityRoutingHelper = $entityRoutingHelper;
+        $this->aclManager = $aclManager;
+    }
+
     /**
      * @Route(
-     *  "/acl-access-levels/{oid}/{permission}",
-     *  name="oro_security_access_levels",
-     *  requirements={"oid"="[\w]+:[\w\:\(\)\|]+", "permission"="[\w/]+"},
-     *  defaults={"_format"="json", "permission"=null}
+     *      "/acl-access-levels/{oid}/{permission}",
+     *      name="oro_security_access_levels",
+     *      requirements={"oid"="[\w]+:[\w\:\(\)\|]+", "permission"="[\w/]+"},
+     *      defaults={"_format"="json", "permission"=null}
      * )
      * @Template
-     *
-     * @param string $oid
-     * @param string $permission
-     *
-     * @return array
      */
-    public function aclAccessLevelsAction($oid, $permission = null)
+    public function aclAccessLevelsAction(string $oid, string $permission = null): array
     {
-        if (ObjectIdentityHelper::getExtensionKeyFromIdentityString($oid) === 'entity') {
+        if (ObjectIdentityHelper::getExtensionKeyFromIdentityString($oid) === EntityAclExtension::NAME) {
             $entity = ObjectIdentityHelper::getClassFromIdentityString($oid);
-            if ($entity !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+            if (ObjectIdentityFactory::ROOT_IDENTITY_TYPE !== $entity) {
                 if (ObjectIdentityHelper::isFieldEncodedKey($entity)) {
-                    list($className, $fieldName) = ObjectIdentityHelper::decodeEntityFieldInfo($entity);
+                    [$className, $fieldName] = ObjectIdentityHelper::decodeEntityFieldInfo($entity);
                     $oid = ObjectIdentityHelper::encodeIdentityString(
-                        'entity',
+                        EntityAclExtension::NAME,
                         ObjectIdentityHelper::encodeEntityFieldInfo(
-                            $this->get('oro_entity.routing_helper')->resolveEntityClass($className),
+                            $this->entityRoutingHelper->resolveEntityClass($className),
                             $fieldName
                         )
                     );
                 } else {
                     $oid = ObjectIdentityHelper::encodeIdentityString(
-                        'entity',
-                        $this->get('oro_entity.routing_helper')->resolveEntityClass($entity)
+                        EntityAclExtension::NAME,
+                        $this->entityRoutingHelper->resolveEntityClass($entity)
                     );
                 }
             }
         }
 
-        $levels = $this
-            ->get('oro_security.acl.manager')
-            ->getAccessLevels($oid, $permission);
-
-        return ['levels' => $levels];
-    }
-
-    /**
-     * @Route(
-     *      "/switch-organization/{id}",
-     *      name="oro_security_switch_organization", defaults={"id"=0}
-     * )
-     *
-     * @param Organization $organization
-     *
-     * @return RedirectResponse , AccessDeniedException
-     */
-    public function switchOrganizationAction(Organization $organization)
-    {
-        $token = $this->container->get('security.token_storage')->getToken();
-        $user  = $token->getUser();
-
-        if (!$token instanceof OrganizationContextTokenInterface ||
-            !$token->getUser() instanceof User ||
-            !$organization->isEnabled() ||
-            !$token->getUser()->getOrganizations()->contains($organization)
-        ) {
-            throw new AccessDeniedException(
-                $this->get('translator')->trans(
-                    'oro.security.organization.access_denied',
-                    ['%organization_name%' => $organization->getName()]
-                )
-            );
-        }
-
-        $event = new OrganizationSwitchBefore($user, $token->getOrganizationContext(), $organization);
-        $this->get('event_dispatcher')->dispatch(OrganizationSwitchBefore::NAME, $event);
-        $organization = $event->getOrganizationToSwitch();
-
-        if (!$user->getOrganizations(true)->contains($organization)) {
-            $message = $this->get('translator')
-                ->trans('oro.security.organization.access_denied', ['%organization_name%' => $organization->getName()]);
-
-            throw new AccessDeniedException($message);
-        }
-
-        $token->setOrganizationContext($organization);
-        $event = new OrganizationSwitchAfter($user, $organization);
-        $this->get('event_dispatcher')->dispatch(OrganizationSwitchAfter::NAME, $event);
-
-        return $this->redirect($this->generateUrl('oro_default'));
+        return ['levels' => $this->aclManager->getAccessLevels($oid, $permission)];
     }
 }

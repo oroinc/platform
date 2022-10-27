@@ -11,10 +11,7 @@ class FieldVisitorTest extends \PHPUnit\Framework\TestCase
     /** @var FieldVisitor */
     private $fieldVisitor;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fieldVisitor = new FieldVisitor();
     }

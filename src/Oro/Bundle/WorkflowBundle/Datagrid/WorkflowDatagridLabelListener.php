@@ -11,7 +11,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionSelectType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Replaces translation keys (Workflow Step Label) with their translated values
@@ -41,9 +41,6 @@ class WorkflowDatagridLabelListener
         $this->translator = $translator;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $configuration = $event->getConfig();
@@ -69,13 +66,13 @@ class WorkflowDatagridLabelListener
     /**
      * Used only internally, please use WorkflowTranslationHelper or '@translator.default'
      *
-     * @param $id
+     * @param mixed $id
      *
      * @return string
      */
-    public function trans($id)
+    public function trans(mixed $id): string
     {
-        return $this->translator->trans($id, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+        return $this->translator->trans((string) $id, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
     }
 
     /**
@@ -91,13 +88,10 @@ class WorkflowDatagridLabelListener
         ];
         $columnAliases = $configuration->offsetGetByPath(QueryDesignerQueryConfiguration::COLUMN_ALIASES, []);
         foreach ($columnAliases as $key => $alias) {
-            if (false !== strpos($key, WorkflowStep::class . '::label')) {
+            if (str_contains($key, WorkflowStep::class . '::label')) {
                 $columns[WorkflowStep::class][] = $alias;
-                continue;
-            }
-            if (false !== strpos($key, WorkflowDefinition::class . '::label')) {
+            } elseif (str_contains($key, WorkflowDefinition::class . '::label')) {
                 $columns[WorkflowDefinition::class][] = $alias;
-                continue;
             }
         }
 
@@ -114,7 +108,7 @@ class WorkflowDatagridLabelListener
         $column = $configuration->offsetGetByPath($path);
         $column['frontend_type'] = 'html';
         $column['type'] = 'callback';
-        $column['callable'] = [$this, "trans"];
+        $column['callable'] = [$this, 'trans'];
         $column['params'] = [$columnName];
         $configuration->offsetSetByPath($path, $column);
     }
@@ -175,7 +169,7 @@ class WorkflowDatagridLabelListener
         $selects = $configuration->getOrmQuery()->getSelect();
         foreach ($selects as $select) {
             $matches = [];
-            if (preg_match('/^(.*)\.[a-zA-Z0-9_]+\sas\s' . $columnName . '$/', $select, $matches)) {
+            if (preg_match('/^(.*)\.[a-zA-Z0-9\_]+\sas\s' . $columnName . '$/', $select, $matches)) {
                 if ($matches && isset($matches[1])) {
                     return $matches[1];
                 }

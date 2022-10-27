@@ -1,19 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var Backbone = require('backbone');
-    var RegistryEntry = require('oroui/js/app/services/registry/registry-entry');
+    const Backbone = require('backbone');
+    const RegistryEntry = require('oroui/js/app/services/registry/registry-entry');
 
     describe('oroui/js/app/services/registry/registry-entry', function() {
         it('implements Backbone.Events', function() {
             expect(Object.getPrototypeOf(RegistryEntry.prototype)).toBe(Backbone.Events);
         });
 
-        var entry;
-        var instance;
-        var applicant1;
-        var applicant2;
-        var applicant3;
+        let entry;
+        let instance;
+        let applicant1;
+        let applicant2;
+        let applicant3;
 
         describe('registryEntry', function() {
             beforeEach(function() {

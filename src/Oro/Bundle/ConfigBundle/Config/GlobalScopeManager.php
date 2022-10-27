@@ -7,18 +7,19 @@ namespace Oro\Bundle\ConfigBundle\Config;
  */
 class GlobalScopeManager extends AbstractScopeManager
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopedEntityName()
+    public const SCOPE_NAME = 'app';
+
+    public function getScopedEntityName(): string
     {
-        return 'app';
+        return self::SCOPE_NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopeId()
+    public function getScopeId(): ?int
+    {
+        return 0;
+    }
+
+    public function getScopeIdFromEntity($entity): int
     {
         return 0;
     }

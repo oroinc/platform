@@ -2,66 +2,65 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model;
 
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
+use Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityMergerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityMerger
-     */
-    protected $merger;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject[]
-     */
-    protected $steps;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->steps = array(
-            $this->createMock('Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface'),
-            $this->createMock('Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface')
-        );
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->merger = new EntityMerger($this->steps, $this->eventDispatcher);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
-    public function testMerge()
+    private function setMergeExpectations(EntityData $data): array
     {
-        $data = $this->createEntityData();
+        $step1 = $this->createMock(MergeStepInterface::class);
+        $step1->expects($this->once())
+            ->method('run')
+            ->with($data);
 
-        $this->steps[0]->expects($this->once())->method('run')->with($data);
-        $this->steps[1]->expects($this->once())->method('run')->with($data);
+        $step2 = $this->createMock(MergeStepInterface::class);
+        $step2->expects($this->once())
+            ->method('run')
+            ->with($data);
 
-        $this->eventDispatcher->expects($this->exactly(2))->method('dispatch');
-        $this->eventDispatcher->expects($this->at(0))
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with(
-                MergeEvents::BEFORE_MERGE_ENTITY,
-                new EntityDataEvent($data)
-            );
+            ->withConsecutive(
+                [$this->isInstanceOf(EntityDataEvent::class), MergeEvents::BEFORE_MERGE_ENTITY],
+                [$this->isInstanceOf(EntityDataEvent::class), MergeEvents::AFTER_MERGE_ENTITY]
+            )
+            ->willReturnCallback(function (EntityDataEvent $event) use ($data) {
+                $this->assertSame($data, $event->getEntityData());
 
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(
-                MergeEvents::AFTER_MERGE_ENTITY,
-                new EntityDataEvent($data)
-            );
+                return $event;
+            });
 
-        $this->merger->merge($data);
+        return [$step1, $step2];
     }
 
-    protected function createEntityData()
+    public function testMergeWhenStepsAreArray(): void
     {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $data = $this->createMock(EntityData::class);
+        $steps = $this->setMergeExpectations($data);
+
+        $merger = new EntityMerger($steps, $this->eventDispatcher);
+        $merger->merge($data);
+    }
+
+    public function testMergeWhenStepsAreTraversable(): void
+    {
+        $data = $this->createMock(EntityData::class);
+        $steps = $this->setMergeExpectations($data);
+
+        $merger = new EntityMerger(new \ArrayIterator($steps), $this->eventDispatcher);
+        $merger->merge($data);
     }
 }

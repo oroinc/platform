@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v2_3;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -40,23 +40,40 @@ class UpdateWorkflowConfigurationQuery extends ParametrizedMigrationQuery
      */
     protected function doExecute(LoggerInterface $logger, $dryRun = false)
     {
-        $items = $this->connection->fetchAll(
-            'SELECT name, configuration FROM oro_workflow_definition WHERE system = false'
-        );
+        $qb = $this->connection->createQueryBuilder();
+        $qb
+            ->select(
+                $this->connection->quoteIdentifier('name'),
+                $this->connection->quoteIdentifier('configuration')
+            )
+            ->from('oro_workflow_definition')
+            ->where($this->connection->getExpressionBuilder()->eq(
+                $this->connection->quoteIdentifier('system'),
+                ':isSystem'
+            ))
+            ->setParameter('isSystem', false, Types::BOOLEAN);
+
+        $items = $qb->execute()->fetchAll();
 
         foreach ($items as $item) {
             $name = $item['name'];
             $configuration = $item['configuration'];
-            $data = $configuration ? $this->connection->convertToPHPValue($configuration, Type::TARRAY) : [];
+            $data = $configuration ? $this->connection->convertToPHPValue($configuration, Types::ARRAY) : [];
             $data = $this->updateConfig($data);
-            $configuration = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+            $configuration = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
 
-            $query = 'UPDATE oro_workflow_definition SET configuration = ? WHERE name = ?';
-            $params = [$configuration, $name];
-
-            $this->logQuery($logger, $query, $params);
+            $updateQb = $this->connection->createQueryBuilder()
+                ->update('oro_workflow_definition')
+                ->set($this->connection->quoteIdentifier('configuration'), ':configuration')
+                ->where($this->connection->getExpressionBuilder()->eq(
+                    $this->connection->quoteIdentifier('name'),
+                    ':name'
+                ));
+            $params = ['configuration' => $configuration, 'name' => $name];
+            $types = ['configuration' => Types::ARRAY, 'name' => Types::STRING];
+            $this->logQuery($logger, $updateQb->getSQL(), $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params);
+                $updateQb->setParameters($params, $types)->execute();
             }
         }
     }

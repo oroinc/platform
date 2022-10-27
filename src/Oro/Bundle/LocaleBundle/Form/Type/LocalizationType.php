@@ -4,11 +4,15 @@ namespace Oro\Bundle\LocaleBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * The form type for Localization entity.
+ */
 class LocalizationType extends AbstractType
 {
     const NAME = 'oro_localization';
@@ -53,6 +57,14 @@ class LocalizationType extends AbstractType
                 [
                     'required' => true,
                     'label' => 'oro.locale.localization.formatting_code.label'
+                ]
+            )
+            ->add(
+                'rtlMode',
+                CheckboxType::class,
+                [
+                    'required' => true,
+                    'label' => 'oro.locale.localization.rtl_mode.label'
                 ]
             )
             ->add(

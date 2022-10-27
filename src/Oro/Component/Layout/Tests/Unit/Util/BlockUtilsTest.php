@@ -6,6 +6,9 @@ use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\BlockUtils;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BlockUtilsTest extends \PHPUnit\Framework\TestCase
 {
     public function testRegisterPlugin()
@@ -64,12 +67,11 @@ class BlockUtilsTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @expectedExceptionMessage Either "path" or "route_name" must be set.
-     */
     public function testProcessUrlShouldThrowExceptionIfRequiredAndEmptyOptions()
     {
+        $this->expectException(\Symfony\Component\OptionsResolver\Exception\MissingOptionsException::class);
+        $this->expectExceptionMessage('Either "path" or "route_name" must be set.');
+
         BlockUtils::processUrl(
             new BlockView(),
             new Options(),

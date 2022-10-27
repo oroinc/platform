@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Formatter;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\Query\Expr\Func;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Formatter\ResultFormatter;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Category;
@@ -14,203 +14,146 @@ use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Product;
 
 class ResultFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityManager;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var array
-     */
-    protected $productStubs;
+    private array $productStubs;
+    private array $categoryStubs;
 
-    /**
-     * @var array
-     */
-    protected $categoryStubs;
-
-    /**
-     * @var ClassMetadataFactory
-     */
-    protected $stubMetadata;
-
-    /**
-     * Prepare entity manager mock
-     */
-    protected function prepareEntityManager()
+    private function prepareEntityManager()
     {
-        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
+            ->onlyMethods(['getEntityMetadataForClass', 'getSingleEntityIdentifierFieldName', 'getEntityRepository'])
             ->getMock();
-        $configuration->expects($this->any())
-            ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
-        $configuration->expects($this->any())
-            ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
-
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getMetadataFactory', 'getRepository', 'getConfiguration'))
-            ->getMock();
-        $this->entityManager->expects($this->any())
-            ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
     }
 
-    /**
-     * Prepare stub data and mocks
-     *
-     * @return array
-     */
-    protected function prepareStubData()
+    private function prepareStubData(): array
     {
         // create product stubs
-        $productEntities = array();
+        $productEntities = [];
         for ($i = 1; $i <= 5; $i++) {
             $indexerItem = new Item(Product::getEntityName(), $i);
             $entity = new Product($i);
             $productEntities[$i] = $entity;
 
-            $this->productStubs[$i] = array(
+            $this->productStubs[$i] = [
                 'indexer_item' => $indexerItem,
                 'entity' => $entity,
-            );
+            ];
         }
 
         $productMetadata = new ClassMetadata(Product::getEntityName());
-        $productMetadata->setIdentifier(array('id'));
+        $productMetadata->setIdentifier(['id']);
         $reflectionProperty = new \ReflectionProperty(
-            'Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Product',
+            Product::class,
             'id'
         );
         $reflectionProperty->setAccessible(true);
         $productMetadata->reflFields['id'] = $reflectionProperty;
 
         // create category stubs
-        $categoryEntities = array();
+        $categoryEntities = [];
         for ($i = 1; $i <= 3; $i++) {
             $indexerItem = new Item(Category::getEntityName(), $i);
             $entity = new Category($i);
             $categoryEntities[$i] = $entity;
 
-            $this->categoryStubs[$i] = array(
+            $this->categoryStubs[$i] = [
                 'indexer_item' => $indexerItem,
                 'entity' => $entity,
-            );
+            ];
         }
 
         $categoryMetadata = new ClassMetadata(Category::getEntityName());
-        $categoryMetadata->setIdentifier(array('id'));
+        $categoryMetadata->setIdentifier(['id']);
         $reflectionProperty = new \ReflectionProperty(
-            'Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Category',
+            Category::class,
             'id'
         );
         $reflectionProperty->setAccessible(true);
         $categoryMetadata->reflFields['id'] = $reflectionProperty;
 
-        // create metadata factory for stubs
-        $this->stubMetadata = new ClassMetadataFactory($this->entityManager);
-        $this->stubMetadata->setMetadataFor(Product::getEntityName(), $productMetadata);
-        $this->stubMetadata->setMetadataFor(Category::getEntityName(), $categoryMetadata);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [Product::getEntityName(), true, $productMetadata],
+                [Category::getEntityName(), true, $categoryMetadata],
+            ]);
 
-        $this->entityManager->expects($this->any())
-            ->method('getMetadataFactory')
-            ->will($this->returnValue($this->stubMetadata));
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->willReturn('id');
 
-        return array(
+        return [
             Product::getEntityName()  => $productEntities,
             Category::getEntityName() => $categoryEntities,
-        );
+        ];
     }
 
-    /**
-     * Prepare repository for specific entity
-     *
-     * @param  string           $entityName
-     * @param  array            $entities
-     * @param  array            $entityIds
-     * @return EntityRepository
-     */
-    protected function prepareEntityRepository($entityName, array $entities, array $entityIds)
+    private function prepareEntityRepository(array $entities, array $entityIds): EntityRepository
     {
         $query = $this->getMockForAbstractClass(
-            'Doctrine\ORM\AbstractQuery',
-            array($this->entityManager),
+            AbstractQuery::class,
+            [],
             '',
+            false,
             true,
             true,
-            true,
-            array('getResult')
+            ['getResult']
         );
         $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue($entities));
+            ->willReturn($entities);
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->setMethods(array('where', 'getQuery'))
-            ->setConstructorArgs(array($this->entityManager))
+        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
+            ->onlyMethods(['where', 'getQuery', 'setParameter'])
+            ->disableOriginalConstructor()
             ->getMock();
 
         $queryBuilder->expects($this->once())
             ->method('where')
-            ->with(new Func('e.id IN', $entityIds));
+            ->with('e.id IN (:entityIds)')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('entityIds', $entityIds)
+            ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
-        $repository = $this->createMock(
-            'Doctrine\ORM\EntityRepository',
-            array('createQueryBuilder'),
-            array($this->entityManager, $this->stubMetadata->getMetadataFor($entityName))
-        );
+        $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->any())
             ->method('createQueryBuilder')
             ->with('e')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
         return $repository;
     }
 
-    /**
-     * Prepare repositories with stub data
-     *
-     * @param array $productEntities
-     * @param array $categoryEntities
-     */
-    protected function prepareRepositories(array $productEntities, array $categoryEntities)
+    private function prepareRepositories(array $productEntities, array $categoryEntities)
     {
         $productRepository = $this->prepareEntityRepository(
-            Product::getEntityName(),
             $productEntities,
-            array(1,2,3,4,5)
+            [1,2,3,4,5]
         );
 
         $categoryRepository = $this->prepareEntityRepository(
-            Category::getEntityName(),
             $categoryEntities,
-            array(1,2,3)
+            [1,2,3]
         );
 
         // entity manager behaviour
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array(Product::getEntityName(), $productRepository),
-                        array(Category::getEntityName(), $categoryRepository),
-                    )
-                )
-            );
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->willReturnMap([
+                [Product::getEntityName(), $productRepository],
+                [Category::getEntityName(), $categoryRepository],
+            ]);
     }
 
-    /**
-     * Prepare and get stub entities
-     *
-     * @return array
-     */
-    protected function prepareStubEntities()
+    private function prepareStubEntities(): array
     {
         $stubEntities = $this->prepareStubData();
         $this->prepareRepositories(
@@ -221,15 +164,10 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         return $stubEntities;
     }
 
-    /**
-     * Get list of test indexer rows
-     *
-     * @return array
-     */
-    protected function getIndexerRows()
+    private function getIndexerRows(): array
     {
-        $indexerRows = array();
-        foreach (array($this->productStubs, $this->categoryStubs) as $stubElements) {
+        $indexerRows = [];
+        foreach ([$this->productStubs, $this->categoryStubs] as $stubElements) {
             foreach ($stubElements as $stubElement) {
                 $indexerRows[] = $stubElement['indexer_item'];
             }
@@ -238,15 +176,10 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         return $indexerRows;
     }
 
-    /**
-     * Get list of ordered result entities
-     *
-     * @return array
-     */
-    protected function getOrderedEntities()
+    private function getOrderedEntities(): array
     {
-        $entities = array();
-        foreach (array($this->productStubs, $this->categoryStubs) as $stubElements) {
+        $entities = [];
+        foreach ([$this->productStubs, $this->categoryStubs] as $stubElements) {
             foreach ($stubElements as $stubElement) {
                 $entities[] = $stubElement['entity'];
             }
@@ -260,11 +193,9 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         $this->prepareEntityManager();
         $expectedResult = $this->prepareStubEntities();
 
-        /** @var $indexer Indexer */
-        $indexer = $this->createMock('Oro\Bundle\SearchBundle\Engine\Indexer');
         $indexerRows = $this->getIndexerRows();
 
-        $resultFormatter = new ResultFormatter($this->entityManager, $indexer);
+        $resultFormatter = new ResultFormatter($this->doctrineHelper);
         $actualResult = $resultFormatter->getResultEntities($indexerRows);
 
         $this->assertEquals($expectedResult, $actualResult);
@@ -275,11 +206,9 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         $this->prepareEntityManager();
         $this->prepareStubEntities();
 
-        /** @var $indexer Indexer */
-        $indexer = $this->createMock('Oro\Bundle\SearchBundle\Engine\Indexer');
         $indexerRows = $this->getIndexerRows();
 
-        $resultFormatter = new ResultFormatter($this->entityManager, $indexer);
+        $resultFormatter = new ResultFormatter($this->doctrineHelper);
         $actualResult = $resultFormatter->getOrderedResultEntities($indexerRows);
 
         $expectedResult = $this->getOrderedEntities();

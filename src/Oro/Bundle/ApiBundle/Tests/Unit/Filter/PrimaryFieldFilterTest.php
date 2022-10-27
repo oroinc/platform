@@ -5,30 +5,29 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter;
 
 class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The Field must not be empty.
-     */
     public function testFieldIsNotSpecified()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The Field must not be empty.');
+
         $filter = new PrimaryFieldFilter('string');
-        $filter->apply(new Criteria(), new FilterValue('path', 'value', PrimaryFieldFilter::EQ));
+        $filter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::EQ));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The DataField must not be empty.
-     */
     public function testDataFieldIsNotSpecified()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The DataField must not be empty.');
+
         $filter = new PrimaryFieldFilter('string');
         $filter->setField('association');
-        $filter->apply(new Criteria(), new FilterValue('path', 'value', PrimaryFieldFilter::EQ));
+        $filter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::EQ));
     }
 
     public function testOptions()
@@ -60,7 +59,7 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         $filter->setDataField('dataField');
 
         $criteria = new Criteria();
-        $filter->apply($criteria, new FilterValue('path', 'value', PrimaryFieldFilter::EQ));
+        $filter->apply($criteria, new FilterValue('path', 'value', FilterOperator::EQ));
 
         self::assertEquals(
             new CompositeExpression(
@@ -82,7 +81,7 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         $filter->setPrimaryFlagField('primaryFlagField');
 
         $criteria = new Criteria();
-        $filter->apply($criteria, new FilterValue('path', 'value', PrimaryFieldFilter::EQ));
+        $filter->apply($criteria, new FilterValue('path', 'value', FilterOperator::EQ));
 
         self::assertEquals(
             new CompositeExpression(

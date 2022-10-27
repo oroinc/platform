@@ -8,14 +8,12 @@ define([
 ], function($, _, Backbone, BackbonePageableCollection, __, tools) {
     'use strict';
 
-    var PageableCollection;
-
     /**
      * Object declares state keys that will be involved in URL-state saving with their shorthands
      *
      * @property {Object}
      */
-    var stateShortKeys = {
+    const stateShortKeys = {
         currentPage: 'i',
         pageSize: 'p',
         sorters: 's',
@@ -37,16 +35,16 @@ define([
      * @param {Object} options
      * @returns {Backbone.Collection}
      */
-    function resetQuickly() {
-        var collection = arguments[0];
-        var options = arguments[2];
-        var resetArgs = _.toArray(arguments).slice(1);
+    function resetQuickly(...args) {
+        const collection = args[0];
+        const options = args[2];
+        const resetArgs = _.toArray(args).slice(1);
 
-        var comparator = collection.comparator;
+        const comparator = collection.comparator;
         collection.comparator = null;
 
         try {
-            collection.reset.apply(collection, resetArgs);
+            collection.reset(...resetArgs);
         } finally {
             collection.comparator = comparator;
             if (comparator && !options.reset) {
@@ -69,7 +67,7 @@ define([
      * @class   orodatagrid.PageableCollection
      * @extends Backbone.PageableCollection
      */
-    PageableCollection = BackbonePageableCollection.extend({
+    const PageableCollection = BackbonePageableCollection.extend({
         /**
          * Basic model to store row data
          *
@@ -158,10 +156,10 @@ define([
         onePagePagination: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function PageableCollection() {
-            PageableCollection.__super__.constructor.apply(this, arguments);
+        constructor: function PageableCollection(...args) {
+            PageableCollection.__super__.constructor.apply(this, args);
         },
 
         /**
@@ -251,8 +249,11 @@ define([
          *
          * @protected
          */
-        onRemove: function() {
-            if (this.state.totalRecords > 0) {
+        onRemove: function(modelToRemove, collection, options = {}) {
+            this.trigger('beforeRemove', modelToRemove, collection, options);
+            const {recountTotalRecords = true} = options;
+
+            if (recountTotalRecords && this.state.totalRecords > 0) {
                 this.state.totalRecords--;
             }
         },
@@ -300,7 +301,7 @@ define([
                 prefix = this.inputName + '[_columns]';
             }
 
-            var columnsData = {};
+            const columnsData = {};
             columnsData[prefix] = this._packColumnsStateData(state.columns);
             _.extend(data, columnsData);
 
@@ -317,11 +318,11 @@ define([
             state = tools.deepClone(state);
             state.parameters = state.parameters || {};
 
-            _.each(this.additionalParameters, _.bind(function(value, key) {
+            _.each(this.additionalParameters, (value, key) => {
                 if (!_.isUndefined(state[value])) {
                     state.parameters[key] = state[value];
                 }
-            }, this));
+            });
 
             return state;
         },
@@ -334,12 +335,12 @@ define([
          * @return {Object}
          */
         generateParameterStrings: function(parameters, prefix) {
-            var localStrings = {};
-            var localPrefix = prefix;
+            const localStrings = {};
+            const localPrefix = prefix;
             _.each(parameters, function(filterParameters, filterKey) {
                 filterKey = filterKey.toString();
                 if (filterKey.substr(0, 2) !== '__') {
-                    var filterKeyString = localPrefix + '[' + filterKey + ']';
+                    const filterKeyString = localPrefix + '[' + filterKey + ']';
                     if (_.isObject(filterParameters)) {
                         _.extend(
                             localStrings,
@@ -362,14 +363,16 @@ define([
          * @return {Object}
          */
         parse: function(resp, options) {
-            var responseModels = this._parseResponseModels(resp);
-            var responseOptions = this._parseResponseOptions(resp);
+            const responseModels = this._parseResponseModels(resp);
+            const responseOptions = this._parseResponseOptions(resp);
             if (responseOptions) {
-                _.extend(options, responseOptions);
+                _.extend(options, responseOptions, {recountTotalRecords: false});
             }
-            this.state.totalRecords = options.totalRecords || 0;
-            this.state.hideToolbar = options.hideToolbar;
-            this.state = this._checkState(this.state);
+            const state = {
+                totalRecords: options.totalRecords || 0,
+                hideToolbar: options.hideToolbar
+            };
+            this.updateState(state);
 
             return responseModels;
         },
@@ -381,13 +384,13 @@ define([
          * @param options
          */
         reset: function(resp, options) {
-            var responseModels = this._parseResponseModels(resp);
-            var responseOptions = this._parseResponseOptions(resp);
+            const responseModels = this._parseResponseModels(resp);
+            const responseOptions = this._parseResponseOptions(resp);
             if (responseOptions) {
                 _.extend(options, responseOptions);
             }
             this.trigger('beforeReset', this, responseModels, options);
-            BackbonePageableCollection.prototype.reset.apply(this, arguments);
+            BackbonePageableCollection.prototype.reset.call(this, resp, options);
         },
 
         /**
@@ -396,6 +399,10 @@ define([
          * @protected
          */
         _parseResponseModels: function(resp) {
+            if (this.options.parseResponseModels) {
+                return this.options.parseResponseModels(resp);
+            }
+
             if (_.has(resp, 'data')) {
                 return resp.data;
             }
@@ -408,6 +415,10 @@ define([
          * @protected
          */
         _parseResponseOptions: function(resp) {
+            if (this.options.parseResponseOptions) {
+                return this.options.parseResponseOptions(resp);
+            }
+
             if (_.has(resp, 'options')) {
                 return resp.options;
             }
@@ -416,7 +427,7 @@ define([
 
         /**
          * Method is overridden to have in collection models with not unique id
-         * @inheritDoc
+         * @inheritdoc
          */
         // Update a collection by `set`-ing a new list of models, adding new ones,
         // removing models that are no longer present, and merging models that
@@ -427,27 +438,27 @@ define([
             if (options.parse) {
                 models = this.parse(models, options);
             }
-            var singular = !_.isArray(models);
+            const singular = !_.isArray(models);
             models = singular ? (models ? [models] : []) : _.clone(models);
-            var i;
-            var l;
-            var id;
-            var model;
-            var attrs;
-            var existing;
-            var sort;
-            var at = options.at;
-            var targetModel = this.model;
-            var sortable = this.comparator && (at === null || at === undefined) && options.sort !== false;
-            var sortAttr = _.isString(this.comparator) ? this.comparator : null;
-            var toAdd = [];
-            var toRemove = [];
-            var modelMap = {};
-            var add = options.add;
-            var merge = options.merge;
-            var remove = options.remove;
-            var uniqueOnly = options.uniqueOnly;
-            var order = !sortable && add && remove ? [] : false;
+            let i;
+            let l;
+            let id;
+            let model;
+            let attrs;
+            let existing;
+            let sort;
+            const at = options.at;
+            const targetModel = this.model;
+            const sortable = this.comparator && (at === null || at === undefined) && options.sort !== false;
+            const sortAttr = _.isString(this.comparator) ? this.comparator : null;
+            const toAdd = [];
+            const toRemove = [];
+            const modelMap = {};
+            const add = options.add;
+            const merge = options.merge;
+            const remove = options.remove;
+            const uniqueOnly = options.uniqueOnly;
+            const order = !sortable && add && remove ? [] : false;
 
             // Turn bare objects into model references, and prevent invalid models
             // from being added.
@@ -521,7 +532,7 @@ define([
                     if (order) {
                         this.models.length = 0;
                     }
-                    var orderedModels = order || toAdd;
+                    const orderedModels = order || toAdd;
                     for (i = 0, l = orderedModels.length; i < l; i++) {
                         this.models.push(orderedModels[i]);
                     }
@@ -553,25 +564,30 @@ define([
          * @param {Object} state
          */
         updateState: function(state) {
-            var previousState = _.clone(this.state);
-            var newState = _.extend({}, this.state, state);
+            const previousState = _.clone(this.state);
+            const newState = _.extend({}, this.state, state);
 
             this.state = this._checkState(newState);
             this.previousState = previousState;
             this.trigger('updateState', this, this.state);
         },
 
+        patchInitialState(statePatch) {
+            this.initialState = _.extend({}, this.initialState, statePatch);
+            this.trigger('patchInitialState', this, this.initialState);
+        },
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _checkState: function(state) {
-            var mode = this.mode;
-            var links = this.links;
-            var totalRecords = state.totalRecords;
-            var pageSize = state.pageSize;
-            var currentPage = state.currentPage;
-            var firstPage = state.firstPage;
-            var totalPages = state.totalPages;
+            const mode = this.mode;
+            const links = this.links;
+            let totalRecords = state.totalRecords;
+            let pageSize = state.pageSize;
+            let currentPage = state.currentPage;
+            let firstPage = state.firstPage;
+            let totalPages = state.totalPages;
 
             if (totalRecords !== null && totalRecords !== void 0 &&
                 pageSize !== null && pageSize !== void 0 &&
@@ -658,20 +674,20 @@ define([
          * @returns {Array}
          */
         getFetchData: function() {
-            var data = {};
+            let data = {};
 
             // extract params from a grid collection url
-            var url = _.result(this, 'url') || '';
-            var qsi = url.indexOf('?');
+            const url = _.result(this, 'url') || '';
+            const qsi = url.indexOf('?');
             if (qsi !== -1) {
-                var nvp = url.slice(qsi + 1).split('&');
-                for (var i = 0; i < nvp.length; i++) {
-                    var pair = nvp[i].split('=');
+                const nvp = url.slice(qsi + 1).split('&');
+                for (let i = 0; i < nvp.length; i++) {
+                    const pair = nvp[i].split('=');
                     data[tools.decodeUriComponent(pair[0])] = tools.decodeUriComponent(pair[1]);
                 }
             }
 
-            var state = this._checkState(this.state);
+            const state = this._checkState(this.state);
             data = this.processQueryParams(data, state);
             data = this.processFiltersParams(data, state);
             data = this.processColumnsParams(data, state);
@@ -689,17 +705,17 @@ define([
             this.trigger('beforeFetch', this, options);
 
             if (options.waitForPromises.length) {
-                var deferredFetch = $.Deferred();
-                $.when.apply($, options.waitForPromises).done(_.bind(function() {
+                const deferredFetch = $.Deferred();
+                $.when(...options.waitForPromises).done((...args) => {
                     this._fetch(options)
                         .done(function() {
-                            deferredFetch.resolveWith(this, arguments);
+                            deferredFetch.resolveWith(this, args);
                         })
                         .fail(function() {
-                            deferredFetch.rejectWith(this, arguments);
+                            deferredFetch.rejectWith(this, args);
                         });
-                }, this)).fail(function() {
-                    deferredFetch.rejectWith(this, arguments);
+                }).fail(function(...args) {
+                    deferredFetch.rejectWith(this, args);
                 });
 
                 return deferredFetch.promise();
@@ -709,23 +725,24 @@ define([
         },
 
         _fetch: function(options) {
-            var BBColProto = Backbone.Collection.prototype;
+            const BBColProto = Backbone.Collection.prototype;
 
             options = _.defaults(options || {}, {reset: true});
 
-            var state = this._checkState(this.state);
+            this.updateState({});
+            let state = this.state;
 
-            var mode = this.mode;
+            const mode = this.mode;
 
             if (mode === 'infinite' && !options.url) {
                 options.url = this.links[state.currentPage];
             }
 
-            var data = options.data || {};
+            let data = options.data || {};
 
             // set up query params
-            var url = options.url || _.result(this, 'url') || '';
-            var qsi = url.indexOf('?');
+            let url = options.url || _.result(this, 'url') || '';
+            const qsi = url.indexOf('?');
             if (qsi !== -1) {
                 _.extend(data, tools.unpackFromQueryString(url.slice(qsi + 1)));
                 url = url.slice(0, qsi);
@@ -756,10 +773,10 @@ define([
             this.processFiltersParams(data, state);
             this.processColumnsParams(data, state);
 
-            var self = this;
-            var success = options.success;
-            var fullCollection = this.fullCollection;
-            var links = this.links;
+            const self = this;
+            const success = options.success;
+            const fullCollection = this.fullCollection;
+            const links = this.links;
 
             if (mode !== 'server') {
                 options.success = function(col, resp, opts) {
@@ -771,19 +788,19 @@ define([
                         opts.silent = options.silent;
                     }
 
-                    var models = col.models;
-                    var currentPage = state.currentPage;
+                    const models = col.models;
+                    const currentPage = state.currentPage;
 
                     if (mode === 'client') {
                         resetQuickly(fullCollection, models, opts);
                     } else if (links[currentPage]) { // refetching a page
-                        var pageSize = state.pageSize;
-                        var pageStart = (state.firstPage === 0
+                        const pageSize = state.pageSize;
+                        const pageStart = (state.firstPage === 0
                             ? currentPage
                             : currentPage - 1) * pageSize;
-                        var fullModels = fullCollection.models;
-                        var head = fullModels.slice(0, pageStart);
-                        var tail = fullModels.slice(pageStart + pageSize);
+                        let fullModels = fullCollection.models;
+                        const head = fullModels.slice(0, pageStart);
+                        const tail = fullModels.slice(pageStart + pageSize);
                         fullModels = head.concat(models).concat(tail);
                         fullCollection.update(fullModels,
                             _.extend({silent: true, sort: false}, opts));
@@ -805,7 +822,7 @@ define([
                 // silent the first reset from backbone
                 return BBColProto.fetch.call(self, _.extend({}, options, {silent: true}));
             } else {
-                var currentPage = state.currentPage;
+                const currentPage = state.currentPage;
                 options.success = function(col, resp, opts) {
                     if (currentPage > 1 && _.isEmpty(resp.data) && col.state.totalRecords > 0) {
                         // load last page, if records not found for current page(for example after records delete)
@@ -825,7 +842,7 @@ define([
         },
 
         loadMore: function() {
-            var collection = this;
+            const collection = this;
             this.isLoadingMore = true;
             this.fetch({
                 loadMore: true,
@@ -846,19 +863,19 @@ define([
          */
         processQueryParams: function(data, state) {
             state = this.processAdditionalParams(state);
-            var pageablePrototype = PageableCollection.prototype;
+            const pageablePrototype = PageableCollection.prototype;
 
             // map params except directions
-            var queryParams = this.mode === 'client'
+            const queryParams = this.mode === 'client'
                 ? _.pick(this.queryParams, 'sorters')
                 : _.omit(_.pick(this.queryParams, _.keys(pageablePrototype.queryParams)), 'directions');
 
-            var i;
-            var kvp;
-            var k;
-            var v;
-            var kvps = _.pairs(queryParams);
-            var thisCopy = _.clone(this);
+            let i;
+            let kvp;
+            let k;
+            let v;
+            const kvps = _.pairs(queryParams);
+            const thisCopy = _.clone(this);
             for (i = 0; i < kvps.length; i++) {
                 kvp = kvps[i];
                 k = kvp[0];
@@ -872,13 +889,13 @@ define([
             // set sorting parameters
             if (state.sorters) {
                 _.each(state.sorters, function(direction, field) {
-                    var key = this.queryParams.sortBy.replace('%field%', field);
+                    const key = this.queryParams.sortBy.replace('%field%', field);
                     data[key] = this.queryParams.directions[direction];
                 }, this);
             }
 
             // map extra query parameters
-            var extraKvps = _.pairs(_.omit(this.queryParams,
+            const extraKvps = _.pairs(_.omit(this.queryParams,
                 _.keys(pageablePrototype.queryParams)));
             for (i = 0; i < extraKvps.length; i++) {
                 kvp = extraKvps[i];
@@ -901,7 +918,7 @@ define([
          * @return {String}
          */
         getSortDirectionKey: function(directionValue) {
-            var directionKey = null;
+            let directionKey = null;
             _.each(this.queryParams.directions, function(value, key) {
                 if (value === directionValue || key === directionValue) {
                     directionKey = key;
@@ -919,7 +936,7 @@ define([
          * @return {*}
          */
         setSorting: function(sortKey, order, options) {
-            var state = this.state;
+            const state = this.state;
 
             state.sorters = state.sorters || {};
 
@@ -939,23 +956,23 @@ define([
                 state.sorters[sortKey] = order;
             }
 
-            var fullCollection = this.fullCollection;
-            var delComp = false;
-            var delFullComp = false;
+            const fullCollection = this.fullCollection;
+            let delComp = false;
+            let delFullComp = false;
 
             if (!order) {
                 delComp = delFullComp = true;
             }
 
-            var mode = this.mode;
+            const mode = this.mode;
             options = _.extend({side: mode === 'client' ? mode : 'server', full: true},
                 options
             );
 
-            var comparator = this._makeComparator(sortKey, order);
+            const comparator = this._makeComparator(sortKey, order);
 
-            var full = options.full;
-            var side = options.side;
+            const full = options.full;
+            const side = options.side;
 
             if (side === 'client') {
                 if (full) {
@@ -987,7 +1004,7 @@ define([
          * @return {PageableCollection}
          */
         clone: function() {
-            var newCollection = new (this.constructor)(this.toJSON(), tools.deepClone(this.options));
+            const newCollection = new (this.constructor)(this.toJSON(), tools.deepClone(this.options));
             newCollection.state = tools.deepClone(this.state);
             newCollection.initialState = tools.deepClone(this.initialState);
             return newCollection;
@@ -1001,7 +1018,7 @@ define([
          * @returns {string|null}
          */
         stateHashValue: function(purge) {
-            var hash;
+            let hash;
 
             hash = this._encodeStateData(this.state);
             if (purge && hash === this._encodeStateData(this.initialState)) {
@@ -1018,9 +1035,9 @@ define([
          * @returns {Object}
          */
         setPageSize: function(pageSize, options) {
-            var result;
+            let result;
             // make state clone
-            var oldState = _.extend({}, this.state);
+            const oldState = _.extend({}, this.state);
 
             this.state.pageSize = pageSize;
             if (this.mode === 'server') {
@@ -1036,10 +1053,10 @@ define([
             result = result || {};
 
             if (_.isFunction(result.fail)) {
-                result.fail(_.bind(function() {
+                result.fail(() => {
                     // revert state if page change fail
                     this.state = this._checkState(oldState);
-                }, this));
+                });
             }
 
             return result;
@@ -1052,9 +1069,8 @@ define([
          * @returns {string}
          * @protected
          */
-        _encodeStateData: function(state) {
-            var stateData = {urlParams: this.urlParams};
-            stateData = _.extend(stateData, state);
+        _encodeStateData: function(state = {}) {
+            const stateData = {...state, urlParams: {...this.urlParams, ...state.parameters}};
             this._packStateData(stateData);
             return PageableCollection.encodeStateData(stateData);
         },
@@ -1088,7 +1104,7 @@ define([
          */
         _packColumnsStateData: function(state) {
             // convert columns state to array
-            var packedState = _.map(state, function(item, columnName) {
+            let packedState = _.map(state, function(item, columnName) {
                 return _.extend({name: columnName}, item);
             });
 
@@ -1123,7 +1139,7 @@ define([
          */
         _unpackColumnsStateData: function(packedState) {
             return _.object(_.map(packedState.split('.'), function(value, index) {
-                var columnName = value.substr(0, value.length - 1);
+                const columnName = value.substr(0, value.length - 1);
                 return [columnName, {
                     renderable: Boolean(Number(value.substr(-1))),
                     order: index
@@ -1140,7 +1156,7 @@ define([
          * @protected
          */
         _makeComparator: function(sortKey, order) {
-            var state = this.state;
+            const state = this.state;
 
             sortKey = sortKey || state.sortKey;
             order = order || state.order;
@@ -1150,9 +1166,9 @@ define([
             }
 
             return function(left, right) {
-                var l = left.get(sortKey);
-                var r = right.get(sortKey);
-                var t;
+                let l = left.get(sortKey);
+                let r = right.get(sortKey);
+                let t;
 
                 // order might be int or string
                 if (order === '1' || order === 1) {
@@ -1219,7 +1235,7 @@ define([
      * @return {string}
      */
     PageableCollection.encodeStateData = function(stateObject) {
-        var data;
+        let data;
         data = _.pick(stateObject, _.keys(stateShortKeys));
         data = tools.invertKeys(data, stateShortKeys);
         return tools.packToQueryString(data);
@@ -1233,7 +1249,7 @@ define([
      * @return {Object}
      */
     PageableCollection.decodeStateData = function(stateString) {
-        var data = tools.unpackFromQueryString(stateString);
+        let data = tools.unpackFromQueryString(stateString);
         data = tools.invertKeys(data, _.invert(stateShortKeys));
         return data;
     };

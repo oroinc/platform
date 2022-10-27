@@ -3,6 +3,8 @@
 namespace Oro\Bundle\LocaleBundle\Model;
 
 /**
+ * Calendar class
+ *
  * @link http://userguide.icu-project.org/formatparse/datetime
  */
 class Calendar
@@ -194,8 +196,8 @@ class Calendar
     {
         return new \IntlDateFormatter(
             $locale ? : $this->getLocale(),
-            null,
-            null,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
             'UTC',
             \IntlDateFormatter::GREGORIAN,
             $pattern

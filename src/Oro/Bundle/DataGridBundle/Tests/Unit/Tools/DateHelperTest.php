@@ -7,13 +7,13 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
 
     /** @var DateHelper */
     private $dateHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);
 
@@ -24,11 +24,11 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
-            ->willReturn('Europe/Kiev');
+            ->willReturn('Asia/Tokyo');
 
-        self::assertEquals('+03:00', $this->dateHelper->getTimeZoneOffset());
+        self::assertEquals('+09:00', $this->dateHelper->getTimeZoneOffset());
         // test that the offset is cached
-        self::assertEquals('+03:00', $this->dateHelper->getTimeZoneOffset());
+        self::assertEquals('+09:00', $this->dateHelper->getTimeZoneOffset());
     }
 
     public function testGetTimeZoneOffsetForUTC()
@@ -44,10 +44,10 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
-            ->willReturn('Europe/Kiev');
+            ->willReturn('Asia/Tokyo');
 
         self::assertEquals(
-            'CONVERT_TZ(e.createdAt, \'+00:00\', \'+03:00\')',
+            'CONVERT_TZ(e.createdAt, \'+00:00\', \'+09:00\')',
             $this->dateHelper->getConvertTimezoneExpression('e.createdAt')
         );
     }

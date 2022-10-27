@@ -3,10 +3,22 @@
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
+use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * The default strategy for grid names.
+ */
 class NameStrategy implements NameStrategyInterface
 {
     const DELIMITER = ':';
+
+    /** @var RequestStack */
+    private $requestStack;
+
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
 
     /**
      * {@inheritdoc}
@@ -51,11 +63,35 @@ class NameStrategy implements NameStrategyInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getGridUniqueName($name)
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if (null === $request) {
+            return $name;
+        }
+
+        $uniqueName = $name;
+        $widgetId = $request->get('_widgetId');
+        if ($widgetId) {
+            $uniqueName = sprintf('%s_w%s', $uniqueName, $widgetId);
+        } elseif ($request->query->count() === 1) {
+            $paramName = array_keys($request->query->all())[0];
+            if (str_starts_with($paramName, $name)) {
+                $uniqueName = $paramName;
+            }
+        }
+
+        return $uniqueName;
+    }
+
+    /**
      * @param string $name
      * @return array
      * @throws InvalidArgumentException
      */
-    protected function parseGridNameAndScope($name)
+    private function parseGridNameAndScope($name)
     {
         if (substr_count($name, self::DELIMITER) > 1) {
             throw new InvalidArgumentException(
@@ -78,13 +114,5 @@ class NameStrategy implements NameStrategyInterface
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getGridUniqueName($name)
-    {
-        return $name;
     }
 }

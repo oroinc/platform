@@ -18,11 +18,6 @@ class CommentPlaceholderFilter
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
-    /**
-     * @param CommentAssociationHelper      $commentAssociationHelper
-     * @param DoctrineHelper                $doctrineHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         CommentAssociationHelper $commentAssociationHelper,
         DoctrineHelper $doctrineHelper,

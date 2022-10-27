@@ -22,8 +22,6 @@ class CleanupMarketingPostUpMigrationListener
 
     /**
      * Constructor.
-     *
-     * @param KernelInterface $kernel
      */
     public function __construct(KernelInterface $kernel)
     {
@@ -32,8 +30,6 @@ class CleanupMarketingPostUpMigrationListener
 
     /**
      * POST UP event handler
-     *
-     * @param PostMigrationEvent $event
      */
     public function onPostUp(PostMigrationEvent $event)
     {

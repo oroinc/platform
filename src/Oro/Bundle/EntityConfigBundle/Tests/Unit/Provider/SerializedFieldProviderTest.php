@@ -9,16 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
 
 class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $extendConfigProvider;
-    /**
-     * @var SerializedFieldProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+
+    /** @var SerializedFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $serializedFieldProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
 
@@ -55,9 +52,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
     private function expectsEmptyPropertiesValues()
     {
         $fieldConfigModel = new FieldConfigModel('name', 'string');
-        $propertyConfigContainer = $this->getMockBuilder(PropertyConfigContainer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $propertyConfigContainer = $this->createMock(PropertyConfigContainer::class);
         $propertyConfigContainer->expects($this->once())
             ->method('getRequiredPropertiesValues')
             ->with(PropertyConfigContainer::TYPE_FIELD)
@@ -125,14 +120,11 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertExtendConfigProvider();
 
         $isSerialized = $this->serializedFieldProvider->isSerializedByData($fieldConfigModel, $data);
-        
+
         $this->assertTrue($isSerialized);
     }
 
-    /**
-     * @return array
-     */
-    public function allowEmptyDataProvider()
+    public function allowEmptyDataProvider(): array
     {
         return [
             'empty allowed' => [

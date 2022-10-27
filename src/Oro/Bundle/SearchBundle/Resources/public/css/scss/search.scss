@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 .search-header {
-    padding: 16px 20px 13px;
+    @include safe-area-offset(padding, $search-header-padding);
 
     &.container-fluid {
         background-color: $primary-900;
@@ -24,51 +24,52 @@
         min-width: 260px;
         padding-left: 0;
 
-        input[type="text"] {
+        input[type='text'] {
             width: 300px;
-        }
 
-        .btn {
-            height: 30px;
-            line-height: 29px;
+            margin-bottom: 0;
         }
     }
 }
 
 .search-results-column {
-    .customer-info {
-        padding: 0 0 0 60px;
+    .page-title {
         margin: 9px 0 5px;
 
         h1 {
             font-size: 18px;
-            line-height: 18px;
+            line-height: 24px;
         }
 
         .sub-title {
             font-size: 13px;
             line-height: 1em;
+            vertical-align: bottom;
         }
 
-        .user-name {
+        &__icon {
+            top: 0;
+            width: 28px;
+
+            &:empty::before {
+                font-size: 22px;
+                height: 22px;
+            }
+
+            img {
+                width: 22px;
+                border-radius: 0;
+            }
+        }
+
+        &__entity-title {
             margin: 2px 0 3px;
         }
     }
 }
 
-.search-no-results {
-    margin: 10px auto;
-    width: 98%;
-    padding: 10px 0;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 16px;
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-}
-
 .search-grid {
-    .table.grid tbody tr:first-child td {
-        border-top: 0 none;
+    .grid-row:last-child .grid-body-cell {
+        border-width: 0;
     }
 }

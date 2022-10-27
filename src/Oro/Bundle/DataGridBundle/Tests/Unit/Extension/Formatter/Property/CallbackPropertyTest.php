@@ -9,18 +9,15 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyConfiguration
 class CallbackPropertyTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \stdClass|\PHPUnit\Framework\MockObject\MockObject */
-    protected $callable;
+    private $callable;
 
     /** @var CallbackProperty */
-    protected $property;
+    private $property;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->callable = $this->getMockBuilder('stdClass')
-            ->setMethods(['virtualMethod'])
+        $this->callable = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['virtualMethod'])
             ->getMock();
 
         $this->property = new CallbackProperty();

@@ -28,10 +28,6 @@ class ScheduleIntervalTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array $submittedData
-     * @param ScheduleIntervalInterface $expected
-     * @param ScheduleIntervalInterface|null $data
      */
     public function testSubmit(
         array $submittedData,
@@ -45,14 +41,12 @@ class ScheduleIntervalTypeTest extends FormIntegrationTestCase
 
         $form->submit($submittedData);
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $data = $form->getData();
         $this->assertEquals($expected, $data);
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             [

@@ -2,21 +2,25 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
-use \Zend\Mail\Header\ContentType;
-use \Zend\Mail\Header\HeaderInterface;
-use \Zend\Mail\Storage\AbstractStorage;
-use \Zend\Mail\Storage\Exception\InvalidArgumentException;
-use \Zend\Mail\Storage\Exception\RuntimeException;
-use \Zend\Mail\Storage\Part;
-use \Zend\Mime\Mime as BaseMime;
-use \Zend\Stdlib\ErrorHandler;
-use Oro\Bundle\EmailBundle\Mail\Headers;
-use Oro\Bundle\EmailBundle\Mime\Decode;
+use Laminas\Mail\Header\ContentType;
+use Laminas\Mail\Header\HeaderInterface;
+use Laminas\Mail\Storage\AbstractStorage;
+use Laminas\Mail\Storage\Exception\InvalidArgumentException;
+use Laminas\Mail\Storage\Exception\RuntimeException;
+use Laminas\Mail\Storage\Part;
+use Laminas\Mime\Mime as BaseMime;
+use Laminas\Stdlib\ErrorHandler;
+use Oro\Bundle\ImapBundle\Exception\InvalidHeadersException;
+use Oro\Bundle\ImapBundle\Exception\InvalidMessageHeadersException;
+use Oro\Bundle\ImapBundle\Mail\Headers;
+use Oro\Bundle\ImapBundle\Mime\Decode;
 
 /**
+ * Imap protocol message.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class Message extends \Zend\Mail\Storage\Message
+class Message extends \Laminas\Mail\Storage\Message
 {
     /**
      * {@inheritdoc}
@@ -56,38 +60,14 @@ class Message extends \Zend\Mail\Storage\Message
         }
 
         $params['strict'] = isset($params['strict']) ? $params['strict'] : false;
-
-        if (isset($params['raw'])) {
-            Decode::splitMessage(
-                $params['raw'],
-                $this->headers,
-                $this->content,
-                BaseMime::LINEEND,
-                $params['strict']
-            );
-        } elseif (isset($params['headers'])) {
-            if (is_array($params['headers'])) {
-                $this->headers = new Headers();
-                $this->headers->addHeaders($params['headers']);
-            } else {
-                if (empty($params['noToplines'])) {
-                    Decode::splitMessage($params['headers'], $this->headers, $this->topLines);
-                } else {
-                    $this->headers = Headers::fromString($params['headers']);
-                }
-            }
-
-            if (isset($params['content'])) {
-                $this->content = $params['content'];
-            }
-        }
+        $this->decodeHeaders($params);
     }
 
     /**
      * Gets the message attachments
      *
      * @return Body
-     * @throws \Zend\Mail\Storage\Exception\RuntimeException
+     * @throws RuntimeException
      */
     public function getBody()
     {
@@ -150,7 +130,7 @@ class Message extends \Zend\Mail\Storage\Message
      *
      * @param Part $part The message part
      *
-     * @return \Zend\Mail\Header\ContentType|null
+     * @return ContentType|null
      */
     protected function getPartContentType($part)
     {
@@ -262,11 +242,6 @@ class Message extends \Zend\Mail\Storage\Message
             throw new RuntimeException('part not found');
         }
 
-        if ($this->mail && $this->mail->hasFetchPart) {
-            // TODO: fetch part
-            // return
-        }
-
         $this->cacheContent();
 
         if (!isset($this->parts[$num])) {
@@ -290,11 +265,6 @@ class Message extends \Zend\Mail\Storage\Message
             return $this->countParts;
         }
 
-        if ($this->mail && $this->mail->hasFetchPart) {
-            // TODO: fetch part
-            // return
-        }
-
         $this->cacheContent();
 
         $this->countParts = count($this->parts);
@@ -305,7 +275,6 @@ class Message extends \Zend\Mail\Storage\Message
      * Cache content and split in parts if multipart
      *
      * @throws RuntimeException
-     * @return null
      */
     protected function cacheContent()
     {
@@ -329,7 +298,43 @@ class Message extends \Zend\Mail\Storage\Message
         }
         $counter = 1;
         foreach ($parts as $part) {
-            $this->parts[$counter++] = new static(array('headers' => $part['header'], 'content' => $part['body']));
+            $this->parts[$counter++] = new static(['headers' => $part['header'], 'content' => $part['body']]);
+        }
+    }
+
+    /**
+     * @param array $params
+     */
+    protected function decodeHeaders($params)
+    {
+        try {
+            if (isset($params['raw'])) {
+                Decode::splitMessage(
+                    $params['raw'],
+                    $this->headers,
+                    $this->content,
+                    BaseMime::LINEEND,
+                    $params['strict']
+                );
+            } elseif (isset($params['headers'])) {
+                if (is_array($params['headers'])) {
+                    $this->headers = new Headers();
+                    $this->headers->addHeaders($params['headers']);
+                } else {
+                    if (empty($params['noToplines'])) {
+                        Decode::splitMessage($params['headers'], $this->headers, $this->topLines);
+                    } else {
+                        $this->headers = Headers::fromString($params['headers']);
+                    }
+                }
+
+                if (isset($params['content'])) {
+                    $this->content = $params['content'];
+                }
+            }
+        } catch (InvalidHeadersException $e) {
+            $this->headers = $e->getHeaders();
+            throw new InvalidMessageHeadersException($e->getExceptions(), $this);
         }
     }
 }

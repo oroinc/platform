@@ -1,11 +1,11 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set widgetComponentOptions = {
     'type' : widgetType,
     'options' : options
 } %}
 
-{% set content = render(options.url) %}
-{% if content|length %}
+{%- set content = render(options.url) -%}
+{%- if content|length -%}
     {% set separateLayout = options.separateLayout is not defined or options.separateLayout %}
     {% set separateLayoutContent %}
         {% if separateLayout %} data-layout="separate"{% endif %}
@@ -15,4 +15,4 @@
             {{ content|raw }}
         {% endif %}
     </div>
-{% endif %}
+{%- endif -%}

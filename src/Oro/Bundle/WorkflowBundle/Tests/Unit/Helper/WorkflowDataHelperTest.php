@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -19,30 +20,32 @@ use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityWithWorkflow;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    private $router;
 
-    /** @var WorkflowDataHelper */
-    protected $workflowDataHelper;
+    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclGroupProvider;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->router = $this->createMock(UrlGeneratorInterface::class);
+        $this->aclGroupProvider = $this->createMock(AclGroupProviderInterface::class);
+
+        $this->aclGroupProvider->expects($this->any())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
@@ -57,13 +60,11 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function workflowsDataProvider()
+    public function workflowsDataProvider(): array
     {
         return [
-            'two workflows' => [
+            'workflows' => [
                 'workflowsData' => [
                     [
                         'name' => 'started_flow',
@@ -108,6 +109,20 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                         'allowed' => ['start'],
+                        'isStarted' => false,
+                    ],
+                    [
+                        'name' => 'flow_which_cannot_be_started',
+                        'transitions' => [
+                            [
+                                'name' => TransitionManager::DEFAULT_START_TRANSITION_NAME,
+                                'isStart' => false,
+                                'hasForm' => false,
+                                'isAvailable' => false,
+                            ],
+                        ],
+                        'allowed' => [],
+                        'isStartStep' => true,
                         'isStarted' => false,
                     ],
                 ],
@@ -159,6 +174,13 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                     ],
+                    [
+                        'name' => 'flow_which_cannot_be_started',
+                        'label' => 'Flow_which_cannot_be_started',
+                        'isStarted' => false,
+                        'workflowItemId' => null,
+                        'transitionsData' => [],
+                    ],
                 ],
             ],
         ];
@@ -166,11 +188,8 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider workflowsDataProvider
-     *
-     * @param $workflowsData
-     * @param $expected
      */
-    public function testGetEntityWorkflowsData($workflowsData, $expected)
+    public function testGetEntityWorkflowsData(array $workflowsData, array $expected)
     {
         $entity = new EntityWithWorkflow();
 
@@ -178,25 +197,20 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
             $this->getWorkflowManager($entity, $workflowsData),
             $this->authorizationChecker,
             $this->translator,
-            $this->router
+            $this->router,
+            $this->aclGroupProvider
         );
 
         $this->assertEquals($expected, $workflowDataHelper->getEntityWorkflowsData($entity));
     }
 
-    /**
-     * @param string $name
-     * @param bool $isStart
-     * @param bool $hasForm
-     * @param bool $isAvailable
-     *
-     * @return Transition
-     */
-    protected function getTransition($name, $isStart = false, $hasForm = false, $isAvailable = true)
-    {
-        $transition = $this->getMockBuilder(Transition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+    private function getTransition(
+        string $name,
+        bool $isStart = false,
+        bool $hasForm = false,
+        bool $isAvailable = true
+    ): Transition {
+        $transition = $this->createMock(Transition::class);
         $transition->expects($this->any())
             ->method('getName')
             ->willReturn($name);
@@ -220,17 +234,21 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @return WorkflowManager
      */
-    protected function getWorkflowManager($entity, array $workflowsData)
+    private function getWorkflowManager(object $entity, array $workflowsData): WorkflowManager
     {
         $workflows = array_map(
             function (array $workflow) {
-                return $this->getWorkflow($workflow['name'], $workflow['transitions'], $workflow['allowed']);
+                return $this->getWorkflow(
+                    $workflow['name'],
+                    $workflow['transitions'],
+                    $workflow['allowed'],
+                    $workflow['isStartStep'] ?? false
+                );
             },
             $workflowsData
         );
-        $workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
-        $workflowManager
-            ->expects($this->any())
+        $workflowManager = $this->createMock(WorkflowManager::class);
+        $workflowManager->expects($this->any())
             ->method('getApplicableWorkflows')
             ->willReturn($workflows);
 
@@ -238,19 +256,17 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
             function (array $workflow) use ($entity) {
                 $workflowItem = new WorkflowItem();
                 $workflowItem->setId(1);
-                $workflowItem->setCurrentStep(new WorkflowStep());
+                $workflowItem->setCurrentStep((new WorkflowStep())->setName('Start'));
 
                 return [$entity, $workflow['name'], $workflow['isStarted'] ? $workflowItem : null];
             },
             $workflowsData
         );
 
-        $workflowManager
-            ->expects($this->any())
+        $workflowManager->expects($this->any())
             ->method('getWorkflowItem')
             ->willReturnMap($workflowItemMap);
 
-        /** @var WorkflowManager $workflowManager */
         return $workflowManager;
     }
 
@@ -261,7 +277,7 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
      *
      * @return TransitionManager
      */
-    protected function getTransitionManager(array $transitionsData)
+    private function getTransitionManager(array $transitionsData): TransitionManager
     {
         $extractTransitionsMap = array_map(
             function ($transition) {
@@ -278,9 +294,7 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
             $transitionsData
         );
 
-        $transitionManager = $this->getMockBuilder(TransitionManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $transitionManager = $this->createMock(TransitionManager::class);
         $transitionManager->expects($this->any())
             ->method('extractTransition')
             ->willReturnMap($extractTransitionsMap);
@@ -296,46 +310,40 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getStartTransitions')
             ->willReturn($startTransitions);
 
-        /** @var TransitionManager $transitionManager */
+        $defaultTransitions = array_filter(
+            array_column($extractTransitionsMap, 1),
+            function (Transition $transition) {
+                return $transition->getName() === TransitionManager::DEFAULT_START_TRANSITION_NAME;
+            }
+        );
+
+        $transitionManager->expects($this->any())
+            ->method('getDefaultStartTransition')
+            ->willReturn(reset($defaultTransitions));
+
         return $transitionManager;
     }
 
-    /**
-     * @param string $workflowName
-     * @param array $transitionsData
-     * @param array $allowed
-     *
-     * @return Workflow
-     */
-    protected function getWorkflow($workflowName, array $transitionsData, array $allowed)
-    {
+    private function getWorkflow(
+        string $workflowName,
+        array $transitionsData,
+        array $allowed,
+        bool $isStartStep
+    ): Workflow {
         $step = new Step();
         $step->setName('Start');
         $step->setAllowedTransitions($allowed);
 
-        /** @var StepManager|\PHPUnit\Framework\MockObject\MockObject $stepManager */
-        $stepManager = $this->getMockBuilder(StepManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $stepManager = new StepManager([$step]);
+        if ($isStartStep) {
+            $stepManager->setStartStepName($step->getName());
+        }
 
-        $stepManager->expects($this->any())
-            ->method('getStep')
-            ->willReturn($step);
+        $aclManager = $this->createMock(AclManager::class);
 
-        /** @var AclManager $aclManager */
-        $aclManager = $this->getMockBuilder(AclManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
-        /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject $restrictionManager */
-        $restrictionManager = $this->getMockBuilder(RestrictionManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $restrictionManager = $this->createMock(RestrictionManager::class);
 
         $definition = new WorkflowDefinition();
         $definition->setName($workflowName);
@@ -346,7 +354,7 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
             $aclManager,
             $restrictionManager,
             $stepManager,
-            $attributeManager = null,
+            null,
             $this->getTransitionManager($transitionsData)
         );
 

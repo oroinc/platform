@@ -1,25 +1,29 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
 
-    var EntityCategoryTabsComponent;
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var BaseCollection = require('oroui/js/app/models/base/collection');
-    var TabCollectionView = require('oroui/js/app/views/tab-collection-view');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const BaseCollection = require('oroui/js/app/models/base/collection');
+    const TabCollectionView = require('oroui/js/app/views/tab-collection-view');
+    let config = require('module-config').default(module.id);
 
-    EntityCategoryTabsComponent = BaseComponent.extend({
+    config = _.extend({
+        useDropdown: true
+    }, config);
+
+    const EntityCategoryTabsComponent = BaseComponent.extend({
         /**
          * @type {Object<string, Object<string, boolean>>}
          */
         changesByCategory: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EntityCategoryTabsComponent() {
-            EntityCategoryTabsComponent.__super__.constructor.apply(this, arguments);
+        constructor: function EntityCategoryTabsComponent(options) {
+            EntityCategoryTabsComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -29,7 +33,7 @@ define(function(require) {
         initialize: function(options) {
             this.changesByCategory = {};
 
-            var categories = options.data;
+            let categories = options.data;
             categories.unshift({
                 id: 'all',
                 label: __('oro.role.tabs.all.label'),
@@ -42,7 +46,7 @@ define(function(require) {
                 multi: true
             });
 
-            var controlTabPanel = options.controlTabPanel;
+            const controlTabPanel = options.controlTabPanel;
             categories = _.each(categories, function(category) {
                 category.uniqueId = _.uniqueId(category.id);
                 if (typeof controlTabPanel === 'string') {
@@ -56,7 +60,7 @@ define(function(require) {
                 el: options._sourceElement,
                 animationDuration: 0,
                 collection: this.categories,
-                useDropdown: options.useDropdown
+                useDropdown: (options.useDropdown === void 0 ? config : options)['useDropdown']
             });
 
             this.listenTo(this.categories, 'change', this.onCategoryChange);
@@ -72,8 +76,8 @@ define(function(require) {
         },
 
         onAccessLevelChange: function(data) {
-            var permission = data.identityId + '::' + data.permissionName;
-            var category = data.category;
+            const permission = data.identityId + '::' + data.permissionName;
+            const category = data.category;
 
             if (_.isUndefined(category)) {
                 return;
@@ -94,7 +98,7 @@ define(function(require) {
 
             // update tabs
             this.categories.findWhere({id: 'all'}).set('changed', !_.isEmpty(this.changesByCategory));
-            var particularCategory = this.categories.findWhere({id: category});
+            const particularCategory = this.categories.findWhere({id: category});
             if (particularCategory) {
                 particularCategory.set('changed', !_.isEmpty(this.changesByCategory[category]));
             }

@@ -1,54 +1,41 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\Handler;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\Handler\AddressHandler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class AddressHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $form;
 
-    /**
-     * @var Request
-     */
+    /** @var Request */
     private $request;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $om;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Address|\PHPUnit\Framework\MockObject\MockObject */
     private $address;
 
-    /**
-     * @var AddressHandler
-     */
+    /** @var AddressHandler */
     private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);
         $this->request = new Request();
-        $requestStack = new RequestStack();
-        $requestStack->push($this->request);
         $this->om = $this->createMock(ObjectManager::class);
         $this->address = $this->createMock(Address::class);
 
-        $this->handler = new AddressHandler($this->form, $requestStack, $this->om);
+        $this->handler = new AddressHandler($this->om);
     }
 
-    public function testGoodRequest()
+    public function testGoodRequest(): void
     {
         $this->form->expects($this->once())
             ->method('setData');
@@ -59,18 +46,18 @@ class AddressHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('submit');
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue('true'));
+            ->willReturn('true');
 
         $this->om->expects($this->once())
             ->method('persist')
-            ->with($this->equalTo($this->address));
+            ->with($this->identicalTo($this->address));
         $this->om->expects($this->once())
             ->method('flush');
 
-        $this->assertTrue($this->handler->process($this->address));
+        self::assertTrue($this->handler->process($this->address, $this->form, $this->request));
     }
 
-    public function testBadRequest()
+    public function testBadRequest(): void
     {
         $this->form->expects($this->once())
             ->method('setData');
@@ -81,17 +68,17 @@ class AddressHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('submit');
         $this->form->expects($this->never())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->om->expects($this->never())
             ->method('persist');
         $this->om->expects($this->never())
             ->method('flush');
 
-        $this->assertFalse($this->handler->process($this->address));
+        self::assertFalse($this->handler->process($this->address, $this->form, $this->request));
     }
 
-    public function testNotValidForm()
+    public function testNotValidForm(): void
     {
         $this->form->expects($this->once())
             ->method('setData');
@@ -102,13 +89,13 @@ class AddressHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('submit');
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->om->expects($this->never())
             ->method('persist');
         $this->om->expects($this->never())
             ->method('flush');
 
-        $this->assertFalse($this->handler->process($this->address));
+        self::assertFalse($this->handler->process($this->address, $this->form, $this->request));
     }
 }

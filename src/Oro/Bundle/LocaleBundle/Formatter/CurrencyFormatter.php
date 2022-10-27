@@ -4,14 +4,14 @@ namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
 
+/**
+ * The formatter for currency values.
+ */
 class CurrencyFormatter implements FormatterInterface
 {
     /** @var NumberFormatter */
-    protected $formatter;
+    private $formatter;
 
-    /**
-     * @param NumberFormatter $formatter
-     */
     public function __construct(NumberFormatter $formatter)
     {
         $this->formatter = $formatter;
@@ -20,29 +20,15 @@ class CurrencyFormatter implements FormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormatterName()
+    public function format($value, array $formatterArguments = [])
     {
-        return 'currency';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function format($parameter, array $formatterArguments = [])
-    {
-        $currency = $this->getOption($formatterArguments, 'currency');
-        $attributes = (array)$this->getOption($formatterArguments, 'attributes', []);
-        $textAttributes = (array)$this->getOption($formatterArguments, 'textAttributes', []);
-        $symbols = (array)$this->getOption($formatterArguments, 'symbols', []);
-        $locale = $this->getOption($formatterArguments, 'locale');
-
         return $this->formatter->formatCurrency(
-            $parameter,
-            $currency,
-            $attributes,
-            $textAttributes,
-            $symbols,
-            $locale
+            $value,
+            $formatterArguments['currency'] ?? null,
+            (array)($formatterArguments['attributes'] ?? []),
+            (array)($formatterArguments['textAttributes'] ?? []),
+            (array)($formatterArguments['symbols'] ?? []),
+            $formatterArguments['locale'] ?? null
         );
     }
 
@@ -52,34 +38,5 @@ class CurrencyFormatter implements FormatterInterface
     public function getDefaultValue()
     {
         return 0;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedTypes()
-    {
-        return ['money'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isDefaultFormatter()
-    {
-        return true;
-    }
-
-    /**
-     * Gets option or default value if option not exist
-     *
-     * @param array $options
-     * @param string $name
-     * @param mixed $default
-     * @return mixed
-     */
-    protected function getOption(array $options, $name, $default = null)
-    {
-        return isset($options[$name]) ? $options[$name] : $default;
     }
 }

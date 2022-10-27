@@ -2,47 +2,51 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
+use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\ColumnOptionsGuesserMock;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTestCase;
 
-class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTest
+class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTestCase
 {
     /**
-     * @param QueryDesignerModel                            $model
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $doctrine
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $functionProvider
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $virtualFieldProvider
-     * @param array                                         $guessers
+     * @param AbstractQueryDesigner                 $source
+     * @param ManagerRegistry|null                  $doctrine
+     * @param FunctionProviderInterface|null        $functionProvider
+     * @param VirtualFieldProviderInterface|null    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface|null $virtualRelationProvider
+     * @param ColumnOptionsGuesserInterface[]       $guessers
+     * @param EntityNameResolver|null               $entityNameResolver
      *
      * @return DatagridConfigurationBuilder
      */
     protected function createDatagridConfigurationBuilder(
-        QueryDesignerModel $model,
-        $doctrine = null,
-        $functionProvider = null,
-        $virtualFieldProvider = null,
+        AbstractQueryDesigner $source,
+        ManagerRegistry $doctrine = null,
+        FunctionProviderInterface $functionProvider = null,
+        VirtualFieldProviderInterface $virtualFieldProvider = null,
+        VirtualRelationProviderInterface $virtualRelationProvider = null,
         array $guessers = [],
-        $entityNameResolver = null
-    ) {
-        if (!isset($entityNameResolver)) {
-            $entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-                ->disableOriginalConstructor()
-                ->getMock();
-        }
-
+        EntityNameResolver $entityNameResolver = null
+    ): DatagridConfigurationBuilder {
         $builder = new DatagridConfigurationBuilder(
-            $functionProvider ? : $this->getFunctionProvider(),
-            $virtualFieldProvider ? : $this->getVirtualFieldProvider(),
-            $doctrine ? : $this->getDoctrine(),
-            new DatagridGuesserMock($guessers),
-            $entityNameResolver
+            $functionProvider ?? $this->getFunctionProvider(),
+            $virtualFieldProvider ?? $this->getVirtualFieldProvider(),
+            $virtualRelationProvider ?? $this->getVirtualRelationProvider(),
+            new DoctrineHelper($doctrine ?? $this->getDoctrine()),
+            new DatagridGuesser($guessers ?: [new ColumnOptionsGuesserMock()]),
+            $entityNameResolver ?? $this->getEntityNameResolver()
         );
-
         $builder->setGridName('test_grid');
-        $builder->setSource($model);
+        $builder->setSource($source);
 
         return $builder;
     }

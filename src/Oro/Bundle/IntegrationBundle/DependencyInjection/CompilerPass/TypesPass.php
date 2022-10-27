@@ -30,9 +30,6 @@ class TypesPass implements CompilerPassInterface
     /**
      * Pass integration types to a manager
      *
-     * @param Definition       $managerDefinition
-     * @param ContainerBuilder $container
-     *
      * @throws LogicException
      */
     protected function processChannelTypes(Definition $managerDefinition, ContainerBuilder $container)
@@ -53,9 +50,6 @@ class TypesPass implements CompilerPassInterface
 
     /**
      * Pass transport types to a manager
-     *
-     * @param Definition       $managerDefinition
-     * @param ContainerBuilder $container
      *
      * @throws LogicException
      */
@@ -87,9 +81,6 @@ class TypesPass implements CompilerPassInterface
 
     /**
      * Pass connector types to manager
-     *
-     * @param Definition       $managerDefinition
-     * @param ContainerBuilder $container
      *
      * @throws LogicException
      */

@@ -1,6 +1,9 @@
 define(function(require) {
     'use strict';
 
+    const TextEditorView = require('./text-editor-view');
+    const NumberFormatter = require('orofilter/js/formatter/number-formatter');
+
     /**
      * Number cell content editor.
      *
@@ -57,70 +60,69 @@ define(function(require) {
      * @augments [TextEditorView](./text-editor-view.md)
      * @exports NumberEditorView
      */
-    var NumberEditorView;
-    var TextEditorView = require('./text-editor-view');
-    var _ = require('underscore');
-    var NumberFormatter = require('orofilter/js/formatter/number-formatter');
-
-    NumberEditorView = TextEditorView.extend(/** @lends NumberEditorView.prototype */{
+    const NumberEditorView = TextEditorView.extend(/** @lends NumberEditorView.prototype */{
         className: 'number-editor',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function NumberEditorView() {
-            NumberEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function NumberEditorView(options) {
+            NumberEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            this.formatter = new NumberFormatter(options);
-            NumberEditorView.__super__.initialize.apply(this, arguments);
+            const formatOptions = {};
+            if (options.metadata) {
+                const cellMetadata = options.metadata;
+                if (cellMetadata.style) {
+                    formatOptions.style = cellMetadata.style;
+                }
+            }
+
+            this.formatter = new NumberFormatter(formatOptions);
+            NumberEditorView.__super__.initialize.call(this, options);
         },
 
         getValue: function() {
-            var userInput = this.$('input[name=value]').val();
-            var parsed = this.formatter.toRaw(userInput);
-            return _.isNumber(parsed) ? parsed : (!parsed ? void 0 : NaN);
+            const userInput = this.$('input[name=value]').val();
+            const parsed = this.formatter.toRaw(userInput);
+
+            return parsed ? parsed : void 0;
         },
 
         getValidationRules: function() {
-            var rules = NumberEditorView.__super__.getValidationRules.call(this);
+            const rules = NumberEditorView.__super__.getValidationRules.call(this);
             rules.Number = true;
             return rules;
         },
 
         formatRawValue: function(value) {
-            value = this.parseRawValue(value);
             if (isNaN(value)) {
                 return '';
             }
             return this.formatter.fromRaw(value);
         },
 
-        parseRawValue: function(value) {
-            return parseFloat(value);
-        },
-
         isChanged: function() {
-            var valueChanged = this.getValue() !== this.getModelValue();
+            const valueChanged = this.getValue() !== this.getModelValue();
             return isNaN(this.getModelValue())
                 ? this.$('input[name=value]').val() !== ''
                 : valueChanged;
         },
 
         getServerUpdateData: function() {
-            var data = {};
-            var value = this.getValue();
+            const data = {};
+            const value = this.getValue();
             data[this.fieldName] = isNaN(value) ? null : value;
             return data;
         },
 
         getModelUpdateData: function() {
-            var data = {};
-            var value = this.getValue();
+            const data = {};
+            const value = this.getValue();
             data[this.fieldName] = isNaN(value) ? null : value;
             return data;
         }

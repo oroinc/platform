@@ -13,10 +13,6 @@ class OptionsResolver
     /** @var ContextAccessor */
     protected $contextAccessor;
 
-    /**
-     * @param OptionsAssembler $optionsAssembler
-     * @param ContextAccessor $contextAccessor
-     */
     public function __construct(OptionsAssembler $optionsAssembler, ContextAccessor $contextAccessor)
     {
         $this->optionsAssembler = $optionsAssembler;

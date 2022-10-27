@@ -15,27 +15,17 @@ class Exists implements ExpressionInterface
     /** @var Subquery */
     private $expression;
 
-    /**
-     * @param Subquery $expression
-     * @param bool $not
-     */
     public function __construct(Subquery $expression, bool $not = false)
     {
         $this->expression = $expression;
         $this->not = $not;
     }
 
-    /**
-     * @return bool
-     */
     public function isNot(): bool
     {
         return $this->not;
     }
 
-    /**
-     * @return Subquery
-     */
     public function getExpression(): Subquery
     {
         return $this->expression;

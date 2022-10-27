@@ -1,0 +1,110 @@
+{%- if saved is defined and saved -%}
+    {%- set widgetResponse = {
+        widget: {
+            message: 'oro.digitalasset.dam.dialog.uploaded.message'|trans,
+            messageOptions: {
+                container: '[data-wid=' ~ app.request.get('_wid') ~ '] .flash-messages'
+            },
+            messageAfterPageChange: false,
+            triggerSuccess: false,
+            newDigitalAssetId: digital_asset.id,
+            gridName: grid_name,
+            trigger: [
+                {
+                    eventBroker: 'mediator',
+                    name: 'datagrid:doInitialRefresh:' ~ grid_name,
+                    args: [],
+                },
+                {
+                    eventBroker: 'widget',
+                    name: 'formReset',
+                    args: [],
+                }
+            ],
+            remove: false
+        }
+    } -%}
+    {{ widgetResponse|json_encode|raw }}
+{%- else -%}
+    {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+
+    {% set grid_render_params = {
+        enableViews: true,
+        showViewsInNavbar: false,
+        filtersStateElement: '[data-role="filters-state-view-container"]',
+        routerEnabled: false,
+        jsmodules: ['orodatagrid/js/row-select-for-widget/builder'],
+        gridBuildersOptions: {
+            rowSelectForWidget: {
+                wid: app.request.get('_wid'),
+                multiSelect: false
+            }
+        },
+        cssClass: 'inner-grid ' ~ (is_image_type ? 'digital-asset-image-grid' : 'digital-asset-file-grid')
+    } %}
+
+    <div class="widget-content">
+        {%- block widget_content -%}
+            <div class="flash-messages">
+                <div class="flash-messages-frame">
+                    <div class="flash-messages-holder"></div>
+                </div>
+            </div>
+
+            {%- if not form.vars.valid and form_errors(form) -%}
+                <div class="alert alert-error" role="alert">
+                    <div class="message">
+                        {{ form_errors(form) }}
+                    </div>
+                </div>
+            {%- endif -%}
+
+            {%- set form_options = {
+                attr: {
+                    id: form.vars.id,
+                },
+                action: path(
+                    app.request.attributes.get('_route'),
+                    app.request.attributes.get('_route_params')
+                )
+            } -%}
+            {{- form_start(form, form_options) -}}
+
+            <div class="form-flex">
+                {{- form_row(form.sourceFile, {
+                    'attr': {
+                        'class': 'form-source-file widget-title-container'
+                    }
+                }) -}}
+                {{- form_row(form.titles, {
+                    'attr': {
+                        'class': 'form-titles widget-title-container'
+                    }
+                }) -}}
+                <div class="widget-actions form-buttons">
+                    <button class="btn" type="reset">{{ 'oro.digitalasset.dam.dialog.clear.label'|trans }}</button>
+                    <button class="btn btn-primary" type="submit">{{ 'oro.digitalasset.dam.dialog.upload.label'|trans }}</button>
+                </div>
+            </div>
+
+            <div class="hide">
+                {{- form_rest(form) -}}
+            </div>
+
+            {{- form_end(form) -}}
+            {{- oro_form_js_validation(form) -}}
+
+            <h4 class="scrollspy-title datagrid-title">
+                {%- if is_image_type -%}
+                    {{ 'oro.digitalasset.dam.dialog.datagrid_title.images'|trans }}
+                {%- else -%}
+                    {{ 'oro.digitalasset.dam.dialog.datagrid_title.files'|trans }}
+                {%- endif -%}
+            </h4>
+            <div class="scrollspy-nav-target" aria-hidden="true"></div>
+            <div class="section-content">
+                {{ dataGrid.renderGrid(grid_name, grid_params|default({}), grid_render_params) }}
+            </div>
+        {% endblock %}
+    </div>
+{% endif %}

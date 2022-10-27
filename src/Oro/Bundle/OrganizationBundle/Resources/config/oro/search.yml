@@ -1,9 +1,12 @@
 search:
     Oro\Bundle\OrganizationBundle\Entity\Organization:
         alias:                          oro_organization
-        search_template:                OroOrganizationBundle:Search:organizationResult.html.twig
-        title_fields:                   [name]
+        search_template:                '@OroOrganization/Search/organizationResult.html.twig'
         fields:
+            -
+                name:                   id
+                target_type:            integer
+                target_fields:          [oro_organization_id]
             -
                 name:                   name
                 target_type:            text
@@ -11,13 +14,16 @@ search:
 
     Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
         alias:                          oro_business_unit
-        search_template:                OroOrganizationBundle:Search:businessUnitResult.html.twig
-        title_fields:                   [name]
+        search_template:                '@OroOrganization/Search/businessUnitResult.html.twig'
+        route:
+            name:                       oro_business_unit_view
+            parameters:
+                id:                     id
         fields:
             -
                 name:                   id
                 target_type:            integer
-                target_fields:          [id]
+                target_fields:          [id, oro_business_unit_id]
             -
                 name:                   name
                 target_type:            text

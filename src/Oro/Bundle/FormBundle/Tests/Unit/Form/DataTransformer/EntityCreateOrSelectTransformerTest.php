@@ -1,101 +1,80 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'TestClass';
-    const DEFAULT_MODE = 'default';
+    private const CLASS_NAME = 'TestClass';
+    private const DEFAULT_MODE = 'default';
 
-    /**
-     * @var EntityCreateOrSelectTransformer
-     */
-    protected $transformer;
+    /** @var EntityCreateOrSelectTransformer */
+    private $transformer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
-            ->will(
-                $this->returnCallback(
-                    function (TestEntity $entity) {
-                        return $entity->getId();
-                    }
-                )
-            );
+            ->willReturnCallback(function (TestEntity $entity) {
+                return $entity->getId();
+            });
 
         $this->transformer = new EntityCreateOrSelectTransformer(
-            $this->doctrineHelper,
+            $doctrineHelper,
             self::CLASS_NAME,
             self::DEFAULT_MODE
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->doctrineHelper);
-        unset($this->transformer);
-    }
-
     /**
-     * @param mixed $value
-     * @param array $expected
      * @dataProvider transformDataProvider
      */
-    public function testTransform($value, array $expected)
+    public function testTransform(?object $value, array $expected)
     {
         $this->assertEquals($expected, $this->transformer->transform($value));
     }
 
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
-        return array(
-            'no value' => array(
+        return [
+            'no value' => [
                 'value' => null,
-                'expected' => array(
+                'expected' => [
                     'new_entity' => null,
                     'existing_entity' => null,
                     'mode' => self::DEFAULT_MODE
-                )
-            ),
-            'new entity' => array(
+                ]
+            ],
+            'new entity' => [
                 'value' => new TestEntity(),
-                'expected' => array(
+                'expected' => [
                     'new_entity' => new TestEntity(),
                     'existing_entity' => null,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
-                )
-            ),
-            'existing entity' => array(
+                ]
+            ],
+            'existing entity' => [
                 'value' => new TestEntity(1),
-                'expected' => array(
+                'expected' => [
                     'new_entity' => null,
                     'existing_entity' => new TestEntity(1),
                     'mode' => OroEntityCreateOrSelectType::MODE_VIEW,
-                )
-            ),
-        );
+                ]
+            ],
+        ];
     }
 
     /**
-     * @param mixed $value
-     * @param string $exception
-     * @param string $message
      * @dataProvider transformExceptionDataProvider
      */
-    public function testTransformException($value, $exception, $message)
+    public function testTransformException(string $value, string $exception, string $message)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
@@ -103,64 +82,59 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer->transform($value);
     }
 
-    public function transformExceptionDataProvider()
+    public function transformExceptionDataProvider(): array
     {
-        return array(
-            'invalid type' => array(
+        return [
+            'invalid type' => [
                 'value' => 'not an object',
-                'exception' => '\Symfony\Component\Form\Exception\UnexpectedTypeException',
+                'exception' => UnexpectedTypeException::class,
                 'message' => 'Expected argument of type "object", "string" given',
-            )
-        );
+            ]
+        ];
     }
 
     /**
-     * @param mixed $value
-     * @param mixed $expected
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform($value, $expected)
+    public function testReverseTransform(?array $value, ?object $expected)
     {
         $this->assertEquals($expected, $this->transformer->reverseTransform($value));
     }
 
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
-        return array(
-            'null' => array(
+        return [
+            'null' => [
                 'value' => null,
                 'expected' => null,
-            ),
-            'create mode' => array(
-                'value' => array(
+            ],
+            'create mode' => [
+                'value' => [
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
                     'new_entity' => new TestEntity(),
-                ),
+                ],
                 'expected' => new TestEntity(),
-            ),
-            'view mode' => array(
-                'value' => array(
+            ],
+            'view mode' => [
+                'value' => [
                     'mode' => OroEntityCreateOrSelectType::MODE_VIEW,
                     'existing_entity' => new TestEntity(1),
-                ),
+                ],
                 'expected' => new TestEntity(1),
-            ),
-            'grid mode' => array(
-                'value' => array(
+            ],
+            'grid mode' => [
+                'value' => [
                     'mode' => OroEntityCreateOrSelectType::MODE_GRID,
-                ),
+                ],
                 'expected' => null,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
-     * @param mixed $value
-     * @param string $exception
-     * @param string $message
      * @dataProvider reverseTransformExceptionDataProvider
      */
-    public function testReverseTransformException($value, $exception, $message)
+    public function testReverseTransformException(object|array $value, string $exception, string $message)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
@@ -168,34 +142,34 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer->reverseTransform($value);
     }
 
-    public function reverseTransformExceptionDataProvider()
+    public function reverseTransformExceptionDataProvider(): array
     {
-        return array(
-            'invalid type' => array(
+        return [
+            'invalid type' => [
                 'value' => new TestEntity('not an array'),
-                'exception' => '\Symfony\Component\Form\Exception\UnexpectedTypeException',
+                'exception' => UnexpectedTypeException::class,
                 'message' => 'Expected argument of type "array",'
                     . ' "Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity" given',
-            ),
-            'empty mode' => array(
-                'value' => array(),
-                'exception' => '\Symfony\Component\Form\Exception\TransformationFailedException',
+            ],
+            'empty mode' => [
+                'value' => [],
+                'exception' => TransformationFailedException::class,
                 'message' => 'Data parameter "mode" is required',
-            ),
-            'no new entity' => array(
-                'value' => array(
+            ],
+            'no new entity' => [
+                'value' => [
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
-                ),
-                'exception' => '\Symfony\Component\Form\Exception\TransformationFailedException',
+                ],
+                'exception' => TransformationFailedException::class,
                 'message' => 'Data parameter "new_entity" is required',
-            ),
-            'no existing entity' => array(
-                'value' => array(
+            ],
+            'no existing entity' => [
+                'value' => [
                     'mode' => OroEntityCreateOrSelectType::MODE_VIEW,
-                ),
-                'exception' => '\Symfony\Component\Form\Exception\TransformationFailedException',
+                ],
+                'exception' => TransformationFailedException::class,
                 'message' => 'Data parameter "existing_entity" is required',
-            ),
-        );
+            ],
+        ];
     }
 }

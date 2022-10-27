@@ -6,12 +6,10 @@ define([
 ], function($, _, mediator, BaseView) {
     'use strict';
 
-    var RoleView;
-
     /**
      * @export orouser/js/views/role-view
      */
-    RoleView = BaseView.extend({
+    const RoleView = BaseView.extend({
         options: {
             elSelector: '',
             formName: '',
@@ -42,10 +40,10 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function RoleView() {
-            RoleView.__super__.constructor.apply(this, arguments);
+        constructor: function RoleView(options) {
+            RoleView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -61,7 +59,7 @@ define([
             this.$appendUsers = $(this.options.appendUsersSelector);
             this.$removeUsers = $(this.options.removeUsersSelector);
 
-            var fields = {};
+            const fields = {};
             _.each(
                 this.options.fields,
                 function(selector, name) {
@@ -72,7 +70,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -92,8 +90,8 @@ define([
          * onSubmit event listener
          */
         onSubmit: function(event) {
-            var $form = this.$form;
-            var hasError = false;
+            const $form = this.$form;
+            let hasError = false;
             _.each(this.$fields, function(field) {
                 hasError = hasError || !field.valid();
             });
@@ -110,9 +108,9 @@ define([
 
             $form.data('sent', true);
 
-            var action = $form.attr('action');
-            var method = $form.attr('method');
-            var url = (typeof action === 'string') ? $.trim(action) : '';
+            const action = $form.attr('action');
+            const method = $form.attr('method');
+            let url = (typeof action === 'string') ? action.trim() : '';
             url = url || window.location.href || '';
             if (url) {
                 url += '?input_action=' + $(event.target).attr('data-action');
@@ -121,14 +119,14 @@ define([
                 url = (url.match(/^([^#]+)/) || [])[1];
             }
 
-            var data = this.getData();
+            const data = this.getData();
 
-            var dataAction = $(event.target).attr('data-action');
+            const dataAction = $(event.target).attr('data-action');
             if (dataAction) {
                 data.input_action = dataAction;
             }
 
-            var options = {
+            const options = {
                 url: url,
                 type: method || 'GET',
                 data: $.param(data)
@@ -140,13 +138,13 @@ define([
          * @returns {Object}
          */
         getData: function() {
-            var data = {};
+            const data = {};
 
-            var formName = this.options.formName;
+            const formName = this.options.formName;
             _.each(
                 this.$fields,
                 function(element, name) {
-                    var value = element.val();
+                    let value = element.val();
 
                     if (element.attr('type') === 'checkbox') {
                         value = element.is(':checked') ? 1 : 0;
@@ -174,9 +172,9 @@ define([
             if (this.disposed) {
                 return;
             }
-            var obj = JSON.parse(this.$privileges.val());
+            const obj = JSON.parse(this.$privileges.val());
 
-            var knownIdentities = _.reduce(obj, function(memo, group) {
+            const knownIdentities = _.reduce(obj, function(memo, group) {
                 memo = _.reduce(group, function(memo, item) {
                     memo[item.identity.id] = item;
                     return memo;
@@ -184,16 +182,16 @@ define([
                 return memo;
             }, {});
 
-            var identity = data.identityId;
-            var splittedIdentity = identity.split('::');
-            var field;
+            let identity = data.identityId;
+            const splittedIdentity = identity.split('::');
+            let field;
             if (typeof splittedIdentity[1] !== 'undefined') {
                 identity = splittedIdentity[0];
                 field = splittedIdentity[1];
             }
 
-            var privelege;
-            var fieldPrivelege;
+            let privelege;
+            let fieldPrivelege;
             if (identity in knownIdentities) {
                 privelege = knownIdentities[identity];
             } else {
@@ -217,16 +215,16 @@ define([
                         name: data.permissionName
                     };
                 }
-                var permission = privelege.permissions[data.permissionName];
+                const permission = privelege.permissions[data.permissionName];
                 permission.accessLevel = data.accessLevel;
             } else {
-                var knownFieldIdentities = _.reduce(privelege.fields, function(memo, item) {
+                const knownFieldIdentities = _.reduce(privelege.fields, function(memo, item) {
                     memo[item.identity.id] = item;
                     return memo;
                 }, {});
 
                 fieldPrivelege = knownFieldIdentities[data.identityId];
-                var fieldPermission = fieldPrivelege.permissions[data.permissionName];
+                const fieldPermission = fieldPrivelege.permissions[data.permissionName];
                 fieldPermission.accessLevel = data.accessLevel;
             }
 

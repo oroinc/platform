@@ -2,37 +2,31 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
-use Doctrine\Common\Cache\ClearableCache;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 /**
- * Event listener that processed InvalidateTranslationCacheEvent event and clears the doctrine queries cache.
- * This allows to use translated enum options after saving them
+ * Clears the doctrine queries cache after clearing of the translation cache.
+ * This is required bo be able to use translated enum options after saving them.
  */
 class InvalidateTranslationCacheListener
 {
-    /**
-     * @var RegistryInterface
-     */
-    protected $registry;
+    private ManagerRegistry $doctrine;
 
-    /**
-     * @param RegistryInterface $registry
-     */
-    public function __construct(RegistryInterface $registry)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
     }
 
-    public function onInvalidateTranslationCache()
+    public function onInvalidateDynamicTranslationCache(): void
     {
-        /** @var EntityManagerInterface $manager */
-        $manager = $this->registry->getManagerForClass(AbstractEnumValue::class);
-        $cacheProvider = $manager->getConfiguration()->getQueryCacheImpl();
-        if ($cacheProvider instanceof ClearableCache) {
-            $cacheProvider->deleteAll();
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(AbstractEnumValue::class);
+        $cacheProvider = $em->getConfiguration()->getQueryCache();
+        if ($cacheProvider instanceof AdapterInterface) {
+            $cacheProvider->clear();
         }
     }
 }

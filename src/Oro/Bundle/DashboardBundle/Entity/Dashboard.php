@@ -5,13 +5,14 @@ namespace Oro\Bundle\DashboardBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\DashboardBundle\Model\ExtendDashboard;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
- * Dashboard
+ * Dashboard entity
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository")
  * @ORM\Table(name="oro_dashboard", indexes={@ORM\Index(name="dashboard_is_default_idx", columns={"is_default"})})
@@ -30,9 +31,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "group_name"="",
  *              "category"="account_management"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "activity"={
  *              "immutable"=true
  *          },
@@ -42,7 +40,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      }
  * )
  */
-class Dashboard
+class Dashboard extends ExtendDashboard
 {
     /**
      * @var integer
@@ -135,6 +133,8 @@ class Dashboard
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->widgets = new ArrayCollection();
     }
 

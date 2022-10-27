@@ -1,5 +1,0 @@
-config:
-    paths:
-        'orocron/js/app/views/job-queue-view': 'bundles/orocron/js/app/views/job-queue-view.js'
-        'orocron/js/app/views/schedule-intervals-view': 'bundles/orocron/js/app/views/schedule-intervals-view.js'
-        'oro/filter/command_with_args-filter': 'bundles/orocron/js/filter/command-with-args-filter.js'

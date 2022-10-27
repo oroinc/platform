@@ -9,12 +9,12 @@ use Symfony\Component\HttpFoundation\Request;
 class StartContextInitProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    protected $request;
+    private $request;
 
     /** @var StartContextInitProcessor */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new StartContextInitProcessor();
         $this->request = $this->createMock(Request::class);
@@ -26,7 +26,8 @@ class StartContextInitProcessorTest extends \PHPUnit\Framework\TestCase
         $context->setIsStartTransition(false);
         $context->setRequest($this->request);
 
-        $this->request->expects($this->never())->method('get');
+        $this->request->expects($this->never())
+            ->method('get');
 
         $this->processor->process($context);
 

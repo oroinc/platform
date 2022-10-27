@@ -2,155 +2,197 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
+use Knp\Menu\FactoryInterface;
+use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
-use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 use Oro\Bundle\NavigationBundle\Menu\ChainBreadcrumbManager;
 use Symfony\Component\Routing\Route;
 
 class ChainBreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const MENU_NAME = 'test_menu';
+    private const MENU_NAME = 'test_menu';
 
-    /**
-     * @var ChainBreadcrumbManager
-     */
-    protected $manager;
+    /** @var FactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $factory;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|BreadcrumbManager
-     */
-    protected $managerMock;
-
-    /**
-     * @var \Knp\Menu\FactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $factory;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->factory = $this->getMockBuilder('Knp\Menu\MenuFactory')
-            ->setMethods(['getRouteInfo', 'processRoute'])
-            ->getMock();
-        $this->manager = new ChainBreadcrumbManager();
-        $this->manager->setDefaultManager($this->getManagerMock());
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|BreadcrumbManagerInterface
-     */
-    protected function getManagerMock()
-    {
-        return $this->createMock('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface');
-    }
-
-    public function testAddProvider()
-    {
-        $supportedManager = $this->getManagerMock();
-        $supportedManager->expects($this->once())
-            ->method('supports')
-            ->willReturn(true);
-
-        $unsupportedManager = $this->getManagerMock();
-        $unsupportedManager->expects($this->once())
-            ->method('supports')
-            ->willReturn(false);
-
-        $this->manager->addManager($unsupportedManager);
-        $this->manager->addManager($supportedManager);
-
-        $this->assertEquals($supportedManager, $this->manager->getSupportedManager());
-    }
-
-    public function testSetDefaultProvider()
-    {
-        $manager = $this->getManagerMock();
-
-        $this->manager->setDefaultManager($manager);
-
-        $this->assertEquals($manager, $this->manager->getSupportedManager());
+        $this->factory = $this->createMock(MenuFactory::class);
     }
 
     public function testGetBreadcrumbs()
     {
-        $manager = $this->getManagerMock();
+        $manager = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
         $manager->expects($this->once())
             ->method('getBreadcrumbs')
             ->with(self::MENU_NAME);
 
-        $this->manager->setDefaultManager($manager);
-        $this->manager->getBreadcrumbs(self::MENU_NAME);
+        $manager = new ChainBreadcrumbManager([$manager]);
+        $manager->getBreadcrumbs(self::MENU_NAME);
+    }
+
+    public function testGetBreadcrumbsWithRoute()
+    {
+        $validRoute = 'valid_route';
+        $invalidRoute = 'invalid_route';
+
+        $manager1 = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager1->expects($this->once())
+            ->method('supports')
+            ->with($validRoute)
+            ->willReturn(false);
+        $manager1->expects($this->never())
+            ->method('getBreadcrumbs')
+            ->with(self::MENU_NAME)
+            ->willReturn(['manager1_breadcrumbs']);
+
+        $manager2 = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager2->expects($this->once())
+            ->method('supports')
+            ->with($validRoute)
+            ->willReturn(true);
+        $manager2->expects($this->once())
+            ->method('getBreadcrumbs')
+            ->with(self::MENU_NAME)
+            ->willReturn(['manager2_breadcrumbs']);
+
+        $manager = new ChainBreadcrumbManager([$manager1, $manager2]);
+        $breadcrumbs = $manager->getBreadcrumbs(self::MENU_NAME, true, $validRoute);
+        $this->assertEquals(['manager2_breadcrumbs'], $breadcrumbs);
+
+        $manager1 = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager1->expects($this->once())
+            ->method('supports')
+            ->willReturn(false);
+        $manager1->expects($this->never())
+            ->method('getBreadcrumbs')
+            ->with(self::MENU_NAME);
+
+        $manager2 = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager2->expects($this->once())
+            ->method('supports')
+            ->willReturn(false);
+        $manager2->expects($this->never())
+            ->method('getBreadcrumbs')
+            ->with(self::MENU_NAME);
+
+        $manager = new ChainBreadcrumbManager([$manager1, $manager2]);
+        $this->expectErrorMessage('A breadcrumb manager was not found.');
+        $manager->getBreadcrumbs(self::MENU_NAME);
+
+        $manager1 = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager1->expects($this->once())
+            ->method('supports')
+            ->with($invalidRoute)
+            ->willReturn(false);
+        $manager1->expects($this->never())
+            ->method('getBreadcrumbs')
+            ->with(self::MENU_NAME);
+
+        $manager2 = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager2->expects($this->once())
+            ->method('supports')
+            ->with($invalidRoute)
+            ->willReturn(false);
+        $manager2->expects($this->never())
+            ->method('getBreadcrumbs')
+            ->with(self::MENU_NAME);
+
+        $manager = new ChainBreadcrumbManager([$manager1, $manager2]);
+        $this->expectErrorMessage('A breadcrumb manager was not found.');
+        $manager->getBreadcrumbs(self::MENU_NAME, true, 'invalid_route');
     }
 
     public function testGetMenu()
     {
-        $manager = $this->getManagerMock();
+        $manager = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
         $manager->expects($this->once())
             ->method('getMenu')
             ->with(self::MENU_NAME);
 
-        $this->manager->setDefaultManager($manager);
-        $this->manager->getMenu(self::MENU_NAME);
+        $manager = new ChainBreadcrumbManager([$manager]);
+        $manager->getMenu(self::MENU_NAME);
     }
 
     public function testGetBreadcrumbArray()
     {
         $menuItem = new MenuItem('test', $this->factory);
 
-        $manager = $this->getManagerMock();
+        $manager = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
         $manager->expects($this->once())
             ->method('getBreadcrumbArray')
             ->with(self::MENU_NAME, $menuItem);
 
-        $this->manager->setDefaultManager($manager);
-        $this->manager->getBreadcrumbArray(self::MENU_NAME, $menuItem);
+        $manager = new ChainBreadcrumbManager([$manager]);
+        $manager->getBreadcrumbArray(self::MENU_NAME, $menuItem);
     }
 
     public function testGetCurrentMenuItem()
     {
-        $manager = $this->getManagerMock();
+        $manager = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
         $manager->expects($this->once())
             ->method('getCurrentMenuItem')
             ->with(self::MENU_NAME);
 
-        $this->manager->setDefaultManager($manager);
-        $this->manager->getCurrentMenuItem(self::MENU_NAME);
+        $manager = new ChainBreadcrumbManager([$manager]);
+        $manager->getCurrentMenuItem(self::MENU_NAME);
     }
 
     public function testGetBreadcrumbLabels()
     {
         $route = new Route('test_route');
-        $manager = $this->getManagerMock();
+
+        $manager = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager->expects($this->once())
+            ->method('supports')
+            ->with($route)
+            ->willReturn(true);
         $manager->expects($this->once())
             ->method('getBreadcrumbLabels')
             ->with(self::MENU_NAME, $route);
 
-        $this->manager->setDefaultManager($manager);
-        $this->manager->getBreadcrumbLabels(self::MENU_NAME, $route);
+        $manager = new ChainBreadcrumbManager([$manager]);
+        $manager->getBreadcrumbLabels(self::MENU_NAME, $route);
     }
 
     public function testSupports()
     {
-        $manager = $this->getManagerMock();
-        $supports = true;
-        $manager->expects($this->once())->method('supports')->willReturn($supports);
+        $manager = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
+        $manager->expects($this->once())
+            ->method('supports')
+            ->willReturn(true);
 
-        $this->manager->addManager($manager);
-
-        $this->assertEquals($supports, $this->manager->supports());
+        $manager = new ChainBreadcrumbManager([$manager]);
+        $this->assertTrue($manager->supports());
     }
 
-    public function testSupportsDefault()
+    public function testSupportsWhenNoManagersSupportRequest()
     {
-        $manager = $this->getManagerMock();
-        $supports = true;
-        $manager->expects($this->never())->method('supports')->willReturn($supports);
+        $route = 'test';
 
-        $this->manager->setDefaultManager($manager);
+        $manager = $this->createMock(BreadcrumbManagerInterface::class);
+        $manager->expects($this->once())
+            ->method('supports')
+            ->with($route)
+            ->willReturn(false);
 
-        $this->assertEquals($supports, $this->manager->supports());
+        $manager = new ChainBreadcrumbManager([$manager]);
+        $this->assertFalse($manager->supports($route));
     }
 }

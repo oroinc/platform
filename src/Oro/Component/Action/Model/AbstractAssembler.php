@@ -6,6 +6,9 @@ use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
+/**
+ * The base class for action assemblers.
+ */
 abstract class AbstractAssembler
 {
     /**
@@ -13,9 +16,6 @@ abstract class AbstractAssembler
      */
     protected $configurationPasses = array();
 
-    /**
-     * @param ConfigurationPassInterface $configurationPass
-     */
     public function addConfigurationPass(ConfigurationPassInterface $configurationPass)
     {
         $this->configurationPasses[] = $configurationPass;
@@ -65,10 +65,11 @@ abstract class AbstractAssembler
      */
     protected function isService($configuration)
     {
-        if (!is_array($configuration) || count($configuration) != 1) {
+        if (!\is_array($configuration) || count($configuration) !== 1) {
             return false;
         }
-        return strpos($this->getEntityType($configuration), '@') === 0;
+
+        return str_starts_with($this->getEntityType($configuration), '@');
     }
 
     /**
@@ -83,8 +84,6 @@ abstract class AbstractAssembler
     }
 
     /**
-     * @param array $options
-     * @param array $requiredOptions
      * @throws AssemblerException
      */
     protected function assertOptions(array $options, array $requiredOptions)
@@ -111,9 +110,6 @@ abstract class AbstractAssembler
     }
 
     /**
-     * @param ParameterInterface $parameter
-     * @param array $optionNames
-     *
      * @throws AssemblerException If parameter is invalid
      */
     protected function assertParameterHasOptions(ParameterInterface $parameter, array $optionNames)
@@ -133,9 +129,6 @@ abstract class AbstractAssembler
     }
 
     /**
-     * @param ParameterInterface $parameter
-     * @param array $optionNames
-     *
      * @throws AssemblerException
      */
     protected function assertParameterHasNoOptions(ParameterInterface $parameter, array $optionNames)
@@ -155,8 +148,6 @@ abstract class AbstractAssembler
     }
 
     /**
-     * @param ParameterInterface $parameter
-     *
      * @throws AssemblerException
      */
     protected function assertParameterHasClassOption(ParameterInterface $parameter)

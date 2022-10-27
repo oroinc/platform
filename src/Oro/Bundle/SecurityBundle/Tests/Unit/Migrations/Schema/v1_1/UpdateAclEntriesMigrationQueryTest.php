@@ -14,45 +14,41 @@ use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 
 class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTRIES_TABLE_NAME = 'acl_entries';
-    const OBJECT_IDENTITIES_TABLE_NAME = 'acl_object_identities';
-    const ACL_CLASSES_TABLE_NAME = 'acl_classes';
+    private const ENTRIES_TABLE_NAME = 'acl_entries';
+    private const OBJECT_IDENTITIES_TABLE_NAME = 'acl_object_identities';
+    private const ACL_CLASSES_TABLE_NAME = 'acl_classes';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|Connection */
-    protected $connection;
+    private $connection;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclManager */
-    protected $aclManager;
+    private $aclManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|AclCacheInterface */
-    protected $aclCache;
+    private $aclCache;
 
     /** @var UpdateAclEntriesMigrationQuery */
-    protected $query;
+    private $query;
 
     /** @var array */
-    protected $keys = ['id', 'class_id', 'object_identity_id', 'field_name', 'ace_order', 'security_identity_id',
+    private $keys = ['id', 'class_id', 'object_identity_id', 'field_name', 'ace_order', 'security_identity_id',
         'mask', 'granting', 'granting_strategy', 'audit_success', 'audit_failure'];
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
+        $this->connection = $this->createMock(Connection::class);
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')
             ->willReturn(new MySqlPlatform());
         $this->connection->expects($this->any())
             ->method('quote')
-            ->willReturnCallback(
-                function ($value) {
-                    return is_string($value) ? "'" . $value . "'" : $value;
-                }
-            );
+            ->willReturnCallback(function ($value) {
+                return is_string($value) ? "'" . $value . "'" : $value;
+            });
 
-        $this->aclManager = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->aclManager = $this->createMock(AclManager::class);
 
-        $this->aclCache = $this->createMock('Symfony\Component\Security\Acl\Model\AclCacheInterface');
+        $this->aclCache = $this->createMock(AclCacheInterface::class);
 
         $this->query = new UpdateAclEntriesMigrationQuery(
             $this->aclManager,
@@ -62,11 +58,6 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
             self::ACL_CLASSES_TABLE_NAME
         );
         $this->query->setConnection($this->connection);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->query, $this->connection, $this->aclManager, $this->aclCache);
     }
 
     public function testGetDescription()
@@ -90,10 +81,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $this->query->execute(new ArrayLogger());
     }
 
-    /**
-     * @return array
-     */
-    protected function getAces()
+    private function getAces(): array
     {
         return array_map(
             function (array $values) {
@@ -103,20 +91,14 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function assertEntityAclExtensionCalled()
+    private function assertEntityAclExtensionCalled()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAclExtension $extension */
-        $extension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extension = $this->createMock(EntityAclExtension::class);
         $extension->expects($this->exactly(count($this->getAcesData())))
             ->method('getAllMaskBuilders')
             ->willReturn($this->getMaskBuilders());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AclExtensionSelector $extensionSelector */
-        $extensionSelector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extensionSelector = $this->createMock(AclExtensionSelector::class);
         $extensionSelector->expects($this->once())
             ->method('select')
             ->with('entity:(root)')
@@ -127,10 +109,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
             ->willReturn($extensionSelector);
     }
 
-    /**
-     * @param bool $noUpdates
-     */
-    protected function assertConnectionCalled($noUpdates = false)
+    private function assertConnectionCalled(bool $noUpdates = false)
     {
         $this->connection->expects($this->once())
             ->method('fetchAll')
@@ -141,13 +120,13 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $data = $updatesCount ? $this->getExpectedExecuteUpdateParams() : [];
 
         $this->connection->expects($this->exactly($updatesCount))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->willReturnCallback(
                 function ($query, array $params = [], array $types = []) use (&$data) {
                     $index = array_search($params, $data, true);
 
-                    $this->assertTrue($index !== false);
-                    $this->assertContains(
+                    self::assertNotFalse($index);
+                    self::assertStringContainsString(
                         (count($data[$index]) > 2 ? 'INSERT INTO ' : 'UPDATE ') . self::ENTRIES_TABLE_NAME,
                         $query
                     );
@@ -157,18 +136,16 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
             );
     }
 
-    /**
-     * @param bool $never
-     */
-    protected function assertAclCacheCleared($never = false)
+    private function assertAclCacheCleared(bool $never = false)
     {
-        $this->aclCache->expects($never ? $this->never() : $this->once())->method('clearCache');
+        $this->aclCache->expects($never ? $this->never() : $this->once())
+            ->method('clearCache');
     }
 
     /**
-     * @return array|EntityMaskBuilder[]
+     * @return EntityMaskBuilder[]
      */
-    protected function getMaskBuilders()
+    private function getMaskBuilders(): array
     {
         return [
             new EntityMaskBuilder(0 << 15, ['VIEW', 'CREATE', 'EDIT']),
@@ -177,10 +154,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getAcesData()
+    private function getAcesData(): array
     {
         return [
             [1, 1,    1, null, 0, 1, (1 << 30) - 1, true, 'all', false, false],
@@ -191,10 +165,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getExpectedExecuteUpdateParams()
+    private function getExpectedExecuteUpdateParams(): array
     {
         $keys = $this->keys;
         array_shift($keys);

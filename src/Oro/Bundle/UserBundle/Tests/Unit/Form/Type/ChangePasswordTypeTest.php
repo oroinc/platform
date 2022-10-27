@@ -1,42 +1,32 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
 use Oro\Bundle\UserBundle\Form\Type\ChangePasswordType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ChangePasswordTypeTest extends FormIntegrationTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ChangePasswordSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
     /** @var ChangePasswordType */
-    protected $type;
+    private $type;
 
     /** @var PasswordFieldOptionsProvider */
-    protected $optionsProvider;
+    private $optionsProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->subscriber = $this->getMockBuilder('Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->optionsProvider = $this->getMockBuilder(PasswordFieldOptionsProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->subscriber = $this->createMock(ChangePasswordSubscriber::class);
+        $this->optionsProvider = $this->createMock(PasswordFieldOptionsProvider::class);
 
         $this->type = new ChangePasswordType($this->subscriber, $this->optionsProvider);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->subscriber, $this->type);
     }
 
     /**
@@ -44,8 +34,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
      */
     public function testBuildForm()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FormBuilderInterface $builder */
-        $builder = $this->createMock('Symfony\Component\Form\Test\FormBuilderInterface');
+        $builder = $this->createMock(\Symfony\Component\Form\Test\FormBuilderInterface::class);
         $options = [
             'current_password_label' => 'label',
             'plain_password_invalid_message' => 'label',
@@ -56,11 +45,11 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
 
         $builder->expects($this->once())
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber'));
+            ->with($this->isInstanceOf(ChangePasswordSubscriber::class));
 
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $this->type->buildForm($builder, $options);
     }
@@ -70,8 +59,7 @@ class ChangePasswordTypeTest extends FormIntegrationTestCase
      */
     public function testConfigureOptions()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OptionsResolver $resolver */
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(

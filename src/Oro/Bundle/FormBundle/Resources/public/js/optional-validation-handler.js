@@ -10,10 +10,10 @@ define(['jquery'], function($) {
          * @param  {jQuery}  $group Optional validation elements group
          */
         initialize: function($group) {
-            var labels = this.getGroupElements($group, $group.find('label[data-required]'));
+            const labels = this.getGroupElements($group, $group.find('label[data-required]'));
             labels.addClass('required');
 
-            var labelAsterisk = labels.find('em');
+            const labelAsterisk = labels.find('em');
             labelAsterisk.html('*');
 
             if (this.isGroupEmpty($group)) {
@@ -42,12 +42,15 @@ define(['jquery'], function($) {
          * @returns {boolean}
          */
         hasNotEmptyInput: function($group) {
-            var elementsSelector = 'textarea, input[type!="checkbox"][type!="radio"][type!="button"][data-required],' +
-                ' input[type="radio"][data-required]:checked,' +
-                ' input[type="checkbox"][data-required]:checked';
+            const elementsSelector = [
+                'textarea',
+                'input[type!="checkbox"][type!="radio"][type!="button"][data-required]',
+                'input[type="radio"][data-required]:checked',
+                'input[type="checkbox"][data-required]:checked'
+            ].join(', ');
 
-            var checkedElements = this.getGroupElements($group, $group.find(elementsSelector));
-            for (var i = 0; i < checkedElements.length; i++) {
+            const checkedElements = this.getGroupElements($group, $group.find(elementsSelector));
+            for (let i = 0; i < checkedElements.length; i++) {
                 if (!this.isValueEmpty($(checkedElements[i]).val())) {
                     return true;
                 }
@@ -61,8 +64,8 @@ define(['jquery'], function($) {
          * @returns {boolean}
          */
         hasNotEmptySelect: function($group) {
-            var elements = this.getGroupElements($group, $group.find('select'));
-            for (var i = 0; i < elements.length; i++) {
+            const elements = this.getGroupElements($group, $group.find('select'));
+            for (let i = 0; i < elements.length; i++) {
                 if (!this.isValueEmpty($(elements[i]).find('option:selected').val())) {
                     return true;
                 }
@@ -78,7 +81,7 @@ define(['jquery'], function($) {
          * @return {boolean} Should parent OptionalValidationHandler be called
          */
         handle: function($group, $element) {
-            var tagName = $element.prop('tagName').toLowerCase();
+            const tagName = $element.prop('tagName').toLowerCase();
 
             switch (tagName) {
                 case 'select':
@@ -120,7 +123,7 @@ define(['jquery'], function($) {
                 $group.data('group-validation-required', false);
             } else {
                 $group.find('label[data-required] em').show();
-                var inputs = this.getGroupElements($group, $group.find('input, select, textarea'));
+                const inputs = this.getGroupElements($group, $group.find('input, select, textarea'));
                 inputs.data('ignore-validation', false);
                 $group.data('group-validation-required', true);
             }
@@ -131,7 +134,7 @@ define(['jquery'], function($) {
          * @returns {boolean}
          */
         isValueEmpty: function(value) {
-            value = value ? $.trim(value) : '';
+            value = value ? value.trim() : '';
             return !value;
         },
 
@@ -139,8 +142,8 @@ define(['jquery'], function($) {
          * @param {jQuery} $group
          */
         clearValidationErrorsAndDisableValidation: function($group) {
-            var validator = $group.validate();
-            var inputs = this.getGroupElements($group, $group.find('input, select, textarea'));
+            const validator = $group.validate();
+            const inputs = this.getGroupElements($group, $group.find('input, select, textarea'));
             inputs.data('ignore-validation', true);
             inputs.each(
                 function(key, element) {

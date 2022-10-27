@@ -2,432 +2,213 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
+use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
-use Oro\Component\MessageQueue\StatusCalculator\CollectionCalculator;
+use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
+use Oro\Component\MessageQueue\StatusCalculator\AbstractStatusCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- */
 class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobStorage */
-    private $jobStorage;
+    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobManager;
+
+    /** @var JobStatusChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobStatusChecker;
+
+    /** @var StatusCalculatorResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $statusCalculatorResolver;
+
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $messageProducer;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var RootJobStatusCalculator */
     private $rootJobStatusCalculator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->jobStorage = $this->createMock(JobStorage::class);
-
-        $jobStatusChecker = new JobStatusChecker();
-        $statusCalculator = new CollectionCalculator();
-        $statusCalculator->setJobStatusChecker($jobStatusChecker);
-
-        $statusCalculatorResolver = $this->createMock(StatusCalculatorResolver::class);
-        $statusCalculatorResolver
-            ->method('getCalculatorForRootJob')
-            ->willReturnCallback(
-                function (Job $rootJob) use ($statusCalculator) {
-                    $statusCalculator->init($rootJob);
-                    return $statusCalculator;
-                }
-            );
-
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
+        $this->jobStatusChecker = new JobStatusChecker();
+        $this->statusCalculatorResolver = $this->createMock(StatusCalculatorResolver::class);
+        $this->messageProducer = $this->createMock(MessageProducerInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->rootJobStatusCalculator = new RootJobStatusCalculator(
-            $this->jobStorage,
-            $jobStatusChecker,
-            $statusCalculatorResolver
+            $this->jobManager,
+            $this->jobStatusChecker,
+            $this->statusCalculatorResolver,
+            $this->messageProducer,
+            $this->doctrine
         );
-    }
 
-    public function stopStatusProvider()
-    {
-        return [
-            [Job::STATUS_SUCCESS],
-            [Job::STATUS_FAILED],
-            [Job::STATUS_CANCELLED],
-        ];
+        $this->jobManager->expects($this->any())
+            ->method('saveJobWithLock')
+            ->willReturnCallback(fn (Job $job, callable $callback) => $callback($job));
     }
 
     /**
-     * @dataProvider stopStatusProvider
+     * @dataProvider testJobStoppedBeforeCalculateProvider
      */
-    public function testShouldDoNothingIfRootJobHasStopState($status)
+    public function testJobStoppedBeforeCalculate(Job $job): void
     {
-        $rootJob = new Job();
-        $rootJob->setStatus($status);
+        $this->assertObjectManaged();
+        $this->statusCalculatorResolver->expects($this->never())
+            ->method('getCalculatorForRootJob');
 
-        $notRootJob = new Job();
-        $notRootJob->setRootJob($rootJob);
+        $this->messageProducer->expects($this->never())
+            ->method('send');
 
-        $this->jobStorage->expects(self::never())
-            ->method('saveJob');
-
-        $this->rootJobStatusCalculator->calculate($notRootJob);
+        $this->rootJobStatusCalculator->calculate($job);
+        $this->assertNull($job->getLastActiveAt());
     }
 
-    public function testShouldCalculateRootJobStatus()
+    public function testJobStoppedBeforeCalculateProvider(): \Generator
     {
-        $rootJob = new Job();
-        $rootJob->setId(123);
-
-        $childJob = new Job();
-        $childJob->setRootJob($rootJob);
-        $childJob->setStatus(Job::STATUS_RUNNING);
-
-        $rootJob->setChildJobs([$childJob]);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($childJob);
-
-        self::assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
-        self::assertNull($rootJob->getStoppedAt());
+        yield Job::STATUS_SUCCESS => [$this->getJob('job', Job::STATUS_SUCCESS)];
+        yield Job::STATUS_FAILED => [$this->getJob('job', Job::STATUS_FAILED)];
+        yield Job::STATUS_CANCELLED => [$this->getJob('job', Job::STATUS_CANCELLED)];
+        yield Job::STATUS_STALE => [$this->getJob('job', Job::STATUS_STALE)];
     }
 
-    /**
-     * @dataProvider stopStatusProvider
-     */
-    public function testShouldCalculateRootJobStatusAndSetStoppedAtTimeIfGotStopStatus($stopStatus)
+    public function testChangeJobStatus(): void
     {
-        $rootJob = new Job();
-        $rootJob->setId(123);
+        $this->assertObjectManaged();
+        $job = $this->getJob();
 
-        $childJob = new Job();
-        $childJob->setRootJob($rootJob);
-        $childJob->setStatus($stopStatus);
+        $statusAndProgressCalculator = $this->createMock(AbstractStatusCalculator::class);
+        $statusAndProgressCalculator->expects($this->once())
+            ->method('calculateRootJobStatus')
+            ->willReturn(Job::STATUS_RUNNING);
+        $statusAndProgressCalculator->expects($this->once())
+            ->method('clean');
 
-        $rootJob->setChildJobs([$childJob]);
+        $this->statusCalculatorResolver->expects($this->once())
+            ->method('getCalculatorForRootJob')
+            ->with($job)
+            ->willReturn($statusAndProgressCalculator);
 
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
+        $this->messageProducer->expects($this->never())
+            ->method('send');
 
-        $this->rootJobStatusCalculator->calculate($childJob);
+        $this->rootJobStatusCalculator->calculate($job);
 
-        self::assertEquals($stopStatus, $rootJob->getStatus());
-        self::assertEquals(new \DateTime(), $rootJob->getStoppedAt(), '', 1);
+        $this->assertNotNull($job->getLastActiveAt());
+        $this->assertNull($job->getStoppedAt());
+        $this->assertEquals(Job::STATUS_RUNNING, $job->getStatus());
     }
 
-    public function testShouldSetStoppedAtOnlyIfWasNotSet()
+    public function testChangeJobStatusAndStop(): void
     {
-        $rootJob = new Job();
-        $rootJob->setId(123);
-        $rootJob->setStoppedAt(new \DateTime('2012-12-12 12:12:12'));
+        $this->assertObjectManaged();
+        $job = $this->getJob('job', Job::STATUS_RUNNING, 1);
 
-        $childJob = new Job();
-        $childJob->setRootJob($rootJob);
-        $childJob->setStatus(Job::STATUS_SUCCESS);
+        $statusAndProgressCalculator = $this->createMock(AbstractStatusCalculator::class);
+        $statusAndProgressCalculator->expects($this->once())
+            ->method('calculateRootJobStatus')
+            ->willReturn(Job::STATUS_SUCCESS);
+        $statusAndProgressCalculator->expects($this->once())
+            ->method('calculateRootJobProgress')
+            ->willReturn(1);
+        $statusAndProgressCalculator->expects($this->once())
+            ->method('clean');
 
-        $rootJob->setChildJobs([$childJob]);
+        $this->statusCalculatorResolver->expects($this->once())
+            ->method('getCalculatorForRootJob')
+            ->with($job)
+            ->willReturn($statusAndProgressCalculator);
 
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
+        $this->messageProducer->expects($this->once())
+            ->method('send')
+            ->with(RootJobStoppedTopic::getName(), new Message(['jobId' => 1], MessagePriority::HIGH));
 
-        $this->rootJobStatusCalculator->calculate($childJob);
+        $this->rootJobStatusCalculator->calculate($job);
 
-        self::assertEquals(new \DateTime('2012-12-12 12:12:12'), $rootJob->getStoppedAt());
+        $this->assertNotNull($job->getLastActiveAt());
+        $this->assertNotNull($job->getStoppedAt());
+        $this->assertEquals(1, $job->getJobProgress());
+        $this->assertEquals(Job::STATUS_SUCCESS, $job->getStatus());
     }
 
-    public function testShouldThrowIfInvalidStatus()
+    public function testCalculateChildJobsWithStop(): void
     {
-        $rootJob = new Job();
+        $this->assertObjectManaged();
 
-        $childJob = new Job();
-        $childJob->setId(12345);
-        $childJob->setRootJob($rootJob);
-        $childJob->setStatus('invalid-status');
+        $rootJob = $this->getJob(name: 'Root Job', id: 1);
+        $child1 = $this->getJob(name: 'Child Job 1', rootJob: $rootJob);
+        $child2 = $this->getJob(name: 'Child Job 2', rootJob: $rootJob);
+        $rootJob->setChildJobs([$child1, $child2]);
 
-        $rootJob->setChildJobs([$childJob]);
+        $statusAndProgressCalculator = $this->createMock(AbstractStatusCalculator::class);
+        $statusAndProgressCalculator->expects($this->once())
+            ->method('calculateRootJobStatus')
+            ->willReturn(Job::STATUS_SUCCESS);
+        $statusAndProgressCalculator->expects($this->once())
+            ->method('calculateRootJobProgress')
+            ->willReturn(1);
+        $statusAndProgressCalculator->expects($this->once())
+            ->method('clean');
 
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
+        $this->statusCalculatorResolver->expects($this->once())
+            ->method('getCalculatorForRootJob')
+            ->with($rootJob)
+            ->willReturn($statusAndProgressCalculator);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Got unsupported job status: id: "12345" status: "invalid-status"');
+        $this->messageProducer->expects($this->once())
+            ->method('send')
+            ->with(RootJobStoppedTopic::getName(), new Message(['jobId' => 1], MessagePriority::HIGH));
 
-        $this->rootJobStatusCalculator->calculate($childJob);
-    }
-
-    public function testShouldSetStatusNewIfAllChildJobsAreNew()
-    {
-        $rootJob = new Job();
-
-        $childJob1 = new Job();
-        $childJob1->setRootJob($rootJob);
-        $childJob1->setStatus(Job::STATUS_NEW);
-
-        $childJob2 = new Job();
-        $childJob2->setRootJob($rootJob);
-        $childJob2->setStatus(Job::STATUS_NEW);
-
-        $rootJob->setChildJobs([$childJob1, $childJob2]);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_NEW, $rootJob->getStatus());
-    }
-
-    public function testShouldSetStatusRunningIfAnyOneIsRunning()
-    {
-        $rootJob = new Job();
-
-        $childJob1 = new Job();
-        $childJob1->setRootJob($rootJob);
-        $childJob1->setStatus(Job::STATUS_NEW);
-
-        $childJob2 = new Job();
-        $childJob2->setRootJob($rootJob);
-        $childJob2->setStatus(Job::STATUS_RUNNING);
-
-        $childJob3 = new Job();
-        $childJob3->setRootJob($rootJob);
-        $childJob3->setStatus(Job::STATUS_SUCCESS);
-
-        $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
-    }
-
-    public function testShouldSetStatusRunningIfThereIsNoRunningButNewAndAnyOfStopStatus()
-    {
-        $rootJob = new Job();
-
-        $childJob1 = new Job();
-        $childJob1->setRootJob($rootJob);
-        $childJob1->setStatus(Job::STATUS_NEW);
-
-        $childJob2 = new Job();
-        $childJob2->setRootJob($rootJob);
-        $childJob2->setStatus(Job::STATUS_SUCCESS);
-
-        $childJob3 = new Job();
-        $childJob3->setRootJob($rootJob);
-        $childJob3->setStatus(Job::STATUS_CANCELLED);
-
-        $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
-    }
-
-    public function testShouldSetStatusCancelledIfAllIsStopButOneIsCancelled()
-    {
-        $rootJob = new Job();
-
-        $childJob1 = new Job();
-        $childJob1->setRootJob($rootJob);
-        $childJob1->setStatus(Job::STATUS_SUCCESS);
-
-        $childJob2 = new Job();
-        $childJob2->setRootJob($rootJob);
-        $childJob2->setStatus(Job::STATUS_FAILED);
-
-        $childJob3 = new Job();
-        $childJob3->setRootJob($rootJob);
-        $childJob3->setStatus(Job::STATUS_CANCELLED);
-
-        $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_CANCELLED, $rootJob->getStatus());
-    }
-
-    public function testShouldSetStatusFailedIfThereIsAnyOneIsFailedButIsNotCancelled()
-    {
-        $rootJob = new Job();
-
-        $childJob1 = new Job();
-        $childJob1->setRootJob($rootJob);
-        $childJob1->setStatus(Job::STATUS_SUCCESS);
-
-        $childJob2 = new Job();
-        $childJob2->setRootJob($rootJob);
-        $childJob2->setStatus(Job::STATUS_FAILED);
-
-        $childJob3 = new Job();
-        $childJob3->setRootJob($rootJob);
-        $childJob3->setStatus(Job::STATUS_SUCCESS);
-
-        $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_FAILED, $rootJob->getStatus());
-    }
-
-    public function testShouldSetStatusFailedRedeliveredIfThereIsAnyOneIsFailedRedelivered()
-    {
-        $rootJob = new Job();
-
-        $childJob1 = new Job();
-        $childJob1->setRootJob($rootJob);
-        $childJob1->setStatus(Job::STATUS_SUCCESS);
-
-        $childJob2 = new Job();
-        $childJob2->setRootJob($rootJob);
-        $childJob2->setStatus(Job::STATUS_FAILED_REDELIVERED);
-
-        $childJob3 = new Job();
-        $childJob3->setRootJob($rootJob);
-        $childJob3->setStatus(Job::STATUS_SUCCESS);
-
-        $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_RUNNING, $rootJob->getStatus());
-    }
-
-    public function testShouldSetStatusSuccessIfAllAreSuccess()
-    {
-        $rootJob = new Job();
-
-        $childJob1 = new Job();
-        $childJob1->setRootJob($rootJob);
-        $childJob1->setStatus(Job::STATUS_SUCCESS);
-
-        $childJob2 = new Job();
-        $childJob2->setRootJob($rootJob);
-        $childJob2->setStatus(Job::STATUS_SUCCESS);
-
-        $childJob3 = new Job();
-        $childJob3->setRootJob($rootJob);
-        $childJob3->setStatus(Job::STATUS_SUCCESS);
-
-        $rootJob->setChildJobs([$childJob1, $childJob2, $childJob3]);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_SUCCESS, $rootJob->getStatus());
-    }
-
-    public function calculateProgressProvider()
-    {
-        return [
-            [[Job::STATUS_NEW, Job::STATUS_NEW], 0],
-            [[Job::STATUS_RUNNING, Job::STATUS_NEW], 0],
-            [[Job::STATUS_SUCCESS, Job::STATUS_NEW], 0.5],
-            [[Job::STATUS_SUCCESS, Job::STATUS_RUNNING, Job::STATUS_NEW], 0.3333],
-            [[Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_RUNNING], 0.6667],
-            [[Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_SUCCESS], 1],
-            [[Job::STATUS_SUCCESS, Job::STATUS_FAILED, Job::STATUS_CANCELLED], 0.6667],
-            [[Job::STATUS_SUCCESS, Job::STATUS_STALE, Job::STATUS_STALE], 0.3333],
-        ];
-    }
-
-    /**
-     * @dataProvider calculateProgressProvider
-     */
-    public function testShouldCalculateRootJobProgress($statuses, $expectedProgress)
-    {
-        $rootJob = new Job();
-        $rootJob->setId(123);
-
-        foreach ($statuses as $status) {
-            $childJob = new Job();
-            $childJob->setRootJob($rootJob);
-            $childJob->setStatus($status);
-            $rootJob->addChildJob($childJob);
+        // Because all consumers wait until at least one consumer updates the status of the 'job'
+        // and unlocks the record, we can simulate parallel processors due to the loop.
+        foreach ($rootJob->getChildJobs() as $childJob) {
+            $this->rootJobStatusCalculator->calculate($childJob);
         }
 
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob, true);
-        self::assertEquals($expectedProgress, $rootJob->getJobProgress());
+        $this->assertNotNull($rootJob->getLastActiveAt());
+        $this->assertNotNull($rootJob->getStoppedAt());
+        $this->assertEquals(1, $rootJob->getJobProgress());
+        $this->assertEquals(Job::STATUS_SUCCESS, $rootJob->getStatus());
     }
 
-    public function testShouldCalculateRootJobProgressIfRootJobIsStopped()
+    private function assertObjectManaged(): void
     {
-        $rootJob = new Job();
+        $manager = $this->createMock(EntityManager::class);
+        $manager->expects($this->any())
+            ->method('contains')
+            ->willReturn(true);
+        $manager->expects($this->any())
+            ->method('refresh');
 
-        $childJob1 = new Job();
-        $childJob1->setRootJob($rootJob);
-        $childJob1->setStatus(Job::STATUS_SUCCESS);
+        $this->doctrine->expects($this->any())
+            ->method('getManager')
+            ->willReturn($manager);
+    }
 
-        $childJob2 = new Job();
-        $childJob2->setRootJob($rootJob);
-        $childJob2->setStatus(Job::STATUS_SUCCESS);
+    private function getJob(
+        string $name = 'Job',
+        ?string $status = Job::STATUS_NEW,
+        ?int $id = null,
+        ?Job $rootJob = null
+    ): Job {
+        $job = new Job();
+        $job->setName($name);
+        $job->setStatus($status);
+        if ($id) {
+            $job->setId($id);
+        }
+        if ($rootJob) {
+            $job->setRootJob($rootJob);
+        }
 
-        $rootJob->setChildJobs([$childJob1, $childJob2]);
-
-        $this->jobStorage->expects(self::once())
-            ->method('saveJob')
-            ->willReturnCallback(function (Job $job, $callback) {
-                $callback($job);
-            });
-
-        $this->rootJobStatusCalculator->calculate($rootJob);
-
-        self::assertEquals(Job::STATUS_SUCCESS, $rootJob->getStatus());
-        self::assertEquals(1, $rootJob->getJobProgress());
+        return $job;
     }
 }

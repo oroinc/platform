@@ -44,10 +44,6 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition       $processorBagConfigBuilderServiceDef
-     */
     protected function registerProcessors(
         ContainerBuilder $container,
         Definition $processorBagConfigBuilderServiceDef

@@ -8,6 +8,7 @@ use Knp\Menu\ItemInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class MenuItemStub implements ItemInterface
 {
@@ -35,49 +36,49 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setFactory(FactoryInterface $factory)
+    public function setFactory(FactoryInterface $factory): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -85,7 +86,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setName($name)
+    public function setName($name): self
     {
         $this->name = $name;
 
@@ -95,7 +96,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getUri()
+    public function getUri(): ?string
     {
         return $this->uri;
     }
@@ -103,7 +104,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setUri($uri)
+    public function setUri($uri): self
     {
         $this->uri = $uri;
 
@@ -113,15 +114,15 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getLabel()
+    public function getLabel(): string
     {
-        return $this->label ? $this->label : $this->getName();
+        return $this->label ?: $this->getName();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setLabel($label)
+    public function setLabel($label): self
     {
         $this->label = $label;
 
@@ -131,7 +132,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return $this->attributes;
     }
@@ -139,7 +140,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setAttributes(array $attributes)
+    public function setAttributes(array $attributes): self
     {
         $this->attributes = $attributes;
 
@@ -161,7 +162,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setAttribute($name, $value)
+    public function setAttribute($name, $value): self
     {
         $this->attributes[$name] = $value;
 
@@ -171,14 +172,14 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getLinkAttributes()
+    public function getLinkAttributes(): array
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setLinkAttributes(array $linkAttributes)
+    public function setLinkAttributes(array $linkAttributes): self
     {
     }
 
@@ -192,21 +193,21 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setLinkAttribute($name, $value)
+    public function setLinkAttribute($name, $value): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getChildrenAttributes()
+    public function getChildrenAttributes(): array
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setChildrenAttributes(array $childrenAttributes)
+    public function setChildrenAttributes(array $childrenAttributes): self
     {
     }
 
@@ -220,21 +221,21 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setChildrenAttribute($name, $value)
+    public function setChildrenAttribute($name, $value): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLabelAttributes()
+    public function getLabelAttributes(): array
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setLabelAttributes(array $labelAttributes)
+    public function setLabelAttributes(array $labelAttributes): self
     {
     }
 
@@ -248,14 +249,14 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setLabelAttribute($name, $value)
+    public function setLabelAttribute($name, $value): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getExtras()
+    public function getExtras(): array
     {
         return $this->extras;
     }
@@ -263,7 +264,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setExtras(array $extras)
+    public function setExtras(array $extras): self
     {
         $this->extras = $extras;
 
@@ -285,7 +286,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setExtra($name, $value)
+    public function setExtra($name, $value): self
     {
         $this->extras[$name] = $value;
 
@@ -295,35 +296,36 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getDisplayChildren()
+    public function getDisplayChildren(): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDisplayChildren($bool): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDisplayChildren($bool)
+    public function isDisplayed(): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isDisplayed()
+    public function setDisplay($bool): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setDisplay($bool)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addChild($child, array $options = [])
+    public function addChild($child, array $options = []): self
     {
         $this->children[] = $child;
 
@@ -333,7 +335,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getChild($name)
+    public function getChild($name): ?self
     {
         if (array_key_exists($name, $this->children)) {
             return $this->children[$name];
@@ -345,42 +347,42 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function reorderChildren($order)
+    public function reorderChildren($order): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function copy()
+    public function copy(): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLevel()
+    public function getLevel(): int
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getRoot()
+    public function getRoot(): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isRoot()
+    public function isRoot(): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): ?self
     {
         return $this->parent;
     }
@@ -388,7 +390,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setParent(ItemInterface $parent = null)
+    public function setParent(ItemInterface $parent = null): self
     {
         $this->parent = $parent;
 
@@ -398,7 +400,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getChildren()
+    public function getChildren(): array
     {
         return $this->children;
     }
@@ -406,7 +408,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setChildren(array $children)
+    public function setChildren(array $children): self
     {
         $this->children = $children;
 
@@ -416,7 +418,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function removeChild($name)
+    public function removeChild($name): self
     {
         if (array_key_exists($name, $this->children)) {
             unset($this->children[$name]);
@@ -428,21 +430,21 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getFirstChild()
+    public function getFirstChild(): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLastChild()
+    public function getLastChild(): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return !empty($this->children);
     }
@@ -450,49 +452,49 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function setCurrent($bool)
+    public function setCurrent($bool): self
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isCurrent()
+    public function isCurrent(): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isLast()
+    public function isLast(): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isFirst()
+    public function isFirst(): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function actsLikeFirst()
+    public function actsLikeFirst(): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function actsLikeLast()
+    public function actsLikeLast(): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
     }
 }

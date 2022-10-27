@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * The base form type for system configuration fields.
+ */
 class FormType extends AbstractType
 {
     /** @var ConfigSubscriber */
@@ -20,10 +23,6 @@ class FormType extends AbstractType
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ConfigSubscriber   $subscriber
-     * @param ContainerInterface $container
-     */
     public function __construct(ConfigSubscriber $subscriber, ContainerInterface $container)
     {
         $this->subscriber = $subscriber;
@@ -88,27 +87,25 @@ class FormType extends AbstractType
             );
         }
 
-        if (0 === strpos($definition, '@')) {
+        if (str_starts_with($definition, '@')) {
             $delimiterPos = strpos($definition, '::');
             if (false !== $delimiterPos) {
                 $callback = [
                     $this->container->get(substr($definition, 1, $delimiterPos - 1)),
                     substr($definition, $delimiterPos + 2)
                 ];
-                if (is_callable($callback)) {
+                if (\is_callable($callback)) {
                     return $callback;
                 }
             }
-        } elseif (is_callable($definition)) {
+        } elseif (\is_callable($definition)) {
             return $definition;
         }
 
-        throw new \InvalidArgumentException(
-            sprintf(
-                'Expected that "%s" is a callable.',
-                $definition
-            )
-        );
+        throw new \InvalidArgumentException(sprintf(
+            'Expected that "%s" is a callable.',
+            $definition
+        ));
     }
 
     /**

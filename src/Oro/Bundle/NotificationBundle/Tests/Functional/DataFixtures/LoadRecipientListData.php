@@ -4,7 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -51,9 +51,6 @@ class LoadRecipientListData extends AbstractFixture implements DependentFixtureI
         $this->setReference(self::RECIPIENT_LIST_WITH_USERS, $recipientList);
     }
 
-    /**
-     * @param Group $group
-     */
     private function createRecipientListWithGroups(Group $group): void
     {
         $recipientList = new RecipientList();
@@ -63,9 +60,6 @@ class LoadRecipientListData extends AbstractFixture implements DependentFixtureI
         $this->setReference(self::RECIPIENT_LIST_WITH_GROUPS, $recipientList);
     }
 
-    /**
-     * @param Group $group
-     */
     private function createRecipientListWithGroupsAndUsers(Group $group): void
     {
         $recipientList = new RecipientList();
@@ -78,9 +72,6 @@ class LoadRecipientListData extends AbstractFixture implements DependentFixtureI
         $this->setReference(self::RECIPIENT_LIST_WITH_GROUPS_AND_USERS, $recipientList);
     }
 
-    /**
-     * @param Group $group
-     */
     private function createRecipientListWithGroupsAndUsersAndEmail(Group $group): void
     {
         $recipientList = new RecipientList();
@@ -94,9 +85,6 @@ class LoadRecipientListData extends AbstractFixture implements DependentFixtureI
         $this->setReference(self::RECIPIENT_LIST_WITH_GROUPS_AND_USERS_AND_EMAIL, $recipientList);
     }
 
-    /**
-     * @param Group $group
-     */
     private function createRecipientListWithGroupsAndUsersAndDuplicatedEmail(Group $group): void
     {
         $recipientList = new RecipientList();
@@ -114,9 +102,6 @@ class LoadRecipientListData extends AbstractFixture implements DependentFixtureI
         $this->setReference(self::RECIPIENT_LIST_WITH_GROUPS_AND_USERS_AND_DUPLICATED_EMAIL, $recipientList);
     }
 
-    /**
-     * @return Group
-     */
     private function createGroup(): Group
     {
         $group = new Group();

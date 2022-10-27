@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\NavigationBundle\Model;
 
+/**
+ * Provides basic implementation for entities which implement UrlAwareInterface.
+ */
 trait UrlAwareTrait
 {
     /**
      * @var string $url
      *
-     * @ORM\Column(name="url", type="string", length=1023)
+     * @ORM\Column(name="url", type="string", length=8190)
      */
     protected $url;
 

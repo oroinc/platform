@@ -3,29 +3,22 @@
 namespace Oro\Bundle\PlatformBundle\Twig;
 
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class PlatformExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to retrieve the application version:
+ *   - oro_version
+ */
+class PlatformExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const EXTENSION_NAME = 'oro_platform';
+    private ContainerInterface $container;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return VersionHelper
-     */
-    protected function getVersionHelper()
-    {
-        return $this->container->get('oro_platform.composer.version_helper');
     }
 
     /**
@@ -34,23 +27,27 @@ class PlatformExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_version', [$this, 'getVersion'])
+            new TwigFunction('oro_version', [$this, 'getVersion'])
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->getVersionHelper()->getVersion();
     }
 
     /**
-     * @return string The extension name
+     * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::EXTENSION_NAME;
+        return [
+            'oro_platform.composer.version_helper' => VersionHelper::class,
+        ];
+    }
+
+    private function getVersionHelper(): VersionHelper
+    {
+        return $this->container->get('oro_platform.composer.version_helper');
     }
 }

@@ -9,8 +9,6 @@ interface CollectionAwareFilterInterface
 {
     /**
      * Sets a flag indicates whether the filter represents a collection valued association.
-     *
-     * @param bool $collection
      */
-    public function setCollection($collection);
+    public function setCollection(bool $collection): void;
 }

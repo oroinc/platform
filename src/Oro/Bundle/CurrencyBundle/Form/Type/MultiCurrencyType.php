@@ -38,10 +38,6 @@ class MultiCurrencyType extends PriceType
         return self::NAME;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $isRequired = $this->isRequired($options);

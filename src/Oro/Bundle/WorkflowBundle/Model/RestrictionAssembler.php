@@ -59,7 +59,6 @@ class RestrictionAssembler extends ComponentAbstractAssembler
         return $restrictions;
     }
 
-
     /**
      * @param Attribute[]|Collection $attributes
      *

@@ -1,8 +1,8 @@
-{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
+{% extends '@OroNavigation/Menu/menu.html.twig' %}
 
 {% block root %}
     {% set listAttributes = item.childrenAttributes %}
-    {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
+    {% import '@OroNavigation/Menu/menu.html.twig' as oro_menu %}
     {% set listAttributes = listAttributes|merge({
         'class': oro_menu.add_attribute_values(listAttributes, 'class', ['dropdown-menu']|merge([options.class|default('')])),
         'role': 'menu'

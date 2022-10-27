@@ -9,33 +9,32 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroFeatureToggleExtension extends Extension
 {
-    const ALIAS = 'oro_featuretoggle';
-
     /**
      * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
-        // load services
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('commands.yml');
 
-        $container
-            ->getDefinition('oro_featuretoggle.checker.feature_checker')
-            ->addArgument($config['strategy'])
-            ->addArgument($config['allow_if_all_abstain'])
-            ->addArgument($config['allow_if_equal_granted_denied'])
-        ;
+        $container->getDefinition('oro_featuretoggle.feature_decision_manager')
+            ->setArgument('$strategy', $config['strategy'])
+            ->setArgument('$allowIfAllAbstainDecisions', $config['allow_if_all_abstain'])
+            ->setArgument('$allowIfEqualGrantedDeniedDecisions', $config['allow_if_equal_granted_denied']);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getAlias()
+    public function getAlias(): string
     {
-        return self::ALIAS;
+        return Configuration::ROOT_NODE;
     }
 }

@@ -3,17 +3,33 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\ORM\Query\Expr\Join;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 
+/**
+ * The provider for virtual relations defined in "Resources/config/oro/entity.yml" files.
+ */
 class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implements VirtualRelationProviderInterface
 {
+    /** @var EntityConfigurationProvider */
+    private $configProvider;
+
+    public function __construct(
+        EntityHierarchyProviderInterface $entityHierarchyProvider,
+        EntityConfigurationProvider $configProvider
+    ) {
+        parent::__construct($entityHierarchyProvider);
+        $this->configProvider = $configProvider;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function isVirtualRelation($className, $fieldName)
     {
-        $this->ensureVirtualFieldsInitialized();
+        $items = $this->getItems();
 
-        return !empty($this->items[$className][$fieldName]);
+        return !empty($items[$className][$fieldName]);
     }
 
     /**
@@ -21,13 +37,13 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
      */
     public function getVirtualRelationQuery($className, $fieldName)
     {
-        $this->ensureVirtualFieldsInitialized();
+        $items = $this->getItems();
 
-        if (empty($this->items[$className][$fieldName]['query'])) {
+        if (empty($items[$className][$fieldName]['query'])) {
             return [];
         }
 
-        return $this->items[$className][$fieldName]['query'];
+        return $items[$className][$fieldName]['query'];
     }
 
     /**
@@ -35,13 +51,13 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
      */
     public function getVirtualRelations($className)
     {
-        $this->ensureVirtualFieldsInitialized();
+        $items = $this->getItems();
 
-        if (empty($this->items[$className])) {
+        if (empty($items[$className])) {
             return [];
         }
 
-        return $this->items[$className];
+        return $items[$className];
     }
 
     /**
@@ -58,8 +74,9 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
             );
         }
 
-        if (!empty($this->items[$className][$fieldName]['target_join_alias'])) {
-            return $this->items[$className][$fieldName]['target_join_alias'];
+        $items = $this->getItems();
+        if (!empty($items[$className][$fieldName]['target_join_alias'])) {
+            return $items[$className][$fieldName]['target_join_alias'];
         }
 
         $query = $this->getVirtualRelationQuery($className, $fieldName);
@@ -93,5 +110,13 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
         throw new \InvalidArgumentException(
             sprintf('Please configure "target_join_alias" option for "%s::%s"', $className, $fieldName)
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getConfiguration()
+    {
+        return $this->configProvider->getConfiguration(EntityConfiguration::VIRTUAL_RELATIONS);
     }
 }

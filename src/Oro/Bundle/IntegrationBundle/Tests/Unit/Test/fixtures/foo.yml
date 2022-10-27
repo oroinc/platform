@@ -1,5 +1,5 @@
 __DEFAULT__:
-    code: 302
+    code: 304
     headers: ~
     body: ~
 

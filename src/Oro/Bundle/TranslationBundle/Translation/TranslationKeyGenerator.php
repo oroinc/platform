@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
-use Doctrine\Common\Inflector\Inflector;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
+/**
+ * Generates a translate key by translation source.
+ */
 class TranslationKeyGenerator
 {
     /**
@@ -30,7 +33,7 @@ class TranslationKeyGenerator
      */
     protected function replaceData($data, $key, $value)
     {
-        $value = Inflector::tableize($value);
+        $value = InflectorFactory::create()->tableize($value);
         $value = preg_replace('/\s+/', '_', trim($value));
 
         return str_replace('{{ ' . $key . ' }}', $value, $data);

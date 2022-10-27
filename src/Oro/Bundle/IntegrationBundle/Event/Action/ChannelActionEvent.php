@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Event\Action;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class ChannelActionEvent extends Event
 {
@@ -21,9 +21,6 @@ abstract class ChannelActionEvent extends Event
      */
     private $channel;
 
-    /**
-     * @param Channel $channel
-     */
     public function __construct(Channel $channel)
     {
         $this->channel = $channel;

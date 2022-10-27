@@ -8,6 +8,9 @@ use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionIn
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
+/**
+ * Adds "imports" directive.
+ */
 class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensionInterface
 {
     const NODE_IMPORTS = 'imports';
@@ -26,7 +29,7 @@ class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensi
 
         // imported layout update
         $delimiter = PathProviderInterface::DELIMITER;
-        if (strpos($data->getFilename(), $delimiter.ImportVisitor::IMPORT_FOLDER.$delimiter) !== false) {
+        if (str_contains($data->getFilename(), $delimiter . ImportVisitor::IMPORT_FOLDER . $delimiter)) {
             $visitorCollection->append(new ImportLayoutUpdateVisitor());
         }
     }

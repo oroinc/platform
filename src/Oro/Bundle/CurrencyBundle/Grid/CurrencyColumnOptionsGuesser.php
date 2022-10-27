@@ -13,7 +13,6 @@ class CurrencyColumnOptionsGuesser extends AbstractColumnOptionsGuesser
      */
     protected $currencyHelper;
 
-
     public function __construct(CurrencyNameHelper $currencyHelper)
     {
         $this->currencyHelper = $currencyHelper;

@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
+use Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
@@ -20,6 +24,7 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\BusinessUnit;
@@ -28,20 +33,20 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var EntityAclExtension */
     private $extension;
 
@@ -66,18 +71,15 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
-    protected function setUp()
+    /** @var Inflector */
+    private $inflector;
+
+    protected function setUp(): void
     {
         $this->tree = new OwnerTree();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->securityMetadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->securityMetadataProvider = $this->createMock(EntitySecurityMetadataProvider::class);
 
         $this->metadataProvider = new OwnershipMetadataProviderStub($this);
         $this->metadataProvider->setMetadata(
@@ -93,16 +95,15 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProvider $treeProviderMock */
-        $treeProviderMock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $treeProviderMock = $this->createMock(OwnerTreeProvider::class);
 
         $treeProviderMock->expects($this->any())
             ->method('getTree')
-            ->will($this->returnValue($this->tree));
+            ->willReturn($this->tree);
 
-        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider);
+        $this->inflector = (new InflectorFactory())->build();
+
+        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider, $this->inflector);
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             new ObjectIdAccessor($this->doctrineHelper),
@@ -111,9 +112,9 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             $this->createMock(TokenAccessorInterface::class)
         );
 
-        $this->permissionManager = $this->getPermissionManagerMock();
+        $this->permissionManager = $this->getPermissionManager();
 
-        $this->groupProvider = $this->createMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $this->groupProvider = $this->createMock(AclGroupProviderInterface::class);
         $this->groupProvider->expects($this->any())
             ->method('getGroup')
             ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
@@ -158,7 +159,6 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
          *
          * bu1   bu2   bu3   bu31   bu4   bu411
          * bu2         bu2
-         *
          */
         $this->tree->addBusinessUnit('bu1', null);
         $this->tree->addBusinessUnit('bu2', null);
@@ -169,16 +169,6 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->tree->addBusinessUnit('bu4', 'org4');
         $this->tree->addBusinessUnit('bu41', 'org4');
         $this->tree->addBusinessUnit('bu411', 'org4');
-
-        $this->tree->addBusinessUnitRelation('bu1', null);
-        $this->tree->addBusinessUnitRelation('bu2', null);
-        $this->tree->addBusinessUnitRelation('bu3', null);
-        $this->tree->addBusinessUnitRelation('bu31', 'bu3');
-        $this->tree->addBusinessUnitRelation('bu3a', null);
-        $this->tree->addBusinessUnitRelation('bu3a1', 'bu3a');
-        $this->tree->addBusinessUnitRelation('bu4', null);
-        $this->tree->addBusinessUnitRelation('bu41', 'bu4');
-        $this->tree->addBusinessUnitRelation('bu411', 'bu41');
 
         $this->tree->addUser('user1', null);
         $this->tree->addUser('user2', 'bu2');
@@ -206,81 +196,67 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->tree->addUserBusinessUnit('user4', 'org4', 'bu4');
         $this->tree->addUserBusinessUnit('user411', 'org4', 'bu411');
 
-        $this->tree->buildTree();
+        $this->buildTree();
     }
 
     /**
      * @dataProvider validateMaskForOrganizationProvider
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForOrganization($mask)
+    public function testValidateMaskForOrganization(int $mask)
     {
         $this->extension->validateMask($mask, new Organization());
     }
 
     /**
      * @dataProvider validateMaskForOrganizationInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForOrganizationInvalid($mask)
+    public function testValidateMaskForOrganizationInvalid(int $mask)
     {
+        $this->expectException(InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new Organization());
     }
 
     /**
      * @dataProvider validateMaskForBusinessUnitProvider
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForBusinessUnit($mask)
+    public function testValidateMaskForBusinessUnit(int $mask)
     {
         $this->extension->validateMask($mask, new BusinessUnit());
     }
 
     /**
      * @dataProvider validateMaskForBusinessUnitInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForBusinessUnitInvalid($mask)
+    public function testValidateMaskForBusinessUnitInvalid(int $mask)
     {
+        $this->expectException(InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new BusinessUnit());
     }
 
     /**
      * @dataProvider validateMaskForUserProvider
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForUser($mask)
+    public function testValidateMaskForUser(int $mask)
     {
         $this->extension->validateMask($mask, new User());
     }
 
     /**
      * @dataProvider validateMaskForUserInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForUserInvalid($mask)
+    public function testValidateMaskForUserInvalid(int $mask)
     {
+        $this->expectException(InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new User());
     }
 
     /**
      * @dataProvider validateMaskForOrganizationOwnedProvider
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForOrganizationOwned($mask)
+    public function testValidateMaskForOrganizationOwned(int $mask)
     {
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
         );
         $this->extension->validateMask($mask, new TestEntity());
@@ -288,14 +264,12 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForOrganizationOwnedInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForOrganizationOwnedInvalid($mask)
+    public function testValidateMaskForOrganizationOwnedInvalid(int $mask)
     {
+        $this->expectException(InvalidAclMaskException::class);
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id')
         );
         $this->extension->validateMask($mask, new TestEntity());
@@ -303,13 +277,11 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForUserOwnedProvider
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForUserOwned($mask)
+    public function testValidateMaskForUserOwned(int $mask)
     {
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('USER', 'owner', 'owner_id')
         );
         $this->extension->validateMask($mask, new TestEntity());
@@ -317,14 +289,12 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForUserOwnedInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForUserOwnedInvalid($mask)
+    public function testValidateMaskForUserOwnedInvalid(int $mask)
     {
+        $this->expectException(InvalidAclMaskException::class);
         $this->metadataProvider->setMetadata(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+            TestEntity::class,
             new OwnershipMetadata('USER', 'owner', 'owner_id')
         );
         $this->extension->validateMask($mask, new TestEntity());
@@ -332,23 +302,99 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider validateMaskForUserOwnedProvider
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForRoot($mask)
+    public function testValidateMaskForRoot(int $mask)
     {
         $this->extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
     }
 
     /**
      * @dataProvider validateMaskForUserOwnedInvalidProvider
-     * @expectedException \Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException
-     *
-     * @param int $mask
      */
-    public function testValidateMaskForRootInvalid($mask)
+    public function testValidateMaskForRootInvalid(int $mask)
     {
+        $this->expectException(InvalidAclMaskException::class);
         $this->extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
+    }
+
+    /**
+     * @dataProvider validateMaskForRootWithoutSystemAccessLevelProvider
+     */
+    public function testValidateMaskForRootWithoutSystemAccessLevel(int $mask)
+    {
+        $metadataProvider = $this->createMock(OwnershipMetadataProvider::class);
+        $metadataProvider->expects($this->any())
+            ->method('getMaxAccessLevel')
+            ->willReturn(AccessLevel::GLOBAL_LEVEL);
+
+        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider, $this->inflector);
+
+        $extension = TestHelper::get($this)->createEntityAclExtension(
+            $metadataProvider,
+            $this->tree,
+            new ObjectIdAccessor($this->doctrineHelper),
+            $this->decisionMaker,
+            $entityOwnerAccessor,
+            $this->permissionManager,
+            $this->groupProvider
+        );
+
+        $extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
+    }
+
+    /**
+     * @dataProvider validateMaskForRootWithoutSystemAccessLevelInvalidProvider
+     */
+    public function testValidateMaskForRootWithoutSystemAccessLevelInvalid(int $mask)
+    {
+        $this->expectException(InvalidAclMaskException::class);
+
+        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider, $this->inflector);
+
+        $metadataProvider = $this->createMock(OwnershipMetadataProvider::class);
+        $metadataProvider->expects($this->any())
+            ->method('getMaxAccessLevel')
+            ->willReturn(AccessLevel::GLOBAL_LEVEL);
+
+        $extension = TestHelper::get($this)->createEntityAclExtension(
+            $metadataProvider,
+            $this->tree,
+            new ObjectIdAccessor($this->doctrineHelper),
+            $this->decisionMaker,
+            $entityOwnerAccessor,
+            $this->permissionManager,
+            $this->groupProvider
+        );
+
+        $extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
+    }
+
+    public function testGetDefaultPermission()
+    {
+        self::assertSame('', $this->extension->getDefaultPermission());
+    }
+
+    /**
+     * @dataProvider getPermissionGroupMaskProvider
+     */
+    public function testGetPermissionGroupMask(int $mask, ?int $expectedPermissionGroupMask)
+    {
+        self::assertSame($expectedPermissionGroupMask, $this->extension->getPermissionGroupMask($mask));
+    }
+
+    public function getPermissionGroupMaskProvider(): array
+    {
+        return [
+            [0, null],
+            [1, 31],
+            [2, 31],
+            [4, 31],
+            [8, 31],
+            [16, 31],
+            [32, 31 << 5],
+            [32 << 5, 31 << 10],
+            [EntityMaskBuilder::REMOVE_SERVICE_BITS + 1 + 1, EntityMaskBuilder::REMOVE_SERVICE_BITS + 1 + 31]
+        ];
     }
 
     public function testGetPermissions()
@@ -362,7 +408,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetPermissionsByMask()
     {
         $this->assertEquals(
-            ['VIEW', 'CREATE', 'EDIT'],
+            ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN'],
             $this->extension->getPermissions(1)
         );
     }
@@ -376,9 +422,6 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider getAllowedPermissionsProvider
      */
     public function testGetAllowedPermissions(array $inputData, array $expectedData)
@@ -397,9 +440,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $isRootType = $inputData['type'] === ObjectIdentityFactory::ROOT_IDENTITY_TYPE;
 
-        $this->permissionManager = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->permissionManager = $this->createMock(PermissionManager::class);
         $this->permissionManager->expects($isRootType ? $this->never() : $this->once())
             ->method('getPermissionsForEntity')
             ->with($inputData['type'], AclGroupProviderInterface::DEFAULT_SECURITY_GROUP)
@@ -419,26 +460,21 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
                 'PERMIT' => 6,
                 'UNKNOWN' => 7
             ]);
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
-        /* @var $entityClassResolver EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject  */
-        $entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fieldAclExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityClassResolver = $this->createMock(EntityClassResolver::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $fieldAclExtension = $this->createMock(FieldAclExtension::class);
 
         $extension = new EntityAclExtension(
             new ObjectIdAccessor($doctrineHelper),
             $entityClassResolver,
             $this->securityMetadataProvider,
             $this->metadataProvider,
-            new EntityOwnerAccessor($this->metadataProvider),
+            new EntityOwnerAccessor($this->metadataProvider, $this->inflector),
             $this->decisionMaker,
             $this->permissionManager,
             $this->groupProvider,
@@ -450,17 +486,30 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
+    public function testDecideIsGrantingForNewObject()
+    {
+        $object = new TestEntity(null);
+
+        $this->metadataProvider->setMetadata(
+            get_class($object),
+            new OwnershipMetadata('ORGANIZATION', 'owner', 'owner_id', 'organization')
+        );
+
+        $token =$this->createMock(UsernamePasswordOrganizationToken::class);
+
+        $this->assertTrue($this->extension->decideIsGranting(1, $object, $token));
+    }
+
     /**
      * @dataProvider decideIsGrantingProvider
-     *
-     * @param int $triggeredMask
-     * @param User $user
-     * @param Organization $organization
-     * @param object $object
-     * @param bool $expectedResult
      */
-    public function testDecideIsGranting($triggeredMask, $user, $organization, $object, $expectedResult)
-    {
+    public function testDecideIsGranting(
+        int $triggeredMask,
+        ?User $user,
+        Organization $organization,
+        object|string|null $object,
+        bool $expectedResult
+    ) {
         $this->buildTestTree();
 
         if ($object instanceof TestEntity && $object->getOwner() !== null) {
@@ -483,29 +532,25 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             }
         }
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|UsernamePasswordOrganizationToken $token */
-        $token =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $token =$this->createMock(UsernamePasswordOrganizationToken::class);
         $token->expects($this->any())
-            ->method('getOrganizationContext')
-            ->will($this->returnValue($organization));
+            ->method('getOrganization')
+            ->willReturn($organization);
         $token->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
         $this->assertEquals($expectedResult, $this->extension->decideIsGranting($triggeredMask, $object, $token));
     }
 
     /**
      * @dataProvider getMaskBuilderProvider
-     *
-     * @param string $permission
-     * @param int $identity
-     * @param array $permissions
      */
-    public function testGetMaskBuilder($permission, $identity, array $permissions)
+    public function testGetMaskBuilder(string $permission, int $identity, array $permissions)
     {
         $this->assertEquals(
             new EntityMaskBuilder($identity, $permissions),
@@ -513,18 +558,39 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getMaskBuilderProvider()
+    public function getMaskBuilderProvider(): array
     {
         return [
-            ['permission' => 'VIEW', 'identity' => 0, 'permissions' => ['VIEW', 'CREATE', 'EDIT']],
-            ['permission' => 'CREATE', 'identity' => 0, 'permissions' => ['VIEW', 'CREATE', 'EDIT']],
-            ['permission' => 'EDIT', 'identity' => 0, 'permissions' => ['VIEW', 'CREATE', 'EDIT']],
-            ['permission' => 'DELETE', 'identity' => 32768, 'permissions' => ['DELETE', 'ASSIGN', 'PERMIT']],
-            ['permission' => 'ASSIGN', 'identity' => 32768, 'permissions' => ['DELETE', 'ASSIGN', 'PERMIT']],
-            ['permission' => 'PERMIT', 'identity' => 32768, 'permissions' => ['DELETE', 'ASSIGN', 'PERMIT']],
+            [
+                'permission' => 'VIEW',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'CREATE',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'EDIT',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'DELETE',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'ASSIGN',
+                'identity' => 0,
+                'permissions' => ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']
+            ],
+            [
+                'permission' => 'PERMIT',
+                'identity' => 33554432,
+                'permissions' => ['PERMIT']
+            ],
         ];
     }
 
@@ -532,8 +598,8 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals(
             [
-                new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']),
-                new EntityMaskBuilder(32768, ['DELETE', 'ASSIGN', 'PERMIT'])
+                new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT', 'DELETE', 'ASSIGN']),
+                new EntityMaskBuilder(33554432, ['PERMIT'])
             ],
             $this->extension->getAllMaskBuilders()
         );
@@ -541,20 +607,19 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider adaptRootMaskProvider
-     *
-     * @param object $object
-     * @param string $ownerType
-     * @param int $aceMask
-     * @param int $expectedMask
      */
-    public function testAdaptRootMask($object, $ownerType, $aceMask, $expectedMask)
+    public function testAdaptRootMask(object $object, ?string $ownerType, int $aceMask, int $expectedMask)
     {
         if ($ownerType !== null) {
             $this->metadataProvider->setMetadata(
-                'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity',
+                TestEntity::class,
                 new OwnershipMetadata($ownerType, 'owner', 'owner_id')
             );
         }
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
         $resultMask = $this->extension->adaptRootMask($aceMask, $object);
         $this->assertEquals(
@@ -577,20 +642,13 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getAccessLevelProvider
-     *
-     * @param int $mask
-     * @param int $expectedLevel
-     * @param string $permission
      */
-    public function testGetAccessLevel($mask, $expectedLevel, $permission = null)
+    public function testGetAccessLevel(int $mask, int $expectedLevel, string $permission = null)
     {
         $this->assertEquals($expectedLevel, $this->extension->getAccessLevel($mask, $permission));
     }
 
-    /**
-     * @return array
-     */
-    public function getAccessLevelProvider()
+    public function getAccessLevelProvider(): array
     {
         return [
             [
@@ -598,7 +656,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
                 'expectedLevel' => AccessLevel::NONE_LEVEL
             ],
             [
-                'mask' => 32768 /* GROUP_NONE */,
+                'mask' => 33554432 /* GROUP_NONE */,
                 'expectedLevel' => AccessLevel::NONE_LEVEL
             ],
             [
@@ -642,6 +700,13 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetAccessLevelNamesForRoot()
     {
         $object = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::once())
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
         $this->assertEquals(
             [
                 0 => 'NONE',
@@ -655,16 +720,13 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param OwnershipMetadata $metadata
-     * @param array $expected
-     *
      * @dataProvider accessLevelProvider
      */
     public function testGetAccessLevelNamesForNonRoot(OwnershipMetadata $metadata, array $expected)
     {
-        $object = new ObjectIdentity('entity', '\stdClass');
+        $object = new ObjectIdentity('entity', \stdClass::class);
 
-        $this->metadataProvider->setMetadata('\stdClass', $metadata);
+        $this->metadataProvider->setMetadata(\stdClass::class, $metadata);
 
         $this->assertEquals(
             $expected,
@@ -672,10 +734,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function accessLevelProvider()
+    public function accessLevelProvider(): array
     {
         return [
             'without owner' => [new OwnershipMetadata(), [0 => 'NONE', 5 => 'SYSTEM']],
@@ -708,10 +767,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getAllowedPermissionsProvider()
+    public function getAllowedPermissionsProvider(): array
     {
         return [
             '(root)' => [
@@ -774,10 +830,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function decideIsGrantingProvider()
+    public function decideIsGrantingProvider(): array
     {
         $org3 = new Organization('org3');
         $org4 = new Organization('org4');
@@ -842,10 +895,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function adaptRootMaskProvider()
+    public static function adaptRootMaskProvider(): array
     {
         return [
             [
@@ -863,8 +913,20 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 new TestEntity(),
                 null,
-                ((1 << 9) | 32768) /* MASK_ASSIGN_SYSTEM */,
-                32768 /* GROUP_NONE */
+                (1 << 19) /* MASK_DELETE_SYSTEM */,
+                (1 << 19) /* MASK_DELETE_SYSTEM */
+            ],
+            [
+                new TestEntity(),
+                null,
+                (1 << 24) /* MASK_ASSIGN_SYSTEM */,
+                0 /* GROUP_NONE */
+            ],
+            [
+                new TestEntity(),
+                null,
+                ((1 << 4) | 33554432) /* MASK_PERMIT_SYSTEM */,
+                ((1 << 4) | 33554432) /* MASK_PERMIT_SYSTEM */
             ],
             [
                 new Organization(),
@@ -911,27 +973,22 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForOrganizationProvider()
+    public static function validateMaskForOrganizationProvider(): array
     {
         return [
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 4) /* MASK_VIEW_SYSTEM */ | ((1 << 4) + 32768) /* MASK_DELETE_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
+            [(1 << 4) /* MASK_VIEW_SYSTEM */ | ((1 << 4) + 33554432) /* MASK_PERMIT_SYSTEM */],
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForOrganizationInvalidProvider()
+    public static function validateMaskForOrganizationInvalidProvider(): array
     {
         return [
-            [(1 << 9) + 32768 /*MASK_ASSIGN_SYSTEM*/],
+            [(1 << 9) + 33554432 /*MASK_PERMIT_SYSTEM*/],
             [1 << 3 /*MASK_VIEW_GLOBAL*/],
             [1 << 2 /*MASK_VIEW_DEEP*/],
             [1 << 1 /*MASK_VIEW_LOCAL*/],
@@ -939,45 +996,39 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForBusinessUnitProvider()
+    public static function validateMaskForBusinessUnitProvider(): array
     {
         return [
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_SYSTEM */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [1 << 24 /* MASK_ASSIGN_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
             [1 << 3 /* MASK_VIEW_GLOBAL */],
             [1 << 8 /* MASK_CREATE_GLOBAL */],
             [1 << 13 /* MASK_EDIT_GLOBAL */],
-            [(1 << 3) + 32768 /* MASK_DELETE_GLOBAL */],
-            [(1 << 8) + 32768 /* MASK_ASSIGN_GLOBAL */],
-            [(1 << 13) + 32768 /* MASK_PERMIT_GLOBAL */],
+            [1 << 18 /* MASK_DELETE_GLOBAL */],
+            [1 << 23 /* MASK_ASSIGN_GLOBAL */],
+            [(1 << 3) + 33554432 /* MASK_PERMIT_GLOBAL */],
             [1 << 2 /* MASK_VIEW_DEEP */],
             [1 << 7 /* MASK_CREATE_DEEP */],
             [1 << 12 /* MASK_EDIT_DEEP */],
-            [(1 << 2) + 32768 /* MASK_DELETE_DEEP */],
-            [(1 << 7) + 32768 /* MASK_ASSIGN_DEEP */],
-            [(1 << 12) + 32768 /* MASK_PERMIT_DEEP */],
+            [1 << 17 /* MASK_DELETE_DEEP */],
+            [1 << 22 /* MASK_ASSIGN_DEEP */],
+            [(1 << 2) + 33554432 /* MASK_PERMIT_DEEP */],
             [1 << 1 /* MASK_VIEW_LOCAL */],
             [1 << 6 /* MASK_CREATE_LOCAL */],
             [1 << 11 /* MASK_EDIT_LOCAL */],
-            [(1 << 1) + 32768 /* MASK_DELETE_LOCAL */],
-            [(1 << 6) + 32768 /* MASK_ASSIGN_LOCAL */],
-            [(1 << 11) + 32768 /* MASK_PERMIT_LOCAL */],
+            [1 << 16 /* MASK_DELETE_LOCAL */],
+            [1 << 21 /* MASK_ASSIGN_LOCAL */],
+            [(1 << 1) + 33554432 /* MASK_PERMIT_LOCAL */],
             [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 8) /* MASK_CREATE_GLOBAL */ | (1 << 12) /* MASK_EDIT_DEEP */],
             [(1 << 3) /* MASK_VIEW_GLOBAL */ | (1 << 7) /* MASK_CREATE_DEEP */ | (1 << 11) /* MASK_EDIT_LOCAL */]
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForBusinessUnitInvalidProvider()
+    public static function validateMaskForBusinessUnitInvalidProvider(): array
     {
         return [
             [1 << 0 /* MASK_VIEW_BASIC */],
@@ -987,45 +1038,39 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForUserProvider()
+    public static function validateMaskForUserProvider(): array
     {
         return [
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_SYSTEM */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [1 << 24 /* MASK_ASSIGN_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
             [1 << 3 /* MASK_VIEW_GLOBAL */],
             [1 << 8 /* MASK_CREATE_GLOBAL */],
             [1 << 13 /* MASK_EDIT_GLOBAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_GLOBAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_GLOBAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_GLOBAL */],
+            [1 << 18 /* MASK_DELETE_GLOBAL */],
+            [1 << 23 /* MASK_ASSIGN_GLOBAL */],
+            [(1 << 3) + 33554432 /* MASK_PERMIT_GLOBAL */],
             [1 << 2 /* MASK_VIEW_DEEP */],
             [1 << 7 /* MASK_CREATE_DEEP */],
             [1 << 12 /* MASK_EDIT_DEEP */],
-            [(1 << 4) + 32768 /* MASK_DELETE_DEEP */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_DEEP */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_DEEP */],
+            [1 << 17 /* MASK_DELETE_DEEP */],
+            [1 << 22 /* MASK_ASSIGN_DEEP */],
+            [(1 << 2) + 33554432 /* MASK_PERMIT_DEEP */],
             [1 << 1 /* MASK_VIEW_LOCAL */],
             [1 << 6 /* MASK_CREATE_LOCAL */],
             [1 << 11 /* MASK_EDIT_LOCAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_LOCAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_LOCAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_LOCAL */],
+            [1 << 16 /* MASK_DELETE_LOCAL */],
+            [1 << 21 /* MASK_ASSIGN_LOCAL */],
+            [(1 << 1) + 33554432 /* MASK_PERMIT_LOCAL */],
             [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 8) /* MASK_CREATE_GLOBAL */ | (1 << 12) /* MASK_EDIT_DEEP */],
             [(1 << 3) /* MASK_VIEW_GLOBAL */ | (1 << 7) /* MASK_CREATE_DEEP */ | (1 << 11) /* MASK_EDIT_LOCAL */]
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForUserInvalidProvider()
+    public static function validateMaskForUserInvalidProvider(): array
     {
         return [
             [1 << 0 /* MASK_VIEW_BASIC */],
@@ -1035,52 +1080,91 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForUserOwnedProvider()
+    public static function validateMaskForUserOwnedProvider(): array
     {
         return [
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_SYSTEM */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [1 << 24 /* MASK_ASSIGN_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
             [1 << 3 /* MASK_VIEW_GLOBAL */],
             [1 << 8 /* MASK_CREATE_GLOBAL */],
             [1 << 13 /* MASK_EDIT_GLOBAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_GLOBAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_GLOBAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_GLOBAL */],
+            [1 << 18 /* MASK_DELETE_GLOBAL */],
+            [1 << 23 /* MASK_ASSIGN_GLOBAL */],
+            [(1 << 3) + 33554432 /* MASK_PERMIT_GLOBAL */],
             [1 << 2 /* MASK_VIEW_DEEP */],
             [1 << 7 /* MASK_CREATE_DEEP */],
             [1 << 12 /* MASK_EDIT_DEEP */],
-            [(1 << 4) + 32768 /* MASK_DELETE_DEEP */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_DEEP */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_DEEP */],
+            [1 << 17 /* MASK_DELETE_DEEP */],
+            [1 << 22 /* MASK_ASSIGN_DEEP */],
+            [(1 << 2) + 33554432 /* MASK_PERMIT_DEEP */],
             [1 << 1 /* MASK_VIEW_LOCAL */],
             [1 << 6 /* MASK_CREATE_LOCAL */],
             [1 << 11 /* MASK_EDIT_LOCAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_LOCAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_LOCAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_LOCAL */],
+            [1 << 16 /* MASK_DELETE_LOCAL */],
+            [1 << 21 /* MASK_ASSIGN_LOCAL */],
+            [(1 << 1) + 33554432 /* MASK_PERMIT_LOCAL */],
             [1 << 0 /* MASK_VIEW_BASIC */],
             [1 << 5 /* MASK_CREATE_BASIC */],
             [1 << 10 /* MASK_EDIT_BASIC */],
-            [(1 << 0) + 32768 /* MASK_DELETE_BASIC */],
-            [(1 << 5) + 32768 /* MASK_ASSIGN_BASIC */],
-            [(1 << 10) + 32768 /* MASK_PERMIT_BASIC */],
+            [1 << 15 /* MASK_DELETE_BASIC */],
+            [1 << 20 /* MASK_ASSIGN_BASIC */],
+            [(1 << 0) + 33554432 /* MASK_PERMIT_BASIC */],
             [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 8) /* MASK_CREATE_GLOBAL */ | (1 << 12) /* MASK_EDIT_DEEP */],
             [(1 << 3) /* MASK_VIEW_GLOBAL */ | (1 << 7) /* MASK_CREATE_DEEP */ | (1 << 11) /* MASK_EDIT_LOCAL */],
             [(1 << 2) /* MASK_VIEW_DEEP */ | (1 << 6) /* MASK_CREATE_LOCAL */ | (1 << 10) /* MASK_EDIT_BASIC */]
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForUserOwnedInvalidProvider()
+    public static function validateMaskForRootWithoutSystemAccessLevelInvalidProvider(): array
+    {
+        return [
+            [1 << 4 /* MASK_VIEW_SYSTEM */],
+            [1 << 9 /* MASK_CREATE_SYSTEM */],
+            [1 << 14 /* MASK_EDIT_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [1 << 24 /* MASK_ASSIGN_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
+            [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 8) /* MASK_CREATE_GLOBAL */ | (1 << 12) /* MASK_EDIT_DEEP */]
+        ];
+    }
+
+    public static function validateMaskForRootWithoutSystemAccessLevelProvider(): array
+    {
+        return [
+            [1 << 3 /* MASK_VIEW_GLOBAL */],
+            [1 << 8 /* MASK_CREATE_GLOBAL */],
+            [1 << 13 /* MASK_EDIT_GLOBAL */],
+            [1 << 18 /* MASK_DELETE_GLOBAL */],
+            [1 << 23 /* MASK_ASSIGN_GLOBAL */],
+            [(1 << 3) + 33554432 /* MASK_PERMIT_GLOBAL */],
+            [1 << 2 /* MASK_VIEW_DEEP */],
+            [1 << 7 /* MASK_CREATE_DEEP */],
+            [1 << 12 /* MASK_EDIT_DEEP */],
+            [1 << 17 /* MASK_DELETE_DEEP */],
+            [1 << 22 /* MASK_ASSIGN_DEEP */],
+            [(1 << 2) + 33554432 /* MASK_PERMIT_DEEP */],
+            [1 << 1 /* MASK_VIEW_LOCAL */],
+            [1 << 6 /* MASK_CREATE_LOCAL */],
+            [1 << 11 /* MASK_EDIT_LOCAL */],
+            [1 << 16 /* MASK_DELETE_LOCAL */],
+            [1 << 21 /* MASK_ASSIGN_LOCAL */],
+            [(1 << 1) + 33554432 /* MASK_PERMIT_LOCAL */],
+            [1 << 0 /* MASK_VIEW_BASIC */],
+            [1 << 5 /* MASK_CREATE_BASIC */],
+            [1 << 10 /* MASK_EDIT_BASIC */],
+            [1 << 15 /* MASK_DELETE_BASIC */],
+            [1 << 20 /* MASK_ASSIGN_BASIC */],
+            [(1 << 0) + 33554432 /* MASK_PERMIT_BASIC */],
+            [(1 << 3) /* MASK_VIEW_GLOBAL */ | (1 << 7) /* MASK_CREATE_DEEP */ | (1 << 11) /* MASK_EDIT_LOCAL */],
+            [(1 << 2) /* MASK_VIEW_DEEP */ | (1 << 6) /* MASK_CREATE_LOCAL */ | (1 << 10) /* MASK_EDIT_BASIC */]
+        ];
+    }
+
+    public static function validateMaskForUserOwnedInvalidProvider(): array
     {
         return [
             [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 3) /* MASK_VIEW_GLOBAL */],
@@ -1090,32 +1174,26 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForOrganizationOwnedProvider()
+    public static function validateMaskForOrganizationOwnedProvider(): array
     {
         return [
             [1 << 4 /* MASK_VIEW_SYSTEM */],
             [1 << 9 /* MASK_CREATE_SYSTEM */],
             [1 << 14 /* MASK_EDIT_SYSTEM */],
-            [(1 << 4) + 32768 /* MASK_DELETE_SYSTEM */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_SYSTEM */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_SYSTEM */],
+            [1 << 19 /* MASK_DELETE_SYSTEM */],
+            [1 << 24 /* MASK_ASSIGN_SYSTEM */],
+            [(1 << 4) + 33554432 /* MASK_PERMIT_SYSTEM */],
             [1 << 3 /* MASK_VIEW_GLOBAL */],
             [1 << 8 /* MASK_CREATE_GLOBAL */],
             [1 << 13 /* MASK_EDIT_GLOBAL */],
-            [(1 << 4) + 32768 /* MASK_DELETE_GLOBAL */],
-            [(1 << 9) + 32768 /* MASK_ASSIGN_GLOBAL */],
-            [(1 << 14) + 32768 /* MASK_PERMIT_GLOBAL */],
+            [1 << 18 /* MASK_DELETE_GLOBAL */],
+            [1 << 23 /* MASK_ASSIGN_GLOBAL */],
+            [(1 << 3) + 33554432 /* MASK_PERMIT_GLOBAL */],
             [(1 << 4) /* MASK_VIEW_SYSTEM */ | (1 << 8) /* MASK_CREATE_GLOBAL */]
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function validateMaskForOrganizationOwnedInvalidProvider()
+    public static function validateMaskForOrganizationOwnedInvalidProvider(): array
     {
         return [
             [1 << 2 /* MASK_VIEW_DEEP */],
@@ -1128,43 +1206,34 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider supportsDataProvider
-     *
-     * @param mixed $id
-     * @param string $type
-     * @param string $class
-     * @param bool $isEntity
-     * @param bool $expected
      */
-    public function testSupports($id, $type, $class, $isEntity, $isProtectedEntity, $expected)
-    {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver $entityClassResolverMock */
-        $entityClassResolverMock = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+    public function testSupports(
+        string $id,
+        string $type,
+        string $class,
+        bool $isEntity,
+        bool $isProtectedEntity,
+        bool $expected
+    ) {
+        $entityClassResolverMock = $this->createMock(EntityClassResolver::class);
         $entityClassResolverMock->expects($isEntity ? $this->once() : $this->never())
             ->method('getEntityClass')
             ->with($class)
             ->willReturn($class);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySecurityMetadataProvider $entityMetadataProvider */
-        $entityMetadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityMetadataProvider = $this->createMock(EntitySecurityMetadataProvider::class);
         $entityMetadataProvider->expects($this->once())
             ->method('isProtectedEntity')
             ->with($class)
             ->willReturn($isProtectedEntity);
-        $fieldAclExtension = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\FieldAclExtension')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldAclExtension = $this->createMock(FieldAclExtension::class);
 
         $extension = new EntityAclExtension(
             new ObjectIdAccessor($this->doctrineHelper),
             $entityClassResolverMock,
             $entityMetadataProvider,
             $this->metadataProvider,
-            new EntityOwnerAccessor($this->metadataProvider),
+            new EntityOwnerAccessor($this->metadataProvider, $this->inflector),
             $this->decisionMaker,
             $this->permissionManager,
             $this->groupProvider,
@@ -1174,48 +1243,45 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $extension->supports($type, $id));
     }
 
-    /**
-     * @return array
-     */
-    public function supportsDataProvider()
+    public function supportsDataProvider(): array
     {
         return [
             [
                 'id' => 'action',
-                'type' => '\stdClass',
-                'class' => '\stdClass',
+                'type' => \stdClass::class,
+                'class' => \stdClass::class,
                 'isEntity' => false,
                 'isProtectedEntity' => false,
                 'expected' => false
             ],
             [
                 'id' => 'entity',
-                'type' => '\stdClass',
-                'class' => '\stdClass',
+                'type' => \stdClass::class,
+                'class' => \stdClass::class,
                 'isEntity' => true,
                 'isProtectedEntity' => true,
                 'expected' => true
             ],
             [
                 'id' => 'entity',
-                'type' => '@\stdClass',
-                'class' => '\stdClass',
+                'type' => '@' . \stdClass::class,
+                'class' => \stdClass::class,
                 'isEntity' => true,
                 'isProtectedEntity' => true,
                 'expected' => true
             ],
             [
                 'id' => 'entity',
-                'type' => 'group@\stdClass',
-                'class' => '\stdClass',
+                'type' => 'group@' . \stdClass::class,
+                'class' => \stdClass::class,
                 'isEntity' => true,
                 'isProtectedEntity' => true,
                 'expected' => true
             ],
             [
                 'id' => 'entity',
-                'type' => '@\stdClass',
-                'class' => '\stdClass',
+                'type' => '@' . \stdClass::class,
+                'class' => \stdClass::class,
                 'isEntity' => true,
                 'isProtectedEntity' => false,
                 'expected' => false
@@ -1225,32 +1291,26 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getObjectIdentityDataProvider
-     *
-     * @param mixed $val
-     * @param ObjectIdentity $expected
      */
-    public function testGetObjectIdentity($val, $expected)
+    public function testGetObjectIdentity(mixed $val, ObjectIdentity $expected)
     {
         $this->assertEquals($expected, $this->extension->getObjectIdentity($val));
     }
 
-    /**
-     * @return array
-     */
-    public function getObjectIdentityDataProvider()
+    public function getObjectIdentityDataProvider(): array
     {
         $annotation = new AclAnnotation([
             'id' => 'test_id',
             'type' => 'entity',
             'permission' => 'VIEW',
-            'class' => '\stdClass'
+            'class' => \stdClass::class
         ]);
 
         $annotation2 = new AclAnnotation([
             'id' => 'test_id',
             'type' => 'entity',
             'permission' => 'VIEW',
-            'class' => '\stdClass',
+            'class' => \stdClass::class,
             'group_name' => 'group'
         ]);
 
@@ -1258,24 +1318,24 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         return [
             [
-                'val' => 'entity:\stdClass',
-                'expected' => new ObjectIdentity('entity', '\stdClass')
+                'val' => 'entity:' . \stdClass::class,
+                'expected' => new ObjectIdentity('entity', \stdClass::class)
             ],
             [
-                'val' => 'entity:group@\stdClass',
-                'expected' => new ObjectIdentity('entity', 'group@\stdClass')
+                'val' => 'entity:group@' . \stdClass::class,
+                'expected' => new ObjectIdentity('entity', 'group@' . \stdClass::class)
             ],
             [
-                'val' => 'entity:@\stdClass',
-                'expected' => new ObjectIdentity('entity', '\stdClass')
+                'val' => 'entity:@' . \stdClass::class,
+                'expected' => new ObjectIdentity('entity', \stdClass::class)
             ],
             [
                 'val' => $annotation,
-                'expected' => new ObjectIdentity('entity', '\stdClass')
+                'expected' => new ObjectIdentity('entity', \stdClass::class)
             ],
             [
                 'val' => $annotation2,
-                'expected' => new ObjectIdentity('entity', 'group@\stdClass')
+                'expected' => new ObjectIdentity('entity', 'group@' . \stdClass::class)
             ],
             [
                 'val' => $domainObject,
@@ -1287,24 +1347,18 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $id
-     * @param string $name
-     * @return Permission
-     */
-    protected function getPermission($id, $name)
+    private function getPermission(string $id, string $name): Permission
     {
-        return $this->getEntity('Oro\Bundle\SecurityBundle\Entity\Permission', ['id' => $id, 'name' => $name]);
+        $permission = new Permission();
+        ReflectionUtil::setId($permission, $id);
+        $permission->setName($name);
+
+        return $permission;
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|PermissionManager
-     */
-    protected function getPermissionManagerMock()
+    private function getPermissionManager(): PermissionManager
     {
-        $mock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mock = $this->createMock(PermissionManager::class);
         $mock->expects($this->any())
             ->method('getPermissionsMap')
             ->willReturn([
@@ -1317,5 +1371,20 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             ]);
 
         return $mock;
+    }
+
+    private function buildTree()
+    {
+        $subordinateBusinessUnits = [
+            'bu3'  => ['bu31'],
+            'bu3a' => ['bu3a1'],
+            'bu41' => ['bu411'],
+            'bu4'  => ['bu41', 'bu411'],
+
+        ];
+
+        foreach ($subordinateBusinessUnits as $parentBuId => $buIds) {
+            $this->tree->setSubordinateBusinessUnitIds($parentBuId, $buIds);
+        }
     }
 }

@@ -2,7 +2,7 @@ namespace Test;
 
 class Entity extends \Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructorWithArgs implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
 {
-    public function __construct(\stdClass $class, $name, $obj = NULL, $flag = false, $int = 123, $str = 't\'est')
+    public function __construct(\stdClass $class, $name, $obj = null, $flag = false, $int = 123, $str = 't\'est')
     {
         parent::__construct($class, $name, $obj, $flag, $int, $str);
     }

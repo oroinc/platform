@@ -3,62 +3,55 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OperationTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OperationDefinition */
-    protected $definition;
+    /** @var OperationDefinition|\PHPUnit\Framework\MockObject\MockObject */
+    private $definition;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionFactory */
-    protected $actionFactory;
+    /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory */
-    protected $conditionFactory;
+    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $conditionFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AttributeAssembler */
-    protected $attributeAssembler;
+    /** @var AttributeAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeAssembler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormOptionsAssembler */
-    protected $formOptionsAssembler;
-
-    /** @var Operation */
-    protected $operation;
+    /** @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $formOptionsAssembler;
 
     /** @var ActionData */
-    protected $data;
+    private $data;
 
-    protected function setUp()
+    /** @var Operation */
+    private $operation;
+
+    protected function setUp(): void
     {
-        $this->definition = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
-
-        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formOptionsAssembler = $this->getMockBuilder(
-            'Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler'
-        )->disableOriginalConstructor()->getMock();
+        $this->definition = $this->createMock(OperationDefinition::class);
+        $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
+        $this->conditionFactory = $this->createMock(ExpressionFactory::class);
+        $this->attributeAssembler = $this->createMock(AttributeAssembler::class);
+        $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
+        $this->data = new ActionData();
 
         $this->operation = new Operation(
             $this->actionFactory,
@@ -67,8 +60,6 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             $this->formOptionsAssembler,
             $this->definition
         );
-
-        $this->data = new ActionData();
     }
 
     public function testGetName()
@@ -91,7 +82,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDefinition()
     {
-        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\OperationDefinition', $this->operation->getDefinition());
+        $this->assertInstanceOf(OperationDefinition::class, $this->operation->getDefinition());
     }
 
     public function testInit()
@@ -118,13 +109,6 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param ActionData $data
-     * @param array $config
-     * @param array $actions
-     * @param array $conditions
-     * @param string $operationName
-     * @param string $exceptionMessage
-     *
      * @dataProvider executeProvider
      */
     public function testExecute(
@@ -132,11 +116,15 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         array $config,
         array $actions,
         array $conditions,
-        $operationName,
-        $exceptionMessage = ''
+        string $operationName,
+        string $exceptionMessage = ''
     ) {
-        $this->definition->expects($this->any())->method('getName')->willReturn($operationName);
-        $this->definition->expects($this->any())->method('getConditions')->will($this->returnValueMap($config));
+        $this->definition->expects($this->any())
+            ->method('getName')
+            ->willReturn($operationName);
+        $this->definition->expects($this->any())
+            ->method('getConditions')
+            ->willReturnMap($config);
 
         $this->definition->expects($this->any())
             ->method('getActions')
@@ -157,7 +145,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             });
 
         if ($exceptionMessage) {
-            $this->expectException('Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException');
+            $this->expectException(ForbiddenOperationException::class);
             $this->expectExceptionMessage($exceptionMessage);
         }
 
@@ -175,10 +163,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function executeProvider()
+    public function executeProvider(): array
     {
         $data = new ActionData();
 
@@ -235,16 +220,13 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider isAvailableProvider
      */
     public function testIsAvailable(array $inputData, array $expectedData)
     {
         $this->definition->expects($this->any())
             ->method('getConditions')
-            ->will($this->returnValueMap($inputData['config']['conditions']));
+            ->willReturnMap($inputData['config']['conditions']);
 
         $this->definition->expects($this->any())
             ->method('getFormOptions')
@@ -260,11 +242,9 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function isAvailableProvider()
+    public function isAvailableProvider(): array
     {
         $data = new ActionData();
 
@@ -416,9 +396,6 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $input
-     * @param array $expected
-     *
      * @dataProvider getFormOptionsDataProvider
      */
     public function testGetFormOptions(array $input, array $expected)
@@ -452,12 +429,9 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $input
-     * @param bool $expected
-     *
      * @dataProvider hasFormProvider
      */
-    public function testHasForm(array $input, $expected)
+    public function testHasForm(array $input, bool $expected)
     {
         $this->definition->expects($this->once())
             ->method('getFormOptions')
@@ -465,10 +439,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->operation->hasForm());
     }
 
-    /**
-     * @return array
-     */
-    public function hasFormProvider()
+    public function hasFormProvider(): array
     {
         return [
             'empty' => [
@@ -486,10 +457,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getFormOptionsDataProvider()
+    public function getFormOptionsDataProvider(): array
     {
         return [
             'empty' => [
@@ -503,20 +471,11 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects
-     * @param ActionData $data
-     * @return ActionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createAction(
-        \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects,
+    private function createAction(
+        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
         ActionData $data
-    ) {
-        /* @var $action ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+    ): ActionInterface {
+        $action = $this->createMock(ActionInterface::class);
         $action->expects($expects)
             ->method('execute')
             ->with($data);
@@ -524,22 +483,12 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         return $action;
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects
-     * @param ActionData $data
-     * @param bool $returnValue
-     * @return ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createCondition(
-        \PHPUnit\Framework\MockObject\Matcher\InvokedRecorder $expects,
+    private function createCondition(
+        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
         ActionData $data,
-        $returnValue
-    ) {
-        /* @var $condition ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject */
-        $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        bool $returnValue
+    ): ConfigurableCondition {
+        $condition = $this->createMock(ConfigurableCondition::class);
         $condition->expects($expects)
             ->method('evaluate')
             ->with($data)
@@ -568,7 +517,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
 
         $attributeManager = $this->operation->getAttributeManager($this->data);
 
-        $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\AttributeManager', $attributeManager);
+        $this->assertInstanceOf(AttributeManager::class, $attributeManager);
         $this->assertEquals(new ArrayCollection(['test_attr' => $attribute]), $attributeManager->getAttributes());
     }
 

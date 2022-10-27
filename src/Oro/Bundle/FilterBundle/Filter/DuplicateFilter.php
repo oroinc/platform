@@ -5,16 +5,15 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
+use Oro\Component\Exception\UnexpectedTypeException;
 
+/**
+ * Provides a functionality to filter duplicated entities.
+ */
 class DuplicateFilter extends BooleanFilter
 {
     /**
-     * Build an expression used to filter data
-     *
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param int                              $comparisonType 0 to compare with false, 1 to compare with true
-     * @param string                           $fieldName
-     * @return string
+     * {@inheritDoc}
      */
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
@@ -22,10 +21,7 @@ class DuplicateFilter extends BooleanFilter
         $fieldName
     ) {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
-            throw new \InvalidArgumentException(sprintf(
-                '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
-                get_class($ds)
-            ));
+            throw new UnexpectedTypeException($ds, OrmFilterDatasourceAdapter::class);
         }
 
         $operator = $comparisonType === BooleanFilterType::TYPE_YES ? '>' : '=';
@@ -37,7 +33,7 @@ class DuplicateFilter extends BooleanFilter
             ->select($fieldName)
             ->groupBy($fieldName)
             ->having(sprintf('COUNT(%s) %s 1', $fieldName, $operator));
-        list($dql) = $this->createDQLWithReplacedAliases($ds, $qb);
+        [$dql] = $this->createDqlWithReplacedAliases($ds, $qb);
 
         return $ds->expr()->in($fieldName, $dql);
     }

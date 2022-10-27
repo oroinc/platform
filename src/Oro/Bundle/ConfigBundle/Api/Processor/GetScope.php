@@ -16,14 +16,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class GetScope implements ProcessorInterface
 {
-    const CONTEXT_PARAM = '_scope';
+    public const CONTEXT_PARAM = '_scope';
 
-    /** @var ConfigurationRepository */
-    protected $configRepository;
+    private ConfigurationRepository $configRepository;
 
-    /**
-     * @param ConfigurationRepository $configRepository
-     */
     public function __construct(ConfigurationRepository $configRepository)
     {
         $this->configRepository = $configRepository;

@@ -43,9 +43,6 @@ class FieldsChanges
      */
     protected $changedFields = [];
 
-    /**
-     * @param array $changedFields
-     */
     public function __construct(array $changedFields)
     {
         $this->changedFields  = $changedFields;

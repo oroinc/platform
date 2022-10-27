@@ -42,12 +42,6 @@ class AbstractUserRepository extends EntityRepository
         );
     }
 
-    /**
-     * @param string $email
-     * @param bool $useLowercase
-     *
-     * @return AbstractUser|null
-     */
     public function findUserByEmail(string $email, bool $useLowercase = false): ?AbstractUser
     {
         return $this->getQbForFindUserByEmail($email, $useLowercase)
@@ -55,12 +49,6 @@ class AbstractUserRepository extends EntityRepository
             ->getOneOrNullResult();
     }
 
-    /**
-     * @param string $email
-     * @param bool $useLowercase
-     *
-     * @return QueryBuilder
-     */
     protected function getQbForFindUserByEmail(string $email, bool $useLowercase): QueryBuilder
     {
         $qb = $this->createQueryBuilder('u');
@@ -82,11 +70,6 @@ class AbstractUserRepository extends EntityRepository
         return $qb;
     }
 
-    /**
-     * @param int $limit
-     *
-     * @return array
-     */
     public function findLowercaseDuplicatedEmails(int $limit): array
     {
         $result = $this->getQbForFindLowercaseDuplicatedEmails($limit)
@@ -96,11 +79,6 @@ class AbstractUserRepository extends EntityRepository
         return array_column($result, 'emailLowercase');
     }
 
-    /**
-     * @param int $limit
-     *
-     * @return QueryBuilder
-     */
     protected function getQbForFindLowercaseDuplicatedEmails(int $limit): QueryBuilder
     {
         $qb = $this->createQueryBuilder('u');
@@ -112,9 +90,6 @@ class AbstractUserRepository extends EntityRepository
         return $qb;
     }
 
-    /**
-     * @return bool
-     */
     protected function isMySql(): bool
     {
         $platform = $this->getEntityManager()

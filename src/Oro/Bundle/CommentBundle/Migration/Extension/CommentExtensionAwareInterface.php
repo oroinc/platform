@@ -9,8 +9,6 @@ interface CommentExtensionAwareInterface
 {
     /**
      * Sets the CommentExtension
-     *
-     * @param CommentExtension $commentExtension
      */
     public function setCommentExtension(CommentExtension $commentExtension);
 }

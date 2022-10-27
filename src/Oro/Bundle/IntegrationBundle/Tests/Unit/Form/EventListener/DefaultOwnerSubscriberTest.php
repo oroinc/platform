@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Form\EventListener;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
@@ -11,37 +12,31 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclSelectType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var */
-    protected $user;
+    /** @var AbstractUser|\PHPUnit\Framework\MockObject\MockObject */
+    private $user;
 
-    /** @var TypesRegistry */
-    protected $typesRegistry;
+    /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $typesRegistry;
 
     /** @var DefaultOwnerSubscriber */
-    protected $subscriber;
+    private $subscriber;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->user = $this->createMock(AbstractUser::class);
-        $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->typesRegistry = $this->createMock(TypesRegistry::class);
 
+        $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $tokenAccessor->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue($this->user));
-
-        $this->typesRegistry = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry')
-            ->getMock();
+            ->willReturn($this->user);
 
         $this->subscriber = new DefaultOwnerSubscriber($tokenAccessor, $this->typesRegistry);
-    }
-
-    public function tearDown()
-    {
-        unset($this->subscriber);
     }
 
     /**
@@ -56,37 +51,38 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey(FormEvents::POST_SET_DATA, $events);
         $this->assertEquals($events[FormEvents::POST_SET_DATA], 'postSet');
 
-        $form      = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-        $fieldMock = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $form = $this->createMock(FormInterface::class);
+        $field = $this->createMock(FormInterface::class);
 
         $form->expects($this->any())
             ->method('has')
-            ->with($this->equalTo('defaultUserOwner'))
-            ->will($this->returnValue(true));
+            ->with('defaultUserOwner')
+            ->willReturn(true);
 
         $form->expects($this->any())
             ->method('get')
-            ->with($this->equalTo('defaultUserOwner'))
-            ->will($this->returnValue($fieldMock));
+            ->with('defaultUserOwner')
+            ->willReturn($field);
 
         if ($setsUser) {
-            $fieldMock->expects($this->once())->method('setData')->with($this->identicalTo($this->user));
+            $field->expects($this->once())
+                ->method('setData')
+                ->with($this->identicalTo($this->user));
         } else {
-            $fieldMock->expects($this->never())->method('setData');
+            $field->expects($this->never())
+                ->method('setData');
         }
 
         $event = new  FormEvent($form, $formData);
         $this->subscriber->postSet($event);
     }
 
-    /**
-     * @return array
-     */
-    public function formDataProvider()
+    public function formDataProvider(): array
     {
-        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $integration->expects($this->any())->method('getId')
-            ->will($this->returnValue(123));
+        $integration = $this->createMock(Channel::class);
+        $integration->expects($this->any())
+            ->method('getId')
+            ->willReturn(123);
 
         return [
             'should set if null value given'        => [null, true],
@@ -96,43 +92,36 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPreSetWithUserDefaultOwnerType()
     {
-        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('integration_type'));
+            ->willReturn('integration_type');
 
         $this->typesRegistry->expects($this->any())
             ->method('getDefaultOwnerType')
-            ->with($this->equalTo('integration_type'))
-            ->will($this->returnValue(DefaultOwnerTypeAwareInterface::USER));
+            ->with('integration_type')
+            ->willReturn(DefaultOwnerTypeAwareInterface::USER);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-
-        $form->expects($this->at(0))
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->exactly(2))
             ->method('has')
-            ->with($this->equalTo('defaultBusinessUnitOwner'))
-            ->will($this->returnValue(false));
-
-        $form->expects($this->at(1))
-            ->method('has')
-            ->with($this->equalTo('defaultUserOwner'))
-            ->will($this->returnValue(false));
-
+            ->willReturnMap([
+                ['defaultBusinessUnitOwner', false],
+                ['defaultUserOwner', false]
+            ]);
         $form->expects($this->once())
             ->method('add')
             ->with(
-                $this->equalTo('defaultUserOwner'),
-                $this->equalTo(OrganizationUserAclSelectType::class),
-                $this->equalTo(
-                    [
-                        'required' => true,
-                        'label'    => 'oro.integration.integration.default_user_owner.label',
-                        'tooltip'  => 'oro.integration.integration.default_user_owner.description',
-                        'constraints' => new NotBlank()
-                    ]
-                )
+                'defaultUserOwner',
+                OrganizationUserAclSelectType::class,
+                [
+                    'required'    => true,
+                    'label'       => 'oro.integration.integration.default_user_owner.label',
+                    'tooltip'     => 'oro.integration.integration.default_user_owner.description',
+                    'constraints' => new NotBlank()
+                ]
             )
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $event = new  FormEvent($form, $integration);
         $this->subscriber->preSet($event);
@@ -140,44 +129,36 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPreSetWithBusinessUnitDefaultOwnerType()
     {
-        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('integration_type'));
+            ->willReturn('integration_type');
 
         $this->typesRegistry->expects($this->any())
             ->method('getDefaultOwnerType')
-            ->with($this->equalTo('integration_type'))
-            ->will($this->returnValue(DefaultOwnerTypeAwareInterface::BUSINESS_UNIT));
+            ->with('integration_type')
+            ->willReturn(DefaultOwnerTypeAwareInterface::BUSINESS_UNIT);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-
-        $form->expects($this->at(0))
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->exactly(2))
             ->method('has')
-            ->with($this->equalTo('defaultUserOwner'))
-            ->will($this->returnValue(false));
-
-        $form->expects($this->at(1))
-            ->method('has')
-            ->with($this->equalTo('defaultBusinessUnitOwner'))
-            ->will($this->returnValue(false));
-
+            ->willReturnMap([
+                ['defaultBusinessUnitOwner', false],
+                ['defaultUserOwner', false]
+            ]);
         $form->expects($this->once())
             ->method('add')
             ->with(
-                $this->equalTo('defaultBusinessUnitOwner'),
-                $this->equalTo(BusinessUnitSelectType::class),
-                $this->equalTo(
-                    [
-                        'required'    => true,
-                        'label'       => 'oro.integration.integration.default_business_unit_owner.label',
-                        'tooltip'     => 'oro.integration.integration.default_business_unit_owner.description',
-                        'constraints' => new NotBlank(),
-                    ]
-                )
+                'defaultBusinessUnitOwner',
+                BusinessUnitSelectType::class,
+                [
+                    'required'    => true,
+                    'label'       => 'oro.integration.integration.default_business_unit_owner.label',
+                    'tooltip'     => 'oro.integration.integration.default_business_unit_owner.description',
+                    'constraints' => new NotBlank(),
+                ]
             )
-            ->will($this->returnValue(true));
-
+            ->willReturn(true);
 
         $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);
@@ -185,47 +166,39 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPreSetWithUserDefaultOwnerTypeAndExistingOtherField()
     {
-        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('integration_type'));
+            ->willReturn('integration_type');
 
         $this->typesRegistry->expects($this->any())
             ->method('getDefaultOwnerType')
-            ->with($this->equalTo('integration_type'))
-            ->will($this->returnValue(DefaultOwnerTypeAwareInterface::USER));
+            ->with('integration_type')
+            ->willReturn(DefaultOwnerTypeAwareInterface::USER);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-
-        $form->expects($this->at(0))
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->exactly(2))
             ->method('has')
-            ->with($this->equalTo('defaultBusinessUnitOwner'))
-            ->will($this->returnValue(true));
-
+            ->willReturnMap([
+                ['defaultBusinessUnitOwner', true],
+                ['defaultUserOwner', false]
+            ]);
         $form->expects($this->once())
             ->method('remove')
-            ->with($this->equalTo('defaultBusinessUnitOwner'));
-
-        $form->expects($this->at(2))
-            ->method('has')
-            ->with($this->equalTo('defaultUserOwner'))
-            ->will($this->returnValue(false));
-
+            ->with('defaultBusinessUnitOwner');
         $form->expects($this->once())
             ->method('add')
             ->with(
-                $this->equalTo('defaultUserOwner'),
-                $this->equalTo(OrganizationUserAclSelectType::class),
-                $this->equalTo(
-                    [
-                        'required' => true,
-                        'label'    => 'oro.integration.integration.default_user_owner.label',
-                        'tooltip'  => 'oro.integration.integration.default_user_owner.description',
-                        'constraints' => new NotBlank(),
-                    ]
-                )
+                'defaultUserOwner',
+                OrganizationUserAclSelectType::class,
+                [
+                    'required'    => true,
+                    'label'       => 'oro.integration.integration.default_user_owner.label',
+                    'tooltip'     => 'oro.integration.integration.default_user_owner.description',
+                    'constraints' => new NotBlank(),
+                ]
             )
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $event = new  FormEvent($form, $integration);
         $this->subscriber->preSet($event);
@@ -233,48 +206,39 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPreSetWithBusinessUnitDefaultOwnerTypeAndExistingOtherField()
     {
-        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('integration_type'));
+            ->willReturn('integration_type');
 
         $this->typesRegistry->expects($this->any())
             ->method('getDefaultOwnerType')
-            ->with($this->equalTo('integration_type'))
-            ->will($this->returnValue(DefaultOwnerTypeAwareInterface::BUSINESS_UNIT));
+            ->with('integration_type')
+            ->willReturn(DefaultOwnerTypeAwareInterface::BUSINESS_UNIT);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-
-        $form->expects($this->at(0))
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->exactly(2))
             ->method('has')
-            ->with($this->equalTo('defaultUserOwner'))
-            ->will($this->returnValue(true));
-
+            ->willReturnMap([
+                ['defaultBusinessUnitOwner', false],
+                ['defaultUserOwner', true]
+            ]);
         $form->expects($this->once())
             ->method('remove')
-            ->with($this->equalTo('defaultUserOwner'));
-
-        $form->expects($this->at(2))
-            ->method('has')
-            ->with($this->equalTo('defaultBusinessUnitOwner'))
-            ->will($this->returnValue(false));
-
+            ->with('defaultUserOwner');
         $form->expects($this->once())
             ->method('add')
             ->with(
-                $this->equalTo('defaultBusinessUnitOwner'),
-                $this->equalTo(BusinessUnitSelectType::class),
-                $this->equalTo(
-                    [
-                        'required'    => true,
-                        'label'       => 'oro.integration.integration.default_business_unit_owner.label',
-                        'tooltip'     => 'oro.integration.integration.default_business_unit_owner.description',
-                        'constraints' => new NotBlank(),
-                    ]
-                )
+                'defaultBusinessUnitOwner',
+                BusinessUnitSelectType::class,
+                [
+                    'required'    => true,
+                    'label'       => 'oro.integration.integration.default_business_unit_owner.label',
+                    'tooltip'     => 'oro.integration.integration.default_business_unit_owner.description',
+                    'constraints' => new NotBlank(),
+                ]
             )
-            ->will($this->returnValue(true));
-
+            ->willReturn(true);
 
         $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);
@@ -282,29 +246,25 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPreSetWithUserDefaultOwnerTypeAndExistingSameField()
     {
-        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('integration_type'));
+            ->willReturn('integration_type');
 
         $this->typesRegistry->expects($this->any())
             ->method('getDefaultOwnerType')
-            ->with($this->equalTo('integration_type'))
-            ->will($this->returnValue(DefaultOwnerTypeAwareInterface::USER));
+            ->with('integration_type')
+            ->willReturn(DefaultOwnerTypeAwareInterface::USER);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-
-        $form->expects($this->at(0))
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->exactly(2))
             ->method('has')
-            ->with($this->equalTo('defaultBusinessUnitOwner'))
-            ->will($this->returnValue(false));
-
-        $form->expects($this->at(1))
-            ->method('has')
-            ->with($this->equalTo('defaultUserOwner'))
-            ->will($this->returnValue(true));
-
-        $form->expects($this->never())->method('add');
+            ->willReturnMap([
+                ['defaultBusinessUnitOwner', false],
+                ['defaultUserOwner', true]
+            ]);
+        $form->expects($this->never())
+            ->method('add');
 
         $event = new  FormEvent($form, $integration);
         $this->subscriber->preSet($event);
@@ -312,29 +272,25 @@ class DefaultOwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPreSetWithBusinessUnitDefaultOwnerTypeAndExistingSameField()
     {
-        $integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $integration = $this->createMock(Channel::class);
         $integration->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue('integration_type'));
+            ->willReturn('integration_type');
 
         $this->typesRegistry->expects($this->any())
             ->method('getDefaultOwnerType')
-            ->with($this->equalTo('integration_type'))
-            ->will($this->returnValue(DefaultOwnerTypeAwareInterface::BUSINESS_UNIT));
+            ->with('integration_type')
+            ->willReturn(DefaultOwnerTypeAwareInterface::BUSINESS_UNIT);
 
-        $form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
-
-        $form->expects($this->at(0))
+        $form = $this->createMock(FormInterface::class);
+        $form->expects($this->exactly(2))
             ->method('has')
-            ->with($this->equalTo('defaultUserOwner'))
-            ->will($this->returnValue(false));
-
-        $form->expects($this->at(1))
-            ->method('has')
-            ->with($this->equalTo('defaultBusinessUnitOwner'))
-            ->will($this->returnValue(true));
-
-        $form->expects($this->never())->method('add');
+            ->willReturnMap([
+                ['defaultBusinessUnitOwner', true],
+                ['defaultUserOwner', false]
+            ]);
+        $form->expects($this->never())
+            ->method('add');
 
         $event = new FormEvent($form, $integration);
         $this->subscriber->preSet($event);

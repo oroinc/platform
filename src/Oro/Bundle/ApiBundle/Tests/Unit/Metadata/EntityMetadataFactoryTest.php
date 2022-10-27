@@ -10,12 +10,15 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityMetadataFactoryTest extends OrmRelatedTestCase
 {
     /** @var EntityMetadataFactory */
     private $metadataFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -24,8 +27,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
 
     public function testCreateEntityMetadata()
     {
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(Entity\Product::class);
+        $expectedMetadata = new EntityMetadata(Entity\Product::class);
         $expectedMetadata->setIdentifierFieldNames(['id']);
         $expectedMetadata->setHasIdentifierGenerator(true);
         $expectedMetadata->setInheritedType(false);
@@ -39,8 +41,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
 
     public function testCreateEntityMetadataForEntityWithCompositeIdentifier()
     {
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(Entity\CompositeKeyEntity::class);
+        $expectedMetadata = new EntityMetadata(Entity\CompositeKeyEntity::class);
         $expectedMetadata->setIdentifierFieldNames(['id', 'title']);
         $expectedMetadata->setHasIdentifierGenerator(false);
         $expectedMetadata->setInheritedType(false);
@@ -185,6 +186,36 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         );
 
         self::assertEquals($expectedMetadata, $metadata);
+    }
+
+    public function testCreateFieldMetadataForNonManageableField()
+    {
+        $expectedMetadata = new FieldMetadata();
+        $expectedMetadata->setName('another');
+        $expectedMetadata->setDataType('string');
+        $expectedMetadata->setIsNullable(true);
+
+        $metadata = $this->metadataFactory->createFieldMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
+            'another',
+            'string'
+        );
+
+        self::assertEquals($expectedMetadata, $metadata);
+    }
+
+    public function testCreateFieldMetadataForNonManageableFieldWhenFieldTypeIsNotSpecified()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The data type for "%s::another" is not defined.',
+            Entity\Product::class
+        ));
+
+        $this->metadataFactory->createFieldMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
+            'another'
+        );
     }
 
     public function testCreateAssociationMetadataForManyToOne()

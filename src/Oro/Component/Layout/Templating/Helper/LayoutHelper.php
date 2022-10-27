@@ -22,11 +22,6 @@ class LayoutHelper extends Helper
     /** @var FormRendererEngineInterface */
     private $formRendererEngine;
 
-    /**
-     * @param FormRendererInterface $renderer
-     * @param TextHelper $textHelper
-     * @param FormRendererEngineInterface $formRendererEngine
-     */
     public function __construct(
         FormRendererInterface $renderer,
         TextHelper $textHelper,

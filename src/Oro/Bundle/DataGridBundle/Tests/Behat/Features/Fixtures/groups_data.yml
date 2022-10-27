@@ -1,0 +1,5 @@
+Oro\Bundle\UserBundle\Entity\Group:
+    businessUnit{1..105}:
+        name: Test-<current()>
+        owner: '@business_unit'
+        organization: '@organization'

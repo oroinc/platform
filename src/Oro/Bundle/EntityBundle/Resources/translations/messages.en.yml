@@ -12,6 +12,9 @@ oro:
             choose_entity_fields:   Choose fields...
             entity_fields:          Fields
             entity_related:         Related
+        formatter:
+            simple_array:
+                default: N/A
 
         plural_label: Entities
         item: "Item #%id%"
@@ -36,6 +39,8 @@ oro:
                         label.tooltip: To keep the attribute content unlabeled on the Front Store, prefix the label text with an underscore (e.g. _Video Review, _Img Front View, _Img Rare View).
                         description: Description
                         description.tooltip: When filled in, description will be used as a field tooltip on entity forms
+                        actualize_owning_side_on_change: Actualize relation-owning entity on update
+                        actualize_owning_side_on_change.tooltip: Actualize "Updated At" and "Updated By" fields of the owning entity when related items are updated
             datagrid:
                 field:
                     items:
@@ -61,8 +66,10 @@ oro:
             system_config.label: System Config
 
         entityfieldfallbackvalue:
-            entity_label: Entity fallback value
-            entity_plural_label: Entity fallback values
+            entity_label: Entity Fallback Value
+            entity_plural_label: Entity Fallback Values
+            entity_description: "This entity represents one of three value options: scalar, array, or fallback to another value"
+            entity_grid_all_view_label: All %entity_plural_label%
             array_value:
                 label: Array value
                 description: The array value for the field

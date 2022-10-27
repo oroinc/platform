@@ -22,10 +22,6 @@ class WorkflowStartListener
     /** @var WorkflowAwareCache */
     private $cache;
 
-    /**
-     * @param WorkflowManagerRegistry $workflowManagerRegistry
-     * @param WorkflowAwareCache $cache
-     */
     public function __construct(
         WorkflowManagerRegistry $workflowManagerRegistry,
         WorkflowAwareCache $cache
@@ -36,8 +32,6 @@ class WorkflowStartListener
 
     /**
      * Schedule workflow auto start for entity.
-     *
-     * @param LifecycleEventArgs $args
      */
     public function postPersist(LifecycleEventArgs $args)
     {

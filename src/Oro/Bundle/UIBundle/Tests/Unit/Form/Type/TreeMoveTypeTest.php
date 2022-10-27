@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ShoppingListBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension;
 use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;
@@ -14,10 +14,6 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
 {
     /**
      * @dataProvider submitProvider
-     *
-     * @param TreeCollection $defaultData
-     * @param array          $submittedData
-     * @param TreeCollection $expectedData
      */
     public function testSubmit(TreeCollection $defaultData, array $submittedData, TreeCollection $expectedData)
     {
@@ -40,13 +36,11 @@ class TreeMoveTypeTest extends FormIntegrationTestCase
         $form->submit($submittedData);
 
         $this->assertEquals(true, $form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitProvider()
+    public function submitProvider(): array
     {
         $parent = new TreeItem('parent', 'Parent');
 

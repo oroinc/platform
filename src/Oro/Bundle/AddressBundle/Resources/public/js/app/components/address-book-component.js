@@ -1,26 +1,27 @@
 define(function(require) {
     'use strict';
 
-    var AddressBookComponent;
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var AddressBookView = require('oroaddress/js/address-book');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const AddressBookView = require('oroaddress/js/address-book');
 
-    AddressBookComponent = BaseComponent.extend({
+    const AddressBookComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat([
-            'addressListUrl', 'addressBookSelector', 'addresses'
+            'addressListUrl', 'addressBookSelector', 'addresses', 'addressMapOptions', 'isAddressHtmlFormatted'
         ]),
 
         addressBookSelector: '#address-book',
 
+        isAddressHtmlFormatted: false,
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AddressBookComponent() {
-            AddressBookComponent.__super__.constructor.apply(this, arguments);
+        constructor: function AddressBookComponent(options) {
+            AddressBookComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function() {
             this._createAddressBook();
@@ -37,7 +38,9 @@ define(function(require) {
         _getAddressBookViewOptions: function() {
             return {
                 el: this.addressBookSelector,
-                addressListUrl: this.addressListUrl
+                addressListUrl: this.addressListUrl,
+                addressMapOptions: this.addressMapOptions || {},
+                isAddressHtmlFormatted: this.isAddressHtmlFormatted
             };
         },
 

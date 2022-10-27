@@ -32,8 +32,9 @@
 
     min-height: $loading-mask-icon-size + 6px;
 
-    body& {
+    @at-root body#{&} {
         height: 100vh;
+        overflow: hidden;
     }
 
     > .loader-mask.shown {
@@ -44,9 +45,11 @@
         justify-content: center;
     }
 
-    // hide all nested loaders
+    /**
+        1. hide all nested loaders
+        2. hide rest of first level loaders, except first one
+     */
     .loading .loader-mask.shown,
-        // hide rest of first level loaders, except first one
     > .loader-mask.shown ~ .loader-mask.shown {
         display: none;
     }

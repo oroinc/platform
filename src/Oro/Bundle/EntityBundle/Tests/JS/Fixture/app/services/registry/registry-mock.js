@@ -19,7 +19,7 @@ define(function(require) {
             }
         },
         put: function(instance, applicant) {
-            var globalId = instance.globalId;
+            const globalId = instance.globalId;
             if (this._entries[globalId]) {
                 throw new Error('is already registered');
             }

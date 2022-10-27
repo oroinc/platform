@@ -17,7 +17,7 @@ class ProcessorApplicableCheckerFactory implements ProcessorApplicableCheckerFac
     {
         $applicableChecker = new ChainApplicableChecker();
         $applicableChecker->addChecker(
-            new MatchApplicableChecker(['group'], ['class', 'parentClass'])
+            new MatchApplicableChecker([], ['class', 'parentClass'])
         );
 
         return $applicableChecker;

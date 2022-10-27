@@ -2,14 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\EventListener;
 
-use Doctrine\Common\EventManager;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 use Oro\Component\Testing\Doctrine\StubEventListener;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -20,51 +17,44 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
  */
 class WorkflowStartListenerTest extends WorkflowTestCase
 {
-    /** @var EntityManager */
-    protected $entityManger;
-
-    /** @var WorkflowManager */
-    protected $systemWorkflowManager;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
-        $this->entityManger = $this->getEntityManager(WorkflowAwareEntity::class);
-        $this->systemWorkflowManager = self::getSystemWorkflowManager();
     }
 
     public function testPersistStarts()
     {
-        self::loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/StartListenerActiveNotActive');
+        $this->loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/StartListenerActiveNotActive');
 
         $firstEntity = $this->createWorkflowAwareEntity();
+        $systemWorkflowManager = $this->getSystemWorkflowManager();
 
         self::assertInstanceOf(
             WorkflowItem::class,
-            $this->systemWorkflowManager->getWorkflowItem($firstEntity, 'test_flow_autostart')
+            $systemWorkflowManager->getWorkflowItem($firstEntity, 'test_flow_autostart')
         );
         self::assertNull(
-            $this->systemWorkflowManager->getWorkflowItem($firstEntity, 'test_flow_autostart_not_active')
+            $systemWorkflowManager->getWorkflowItem($firstEntity, 'test_flow_autostart_not_active')
         );
 
         //test after activation
-        $this->systemWorkflowManager->activateWorkflow('test_flow_autostart_not_active');
+        $systemWorkflowManager->activateWorkflow('test_flow_autostart_not_active');
 
         $secondEntity = $this->createWorkflowAwareEntity();
 
         self::assertInstanceOf(
             WorkflowItem::class,
-            $this->systemWorkflowManager->getWorkflowItem($secondEntity, 'test_flow_autostart')
+            $systemWorkflowManager->getWorkflowItem($secondEntity, 'test_flow_autostart')
         );
         self::assertInstanceOf(
             WorkflowItem::class,
-            $this->systemWorkflowManager->getWorkflowItem($secondEntity, 'test_flow_autostart_not_active')
+            $systemWorkflowManager->getWorkflowItem($secondEntity, 'test_flow_autostart_not_active')
         );
     }
 
     public function testForceAutoStartDifferentApplications()
     {
-        self::loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/StartListenerForceAutoStart');
+        $this->loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/StartListenerForceAutoStart');
 
         //making context of execution as default application
         $user = self::getContainer()->get('doctrine')
@@ -77,21 +67,22 @@ class WorkflowStartListenerTest extends WorkflowTestCase
         self::getContainer()->get('event_dispatcher')
             ->addListener(KernelEvents::REQUEST, function () {
                 $entity = $this->createWorkflowAwareEntity();
+                $systemWorkflowManager = $this->getSystemWorkflowManager();
 
                 //as default app
                 self::assertInstanceOf(
                     WorkflowItem::class,
-                    $this->systemWorkflowManager->getWorkflowItem($entity, 'test_flow_force_autostart_different_app')
+                    $systemWorkflowManager->getWorkflowItem($entity, 'test_flow_force_autostart_different_app')
                 );
 
                 self::assertInstanceOf(
                     WorkflowItem::class,
-                    $this->systemWorkflowManager->getWorkflowItem($entity, 'test_flow_no_force_autostart_default_app')
+                    $systemWorkflowManager->getWorkflowItem($entity, 'test_flow_no_force_autostart_default_app')
                 );
 
                 self::assertNotInstanceOf(
                     WorkflowItem::class,
-                    $this->systemWorkflowManager->getWorkflowItem($entity, 'test_flow_no_force_autostart_different_app')
+                    $systemWorkflowManager->getWorkflowItem($entity, 'test_flow_no_force_autostart_different_app')
                 );
             });
 
@@ -105,7 +96,7 @@ class WorkflowStartListenerTest extends WorkflowTestCase
         $transitionRecords = $this->getEntityManager(WorkflowTransitionRecord::class)
             ->getRepository(WorkflowTransitionRecord::class)->findAll();
 
-        self::loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/StartListenerMassAutoStart');
+        $this->loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/StartListenerMassAutoStart');
 
         for ($i = 0; $i < 10; $i++) {
             $this->createWorkflowAwareEntity(false);
@@ -120,11 +111,11 @@ class WorkflowStartListenerTest extends WorkflowTestCase
          */
         $listenerMock->expects($this->exactly(3))->method('postFlush');
 
-        /** @var EventManager $eventManager */
-        $eventManager = $this->entityManger->getEventManager();
+        $entityManger = $this->getEntityManager(WorkflowAwareEntity::class);
+        $eventManager = $entityManger->getEventManager();
         $eventManager->addEventListener(Events::postFlush, $listenerMock);
 
-        $this->entityManger->flush();
+        $entityManger->flush();
 
         $this->assertWorkflowItemsCount(0, 'test_flow_autostart_three_inactive');
         $this->assertWorkflowItemsCount(10, 'test_flow_autostart_two');

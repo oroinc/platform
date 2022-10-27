@@ -1,0 +1,5 @@
+title: Bar2
+icon: bar2.ico
+module: widget/bar2
+placement: right
+settings: ~

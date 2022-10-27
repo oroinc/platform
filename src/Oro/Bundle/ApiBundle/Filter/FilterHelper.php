@@ -7,23 +7,19 @@ namespace Oro\Bundle\ApiBundle\Filter;
  */
 class FilterHelper
 {
-    const PAGE_NUMBER_FIELD_NAME = '__page_number__';
-    const PAGE_SIZE_FIELD_NAME   = '__page_size__';
-    const SORT_FIELD_NAME        = '__sort__';
+    private const PAGE_NUMBER_FIELD_NAME = '__page_number__';
+    private const PAGE_SIZE_FIELD_NAME   = '__page_size__';
+    private const SORT_FIELD_NAME        = '__sort__';
 
     /** @var FilterCollection */
-    protected $filters;
+    private $filters;
 
     /** @var FilterValueAccessorInterface */
-    protected $filterValues;
+    private $filterValues;
 
     /** @var array [field name => [FilterValue|null, filterKey, filter], ...] */
-    protected $filterMap;
+    private $filterMap;
 
-    /**
-     * @param FilterCollection             $filters
-     * @param FilterValueAccessorInterface $filterValues
-     */
     public function __construct(FilterCollection $filters, FilterValueAccessorInterface $filterValues)
     {
         $this->filters = $filters;
@@ -32,13 +28,11 @@ class FilterHelper
 
     /**
      * Return a value of "page number" filter.
-     *
-     * @return int|null
      */
-    public function getPageNumber()
+    public function getPageNumber(): ?int
     {
         $result = null;
-        $filterValue = $this->getFilterValue(FilterHelper::PAGE_NUMBER_FIELD_NAME);
+        $filterValue = $this->getFilterValue(self::PAGE_NUMBER_FIELD_NAME);
         if ($filterValue) {
             $result = $filterValue->getValue();
         }
@@ -48,13 +42,11 @@ class FilterHelper
 
     /**
      * Return a value of "page size" filter.
-     *
-     * @return int|null
      */
-    public function getPageSize()
+    public function getPageSize(): ?int
     {
         $result = null;
-        $filterValue = $this->getFilterValue(FilterHelper::PAGE_SIZE_FIELD_NAME);
+        $filterValue = $this->getFilterValue(self::PAGE_SIZE_FIELD_NAME);
         if ($filterValue) {
             $result = $filterValue->getValue();
         }
@@ -67,10 +59,10 @@ class FilterHelper
      *
      * @return array|null [field name => direction, ...] or NULL
      */
-    public function getOrderBy()
+    public function getOrderBy(): ?array
     {
         $result = null;
-        $filterValue = $this->getFilterValue(FilterHelper::SORT_FIELD_NAME);
+        $filterValue = $this->getFilterValue(self::SORT_FIELD_NAME);
         if ($filterValue) {
             $result = $filterValue->getValue();
         }
@@ -80,18 +72,14 @@ class FilterHelper
 
     /**
      * Returns a value of a given boolean filter.
-     *
-     * @param string $fieldName
-     *
-     * @return bool|null
      */
-    public function getBooleanFilterValue($fieldName)
+    public function getBooleanFilterValue(string $fieldName): ?bool
     {
         $result = null;
         $filterValue = $this->getFilterValue($fieldName);
         if ($filterValue) {
             $result = $filterValue->getValue();
-            if (ComparisonFilter::NEQ === $filterValue->getOperator()) {
+            if (FilterOperator::NEQ === $filterValue->getOperator()) {
                 $result = !$result;
             }
         }
@@ -101,12 +89,8 @@ class FilterHelper
 
     /**
      * Returns a value of a given filter.
-     *
-     * @param string $fieldName
-     *
-     * @return FilterValue|null
      */
-    public function getFilterValue($fieldName)
+    public function getFilterValue(string $fieldName): ?FilterValue
     {
         $this->ensureInitialized();
 
@@ -117,7 +101,7 @@ class FilterHelper
         $item = $this->filterMap[$fieldName];
         $filterValue = $item[0];
         if (null === $filterValue && $item[2] instanceof StandaloneFilterWithDefaultValue) {
-            $filterValue = new FilterValue($item[1], $item[2]->getDefaultValue(), StandaloneFilter::EQ);
+            $filterValue = new FilterValue($item[1], $item[2]->getDefaultValue(), FilterOperator::EQ);
             $this->filterMap[$fieldName][0] = $filterValue;
         }
 
@@ -127,7 +111,7 @@ class FilterHelper
     /**
      * Makes sure that $this->filterMap is initialized.
      */
-    protected function ensureInitialized()
+    private function ensureInitialized(): void
     {
         if (null !== $this->filterMap) {
             return;

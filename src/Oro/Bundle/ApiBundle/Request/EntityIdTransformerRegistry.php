@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * Contains all entity identifier value transformers
@@ -26,12 +26,6 @@ class EntityIdTransformerRegistry
     /** @var array [request type => EntityIdTransformerInterface, ...] */
     private $cache = [];
 
-    /**
-     * @param array                    $transformers
-     * @param ContainerInterface       $container
-     * @param RequestExpressionMatcher $matcher
-     * @param EntityIdResolverRegistry $resolverRegistry
-     */
     public function __construct(
         array $transformers,
         ContainerInterface $container,
@@ -46,10 +40,6 @@ class EntityIdTransformerRegistry
 
     /**
      * Gets entity identifier value transformer for the given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
      */
     public function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {

@@ -4,12 +4,12 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class ConnectorContextMediator
 {
@@ -19,17 +19,13 @@ class ConnectorContextMediator
     /** @var ServiceLink */
     protected $registryLink;
 
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $doctrineRegistry;
 
     /** @var TransportInterface[] */
     protected $transportByIntegration = [];
 
-    /**
-     * @param ServiceLink       $registryLink
-     * @param RegistryInterface $doctrineRegistry
-     */
-    public function __construct(ServiceLink $registryLink, RegistryInterface $doctrineRegistry)
+    public function __construct(ServiceLink $registryLink, ManagerRegistry $doctrineRegistry)
     {
         $this->registryLink     = $registryLink;
         $this->doctrineRegistry = $doctrineRegistry;

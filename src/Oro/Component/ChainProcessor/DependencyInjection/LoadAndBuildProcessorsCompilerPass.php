@@ -9,21 +9,17 @@ use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * This DIC compiler pass can be used if you want to use DIC tags to load processors
- * and build the ProcessorBag configuration during the buildin of DIC instead of do it in runtime.
+ * and build the ProcessorBag configuration during the building of DIC instead of do it in runtime.
  */
 class LoadAndBuildProcessorsCompilerPass implements CompilerPassInterface
 {
     /** @var string */
-    protected $processorBagConfigProviderServiceId;
+    private $processorBagConfigProviderServiceId;
 
     /** @var string */
-    protected $processorTagName;
+    private $processorTagName;
 
-    /**
-     * @param string $processorBagConfigProviderServiceId
-     * @param string $processorTagName
-     */
-    public function __construct($processorBagConfigProviderServiceId, $processorTagName)
+    public function __construct(string $processorBagConfigProviderServiceId, string $processorTagName)
     {
         $this->processorBagConfigProviderServiceId = $processorBagConfigProviderServiceId;
         $this->processorTagName = $processorTagName;
@@ -46,20 +42,16 @@ class LoadAndBuildProcessorsCompilerPass implements CompilerPassInterface
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition       $processorBagConfigProviderServiceDef
-     */
-    protected function registerProcessors(
+    private function registerProcessors(
         ContainerBuilder $container,
         Definition $processorBagConfigProviderServiceDef
-    ) {
+    ): void {
         $numberOfArguments = count($processorBagConfigProviderServiceDef->getArguments());
         $groups = [];
         // try get groups from the first argument of the config provider service
         if ($numberOfArguments > 0) {
             $groups = $processorBagConfigProviderServiceDef->getArgument(0);
-            if (is_string($groups) && 0 === strpos($groups, '%')) {
+            if (is_string($groups) && 0 === strncmp($groups, '%', 1)) {
                 $groups = $container->getParameter(substr($groups, 1, -1));
             }
         }
@@ -82,12 +74,12 @@ class LoadAndBuildProcessorsCompilerPass implements CompilerPassInterface
         $builder = new ProcessorBagConfigBuilder($groups, $processors);
         // inject built processors to the config provider service
         if ($numberOfArguments > 1) {
-            $processorBagConfigProviderServiceDef->replaceArgument(1, $builder->getProcessors());
+            $processorBagConfigProviderServiceDef->replaceArgument(1, $builder->getAllProcessors());
         } else {
             if ($numberOfArguments === 0) {
                 $processorBagConfigProviderServiceDef->addArgument([]);
             }
-            $processorBagConfigProviderServiceDef->addArgument($builder->getProcessors());
+            $processorBagConfigProviderServiceDef->addArgument($builder->getAllProcessors());
         }
     }
 }

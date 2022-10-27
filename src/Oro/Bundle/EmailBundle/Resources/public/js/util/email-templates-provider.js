@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var routing = require('routing');
-    var __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const routing = require('routing');
 
     return {
         create: function(templateId, relatedEntityId) {
-            var url = routing.generate(
+            const url = routing.generate(
                 'oro_api_get_emailtemplate_compiled',
                 {id: templateId, entityId: relatedEntityId}
             );
@@ -15,7 +14,7 @@ define(function(require) {
             return $.ajax({
                 url: url,
                 dataType: 'json',
-                errorHandlerMessage: __('oro.email.emailtemplate.load_failed')
+                errorHandlerMessage: ''
             }).then(function(data, textStatus, jqXHR) {
                 return data;
             });

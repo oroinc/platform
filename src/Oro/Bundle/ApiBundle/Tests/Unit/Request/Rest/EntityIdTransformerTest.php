@@ -15,7 +15,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdTransformer */
     private $entityIdTransformer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
@@ -25,13 +25,13 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformProvider
      */
-    public function testTransform($id, $expectedResult)
+    public function testTransform(int|array $id, string $expectedResult)
     {
-        $result = $this->entityIdTransformer->transform($id, new EntityMetadata());
+        $result = $this->entityIdTransformer->transform($id, new EntityMetadata('Test\Entity'));
         self::assertSame($expectedResult, $result);
     }
 
-    public function transformProvider()
+    public function transformProvider(): array
     {
         return [
             [123, '123'],
@@ -45,8 +45,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = '123';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
 
@@ -59,14 +58,12 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(123, $result);
     }
 
-
     public function testReverseTransformForSingleIdentifierWhenFieldDataTypeIsString()
     {
         $entityClass = 'Test\Class';
         $value = '123';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'))->setDataType('string');
 
@@ -82,20 +79,15 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = 'id1=123;id2=456';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
 
-        $this->valueNormalizer->expects(self::at(0))
+        $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->with('123', 'integer')
-            ->willReturn(123);
-        $this->valueNormalizer->expects(self::at(1))
-            ->method('normalizeValue')
-            ->with('456', 'integer')
-            ->willReturn(456);
+            ->withConsecutive(['123', 'integer'], ['456', 'integer'])
+            ->willReturnOnConsecutiveCalls(123, 456);
 
         $result = $this->entityIdTransformer->reverseTransform($value, $metadata);
         self::assertSame(
@@ -109,8 +101,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = 'id1=123;id2=456';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('string');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('string');
@@ -130,8 +121,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = http_build_query(['id1' => 'key 1', 'id2' => 'key&1\'1'], '', ';');
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('string');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('string');
@@ -146,19 +136,18 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage The entity identifier contains the key "anotherId" which is not defined in composite identifier of the entity "Test\Class".
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformForCompositeIdentifierWithInvalidField()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'The entity identifier contains the key "anotherId" which is not defined'
+            . ' in composite identifier of the entity "Test\Class".'
+        );
+
         $entityClass = 'Test\Class';
         $value = 'id1=123;anotherId=456';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
@@ -171,19 +160,18 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->entityIdTransformer->reverseTransform($value, $metadata);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage The entity identifier does not contain all keys defined in composite identifier of the entity "Test\Class".
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformForCompositeIdentifierWhenItDoesNotContainAllIdentifierFields()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'The entity identifier does not contain all keys defined in composite identifier of the entity'
+            . ' "Test\Class".'
+        );
+
         $entityClass = 'Test\Class';
         $value = 'id1=123';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
@@ -196,19 +184,17 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->entityIdTransformer->reverseTransform($value, $metadata);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Unexpected identifier value "id1=123;id2" for composite identifier of the entity "Test\Class".
-     */
-    // @codingStandardsIgnoreEnd
     public function testReverseTransformForCompositeIdentifierThatDoesNotHaveFieldValue()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(
+            'Unexpected identifier value "id1=123;id2" for composite identifier of the entity "Test\Class".'
+        );
+
         $entityClass = 'Test\Class';
         $value = 'id1=123;id2';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');

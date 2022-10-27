@@ -2,27 +2,27 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Model\Accessor;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Model\Accessor\ActivityAccessor;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class ActivityAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActivityAccessor $fieldAccessor */
-    protected $accessor;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    /** @var ActivityAccessor */
+    private $accessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->accessor = new ActivityAccessor($this->registry); //, $this->translator);
+        $this->accessor = new ActivityAccessor($this->doctrine);
     }
 
     public function testGetName()
@@ -31,19 +31,12 @@ class ActivityAccessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $entity
-     * @param FieldMetadata $metadata
-     * @param int $count
-     * @param $expectedValue
-     *
      * @dataProvider getValueDataProvider
      */
-    public function testGetValue($entity, FieldMetadata $metadata, $count, $expectedValue)
+    public function testGetValue(object $entity, FieldMetadata $metadata, int $count, $expectedValue)
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $repository = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repository = $this->createMock(ActivityListRepository::class);
 
         $repository->expects($this->once())
             ->method('getRecordsCountForTargetClassAndId')
@@ -52,18 +45,18 @@ class ActivityAccessorTest extends \PHPUnit\Framework\TestCase
         $em->expects($this->once())
             ->method('getRepository')
             ->willReturn($repository);
-        $this->registry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->willReturn($em);
 
         $this->assertEquals($expectedValue, $this->accessor->getValue($entity, $metadata));
     }
 
-    public function getValueDataProvider()
+    public function getValueDataProvider(): array
     {
         return [
             'activity' => [
-                'entity' => $this->createEntity('foo'),
+                'entity' => new EntityStub('foo'),
                 'metadata' => $this->getFieldMetadata('id', ['activity' => true, 'type' => 'test']),
                 'count' => 123,
                 'expected' => '123',
@@ -71,41 +64,24 @@ class ActivityAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function createEntity($id = null)
+    private function getFieldMetadata(string $fieldName = null, array $options = []): FieldMetadata
     {
-        return new EntityStub($id);
-    }
-
-    protected function getFieldMetadata($fieldName = null, array $options = [])
-    {
-        $result = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $result = $this->createMock(FieldMetadata::class);
         $result->expects($this->any())
             ->method('getFieldName')
-            ->will($this->returnValue($fieldName));
-
+            ->willReturn($fieldName);
         $result->expects($this->any())
             ->method('get')
-            ->will(
-                $this->returnCallback(
-                    function ($code) use ($options) {
-                        $this->assertArrayHasKey($code, $options);
-                        return $options[$code];
-                    }
-                )
-            );
+            ->willReturnCallback(function ($code) use ($options) {
+                $this->assertArrayHasKey($code, $options);
 
+                return $options[$code];
+            });
         $result->expects($this->any())
             ->method('has')
-            ->will(
-                $this->returnCallback(
-                    function ($code) use ($options) {
-                        return isset($options[$code]);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($code) use ($options) {
+                return isset($options[$code]);
+            });
 
         return $result;
     }

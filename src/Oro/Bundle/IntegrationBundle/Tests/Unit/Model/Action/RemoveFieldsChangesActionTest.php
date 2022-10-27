@@ -5,46 +5,36 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Action;
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 use Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RemoveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var RemoveFieldsChangesAction
-     */
-    protected $action;
+    /** @var RemoveFieldsChangesAction */
+    private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $contextAccessor = new ContextAccessor();
-        $this->action    = new RemoveFieldsChangesAction($contextAccessor);
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action = new RemoveFieldsChangesAction(new ContextAccessor());
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     /**
-     * @param array  $options
-     * @param string $message
-     *
      * @dataProvider initializeDataProvider
      */
-    public function testInitializeFailed(array $options, $message = null)
+    public function testInitializeFailed(array $options, ?string $message)
     {
         if ($message) {
-            $this->expectException('Oro\Component\Action\Exception\InvalidParameterException');
+            $this->expectException(InvalidParameterException::class);
             $this->expectExceptionMessage($message);
         }
 
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeDataProvider()
+    public function initializeDataProvider(): array
     {
         return [
             'empty' => [
@@ -59,22 +49,14 @@ class RemoveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param array $context
-     *
      * @dataProvider executeDataProvider
      */
     public function testExecuteAction(array $options, array $context)
     {
-        /** @var FieldsChangesManager|\PHPUnit\Framework\MockObject\MockObject $fieldsChangesManager */
-        $fieldsChangesManager = $this
-            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $fieldsChangesManager = $this->createMock(FieldsChangesManager::class);
 
         if (!empty($context['entity'])) {
-            $fieldsChangesManager
-                ->expects($this->once())
+            $fieldsChangesManager->expects($this->once())
                 ->method('removeChanges')
                 ->with($this->equalTo($context['entity']));
         }
@@ -84,10 +66,7 @@ class RemoveFieldsChangesActionTest extends \PHPUnit\Framework\TestCase
         $this->action->execute(new ProcessData($context));
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             [

@@ -4,14 +4,13 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Proxy\Proxy;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\UnitOfWork;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
-use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestQueryStringNormalizer;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
@@ -19,14 +18,18 @@ use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 
 /**
+ * The base class for REST API controllers that implement GET HTTP method.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
+abstract class RestGetController extends AbstractFOSRestController implements
+    EntityManagerAwareInterface,
+    RestApiReadInterface
 {
     const ITEMS_PER_PAGE = 10;
 
@@ -51,7 +54,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
 
                 $dispatcher = $this->get('event_dispatcher');
                 foreach ($searchResult->getElements() as $item) {
-                    $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+                    $dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
                 }
 
                 $result       = $this->getPreparedItems($searchResult->toArray());
@@ -98,7 +101,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
             $result ?: '',
             self::ACTION_READ,
             ['result' => $result],
-            $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
+            $result ? Response::HTTP_OK : Response::HTTP_NOT_FOUND
         );
     }
 
@@ -116,7 +119,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $metadata = $this->get('oro_soap.provider.metadata')->getMetadataFor($this);
 
         return $this->handleView(
-            $this->view($metadata, Codes::HTTP_OK)
+            $this->view($metadata, Response::HTTP_OK)
         );
     }
 
@@ -130,7 +133,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     protected function getSupportedQueryParameters($methodName)
     {
         /** @var ParamFetcherInterface $paramFetcher */
-        $paramFetcher = $this->container->get('fos_rest.request.param_fetcher');
+        $paramFetcher = $this->container->get('oro_soap.request.param_fetcher');
         $paramFetcher->setController([$this, $methodName]);
 
         $skipParameters = ['limit', 'page'];
@@ -163,6 +166,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      * @param  array $resultFields If not empty, result item will contain only given fields.
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getPreparedItem($entity, $resultFields = [])
     {
@@ -187,9 +191,9 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                 return [
                     'id'     => $entity->getRecordId(),
                     'entity' => $entity->getEntityName(),
-                    'title'  => $entity->getRecordTitle()
                 ];
             } else {
+                $entityClass = get_class($entity);
                 /** @var UnitOfWork $uow */
                 $uow = $this->getDoctrine()->getManager()->getUnitOfWork();
                 foreach ($uow->getOriginalEntityData($entity) as $field => $value) {
@@ -197,26 +201,27 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                         continue;
                     }
 
-                    $accessors = ['get' . ucfirst($field), 'is' . ucfirst($field), 'has' . ucfirst($field)];
-                    foreach ($accessors as $accessor) {
-                        if (method_exists($entity, $accessor)) {
-                            $isForbidden = !$this->isGranted('VIEW', new FieldVote($entity, $field));
-                            if ($isForbidden) {
-                                continue;
-                            }
-
-                            $value = $entity->$accessor();
-
-                            $this->transformEntityField($field, $value);
-                            $result[$field] = $value;
-                            break;
-                        }
+                    $dataAccessor = $this->getDataAccessor();
+                    if ($dataAccessor->hasGetter($entityClass, $field)
+                        && $this->isGranted('VIEW', new FieldVote($entity, $field))
+                    ) {
+                        $value = $dataAccessor->getValue($entity, $field);
+                        $this->transformEntityField($field, $value);
+                        $result[$field] = $value;
                     }
                 }
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @return DataAccessorInterface
+     */
+    protected function getDataAccessor()
+    {
+        return $this->get('oro_soap.entity_serializer.entity_accessor');
     }
 
     /**
@@ -266,7 +271,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $criteria = Criteria::create();
 
         foreach ($filters as $filterName => $data) {
-            list($operator, $value) = $data;
+            [$operator, $value] = $data;
 
             $normaliser = isset($normalisers[$filterName]) ? $normalisers[$filterName] : false;
             if ($normaliser) {
@@ -295,9 +300,12 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function filterQueryParameters(array $supportedParameters)
     {
+        $queryString = $this->get('request_stack')->getCurrentRequest()->server->get('QUERY_STRING');
+        $queryString = RequestQueryStringNormalizer::normalizeQueryString($queryString);
+
         if (false === preg_match_all(
-            '#(?P<name>[\w\d_-]+)(?P<operator>(<|>|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))(?P<value>[^&]+)#',
-            $this->get('request_stack')->getCurrentRequest()->getQueryString(),
+            '#(?P<name>[\w\d_\-]+)(?P<operator>(<|>|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))(?P<value>[^&]+)#',
+            $queryString,
             $matches,
             PREG_SET_ORDER
         )) {
@@ -370,10 +378,14 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function transformEntityField($field, &$value)
     {
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
         if ($value instanceof Proxy && method_exists($value, '__toString')) {
             $value = (string)$value;
         } elseif ($value instanceof \DateTime) {
             $value = $value->format('c');
+        } elseif (is_object($value) && method_exists($value, '__toString') &&
+            $doctrineHelper->isManageableEntity($value)) {
+            $value = (string)$value;
         }
     }
 
@@ -385,7 +397,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      *
      * @return Response
      */
-    protected function buildResponse($data, $action, $contextValues = [], $status = Codes::HTTP_OK)
+    protected function buildResponse($data, $action, $contextValues = [], $status = Response::HTTP_OK)
     {
         if ($data instanceof View) {
             $response = parent::handleView($data);
@@ -413,6 +425,6 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function buildNotFoundResponse()
     {
-        return $this->buildResponse('', self::ACTION_READ, ['result' => null], Codes::HTTP_NOT_FOUND);
+        return $this->buildResponse('', self::ACTION_READ, ['result' => null], Response::HTTP_NOT_FOUND);
     }
 }

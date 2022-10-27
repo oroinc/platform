@@ -43,7 +43,7 @@ class EmbedFormStartType extends AbstractFormType
         );
         parent::buildView($view, $block, $options);
     }
-    
+
     /**
      * {@inheritdoc}
      *

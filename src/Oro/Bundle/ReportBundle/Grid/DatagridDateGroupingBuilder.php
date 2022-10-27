@@ -4,15 +4,19 @@ namespace Oro\Bundle\ReportBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
+use Oro\Bundle\DataGridBundle\Tools\DateHelper;
 use Oro\Bundle\FilterBundle\Filter\DateGroupingFilter;
 use Oro\Bundle\FilterBundle\Filter\SkipEmptyPeriodsFilter;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
 
 /**
+ * Modifies datagrid query to allow for grouping by date
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DatagridDateGroupingBuilder
@@ -25,7 +29,7 @@ class DatagridDateGroupingBuilder
     const FIELDS_ACL_KEY_NAME = 'fields_acl';
     const COLUMNS_KEY_NAME = 'columns';
     const CALENDAR_DATE_COLUMN_ALIAS = 'cDate';
-    const CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE = 'CAST(%s as DATE) = CAST(%s.%s as DATE)';
+    const CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE = 'CAST(%s as DATE) = CAST(%s as DATE)';
     const CALENDAR_DATE_GRID_COLUMN_NAME = 'timePeriod';
     const DATE_PERIOD_FILTER = 'datePeriodFilter';
     const DEFAULT_GROUP_BY_FIELD = 'id';
@@ -40,19 +44,25 @@ class DatagridDateGroupingBuilder
      */
     protected $joinIdHelper;
 
+    /** @var DateHelper */
+    private $dateHelper;
+
     /**
      * @param string $calendarDateEntity
+     * @param DateHelper $dateHelper
      * @param JoinIdentifierHelper|null $joinIdHelper
      */
-    public function __construct($calendarDateEntity, JoinIdentifierHelper $joinIdHelper = null)
-    {
+    public function __construct(
+        $calendarDateEntity,
+        DateHelper $dateHelper,
+        JoinIdentifierHelper $joinIdHelper = null
+    ) {
         $this->calendarDateClass = $calendarDateEntity;
         $this->joinIdHelper = $joinIdHelper;
+        $this->dateHelper = $dateHelper;
     }
 
     /**
-     * @param DatagridConfiguration $config
-     * @param AbstractQueryDesigner $report
      * @throws InvalidDatagridConfigException
      */
     public function applyDateGroupingFilterIfRequired(DatagridConfiguration $config, AbstractQueryDesigner $report)
@@ -61,7 +71,7 @@ class DatagridDateGroupingBuilder
             return;
         }
 
-        $reportDefinition = json_decode($report->getDefinition(), true);
+        $reportDefinition = QueryDefinitionUtil::decodeDefinition($report->getDefinition());
         if (!$this->isDateGroupingFilterRequired($reportDefinition)) {
             return;
         }
@@ -100,9 +110,6 @@ class DatagridDateGroupingBuilder
         $this->removeViewLink($config);
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     */
     protected function removeViewLink(DatagridConfiguration $config)
     {
         if (!$config->offsetExists(static::PROPERTIES_KEY_NAME)) {
@@ -219,8 +226,6 @@ class DatagridDateGroupingBuilder
 
     /**
      * Adds two more columns to datagrid config related to grouping
-     *
-     * @param DatagridConfiguration $config
      */
     protected function changeColumnsSection(DatagridConfiguration $config)
     {
@@ -240,8 +245,6 @@ class DatagridDateGroupingBuilder
 
     /**
      * Configures sorter section for newly added date grouping columns
-     *
-     * @param DatagridConfiguration $config
      */
     protected function changeSortersSection(DatagridConfiguration $config)
     {
@@ -305,8 +308,9 @@ class DatagridDateGroupingBuilder
         return sprintf(
             static::CALENDAR_TABLE_JOIN_CONDITION_TEMPLATE,
             $this->getCalendarDateFieldReferenceString(),
-            $dateFieldTableAlias,
-            $dateFieldName
+            $this->dateHelper->getConvertTimezoneExpression(
+                sprintf('%s.%s', $dateFieldTableAlias, $dateFieldName)
+            )
         );
     }
 
@@ -370,8 +374,8 @@ class DatagridDateGroupingBuilder
      */
     protected function isDateGroupingFilterRequired($definition)
     {
-        return (is_array($definition)
-            && array_key_exists(DateGroupingType::DATE_GROUPING_NAME, $definition)
+        return
+            array_key_exists(DateGroupingType::DATE_GROUPING_NAME, $definition)
             && array_key_exists(
                 DateGroupingType::FIELD_NAME_ID,
                 $definition[DateGroupingType::DATE_GROUPING_NAME]
@@ -379,8 +383,7 @@ class DatagridDateGroupingBuilder
             && array_key_exists(
                 DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID,
                 $definition[DateGroupingType::DATE_GROUPING_NAME]
-            )
-        );
+            );
     }
 
     /**
@@ -396,22 +399,24 @@ class DatagridDateGroupingBuilder
 
     /**
      * @param DatagridConfiguration $config
-     * @param  [] $joinIds
+     * @param string[]              $joinIds
+     *
      * @return string
+     *
      * @throws InvalidDatagridConfigException
      */
-    protected function getRealDateFieldTableAlias(DatagridConfiguration $config, $joinIds)
+    protected function getRealDateFieldTableAlias(DatagridConfiguration $config, array $joinIds): string
     {
-        $tableAliasKey = end($joinIds);
         $tableAliases = $config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['table_aliases'];
-
-        if (!array_key_exists($tableAliasKey, $tableAliases)) {
-            throw new InvalidDatagridConfigException(
-                sprintf('The table alias for key %s must be defined!', $tableAliasKey)
-            );
+        $joinId = end($joinIds);
+        if (!\array_key_exists($joinId, $tableAliases)) {
+            throw new InvalidDatagridConfigException(sprintf(
+                'The table alias for the "%s" must be defined.',
+                $joinId
+            ));
         }
 
-        return $tableAliases[$tableAliasKey];
+        return $tableAliases[$joinId];
     }
 
     /**

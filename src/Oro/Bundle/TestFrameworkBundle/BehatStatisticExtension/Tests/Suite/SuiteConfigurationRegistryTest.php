@@ -6,7 +6,6 @@ use Behat\Testwork\Specification\SpecificationFinder;
 use Behat\Testwork\Suite\Generator\GenericSuiteGenerator;
 use Behat\Testwork\Suite\Suite;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\AvgTimeProvider\FeatureAvgTimeRegistry;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\FeatureStatisticRepository;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\FeaturePathLocator;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SpecificationCountDivider;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\SuiteConfigurationDivider;
@@ -46,8 +45,6 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider generateSetsDividedByCountProvider
-     * @param $divider
-     * @param $expectedSets
      */
     public function testGenerateSetsDividedByCount($divider, $expectedSets)
     {
@@ -128,9 +125,9 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dividingSuitesProvider
-     * @param int $divider
-     * @param array $suiteConfigs
-     * @param array $expectedSuites
+     *
+     * @param int   $divider
+     * @param array $expectedSuiteConfigs
      */
     public function testDivideSuites($divider, $expectedSuiteConfigs)
     {
@@ -177,13 +174,12 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Suite with 'Acme0' name does not configured
-     * @expectedExceptionMessage Configured suites: 'AcmeSuite3, AcmeSuite5'
-     */
     public function testNotExistentSuiteConfigException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Suite with 'Acme0' name does not configured");
+        $this->expectExceptionMessage("Configured suites: 'AcmeSuite3, AcmeSuite5'");
+
         $suiteConfigRegistry = $this->getSuiteConfigRegistry();
         $suiteConfigRegistry->getSuiteConfig('Acme0');
     }
@@ -193,10 +189,7 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
         $suiteConfigRegistry = $this->getSuiteConfigRegistry();
         $suiteConfigRegistry->generateSetsDividedByCount(8);
 
-        $this->assertInternalType(
-            'array',
-            $suiteConfigRegistry->getSet(SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_0')
-        );
+        $this->assertIsArray($suiteConfigRegistry->getSet(SuiteConfigurationRegistry::PREFIX_SUITE_SET.'_0'));
     }
 
     public function testFilterConfiguration()
@@ -205,12 +198,11 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('AcmeSuite0', $suiteConfigRegistry->getSuites());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Suite set with "Non existent" name does not registered
-     */
     public function testNotExistentSuiteSetException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Suite set with "Non existent" name does not registered');
+
         $suiteConfigRegistry = $this->getSuiteConfigRegistry();
         $suiteConfigRegistry->getSet('Non existent');
     }

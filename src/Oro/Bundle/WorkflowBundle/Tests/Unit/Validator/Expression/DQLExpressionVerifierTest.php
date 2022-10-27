@@ -3,59 +3,62 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Validator\Expression;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\AST\DeleteStatement;
+use Doctrine\ORM\Query\AST\SelectStatement;
+use Doctrine\ORM\Query\AST\UpdateStatement;
 use Doctrine\ORM\Query\QueryException;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\DQLExpressionVerifier;
+use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException;
 use Oro\Bundle\WorkflowBundle\Validator\Expression\ExpressionVerifierInterface;
 
 class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExpressionVerifierInterface */
-    protected $verifier;
+    private $verifier;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->verifier = new DQLExpressionVerifier();
     }
 
-    public function tearDown()
-    {
-        unset($this->verifier);
-    }
-
     public function testValidSelectDQL()
     {
-        $query = $this->createQuery('Doctrine\ORM\Query\AST\SelectStatement');
-        $query->expects($this->once())->method('setFirstResult')->with(0)->willReturnSelf();
-        $query->expects($this->once())->method('setMaxResults')->with(1)->willReturnSelf();
-        $query->expects($this->once())->method('execute');
+        $query = $this->createQuery(SelectStatement::class);
+        $query->expects($this->once())
+            ->method('setFirstResult')
+            ->with(0)
+            ->willReturnSelf();
+        $query->expects($this->once())
+            ->method('setMaxResults')
+            ->with(1)
+            ->willReturnSelf();
+        $query->expects($this->once())
+            ->method('execute');
 
         $this->assertTrue($this->verifier->verify($query));
     }
 
     /**
      * @dataProvider validNonSelectDQLProvider
-     *
-     * @param string $class
      */
-    public function testValidNonSelectDQL($class)
+    public function testValidNonSelectDQL(string $class)
     {
         $query = $this->createQuery($class);
-        $query->expects($this->never())->method('setFirstResult');
-        $query->expects($this->never())->method('setMaxResults');
-        $query->expects($this->never())->method('execute');
+        $query->expects($this->never())
+            ->method('setFirstResult');
+        $query->expects($this->never())
+            ->method('setMaxResults');
+        $query->expects($this->never())
+            ->method('execute');
 
         $this->assertTrue($this->verifier->verify($query));
     }
 
-    /**
-     * @return array
-     */
-    public function validNonSelectDQLProvider()
+    public function validNonSelectDQLProvider(): array
     {
         return [
-            ['Doctrine\ORM\Query\AST\DeleteStatement'],
-            ['Doctrine\ORM\Query\AST\UpdateStatement']
+            [DeleteStatement::class],
+            [UpdateStatement::class]
         ];
     }
 
@@ -63,41 +66,48 @@ class DQLExpressionVerifierTest extends \PHPUnit\Framework\TestCase
     {
         $exception = new QueryException('WRONG DQL');
 
-        $query = $this->createQuery('Doctrine\ORM\Query\AST\SelectStatement');
-        $query->expects($this->once())->method('setFirstResult')->with(0)->willReturnSelf();
-        $query->expects($this->once())->method('setMaxResults')->with(1)->willReturnSelf();
-        $query->expects($this->once())->method('execute')->willThrowException($exception);
+        $query = $this->createQuery(SelectStatement::class);
+        $query->expects($this->once())
+            ->method('setFirstResult')
+            ->with(0)
+            ->willReturnSelf();
+        $query->expects($this->once())
+            ->method('setMaxResults')
+            ->with(1)
+            ->willReturnSelf();
+        $query->expects($this->once())
+            ->method('execute')
+            ->willThrowException($exception);
 
-        $this->expectException('Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException');
+        $this->expectException(ExpressionException::class);
         $this->expectExceptionMessage($exception->getMessage());
 
         $this->verifier->verify($query);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $expression must be instance of Doctrine\ORM\AbstractQuery. "string" given
-     */
     public function testVerifyWithInvalidData()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$expression must be instance of Doctrine\ORM\AbstractQuery. "string" given');
+
         $this->verifier->verify('string');
     }
 
     /**
-     * @param string $statementClass
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|AbstractQuery
+     * @return AbstractQuery|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function createQuery($statementClass)
+    private function createQuery(string $statementClass)
     {
-        $statement = $this->getMockBuilder($statementClass)->disableOriginalConstructor()->getMock();
+        $statement = $this->createMock($statementClass);
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->setMethods(['setFirstResult', 'setMaxResults', 'execute', 'getAST'])
+        $query = $this->getMockBuilder(AbstractQuery::class)
+            ->onlyMethods(['execute'])
+            ->addMethods(['setFirstResult', 'setMaxResults', 'getAST'])
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-
-        $query->expects($this->atLeastOnce())->method('getAST')->willReturn($statement);
+        $query->expects($this->atLeastOnce())
+            ->method('getAST')
+            ->willReturn($statement);
 
         return $query;
     }

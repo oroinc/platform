@@ -2,47 +2,76 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
+use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\AbstractPass;
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ActionPass;
+use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayAction as NotDispatcherAwareAction;
+use Oro\Component\Action\Tests\Unit\Action\Stub\DispatcherAwareAction;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
-class ActionPassTest extends AbstractPassTest
+class ActionPassTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp()
-    {
-        parent::setUp();
+    private const ACTION_FACTORY_SERVICE_ID = 'oro_action.action_factory';
+    private const ACTION_TAG = 'oro_action.action';
 
-        $this->compilerPass = new ActionPass();
+    /** @var AbstractPass */
+    private $compiler;
+
+    protected function setUp(): void
+    {
+        $this->compiler = new ActionPass();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getServiceId()
+    private function assertActionServiceHasValidConfiguration(Definition $definition, bool $dispatcherAware)
     {
-        return ActionPass::ACTION_FACTORY_SERVICE_ID;
+        self::assertFalse($definition->isShared());
+        self::assertFalse($definition->isPublic());
+        if ($dispatcherAware) {
+            self::assertEquals(
+                [
+                    ['setDispatcher', [new Reference('event_dispatcher')]]
+                ],
+                $definition->getMethodCalls()
+            );
+        } else {
+            self::assertEquals([], $definition->getMethodCalls());
+        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getTag()
+    public function testProcessWithoutFactoryService()
     {
-        return ActionPass::ACTION_TAG;
+        $this->compiler->process(new ContainerBuilder());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createServiceDefinition()
+    public function testProcess()
     {
-        $definition = parent::createServiceDefinition();
+        $container = new ContainerBuilder();
+        $container->setParameter('action_service_2.class', DispatcherAwareAction::class);
+        $container->register(self::ACTION_FACTORY_SERVICE_ID)
+            ->setArguments([null, []]);
+        $container->register('action_service_1', DispatcherAwareAction::class)
+            ->addTag(self::ACTION_TAG, ['alias' => 'service_first|service_first_alias']);
+        $container->register('action_service_2', '%action_service_2.class%')
+            ->addTag(self::ACTION_TAG)
+            ->setShared(false)
+            ->setPublic(false);
+        $container->register('action_service_3', NotDispatcherAwareAction::class)
+            ->addTag(self::ACTION_TAG, ['alias' => 'service_third']);
 
-        $definition->expects($this->once())
-            ->method('getClass')
-            ->willReturn('Oro\Component\Action\Tests\Unit\Action\Stub\DispatcherAwareAction');
-        $definition->expects($this->once())
-            ->method('addMethodCall')
-            ->with('setDispatcher');
+        $this->compiler->process($container);
 
-        return $definition;
+        self::assertEquals(
+            [
+                'service_first'       => 'action_service_1',
+                'service_first_alias' => 'action_service_1',
+                'action_service_2'    => 'action_service_2',
+                'service_third'       => 'action_service_3'
+            ],
+            $container->getDefinition(self::ACTION_FACTORY_SERVICE_ID)->getArgument(1)
+        );
+        $this->assertActionServiceHasValidConfiguration($container->getDefinition('action_service_1'), true);
+        $this->assertActionServiceHasValidConfiguration($container->getDefinition('action_service_2'), true);
+        $this->assertActionServiceHasValidConfiguration($container->getDefinition('action_service_3'), false);
     }
 }

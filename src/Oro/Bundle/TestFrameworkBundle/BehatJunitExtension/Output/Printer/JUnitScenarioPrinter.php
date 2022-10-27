@@ -13,6 +13,9 @@ use Behat\Testwork\Output\Printer\JUnitOutputPrinter;
 use Behat\Testwork\Tester\Result\TestResult;
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\EventListener\JUnitDurationListener;
 
+/**
+ * JUnit scenario printer custom implementation
+ */
 final class JUnitScenarioPrinter
 {
     /**
@@ -35,11 +38,6 @@ final class JUnitScenarioPrinter
      */
     private $outlineStepCount;
 
-    /**
-     * @param ResultToStringConverter $resultConverter
-     * @param JUnitOutlineStoreListener $outlineListener
-     * @param JUnitDurationListener $durationListener
-     */
     public function __construct(
         ResultToStringConverter $resultConverter,
         JUnitOutlineStoreListener $outlineListener,

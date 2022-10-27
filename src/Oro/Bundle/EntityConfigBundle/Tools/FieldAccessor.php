@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
-use Doctrine\Common\Inflector\Inflector;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
+/**
+ * Can get and set object parameters based only on parameter names.
+ */
 class FieldAccessor
 {
     /**
@@ -15,7 +18,7 @@ class FieldAccessor
      */
     public static function getValue($entity, $fieldName)
     {
-        return $entity->{'get' . Inflector::classify($fieldName)}();
+        return $entity->{'get' . InflectorFactory::create()->classify($fieldName)}();
     }
 
     /**
@@ -27,7 +30,7 @@ class FieldAccessor
      */
     public static function setValue($entity, $fieldName, $value)
     {
-        $entity->{'set' . Inflector::classify($fieldName)}($value);
+        $entity->{'set' . InflectorFactory::create()->classify($fieldName)}($value);
     }
 
     /**
@@ -39,7 +42,7 @@ class FieldAccessor
      */
     public static function addValue($entity, $fieldName, $relatedEntity)
     {
-        $entity->{'add' . Inflector::classify($fieldName)}($relatedEntity);
+        $entity->{'add' . InflectorFactory::create()->classify($fieldName)}($relatedEntity);
     }
 
     /**
@@ -51,7 +54,7 @@ class FieldAccessor
      */
     public static function removeValue($entity, $fieldName, $relatedEntity)
     {
-        $entity->{'remove' . Inflector::classify($fieldName)}($relatedEntity);
+        $entity->{'remove' . InflectorFactory::create()->classify($fieldName)}($relatedEntity);
     }
 
     /**
@@ -63,6 +66,6 @@ class FieldAccessor
      */
     public static function hasGetter($entity, $fieldName)
     {
-        return method_exists($entity, 'get' . Inflector::classify($fieldName));
+        return method_exists($entity, 'get' . InflectorFactory::create()->classify($fieldName));
     }
 }

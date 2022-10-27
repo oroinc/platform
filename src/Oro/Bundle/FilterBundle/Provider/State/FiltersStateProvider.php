@@ -22,11 +22,6 @@ class FiltersStateProvider extends AbstractStateProvider
     /** @var DatagridParametersHelper */
     private $datagridParametersHelper;
 
-    /**
-     * @param GridViewManager $gridViewManager
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param DatagridParametersHelper $datagridParametersHelper
-     */
     public function __construct(
         GridViewManager $gridViewManager,
         TokenAccessorInterface $tokenAccessor,
@@ -92,12 +87,6 @@ class FiltersStateProvider extends AbstractStateProvider
         return $this->sanitizeState($state, $this->getFiltersConfig($datagridConfiguration));
     }
 
-    /**
-     * @param array $state
-     * @param array $filtersConfig
-     *
-     * @return array
-     */
     private function sanitizeState(array $state, array $filtersConfig): array
     {
         // Remove filters which are not in datagrid configuration.
@@ -110,7 +99,7 @@ class FiltersStateProvider extends AbstractStateProvider
 
                 // Allows filters with special key - "__{$filterName}".
                 // Initially was added to AbstractFilterExtension::updateFilterStateEnabled() in scope of CRM-4760.
-                if (strpos($filterName, '__') === 0) {
+                if (str_starts_with($filterName, '__')) {
                     $originalFilterName = substr($filterName, 2);
                     return isset($filtersConfig[$originalFilterName]);
                 }
@@ -146,11 +135,6 @@ class FiltersStateProvider extends AbstractStateProvider
         return (array)$datagridConfiguration->offsetGetByPath(FilterConfiguration::COLUMNS_PATH, []);
     }
 
-    /**
-     * @param DatagridConfiguration $datagridConfiguration
-     *
-     * @return array
-     */
     private function getDefaultFiltersState(DatagridConfiguration $datagridConfiguration): array
     {
         return $datagridConfiguration->offsetGetByPath(FilterConfiguration::DEFAULT_FILTERS_PATH, []);

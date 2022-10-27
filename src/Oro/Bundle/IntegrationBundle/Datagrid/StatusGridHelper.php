@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class StatusGridHelper
 {
@@ -17,19 +17,12 @@ class StatusGridHelper
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param TypesRegistry       $typesRegistry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TypesRegistry $typesRegistry, TranslatorInterface $translator)
     {
         $this->typesRegistry = $typesRegistry;
         $this->translator    = $translator;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function statusGridBuildBefore(BuildBefore $event)
     {
         $params = $event->getDatagrid()->getParameters();
@@ -49,8 +42,6 @@ class StatusGridHelper
 
     /**
      * Binds integration ID to query
-     *
-     * @param BuildAfter $event
      */
     public function statusGridBuildAfter(BuildAfter $event)
     {

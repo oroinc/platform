@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor\Options\Rest;
 
 use Oro\Bundle\ApiBundle\Processor\Options\OptionsContext;
-use Oro\Bundle\ApiBundle\Processor\Shared\Rest\CorsHeaders;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetHttpAllowHeader;
+use Oro\Bundle\ApiBundle\Request\Rest\CorsHeaders;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 

@@ -1,22 +1,20 @@
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/app/views/base/view',
-    'module',
-    'oroui/js/tools',
-    'orofilter/js/filter-template',
-    'orofilter/js/filter-hint'
-], function($, _, __, BaseView, module, tools, FilterTemplate, FilterHint) {
+define(function(require, exports, module) {
     'use strict';
 
-    var config = module.config();
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const tools = require('oroui/js/tools');
+    const FilterTemplate = require('orofilter/js/filter-template');
+    const FilterHint = require('orofilter/js/filter-hint');
+    const filterSettings = require('oro/filter-settings').default;
+    let config = require('module-config').default(module.id);
+
     config = _.extend({
         placeholder: __('All'),
         labelPrefix: ''
     }, config);
-
-    var AbstractFilter;
 
     /**
      * Basic grid filter
@@ -25,20 +23,13 @@ define([
      * @class   oro.filter.AbstractFilter
      * @extends Backbone.View
      */
-    AbstractFilter = BaseView.extend(_.extend({}, FilterTemplate, {
+    const AbstractFilter = BaseView.extend(_.extend({}, FilterTemplate, {
         /**
-         * Is filter can be disabled
+         * Is filter renderable
          *
          * @property {Boolean}
          */
-        canDisable: true,
-
-        /**
-         * Is filter enabled
-         *
-         * @property {Boolean}
-         */
-        enabled: false,
+        renderable: false,
 
         /**
          * Is filter visible in UI
@@ -48,11 +39,11 @@ define([
         visible: true,
 
         /**
-         * Is filter enabled by default
+         * Is filter renderable by default
          *
          * @property {Boolean}
          */
-        defaultEnabled: false,
+        renderableByDefault: false,
 
         /**
          * Name of filter field
@@ -97,6 +88,13 @@ define([
         buttonActiveClass: 'open-filter',
 
         /**
+         * Criteria trigger expand class
+         *
+         * @property {String}
+         */
+        buttonExpandClass: filterSettings.buttonExpandClass,
+
+        /**
          * Element enclosing a criteria dropdown
          *
          * @property {Array.<string|jQuery|HTMLElement>}
@@ -118,26 +116,33 @@ define([
         renderMode: '',
 
         /**
-         * @inheritDoc
+         * Separate container selector where filter hint will be placed
+         *
+         * @property {string}
          */
-        constructor: function AbstractFilter() {
-            AbstractFilter.__super__.constructor.apply(this, arguments);
+        outerHintContainer: void 0,
+
+        /**
+         * @inheritdoc
+         */
+        constructor: function AbstractFilter(options) {
+            AbstractFilter.__super__.constructor.call(this, options);
         },
 
         /**
          * Initialize.
          *
          * @param {Object} options
-         * @param {Boolean} [options.enabled]
+         * @param {Boolean} [options.renderable]
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
-                'templateSelector', 'templateTheme', 'template', 'renderMode');
+            const opts = _.pick(options || {}, 'renderable', 'visible', 'placeholder', 'showLabel', 'label',
+                'templateSelector', 'templateTheme', 'template', 'renderMode', 'outerHintContainer');
             _.extend(this, opts);
 
             this._defineTemplate();
 
-            this.defaultEnabled = this.enabled;
+            this.renderableByDefault = this.renderable;
 
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
@@ -148,9 +153,9 @@ define([
                 this.value = tools.deepClone(this.emptyValue);
             }
 
-            AbstractFilter.__super__.initialize.apply(this, arguments);
+            AbstractFilter.__super__.initialize.call(this, options);
 
-            var hintView = new FilterHint({
+            const hintView = new FilterHint({
                 filter: this
             });
 
@@ -160,16 +165,17 @@ define([
         },
 
         isRendered: function() {
-            return this._isRendered;
+            return this._rendereddInMode === this.renderMode;
         },
 
         rendered: function() {
-            this._isRendered = true;
-            this.subview('hint').render();
+            this._rendereddInMode = this.renderMode;
+            this.trigger('rendered');
+            return this;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -186,8 +192,8 @@ define([
          * @return {*}
          */
         enable: function() {
-            if (!this.enabled) {
-                this.enabled = true;
+            if (!this.renderable) {
+                this.renderable = true;
                 this.show();
                 this.trigger('enable', this);
             }
@@ -200,8 +206,8 @@ define([
          * @return {*}
          */
         disable: function() {
-            if (this.enabled) {
-                this.enabled = false;
+            if (this.renderable) {
+                this.renderable = false;
                 this.hide();
                 this.trigger('disable', this);
                 this.reset();
@@ -239,6 +245,7 @@ define([
          * @return {*}
          */
         reset: function() {
+            this.trigger('reset');
             this.setValue(this.emptyValue);
             return this;
         },
@@ -260,7 +267,7 @@ define([
          */
         setValue: function(value) {
             if (!tools.isEqualsLoosely(this.value, value)) {
-                var oldValue = this.value;
+                const oldValue = this.value;
                 this.value = tools.deepClone(value);
                 this._updateDOMValue();
                 this._onValueUpdated(this.value, oldValue);
@@ -286,8 +293,8 @@ define([
          */
         _findDropdownFitContainer: function(element) {
             element = element || this.$el;
-            var $container = $();
-            for (var i = 0; i < this.dropdownFitContainers.length && $container.length === 0; i += 1) {
+            let $container = $();
+            for (let i = 0; i < this.dropdownFitContainers.length && $container.length === 0; i += 1) {
                 $container = $(element).closest(this.dropdownFitContainers[i]);
             }
             return $container.length === 0 ? null : $container;
@@ -362,6 +369,17 @@ define([
         },
 
         /**
+         * Compare values
+         *
+         * @param {*} newValue
+         * @param {*} oldValue
+         * @returns {boolean}
+         */
+        isUpdatable(newValue, oldValue) {
+            return true;
+        },
+
+        /**
          * Compares current value with empty value
          *
          * @return {Boolean}
@@ -393,8 +411,8 @@ define([
          * @protected
          */
         _getInputValue: function(input) {
-            var result;
-            var $input = this.$(input);
+            let result;
+            const $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
                     $input.each(function() {
@@ -418,11 +436,11 @@ define([
          * @return {*}
          */
         _setInputValue: function(input, value) {
-            var $input = this.$(input);
+            const $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
                     $input.each(function() {
-                        var $input = $(this);
+                        const $input = $(this);
                         if ($input.attr('value') === value) {
                             $input.prop('checked', true);
                             $input.click();
@@ -462,8 +480,8 @@ define([
          * @return {*}
          * @protected
          */
-        _getDisplayValue: function() {
-            var value = (arguments.length > 0) ? arguments[0] : this.getValue();
+        _getDisplayValue: function(...args) {
+            const value = (args.length > 0) ? args[0] : this.getValue();
             return this._formatDisplayValue(value);
         },
 
@@ -503,18 +521,31 @@ define([
         },
 
         /**
-         * Set filter button class
+         * Set filter parent button class
          *
          * @param {Object} element
          * @param {Boolean} status
          * @protected
          */
         _setButtonPressed: function(element, status) {
+            this._setButtonExpanded(status);
+
             if (status) {
                 element.parent().addClass(this.buttonActiveClass);
             } else {
                 element.parent().removeClass(this.buttonActiveClass);
             }
+        },
+
+        /**
+         * Set filter button class
+         *
+         * @param {Boolean} state
+         * @protected
+         */
+        _setButtonExpanded: function(state) {
+            this.$('.filter-criteria-selector')
+                .toggleClass(this.buttonExpandClass, state).attr('aria-expanded', state);
         },
 
         /**
@@ -544,6 +575,45 @@ define([
                 label: this.label,
                 hint: this._getCriteriaHint()
             };
+        },
+
+        /**
+         * Get extra criteria classes dependent on render mode
+         *
+         * @return {string|undefined}
+         */
+        getCriteriaExtraClass() {
+            if (_.isObject(filterSettings) && _.isObject(filterSettings.appearance)) {
+                const mode = filterSettings.appearance[this.renderMode];
+
+                return mode && typeof mode.criteriaClass === 'string'
+                    ? mode.criteriaClass
+                    : void 0;
+            }
+
+            return void 0;
+        },
+
+        /**
+         * @return {Object}
+         */
+        getTemplateDataProps() {
+            return {
+                inputFieldAriaLabel: __('oro.filter.input_field.aria_label', {label: this.label}),
+                choiceAriaLabel: __('oro.filter.select_field.aria_label', {label: this.label}),
+                updateButtonAriaLabel: __('oro.filter.updateButton.aria_label', {
+                    label: `${__('oro.filter.by')} ${this.label}`}
+                )
+            };
+        },
+
+        /**
+         * Detect is filter has dropdown mode
+         * If renderMode is empty equals `dropdown-mode`
+         * @returns {boolean}
+         */
+        isDropdownRenderMode() {
+            return this.renderMode === 'dropdown-mode';
         }
     }));
 

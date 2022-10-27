@@ -9,22 +9,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BusinessUnitTreeTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var BusinessUnitTreeType
-     */
-    protected $formType;
+    /** @var BusinessUnitTreeType */
+    private $formType;
 
-    /**
-     * @var BusinessUnitManager
-     */
-    protected $buManager;
+    /** @var BusinessUnitManager */
+    private $buManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->buManager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->formType  = new BusinessUnitTreeType($this->buManager);
+        $this->buManager = $this->createMock(BusinessUnitManager::class);
+
+        $this->formType = new BusinessUnitTreeType($this->buManager);
     }
 
     public function testParent()
@@ -41,21 +36,19 @@ class BusinessUnitTreeTypeTest extends \PHPUnit\Framework\TestCase
     {
         $this->buManager->expects($this->once())
             ->method('getBusinessUnitsTree')
-            ->will(
-                $this->returnValue(
+            ->willReturn(
+                [
                     [
-                        [
-                            'id'       => 1,
-                            'name'     => 'Root',
-                            'children' => [
-                                [
-                                    'id'   => 2,
-                                    'name' => 'Child',
-                                ]
+                        'id'       => 1,
+                        'name'     => 'Root',
+                        'children' => [
+                            [
+                                'id'   => 2,
+                                'name' => 'Child',
                             ]
                         ]
                     ]
-                )
+                ]
             );
 
         $resolver = new OptionsResolver();

@@ -12,8 +12,6 @@ class StoreSqlListener
     /**
      * Gets prepared SQL and parameters from executed query
      * and stores them in DataGrid config object
-     *
-     * @param OrmResultAfter $event
      */
     public function onResultAfter(OrmResultAfter $event)
     {

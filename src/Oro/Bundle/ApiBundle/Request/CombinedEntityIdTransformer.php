@@ -20,11 +20,6 @@ class CombinedEntityIdTransformer implements EntityIdTransformerInterface
     /** @var RequestType */
     private $requestType;
 
-    /**
-     * @param EntityIdTransformerInterface $mainTransformer
-     * @param EntityIdResolverRegistry     $resolverRegistry
-     * @param RequestType                  $requestType
-     */
     public function __construct(
         EntityIdTransformerInterface $mainTransformer,
         EntityIdResolverRegistry $resolverRegistry,

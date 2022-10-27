@@ -13,10 +13,6 @@ class RemoveEntitiesStep implements DependentMergeStepInterface
      */
     protected $doctrineHelper;
 
-    /**
-     * @param EntityManager $entityManager
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(EntityManager $entityManager, DoctrineHelper $doctrineHelper)
     {
         $this->entityManager = $entityManager;
@@ -25,8 +21,6 @@ class RemoveEntitiesStep implements DependentMergeStepInterface
 
     /**
      * Merge fields
-     *
-     * @param EntityData $data
      */
     public function run(EntityData $data)
     {

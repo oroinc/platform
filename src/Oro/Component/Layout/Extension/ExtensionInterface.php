@@ -7,13 +7,19 @@ use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutItemInterface;
-use Oro\Component\Layout\LayoutUpdateInterface;
 
 /**
  * Interface for extensions which provide block types, block type extensions and layout updates.
  */
 interface ExtensionInterface
 {
+    /**
+     * Returns names of all block types.
+     *
+     * @return string[]
+     */
+    public function getTypeNames(): array;
+
     /**
      * Returns a block type by name.
      *

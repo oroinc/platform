@@ -2,12 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Twig;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\EnumExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
@@ -16,16 +11,20 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $enumValueProvider;
+    private $enumValueProvider;
 
     /** @var EnumExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->enumValueProvider = $this->createMock(EnumValueProvider::class);
 
-        $this->extension = new EnumExtension($this->enumValueProvider);
+        $container = self::getContainerBuilder()
+            ->add('oro_entity_extend.enum_value_provider', $this->enumValueProvider)
+            ->getContainer($this);
+
+        $this->extension = new EnumExtension($container);
     }
 
     public function testTransEnum()
@@ -89,6 +88,26 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testTransEnumWhenIdsAreNumeric()
+    {
+        $enumValueEntityClass = 'Test\EnumValue';
+
+        $values = [
+            'Value 1' => '05',
+            'Value 2' => '5'
+        ];
+
+        $this->enumValueProvider->expects($this->any())
+            ->method('getEnumChoices')
+            ->with($enumValueEntityClass)
+            ->willReturn($values);
+
+        $this->assertEquals(
+            'Value 2',
+            self::callTwigFilter($this->extension, 'trans_enum', ['5', $enumValueEntityClass])
+        );
+    }
+
     public function testSortEnum()
     {
         $enumValueEntityClass = 'Test\EnumValue';
@@ -122,14 +141,6 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             ['val1', 'val4', 'val2'],
             self::callTwigFilter($this->extension, 'sort_enum', ['val1,val2,val4', $enumValueEntityClass])
-        );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(
-            'oro_enum',
-            $this->extension->getName()
         );
     }
 }

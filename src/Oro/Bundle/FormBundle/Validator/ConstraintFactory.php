@@ -4,6 +4,9 @@ namespace Oro\Bundle\FormBundle\Validator;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * The factory to create validation constraints.
+ */
 class ConstraintFactory
 {
     /**
@@ -19,16 +22,14 @@ class ConstraintFactory
      */
     public function create($name, $options = null)
     {
-        if (strpos($name, '\\') !== false && class_exists($name)) {
+        if (str_contains($name, '\\') && class_exists($name)) {
             $className = (string)$name;
         } else {
             $className = 'Symfony\\Component\\Validator\\Constraints\\' . $name;
         }
 
         if (!class_exists($className)) {
-            throw new \InvalidArgumentException(
-                sprintf('The "%s" class does not exist.', $className)
-            );
+            throw new \InvalidArgumentException(sprintf('The "%s" class does not exist.', $className));
         }
 
         /**

@@ -19,9 +19,6 @@ class TransitionIsAllowedValidator extends ConstraintValidator
      */
     protected $registry;
 
-    /**
-     * @param WorkflowRegistry $registry
-     */
     public function __construct(WorkflowRegistry $registry)
     {
         $this->registry = $registry;

@@ -4,27 +4,19 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Tools;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Tools\SchemaDumper;
+use Twig\Environment;
 
 class SchemaDumperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SchemaDumper
-     */
-    protected $schemaDumper;
+    protected SchemaDumper $schemaDumper;
 
-    /**
-     * @var Schema
-     */
-    protected $schema;
+    protected Schema $schema;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $twig;
+    protected Environment|\PHPUnit\Framework\MockObject\MockObject $twig;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->twig = $this->getMockBuilder('\Twig_Environment')->disableOriginalConstructor()->getMock();
+        $this->twig = $this->createMock(Environment::class);
         $this->schema = new Schema();
         $this->schemaDumper = new SchemaDumper($this->twig);
 
@@ -33,22 +25,16 @@ class SchemaDumperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dumpDataProvider
-     * @param array|null $allowedTables
-     * @param string|null $namespace
-     * @param string|null $expectedNamespace
-     * @param string $className
-     * @param string $version
-     * @param array $extendedOptions
      */
     public function testDump(
-        $allowedTables,
-        $namespace,
-        $expectedNamespace,
-        $className,
-        $version,
-        $extendedOptions
-    ) {
-        $this->twig->expects($this->once())
+        ?array $allowedTables,
+        ?string $namespace,
+        ?string $expectedNamespace,
+        ?string $className,
+        ?string $version,
+        ?array $extendedOptions
+    ): void {
+        $this->twig->expects(self::once())
             ->method('render')
             ->with(
                 SchemaDumper::SCHEMA_TEMPLATE,
@@ -61,26 +47,26 @@ class SchemaDumperTest extends \PHPUnit\Framework\TestCase
                     'extendedOptions' => $extendedOptions
                 ]
             )
-            ->will($this->returnValue('TEST'));
+            ->willReturn('TEST');
 
-        $this->assertEquals(
+        self::assertEquals(
             'TEST',
             $this->schemaDumper->dump($allowedTables, $namespace, $className, $version, $extendedOptions)
         );
     }
 
-    public function dumpDataProvider()
+    public function dumpDataProvider(): array
     {
-        return array(
-            array(null, null, null, null, null, null),
-            array(
-                array('test' => true),
+        return [
+            [null, null, null, null, null, null],
+            [
+                ['test' => true],
                 'Acme\DemoBundle\Entity',
                 'Acme\DemoBundle',
                 'DemoBundleInstaller',
                 'v1_1',
-                array('test' => array('id' => array('test' => true)))
-            )
-        );
+                ['test' => ['id' => ['test' => true]]]
+            ]
+        ];
     }
 }

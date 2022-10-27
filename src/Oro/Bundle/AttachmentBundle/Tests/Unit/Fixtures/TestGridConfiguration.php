@@ -15,7 +15,7 @@ class TestGridConfiguration extends DatagridConfiguration
                     'select' => [
                         'attachment'
                     ],
-                    'form' => [
+                    'from' => [
                         [
                             'table' => 'OroAttachmentBundle:Attachment',
                             'alias' => 'attachment'

@@ -1,23 +1,21 @@
-parameters:
-    oro_sidebar.entity.sidebar_state.class: Oro\Bundle\SidebarBundle\Entity\SidebarState
-    oro_sidebar.entity.widget.class: Oro\Bundle\SidebarBundle\Entity\Widget
-
 services:
-    oro_sidebar.widget_definition.registry:
-        class: Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry
+    oro_sidebar.widget_definition_provider:
+        class: Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider
+        parent: oro.static_config_provider.abstract
         arguments:
-            - '%oro_sidebar.sidebar_widgets_definitions%'
+            - '%kernel.cache_dir%/oro/sidebar_widgets.php'
+            - '%kernel.debug%'
 
     oro_sidebar.twig.extension:
         class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
             - { name: oro_featuretogle.feature, feature: email }
 
     oro_sidebar.config_extension.feature:
-        class: 'Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension'
+        class: Oro\Bundle\SidebarBundle\Configuration\FeatureConfigurationExtension
         tags:
             - { name: oro_feature.config_extension }

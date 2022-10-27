@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -13,8 +13,11 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type provides functionality to select a Workflow.
+ */
 class WorkflowSelectType extends AbstractType
 {
     /**
@@ -25,10 +28,6 @@ class WorkflowSelectType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ManagerRegistry $registry, TranslatorInterface $translator)
     {
         $this->registry = $registry;
@@ -112,7 +111,7 @@ class WorkflowSelectType extends AbstractType
         /** @var ChoiceView $choiceView */
         foreach ($view->vars['choices'] as $choiceView) {
             $choiceView->label = $this->translator->trans(
-                $choiceView->label,
+                (string) $choiceView->label,
                 [],
                 WorkflowTranslationHelper::TRANSLATION_DOMAIN
             );

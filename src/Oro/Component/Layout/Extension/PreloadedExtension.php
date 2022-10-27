@@ -101,6 +101,14 @@ class PreloadedExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
+    public function getTypeNames(): array
+    {
+        return array_keys($this->types);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType($name)
     {
         if (!isset($this->types[$name])) {
@@ -199,8 +207,6 @@ class PreloadedExtension implements ExtensionInterface
     }
 
     /**
-     * @param array $types
-     *
      * @throws Exception\InvalidArgumentException
      */
     protected function validateTypes(array $types)
@@ -220,8 +226,6 @@ class PreloadedExtension implements ExtensionInterface
     }
 
     /**
-     * @param array $typeExtensions
-     *
      * @throws Exception\InvalidArgumentException
      */
     protected function validateTypeExtensions(array $typeExtensions)
@@ -248,8 +252,6 @@ class PreloadedExtension implements ExtensionInterface
     }
 
     /**
-     * @param array $layoutUpdates
-     *
      * @throws Exception\InvalidArgumentException
      */
     protected function validateLayoutUpdates(array $layoutUpdates)
@@ -276,8 +278,6 @@ class PreloadedExtension implements ExtensionInterface
     }
 
     /**
-     * @param array $contextConfigurators
-     *
      * @throws Exception\InvalidArgumentException
      */
     protected function validateContextConfigurators(array $contextConfigurators)
@@ -292,8 +292,6 @@ class PreloadedExtension implements ExtensionInterface
     }
 
     /**
-     * @param array $dataProviders
-     *
      * @throws Exception\InvalidArgumentException
      */
     protected function validateDataProviders(array $dataProviders)

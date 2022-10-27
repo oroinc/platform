@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Component\ConfigExpression\Tests\Unit\Func;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\ConfigExpression;
 
 use Oro\Bundle\LayoutBundle\ConfigExpression\GetContextValue;
-use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 class GetContextValueTest extends \PHPUnit\Framework\TestCase
 {
     /** @var GetContextValue */
-    protected $function;
+    private $function;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->function = new GetContextValue();
         $this->function->setContextAccessor(new ContextAccessor());
@@ -20,31 +20,31 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider evaluateDataProvider
      */
-    public function testEvaluate(array $options, $context, $expectedResult)
+    public function testEvaluate(array $options, array $context, string $expectedResult)
     {
         $this->assertSame($this->function, $this->function->initialize($options));
         $this->assertEquals($expectedResult, $this->function->evaluate($context));
     }
 
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         return [
-            'get'                                         => [
+            'get'                             => [
                 'options'        => ['foo'],
-                'context' => ['context' => ['foo' => 'bar']],
+                'context'        => ['context' => ['foo' => 'bar']],
                 'expectedResult' => 'bar'
             ],
-            'get_with_default'                            => [
+            'get_with_default'                => [
                 'options'        => ['foo', 'baz'],
                 'context'        => ['context' => ['foo' => 'bar']],
                 'expectedResult' => 'bar'
             ],
-            'get_with_default_and_value_null'             => [
+            'get_with_default_and_value_null' => [
                 'options'        => ['foo', 'baz'],
                 'context'        => ['context' => ['foo' => null]],
                 'expectedResult' => 'baz'
             ],
-            'get_with_default_and_no_value'               => [
+            'get_with_default_and_no_value'   => [
                 'options'        => ['foo', 'baz'],
                 'context'        => [],
                 'expectedResult' => 'baz'
@@ -52,37 +52,34 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 or 2 elements, but 0 given.
-     */
     public function testInitializeFailsWhenEmptyOptions()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
+
         $this->function->initialize([]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 1 or 2 elements, but 3 given.
-     */
     public function testInitializeFailsWhenTooManyOptions()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options must have 1 or 2 elements, but 3 given.');
+
         $this->function->initialize([1, 2, 3]);
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The first option should be a string, but integer given.
-     */
     public function testInitializeFailsWhenFirstOptionIsNotString()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The first option should be a string, but integer given.');
+
         $this->function->initialize([4, 5]);
     }
 
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray(array $options, ?string $message, array $expected)
     {
         $this->function->initialize($options);
         if ($message !== null) {
@@ -92,7 +89,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -136,7 +133,7 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile(array $options, ?string $message, string $expected)
     {
         $this->function->initialize($options);
         if ($message !== null) {
@@ -146,29 +143,29 @@ class GetContextValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [
                 'options'  => ['foo'],
                 'message'  => null,
                 'expected' => '$factory->create(\'context\', ['
-                    .'\'foo\''
-                    .'])'
+                    . '\'foo\''
+                    . '])'
             ],
             [
                 'options'  => ['foo', null],
                 'message'  => null,
                 'expected' => '$factory->create(\'context\', ['
-                    .'\'foo\''
-                    .', null])'
+                    . '\'foo\''
+                    . ', null])'
             ],
             [
                 'options'  => ['foo'],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'context\', ['
-                    .'\'foo\''
-                    .'])->setMessage(\'Test\')'
+                    . '\'foo\''
+                    . '])->setMessage(\'Test\')'
             ]
         ];
     }

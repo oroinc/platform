@@ -2,133 +2,86 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 use Oro\Bundle\UserBundle\DependencyInjection\OroUserExtension;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Yaml\Parser;
 
-class OroUserExtensionTest extends ExtensionTestCase
+class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContainerBuilder
-     */
-    protected $configuration;
-
-    public function testLoadWithDefaults()
+    public function testLoadWithDefaults(): void
     {
-        $this->createEmptyConfiguration();
-
-        $this->assertParameter(86400, 'oro_user.reset.ttl');
-    }
-
-    public function testLoad()
-    {
-        $this->createFullConfiguration();
-
-        $this->assertParameter(1800, 'oro_user.reset.ttl');
-    }
-
-    public function testLoadDefinitions()
-    {
-        $this->loadExtension(new OroUserExtension());
-
-        $expectedDefinitions = [
-            'oro_user.importexport.configuration_provider.user',
-        ];
-        $this->assertDefinitionsLoaded($expectedDefinitions);
-    }
-
-    public function testPrepend()
-    {
-        $inputSecurityConfig = [
-            'firewalls' => [
-                'main' => ['main_config'],
-                'first' => ['first_config'],
-                'second' => ['second_config'],
-            ]
-        ];
-        $expectedSecurityConfig = [
-            'firewalls' => [
-                'first' => ['first_config'],
-                'second' => ['second_config'],
-                'main' => ['main_config'],
-            ]
-        ];
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder $containerBuilder */
-        $containerBuilder = $this->getMockBuilder('Oro\Component\DependencyInjection\ExtendedContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $containerBuilder->expects($this->once())
-            ->method('getExtensionConfig')
-            ->with('security')
-            ->willReturn([$inputSecurityConfig]);
-        $containerBuilder->expects($this->once())
-            ->method('setExtensionConfig')
-            ->with('security', [$expectedSecurityConfig]);
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroUserExtension();
-        $extension->prepend($containerBuilder);
+        $extension->load([], $container);
+
+        $extensionConfig = $container->getExtensionConfig('oro_user');
+        self::assertSame(
+            [
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'password_min_length' => ['value' => 8, 'scope' => 'app'],
+                        'password_lower_case' => ['value' => true, 'scope' => 'app'],
+                        'password_upper_case' => ['value' => true, 'scope' => 'app'],
+                        'password_numbers' => ['value' => true, 'scope' => 'app'],
+                        'password_special_chars' => ['value' => false, 'scope' => 'app'],
+                        'send_password_in_invitation_email' => ['value' => false, 'scope' => 'app'],
+                        'case_insensitive_email_addresses_enabled' => ['value' => false, 'scope' => 'app'],
+                    ]
+                ]
+            ],
+            $extensionConfig
+        );
+
+        $this->assertEquals(86400, $container->getParameter('oro_user.reset.ttl'));
     }
 
-    protected function createEmptyConfiguration()
+    public function testLoad(): void
     {
-        $this->configuration = new ContainerBuilder();
+        $config = [
+            'reset' => [
+                'ttl' => 1800
+            ]
+        ];
 
-        $loader = new OroUserExtension();
-        $config = $this->getEmptyConfig();
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
-        $loader->load(array($config), $this->configuration);
+        $extension = new OroUserExtension();
+        $extension->load([$config], $container);
 
-        $this->assertTrue($this->configuration instanceof ContainerBuilder);
+        $this->assertEquals(1800, $container->getParameter('oro_user.reset.ttl'));
     }
 
-    protected function createFullConfiguration()
+    public function testPrepend(): void
     {
-        $this->configuration = new ContainerBuilder();
+        $container = new ExtendedContainerBuilder();
+        $container->setExtensionConfig('security', [
+            [
+                'firewalls' => [
+                    'main' => ['main_config'],
+                    'first' => ['first_config'],
+                    'second' => ['second_config'],
+                ]
+            ]
+        ]);
 
-        $loader = new OroUserExtension();
-        $config = $this->getFullConfig();
+        $extension = new OroUserExtension();
+        $extension->prepend($container);
 
-        $loader->load(array($config), $this->configuration);
-
-        $this->assertTrue($this->configuration instanceof ContainerBuilder);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getEmptyConfig()
-    {
-        $yaml   = '';
-        $parser = new Parser();
-
-        return $parser->parse($yaml);
-    }
-
-    protected function getFullConfig()
-    {
-        $yaml = <<<EOF
-reset:
-    ttl: 1800
-EOF;
-        $parser = new Parser();
-
-        return  $parser->parse($yaml);
-    }
-
-    /**
-     * @param mixed  $value
-     * @param string $key
-     */
-    protected function assertParameter($value, $key)
-    {
-        $this->assertEquals($value, $this->configuration->getParameter($key), sprintf('%s parameter is correct', $key));
-    }
-
-    protected function tearDown()
-    {
-        unset($this->configuration);
+        self::assertSame(
+            [
+                [
+                    'firewalls' => [
+                        'first' => ['first_config'],
+                        'second' => ['second_config'],
+                        'main' => ['main_config'],
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig('security')
+        );
     }
 }

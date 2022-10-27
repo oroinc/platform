@@ -2,35 +2,32 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
-use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractDateTypeTestCase;
+use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
+class DateRangeFilterTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var DateRangeFilterType
-     */
+    /** @var DateRangeFilterType */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
 
-        $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
+        $subscriber = $this->getMockSubscriber(DateFilterSubscriber::class);
 
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->setMethods(['getTimezone'])
-            ->getMock();
-
+        $localeSettings = $this->createMock(LocaleSettings::class);
         $localeSettings->expects($this->any())
             ->method('getTimezone')
-            ->will($this->returnValue('UTC'));
+            ->willReturn('UTC');
 
         $types = [
             new DateRangeType($localeSettings),
@@ -50,6 +47,18 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
     protected function getTestFormType()
     {
         return $this->type;
+    }
+
+    /**
+     * @dataProvider configureOptionsDataProvider
+     */
+    public function testConfigureOptions(array $defaultOptions, array $requiredOptions = [])
+    {
+        $resolver = new OptionsResolver();
+        $this->getTestFormType()->configureOptions($resolver);
+        $resolvedOptions = $resolver->resolve([]);
+        $resolvedOptions = array_intersect_key($resolvedOptions, $defaultOptions);
+        self::assertEquals($defaultOptions, $resolvedOptions);
     }
 
     /**

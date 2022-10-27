@@ -1,13 +1,11 @@
-define([
-    'underscore',
-    'backbone',
-    'backgrid',
-    './header-row',
-    './header-cell/header-cell'
-], function(_, Backbone, Backgrid, HeaderRow, HeaderCell) {
+define(function(require) {
     'use strict';
 
-    var Header;
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const Backgrid = require('backgrid');
+    const HeaderRow = require('./header-row');
+    const HeaderCell = require('./header-cell/header-cell');
 
     /**
      * Datagrid header widget
@@ -16,7 +14,7 @@ define([
      * @class   orodatagrid.datagrid.Header
      * @extends Backgrid.Header
      */
-    Header = Backgrid.Header.extend({
+    const Header = Backgrid.Header.extend({
         /** @property */
         tagName: 'thead',
 
@@ -32,14 +30,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function Header() {
-            Header.__super__.constructor.apply(this, arguments);
+        constructor: function Header(options) {
+            Header.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['themeOptions']));
@@ -57,11 +55,12 @@ define([
 
             this.filteredColumns = options.filteredColumns;
 
-            var rowOptions = {
+            const rowOptions = {
                 columns: this.columns,
                 collection: this.filteredColumns,
                 dataCollection: this.collection,
-                headerCell: this.headerCell
+                headerCell: this.headerCell,
+                ariaRowIndex: 1
             };
             this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
             this.row = new this.row(rowOptions);
@@ -70,7 +69,16 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * Get a number of rendered rows in a header
+         *
+         * @return {number}
+         */
+        getRowsCount() {
+            return 1;
+        },
+
+        /**
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -80,7 +88,7 @@ define([
             delete this.row;
             delete this.columns;
             delete this.filteredColumns;
-            Header.__super__.dispose.apply(this, arguments);
+            Header.__super__.dispose.call(this);
         }
     });
 

@@ -2,35 +2,25 @@
 
 namespace Oro\Bundle\CacheBundle\DataStorage;
 
+/**
+ * Interface for cache data storage of arbitrary data.
+ */
 interface DataStorageInterface
 {
     /**
-     * @param string $name
-     *
      * @return mixed
      */
-    public function get($name);
+    public function get(string $key, $default = null);
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      */
-    public function set($name, $value);
+    public function set(string $key, $value);
 
     /**
-     * @param string $name
-     *
-     * @return boolean
+     * @return bool
      */
-    public function has($name);
+    public function has(string $key);
 
-    /**
-     * @return array
-     */
-    public function all();
-
-    /**
-     * @param string $name
-     */
-    public function remove($name);
+    public function remove(string $key);
 }

@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
@@ -15,7 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -35,6 +33,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  * @ORM\Table(name="oro_user", indexes = {
  *      @ORM\Index("user_first_name_last_name_idx", columns = {"first_name", "last_name"}),
  *      @ORM\Index(name="idx_oro_user_email_lowercase", columns={"email_lowercase"}),
+ *      @ORM\Index(name="idx_oro_user_username_lowercase", columns={"username_lowercase"}),
  * })
  * @ORM\HasLifecycleCallbacks()
  * @Config(
@@ -51,7 +50,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *              "virtual_fields"={"id"},
  *              "search_fields"={"firstName", "lastName"},
  *              "representation_field"="fullName",
- *              "activity_support"="true"
+ *              "activity_support"=true
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
@@ -79,14 +78,11 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          }
  *      }
  * )
- * @JMS\ExclusionPolicy("ALL")
  */
 class User extends ExtendUser implements
     EmailOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,
-    NotificationEmailInterface,
-    OrganizationAwareUserInterface,
     AdvancedApiUserInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
@@ -97,8 +93,6 @@ class User extends ExtendUser implements
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $id;
 
@@ -106,8 +100,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string", length=255, unique=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -124,9 +116,25 @@ class User extends ExtendUser implements
     /**
      * @var string
      *
+     * @ORM\Column(name="username_lowercase", type="string", length=255)
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=false
+     *          },
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      },
+     *      mode="hidden"
+     * )
+     */
+    protected $usernameLowercase;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(type="string", length=255, unique=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -161,8 +169,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="name_prefix", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -179,8 +185,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -197,8 +201,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="middle_name", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -215,8 +217,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -233,8 +233,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="name_suffix", type="string", length=255, nullable=true)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -267,8 +265,6 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="birthday", type="date", nullable=true)
-     * @JMS\Type("DateTime")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -283,8 +279,6 @@ class User extends ExtendUser implements
      * @var bool
      *
      * @ORM\Column(type="boolean")
-     * @JMS\Type("boolean")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -299,8 +293,6 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="last_login", type="datetime", nullable=true)
-     * @JMS\Type("DateTime")
-     * @JMS\Expose
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={
@@ -343,22 +335,6 @@ class User extends ExtendUser implements
      * )
      */
     protected $apiKeys;
-
-    /**
-     * @var Status[]|Collection
-     *
-     * @ORM\OneToMany(targetEntity="Status", mappedBy="user")
-     * @ORM\OrderBy({"createdAt" = "DESC"})
-     */
-    protected $statuses;
-
-    /**
-     * @var Status
-     *
-     * @ORM\OneToOne(targetEntity="Status")
-     * @ORM\JoinColumn(name="status_id", referencedColumnName="id", nullable=true)
-     */
-    protected $currentStatus;
 
     /**
      * @var Email[]|Collection
@@ -463,8 +439,8 @@ class User extends ExtendUser implements
     {
         parent::__construct();
 
-        $this->statuses = new ArrayCollection();
         $this->emails = new ArrayCollection();
+        $this->organizations = new ArrayCollection();
         $this->businessUnits = new ArrayCollection();
         $this->emailOrigins = new ArrayCollection();
         $this->apiKeys = new ArrayCollection();
@@ -474,17 +450,27 @@ class User extends ExtendUser implements
     /**
      * {@inheritdoc}
      */
-    public function getClass()
+    public function getEmailFields()
     {
-        return __CLASS__;
+        return ['email'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getEmailFields()
+    public function setUsername($username): self
     {
-        return ['email'];
+        parent::setUsername($username);
+        $this->usernameLowercase = $username
+            ? mb_strtolower($username)
+            : $username;
+
+        return $this;
+    }
+
+    public function getUsernameLowercase(): string
+    {
+        return $this->usernameLowercase;
     }
 
     /**
@@ -604,7 +590,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     *
      * @param \DateTime $birthday [optional] New birthday value. Null by default.
      *
      * @return User
@@ -702,40 +687,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Returns the true Collection of Roles.
-     *
-     * @deprecated since 1.8
-     *
-     * @return Collection
-     */
-    public function getRolesCollection()
-    {
-        return $this->roles;
-    }
-
-    /**
-     * Directly set the Collection of Roles.
-     *
-     * @deprecated since 1.8
-     *
-     * @param Collection $collection
-     *
-     * @return User
-     * @throws \InvalidArgumentException
-     */
-    public function setRolesCollection($collection)
-    {
-        if (!$collection instanceof Collection) {
-            throw new \InvalidArgumentException(
-                '$collection must be an instance of Doctrine\Common\Collections\Collection'
-            );
-        }
-        $this->roles = $collection;
-
-        return $this;
-    }
-
-    /**
      * Pre persist event listener
      *
      * @ORM\PrePersist
@@ -751,8 +702,6 @@ class User extends ExtendUser implements
      * Invoked before the entity is updated.
      *
      * @ORM\PreUpdate
-     *
-     * @param PreUpdateEventArgs $event
      */
     public function preUpdate(PreUpdateEventArgs $event)
     {
@@ -761,56 +710,11 @@ class User extends ExtendUser implements
         if (array_diff_key($event->getEntityChangeSet(), array_flip($excludedFields))) {
             $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         }
-    }
 
-    /**
-     * Get User Statuses
-     *
-     * @return Status[]|Collection
-     */
-    public function getStatuses()
-    {
-        return $this->statuses;
-    }
-
-    /**
-     * Add Status to User
-     *
-     * @param Status $status
-     *
-     * @return User
-     */
-    public function addStatus(Status $status)
-    {
-        if (!$this->statuses->contains($status)) {
-            $this->statuses->add($status);
+        if (array_intersect_key($event->getEntityChangeSet(), array_flip(['username', 'email', 'password']))) {
+            $this->confirmationToken = null;
+            $this->passwordRequestedAt = null;
         }
-
-        return $this;
-    }
-
-    /**
-     * Get Current Status
-     *
-     * @return Status
-     */
-    public function getCurrentStatus()
-    {
-        return $this->currentStatus;
-    }
-
-    /**
-     * Set User Current Status
-     *
-     * @param Status $status
-     *
-     * @return User
-     */
-    public function setCurrentStatus(Status $status = null)
-    {
-        $this->currentStatus = $status;
-
-        return $this;
     }
 
     /**
@@ -939,14 +843,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getNotificationEmails()
-    {
-        return new ArrayCollection([$this->getEmail()]);
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getEmail()
@@ -962,14 +858,13 @@ class User extends ExtendUser implements
     public function setEmail($email)
     {
         $this->email = $email;
-        $this->emailLowercase = mb_strtolower($email);
+        $this->emailLowercase = $this->email
+            ? mb_strtolower($this->email)
+            : $this->email;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getEmailLowercase(): string
     {
         return $this->emailLowercase;
@@ -1021,14 +916,15 @@ class User extends ExtendUser implements
             : $items->first();
     }
 
-    /**
-     * @param AccountTypeModel|null $accountTypeModel
-     */
     public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
     {
         $this->imapAccountType = $accountTypeModel;
         if ($accountTypeModel instanceof AccountTypeModel) {
-            $this->setImapConfiguration($accountTypeModel->getUserEmailOrigin());
+            /** @var UserEmailOrigin $emailOrigin */
+            if (($emailOrigin = $accountTypeModel->getUserEmailOrigin()) && $accountTypeModel->getAccountType()) {
+                $emailOrigin->setAccountType($accountTypeModel->getAccountType());
+            }
+            $this->setImapConfiguration($emailOrigin);
         }
     }
 
@@ -1043,13 +939,12 @@ class User extends ExtendUser implements
             $accountTypeModel = null;
             if ($userEmailOrigin) {
                 $accountTypeModel = new AccountTypeModel();
-                if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
-                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
-                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
-                } else {
-                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_OTHER);
-                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
-                }
+                $accountType = $userEmailOrigin->getAccountType();
+                // Setting up account type even or inactive OAuth accounts
+                // to keep the display of OAuth account with option to refresh
+                // If method still available
+                $accountTypeModel->setAccountType($accountType);
+                $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
             }
 
             if ($accountTypeModel) {
@@ -1173,18 +1068,17 @@ class User extends ExtendUser implements
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getUserRoles(): array
     {
-        $roles = parent::getRoles();
+        $roles[] = parent::getUserRoles();
 
         /** @var Group $group */
         foreach ($this->getGroups() as $group) {
-            $roles = array_merge($roles, $group->getRoles()->toArray());
+            $roles[] = $group->getRoles()->toArray();
         }
 
-        return array_unique($roles);
+        return array_unique(array_merge(...$roles));
     }
-
     /**
      * @param OrganizationInterface $organization
      *
@@ -1216,37 +1110,36 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Add Organization to User
+     * Adds the given organization to the user.
      *
      * @param Organization $organization
-     * @return AbstractUser
+     *
+     * @return $this
      */
     public function addOrganization(Organization $organization)
     {
-        if (!$this->hasOrganization($organization)) {
-            $this->getOrganizations()->add($organization);
+        if (!$this->organizations->contains($organization)) {
+            $this->organizations->add($organization);
         }
 
         return $this;
     }
 
     /**
-     * Whether user in specified organization
-     *
-     * @param Organization $organization
-     * @return bool
+     * Checks whether the user has the given organization.
+     * Note: use {@see isBelongToOrganization} to check whether the user is belong to an organization.
      */
-    public function hasOrganization(Organization $organization)
+    public function hasOrganization(Organization $organization): bool
     {
-        return $this->getOrganizations()->contains($organization);
+        return $this->organizations->contains($organization);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOrganizations($onlyActive = false)
+    public function getOrganizations(bool $onlyEnabled = false)
     {
-        if ($onlyActive) {
+        if ($onlyEnabled) {
             return $this->organizations->filter(
                 function (Organization $organization) {
                     return $organization->isEnabled() === true;
@@ -1258,8 +1151,11 @@ class User extends ExtendUser implements
     }
 
     /**
+     * Replaces existing organizations with the given ones for the user.
+     *
      * @param Collection $organizations
-     * @return AbstractUser
+     *
+     * @return $this
      */
     public function setOrganizations(Collection $organizations)
     {
@@ -1269,17 +1165,28 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Delete Organization from User
+     * Removes the given organization from the user.
      *
      * @param Organization $organization
-     * @return AbstractUser
+     *
+     * @return $this
      */
     public function removeOrganization(Organization $organization)
     {
-        if ($this->hasOrganization($organization)) {
-            $this->getOrganizations()->removeElement($organization);
+        if ($this->organizations->contains($organization)) {
+            $this->organizations->removeElement($organization);
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __unserialize(array $serialized): void
+    {
+        parent::__unserialize($serialized);
+
+        $this->setUsername($this->username);
     }
 }

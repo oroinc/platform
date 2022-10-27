@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartJsPlumbAreaView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var jsPlumb = require('jsplumb');
-    var JPManager = require('../../../../tools/jsplumb-manager');
-    var FlowchartJsPlumbBaseView = require('./base-view');
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const $ = require('jquery');
+    const jsPlumb = require('jsplumb');
+    const JPManager = require('../../../../tools/jsplumb-manager');
+    const FlowchartJsPlumbBaseView = require('./base-view');
     require('../../../../tools/jsplumb-smartline');
 
-    FlowchartJsPlumbAreaView = FlowchartJsPlumbBaseView.extend({
+    const FlowchartJsPlumbAreaView = FlowchartJsPlumbBaseView.extend({
         /**
          * @type {JsPlumbManager}
          */
@@ -34,41 +34,41 @@ define(function(require) {
                     hoverClass: 'workflow-transition-endpoint-hover'
                 }],
                 PaintStyle: {
-                    strokeStyle: '#caa37b',
+                    strokeStyle: '#bababb',
                     lineWidth: 2,
                     outlineColor: 'transparent',
                     outlineWidth: 7
                 },
                 HoverPaintStyle: {
-                    strokeStyle: '#caa37b'
+                    strokeStyle: '#dba91e'
                 },
                 EndpointStyle: {
-                    fillStyle: '#dcdcdc'
+                    fillStyle: '#bababb'
                 },
                 EndpointHoverStyle: {
-                    fillStyle: '#caa37b'
+                    fillStyle: '#dba91e'
                 },
                 ConnectionOverlays: [
                     ['Arrow', {
                         location: 1,
                         id: 'arrow',
                         length: 10,
-                        width: 8,
-                        foldback: 0.7
+                        width: 12,
+                        foldback: 1
                     }]
                 ]
             };
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function FlowchartJsPlumbAreaView() {
-            FlowchartJsPlumbAreaView.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartJsPlumbAreaView(options) {
+            FlowchartJsPlumbAreaView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.defaultsChartOptions = _.extend(
@@ -76,46 +76,68 @@ define(function(require) {
                 options.chartOptions || {}
             );
             this.flowchartState = options.flowchartState;
+            _.extend(this, _.pick(options, 'chartHandlers'));
 
-            FlowchartJsPlumbAreaView.__super__.initialize.apply(this, arguments);
+            FlowchartJsPlumbAreaView.__super__.initialize.call(this, options);
         },
 
-        delegateEvents: function() {
-            FlowchartJsPlumbAreaView.__super__.delegateEvents.apply(this, arguments);
-            $(document).on('zoomchange' + this.eventNamespace(), _.bind(this.onZoomChange, this));
+        dispose: function() {
+            if (this.disposed) {
+                return;
+            }
+
+            delete this.chartHandlers;
+
+            FlowchartJsPlumbAreaView.__super__.dispose.call(this);
+        },
+
+        delegateEvents: function(events) {
+            FlowchartJsPlumbAreaView.__super__.delegateEvents.call(this, events);
+            $(document).on('zoomchange' + this.eventNamespace(), this.onZoomChange.bind(this));
             return this;
         },
 
         undelegateEvents: function() {
-            FlowchartJsPlumbAreaView.__super__.undelegateEvents.apply(this, arguments);
+            FlowchartJsPlumbAreaView.__super__.undelegateEvents.call(this);
             $(document).off(this.eventNamespace());
             return this;
         },
 
         render: function() {
             // do nothing except connect()
-            if (!this.isConnected) {
-                this.isConnected = true;
+            if (!this.isConnected && !this.isConnecting) {
+                this.isConnecting = true;
                 this.connect();
+                this.isConnected = true;
+                delete this.isConnecting;
             }
             return this;
         },
 
         connect: function() {
-            var chartOptions = _.defaults({
+            const chartOptions = _.defaults({
                 container: this.id()
             }, this.defaultsChartOptions);
             this.jsPlumbInstance = jsPlumb.getInstance(chartOptions);
-            this.debouncedRepaintEverything = _.debounce(
-                _.bind(this.jsPlumbInstance.repaintEverything, this.jsPlumbInstance), 0);
+            this.jsPlumbInstance.eventBus = Object.create(Backbone.Events);
+            if (this.chartHandlers) {
+                this.listenTo(this.jsPlumbInstance.eventBus, this.chartHandlers);
+            }
+            this.debouncedRepaintEverything = _.debounce(this.repaintEverything.bind(this), 0);
             this.jsPlumbManager = new JPManager(this.jsPlumbInstance, this.model);
-            var stepWithPosition = this.model.get('steps').find(function(step) {
-                var position = step.get('position');
+            const stepWithPosition = this.model.get('steps').find(function(step) {
+                const position = step.get('position');
                 return _.isArray(position) && position.length === 2;
             });
             // if positions of step wasn't defined
             if (_.isUndefined(stepWithPosition)) {
                 this.jsPlumbManager.organizeBlocks();
+            }
+        },
+
+        repaintEverything: function() {
+            if (this.isConnected) {
+                this.jsPlumbInstance.repaintEverything();
             }
         },
 

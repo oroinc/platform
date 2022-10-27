@@ -3,24 +3,16 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Symfony2Extension\Context\KernelAwareContext;
-use Behat\Symfony2Extension\Context\KernelDictionary;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 
-class FeatureContext extends OroFeatureContext implements KernelAwareContext
+class FeatureContext extends OroFeatureContext
 {
-    use KernelDictionary;
-
-    /**
-     * @var ImportExportContext
-     */
-    private $importExportContext;
+    private ?ImportExportContext $importExportContext = null;
 
     /**
      * @BeforeScenario
-     *
-     * @param BeforeScenarioScope $scope
      */
     public function gatherContexts(BeforeScenarioScope $scope)
     {
@@ -36,8 +28,8 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
      */
     public function iDownloadDataTemplateFileForExtendEntity($entityAlias)
     {
-        $className = $this->getContainer()->get('oro_entity.entity_alias_resolver')->getClassByAlias($entityAlias);
-        $entityConfigManager = $this->getContainer()->get('oro_entity_config.config_manager');
+        $className = $this->getAppContainer()->get('oro_entity.entity_alias_resolver')->getClassByAlias($entityAlias);
+        $entityConfigManager = $this->getAppContainer()->get('oro_entity_config.config_manager');
         $entityModel = $entityConfigManager->getConfigEntityModel($className);
 
         static::assertNotNull($entityModel, sprintf('No entity model found for class "%s"', $className));
@@ -46,5 +38,34 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext
             'oro_entity_config_entity_field.export_template',
             ['entity_id' => $entityModel->getId()]
         );
+    }
+
+    /**
+     * @Given /^(?:|I )check if field "(?P<field>.*)" "(?P<cond>.*)" in db table by entity class "(?P<class>.*)"$/
+     */
+    public function checkIfFieldNotOrIsInDbTableByEntityClass(string $field, string $cond, string $class)
+    {
+        self::assertContains($cond, ['is', 'not']);
+        /** @var DoctrineHelper $dh */
+        $dh = $this->getAppContainer()->get('oro_entity.doctrine_helper');
+
+        $em = $dh->getEntityManager($class);
+        $sm = $em->getConnection()->getSchemaManager();
+
+        $tableName = $em->getClassMetadata($class)->getTableName();
+
+        $columns = $sm->listTableColumns($tableName);
+
+        $columnsArray = [];
+        foreach ($columns as $column) {
+            $columnsArray[] = strtolower($column->getName());
+        }
+
+        $field = strtolower($field);
+        if ($cond === 'is') {
+            self::assertContains($field, $columnsArray);
+        } else {
+            self::assertNotContains($field, $columnsArray);
+        }
     }
 }

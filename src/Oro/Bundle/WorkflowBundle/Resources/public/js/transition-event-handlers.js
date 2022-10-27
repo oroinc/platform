@@ -27,7 +27,9 @@ define([
                 pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
 
                 function doRedirect(redirectUrl) {
-                    mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
+                    mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true})
+                        // in case redirect action was canceled -- remove loading mask
+                        .fail(() => mediator.execute('hideLoading'));
                 }
                 function doReload() {
                     mediator.execute('refreshPage');
@@ -42,12 +44,11 @@ define([
                     ) {
                         e.stopImmediatePropagation();
                         doRedirect(response.workflowItem.result.redirectUrl);
+                    } else if (pageRefresh) {
+                        /** By default reload page */
+                        doReload();
                     }
                 });
-                /** By default reload page */
-                if (pageRefresh) {
-                    element.one('transitions_success', doReload);
-                }
 
                 element.trigger('transitions_success', [response]);
             };
@@ -61,7 +62,7 @@ define([
                 }
 
                 element.one('transitions_failure', function() {
-                    var message = __('Could not perform transition');
+                    let message = __('Could not perform transition');
                     if (jqxhr.message !== undefined) {
                         message += ': ' + jqxhr.message;
                     }

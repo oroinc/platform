@@ -12,10 +12,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
 {
     protected const JSON_CONTENT_TYPE = 'application/json';
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         parent::setUp();
@@ -24,7 +21,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getRequestType()
+    protected function getRequestType(): RequestType
     {
         return new RequestType([RequestType::REST]);
     }
@@ -32,13 +29,24 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
+    protected function getResponseContentType(): string
     {
-        if (!array_key_exists('HTTP_X-WSSE', $server)) {
-            $server = array_replace($server, $this->getWsseAuthHeader());
-        } elseif (!$server['HTTP_X-WSSE']) {
-            unset($server['HTTP_X-WSSE']);
-        }
+        return self::JSON_CONTENT_TYPE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function request(
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $server = [],
+        string $content = null
+    ): Response {
+        $this->checkHateoasHeader($server);
+        $this->checkWsseAuthHeader($server);
+        $this->checkCsrfHeader($server);
 
         $this->client->request(
             $method,
@@ -49,66 +57,117 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
             $content
         );
 
+        // make sure that REST API call does not start the session
+        $this->assertSessionNotStarted($method, $uri, $server);
+
         return $this->client->getResponse();
     }
 
     /**
-     * Asserts the response content contains the the given data.
+     * Asserts the response content contains the given data.
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response
      * @param object|null  $entity          If not null, object will set as entity reference
      */
-    protected function assertResponseContains($expectedContent, Response $response, $entity = null)
-    {
+    protected function assertResponseContains(
+        array|string $expectedContent,
+        Response $response,
+        object $entity = null
+    ): void {
         if ($entity) {
             $this->getReferenceRepository()->addReference('entity', $entity);
         }
 
         $content = self::jsonToArray($response->getContent());
-        $expectedContent = self::processTemplateData($this->loadResponseData($expectedContent));
+        $expectedContent = self::processTemplateData($this->getResponseData($expectedContent));
 
-        self::assertArrayContains($expectedContent, $content);
+        self::assertThat($content, new RestPlainDocContainsConstraint($expectedContent, false));
     }
 
     /**
-     * Asserts the response content contains the the given validation error.
-     *
-     * @param array    $expectedError
-     * @param Response $response
+     * Asserts that the response content contains one validation error and it is the given error.
      */
-    protected function assertResponseValidationError($expectedError, Response $response)
-    {
-        $this->assertResponseValidationErrors([$expectedError], $response);
+    protected function assertResponseValidationError(
+        array $expectedError,
+        Response $response,
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
+        $this->assertValidationErrors([$expectedError], $response, $statusCode, true);
     }
 
     /**
-     * Asserts the response content contains the the given validation errors.
-     *
-     * @param array    $expectedErrors
-     * @param Response $response
+     * Asserts that the response content contains the given validation error.
      */
-    protected function assertResponseValidationErrors($expectedErrors, Response $response)
-    {
-        static::assertResponseStatusCodeEquals($response, Response::HTTP_BAD_REQUEST);
+    protected function assertResponseContainsValidationError(
+        array $expectedError,
+        Response $response,
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
+        $this->assertValidationErrors([$expectedError], $response, $statusCode, false);
+    }
+
+    /**
+     * Asserts that the response content contains the given validation errors and only them.
+     */
+    protected function assertResponseValidationErrors(
+        array $expectedErrors,
+        Response $response,
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
+        $this->assertValidationErrors($expectedErrors, $response, $statusCode, true);
+    }
+
+    /**
+     * Asserts that the response content contains the given validation errors.
+     */
+    protected function assertResponseContainsValidationErrors(
+        array $expectedErrors,
+        Response $response,
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
+        $this->assertValidationErrors($expectedErrors, $response, $statusCode, false);
+    }
+
+    private function assertValidationErrors(
+        array $expectedErrors,
+        Response $response,
+        int $statusCode,
+        bool $strict
+    ): void {
+        static::assertResponseStatusCodeEquals($response, $statusCode);
 
         $content = self::jsonToArray($response->getContent());
         try {
             $this->assertResponseContains($expectedErrors, $response);
-            self::assertCount(
-                count($expectedErrors),
-                $content,
-                'Unexpected number of validation errors'
-            );
+            if ($strict) {
+                self::assertCount(
+                    count($expectedErrors),
+                    $content,
+                    'Unexpected number of validation errors'
+                );
+            }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     "%s\nResponse:\n%s",
                     $e->getMessage(),
-                    json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                    json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)
                 ),
                 $e->getComparisonFailure()
             );
         }
+    }
+
+    /**
+     * Extracts REST API resource identifier from the response.
+     */
+    protected function getResourceId(Response $response, string $identifierFieldName = 'id'): mixed
+    {
+        $content = self::jsonToArray($response->getContent());
+        self::assertIsArray($content);
+        self::assertArrayHasKey($identifierFieldName, $content);
+
+        return $content[$identifierFieldName];
     }
 }

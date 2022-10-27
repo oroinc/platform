@@ -5,14 +5,18 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\Common;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmQueryConfiguration;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridConfiguration */
-    protected $configuration;
+    private $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = DatagridConfiguration::create([]);
     }
@@ -28,12 +32,11 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(OrmQueryConfiguration::class, $this->configuration->getOrmQuery());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\LogicException
-     * @expectedExceptionMessage The expected data grid source type is "orm". Actual source type is "another".
-     */
     public function testGetOrmQueryForNotOrmDatasourceType()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The expected data grid source type is "orm". Actual source type is "another".');
+
         $this->configuration->setDatasourceType('another');
         $this->configuration->getOrmQuery();
     }
@@ -74,120 +77,58 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $params
-     * @param bool $expected
      * @dataProvider getAclResourceDataProvider
      */
-    public function testGetAclResource(array $params, $expected)
+    public function testGetAclResource(array $params, bool $expected)
     {
         $this->configuration->merge($params);
         $this->assertEquals($expected, $this->configuration->getAclResource());
     }
 
-    public function getAclResourceDataProvider()
+    public function getAclResourceDataProvider(): array
     {
         return [
             [
-                'params' => [
-                    'acl_resource' => false,
-                    'source' => ['acl_resource' => false],
-                ],
+                'params' => [],
                 'expected' => false,
             ],
             [
-                'params' => [
-                    'acl_resource' => false,
-                    'source' => ['acl_resource' => true],
-                ],
+                'params' => ['acl_resource' => false],
                 'expected' => false,
-            ],
-            [
-                'params' => [
-                    'acl_resource' => true,
-                    'source' => ['acl_resource' => false],
-                ],
-                'expected' => true,
-            ],
-            [
-                'params' => [
-                    'acl_resource' => true,
-                    'source' => ['acl_resource' => true],
-                ],
-                'expected' => true,
             ],
             [
                 'params' => ['acl_resource' => true],
                 'expected' => true,
             ],
             [
-                'params' => [
-                    'acl_resource' => false,
-                ],
-                'expected' => false,
-            ],
-            [
-                'params' => [
-                    'source' => ['acl_resource' => false],
-                ],
-                'expected' => false,
-            ],
-            [
-                'params' => [
-                    'source' => ['acl_resource' => true],
-                ],
+                'params' => ['acl_resource' => true],
                 'expected' => true,
             ],
         ];
     }
 
     /**
-     * @param array $params
-     * @param bool $expected
      * @dataProvider isDatasourceSkipAclApplyDataProvider
      */
-    public function testIsDatasourceSkipAclApply(array $params, $expected)
+    public function testIsDatasourceSkipAclApply(array $params, bool $expected)
     {
         $this->configuration->merge($params);
         $this->assertEquals($expected, $this->configuration->isDatasourceSkipAclApply());
     }
 
-    public function isDatasourceSkipAclApplyDataProvider()
+    public function isDatasourceSkipAclApplyDataProvider(): array
     {
         return [
             [
-                'params' => [
-                    'source' => [
-                        'skip_acl_apply' => false,
-                        'skip_acl_check' => false,
-                    ],
-                ],
+                'params' => ['source' => []],
                 'expected' => false,
             ],
             [
-                'params' => [
-                    'source' => [
-                        'skip_acl_apply' => false,
-                        'skip_acl_check' => true,
-                    ],
-                ],
+                'params' => ['source' => ['skip_acl_apply' => false]],
                 'expected' => false,
             ],
             [
-                'params' => [
-                    'source' => [
-                        'skip_acl_apply' => true,
-                        'skip_acl_check' => false,
-                    ],
-                ],
-                'expected' => true,
-            ],
-            [
-                'params' => [
-                    'source' => [
-                        'skip_acl_apply' => true,
-                        'skip_acl_check' => true,
-                    ],
-                ],
+                'params' => ['source' => ['skip_acl_apply' => true]],
                 'expected' => true,
             ],
         ];
@@ -195,21 +136,14 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider addColumnDataProvider
-     *
-     * @param array  $expected
-     * @param string $name
-     * @param string $select
-     * @param array  $definition
-     * @param array  $sorter
-     * @param array  $filter
      */
     public function testAddColumn(
-        $expected,
-        $name,
-        $definition,
-        $select = null,
-        $sorter = [],
-        $filter = []
+        array $expected,
+        string $name,
+        array $definition,
+        string $select = null,
+        array $sorter = [],
+        array $filter = []
     ) {
         $this->configuration->addColumn(
             $name,
@@ -223,19 +157,20 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $configArray);
     }
 
-    public function testExceptions()
+    public function testAddColumnWithoutName()
     {
-        $this->expectException('BadMethodCallException');
+        $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('DatagridConfiguration::addColumn: name should not be empty');
+
         $this->configuration->addColumn(null, []);
+    }
 
-        $this->expectException('BadMethodCallException');
+    public function testUpdateLabelWithoutName()
+    {
+        $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('DatagridConfiguration::updateLabel: name should not be empty');
-        $this->configuration->updateLabel(null, []);
 
-        $this->expectException('BadMethodCallException');
-        $this->expectExceptionMessage('DatagridConfiguration::addSelect: select should not be empty');
-        $this->configuration->addSelect(null);
+        $this->configuration->updateLabel(null, 'label1');
     }
 
     public function testUpdateLabel()
@@ -275,7 +210,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testAddSelect()
     {
-        $this->configuration->addSelect('testColumn');
+        $this->configuration->getOrmQuery()->addSelect('testColumn');
 
         $configArray = $this->configuration->toArray();
         $this->assertEquals(
@@ -290,13 +225,13 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testJoinTable()
     {
-        $this->configuration->joinTable('left', ['param' => 'value']);
+        $this->configuration->getOrmQuery()->addLeftJoin('rootAlias.association', 'joinAlias');
 
         $configArray = $this->configuration->toArray();
         $this->assertEquals(
             [
                 'source' => [
-                    'query' => ['join' => ['left' => [['param' => 'value']]]],
+                    'query' => ['join' => ['left' => [['join' => 'rootAlias.association', 'alias' => 'joinAlias']]]],
                 ]
             ],
             $configArray
@@ -335,10 +270,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->configuration->isDatagridExtendedFrom('some-datagrid-name'));
     }
 
-    /**
-     * @return array
-     */
-    public function addColumnDataProvider()
+    public function addColumnDataProvider(): array
     {
         return [
             'all data supplied'         => [

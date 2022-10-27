@@ -1,14 +1,14 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 {% set pageComponent = {
     'module': 'oroui/js/app/components/view-component',
     'options': {'view': 'oroemail/js/app/views/email-template-editor-view'},
     'layout': 'separate'
 } %}
 {% form_theme form with [
-    'OroFormBundle:Form:fields.html.twig',
-    'OroEmailBundle:Form:fields.html.twig',
+    '@OroForm/Form/fields.html.twig',
+    '@OroEmail/Form/fields.html.twig',
 ]%}
-{% import 'OroEmailBundle::macros.html.twig' as _emailMacros %}
+{% import '@OroEmail/macros.html.twig' as _emailMacros %}
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%name%": form.vars.value.name} }) %}
 {% endif %}
@@ -19,6 +19,8 @@
 %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% if is_granted('oro_email_emailtemplate_preview') %}
         {{ UI.button({
             'path' :  path('oro_email_emailtemplate_preview', {'id': form.vars.value.id }),
@@ -82,7 +84,7 @@
         {% set title = isClone
             ? 'oro.email.emailtemplate.clone_entity'|trans
             : 'oro.ui.create_entity'|trans({'%entityName%': 'oro.email.emailtemplate.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
@@ -90,7 +92,7 @@
     {% set id = 'emailtemplate-edit' %}
     {% set dataBlocks = [
         {
-            'title': 'General'|trans,
+            'title': 'oro.email.emailtemplate.sections.general'|trans,
             'class': 'active',
             'subblocks': [{
                 'title': '',
@@ -102,7 +104,7 @@
             }]
         },
         {
-            'title': 'Template data'|trans,
+            'title': 'oro.email.emailtemplate.sections.template_data'|trans,
             'subblocks': [
             {
                 'title': '',
@@ -118,6 +120,8 @@
             }]
         }
     ] %}
+
+    {% set dataBlocks = dataBlocks|merge(oro_form_additional_data(form, 'Additional'|trans)) %}
 
     {% set data = {
         'formErrors': form_errors(form)? form_errors(form) : null,

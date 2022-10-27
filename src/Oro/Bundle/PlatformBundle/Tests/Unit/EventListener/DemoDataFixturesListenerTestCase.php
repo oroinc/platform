@@ -9,12 +9,12 @@ use Oro\Component\Testing\Unit\EntityTrait;
 
 abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestCase
 {
-    const LISTENERS = [
+    use EntityTrait;
+
+    protected const LISTENERS = [
         'test_listener_1',
         'test_listener_2',
     ];
-
-    use EntityTrait;
 
     /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $listenerManager;
@@ -28,7 +28,7 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
     /**
      * {@inheritDoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);
         $this->event = $this->createMock(MigrationDataFixturesEvent::class);
@@ -78,7 +78,7 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
             ->method('enableListeners')
             ->with(self::LISTENERS);
 
-        $this->listener->onPreLoad($this->event);
+        $this->listener->onPostLoad($this->event);
     }
 
     public function testOnPostLoadWithNoDemoFixtures()
@@ -90,6 +90,6 @@ abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestC
         $this->listenerManager->expects($this->never())
             ->method('enableListeners');
 
-        $this->listener->onPreLoad($this->event);
+        $this->listener->onPostLoad($this->event);
     }
 }

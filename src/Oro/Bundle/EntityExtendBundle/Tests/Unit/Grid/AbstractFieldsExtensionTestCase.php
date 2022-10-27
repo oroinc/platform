@@ -3,19 +3,21 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
-    const ENTITY_NAME = 'Test:Entity';
-    const FIELD_NAME = 'testField';
+    protected const ENTITY_CLASS = 'Test\Entity';
+    protected const ENTITY_NAME = 'Test:Entity';
+    protected const FIELD_NAME = 'testField';
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
@@ -41,99 +43,38 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
     /** @var FieldsHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $fieldsHelper;
 
-    /**
-     * @return AbstractFieldsExtension
-     */
-    abstract protected function getExtension();
+    abstract protected function getExtension(): AbstractFieldsExtension;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityClassResolver = $this->getMockBuilder(EntityClassResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
 
         $this->entityClassResolver->expects($this->any())
             ->method('getEntityClass')
-            ->willReturnMap(
-                [
-                    [self::ENTITY_CLASS, self::ENTITY_CLASS],
-                    [self::ENTITY_NAME, self::ENTITY_CLASS],
-                    [\stdClass::class, \stdClass::class],
-                ]
-            );
+            ->willReturnMap([
+                [self::ENTITY_CLASS, self::ENTITY_CLASS],
+                [self::ENTITY_NAME, self::ENTITY_CLASS],
+                [\stdClass::class, \stdClass::class],
+            ]);
 
-        $this->entityConfigProvider = $this->getConfigProviderMock();
-        $this->extendConfigProvider = $this->getConfigProviderMock();
-        $this->datagridConfigProvider = $this->getConfigProviderMock();
-        $this->viewConfigProvider = $this->getConfigProviderMock();
-        $this->attributeConfigProvider = $this->getConfigProviderMock();
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->datagridConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->viewConfigProvider = $this->createMock(ConfigProvider::class);
+        $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['entity', $this->entityConfigProvider],
-                        ['extend', $this->extendConfigProvider],
-                        ['datagrid', $this->datagridConfigProvider],
-                        ['view', $this->viewConfigProvider],
-                        ['attribute', $this->attributeConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['entity', $this->entityConfigProvider],
+                ['extend', $this->extendConfigProvider],
+                ['datagrid', $this->datagridConfigProvider],
+                ['view', $this->viewConfigProvider],
+                ['attribute', $this->attributeConfigProvider],
+            ]);
 
-        $this->fieldsHelper = $this->getMockBuilder(FieldsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset(
-            $this->configManager,
-            $this->entityClassResolver,
-            $this->entityConfigProvider,
-            $this->extendConfigProvider,
-            $this->datagridConfigProvider,
-            $this->viewConfigProvider,
-            $this->fieldsHelper
-        );
-    }
-
-    /**
-     * @param bool $isEnabled
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFeatureCheckerMock($isEnabled = true)
-    {
-        $checker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $checker->expects($this->any())
-            ->method('isResourceEnabled')
-            ->willReturn($isEnabled);
-
-        return $checker;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldsHelper = $this->createMock(FieldsHelper::class);
     }
 
     public function testProcessConfigsNoFields()
@@ -146,11 +87,75 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->getExtension()->processConfigs($config);
     }
 
-    /**
-     * @param array $options
-     * @return DatagridConfiguration
-     */
-    abstract protected function getDatagridConfiguration(array $options = []);
+    abstract protected function getDatagridConfiguration(array $options = []): DatagridConfiguration;
+
+    public function testProcessConfigsWithDatagridOrder()
+    {
+        $fieldType = 'string';
+
+        $datagridFieldConfig = new Config(
+            new FieldConfigId('datagrid', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType),
+            [
+                'show_filter' => true,
+                'is_visible' => DatagridScope::IS_VISIBLE_TRUE,
+                'renderable' => true,
+                'order' => 3,
+            ]
+        );
+
+        $this->datagridConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, self::FIELD_NAME)
+            ->willReturn($datagridFieldConfig);
+
+        $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
+
+        $config = $this->getDatagridConfiguration();
+        $initialConfig = $config->toArray();
+
+        $this->getExtension()->processConfigs($config);
+        $this->assertEquals(
+            array_merge(
+                $initialConfig,
+                [
+                    'columns' => [
+                        self::FIELD_NAME => [
+                            'label' => 'label',
+                            'frontend_type' => 'string',
+                            'renderable' => true,
+                            'required' => false,
+                            'data_name' => 'testField',
+                            'order' => 3
+                        ],
+                    ],
+                    'sorters' => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'data_name' => 'o.' . self::FIELD_NAME,
+                            ],
+                        ],
+                    ],
+                    'filters' => [
+                        'columns' => [
+                            self::FIELD_NAME => [
+                                'type' => 'string',
+                                'data_name' => 'o.' . self::FIELD_NAME,
+                                'renderable' => true,
+                            ],
+                        ],
+                    ],
+                    'source' => [
+                        'query' => [
+                            'from' => [['table' => self::ENTITY_CLASS, 'alias' => 'o']],
+                            'select' => ['o.testField'],
+                        ],
+                    ],
+                    'fields_acl' => ['columns' => ['testField' => ['data_name' => 'o.testField']]],
+                ]
+            ),
+            $config->toArray()
+        );
+    }
 
     public function testProcessConfigs()
     {
@@ -172,7 +177,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField',
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -187,7 +191,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'type' => 'string',
                                 'data_name' => 'o.'.self::FIELD_NAME,
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -211,7 +215,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->setExpectationForGetFields(self::ENTITY_CLASS, self::FIELD_NAME, $fieldType);
 
         $from = [
-            ['table' => '\stdClass', 'alias' => 'std'],
+            ['table' => \stdClass::class, 'alias' => 'std'],
             ['table' => self::ENTITY_CLASS, 'alias' => 'e'],
         ];
         $config = $this->getDatagridConfiguration(['source' => ['query' => ['from' => $from]]]);
@@ -228,7 +232,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField',
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -243,7 +246,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'type' => 'string',
                                 'data_name' => 'e.'.self::FIELD_NAME,
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -260,16 +263,10 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         );
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param array $extendFieldConfig
-     */
     abstract protected function setExpectationForGetFields(
-        $className,
-        $fieldName,
-        $fieldType,
+        string $className,
+        string $fieldName,
+        string $fieldType,
         array $extendFieldConfig = []
     );
 
@@ -279,19 +276,16 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $alias = 'c';
 
         $targetFieldName = 'testRel';
-        $relAlias = 'auto_rel_1';
 
         $this->setExpectationForGetFields(
             self::ENTITY_CLASS,
             self::FIELD_NAME,
             $fieldType,
-            [
-                'target_field' => $targetFieldName,
-            ]
+            ['target_field' => $targetFieldName]
         );
 
         $from = [
-            ['table' => '\stdClass', 'alias' => 'std'],
+            ['table' => \stdClass::class, 'alias' => 'std'],
             ['table' => self::ENTITY_CLASS, 'alias' => $alias],
         ];
         $config = $this->getDatagridConfiguration(['source' => ['query' => ['from' => $from]]]);
@@ -326,7 +320,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'label' => 'label',
                             'renderable' => true,
                             'required' => false,
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -341,7 +334,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'data_name' => $alias.'.'.self::FIELD_NAME,
                                 'type' => 'enum',
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -369,13 +362,11 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
             self::ENTITY_CLASS,
             self::FIELD_NAME,
             $fieldType,
-            [
-                'target_field' => $targetFieldName,
-            ]
+            ['target_field' => $targetFieldName]
         );
 
         $from = [
-            ['table' => '\stdClass', 'alias' => 'std'],
+            ['table' => \stdClass::class, 'alias' => 'std'],
             ['table' => self::ENTITY_CLASS, 'alias' => $alias],
         ];
         $config = $this->getDatagridConfiguration(['source' => ['query' => ['from' => $from]]]);
@@ -399,7 +390,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'label' => 'label',
                             'renderable' => true,
                             'required' => false,
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -414,7 +404,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'data_name' => 'c.testField',
                                 'type' => 'multiEnum',
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -439,9 +429,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
             self::ENTITY_CLASS,
             self::FIELD_NAME,
             $fieldType,
-            [
-                'target_field' => 'name',
-            ]
+            ['target_field' => 'name']
         );
 
         $config = $this->getDatagridConfiguration(['source' => ['query' => ['groupBy' => 'o.someField']]]);
@@ -458,7 +446,6 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             'renderable' => true,
                             'required' => false,
                             'data_name' => 'testField_target_field',
-                            'order' => 0
                         ],
                     ],
                     'sorters' => [
@@ -473,7 +460,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'type' => 'entity',
                                 'data_name' => 'IDENTITY(o.testField)',
-                                'enabled' => true,
+                                'renderable' => true,
                                 'translatable' => true,
                                 'options' => [
                                     'field_type' => EntityType::class,

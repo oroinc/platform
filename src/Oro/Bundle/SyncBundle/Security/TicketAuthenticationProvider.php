@@ -5,106 +5,82 @@ namespace Oro\Bundle\SyncBundle\Security;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDigestGeneratorInterface;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
-use Oro\Bundle\UserBundle\Security\UserProvider;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+/**
+ * The authentication provider for Sync authentication ticket.
+ */
 class TicketAuthenticationProvider implements AuthenticationProviderInterface
 {
-    /**
-     * @var TicketDigestGeneratorInterface
-     */
+    /** @var TicketDigestGeneratorInterface */
     private $ticketDigestGenerator;
 
-    /**
-     * @var UserProvider
-     */
+    /** @var UserProviderInterface */
     private $userProvider;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $providerKey;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $secret;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $ticketTtl;
 
-    /**
-     * @param TicketDigestGeneratorInterface $ticketDigestGenerator
-     * @param UserProvider $userProvider
-     * @param string $providerKey
-     * @param string $secret
-     * @param string|int $ticketTtl
-     */
     public function __construct(
         TicketDigestGeneratorInterface $ticketDigestGenerator,
-        UserProvider $userProvider,
+        UserProviderInterface $userProvider,
         string $providerKey,
         string $secret,
-        $ticketTtl
+        int $ticketTtl
     ) {
         $this->userProvider = $userProvider;
         $this->ticketDigestGenerator = $ticketDigestGenerator;
         $this->providerKey = $providerKey;
         $this->secret = $secret;
-        $this->ticketTtl = (int)$ticketTtl;
+        $this->ticketTtl = $ticketTtl;
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws BadCredentialsException
      */
     public function authenticate(TokenInterface $token)
     {
-        if (!$this->supports($token)) {
-            throw new \InvalidArgumentException('Token is not supported');
-        }
-
         $this->validateTokenCreatedDate($token);
-
-        $ticketDigest = $token->getCredentials();
-        $nonce = $token->getAttribute('nonce');
-        $created = $token->getAttribute('created');
 
         $password = $this->secret;
         $user = $this->fetchUser($token);
-        if ($user !== null) {
+        if (null !== $user) {
             $password = $user->getPassword();
         }
 
+        $nonce = $token->getAttribute('nonce');
+        $created = $token->getAttribute('created');
+        $ticketDigest = $token->getCredentials();
         $expectedDigest = $this->ticketDigestGenerator->generateDigest($nonce, $created, $password);
-        if ($ticketDigest === $expectedDigest) {
-            if ($user !== null) {
-                $token = new TicketToken(
-                    $user,
-                    $ticketDigest,
-                    $this->providerKey,
-                    $user->getRoles()
-                );
-            } else {
-                $token = new AnonymousTicketToken($ticketDigest, static::USERNAME_NONE_PROVIDED);
-            }
-
-            return $token;
+        if ($ticketDigest !== $expectedDigest) {
+            throw new BadCredentialsException(sprintf(
+                'Ticket "%s" for "%s" is not valid - invalid digest.',
+                $token->getCredentials(),
+                $token->getUsername()
+            ));
         }
 
-        throw new BadCredentialsException(sprintf(
-            'Ticket "%s" for "%s" is not valid - invalid credentials',
-            $token->getCredentials(),
-            $token->getUsername()
-        ));
+        return null !== $user
+            ? new TicketToken($user, $ticketDigest, $this->providerKey, $this->getRoles($user))
+            : new AnonymousTicketToken($ticketDigest, self::USERNAME_NONE_PROVIDED);
+    }
+
+    private function getRoles(SymfonyUserInterface $user): array
+    {
+        return $user instanceof UserInterface ? $user->getUserRoles() : $user->getRoles();
     }
 
     /**
@@ -112,24 +88,20 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
      */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof Token &&
-            $token->hasAttribute('nonce') &&
-            $token->hasAttribute('created') &&
-            $this->providerKey === $token->getProviderKey();
+        return
+            $token instanceof Token
+            && $token->hasAttribute('nonce')
+            && $token->hasAttribute('created')
+            && $this->providerKey === $token->getProviderKey();
     }
 
-    /**
-     * @param TokenInterface $token
-     *
-     * @throws BadCredentialsException
-     */
     private function validateTokenCreatedDate(TokenInterface $token): void
     {
         $created = $token->getAttribute('created');
 
         $createdTime = strtotime($created);
         $now = strtotime(date('c'));
-        if ($createdTime > $now) {
+        if ($createdTime > $now && $createdTime - $now > 30) {
             throw new BadCredentialsException(sprintf(
                 'Ticket "%s" for "%s" is not valid, because token creation date "%s" is in future',
                 $token->getCredentials(),
@@ -147,24 +119,19 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
         }
     }
 
-    /**
-     * @param TokenInterface $token
-     *
-     * @return null|UserInterface
-     */
-    private function fetchUser(TokenInterface $token): ?UserInterface
+    private function fetchUser(TokenInterface $token): ?SymfonyUserInterface
     {
-        $username = $token->getUsername();
         $user = null;
-
+        $username = $token->getUsername();
         if ($username) {
             try {
                 $user = $this->userProvider->loadUserByUsername($username);
-            } catch (UsernameNotFoundException $exception) {
+                $user = $this->userProvider->refreshUser($user);
+            } catch (UsernameNotFoundException $e) {
                 throw new BadCredentialsException(sprintf(
-                    'Ticket "%s" for "%s" is not valid - invalid credentials',
+                    'Ticket "%s" for "%s" is not valid - user was not found.',
                     $token->getCredentials(),
-                    $token->getUsername()
+                    $username
                 ));
             }
         }

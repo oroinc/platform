@@ -1,7 +1,4 @@
 Oro\Bundle\AddressBundle\Entity\AbstractAddress:
-    constraints:
-        - Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganization: { groups: ['RequireName'] }
-
     properties:
         street:
             - Length:
@@ -18,10 +15,6 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
         postalCode:
             - Length:
                   max: 255
-
-        country:
-            - NotBlank:
-                groups: [AbstractAddress]
 
         regionText:
             - Length:
@@ -55,16 +48,18 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
             - Length:
                   max: 255
 
-# Prevent required values for all child of AbstractAddress
 Oro\Bundle\AddressBundle\Entity\Address:
     constraints:
-        - Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion: { groups: ['RequireRegion'] }
+        - Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion: ~
+        - Oro\Bundle\AddressBundle\Validator\Constraints\RegionText: ~
     properties:
         street:
             - NotBlank: ~
         city:
             - NotBlank: ~
         postalCode:
+            - NotBlank: ~
+        country:
             - NotBlank: ~
 
 Oro\Bundle\AddressBundle\Entity\AbstractEmail:

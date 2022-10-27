@@ -6,6 +6,9 @@ use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The fort type for Group entity REST API.
+ */
 class GroupApiType extends GroupType
 {
     /**
@@ -17,7 +20,7 @@ class GroupApiType extends GroupType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -27,7 +30,7 @@ class GroupApiType extends GroupType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

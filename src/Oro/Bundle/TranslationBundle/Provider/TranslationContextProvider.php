@@ -3,39 +3,39 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Oro\Bundle\TranslationBundle\Extension\TranslationContextResolverInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class TranslationContextProvider
+/**
+ * Resolves a translation context using configured resolvers.
+ */
+class TranslationContextProvider implements ResetInterface
 {
-    /** @var TranslationContextResolverInterface[] */
-    protected $extensions = [];
+    /** @var iterable|TranslationContextResolverInterface[] */
+    private $extensions;
 
     /** @var array */
-    protected $context = [];
+    private $context = [];
 
     /**
-     * @param TranslationContextResolverInterface $extension
-     * @param string $name
+     * @param iterable|TranslationContextResolverInterface[] $extensions
      */
-    public function addExtension(TranslationContextResolverInterface $extension, $name)
+    public function __construct(iterable $extensions)
     {
-        $this->extensions[$name] = $extension;
+        $this->extensions = $extensions;
     }
 
     /**
      * @param string $id
+     *
      * @return string|null
      */
     public function resolveContext($id)
     {
         if (!array_key_exists($id, $this->context)) {
             $this->context[$id] = null;
-
-            if (!$this->extensions) {
-                return null;
-            }
-
             foreach ($this->extensions as $extension) {
-                if (null !== ($context = $extension->resolve($id))) {
+                $context = $extension->resolve($id);
+                if (null !== $context) {
                     $this->context[$id] = $context;
                     break;
                 }
@@ -43,5 +43,13 @@ class TranslationContextProvider
         }
 
         return $this->context[$id];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->context = [];
     }
 }

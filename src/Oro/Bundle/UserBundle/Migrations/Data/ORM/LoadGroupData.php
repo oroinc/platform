@@ -1,51 +1,44 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 use Oro\Bundle\UserBundle\Entity\Group;
 
+/**
+ * Loads user groups.
+ */
 class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        return ['Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData'];
+        return [LoadOrganizationAndBusinessUnitData::class];
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
-        /**
-         * addRole was commented due a ticket BAP-1675
-         */
-        $defaultBusinessUnit = $manager
-            ->getRepository('OroOrganizationBundle:BusinessUnit')
+        $defaultBusinessUnit = $manager->getRepository(BusinessUnit::class)
             ->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT]);
-        $administrators = new Group('Administrators');
-        //$administrators->addRole($this->getReference('administrator_role'));
-        if ($defaultBusinessUnit) {
-            $administrators->setOwner($defaultBusinessUnit);
-        }
-        $manager->persist($administrators);
-
-        $sales= new Group('Sales');
-        //$sales->addRole($this->getReference('manager_role'));
-        if ($defaultBusinessUnit) {
-            $sales->setOwner($defaultBusinessUnit);
-        }
-        $manager->persist($sales);
-
-        $marketing= new Group('Marketing');
-        //$marketing->addRole($this->getReference('manager_role'));
-        if ($defaultBusinessUnit) {
-            $marketing->setOwner($defaultBusinessUnit);
-        }
-        $manager->persist($marketing);
-
+        $manager->persist($this->createGroup('Administrators', $defaultBusinessUnit));
+        $manager->persist($this->createGroup('Sales', $defaultBusinessUnit));
+        $manager->persist($this->createGroup('Marketing', $defaultBusinessUnit));
         $manager->flush();
+    }
+
+    private function createGroup(string $name, ?BusinessUnit $businessUnit): Group
+    {
+        $group = new Group($name);
+        if (null !== $businessUnit) {
+            $group->setOwner($businessUnit);
+        }
+
+        return $group;
     }
 }

@@ -1,0 +1,35 @@
+services:
+    _instanceof:
+        Psr\Log\LoggerAwareInterface:
+            calls:
+                - [setLogger, ['@logger']]
+            tags:
+                - { name: monolog.logger, channel: oro_workflow }
+
+    oro_workflow.async.execute_process_job:
+        class: 'Oro\Bundle\WorkflowBundle\Async\ExecuteProcessJobProcessor'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.process.process_handler'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_workflow.async.transition_trigger_processor.abstract:
+        class: 'Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor'
+        abstract: true
+        arguments:
+            - '@doctrine'
+
+    oro_workflow.async.transition_trigger_event_processor:
+        parent: oro_workflow.async.transition_trigger_processor.abstract
+        arguments:
+            - '@oro_workflow.handler.transition_event_trigger'
+        tags:
+            - { name: oro_message_queue.client.message_processor, topicName: !php/const Oro\Bundle\WorkflowBundle\Async\Topic\WorkflowTransitionEventTriggerTopic::NAME }
+
+    oro_workflow.async.transition_trigger_cron_processor:
+        parent: oro_workflow.async.transition_trigger_processor.abstract
+        arguments:
+            - '@oro_workflow.handler.transition_cron_trigger'
+        tags:
+            - { name: oro_message_queue.client.message_processor, topicName: !php/const Oro\Bundle\WorkflowBundle\Async\Topic\WorkflowTransitionCronTriggerTopic::NAME }

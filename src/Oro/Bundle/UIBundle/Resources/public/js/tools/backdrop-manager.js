@@ -1,8 +1,9 @@
 define(function(require) {
     'use strict';
-    var $ = require('jquery');
-    var MultiUseResourceManager = require('./multi-use-resource-manager');
-    var backdropManager = new MultiUseResourceManager({
+
+    const $ = require('jquery');
+    const MultiUseResourceManager = require('./multi-use-resource-manager');
+    const backdropManager = new MultiUseResourceManager({
         listen: {
             constructResource: function() {
                 $(document.body).addClass('backdrop');

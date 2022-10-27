@@ -3,15 +3,18 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\TranslationBundle\Translation\IdentityTranslator;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactory;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
@@ -20,19 +23,16 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 abstract class AbstractConfigTypeTestCase extends TypeTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $testConfigProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->testConfigProvider = $this->getConfigProviderMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->testConfigProvider = $this->createMock(ConfigProvider::class);
 
         parent::setUp();
     }
@@ -90,29 +90,27 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
         $config = new Config(new EntityConfigId('test', 'Test\Entity'));
         $config->set($formName, $oldVal);
 
-        $propertyConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $propertyConfig = $this->createMock(PropertyConfigContainer::class);
         $propertyConfig->expects($this->once())
             ->method('isSchemaUpdateRequired')
             ->with($formName, $config->getId())
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->testConfigProvider->expects($this->once())
             ->method('getPropertyConfig')
-            ->will($this->returnValue($propertyConfig));
+            ->willReturn($propertyConfig);
 
         $extendConfigId = new EntityConfigId('extend', 'Test\Entity');
         $extendConfig   = new Config($extendConfigId);
         $extendConfig->set('state', $state);
-        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->any())
             ->method('getConfigById')
             ->with($config->getId())
-            ->will($this->returnValue($extendConfig));
+            ->willReturn($extendConfig);
         $this->configManager->expects($this->any())
             ->method('getConfig')
             ->with($config->getId())
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->setConfigProvidersForSubmitTest($configProviders);
         $configProviders['extend'] = $extendConfigProvider;
@@ -123,7 +121,7 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
         }
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will($this->returnValueMap($configProvidersMap));
+            ->willReturnMap($configProvidersMap);
 
         $form = $this->factory->createNamed($formName, $formTypeClass, $oldVal, $options);
 
@@ -174,15 +172,5 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
     protected function setConfigProvidersForSubmitTest(array &$configProviders)
     {
         $configProviders['test'] = $this->testConfigProvider;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

@@ -10,21 +10,16 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
-    /**
-     * @var FeatureEnabled
-     */
-    protected $condition;
+    /** @var FeatureEnabled */
+    private $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->condition = new FeatureEnabled($this->featureChecker);
         $this->condition->setContextAccessor(new ContextAccessor());
     }
@@ -36,7 +31,6 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider wrongOptionsDataProvider
-     * @param array $options
      */
     public function testInitializeWrongOptions(array $options)
     {
@@ -44,10 +38,7 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function wrongOptionsDataProvider()
+    public function wrongOptionsDataProvider(): array
     {
         return [
             'empty' => [
@@ -61,17 +52,13 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
      */
     public function testInitialize(array $options)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'short' => [
@@ -91,8 +78,6 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider toArrayDataProvider
-     * @param array $options
-     * @param array $expected
      */
     public function testToArray(array $options, array $expected)
     {
@@ -101,10 +86,7 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -133,20 +115,15 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider compileDataProvider
-     * @param array $options
-     * @param string $expected
      */
-    public function testCompile(array $options, $expected)
+    public function testCompile(array $options, string $expected)
     {
         $this->condition->initialize($options);
         $actual = $this->condition->compile('$factory');
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [
@@ -166,7 +143,7 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
     {
         $context = [
             'feature' => 'test',
-            'identifier' => 'id'
+            'identifier' => 1
         ];
 
         $options = [
@@ -177,7 +154,7 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
 
         $this->featureChecker->expects($this->once())
             ->method('isFeatureEnabled')
-            ->with('test', 'id')
+            ->with('test', 1)
             ->willReturn(true);
 
         $this->assertTrue($this->condition->evaluate($context));

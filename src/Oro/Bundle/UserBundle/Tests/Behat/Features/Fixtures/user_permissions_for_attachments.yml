@@ -1,0 +1,50 @@
+Oro\Bundle\UserBundle\Entity\User:
+    user1:
+        firstName: Charlie
+        lastName: Sheen
+        username: charlie
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@adminRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit', '@businessUnit1']
+        email: charlie@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+        enabled: true
+
+    user2:
+        firstName: Misty
+        lastName: Grant
+        username: misty
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@adminRole']
+        owner: '@business_unit'
+        businessUnits: ['@businessUnit1']
+        email: misty.grant38@example.com
+        password: fhUh+Xk/mjDUR5xLb93SIL/QF/lEK3RcGE3l9dRh4+N4rQCNrOaOYyVtqWajPOBHQDqFGwl+Ran2HTdpbniEUQ==
+        salt: 5ejjb5y9va4g4co8kco4o8wgkgcc48k
+        enabled: true
+
+    user3:
+        firstName: Samantha
+        lastName: Parker
+        username: samantha
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@business_unit'
+        businessUnits: ['@businessUnit2']
+        email: samantha@example.com
+        password: e+p4LKWj8ojCUJ0d8YceG5eleCPY1/qHppSETsVlv7yyDWc3IRg0Y/Emvr/yjT5ZiAVs9/Ox4Bi+FG/KAfr2Lg==
+        salt: ij0yip105p4c4co4c8k4o4k4kkwc0o8
+
+Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+    businessUnit1:
+        name: First Business Unit
+        organization: '@organization'
+
+    businessUnit2:
+        name: Second Business Unit
+        organization: '@organization'

@@ -4,17 +4,47 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DataTypeTest extends \PHPUnit\Framework\TestCase
 {
     /**
+     * @dataProvider arrayProvider
+     */
+    public function testIsArray(?string $dataType, bool $expected)
+    {
+        self::assertSame($expected, DataType::isArray($dataType));
+    }
+
+    public function arrayProvider(): array
+    {
+        return [
+            ['array', true],
+            ['objects', true],
+            ['object[]', true],
+            ['strings', true],
+            ['string[]', true],
+            ['scalar', false],
+            ['object', false],
+            ['nestedObject', false],
+            ['string', false],
+            ['string[]t', false],
+            ['[]string', false],
+            [null, false],
+            ['', false]
+        ];
+    }
+
+    /**
      * @dataProvider nestedObjectProvider
      */
-    public function testIsNestedObject($dataType, $expected)
+    public function testIsNestedObject(?string $dataType, bool $expected)
     {
         self::assertSame($expected, DataType::isNestedObject($dataType));
     }
 
-    public function nestedObjectProvider()
+    public function nestedObjectProvider(): array
     {
         return [
             ['nestedObject', true],
@@ -28,12 +58,12 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider nestedAssociationProvider
      */
-    public function testIsNestedAssociation($dataType, $expected)
+    public function testIsNestedAssociation(?string $dataType, bool $expected)
     {
         self::assertSame($expected, DataType::isNestedAssociation($dataType));
     }
 
-    public function nestedAssociationProvider()
+    public function nestedAssociationProvider(): array
     {
         return [
             ['nestedAssociation', true],
@@ -46,19 +76,25 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider associationAsFieldProvider
      */
-    public function testIsAssociationAsField($dataType, $expected)
+    public function testIsAssociationAsField(?string $dataType, bool $expected)
     {
         self::assertSame($expected, DataType::isAssociationAsField($dataType));
     }
 
-    public function associationAsFieldProvider()
+    public function associationAsFieldProvider(): array
     {
         return [
-            ['array', true],
-            ['object', true],
             ['scalar', true],
+            ['object', true],
+            ['array', true],
+            ['objects', true],
+            ['object[]', true],
+            ['strings', true],
+            ['string[]', true],
             ['nestedObject', true],
             ['string', false],
+            ['string[]t', false],
+            ['[]string', false],
             [null, false],
             ['', false]
         ];
@@ -67,12 +103,12 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider extendedAssociationProvider
      */
-    public function testIsExtendedAssociation($dataType, $expected)
+    public function testIsExtendedAssociation(?string $dataType, bool $expected)
     {
         self::assertSame($expected, DataType::isExtendedAssociation($dataType));
     }
 
-    public function extendedAssociationProvider()
+    public function extendedAssociationProvider(): array
     {
         return [
             ['association:manyToOne', true],
@@ -86,14 +122,17 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseExtendedAssociationProvider
      */
-    public function testParseExtendedAssociation($dataType, $expectedAssociationType, $expectedAssociationKind)
-    {
-        list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
+    public function testParseExtendedAssociation(
+        string $dataType,
+        string $expectedAssociationType,
+        ?string $expectedAssociationKind
+    ) {
+        [$associationType, $associationKind] = DataType::parseExtendedAssociation($dataType);
         self::assertSame($expectedAssociationType, $associationType);
         self::assertSame($expectedAssociationKind, $associationKind);
     }
 
-    public function parseExtendedAssociationProvider()
+    public function parseExtendedAssociationProvider(): array
     {
         return [
             ['association:manyToOne', 'manyToOne', null],
@@ -103,14 +142,14 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidExtendedAssociationProvider
-     * @expectedException \InvalidArgumentException
      */
-    public function testParseInvalidExtendedAssociation($dataType)
+    public function testParseInvalidExtendedAssociation(string $dataType)
     {
+        $this->expectException(\InvalidArgumentException::class);
         DataType::parseExtendedAssociation($dataType);
     }
 
-    public function invalidExtendedAssociationProvider()
+    public function invalidExtendedAssociationProvider(): array
     {
         return [
             ['string'],
@@ -118,7 +157,6 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
             ['association:'],
             ['association::'],
             ['association:manyToOne:'],
-            [null],
             ['']
         ];
     }

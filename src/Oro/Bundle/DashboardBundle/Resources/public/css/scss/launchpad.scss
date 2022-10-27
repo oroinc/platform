@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+@use 'sass:math';
+
 .quick-launchpad-toolbar {
     margin: 0;
     padding: 16px;
@@ -34,7 +36,7 @@
     }
 
     &__label {
-        padding: side-values(14px 8px 10px);
+        padding: 14px 8px 10px;
 
         color: $dashboard-launchpad-label-color;
         text-align: center;
@@ -61,7 +63,7 @@
 
     @for $i from 1 through 7 {
         &--with-#{$i}-items &__item {
-            width: floor(100% / $i);
+            width: floor(math.div(100%, $i));
         }
     }
 }
@@ -83,7 +85,7 @@
 
         text-align: center;
 
-        float: #{$start};
+        float: left;
         vertical-align: top;
     }
 
@@ -98,7 +100,7 @@
 
         background: $dashboard-launchpad-icon-bg;
 
-        border-radius: $quick-launchpad-item-icon-size / 2;
+        border-radius: $quick-launchpad-item-icon-size * .5;
     }
 
     &__label {
@@ -115,7 +117,7 @@
     }
 
     &__list {
-        margin-#{$start}: $quick-launchpad-item-start-padding + $quick-launchpad-item-title-width;
+        margin-left: $quick-launchpad-item-start-padding + $quick-launchpad-item-title-width;
         margin-bottom: 0;
         list-style: none;
     }
@@ -138,14 +140,14 @@
     .launchpad-second-column {
         @include clearfix();
 
-        float: #{$start};
+        float: left;
         width: 50%;
     }
 
     .launchpad-first-column {
         > .launchpad-widget-content {
-            float: #{$end};
-            clear: #{$end};
+            float: right;
+            clear: right;
         }
     }
 }

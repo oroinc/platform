@@ -1,7 +1,7 @@
 define(function() {
     'use strict';
 
-    var constants = {};
+    const constants = {};
 
     /**
      * Left sidebar

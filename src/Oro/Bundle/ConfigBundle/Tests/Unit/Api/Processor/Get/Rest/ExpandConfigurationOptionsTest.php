@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Api\Processor\Get\Rest;
 
-use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest\ExpandConfigurationOptions;
 
 class ExpandConfigurationOptionsTest extends GetProcessorTestCase
 {
     /** @var ExpandConfigurationOptions */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

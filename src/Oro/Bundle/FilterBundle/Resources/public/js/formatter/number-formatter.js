@@ -1,10 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var AbstractFormatter = require('./abstract-formatter');
-    var localeSettings = require('orolocale/js/locale-settings');
-    var formatter = require('orolocale/js/formatter/number');
+    const _ = require('underscore');
+    const AbstractFormatter = require('orofilter/js/formatter/abstract-formatter');
+    const localeSettings = require('orolocale/js/locale-settings');
+    const formatter = require('orolocale/js/formatter/number');
 
     /**
      * A floating point number formatter. Doesn't understand notation at the moment.
@@ -14,11 +14,11 @@ define(function(require) {
      * @extends orofilter.formatter.AbstractFormatter
      * @throws {RangeError} If decimals < 0 or > 20.
      */
-    var NumberFormatter = function(options) {
+    const NumberFormatter = function(options) {
         options = options ? _.clone(options) : {};
         _.extend(this, this.defaults, options);
 
-        if (typeof this.decimals !== 'number' || isNaN(this.decimals)) {
+        if (this.decimals !== null && (typeof this.decimals !== 'number' || isNaN(this.decimals))) {
             throw new TypeError('decimals must be a number');
         }
 
@@ -26,7 +26,7 @@ define(function(require) {
             throw new RangeError('decimals must be between 0 and 20');
         }
 
-        var numberFormats = localeSettings.getNumberFormats('decimal');
+        const numberFormats = localeSettings.getNumberFormats('decimal');
         this.decimalSeparator = numberFormats.decimal_separator_symbol;
     };
 
@@ -71,14 +71,23 @@ define(function(require) {
             }
 
             if (this.percent) {
-                return formatter.formatPercent(number / 100);
+                return formatter.formatPercent(number, {scale_percent_by_100: false});
             } else {
-                number = number.toFixed(this.decimals);
+                if (number === '') {
+                    return number;
+                }
 
-                var parts = number.split('.');
-                var integerPart = parts[0];
-                var isPercentValueTrim = parts[1] && parts[1] === this.EMPTY_DECIMAL && this.percent;
-                var decimalPart = parts[1] && !isPercentValueTrim ? (this.decimalSeparator || '.') + parts[1] : '';
+                const numberString = number.toString();
+
+                const parts = numberString.split('.');
+                const integerPart = parts[0];
+                let decimalPart = !_.isEmpty(parts[1]) ? parts[1] : '';
+                if (decimalPart.length < this.decimals) {
+                    const fixedParts = Number(number).toFixed(this.decimals).split('.');
+                    decimalPart = (this.decimalSeparator || '.') + fixedParts[1];
+                } else {
+                    decimalPart = decimalPart ? (this.decimalSeparator || '.') + decimalPart : '';
+                }
 
                 return integerPart.replace(this.HUMANIZED_NUM_RE, '$1' + this.orderSeparator) + decimalPart;
             }
@@ -97,19 +106,19 @@ define(function(require) {
             if (formattedData === null || /^\s+$/.test(formattedData) || formattedData === '') {
                 return void 0;
             }
-            var rawData = '';
-            var i;
+            let rawData = '';
+            let i;
 
             if (this.percent && formattedData.indexOf('%') > -1) {
                 formattedData = formattedData.replace(/%/g, '');
             }
 
-            var thousands = formattedData.trim().split(this.orderSeparator);
+            const thousands = formattedData.trim().split(this.orderSeparator);
             for (i = 0; i < thousands.length; i++) {
                 rawData += thousands[i];
             }
 
-            var decimalParts = rawData.split(this.decimalSeparator);
+            const decimalParts = rawData.split(this.decimalSeparator);
             rawData = '';
             for (i = 0; i < decimalParts.length; i++) {
                 rawData = rawData + decimalParts[i] + '.';
@@ -119,13 +128,15 @@ define(function(require) {
                 rawData = rawData.slice(0, rawData.length - 1);
             }
 
-            var result = rawData * 1;
-            if (!this.percent) {
-                result = result.toFixed(this.decimals) * 1;
-            }
+            const maxFractionDigits = localeSettings.getNumberFormats('decimal').max_fraction_digits;
+            if (!_.isEmpty(decimalParts[1]) && decimalParts[1].length > maxFractionDigits) {
+                return rawData;
+            } else {
+                const result = rawData * 1;
 
-            if (_.isNumber(result) && !_.isNaN(result)) {
-                return result;
+                if (_.isNumber(result) && !_.isNaN(result)) {
+                    return result;
+                }
             }
         }
     });

@@ -116,14 +116,37 @@ target_class_without_target_type:
         subresources:
             testSubresource:
                 target_class: Test\Class
+
+target_class_with_target_type_to_one:
+    config:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+                target_type: to-one
+    expected:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
                 target_type: to-one
 
-target_class_with_target_type:
+target_class_with_target_type_to_many:
     config:
         subresources:
             testSubresource:
                 target_class: Test\Class
                 target_type: to-many
+    expected:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+                target_type: to-many
+
+target_class_with_target_type_collection:
+    config:
+        subresources:
+            testSubresource:
+                target_class: Test\Class
+                target_type: collection
     expected:
         subresources:
             testSubresource:
@@ -145,7 +168,7 @@ invalid_exclude_type:
             testSubresource:
                 exclude: test
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.exclude". Expected boolean, but got string.'
+    error: 'Invalid type for path "entity.subresources.testSubresource.exclude". Expected "bool", but got "string".'
 
 unknown_property:
     config:
@@ -271,7 +294,7 @@ invalid_actions_definition_exclude_flag_type:
                     delete:
                         exclude: test
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.delete.exclude". Expected boolean, but got string.'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.delete.exclude". Expected "bool", but got "string".'
 
 invalid_actions_definition_unknown_property:
     config:
@@ -291,7 +314,7 @@ default_page_size:
                     get_list:
                         page_size: ~
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.page_size". Expected int, but got NULL.'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.page_size". Expected "int", but got "null".'
 
 disable_pagination:
     config:
@@ -412,7 +435,7 @@ invalid_value_for_disable_sorting:
                     get_list:
                         disable_sorting: 123
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_sorting". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_sorting". Expected "bool", but got "int"'
 
 enable_inclusion:
     config:
@@ -450,7 +473,7 @@ invalid_value_for_disable_inclusion:
                     get_list:
                         disable_inclusion: 123
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_inclusion". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_inclusion". Expected "bool", but got "int"'
 
 enable_fieldset:
     config:
@@ -488,7 +511,7 @@ invalid_value_for_disable_fieldset:
                     get_list:
                         disable_fieldset: 123
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_fieldset". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_fieldset". Expected "bool", but got "int"'
 
 enable_meta_properties:
     config:
@@ -526,7 +549,7 @@ invalid_value_for_disable_meta_properties:
                     get_list:
                         disable_meta_properties: 123
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_meta_properties". Expected boolean, but got integer'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.get_list.disable_meta_properties". Expected "bool", but got "int"'
 
 null_status_codes:
     config:
@@ -689,7 +712,7 @@ action_invalid_field_exclude:
                             field1:
                                 exclude: 123
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.exclude". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.exclude". Expected "bool", but got "int".'
 
 action_null_form_type:
     config:
@@ -783,7 +806,7 @@ action_invalid_form_type:
                     create:
                         form_type: []
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.form_type". Expected scalar, but got array.'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.form_type". Expected "scalar", but got "array".'
 
 action_invalid_form_options:
     config:
@@ -793,7 +816,7 @@ action_invalid_form_options:
                     create:
                         form_options: test
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.form_options". Expected array, but got string'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.form_options". Expected "array", but got "string"'
 
 action_field_dash_in_field_name:
     config:
@@ -834,6 +857,16 @@ action_field_form:
                                 form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                                 form_options:
                                     option1: value1
+                            field7:
+                                post_processor: test
+                                post_processor_options: ~
+                            field8:
+                                post_processor: test
+                                post_processor_options: []
+                            field9:
+                                post_processor: test
+                                post_processor_options:
+                                    option1: value1
     expected:
         subresources:
             testSubresource:
@@ -852,6 +885,14 @@ action_field_form:
                                 form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                                 form_options:
                                     option1: value1
+                            field7:
+                                post_processor: test
+                            field8:
+                                post_processor: test
+                            field9:
+                                post_processor: test
+                                post_processor_options:
+                                    option1: value1
 
 action_invalid_field_form_type:
     config:
@@ -863,7 +904,7 @@ action_invalid_field_form_type:
                             field1:
                                 form_type: []
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.form_type". Expected scalar, but got array.'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.form_type". Expected "scalar", but got "array".'
 
 action_invalid_field_form_options:
     config:
@@ -875,7 +916,69 @@ action_invalid_field_form_options:
                             field1:
                                 form_options: test
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.form_options". Expected array, but got string'
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.form_options". Expected "array", but got "string"'
+
+invalid_field_post_processor:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor: []
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.post_processor". Expected "scalar", but got "array".'
+
+unknown_field_post_processor:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor: another
+    expected: []
+    error: 'Invalid configuration for path "entity.subresources.testSubresource.actions.create.fields.field1": The post processor "another" is unknown. Known post processors: "twig, test".'
+
+invalid_field_post_processor_options:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor_options: test
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.post_processor_options". Expected "array", but got "string"'
+
+twig_field_post_processor_without_options:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor: twig
+    expected: []
+    error: 'Invalid configuration for path "entity.subresources.testSubresource.actions.create.fields.field1": The "template" option is required for the "twig" post processor. Add it to the "post_processor_options".'
+
+twig_field_post_processor_without_template:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor: twig
+                                post_processor_options:
+                                    option1: value1
+    expected: []
+    error: 'Invalid configuration for path "entity.subresources.testSubresource.actions.create.fields.field1": The "template" option is required for the "twig" post processor. Add it to the "post_processor_options".'
 
 empty_filters:
     config:
@@ -930,7 +1033,7 @@ filters_exclusion_policy:
                 filters:
                     exclusion_policy: all
 
-nullfilters__exclusion_policy:
+null_filters_exclusion_policy:
     config:
         subresources:
             testSubresource:
@@ -1017,7 +1120,7 @@ invalid_filters_field_exclude:
                         field1:
                             exclude: 123
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.exclude". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.exclude". Expected "bool", but got "int".'
 
 null_filters_field_property_path:
     config:
@@ -1050,7 +1153,7 @@ invalid_filters_field_allow_array:
                         field1:
                             allow_array: 123
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.allow_array". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.allow_array". Expected "bool", but got "int".'
 
 invalid_filters_field_allow_range:
     config:
@@ -1061,7 +1164,7 @@ invalid_filters_field_allow_range:
                         field1:
                             allow_range: 123
     expected: []
-    error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.allow_range". Expected boolean, but got integer.'
+    error: 'Invalid type for path "entity.subresources.testSubresource.filters.fields.field1.allow_range". Expected "bool", but got "int".'
 
 null_filters_field_description:
     config:
@@ -1084,3 +1187,138 @@ empty_filters_field_description:
                             description: ""
     expected: []
     error: 'The path "entity.subresources.testSubresource.filters.fields.field1.description" cannot contain an empty value, but got "".'
+
+empty_sorters:
+    config:
+        subresources:
+            testSubresource:
+                sorters: []
+    expected:
+        subresources:
+            testSubresource: []
+
+null_sorters_fields:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    fields: ~
+    expected:
+        subresources:
+            testSubresource: []
+
+empty_sorters_fields:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    fields: []
+    expected:
+        subresources:
+            testSubresource: []
+
+default_sorters_exclusion_policy:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    exclusion_policy: none
+    expected:
+        subresources:
+            testSubresource:
+                sorters:
+                    exclusion_policy: none
+
+sorters_exclusion_policy:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    exclusion_policy: all
+    expected:
+        subresources:
+            testSubresource:
+                sorters:
+                    exclusion_policy: all
+
+null_sorters_exclusion_policy:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    exclusion_policy: null
+    expected: []
+    error: 'The value null is not allowed for path "entity.subresources.testSubresource.sorters.exclusion_policy". Permissible values: "all", "none"'
+
+invalid_sorters_exclusion_policy:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    exclusion_policy: invalid
+    expected: []
+    error: 'The value "invalid" is not allowed for path "entity.subresources.testSubresource.sorters.exclusion_policy". Permissible values: "all", "none"'
+
+dash_in_sorters_field_name:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    fields:
+                        test-field: ~
+    expected:
+        subresources:
+            testSubresource:
+                sorters:
+                    fields:
+                        test-field: []
+
+sorters:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    exclusion_policy: all
+                    fields:
+                        field1: ~
+                        field2: []
+                        field3:
+                            exclude: true
+                            property_path: path1
+                        field4:
+                            exclude: false
+    expected:
+        subresources:
+            testSubresource:
+                sorters:
+                    exclusion_policy: all
+                    fields:
+                        field1: []
+                        field2: []
+                        field3:
+                            exclude: true
+                            property_path: path1
+                        field4:
+                            exclude: false
+
+invalid_sorters_field_exclude:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    fields:
+                        field1:
+                            exclude: 123
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.sorters.fields.field1.exclude". Expected "bool", but got "int".'
+
+null_sorters_field_property_path:
+    config:
+        subresources:
+            testSubresource:
+                sorters:
+                    fields:
+                        field1:
+                            property_path: null
+    expected: []
+    error: 'The path "entity.subresources.testSubresource.sorters.fields.field1.property_path" cannot contain an empty value, but got null.'

@@ -3,97 +3,95 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Test\OwnerTreeWrappingPropertiesAccessor;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
+/**
+ * @SuppressWarnings(PHPMD)
+ */
 class OwnerTreeProviderTest extends OrmTestCase
 {
-    const ENTITY_NAMESPACE = 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity';
+    private const ORG_1 = 1;
+    private const ORG_2 = 2;
 
-    const ORG_1 = 1;
-    const ORG_2 = 2;
+    private const MAIN_BU_1 = 10;
+    private const MAIN_BU_2 = 20;
+    private const BU_1 = 30;
+    private const BU_1_1 = 40;
+    private const BU_2 = 50;
+    private const BU_2_1 = 60;
+    private const BU_2_2 = 70;
 
-    const MAIN_BU_1 = 10;
-    const MAIN_BU_2 = 20;
-    const BU_1      = 30;
-    const BU_1_1    = 40;
-    const BU_2      = 50;
-    const BU_2_1    = 60;
-    const BU_2_2    = 70;
-
-    const USER_1 = 100;
-    const USER_2 = 200;
-    const USER_3 = 300;
-    const USER_4 = 400;
-
-    /** @var OwnerTreeProvider */
-    protected $treeProvider;
+    private const USER_1 = 100;
+    private const USER_2 = 200;
+    private const USER_3 = 300;
+    private const USER_4 = 400;
 
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseChecker */
-    protected $databaseChecker;
+    /** @var DatabaseChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $databaseChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
-    protected $cache;
+    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
-    protected $ownershipMetadataProvider;
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadataProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    protected $tokenStorage;
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
 
-    protected function setUp()
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
+    /** @var OwnerTreeProvider */
+    private $treeProvider;
+
+    protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver($reader, self::ENTITY_NAMESPACE);
-
         $conn = new ConnectionMock([], new DriverMock());
         $conn->setDatabasePlatform(new MySqlPlatform());
         $this->em = $this->getTestEntityManager($conn);
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(['Test' => self::ENTITY_NAMESPACE]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
-        $this->databaseChecker = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\DatabaseChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->databaseChecker = $this->createMock(DatabaseChecker::class);
 
-        $this->cache = $this->createMock('Doctrine\Common\Cache\CacheProvider');
-        $this->cache->expects($this->any())->method('fetch')->will($this->returnValue(false));
-        $this->cache->expects($this->any())->method('save');
+        $this->cache = $this->createMock(AbstractAdapter::class);
 
-        $this->ownershipMetadataProvider = $this->createMock(
-            'Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface'
-        );
+        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->ownershipMetadataProvider->expects($this->any())
             ->method('getUserClass')
-            ->willReturn(self::ENTITY_NAMESPACE . '\TestUser');
+            ->willReturn(User::class);
         $this->ownershipMetadataProvider->expects($this->any())
             ->method('getBusinessUnitClass')
-            ->willReturn(self::ENTITY_NAMESPACE . '\TestBusinessUnit');
+            ->willReturn(BusinessUnit::class);
 
-        $this->tokenStorage = $this->createMock(
-            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'
-        );
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->treeProvider = new OwnerTreeProvider(
             $doctrine,
@@ -102,11 +100,12 @@ class OwnerTreeProviderTest extends OrmTestCase
             $this->ownershipMetadataProvider,
             $this->tokenStorage
         );
+        $this->treeProvider->setLogger($this->logger);
     }
 
     public function testSupportsForSupportedUser()
     {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
@@ -119,7 +118,7 @@ class OwnerTreeProviderTest extends OrmTestCase
 
     public function testSupportsForNotSupportedUser()
     {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this->createMock(TokenInterface::class);
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
@@ -139,34 +138,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         $this->assertFalse($this->treeProvider->supports());
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $conn
-     * @param int                                      $expectsAt
-     * @param string                                   $sql
-     * @param array                                    $result
-     */
-    protected function setFetchAllQueryExpectationAt(
-        \PHPUnit\Framework\MockObject\MockObject $conn,
-        $expectsAt,
-        $sql,
-        $result
-    ) {
-        $stmt = $this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
-        $stmt->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn($result);
-        $conn
-            ->expects($this->at($expectsAt))
-            ->method('query')
-            ->with($sql)
-            ->will($this->returnValue($stmt));
-    }
-
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $connection
-     * @param string[]                                 $businessUnits
-     */
-    protected function setGetBusinessUnitsExpectation($connection, array $businessUnits)
+    private function addGetBusinessUnitsExpectation(array $businessUnits)
     {
         $queryResult = [];
         foreach ($businessUnits as $item) {
@@ -176,22 +148,16 @@ class OwnerTreeProviderTest extends OrmTestCase
                 'sclr_2' => $item['parentBuId'],
             ];
         }
-        $this->setQueryExpectationAt(
-            $connection,
-            0,
-            'SELECT t0_.id AS id_0, t0_.organization_id AS sclr_1, t0_.parent_id AS sclr_2,'
-            . ' (CASE WHEN t0_.parent_id IS NULL THEN 0 ELSE 1 END) AS sclr_3'
-            . ' FROM tbl_business_unit t0_'
+        $this->addQueryExpectation(
+            'SELECT o0_.id AS id_0, o0_.organization_id AS sclr_1, o0_.business_unit_owner_id AS sclr_2,'
+            . ' (CASE WHEN o0_.business_unit_owner_id IS NULL THEN 0 ELSE 1 END) AS sclr_3'
+            . ' FROM oro_business_unit o0_'
             . ' ORDER BY sclr_3 ASC, sclr_2 ASC',
             $queryResult
         );
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $connection
-     * @param string[]                                 $users
-     */
-    protected function setGetUsersExpectation($connection, array $users)
+    private function addGetUsersExpectation(array $users)
     {
         $queryResult = [];
         foreach ($users as $item) {
@@ -202,33 +168,57 @@ class OwnerTreeProviderTest extends OrmTestCase
                 'id_3'   => $item['buId'], // bu id (from user->businessUnits)
             ];
         }
-        $this->setQueryExpectationAt(
-            $connection,
-            1,
-            'SELECT t0_.id AS id_0, t1_.id AS id_1, t0_.owner_id AS sclr_2, t2_.id AS id_3'
-            . ' FROM tbl_user t0_'
-            . ' INNER JOIN tbl_user_to_organization t3_ ON t0_.id = t3_.user_id'
-            . ' INNER JOIN tbl_organization t1_ ON t1_.id = t3_.organization_id'
-            . ' LEFT JOIN tbl_user_to_business_unit t4_ ON t0_.id = t4_.user_id'
-            . ' LEFT JOIN tbl_business_unit t2_ ON t2_.id = t4_.business_unit_id'
+        $this->addQueryExpectation(
+            'SELECT o0_.id AS id_0, o1_.id AS id_1, o0_.business_unit_owner_id AS sclr_2, o2_.id AS id_3'
+            . ' FROM oro_user o0_'
+            . ' INNER JOIN oro_user_organization o3_ ON o0_.id = o3_.user_id'
+            . ' INNER JOIN oro_organization o1_ ON o1_.id = o3_.organization_id'
+            . ' LEFT JOIN oro_user_business_unit o4_ ON o0_.id = o4_.user_id'
+            . ' LEFT JOIN oro_business_unit o2_ ON o2_.id = o4_.business_unit_id'
             . ' ORDER BY id_1 ASC',
             $queryResult
         );
     }
 
-    /**
-     * @param array     $expected
-     * @param OwnerTree $actual
-     */
-    protected function assertOwnerTreeEquals(array $expected, OwnerTree $actual)
+    private function assertOwnerTreeEquals(array $expected, OwnerTree $actual)
     {
-        foreach ($expected as $property => $value) {
-            $this->assertEquals(
-                $value,
-                $this->getObjectAttribute($actual, $property),
-                'Owner Tree Property: ' . $property
-            );
-        }
+        $a = new OwnerTreeWrappingPropertiesAccessor($actual);
+        self::assertEqualsCanonicalizing(
+            $expected['userOwningOrganizationId'],
+            $a->xgetUserOwningOrganizationId()
+        );
+        self::assertEqualsCanonicalizing(
+            $expected['userOrganizationIds'],
+            $a->xgetUserOrganizationIds()
+        );
+        self::assertEqualsCanonicalizing(
+            $expected['userOwningBusinessUnitId'],
+            $a->xgetUserOwningBusinessUnitId()
+        );
+        self::assertEqualsCanonicalizing(
+            $expected['userBusinessUnitIds'],
+            $a->xgetUserBusinessUnitIds()
+        );
+        self::assertEqualsCanonicalizing(
+            $expected['userOrganizationBusinessUnitIds'],
+            $a->xgetUserOrganizationBusinessUnitIds()
+        );
+        self::assertEqualsCanonicalizing(
+            $expected['businessUnitOwningOrganizationId'],
+            $a->xgetBusinessUnitOwningOrganizationId()
+        );
+        self::assertEqualsCanonicalizing(
+            $expected['assignedBusinessUnitUserIds'],
+            $a->xgetAssignedBusinessUnitUserIds()
+        );
+        self::assertEqualsCanonicalizing(
+            $expected['subordinateBusinessUnitIds'],
+            $a->xgetSubordinateBusinessUnitIds()
+        );
+        self::assertEqualsCanonicalizing(
+            $expected['organizationBusinessUnitIds'],
+            $a->xgetOrganizationBusinessUnitIds()
+        );
     }
 
     public function testBusinessUnitsWithoutOrganization()
@@ -237,11 +227,9 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->method('checkDatabase')
             ->willReturn(true);
 
-        $connection = $this->getDriverConnectionMock($this->em);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
-        $this->setGetBusinessUnitsExpectation(
-            $connection,
+        $this->addGetBusinessUnitsExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -266,8 +254,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         // should be sorted by organization id
-        $this->setGetUsersExpectation(
-            $connection,
+        $this->addGetUsersExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -283,6 +270,8 @@ class OwnerTreeProviderTest extends OrmTestCase
                 ],
             ]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -333,11 +322,9 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->method('checkDatabase')
             ->willReturn(true);
 
-        $connection = $this->getDriverConnectionMock($this->em);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
-        $this->setGetBusinessUnitsExpectation(
-            $connection,
+        $this->addGetBusinessUnitsExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -362,8 +349,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         // should be sorted by organization id
-        $this->setGetUsersExpectation(
-            $connection,
+        $this->addGetUsersExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -379,6 +365,8 @@ class OwnerTreeProviderTest extends OrmTestCase
                 ],
             ]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -431,11 +419,9 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->method('checkDatabase')
             ->willReturn(true);
 
-        $connection = $this->getDriverConnectionMock($this->em);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
-        $this->setGetBusinessUnitsExpectation(
-            $connection,
+        $this->addGetBusinessUnitsExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -460,8 +446,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         // should be sorted by organization id
-        $this->setGetUsersExpectation(
-            $connection,
+        $this->addGetUsersExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -477,6 +462,8 @@ class OwnerTreeProviderTest extends OrmTestCase
                 ],
             ]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -529,11 +516,9 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->method('checkDatabase')
             ->willReturn(true);
 
-        $connection = $this->getDriverConnectionMock($this->em);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
-        $this->setGetBusinessUnitsExpectation(
-            $connection,
+        $this->addGetBusinessUnitsExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -548,8 +533,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         // should be sorted by organization id
-        $this->setGetUsersExpectation(
-            $connection,
+        $this->addGetUsersExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -559,6 +543,8 @@ class OwnerTreeProviderTest extends OrmTestCase
                 ],
             ]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -601,11 +587,9 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->method('checkDatabase')
             ->willReturn(true);
 
-        $connection = $this->getDriverConnectionMock($this->em);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
-        $this->setGetBusinessUnitsExpectation(
-            $connection,
+        $this->addGetBusinessUnitsExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -630,8 +614,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         // should be sorted by organization id
-        $this->setGetUsersExpectation(
-            $connection,
+        $this->addGetUsersExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -653,6 +636,8 @@ class OwnerTreeProviderTest extends OrmTestCase
                 ],
             ]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -712,11 +697,9 @@ class OwnerTreeProviderTest extends OrmTestCase
             ->method('checkDatabase')
             ->willReturn(true);
 
-        $connection = $this->getDriverConnectionMock($this->em);
         // the business units without parent should be at the top,
         // rest business units are sorted by parent id
-        $this->setGetBusinessUnitsExpectation(
-            $connection,
+        $this->addGetBusinessUnitsExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -756,8 +739,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         // should be sorted by organization id
-        $this->setGetUsersExpectation(
-            $connection,
+        $this->addGetUsersExpectation(
             [
                 [
                     'orgId'      => self::ORG_1,
@@ -803,6 +785,8 @@ class OwnerTreeProviderTest extends OrmTestCase
                 ],
             ]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -868,5 +852,161 @@ class OwnerTreeProviderTest extends OrmTestCase
             ],
             $tree
         );
+    }
+
+    /**
+     * @dataProvider addBusinessUnitDirectCyclicRelationProvider
+     */
+    public function testDirectCyclicRelationshipBetweenBusinessUnits(
+        array $src,
+        array $expected,
+        array $criticalMessageArguments
+    ) {
+        $this->logger->expects($this->once())
+            ->method('critical')
+            ->with(
+                sprintf(
+                    'Cyclic relationship in "%s" with problem id "%s"',
+                    $criticalMessageArguments['businessUnitClass'],
+                    $criticalMessageArguments['buId']
+                )
+            );
+        $this->applyCacheExpectations();
+
+        /** @var OwnerTree $tree */
+        $tree = $this->treeProvider->getTree();
+        $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
+        $subordinateBusinessUnitIds = ReflectionUtil::callMethod(
+            $this->treeProvider,
+            'buildTree',
+            [$src, $businessUnitClass]
+        );
+
+        foreach ($subordinateBusinessUnitIds as $parentBusinessUnit => $businessUnits) {
+            $tree->setSubordinateBusinessUnitIds($parentBusinessUnit, $businessUnits);
+        }
+
+        foreach ($expected as $parentBusinessUnit => $businessUnits) {
+            $this->assertEquals($businessUnits, $tree->getSubordinateBusinessUnitIds($parentBusinessUnit));
+        }
+    }
+
+    /**
+     * @dataProvider addBusinessUnitNotDirectCyclicRelationProvider
+     */
+    public function testNotDirectCyclicRelationshipBetweenBusinessUnits(
+        array $src,
+        array $expected,
+        array $criticalMessageArguments
+    ) {
+        $this->logger->expects($this->exactly(count($criticalMessageArguments)))
+            ->method('critical')
+            ->withConsecutive(
+                [sprintf(
+                    'Cyclic relationship in "%s" with problem id "%s"',
+                    $criticalMessageArguments[0]['businessUnitClass'],
+                    $criticalMessageArguments[0]['buId']
+                )],
+                [sprintf(
+                    'Cyclic relationship in "%s" with problem id "%s"',
+                    $criticalMessageArguments[1]['businessUnitClass'],
+                    $criticalMessageArguments[1]['buId']
+                )],
+                [sprintf(
+                    'Cyclic relationship in "%s" with problem id "%s"',
+                    $criticalMessageArguments[2]['businessUnitClass'],
+                    $criticalMessageArguments[2]['buId']
+                )]
+            );
+        $this->applyCacheExpectations();
+
+        /** @var OwnerTree $tree */
+        $tree = $this->treeProvider->getTree();
+        $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
+        $subordinateBusinessUnitIds = ReflectionUtil::callMethod(
+            $this->treeProvider,
+            'buildTree',
+            [$src, $businessUnitClass]
+        );
+
+        foreach ($subordinateBusinessUnitIds as $parentBusinessUnit => $businessUnits) {
+            $tree->setSubordinateBusinessUnitIds($parentBusinessUnit, $businessUnits);
+        }
+
+        foreach ($expected as $parentBusinessUnit => $businessUnits) {
+            $this->assertEquals($businessUnits, $tree->getSubordinateBusinessUnitIds($parentBusinessUnit));
+        }
+    }
+
+    public function addBusinessUnitDirectCyclicRelationProvider(): array
+    {
+        return [
+            'direct cyclic relationship' => [
+                [
+                    2 => 4,
+                    1 => null,
+                    3 => 1,
+                    4 => 2,
+                    5 => 1,
+                    6 => 5
+                ],
+                [
+                    1 => [3, 5, 6],
+                    5 => [6]
+                ],
+                [
+                    'businessUnitClass' => BusinessUnit::class,
+                    'buId' => 2
+                ]
+            ]
+        ];
+    }
+
+    public function addBusinessUnitNotDirectCyclicRelationProvider(): array
+    {
+        return [
+            'not direct cyclic relationship' => [
+                [
+                    1  => null,
+                    3  => 1,
+                    4  => 1,
+                    5 => 7,
+                    6 => 5,
+                    7  => 6,
+                    8 => 14,
+                    11 =>8,
+                    12 => 11,
+                    13 => 12,
+                    14 => 13
+                ],
+                [
+                    1 => [3, 4]
+                ],
+                [
+                    [
+                        'businessUnitClass' => BusinessUnit::class,
+                        'buId' => 5
+                    ],
+                    [
+                        'businessUnitClass' => BusinessUnit::class,
+                        'buId' => 8
+                    ],
+                    [
+                        'businessUnitClass' => BusinessUnit::class,
+                        'buId' => 12
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    private function applyCacheExpectations(): void
+    {
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
     }
 }

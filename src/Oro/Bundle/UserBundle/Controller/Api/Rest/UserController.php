@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -19,11 +16,12 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @NamePrefix("oro_api_")
+ * REST API CRUD controller for User entity.
  */
-class UserController extends RestController implements ClassResourceInterface
+class UserController extends RestController
 {
     /**
      * Get the list of users
@@ -48,14 +46,10 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @ApiDoc(
      *      description="Get the list of users",
-     *      resource=true,
-     *      filters={
-     *          {"name"="page", "dataType"="integer"},
-     *          {"name"="limit", "dataType"="integer"}
-     *      }
+     *      resource=true
      * )
      * @AclAncestor("oro_user_user_view")
      */
@@ -74,7 +68,6 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Get user data",
      *      resource=true,
@@ -83,8 +76,10 @@ class UserController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_user_view")
+     *
+     * @return Response
      */
-    public function getAction($id)
+    public function getAction(int $id)
     {
         return $this->handleGetRequest($id);
     }
@@ -92,7 +87,7 @@ class UserController extends RestController implements ClassResourceInterface
     /**
      * Create new user
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      * @ApiDoc(
      *      description="Create new user",
      *      resource=true
@@ -109,7 +104,6 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Update existing user",
      *      resource=true,
@@ -118,8 +112,10 @@ class UserController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_user_update")
+     *
+     * @return Response
      */
-    public function putAction($id)
+    public function putAction(int $id)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -129,7 +125,6 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Delete user",
      *      resource=true,
@@ -143,8 +138,10 @@ class UserController extends RestController implements ClassResourceInterface
      *      class="OroUserBundle:User",
      *      permission="DELETE"
      * )
+     *
+     * @return Response
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         return $this->handleDeleteRequest($id);
     }
@@ -154,7 +151,6 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Get user roles",
      *      resource=true,
@@ -163,16 +159,24 @@ class UserController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_role_view")
+     *
+     * @return Response
      */
-    public function getRolesAction($id)
+    public function getRolesAction(int $id)
     {
+        /** @var User|null $entity */
         $entity = $this->getManager()->find($id);
 
         if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity->getRoles(), Codes::HTTP_OK));
+        $serializedRoles = [];
+        foreach ($entity->getUserRoles() as $role) {
+            $serializedRoles[] = $this->serializeRole($role);
+        }
+
+        return $this->handleView($this->view($serializedRoles, Response::HTTP_OK));
     }
 
     /**
@@ -180,7 +184,6 @@ class UserController extends RestController implements ClassResourceInterface
      *
      * @param int $id User id
      *
-     * @return \Symfony\Component\HttpFoundation\Response
      * @ApiDoc(
      *      description="Get user groups",
      *      resource=true,
@@ -189,16 +192,24 @@ class UserController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @AclAncestor("oro_user_group_view")
+     *
+     * @return Response
      */
-    public function getGroupsAction($id)
+    public function getGroupsAction(int $id)
     {
+        /** @var User|null $entity */
         $entity = $this->getManager()->find($id);
 
         if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity->getGroups(), Codes::HTTP_OK));
+        $serializedGroups = [];
+        foreach ($entity->getGroups() as $group) {
+            $serializedGroups[] = $this->serializeGroup($group);
+        }
+
+        return $this->handleView($this->view($serializedGroups, Response::HTTP_OK));
     }
 
     /**
@@ -218,15 +229,11 @@ class UserController extends RestController implements ClassResourceInterface
      * )
      *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      *
      * @ApiDoc(
      *      description="Get user by username or email",
-     *      resource=true,
-     *      filters={
-     *          {"name"="email", "dataType"="string"},
-     *          {"name"="username", "dataType"="string"}
-     *      }
+     *      resource=true
      * )
      * @AclAncestor("oro_user_user_view")
      */
@@ -238,35 +245,33 @@ class UserController extends RestController implements ClassResourceInterface
         );
 
         if (empty($params)) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
         /** @var User $entity */
         $entity = $this->getManager()->getRepository()->findOneBy($params);
         if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
         $result = $this->getPreparedItem($entity);
 
-        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result], Codes::HTTP_OK);
+        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result], Response::HTTP_OK);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function transformEntityField($field, &$value)
     {
         switch ($field) {
-            case 'roles':
+            case 'userRoles':
                 $result = [];
                 /** @var Role $role */
                 foreach ($value as $index => $role) {
-                    $result[$index] = [
-                        'id'    => $role->getId(),
-                        'role'  => $role->getRole(),
-                        'label' => $role->getLabel(),
-                    ];
+                    $result[$index] = $this->serializeRole($role);
                 }
                 $value = $result;
                 break;
@@ -274,10 +279,7 @@ class UserController extends RestController implements ClassResourceInterface
                 $result = [];
                 /** @var Group $group */
                 foreach ($value as $index => $group) {
-                    $result[$index] = [
-                        'id'   => $group->getId(),
-                        'name' => $group->getName()
-                    ];
+                    $result[$index] = $this->serializeGroup($group);
                 }
                 $value = $result;
                 break;
@@ -330,26 +332,14 @@ class UserController extends RestController implements ClassResourceInterface
         unset($result['confirmationToken']);
         unset($result['passwordRequestedAt']);
         unset($result['imapConfiguration']);
-        unset($result['currentStatus']);
-        unset($result['statuses']);
         unset($result['apiKeys']);
         unset($result['organizations']);
         unset($result['emailOrigins']);
-
-        //todo: Add user avatar to api
-        /*$result['imagePath'] = null;
-        if (isset($result['image'])) {
-            $result['imagePath'] = $this->get('request_stack')
-                ->getCurrentRequest()->getBasePath() . '/' . $entity->getImagePath();
-        }
-        unset($result['image']);*/
 
         return $result;
     }
 
     /**
-     * Get entity Manager
-     *
      * @return ApiEntityManager
      */
     public function getManager()
@@ -373,11 +363,20 @@ class UserController extends RestController implements ClassResourceInterface
         return $this->get('oro_user.form.handler.user.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDeleteHandler()
+    private function serializeRole(Role $role): array
     {
-        return $this->get('oro_user.handler.delete');
+        return [
+            'id'    => $role->getId(),
+            'role'  => $role->getRole(),
+            'label' => $role->getLabel()
+        ];
+    }
+
+    private function serializeGroup(Group $group): array
+    {
+        return [
+            'id'   => $group->getId(),
+            'name' => $group->getName()
+        ];
     }
 }

@@ -3,6 +3,8 @@
 namespace Oro\Bundle\PlatformBundle\DependencyInjection;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\JmsSerializerPass;
+use Oro\Component\Config\Loader\ContainerBuilderAdapter;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
@@ -20,6 +22,17 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
      */
     public function prepend(ContainerBuilder $container)
     {
+        $this->loadAppConfigsFromBundles($container);
+        DbalConfigurationLoader::load($container);
+        $this->preparePostgreSql($container);
+        $this->configureJmsSerializer($container);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function loadAppConfigsFromBundles(ContainerBuilder $container): void
+    {
         $configLoader = new CumulativeConfigLoader(
             'oro_app_config',
             new YamlCumulativeFileLoader('Resources/config/oro/app.yml')
@@ -36,21 +49,24 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
 
         $extensions = $container->getExtensions();
 
-        //bundles that are loaded later should be able to override configuration of bundles loaded before
-        $resources = array_reverse($configLoader->load());
+        // bundles that are loaded later should be able to override configuration of bundles loaded before
+        $resources = array_reverse($configLoader->load(new ContainerBuilderAdapter($container)));
         foreach ($resources as $resource) {
             foreach ($resource->data as $name => $config) {
-                if ($name === 'services') {
-                    $loader = new Loader\YamlFileLoader($container, new FileLocator(rtrim($resource->path, 'app.yml')));
+                if ('services' === $name) {
+                    $loader = new Loader\YamlFileLoader(
+                        $container,
+                        new FileLocator(rtrim($resource->path, 'app.yml'))
+                    );
                     $loader->load('app.yml');
-
                     continue;
                 }
 
                 if (empty($extensions[$name])) {
                     continue;
                 }
-                if ($name === 'security') {
+
+                if ('security' === $name) {
                     $securityConfigs[] = $config;
                     $securityModified = true;
                 } else {
@@ -70,19 +86,15 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         if ($securityConfig && $securityModified) {
             $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
         }
-
-        $this->preparePostgreSql($container);
     }
 
     /**
      * Enable ATTR_EMULATE_PREPARES for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
-     *
-     * @param ContainerBuilder $container
      */
-    public function preparePostgreSql(ContainerBuilder $container)
+    private function preparePostgreSql(ContainerBuilder $container): void
     {
         $dbDriver = $container->getParameter('database_driver');
-        if ($dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
+        if ($dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL && class_exists(\PDO::class)) {
             $doctrineConfig = $container->getExtensionConfig('doctrine');
             $doctrineConnectionOptions = [];
             foreach ($doctrineConfig as $config) {
@@ -105,23 +117,26 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
     }
 
     /**
-     * Merge configuration into one config
-     *
-     * @param ContainerBuilder $container
-     * @param string           $name
-     * @param array            $config
-     *
-     * @throws \RuntimeException
+     * Configures JMS Serializer if JMSSerializerBundle is installed.
      */
-    private function mergeConfigIntoOne(ContainerBuilder $container, $name, array $config = [])
+    private function configureJmsSerializer(ContainerBuilder $container): void
+    {
+        if ($container->hasExtension('jms_serializer')) {
+            $container->prependExtensionConfig('jms_serializer', [
+                'metadata' => [
+                    'cache' => JmsSerializerPass::JMS_SERIALIZER_CACHE_ADAPTER_SERVICE_ID
+                ]
+            ]);
+        }
+    }
+
+    private function mergeConfigIntoOne(ContainerBuilder $container, string $name, array $config = []): void
     {
         if (!$container instanceof ExtendedContainerBuilder) {
-            throw new \RuntimeException(
-                sprintf(
-                    '%s is expected to be passed into OroPlatformExtension',
-                    'Oro\Component\DependencyInjection\ExtendedContainerBuilder'
-                )
-            );
+            throw new \RuntimeException(sprintf(
+                '%s is expected to be passed into OroPlatformExtension',
+                ExtendedContainerBuilder::class
+            ));
         }
 
         $originalConfig = $container->getExtensionConfig($name);
@@ -146,5 +161,12 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         $loader->load('doctrine.yml');
         $loader->load('session.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
+        $loader->load('mq_topics.yml');
+        $loader->load('mq_processors.yml');
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 }

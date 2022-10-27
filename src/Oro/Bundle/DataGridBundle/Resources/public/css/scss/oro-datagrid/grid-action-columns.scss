@@ -14,12 +14,14 @@
     }
 
     .icon {
+        min-width: $oro-datagrid-action-min-size;
+
         font-size: $oro-datagrid-action-font-size;
     }
 
     .show {
         .dropdown-toggle {
-            background-color: $oro-datagrid-action-active;
+            background-color: $oro-datagrid-action-active-bg-color;
             box-shadow: none;
             color: $oro-datagrid-label-color;
         }
@@ -30,7 +32,7 @@
     width: $oro-datagrid-action-size;
     padding: $oro-datagrid-action-inner-offset;
 
-    text-align: #{$end};
+    text-align: right;
 
     @extend %header-cell-dropdown;
 
@@ -41,7 +43,7 @@
         line-height: $oro-datagrid-action-size;
 
         border-radius: $oro-datagrid-action-column-radius;
-        color: $oro-datagrid-action-active;
+        color: $oro-datagrid-action-color;
     }
 }
 
@@ -50,7 +52,8 @@
 
     padding: $oro-datagrid-action-cell-offset;
 
-    text-align: #{$end};
+    line-height: 0;
+    text-align: right;
 
     vertical-align: top;
 }
@@ -78,9 +81,12 @@
     }
 
     .icon {
-        margin-#{$start}: $oro-datagrid-all-header-cell-icon-offset;
+        height: $oro-datagrid-action-font-size;
+        margin-left: $oro-datagrid-all-header-cell-icon-offset;
 
         vertical-align: middle;
+
+        @include fa-icon($oro-datagrid-all-header-cell-icon);
     }
 }
 
@@ -90,7 +96,11 @@
 }
 
 .select-row-cell {
-    padding-#{$start}: $oro-grid-first-cell-offset;;
+    padding-left: $oro-grid-first-cell-offset;
+
+    .select-row-cell-input {
+        vertical-align: $oro-datagrid-body-cell-checkbox-vertical-align;
+    }
 }
 
 .row-click-action {

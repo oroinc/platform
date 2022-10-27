@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\Email;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Model\SenderAwareInterface;
@@ -40,11 +40,6 @@ class TemplateEmailNotification implements SenderAwareInterface, TemplateEmailNo
      */
     private $entityNameResolver;
 
-    /**
-     * @param ObjectManager $em
-     * @param ConfigProvider $configProvider
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function __construct(
         ObjectManager $em,
         ConfigProvider $configProvider,
@@ -55,9 +50,6 @@ class TemplateEmailNotification implements SenderAwareInterface, TemplateEmailNo
         $this->entityNameResolver = $entityNameResolver;
     }
 
-    /**
-     * @param Reminder $reminder
-     */
     public function setReminder(Reminder $reminder)
     {
         $this->reminder = $reminder;
@@ -87,7 +79,6 @@ class TemplateEmailNotification implements SenderAwareInterface, TemplateEmailNo
     }
 
     /**
-     * @return Reminder
      * @throws InvalidArgumentException
      */
     protected function getReminder(): Reminder

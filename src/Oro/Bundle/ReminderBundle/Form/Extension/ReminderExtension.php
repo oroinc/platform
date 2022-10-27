@@ -5,26 +5,36 @@ namespace Oro\Bundle\ReminderBundle\Form\Extension;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
-class ReminderExtension extends AbstractTypeExtension
+/**
+ * Saves reminders on post submit event if a form work with an entity that implements RemindableInterface.
+ */
+class ReminderExtension extends AbstractTypeExtension implements ServiceSubscriberInterface
 {
     use FormExtendedTypeTrait;
-    
-    /**
-     * @var ReminderManager
-     */
-    protected $manager;
+
+    /** @var ContainerInterface */
+    private $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
     /**
-     * @param ReminderManager $manager
+     * {@inheritDoc}
      */
-    public function __construct(ReminderManager $manager)
+    public static function getSubscribedServices()
     {
-        $this->manager = $manager;
+        return [
+            'oro_reminder.entity.manager' => ReminderManager::class
+        ];
     }
 
     /**
@@ -37,8 +47,6 @@ class ReminderExtension extends AbstractTypeExtension
 
     /**
      * Set form data
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
@@ -49,6 +57,8 @@ class ReminderExtension extends AbstractTypeExtension
             return;
         }
 
-        $this->manager->saveReminders($entity);
+        /** @var ReminderManager $reminderManager */
+        $reminderManager = $this->container->get('oro_reminder.entity.manager');
+        $reminderManager->saveReminders($entity);
     }
 }

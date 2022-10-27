@@ -7,13 +7,17 @@ use Oro\Component\ChainProcessor\AbstractMatcher;
 use Oro\Component\ChainProcessor\ExpressionParser;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Registers resource documentation parsers for all supported Data API request types.
+ * Registers resource documentation parsers for all supported API request types.
  */
 class ResourceDocParserCompilerPass implements CompilerPassInterface
 {
+    use ApiTaggedServiceTrait;
+
     private const RESOURCE_DOC_PARSER_REGISTRY_SERVICE_ID = 'oro_api.resource_doc_parser_registry';
     private const DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID  = 'oro_api.resource_doc_parser.template';
     private const RESOURCE_DOC_PARSER_TAG                 = 'oro.api.resource_doc_parser';
@@ -24,26 +28,26 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         // find resource documentation parsers
+        $services = [];
         $resourceDocParsers = [];
         $taggedServices = $container->findTaggedServiceIds(self::RESOURCE_DOC_PARSER_TAG);
-        foreach ($taggedServices as $id => $attributes) {
-            $container->getDefinition($id)->setPublic(true);
-            foreach ($attributes as $tagAttributes) {
-                $resourceDocParsers[DependencyInjectionUtil::getPriority($tagAttributes)][] = [
+        foreach ($taggedServices as $id => $tags) {
+            $services[$id] = new Reference($id);
+            foreach ($tags as $attributes) {
+                $resourceDocParsers[$this->getPriorityAttribute($attributes)][] = [
                     $id,
-                    DependencyInjectionUtil::getRequestType($tagAttributes)
+                    $this->getRequestTypeAttribute($attributes)
                 ];
             }
         }
 
-        // sort by priority and flatten
-        if (!empty($resourceDocParsers)) {
-            $resourceDocParsers = DependencyInjectionUtil::sortByPriorityAndFlatten($resourceDocParsers);
+        if ($resourceDocParsers) {
+            $resourceDocParsers = $this->sortByPriorityAndFlatten($resourceDocParsers);
         }
 
         // add non defined explicitly parsers
         $existingRequestType = [];
-        foreach ($resourceDocParsers as list($id, $expr)) {
+        foreach ($resourceDocParsers as [$id, $expr]) {
             if ($expr) {
                 $existingRequestType[$this->normalizeRequestType($expr)] = true;
             }
@@ -56,9 +60,8 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
                 if (!isset($existingRequestType[$expr])) {
                     $existingRequestType[$expr] = true;
                     $id = self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID . '.' . $name;
-                    $container
-                        ->setDefinition($id, new ChildDefinition(self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID))
-                        ->setPublic(true);
+                    $container->setDefinition($id, new ChildDefinition(self::DEFAULT_RESOURCE_DOC_PARSER_SERVICE_ID));
+                    $services[$id] = new Reference($id);
                     $defaultResourceDocParsers[] = [$id, \implode('&', $view['request_type'])];
                 }
             }
@@ -67,14 +70,10 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
 
         // register
         $container->getDefinition(self::RESOURCE_DOC_PARSER_REGISTRY_SERVICE_ID)
-            ->replaceArgument(0, $resourceDocParsers);
+            ->setArgument('$parsers', $resourceDocParsers)
+            ->setArgument('$container', ServiceLocatorTagPass::register($container, $services));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return array
-     */
     private function getApiDocViews(ContainerBuilder $container): array
     {
         $config = DependencyInjectionUtil::getConfig($container);
@@ -94,11 +93,6 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
         return \implode('&', $aspects);
     }
 
-    /**
-     * @param string $requestTypeExpr
-     *
-     * @return string
-     */
     private function normalizeRequestType(string $requestTypeExpr): string
     {
         $requestType = ExpressionParser::parse($requestTypeExpr);

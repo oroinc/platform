@@ -30,9 +30,6 @@ class EmailOwnerManager
 
     /**
      * Constructor.
-     *
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     * @param EmailAddressManager       $emailAddressManager
      */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
@@ -48,7 +45,7 @@ class EmailOwnerManager
     /**
      * @param array $emailAddressData Data retrieved by "createEmailAddressData"
      *
-     * @return array Updated email addresses
+     * @return array [[updated email address, ...], [created email address, ...] [processed address, ...]]
      */
     public function handleChangedAddresses(array $emailAddressData)
     {
@@ -62,7 +59,7 @@ class EmailOwnerManager
      * Creates data
      *
      * @param UnitOfWork $uow
-     * @return array
+     * @return array [updates => [EmailAddress, ...], deletions => [EmailAddress, ...]]
      */
     public function createEmailAddressData(UnitOfWork $uow)
     {
@@ -144,12 +141,6 @@ class EmailOwnerManager
         );
     }
 
-    /**
-     * @param array               $emailOwnerData
-     * @param                     $emailField
-     * @param EmailOwnerInterface $owner
-     * @param array               $changeSet
-     */
     protected function processEntityChanges(
         array &$emailOwnerData,
         $emailField,
@@ -214,14 +205,16 @@ class EmailOwnerManager
     /**
      * @param array $emailOwnerChanges
      *
-     * @return EmailAddress[]
+     * @return array [[updated email address, ...], [created email address, ...] [processed address, ...]]
      */
     protected function updateEmailAddresses(array $emailOwnerChanges, array $emailOwnerDeletions)
     {
+        $emails = [];
         $updatedEmailAddresses = [];
         $createEmailAddresses = [];
         foreach ($emailOwnerChanges as $item) {
             $email = $item['email'];
+            $emails[] = $email;
             $newOwner = false === $item['owner'] ? null : $item['owner'];
             $emailAddress = $this->emailAddressManager->getEmailAddressRepository()->findOneBy(['email' => $email]);
             if ($emailAddress === null) {
@@ -244,12 +237,13 @@ class EmailOwnerManager
                     foreach ($emailAddresses as $emailAddress) {
                         $emailAddress->setOwner(null);
                         $updatedEmailAddresses[] = $emailAddress;
+                        $emails[] = $emailAddress->getEmail();
                     }
                 }
             }
         }
 
-        return [$updatedEmailAddresses, $createEmailAddresses];
+        return [$updatedEmailAddresses, $createEmailAddresses, array_unique($emails)];
     }
 
     /**

@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var HideStartRule;
-    var Rule = require('./jpm-base-rule');
+    const Rule = require('./jpm-base-rule');
 
-    HideStartRule = Rule.extend({
+    const HideStartRule = Rule.extend({
         name: 'HideStart',
         match: function(cell) {
             if (cell.step.get('order') < 0 && cell.children.length < 1) {
@@ -18,8 +17,8 @@ define(function(require) {
             }
         },
         apply: function() {
-            var context = this.context;
-            var changed = false;
+            const context = this.context;
+            let changed = false;
             if (this.root !== null) {
                 changed = true;
                 context.remove(this.root);

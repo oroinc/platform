@@ -9,9 +9,9 @@ use Oro\Bundle\EntityConfigBundle\Layout\AttributeRenderRegistry;
 class AttributeRenderRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AttributeRenderRegistry */
-    protected $attributeRenderRegistry;
+    private $attributeRenderRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->attributeRenderRegistry = new AttributeRenderRegistry();
     }

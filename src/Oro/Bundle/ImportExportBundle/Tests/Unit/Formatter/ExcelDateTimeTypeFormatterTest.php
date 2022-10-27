@@ -4,57 +4,38 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ExcelDateTimeTypeFormatter
-     */
-    protected $formatter;
+    /** @var ExcelDateTimeTypeFormatter */
+    private $formatter;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-        /** @var Translator|\PHPUnit\Framework\MockObject\MockObject $translator */
-        $translator      = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $translator = $this->createMock(TranslatorInterface::class);
+
         $this->formatter = new ExcelDateTimeTypeFormatter($localeSettings, $translator);
     }
 
     /**
      * @dataProvider getPatternProvider
-     *
-     * @param int    $timeType
-     * @param string $locale
-     * @param string $result
      */
-    public function testGetPattern($timeType, $locale, $result)
+    public function testGetPattern(?int $timeType, string $locale, string $result)
     {
         $this->assertEquals($result, $this->formatter->getPattern(1, $timeType, $locale));
     }
 
     /**
      * @dataProvider getPatternWithValueProvider
-     *
-     * @param int    $timeType
-     * @param string $locale
-     * @param        $value
-     * @param string $result
      */
-    public function testGetPatternWithValue($timeType, $locale, $value, $result)
+    public function testGetPatternWithValue(?int $timeType, string $locale, string $value, string $result)
     {
         $this->assertEquals($result, $this->formatter->getPattern(1, $timeType, $locale, $value));
     }
 
-    /**
-     * @return array
-     */
-    public function getPatternProvider()
+    public function getPatternProvider(): array
     {
         return [
             'locale "de" with time'       => [null, 'de', 'dd.MM.y HH:mm:ss'],
@@ -70,10 +51,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getPatternWithValueProvider()
+    public function getPatternWithValueProvider(): array
     {
         return [
             'with seconds'    => [null, 'en', '20.01.1999 12:00:00', 'MM/dd/y HH:mm:ss'],

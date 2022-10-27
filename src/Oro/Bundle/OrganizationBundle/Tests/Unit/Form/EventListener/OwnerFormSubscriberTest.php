@@ -3,45 +3,37 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var string
-     */
-    protected $fieldName = 'owner';
+    /** @var string */
+    private $fieldName = 'owner';
 
-    /**
-     * @var string
-     */
-    protected $fieldLabel = 'Owner';
+    /** @var string */
+    private $fieldLabel = 'Owner';
 
-    /**
-     * @var User
-     */
-    protected $defaultOwner;
+    /** @var User */
+    private $defaultOwner;
 
-    /**
-     * @var OwnerFormSubscriber
-     */
-    protected $subscriber;
+    /** @var OwnerFormSubscriber */
+    private $subscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->defaultOwner = new User();
 
@@ -55,24 +47,20 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->doctrineHelper);
-        unset($this->defaultOwner);
-        unset($this->subscriber);
-    }
-
     public function testGetSubscribedEvents()
     {
-        $expectedEvents = array(FormEvents::POST_SET_DATA => 'postSetData');
+        $expectedEvents = [FormEvents::POST_SET_DATA => 'postSetData'];
         $this->assertEquals($expectedEvents, $this->subscriber->getSubscribedEvents());
     }
 
     public function testPostSetDataNotRootForm()
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $form->expects($this->once())->method('getParent')->will($this->returnValue(true));
-        $form->expects($this->never())->method('has');
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn(true);
+        $form->expects($this->never())
+            ->method('has');
 
         $event = new FormEvent($form, null);
         $this->subscriber->postSetData($event);
@@ -80,10 +68,16 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSetDataNoOwnerField()
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
-        $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(false));
-        $this->doctrineHelper->expects($this->never())->method('isManageableEntity');
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn(false);
+        $form->expects($this->once())
+            ->method('has')
+            ->with($this->fieldName)
+            ->willReturn(false);
+        $this->doctrineHelper->expects($this->never())
+            ->method('isManageableEntity');
 
         $event = new FormEvent($form, new \DateTime());
         $this->subscriber->postSetData($event);
@@ -91,12 +85,18 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSetDataNotAnObject()
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
-        $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(true));
-        $this->doctrineHelper->expects($this->never())->method('isManageableEntity');
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn(false);
+        $form->expects($this->once())
+            ->method('has')
+            ->with($this->fieldName)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->never())
+            ->method('isManageableEntity');
 
-        $event = new FormEvent($form, array(1, 2, 3));
+        $event = new FormEvent($form, [1, 2, 3]);
         $this->subscriber->postSetData($event);
     }
 
@@ -104,11 +104,18 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $data = new \DateTime();
 
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
-        $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(true));
-        $this->doctrineHelper->expects($this->once())->method('isManageableEntity')
-            ->with(get_class($data))->will($this->returnValue(false));
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn(false);
+        $form->expects($this->once())
+            ->method('has')
+            ->with($this->fieldName)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with(get_class($data))
+            ->willReturn(false);
 
         $event = new FormEvent($form, $data);
         $this->subscriber->postSetData($event);
@@ -120,10 +127,16 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->prepareEntityManager($data);
 
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
-        $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(true));
-        $form->expects($this->never())->method('get');
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn(false);
+        $form->expects($this->once())
+            ->method('has')
+            ->with($this->fieldName)
+            ->willReturn(true);
+        $form->expects($this->never())
+            ->method('get');
 
         $event = new FormEvent($form, $data);
         $this->subscriber->postSetData($event);
@@ -138,25 +151,39 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->prepareEntityManager($data);
 
-        $ownerForm = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $ownerForm->expects($this->once())->method('getData')->will($this->returnValue($owner));
+        $ownerForm = $this->createMock(Form::class);
+        $ownerForm->expects($this->once())
+            ->method('getData')
+            ->willReturn($owner);
 
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
-        $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(true));
-        $form->expects($this->once())->method('get')->with($this->fieldName)->will($this->returnValue($ownerForm));
-        $form->expects($this->once())->method('remove')->with($this->fieldName);
-        $form->expects($this->once())->method('add')->with(
-            $this->fieldName,
-            TextType::class,
-            array(
-                'disabled' => true,
-                'data' => $ownerName,
-                'mapped' => false,
-                'required' => false,
-                'label' => $this->fieldLabel
-            )
-        );
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn(false);
+        $form->expects($this->once())
+            ->method('has')
+            ->with($this->fieldName)
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('get')
+            ->with($this->fieldName)
+            ->willReturn($ownerForm);
+        $form->expects($this->once())
+            ->method('remove')
+            ->with($this->fieldName);
+        $form->expects($this->once())
+            ->method('add')
+            ->with(
+                $this->fieldName,
+                TextType::class,
+                [
+                    'disabled' => true,
+                    'data' => $ownerName,
+                    'mapped' => false,
+                    'required' => false,
+                    'label' => $this->fieldLabel
+                ]
+            );
 
         $isAssignGranted = false;
         $this->subscriber = new OwnerFormSubscriber(
@@ -171,33 +198,51 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->postSetData($event);
     }
 
-    protected function prepareEntityManager($entity)
+    private function prepareEntityManager($entity)
     {
         $entityClass = ClassUtils::getClass($entity);
 
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()->getMock();
-        $classMetadata->expects($this->once())->method('getIdentifierValues')
-            ->with($entity)->will($this->returnValue(array(1)));
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
-        $entityManager->expects($this->once())->method('getClassMetadata')
-            ->with($entityClass)->will($this->returnValue($classMetadata));
-        $this->doctrineHelper->expects($this->once())->method('isManageableEntity')
-            ->with($entityClass)->will($this->returnValue(true));
-        $this->doctrineHelper->expects($this->once())->method('getEntityManager')
-            ->with($entityClass)->will($this->returnValue($entityManager));
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierValues')
+            ->with($entity)
+            ->willReturn([1]);
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with($entityClass)
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManager')
+            ->with($entityClass)
+            ->willReturn($entityManager);
     }
 
     public function testPostSetDataSetPredefinedOwnerExists()
     {
-        $ownerForm = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $ownerForm->expects($this->once())->method('getData')->will($this->returnValue(new User()));
-        $ownerForm->expects($this->never())->method('setData');
+        $ownerForm = $this->createMock(Form::class);
+        $ownerForm->expects($this->once())
+            ->method('getData')
+            ->willReturn(new User());
+        $ownerForm->expects($this->never())
+            ->method('setData');
 
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
-        $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(true));
-        $form->expects($this->once())->method('get')->with($this->fieldName)->will($this->returnValue($ownerForm));
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn(false);
+        $form->expects($this->once())
+            ->method('has')
+            ->with($this->fieldName)
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('get')
+            ->with($this->fieldName)
+            ->willReturn($ownerForm);
 
         $event = new FormEvent($form, null);
         $this->subscriber->postSetData($event);
@@ -205,14 +250,26 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSetDataSetPredefinedOwnerNotExists()
     {
-        $ownerForm = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $ownerForm->expects($this->once())->method('getData')->will($this->returnValue(null));
-        $ownerForm->expects($this->once())->method('setData')->with($this->defaultOwner);
+        $ownerForm = $this->createMock(Form::class);
+        $ownerForm->expects($this->once())
+            ->method('getData')
+            ->willReturn(null);
+        $ownerForm->expects($this->once())
+            ->method('setData')
+            ->with($this->defaultOwner);
 
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
-        $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
-        $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(true));
-        $form->expects($this->once())->method('get')->with($this->fieldName)->will($this->returnValue($ownerForm));
+        $form = $this->createMock(Form::class);
+        $form->expects($this->once())
+            ->method('getParent')
+            ->willReturn(false);
+        $form->expects($this->once())
+            ->method('has')
+            ->with($this->fieldName)
+            ->willReturn(true);
+        $form->expects($this->once())
+            ->method('get')
+            ->with($this->fieldName)
+            ->willReturn($ownerForm);
 
         $event = new FormEvent($form, null);
         $this->subscriber->postSetData($event);

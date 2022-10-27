@@ -1,34 +1,32 @@
 define(function(require) {
     'use strict';
 
-    var SelectCreateInlineTypeAsyncView;
-    var _ = require('underscore');
-    var SelectCreateInlineTypeView = require('oroform/js/app/views/select-create-inline-type-view');
+    const SelectCreateInlineTypeView = require('oroform/js/app/views/select-create-inline-type-view');
 
-    SelectCreateInlineTypeAsyncView = SelectCreateInlineTypeView.extend({
+    const SelectCreateInlineTypeAsyncView = SelectCreateInlineTypeView.extend({
         events: {
             'select2-data-request .select2': 'onSelect2Request',
             'select2-data-loaded .select2': 'onSelect2Loaded'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SelectCreateInlineTypeAsyncView() {
-            SelectCreateInlineTypeAsyncView.__super__.constructor.apply(this, arguments);
+        constructor: function SelectCreateInlineTypeAsyncView(options) {
+            SelectCreateInlineTypeAsyncView.__super__.constructor.call(this, options);
         },
 
-        onGridRowSelect: function() {
-            SelectCreateInlineTypeAsyncView.__super__.onGridRowSelect.apply(this, arguments);
+        onGridRowSelect: function(data) {
+            SelectCreateInlineTypeAsyncView.__super__.onGridRowSelect.call(this, data);
             this.dialogWidget.hide();
         },
 
         onCreate: function(e) {
-            SelectCreateInlineTypeAsyncView.__super__.onCreate.apply(this, arguments);
-            this.dialogWidget.once('beforeContentLoad', _.bind(function() {
+            SelectCreateInlineTypeAsyncView.__super__.onCreate.call(this, e);
+            this.dialogWidget.once('beforeContentLoad', () => {
                 this.dialogWidget.hide();
                 this.$el.addClass('loading');
-            }, this));
+            });
         },
 
         onSelect2Request: function() {

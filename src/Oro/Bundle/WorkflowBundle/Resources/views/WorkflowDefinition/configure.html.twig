@@ -1,4 +1,4 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label|trans([], 'workflows')} }) %}
 
@@ -8,6 +8,8 @@
 {% endblock stats %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set html = UI.saveAndCloseButton({
         'route': 'oro_workflow_definition_view', 'params': {'name': entity.name}
     }) ~ UI.saveAndStayButton() %}
@@ -17,6 +19,8 @@
 {% endblock navButtons %}
 
 {% block breadcrumbs %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set breadcrumbs = {
         'entity': entity,
         'indexPath': path('oro_workflow_definition_index'),
@@ -30,30 +34,20 @@
 
     {{ parent() }}
 
-    <div class="pull-left">
+    <span class="page-title__status">
         {% if entity.isActive %}
-            <div class="badge badge-pill badge-enabled status-enabled">
-                <i class="icon-status-enabled fa-circle"></i>{{ 'Active'|trans }}
-            </div>
+            {{ UI.badge('Active'|trans, 'enabled') }}
         {% else %}
-            <div class="badge badge-pill badge-disabled status-disabled">
-                <i class="icon-status-disabled fa-circle"></i>{{ 'Inactive'|trans }}
-            </div>
+            {{ UI.badge('Inactive'|trans, 'disabled') }}
         {% endif %}
-    </div>
+    </span>
 {% endblock breadcrumbs %}
 
 {% block content_data %}
     {% set data = [] %}
     {% for child in form %}
         {% if child.children %}
-            {% set tooltip = null %}
-            {% if child.vars.tooltip is defined %}
-                {% set tooltip = child.vars.tooltip %}
-            {% endif %}
-            {% set data = data|merge([
-                UI.collectionField(child, child.vars.label, 'Add'|trans, tooltip)
-            ]) %}
+            {% set data = data|merge([form_row_collection(child)]) %}
         {% else %}
             {% set data = data|merge([form_row(child)]) %}
         {% endif %}

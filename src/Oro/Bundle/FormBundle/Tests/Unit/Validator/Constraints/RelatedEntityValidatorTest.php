@@ -3,62 +3,49 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntity;
 use Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator;
-use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class RelatedEntityValidatorTest extends \PHPUnit\Framework\TestCase
+class RelatedEntityValidatorTest extends ConstraintValidatorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityClassNameHelper;
+    private $entityClassNameHelper;
 
-    /** @var RelatedEntityValidator */
-    protected $validator;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->doctrineHelper        = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
+        parent::setUp();
+    }
 
-        $this->validator = new RelatedEntityValidator(
-            $this->doctrineHelper,
-            $this->entityClassNameHelper
-        );
+    protected function createValidator()
+    {
+        return new RelatedEntityValidator($this->doctrineHelper, $this->entityClassNameHelper);
     }
 
     /**
      * @dataProvider validItemsDataProvider
-     *
-     * @param string $value
      */
     public function testValidateValid($value)
     {
-        $context = $this->createMock(ExecutionContext::class);
-        $context->expects($this->never())
-            ->method('addViolation');
-
         $this->doctrineHelper->expects($this->any())
             ->method('isManageableEntity')
             ->with($value)
             ->willReturn(true);
 
         $constraint = new RelatedEntity();
-        $this->validator->initialize($context);
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
-    /**
-     * @return array
-     */
-    public function validItemsDataProvider()
+    public function validItemsDataProvider(): array
     {
         return [
             [null],
@@ -74,13 +61,6 @@ class RelatedEntityValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $value = ['id' => 123, 'entity' => 'alias'];
 
-        $constraint = new RelatedEntity();
-
-        $context = $this->createMock(ExecutionContext::class);
-        $context->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->message, ['{{ value }}' => '[id => 123, entity => "alias"]']);
-
         $this->entityClassNameHelper->expects($this->once())
             ->method('resolveEntityClass')
             ->with($value['entity'])
@@ -90,21 +70,17 @@ class RelatedEntityValidatorTest extends \PHPUnit\Framework\TestCase
             ->with('Test\Entity')
             ->willReturn(true);
 
-        $this->validator->initialize($context);
-
+        $constraint = new RelatedEntity();
         $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ value }}', '[id => 123, entity => "alias"]')
+            ->assertRaised();
     }
 
     public function testValidateValidClass()
     {
         $value = ['id' => 123, 'entity' => 'Test\Entity'];
-
-        $constraint = new RelatedEntity();
-
-        $context = $this->createMock(ExecutionContext::class);
-        $context->expects($this->once())
-            ->method('addViolation')
-            ->with($constraint->message, ['{{ value }}' => '[id => 123, entity => "Test\Entity"]']);
 
         $this->entityClassNameHelper->expects($this->once())
             ->method('resolveEntityClass')
@@ -115,39 +91,34 @@ class RelatedEntityValidatorTest extends \PHPUnit\Framework\TestCase
             ->with('Test\Entity')
             ->willReturn(true);
 
-        $this->validator->initialize($context);
-
+        $constraint = new RelatedEntity();
         $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ value }}', '[id => 123, entity => "Test\Entity"]')
+            ->assertRaised();
     }
 
     public function testValidateUnknownAlias()
     {
         $value = ['id' => 123, 'entity' => 'alias'];
 
-        $context = $this->createMock(ExecutionContext::class);
-        $context->expects($this->never())
-            ->method('addViolation');
-
         $this->entityClassNameHelper->expects($this->once())
             ->method('resolveEntityClass')
             ->with($value['entity'])
-            ->will($this->throwException(new EntityAliasNotFoundException()));
+            ->willThrowException(new EntityAliasNotFoundException());
         $this->doctrineHelper->expects($this->never())
             ->method('isManageableEntity');
 
         $constraint = new RelatedEntity();
-        $this->validator->initialize($context);
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValidateNotManageableEntity()
     {
         $value = ['id' => 123, 'entity' => 'Test\Entity'];
-
-        $context = $this->createMock(ExecutionContext::class);
-        $context->expects($this->never())
-            ->method('addViolation');
 
         $this->entityClassNameHelper->expects($this->once())
             ->method('resolveEntityClass')
@@ -159,8 +130,8 @@ class RelatedEntityValidatorTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $constraint = new RelatedEntity();
-        $this->validator->initialize($context);
-
         $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 }

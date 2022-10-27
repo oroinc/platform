@@ -1,0 +1,67 @@
+oro:
+    digitalasset:
+        entity_label: Digital Asset
+        entity_plural_label: Digital Assets
+        entity_grid_all_view_label: All %entity_plural_label%
+        entity_description: Digital Asset represents a file asset which can be used as upload file for other entities.
+
+        id.label: Id
+        titles:
+            label: Title
+            tooltip_file: '"Title" text for link'
+            tooltip_image: '"Alt" text for image'
+        source_file.label: File
+        child_files.label: Child Files
+        owner.label: Owner
+        organization.label: Organization
+
+        entity_config.attachment.field.items.use_dam:
+            label: Use DAM
+            tooltip: Enable use of the Digital Asset Manager for this field
+
+        controller:
+            saved.message: Digital Asset has been saved
+            sections.general.label: General
+
+        datagrid:
+            entity_hint:
+                images: Images
+                files: Files
+            column:
+                file.label: Image
+                owner.label: Uploaded By
+                original_filename.label: Name
+            filter:
+                file_size.label: File size (bytes)
+
+        dam:
+            form:
+                choose_file.label: Choose File
+                choose_image.label: Choose Image
+                choose_another.label: Choose another
+                remove.label: Remove
+                invalid_digital_asset: invalid value
+
+            dialog:
+                datagrid_title:
+                    images: Images
+                    files: Files
+                uploaded.message: Digital Asset has been uploaded
+                delete_message: Item successfully deleted
+                select_file: Select File
+                select_image: Select Image
+                clear.label: Clear
+                upload.label: Upload
+                file.label: File
+                image.label: Picture
+
+        import:
+            entity_is_skipped: 'Digital Asset importing has failed, entity is skipped'
+            cannot_find_digital_asset: 'Cannot find digital asset #%digital_asset_id% specified as parent for file with UUID %file_uuid% in field %fieldname%'
+            failed_to_create_or_reuse_digital_asset: 'Failed to reuse digital asset in field %fieldname%: file not found by specified UUID (%file_uuid%). Failed to create new digital asset: there is no file specified for uploading'
+
+        feature:
+            label: Digital Assets
+            description: Enables creating and managing all digital files uploaded to the DA database from one central location.
+
+    attachment.file.digital_asset.label: Digital Asset

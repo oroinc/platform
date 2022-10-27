@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var UPSInvalidateCacheComponent;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    UPSInvalidateCacheComponent = BaseComponent.extend({
+    const UPSInvalidateCacheComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -19,14 +18,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function UPSInvalidateCacheComponent() {
-            UPSInvalidateCacheComponent.__super__.constructor.apply(this, arguments);
+        constructor: function UPSInvalidateCacheComponent(options) {
+            UPSInvalidateCacheComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -38,16 +37,16 @@ define(function(require) {
             this.removeInvalidationButton = $(this.options.removeInvalidationButton);
             this.form = $(this.$elem).find(this.options.form);
 
-            $(this.removeInvalidationButton).on('click', _.bind(this.onRemoveInvalidationClick, this));
-            $(this.invalidateType).on('change', _.bind(this.onSelectChange, this));
+            $(this.removeInvalidationButton).on('click', this.onRemoveInvalidationClick.bind(this));
+            $(this.invalidateType).on('change', this.onSelectChange.bind(this));
             $(this.invalidateType).trigger('change');
 
-            $(this.invalidateAt).on('change', _.bind(this.toggleRemoveInvalidationVisibility, this));
+            $(this.invalidateAt).on('change', this.toggleRemoveInvalidationVisibility.bind(this));
             $(this.invalidateAt).trigger('change');
         },
 
         toggleRemoveInvalidationVisibility: function() {
-            var value = $(this.invalidateAt).val();
+            const value = $(this.invalidateAt).val();
             if (value === '') {
                 $(this.removeInvalidationButton).hide();
             } else {
@@ -62,7 +61,7 @@ define(function(require) {
         },
 
         onSelectChange: function() {
-            var value = $(this.invalidateType).val();
+            const value = $(this.invalidateType).val();
             if (value === 'immediate') {
                 $(this.invalidateNow).val(1);
                 $(this.$elem).find('tr>td:gt(1)').hide();

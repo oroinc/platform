@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var StepModel;
-    var _ = require('underscore');
-    var TransitionCollection = require('./transition-collection');
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const _ = require('underscore');
+    const TransitionCollection = require('./transition-collection');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    StepModel = BaseModel.extend({
+    const StepModel = BaseModel.extend({
         defaults: {
             name: null,
             label: null,
@@ -20,10 +19,10 @@ define(function(require) {
 
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function StepModel() {
-            StepModel.__super__.constructor.apply(this, arguments);
+        constructor: function StepModel(attrs, options) {
+            StepModel.__super__.constructor.call(this, attrs, options);
         },
 
         initialize: function() {
@@ -46,7 +45,7 @@ define(function(require) {
             // Initialize allowedTransitions as Backbone.Collection instance.
             // allowed_transitions transition attribute should contain only names
             if (this.allowedTransitions === null) {
-                var allowedTransitionsAttr = this.get('allowed_transitions');
+                const allowedTransitionsAttr = this.get('allowed_transitions');
 
                 this.allowedTransitions = new TransitionCollection();
                 if (_.isArray(allowedTransitionsAttr)) {
@@ -59,24 +58,24 @@ define(function(require) {
                     );
                 }
 
-                var onTransitionAdd = _.bind(function(transition) {
-                    var transitionName = transition.get('name');
+                const onTransitionAdd = transition => {
+                    const transitionName = transition.get('name');
                     if (_.indexOf(allowedTransitionsAttr, transitionName) === -1) {
                         this.get('allowed_transitions').push(transitionName);
                     }
-                }, this);
+                };
 
                 this.listenTo(this.allowedTransitions, 'add', onTransitionAdd);
 
-                this.listenTo(this.allowedTransitions, 'reset', _.bind(function(transitions) {
+                this.listenTo(this.allowedTransitions, 'reset', transitions => {
                     this.set('allowed_transitions', []);
                     _.each(transitions.models, onTransitionAdd);
-                }, this));
+                });
 
-                this.listenTo(this.allowedTransitions, 'remove', _.bind(function(transition) {
-                    var transitionName = transition.get('name');
+                this.listenTo(this.allowedTransitions, 'remove', transition => {
+                    const transitionName = transition.get('name');
                     this.set('allowed_transitions', _.without(this.get('allowed_transitions'), transitionName));
-                }, this));
+                });
             }
 
             return this.allowedTransitions;
@@ -85,9 +84,9 @@ define(function(require) {
         destroy: function(options) {
             if (this.workflow) {
                 // Need to manually destroy collection elements to trigger all appropriate events
-                var removeTransitions = function(models) {
+                const removeTransitions = function(models) {
                     if (models.length) {
-                        for (var i = models.length - 1; i > -1; i--) {
+                        for (let i = models.length - 1; i > -1; i--) {
                             models[i].destroy();
                         }
                     }

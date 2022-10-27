@@ -1,78 +1,47 @@
 <?php
 
-namespace Oro\Bundle\ReminderBundle\Tests\Unit;
+namespace Oro\Bundle\ReminderBundle\Tests\Unit\Command;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ReminderBundle\Command\SendRemindersCommand;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
+use Oro\Bundle\ReminderBundle\Model\ReminderSender;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrine;
+    /** @var ReminderRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityManager;
+    /** @var ReminderSender|\PHPUnit\Framework\MockObject\MockObject */
+    private $sender;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $repository;
+    /** @var SendRemindersCommand */
+    private $command;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $sender;
-
-    /**
-     * @var SendRemindersCommand
-     */
-    protected $command;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container     = $this->createMock('Symfony\\Component\\DependencyInjection\\ContainerInterface');
-        $this->doctrine      = $this->createMock('Doctrine\\Common\\Persistence\\ManagerRegistry');
-        $this->entityManager = $this->getMockBuilder('Doctrine\\ORM\\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->repository    = $this->getMockBuilder(
-            'Oro\\Bundle\\ReminderBundle\\Entity\\Repository\\ReminderRepository'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->sender        = $this->getMockBuilder('Oro\\Bundle\\ReminderBundle\\Model\\ReminderSender')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->repository = $this->createMock(ReminderRepository::class);
+        $this->sender = $this->createMock(ReminderSender::class);
 
-        $this->container->expects($this->any())->method('get')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array('doctrine', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->doctrine),
-                        array('oro_reminder.sender', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->sender),
-                    )
-                )
-            );
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
 
-        $this->doctrine->expects($this->any())->method('getManager')
-            ->will($this->returnValue($this->entityManager));
+        $doctrine->expects($this->any())
+            ->method('getRepository')
+            ->with(Reminder::class)
+            ->willReturn($this->repository);
 
-        $this->doctrine->expects($this->any())->method('getRepository')
-            ->with('OroReminderBundle:Reminder')
-            ->will($this->returnValue($this->repository));
-
-        $this->command = new SendRemindersCommand();
-        $this->command->setContainer($this->container);
+        $this->command = new SendRemindersCommand($doctrine, $this->sender);
     }
 
     public function testGetDefaultDefinition()
@@ -82,128 +51,169 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecute()
     {
-        $input  = $this->createMock('Symfony\\Component\\Console\\Input\\InputInterface');
-        $output = $this->createMock('Symfony\\Component\\Console\\Output\\OutputInterface');
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
 
-        $reminders = array($this->createReminder(), $this->createReminder(), $this->createReminder());
+        $reminders = [
+            $this->createMock(Reminder::class),
+            $this->createMock(Reminder::class),
+            $this->createMock(Reminder::class)
+        ];
 
         $this->repository->expects($this->once())
             ->method('findRemindersToSend')
-            ->will($this->returnValue($reminders));
+            ->willReturn($reminders);
 
-        $output->expects($this->at(0))->method('writeln')->with('<comment>Reminders to send:</comment> 3');
+        $calls = [];
 
-        $this->entityManager->expects($this->at(0))->method('beginTransaction');
-
-        $this->sender
-            ->expects($this->at(0))
+        $this->sender->expects($this->exactly(3))
             ->method('push')
-            ->with($reminders[0]);
+            ->withConsecutive(
+                [$this->identicalTo($reminders[0])],
+                [$this->identicalTo($reminders[1])],
+                [$this->identicalTo($reminders[2])]
+            )
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'push';
+            });
 
-        $this->sender
-            ->expects($this->at(1))
-            ->method('push')
-            ->with($reminders[1]);
-
-        $this->sender
-            ->expects($this->at(2))
-            ->method('push')
-            ->with($reminders[1]);
-
-        $this->sender
-            ->expects($this->at(3))
+        $this->sender->expects($this->once())
             ->method('send')
-            ->with();
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'send';
+            });
 
-        $reminders[0]
-            ->expects($this->exactly(2))
+        $reminders[0]->expects($this->exactly(2))
             ->method('getState')
-            ->will($this->returnValue(Reminder::STATE_SENT));
+            ->willReturn(Reminder::STATE_SENT);
 
-        $reminders[1]
-            ->expects($this->exactly(2))
+        $reminders[1]->expects($this->exactly(2))
             ->method('getState')
-            ->will($this->returnValue(Reminder::STATE_NOT_SENT));
+            ->willReturn(Reminder::STATE_NOT_SENT);
 
-        $reminders[2]
-            ->expects($this->exactly(2))
+        $reminders[2]->expects($this->exactly(2))
             ->method('getState')
-            ->will($this->returnValue(Reminder::STATE_FAIL));
+            ->willReturn(Reminder::STATE_FAIL);
 
         $failId = 100;
-        $reminders[2]
-            ->expects($this->once())
+        $reminders[2]->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue($failId));
+            ->willReturn($failId);
 
-        $failException = array('class' => 'ExceptionClass', 'message' => 'Exception message');
-        $reminders[2]
-            ->expects($this->once())
+        $failException = ['class' => 'ExceptionClass', 'message' => 'Exception message'];
+        $reminders[2]->expects($this->once())
             ->method('getFailureException')
-            ->will($this->returnValue($failException));
+            ->willReturn($failException);
 
-        $output->expects($this->at(1))
+        $output->expects($this->exactly(4))
             ->method('writeln')
-            ->with("<error>Failed to send reminder with id=$failId</error>");
+            ->withConsecutive(
+                ['<comment>Reminders to send:</comment> 3'],
+                ["<error>Failed to send reminder with id=$failId</error>"],
+                ["<info>{$failException['class']}</info>: {$failException['message']}"],
+                ["<info>Reminders sent:</info> 1"]
+            );
 
-        $output->expects($this->at(2))
-            ->method('writeln')
-            ->with("<info>{$failException['class']}</info>: {$failException['message']}");
-
-        $output->expects($this->at(3))->method('writeln')->with("<info>Reminders sent:</info> 1");
-
-        $this->entityManager->expects($this->at(1))->method('flush');
-        $this->entityManager->expects($this->at(2))->method('commit');
+        $this->entityManager->expects($this->once())
+            ->method('beginTransaction')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'beginTransaction';
+            });
+        $this->entityManager->expects($this->once())
+            ->method('flush')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'flushData';
+            });
+        $this->entityManager->expects($this->once())
+            ->method('commit')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'commitTransaction';
+            });
 
         $this->command->execute($input, $output);
+
+        self::assertEquals(
+            [
+                'beginTransaction',
+                'push',
+                'push',
+                'push',
+                'send',
+                'flushData',
+                'commitTransaction'
+            ],
+            $calls
+        );
     }
 
     public function testExecuteNoRemindersToSend()
     {
-        $input  = $this->createMock('Symfony\\Component\\Console\\Input\\InputInterface');
-        $output = $this->createMock('Symfony\\Component\\Console\\Output\\OutputInterface');
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
 
         $this->repository->expects($this->once())
             ->method('findRemindersToSend')
-            ->will($this->returnValue(array()));
+            ->willReturn([]);
 
-        $output->expects($this->at(0))->method('writeln')->with('<info>No reminders to sent</info>');
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with('<info>No reminders to sent</info>');
 
         $this->command->execute($input, $output);
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage Test Exception
-     */
-    public function testExecuteRollbackTransation()
+    public function testExecuteRollbackTransaction()
     {
-        $input  = $this->createMock('Symfony\\Component\\Console\\Input\\InputInterface');
-        $output = $this->createMock('Symfony\\Component\\Console\\Output\\OutputInterface');
+        $input = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
 
-        $reminder = $this->createReminder();
+        $reminder = $this->createMock(Reminder::class);
 
         $this->repository->expects($this->once())
             ->method('findRemindersToSend')
-            ->will($this->returnValue(array($reminder)));
+            ->willReturn([$reminder]);
 
-        $output->expects($this->at(0))->method('writeln')->with('<comment>Reminders to send:</comment> 1');
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with('<comment>Reminders to send:</comment> 1');
 
-        $this->entityManager->expects($this->at(0))->method('beginTransaction');
+        $calls = [];
 
-        $this->sender->expects($this->at(0))->method('push')
-            ->with($reminder);
+        $this->sender->expects($this->once())
+            ->method('push')
+            ->with($reminder)
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'push';
+            });
+        $this->sender->expects($this->once())
+            ->method('send')
+            ->willThrowException(new \Exception('Test Exception'));
 
-        $this->sender->expects($this->at(1))->method('send')
-            ->will($this->throwException(new \Exception('Test Exception')));
+        $this->entityManager->expects($this->once())
+            ->method('beginTransaction')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'beginTransaction';
+            });
+        $this->entityManager->expects($this->once())
+            ->method('rollback')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'rollbackTransaction';
+            });
 
-        $this->entityManager->expects($this->at(1))->method('rollback');
+        try {
+            $this->command->execute($input, $output);
+            $this->fail('Expected exception');
+        } catch (\Exception $e) {
+            $this->assertEquals('Test Exception', $e->getMessage());
+        }
 
-        $this->command->execute($input, $output);
-    }
-
-    protected function createReminder()
-    {
-        return $this->createMock('Oro\\Bundle\\ReminderBundle\\Entity\\Reminder');
+        self::assertEquals(
+            [
+                'beginTransaction',
+                'push',
+                'rollbackTransaction'
+            ],
+            $calls
+        );
     }
 }

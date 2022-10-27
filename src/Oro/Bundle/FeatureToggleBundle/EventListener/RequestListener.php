@@ -4,31 +4,25 @@ namespace Oro\Bundle\FeatureToggleBundle\EventListener;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Throws Symfony\Component\HttpKernel\Exception\NotFoundHttpException if the resource related to this route is disabled
+ */
 class RequestListener
 {
-    /**
-     * @var FeatureChecker
-     */
-    protected $featureChecker;
+    protected FeatureChecker $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
-    public function onRequest(GetResponseEvent $event)
+    public function onRequest(RequestEvent $event): void
     {
         $route = $event->getRequest()->get('_route');
-        if (!$this->featureChecker->isResourceEnabled($route, 'routes')) {
+        if (null !== $route && !$this->featureChecker->isResourceEnabled($route, 'routes')) {
             if ($event->isMasterRequest()) {
                 throw new NotFoundHttpException();
             }

@@ -9,6 +9,11 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * A generic configuration DTO.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigObject implements \ArrayAccess, \IteratorAggregate
 {
     const NAME_KEY = 'name';
@@ -39,7 +44,6 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
 
     /**
      * Creates object from array, add name as regular param option
-     *
      *
      * @param string $name
      * @param array  $params
@@ -110,7 +114,7 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     /**
      * {@inheritDoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->params);
     }
@@ -118,7 +122,7 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     /**
      * {@inheritDoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->params[$offset]);
     }
@@ -126,7 +130,7 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     /**
      * {@inheritDoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->params[$offset];
     }
@@ -185,11 +189,9 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     /**
      * {@inheritDoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->params[$offset] = $value;
-
-        return $this;
     }
 
     /**
@@ -210,11 +212,9 @@ class ConfigObject implements \ArrayAccess, \IteratorAggregate
     /**
      * {@inheritDoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->params[$offset]);
-
-        return $this;
     }
 
     /**

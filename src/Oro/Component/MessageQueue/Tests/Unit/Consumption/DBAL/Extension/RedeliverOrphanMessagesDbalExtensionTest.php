@@ -1,76 +1,80 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Tests\Unit\Consumption\DBAL\Extension;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
-use Oro\Component\MessageQueue\Transport\Null\NullSession;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalSessionInterface;
 use Psr\Log\LoggerInterface;
 
 class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithoutAnyArgument()
+    private DbalPidFileManager|\PHPUnit\Framework\MockObject\MockObject $pidFileManager;
+
+    private DbalCliProcessManager|\PHPUnit\Framework\MockObject\MockObject $cliProcessManager;
+
+    private Connection|\PHPUnit\Framework\MockObject\MockObject $dbalConnection;
+
+    private DbalSessionInterface|\PHPUnit\Framework\MockObject\MockObject $session;
+
+    protected function setUp(): void
     {
+        $this->pidFileManager = $this->createMock(DbalPidFileManager::class);
+        $this->cliProcessManager = $this->createMock(DbalCliProcessManager::class);
+
+        $this->dbalConnection = $this->createMock(Connection::class);
+
+        $connection = $this->createMock(DbalConnection::class);
+        $connection->expects(self::any())
+            ->method('getDBALConnection')
+            ->willReturn($this->dbalConnection);
+
+        $this->session = $this->createMock(DbalSessionInterface::class);
+        $this->session->expects(self::any())
+            ->method('getConnection')
+            ->willReturn($connection);
+    }
+
+
+    public function testCouldBeConstructedWithoutAnyArgument(): void
+    {
+        $this->expectNotToPerformAssertions();
+
         new RedeliverOrphanMessagesDbalExtension(
-            $this->createDbalPidFileManagerMock(),
-            $this->createDbalCliProcessManagerMock(),
+            $this->createMock(DbalPidFileManager::class),
+            $this->createMock(DbalCliProcessManager::class),
             ':console'
         );
     }
 
-    public function testOnBeforeReceiveShouldThrowIfSessionIsNotDbal()
+    public function testShouldCreatePidFileOnlyOnce(): void
     {
-        $session = $this->createNullSessionMock();
-        $context = new Context($session);
-
-        $extension = new RedeliverOrphanMessagesDbalExtension(
-            $this->createDbalPidFileManagerMock(),
-            $this->createDbalCliProcessManagerMock(),
-            ':console'
-        );
-
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Unexpected instance of session. expected:'.
-            '"Oro\Component\MessageQueue\Transport\Dbal\DbalSession", actual:"Mock_NullSession_');
-
-        $extension->onBeforeReceive($context);
-    }
-
-    public function testShouldCreatePidFileOnlyOnce()
-    {
-        $consumer = $this->createDbalMessageConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $consumer = $this->createMock(DbalMessageConsumer::class);
+        $consumer->expects(self::once())
             ->method('getConsumerId')
-            ->will($this->returnValue('consumer-id'))
-        ;
+            ->willReturn('consumer-id');
 
-        $session = $this->createSessionMock();
+        $session = $this->createMock(DbalSessionInterface::class);
 
-        $pidFileManager = $this->createDbalPidFileManagerMock();
-        $pidFileManager
-            ->expects($this->once())
+        $this->pidFileManager->expects(self::once())
             ->method('createPidFile')
-            ->with('consumer-id')
-        ;
-        $pidFileManager
-            ->expects($this->once())
+            ->with('consumer-id');
+        $this->pidFileManager->expects(self::once())
             ->method('getListOfPidsFileInfo')
-            ->will($this->returnValue([]))
-        ;
+            ->willReturn([]);
 
         $context = new Context($session);
         $context->setMessageConsumer($consumer);
 
         $extension = new RedeliverOrphanMessagesDbalExtension(
-            $pidFileManager,
-            $this->createDbalCliProcessManagerMock(),
+            $this->pidFileManager,
+            $this->createMock(DbalCliProcessManager::class),
             ':console'
         );
 
@@ -78,81 +82,49 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
         $extension->onBeforeReceive($context);
     }
 
-    public function testShouldRedeliverOrphanMessages()
+    public function testShouldRedeliverOrphanMessages(): void
     {
-        $dbalConnection = $this->createDBALConnection();
-        $dbalConnection
-            ->expects($this->once())
-            ->method('executeUpdate')
+        $this->dbalConnection->expects(self::once())
+            ->method('executeStatement')
             ->with(
-                'UPDATE  SET consumer_id=NULL, redelivered=:isRedelivered '.
+                'UPDATE  SET consumer_id=NULL, redelivered=:isRedelivered ' .
                 'WHERE consumer_id IN (:consumerIds)',
                 [
                     'isRedelivered' => true,
                     'consumerIds' => ['consumer-id-1', 'consumer-id-2'],
                 ],
                 [
-                    'isRedelivered' => Type::BOOLEAN,
+                    'isRedelivered' => Types::BOOLEAN,
                     'consumerIds' => Connection::PARAM_STR_ARRAY,
                 ]
-            )
-        ;
+            );
 
-        $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
-            ->method('getDBALConnection')
-            ->will($this->returnValue($dbalConnection))
-        ;
-
-        $session = $this->createSessionMock();
-        $session
-            ->expects($this->once())
-            ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
-
-        $pidFileManager = $this->createDbalPidFileManagerMock();
-        $pidFileManager
-            ->expects($this->once())
+        $this->pidFileManager->expects(self::once())
             ->method('getListOfPidsFileInfo')
-            ->will($this->returnValue([
+            ->willReturn([
                 ['pid' => 123, 'consumerId' => 'consumer-id-1'],
                 ['pid' => 456, 'consumerId' => 'consumer-id-2'],
-            ]))
-        ;
-        $pidFileManager
-            ->expects($this->at(2))
+            ]);
+        $this->pidFileManager->expects(self::exactly(2))
             ->method('removePidFile')
-            ->with('consumer-id-1')
-        ;
-        $pidFileManager
-            ->expects($this->at(3))
-            ->method('removePidFile')
-            ->with('consumer-id-2')
-        ;
+            ->withConsecutive(['consumer-id-1'], ['consumer-id-2']);
 
-        $cliProcessManager = $this->createDbalCliProcessManagerMock();
-        $cliProcessManager
-            ->expects($this->once())
+        $this->cliProcessManager->expects(self::once())
             ->method('getListOfProcessesPids')
-            ->will($this->returnValue([]))
-        ;
+            ->willReturn([]);
 
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
             ->method('critical')
-            ->with('Orphans were found and redelivered. consumerIds: "consumer-id-1, consumer-id-2"')
-        ;
+            ->with('Orphans were found and redelivered. consumerIds: "consumer-id-1, consumer-id-2"');
 
-        $context = new Context($session);
-        $context->setMessageConsumer($this->createDbalMessageConsumerMock());
+        $context = new Context($this->session);
+        $context->setMessageConsumer($this->createMock(DbalMessageConsumer::class));
         $context->setLogger($logger);
 
         $extension = new RedeliverOrphanMessagesDbalExtension(
-            $pidFileManager,
-            $cliProcessManager,
+            $this->pidFileManager,
+            $this->cliProcessManager,
             ':console'
         );
 
@@ -160,115 +132,54 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
         $extension->onBeforeReceive($context);
     }
 
-    public function testOnInterruptedShouldThrowIfSessionIsNotDbal()
+    public function testShouldNotCheckForRunningProcessesIfNoPidsFileInfo(): void
     {
-        $session = $this->createNullSessionMock();
-        $context = new Context($session);
+        $this->dbalConnection->expects(self::never())
+            ->method('executeStatement');
+
+        $this->pidFileManager->expects(self::once())
+            ->method('getListOfPidsFileInfo')
+            ->willReturn([]);
+
+        $this->cliProcessManager->expects(self::never())
+            ->method('getListOfProcessesPids')
+            ->willReturn([]);
+
+        $context = new Context($this->session);
+        $context->setMessageConsumer($this->createMock(DbalMessageConsumer::class));
 
         $extension = new RedeliverOrphanMessagesDbalExtension(
-            $this->createDbalPidFileManagerMock(),
-            $this->createDbalCliProcessManagerMock(),
+            $this->pidFileManager,
+            $this->cliProcessManager,
             ':console'
         );
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Unexpected instance of session. expected:'.
-            '"Oro\Component\MessageQueue\Transport\Dbal\DbalSession", actual:"Mock_NullSession_');
-
-        $extension->onInterrupted($context);
+        $extension->onBeforeReceive($context);
+        $extension->onBeforeReceive($context);
     }
 
-    public function testOnInterruptedShouldRemovePidFile()
+    public function testOnInterruptedShouldRemovePidFile(): void
     {
-        $consumer = $this->createDbalMessageConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $consumer = $this->createMock(DbalMessageConsumer::class);
+        $consumer->expects(self::once())
             ->method('getConsumerId')
-            ->will($this->returnValue('consumer-id'))
-        ;
+            ->willReturn('consumer-id');
 
-        $session = $this->createSessionMock();
+        $session = $this->createMock(DbalSessionInterface::class);
 
         $context = new Context($session);
         $context->setMessageConsumer($consumer);
 
-        $pidFileManager = $this->createDbalPidFileManagerMock();
-        $pidFileManager
-            ->expects($this->once())
+        $this->pidFileManager->expects(self::once())
             ->method('removePidFile')
-            ->with('consumer-id')
-        ;
+            ->with('consumer-id');
 
         $extension = new RedeliverOrphanMessagesDbalExtension(
-            $pidFileManager,
-            $this->createDbalCliProcessManagerMock(),
+            $this->pidFileManager,
+            $this->createMock(DbalCliProcessManager::class),
             ':console'
         );
 
         $extension->onInterrupted($context);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalSession
-     */
-    private function createNullSessionMock()
-    {
-        return $this->createMock(NullSession::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalSession
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(DbalSession::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalConnection
-     */
-    private function createConnectionMock()
-    {
-        return $this->createMock(DbalConnection::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
-     */
-    private function createDBALConnection()
-    {
-        return $this->createMock(Connection::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalMessageConsumer
-     */
-    private function createDbalMessageConsumerMock()
-    {
-        return $this->createMock(DbalMessageConsumer::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalPidFileManager
-     */
-    private function createDbalPidFileManagerMock()
-    {
-        return $this->createMock(DbalPidFileManager::class, [], [], '', false);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DbalCliProcessManager
-     */
-    private function createDbalCliProcessManagerMock()
-    {
-        return $this->createMock(DbalCliProcessManager::class, [], [], '', false);
     }
 }

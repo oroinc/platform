@@ -7,8 +7,8 @@ namespace Oro\Component\ChainProcessor;
  */
 class ParameterBag extends AbstractParameterBag
 {
-    /** @var array */
-    protected $items = [];
+    /** @var array [key => value, ...] */
+    private $items = [];
 
     /**
      * {@inheritdoc}
@@ -56,5 +56,13 @@ class ParameterBag extends AbstractParameterBag
     public function clear()
     {
         $this->items = [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function count(): int
+    {
+        return \count($this->items);
     }
 }

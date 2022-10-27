@@ -3,21 +3,24 @@
 namespace Oro\Bundle\FormBundle\Controller;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
+use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Autocomplete\Security;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
+ * Autocomplete search controller.
+ *
  * @Route("/autocomplete")
  */
-class AutocompleteController extends Controller
+class AutocompleteController extends AbstractController
 {
     /**
      * @param Request $request
@@ -26,12 +29,11 @@ class AutocompleteController extends Controller
      * @throws HttpException|AccessDeniedHttpException
      *
      * @Route("/search", name="oro_form_autocomplete_search")
-     * AclAncestor("oro_search")
      */
     public function searchAction(Request $request)
     {
         $autocompleteRequest = new AutocompleteRequest($request);
-        $validator           = $this->get('validator');
+        $validator           = $this->get(ValidatorInterface::class);
         $isXmlHttpRequest    = $request->isXmlHttpRequest();
         $code                = 200;
         $result              = [
@@ -47,7 +49,7 @@ class AutocompleteController extends Controller
             }
         }
 
-        if (!$this->get('oro_form.autocomplete.security')->isAutocompleteGranted($autocompleteRequest->getName())) {
+        if (!$this->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
             $result['errors'][] = 'Access denied.';
         }
 
@@ -61,7 +63,7 @@ class AutocompleteController extends Controller
 
         /** @var SearchHandlerInterface $searchHandler */
         $searchHandler = $this
-            ->get('oro_form.autocomplete.search_registry')
+            ->get(SearchRegistry::class)
             ->getSearchHandler($autocompleteRequest->getName());
 
         return new JsonResponse(
@@ -71,6 +73,21 @@ class AutocompleteController extends Controller
                 $autocompleteRequest->getPerPage(),
                 $autocompleteRequest->isSearchById()
             )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                ValidatorInterface::class,
+                Security::class,
+                SearchRegistry::class,
+            ]
         );
     }
 }

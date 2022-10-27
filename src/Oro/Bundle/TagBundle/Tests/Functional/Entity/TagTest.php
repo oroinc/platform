@@ -10,15 +10,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class TagTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->initClient([], static::generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->loadFixtures([LoadTagsData::class]);
     }
 
     public function testAddTaggingNotFetchAllTaggingCollection()
     {
-        $entityManager = static::getContainer()->get('doctrine')->getEntityManagerForClass(TestActivity::class);
+        $entityManager = self::getContainer()->get('doctrine')->getManagerForClass(TestActivity::class);
 
         $entityManager->getUnitOfWork()->clear();
         $this->assertEmpty($entityManager->getUnitOfWork()->getIdentityMap());

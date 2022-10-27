@@ -4,37 +4,45 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model;
 
 use Doctrine\DBAL\Schema\Schema;
 
+/**
+ * Implementation of Statistic model.
+ */
 class FeatureStatistic implements StatisticModelInterface
 {
-    /**
-     * @var mixed
-     */
-    protected $id;
+    /** @var int */
+    private $id;
+
+    /** @var string */
+    private $path;
+
+    /** @var integer */
+    private $time;
+
+    /** @var string */
+    private $gitBranch;
+
+    /** @var string */
+    private $gitTarget;
+
+    /** @var integer */
+    private $buildId;
+
+    /** @var string */
+    private $stageName;
+
+    /** @var string */
+    private $jobName;
+
+    /** @var \DateTime */
+    private $createdAt;
 
     /**
-     * @var string
+     * @return int
      */
-    protected $path;
-
-    /**
-     * @var integer
-     */
-    protected $time;
-
-    /**
-     * @var string
-     */
-    protected $gitBranch;
-
-    /**
-     * @var string
-     */
-    protected $gitTarget;
-
-    /**
-     * @var string
-     */
-    protected $buildId;
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * @param string $path relative path to the feature file
@@ -48,10 +56,18 @@ class FeatureStatistic implements StatisticModelInterface
     }
 
     /**
-     * @param mixed $time
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
+
+    /**
+     * @param int $time
      * @return $this
      */
-    public function setTime($time)
+    public function setDuration($time)
     {
         $this->time = $time;
 
@@ -59,7 +75,15 @@ class FeatureStatistic implements StatisticModelInterface
     }
 
     /**
-     * @param mixed $gitBranch
+     * {@inheritdoc}
+     */
+    public function getDuration()
+    {
+        return $this->time;
+    }
+
+    /**
+     * @param string $gitBranch
      * @return $this
      */
     public function setGitBranch($gitBranch)
@@ -70,7 +94,7 @@ class FeatureStatistic implements StatisticModelInterface
     }
 
     /**
-     * @param mixed $gitTarget
+     * @param string $gitTarget
      * @return $this
      */
     public function setGitTarget($gitTarget)
@@ -81,7 +105,7 @@ class FeatureStatistic implements StatisticModelInterface
     }
 
     /**
-     * @param mixed $buildId
+     * @param int $buildId
      * @return $this
      */
     public function setBuildId($buildId)
@@ -92,16 +116,62 @@ class FeatureStatistic implements StatisticModelInterface
     }
 
     /**
+     * @param int $stageName
+     * @return $this
+     */
+    public function setStageName($stageName)
+    {
+        $this->stageName = $stageName;
+
+        return $this;
+    }
+
+    /**
+     * @param int $jobName
+     * @return $this
+     */
+    public function setJobName($jobName)
+    {
+        $this->jobName = $jobName;
+
+        return $this;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     * @return FeatureStatistic
+     */
+    public function setCreatedAt(\DateTime $createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function toArray()
     {
+        $createdAt = $this->createdAt ?: new \DateTime('now', new \DateTimeZone('UTC'));
+
         return [
             'path' => $this->path,
             'time' => $this->time,
             'git_branch' => $this->gitBranch,
             'git_target' => $this->gitTarget,
             'build_id' => $this->buildId,
+            'stage_name' => $this->stageName,
+            'job_name' => $this->jobName,
+            'created_at' => $createdAt->format('Y-m-d H:i:s'),
         ];
     }
 
@@ -111,12 +181,15 @@ class FeatureStatistic implements StatisticModelInterface
     public static function fromArray(array $data)
     {
         $model = new self();
-        $model->id        = isset($data['id'])         ? $data['id']         : null;
-        $model->path      = isset($data['path'])       ? $data['path']       : null;
-        $model->time      = isset($data['time'])       ? $data['time']       : null;
-        $model->gitBranch = isset($data['git_branch']) ? $data['git_branch'] : null;
-        $model->gitTarget = isset($data['git_target']) ? $data['git_target'] : null;
-        $model->buildId   = isset($data['build_id'])   ? $data['build_id']   : null;
+        $model->id = $data['id'] ?? null;
+        $model->path = $data['path'] ?? null;
+        $model->time = $data['time'] ?? null;
+        $model->gitBranch = $data['git_branch'] ?? null;
+        $model->gitTarget = $data['git_target'] ?? null;
+        $model->buildId = $data['build_id'] ?? null;
+        $model->stageName = $data['stage_name'] ?? null;
+        $model->jobName = $data['job_name'] ?? null;
+        $model->createdAt = $data['created_at'] ? new \DateTime($data['created_at'], new \DateTimeZone('UTC')) : null;
 
         return $model;
     }
@@ -132,39 +205,29 @@ class FeatureStatistic implements StatisticModelInterface
     /**
      * {@inheritdoc}
      */
-    public function getDuration()
-    {
-        return $this->time;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getId()
-    {
-        return $this->path;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public static function declareSchema(Schema $schema)
     {
         $table = $schema->createTable(self::getName());
-        $id = $table->addColumn("id", "integer", ["unsigned" => true]);
+
+        $id = $table->addColumn('id', 'integer', ['unsigned' => true]);
         $id->setAutoincrement(true);
 
-        $table->addColumn("path", "string");
-        $table->addColumn("time", "integer");
+        $table->addColumn('path', 'string');
+        $table->addColumn('time', 'integer');
         $table->addColumn('git_branch', 'string', ['notnull' => false]);
         $table->addColumn('git_target', 'string', ['notnull' => false]);
         $table->addColumn('build_id', 'integer', ['notnull' => false]);
+        $table->addColumn('stage_name', 'string', ['notnull' => false]);
+        $table->addColumn('job_name', 'string', ['notnull' => false]);
+        $table->addColumn('created_at', 'datetime', ['notnull' => false, 'default' => 'CURRENT_TIMESTAMP']);
 
-        $table->setPrimaryKey(["id"]);
+        $table->setPrimaryKey(['id']);
         $table->addIndex(['path']);
         $table->addIndex(['git_branch']);
         $table->addIndex(['git_target']);
         $table->addIndex(['build_id']);
+        $table->addIndex(['build_id', 'git_target', 'git_branch']);
+        $table->addIndex(['created_at']);
     }
 
     /**

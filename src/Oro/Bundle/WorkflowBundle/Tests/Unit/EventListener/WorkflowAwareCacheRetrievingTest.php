@@ -2,42 +2,39 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
-    protected $cache;
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var WorkflowAwareCache */
-    protected $workflowAwareCache;
+    private $workflowAwareCache;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->workflowAwareCache = new WorkflowAwareCache($this->cache, $this->doctrineHelper);
     }
 
     /**
-     * @dataProvider theList
-     *
-     * @param boolean $expected
-     * @param string[] $classes
-     * @param object $entity
+     * @dataProvider listDataProvider
      */
-    public function testHasRelatedActiveWorkflowsFetched($expected, array $classes, $entity)
+    public function testHasRelatedActiveWorkflowsFetched(bool $expected, array $classes, object $entity)
     {
         $this->assertCacheFetching(
-            $cacheKey = 'active_workflow_related',
+            'active_workflow_related',
             $entity,
             $classes
         );
@@ -46,16 +43,13 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider theList
-     * @param boolean $expected
-     * @param array $classes
-     * @param object $entity
+     * @dataProvider listDataProvider
      */
-    public function testHasRelatedActiveWorkflowsFetchingAndSave($expected, array $classes, $entity)
+    public function testHasRelatedActiveWorkflowsFetchingAndSave(bool $expected, array $classes, object $entity)
     {
         $this->assertRepositoryFetching(
-            $cacheKey = 'active_workflow_related',
-            $onlyActiveWorkflows = true,
+            'active_workflow_related',
+            true,
             $entity,
             $classes
         );
@@ -64,15 +58,12 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider theList
-     * @param boolean $expected
-     * @param string[] $classes
-     * @param object $entity
+     * @dataProvider listDataProvider
      */
-    public function testHasRelatedWorkflowsFetched($expected, array $classes, $entity)
+    public function testHasRelatedWorkflowsFetched(bool $expected, array $classes, object $entity)
     {
         $this->assertCacheFetching(
-            $cacheKey = 'all_workflow_related',
+            'all_workflow_related',
             $entity,
             $classes
         );
@@ -81,16 +72,13 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider theList
-     * @param boolean $expected
-     * @param array $classes
-     * @param object $entity
+     * @dataProvider listDataProvider
      */
-    public function testHasRelatedWorkflowsFetchingAndSave($expected, array $classes, $entity)
+    public function testHasRelatedWorkflowsFetchingAndSave(bool $expected, array $classes, object $entity)
     {
         $this->assertRepositoryFetching(
-            $cacheKey = 'all_workflow_related',
-            $onlyActiveWorkflows = false,
+            'all_workflow_related',
+            false,
             $entity,
             $classes
         );
@@ -98,44 +86,38 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->workflowAwareCache->hasRelatedWorkflows($entity));
     }
 
-    /**
-     * @return \Generator
-     */
-    public function theList()
+    public function listDataProvider(): array
     {
-        yield 'nope' => [
-            'expected' => false,
-            'classes' => [\DateTime::class => 0, \DateInterval::class => 1],
-            'entity' => new \stdClass()
-        ];
-
-        yield 'no. FQCNs must be keys. Not values.' => [
-            'expected' => false,
-            'classes' => [\stdClass::class, \DateTime::class],
-            'entity' => new \stdClass()
-        ];
-
-        yield 'yes' => [
-            'expected' => true,
-            'classes' => [\stdClass::class => 0, \DateTime::class => 1],
-            'entity' => new \stdClass()
-        ];
-
-        yield 'nope cause empty' => [
-            'expected' => false,
-            'classes' => [],
-            'entity' => new \stdClass()
+        return [
+            'nope' => [
+                'expected' => false,
+                'classes' => [\DateTime::class => 0, \DateInterval::class => 1],
+                'entity' => new \stdClass()
+            ],
+            'no. FQCNs must be keys. Not values.' => [
+                'expected' => false,
+                'classes' => [\stdClass::class, \DateTime::class],
+                'entity' => new \stdClass()
+            ],
+            'yes' => [
+                'expected' => true,
+                'classes' => [\stdClass::class => 0, \DateTime::class => 1],
+                'entity' => new \stdClass()
+            ],
+            'nope cause empty' => [
+                'expected' => false,
+                'classes' => [],
+                'entity' => new \stdClass()
+            ]
         ];
     }
 
-    /**
-     * @param $cacheKey
-     * @param bool $onlyActiveWorkflows
-     * @param object $entity
-     * @param array $classes
-     */
-    protected function assertRepositoryFetching($cacheKey, $onlyActiveWorkflows, $entity, $classes)
-    {
+    private function assertRepositoryFetching(
+        string $cacheKey,
+        bool $onlyActiveWorkflows,
+        object $entity,
+        array $classes
+    ): void {
         $dbResult = array_flip($classes);
 
         $repository = $this->createMock(WorkflowDefinitionRepository::class);
@@ -144,25 +126,32 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
             ->with($onlyActiveWorkflows)
             ->willReturn($dbResult);
 
-        $this->doctrineHelper->expects($this->once())->method('getEntityClass')->willReturn(get_class($entity));
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->willReturn(get_class($entity));
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with(WorkflowDefinition::class)
             ->willReturn($repository);
 
-        $this->cache->expects($this->once())->method('fetch')->with($cacheKey)->willReturn(false);
-        $this->cache->expects($this->once())->method('save')->with($cacheKey, $classes);
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->with($cacheKey)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
     }
 
-    /**
-     * @param string $cacheKey
-     * @param object $entity
-     * @param array $classes
-     */
-    protected function assertCacheFetching($cacheKey, $entity, array $classes)
+    private function assertCacheFetching(string $cacheKey, object $entity, array $classes): void
     {
-        $this->doctrineHelper->expects($this->once())->method('getEntityClass')->willReturn(get_class($entity));
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->willReturn(get_class($entity));
 
-        $this->cache->expects($this->once())->method('fetch')->with($cacheKey)->willReturn($classes);
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->with($cacheKey)
+            ->willReturn($classes);
     }
 }

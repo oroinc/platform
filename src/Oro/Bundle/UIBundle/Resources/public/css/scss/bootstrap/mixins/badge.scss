@@ -1,14 +1,21 @@
 /* @theme: admin.oro; */
 
-@mixin badge-custom-variant($background, $color: color-yiq($background)) {
+@mixin badge-custom-variant($background, $icon-color, $color: color-yiq($background)) {
     color: $color;
     background-color: $background;
 
+    [class^='fa-'],
+    [class*=' fa-'] {
+        color: $icon-color;
+    }
+
     &[href] {
         @include hover-focus {
+            $background-color: darken($background, 10%);
+
             color: $color;
             text-decoration: none;
-            background-color: darken($background, 10%);
+            background-color: $background-color;
         }
     }
 }

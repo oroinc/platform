@@ -1,0 +1,14 @@
+services:
+    oro_integration.transport.rest.client_factory.stub:
+        decorates: oro_integration.transport.rest.client_factory
+        class: 'Oro\Bundle\IntegrationBundle\Test\FakeRestClientFactory'
+        public: true
+
+    oro_integration.connector.test_connector:
+        class: Oro\Bundle\IntegrationBundle\Test\Provider\TestConnector
+        arguments:
+            - '@oro_importexport.context_registry'
+            - '@oro_integration.logger.strategy'
+            - '@oro_integration.provider.connector_context_mediator'
+        tags:
+            - { name: oro_integration.connector, type: connector1, channel_type: foo }

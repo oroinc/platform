@@ -1,28 +1,25 @@
 <?php
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
+use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 
 class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigVirtualRelationProvider */
-    private $configVirtualRelationProvider;
+    private $virtualRelationProvider;
 
-    /** @var array configuration */
-    private $configurationVirtualRelation;
+    /** @var array */
+    private $virtualRelationsConfig;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $entityHierarchyProvider = $this
-            ->createMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
-
-        $hierarchy = ['TestEntity' => ['AbstractEntity']];
-        $entityHierarchyProvider
-            ->expects($this->any())
-            ->method('getHierarchy')
-            ->will($this->returnValue($hierarchy));
-
-        $this->configurationVirtualRelation = [
+        $hierarchy = [
+            'TestEntity1' => ['AbstractEntity']
+        ];
+        $this->virtualRelationsConfig = [
             'AbstractEntity' => [
                 'virtual_relation' => [
                     'relation_type' => 'oneToMany',
@@ -68,35 +65,46 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->configVirtualRelationProvider = new ConfigVirtualRelationProvider(
+        $entityHierarchyProvider = $this->createMock(EntityHierarchyProviderInterface::class);
+        $entityHierarchyProvider->expects($this->any())
+            ->method('getHierarchy')
+            ->willReturn($hierarchy);
+
+        $configProvider = $this->createMock(EntityConfigurationProvider::class);
+        $configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->with(EntityConfiguration::VIRTUAL_RELATIONS)
+            ->willReturn($this->virtualRelationsConfig);
+
+        $this->virtualRelationProvider = new ConfigVirtualRelationProvider(
             $entityHierarchyProvider,
-            $this->configurationVirtualRelation
+            $configProvider
         );
     }
 
     public function testGetVirtualFields()
     {
         $this->assertEquals(
-            $this->configurationVirtualRelation['AbstractEntity'],
-            $this->configVirtualRelationProvider->getVirtualRelations('TestEntity')
+            $this->virtualRelationsConfig['AbstractEntity'],
+            $this->virtualRelationProvider->getVirtualRelations('TestEntity1')
         );
         $this->assertEquals(
             [],
-            $this->configVirtualRelationProvider->getVirtualRelations('EntityWithoutVirtualFields')
+            $this->virtualRelationProvider->getVirtualRelations('EntityWithoutVirtualFields')
         );
     }
 
     public function testIsVirtualField()
     {
-        $this->assertTrue($this->configVirtualRelationProvider->isVirtualRelation('TestEntity', 'virtual_relation'));
-        $this->assertFalse($this->configVirtualRelationProvider->isVirtualRelation('TestEntity', 'non_virtual_field'));
+        $this->assertTrue($this->virtualRelationProvider->isVirtualRelation('TestEntity1', 'virtual_relation'));
+        $this->assertFalse($this->virtualRelationProvider->isVirtualRelation('TestEntity1', 'non_virtual_field'));
     }
 
     public function testGetVirtualFieldQuery()
     {
         $this->assertEquals(
-            $this->configurationVirtualRelation['AbstractEntity']['virtual_relation']['query'],
-            $this->configVirtualRelationProvider->getVirtualRelationQuery('TestEntity', 'virtual_relation')
+            $this->virtualRelationsConfig['AbstractEntity']['virtual_relation']['query'],
+            $this->virtualRelationProvider->getVirtualRelationQuery('TestEntity1', 'virtual_relation')
         );
     }
 
@@ -110,49 +118,46 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetTargetJoinAlias($className, $fieldName, $expected)
     {
         if (is_array($expected)) {
-            list($exception, $message) = $expected;
+            [$exception, $message] = $expected;
             $this->expectException($exception);
             $this->expectExceptionMessage($message);
         }
 
         $this->assertEquals(
             $expected,
-            $this->configVirtualRelationProvider->getTargetJoinAlias($className, $fieldName)
+            $this->virtualRelationProvider->getTargetJoinAlias($className, $fieldName)
         );
     }
 
-    /**
-     * @return array
-     */
-    public function targetJoinAliasProvider()
+    public function targetJoinAliasProvider(): array
     {
         return [
             'not existing' => [
-                'TestEntity',
+                'TestEntity1',
                 'not_existing',
-                ['\InvalidArgumentException', 'Not a virtual relation "TestEntity::not_existing"']
+                [\InvalidArgumentException::class, 'Not a virtual relation "TestEntity1::not_existing"']
             ],
-            'configured option' => ['TestEntity', 'virtual_relation', 'configured_alias'],
+            'configured option' => ['TestEntity1', 'virtual_relation', 'configured_alias'],
             'without query' => [
-                'TestEntity',
+                'TestEntity1',
                 'without_query',
-                ['\InvalidArgumentException', 'Query configuration is empty for "TestEntity::without_query"']
+                [\InvalidArgumentException::class, 'Query configuration is empty for "TestEntity1::without_query"']
             ],
-            'single join' => ['TestEntity', 'single_join', 'alias'],
+            'single join' => ['TestEntity1', 'single_join', 'alias'],
             'single join without alias' => [
-                'TestEntity',
+                'TestEntity1',
                 'single_join_without_alias',
                 [
-                    '\InvalidArgumentException',
-                    'Alias for join is not configured for "TestEntity::single_join_without_alias"'
+                    \InvalidArgumentException::class,
+                    'Alias for join is not configured for "TestEntity1::single_join_without_alias"'
                 ]
             ],
             'multiple joins' => [
-                'TestEntity',
+                'TestEntity1',
                 'multiple_joins',
                 [
-                    '\InvalidArgumentException',
-                    'Please configure "target_join_alias" option for "TestEntity::multiple_joins"'
+                    \InvalidArgumentException::class,
+                    'Please configure "target_join_alias" option for "TestEntity1::multiple_joins"'
                 ]
             ],
         ];

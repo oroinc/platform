@@ -38,8 +38,6 @@ class OroColorTableTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildViewDataProvider
-     * @param array $options
-     * @param array $expectedVars
      */
     public function testBuildView(array $options, array $expectedVars)
     {
@@ -67,7 +65,7 @@ class OroColorTableTypeTest extends FormIntegrationTestCase
         $this->assertEquals('oro_color_table', $formType->getName());
     }
 
-    public function buildViewDataProvider()
+    public function buildViewDataProvider(): array
     {
         return [
             [

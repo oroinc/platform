@@ -3,21 +3,20 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
+use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType;
 
 class SegmentEntityChoiceTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SegmentEntityChoiceType */
-    protected $type;
+    private $type;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityProviderMock;
+    private $entityProviderMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityProviderMock = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityProviderMock = $this->createMock(EntityProvider::class);
 
         $this->type = new SegmentEntityChoiceType($this->entityProviderMock);
     }
@@ -25,6 +24,6 @@ class SegmentEntityChoiceTypeTest extends \PHPUnit\Framework\TestCase
     public function testGetName()
     {
         $this->assertEquals('oro_segment_entity_choice', $this->type->getName());
-        $this->assertTrue($this->type instanceof EntityChoiceType);
+        $this->assertInstanceOf(EntityChoiceType::class, $this->type);
     }
 }

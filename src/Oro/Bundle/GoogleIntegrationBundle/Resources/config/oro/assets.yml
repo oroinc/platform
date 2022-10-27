@@ -1,0 +1,7 @@
+css:
+    inputs:
+        # Variables
+        - 'bundles/orogoogleintegration/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/orogoogleintegration/css/scss/main.scss'

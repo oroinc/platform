@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var CommentItemView;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('text!../../../templates/comment/comment-item-view.html');
-    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('text-loader!orocomment/templates/comment/comment-item-view.html');
+    const dateTimeFormatter = require('orolocale/js/formatter/datetime');
 
-    CommentItemView = BaseView.extend({
+    const CommentItemView = BaseView.extend({
         template: template,
         tagName: 'li',
         className: 'comment-item',
@@ -21,23 +20,23 @@ define(function(require) {
             'click .item-edit-button': 'onEditCommentClick',
 
             // open/close dropdown on hover
-            'mouseover .dropdown-toggle:not(.file-menu)': function(e) {
-                $(e.target).trigger('click');
+            'mouseenter .more-bar-holder [data-toggle="dropdown"]': function(e) {
+                $(e.currentTarget).trigger('click');
             },
-            'mouseleave .dropdown-menu:not(.file-menu)': function(e) {
-                $(e.target).parent().find('a.dropdown-toggle').trigger('click');
+            'mouseleave .more-bar-holder': function(e) {
+                $(e.currentTarget).find('[data-toggle="dropdown"]').trigger('tohide.bs.dropdown');
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function CommentItemView() {
-            CommentItemView.__super__.constructor.apply(this, arguments);
+        constructor: function CommentItemView(options) {
+            CommentItemView.__super__.constructor.call(this, options);
         },
 
         getTemplateData: function() {
-            var data = CommentItemView.__super__.getTemplateData.apply(this, arguments);
+            const data = CommentItemView.__super__.getTemplateData.call(this);
             if (data.createdAt) {
                 data.createdTime = dateTimeFormatter.formatDateTime(data.createdAt);
             }

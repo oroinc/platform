@@ -1,0 +1,45 @@
+services:
+    oro_attachment.tests.migration_listener:
+        class: Oro\Bundle\AttachmentBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -10 }
+
+    oro_attachment.tests.api.skipped_entity_provider:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\SkippedEntityProvider
+        decorates: oro_api.tests.skipped_entity_provider
+        arguments:
+            - '@.inner'
+        calls:
+            - [ addSkippedEntity, [ 'Oro\Bundle\AttachmentBundle\Entity\File', [ 'create' ] ] ]
+
+    oro_attachment.tests.media_cache_manager_registry:
+        alias: oro_attachment.media_cache_manager_registry
+        public: true
+
+    oro_attachment.tests.provider.image_file_names:
+        alias: oro_attachment.provider.image_file_names
+        public: true
+
+    oro_attachment.tests.imagine.provider.url:
+        alias: oro_attachment.imagine.provider.url
+        public: true
+
+    oro_attachment.tests.checker.voter.webp_feature_voter.stub:
+        class: Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\WebpFeatureVoterStub
+        decorates: oro_attachment.checker.voter.webp_feature_voter
+        decoration_priority: -256 # should be at the top of the decoration chain
+        arguments:
+            - '@.inner'
+
+    oro_attachment.tests.tools.webp_configuration.stub:
+        class: Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\WebpConfigurationStub
+        decorates: oro_attachment.tools.webp_configuration
+        decoration_priority: -256 # should be at the top of the decoration chain
+        arguments:
+            - '@.inner'
+
+    oro_attachment.tests.tools.external_file_factory.stub:
+        class: Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\ExternalFileFactoryStub
+        decorates: oro_attachment.tools.external_file_factory
+        arguments:
+            - '@.inner'

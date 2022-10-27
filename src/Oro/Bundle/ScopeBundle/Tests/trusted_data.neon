@@ -1,0 +1,11 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\ScopeBundle\Model\ScopeCriteria:
+            reapplyJoins:
+                condition: true
+            applyJoinWithModifiedCondition:
+                condition: true
+    safe_methods:
+        Oro\Bundle\ScopeBundle\Model\ScopeCriteria:
+            resolveBasicCondition: [1, 2]

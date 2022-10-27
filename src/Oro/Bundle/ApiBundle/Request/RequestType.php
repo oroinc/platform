@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Request;
 use Oro\Component\ChainProcessor\ToArrayInterface;
 
 /**
- * Represents the type of Data API requests.
+ * Represents the type of API requests.
  */
 class RequestType implements ToArrayInterface
 {
@@ -15,16 +15,19 @@ class RequestType implements ToArrayInterface
     public const REST = 'rest';
 
     /**
-     * A request that conforms JSON API specification.
+     * A request that conforms JSON:API specification.
      * @link http://jsonapi.org
      */
     public const JSON_API = 'json_api';
 
-    /** @var string[] */
-    private $aspects = [];
+    /**
+     * Indicates that a request is the part of a batch request.
+     */
+    public const BATCH = 'batch';
 
-    /** @var string */
-    private $str;
+    /** @var string[] */
+    private array $aspects;
+    private ?string $str = null;
 
     /**
      * @param string[] $aspects
@@ -36,10 +39,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Checks whether this request type represents the given aspect.
-     *
-     * @param string $aspect
-     *
-     * @return bool
      */
     public function contains(string $aspect): bool
     {
@@ -48,8 +47,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Adds an aspect to this request type.
-     *
-     * @param string $aspect
      */
     public function add(string $aspect): void
     {
@@ -61,8 +58,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Adds an aspect from this request type.
-     *
-     * @param string $aspect
      */
     public function remove(string $aspect): void
     {
@@ -76,8 +71,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Initializes this request type based on an another request type.
-     *
-     * @param RequestType $requestType
      */
     public function set(RequestType $requestType): void
     {
@@ -87,8 +80,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Checks if this request type represents at least one aspect.
-     *
-     * @return bool
      */
     public function isEmpty(): bool
     {
@@ -105,7 +96,7 @@ class RequestType implements ToArrayInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toArray(): array
     {
@@ -113,14 +104,14 @@ class RequestType implements ToArrayInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __toString()
     {
         if (null === $this->str) {
             $aspects = $this->aspects;
-            \rsort($aspects, SORT_STRING);
-            $this->str = \implode(',', $aspects);
+            rsort($aspects, SORT_STRING);
+            $this->str = implode(',', $aspects);
         }
 
         return $this->str;

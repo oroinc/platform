@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Configuration\AttributeImportExportConfigurationProvider;
 use Oro\Bundle\EntityConfigBundle\WebSocket\AttributesImportTopicSender;
 use Oro\Bundle\ImportExportBundle\Event\AfterJobExecutionEvent;
@@ -20,17 +20,11 @@ class AttributesImportFinishNotificationListener
      */
     private $topicSender;
 
-    /**
-     * @param AttributesImportTopicSender $topicSender
-     */
     public function __construct(AttributesImportTopicSender $topicSender)
     {
         $this->topicSender = $topicSender;
     }
 
-    /**
-     * @param AfterJobExecutionEvent $event
-     */
     public function onAfterAttributesImport(AfterJobExecutionEvent $event)
     {
         $jobExecution = $event->getJobExecution();
@@ -43,11 +37,6 @@ class AttributesImportFinishNotificationListener
         $this->topicSender->send((int)$jobExecution->getExecutionContext()->get(self::ENTITY_CONFIG_MODEL_ID_KEY));
     }
 
-    /**
-     * @param JobResult $jobResult
-     * @param JobExecution $jobExecution
-     * @return bool
-     */
     protected function isApplicable(JobResult $jobResult, JobExecution $jobExecution): bool
     {
         if (!$jobResult->isSuccessful()) {

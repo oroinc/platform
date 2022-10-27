@@ -7,21 +7,16 @@ use Oro\Component\Layout\ContextInterface;
 
 class LayoutContextHolderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LayoutContextHolder
-     */
-    protected $layoutContextHolder;
+    /** @var LayoutContextHolder */
+    private $layoutContextHolder;
 
-    /**
-     * @var ContextInterface
-     */
-    protected $context;
+    /** @var ContextInterface */
+    private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->layoutContextHolder = new LayoutContextHolder();
 
-        /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject $context **/
         $this->context = $this->createMock(ContextInterface::class);
     }
 

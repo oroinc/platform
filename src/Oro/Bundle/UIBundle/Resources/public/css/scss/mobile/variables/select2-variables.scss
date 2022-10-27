@@ -33,7 +33,20 @@ $mobile-select2-search-choice-close-icon-transform: translate(50%, -50%) !defaul
 $mobile-select2-container-multi-top-min-height: 40px !default;
 $mobile-select2-container-multi-top-height: auto !default;
 
+$mobile-select2-search-multi-choices-inner-offset: 4px 0 0 4px !default;
+$mobile-select2-search-multi-placeholder-height: 28px !default;
+$mobile-select2-search-choice-select2-locked-inner-offset: null !default;
+
 $mobile-select2-container-multi-choice-offset-right: 5px !default;
 
 $mobile-select2-container-multi-select2-search-field-height: 36px !default;
-$mobile-select2-container-multi-select2-search-field-line-height: 36px !default;
+$mobile-select2-container-multi-select2-search-field-top-offset: -4px !default;
+
+$mobile-select2-results-after-search-inner-offset: 0 8px 8px !default;
+$mobile-select2-results-inner-offset: 8px !default;
+
+$mobile-select2-result-label-font-size: $mobile-select2-container-font-size !default;
+$mobile-select2-result-label-line-height: 1.5 !default;
+$mobile-select2-result-label-inner-offset: 4px 8px 5px !default;
+
+$mobile-select2-drop-max-width: calc(100% - #{2 * $content-padding}) !default;

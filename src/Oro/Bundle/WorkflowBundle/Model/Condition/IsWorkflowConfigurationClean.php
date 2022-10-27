@@ -21,9 +21,6 @@ class IsWorkflowConfigurationClean extends AbstractCondition implements ContextA
     /** @var string */
     protected $workflow;
 
-    /**
-     * @param ConfigurationChecker $checker
-     */
     public function __construct(ConfigurationChecker $checker)
     {
         $this->checker = $checker;

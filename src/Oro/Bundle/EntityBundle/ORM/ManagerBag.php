@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 class ManagerBag implements ManagerBagInterface
 {
@@ -12,9 +12,6 @@ class ManagerBag implements ManagerBagInterface
     /** @var string[] */
     protected $managerNames;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;

@@ -3,12 +3,12 @@
 namespace Oro\Bundle\FilterBundle\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -17,6 +17,9 @@ use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * Date grouping filter.
+ */
 class DateGroupingFilter extends ChoiceFilter
 {
     use ArrayTrait;
@@ -37,18 +40,12 @@ class DateGroupingFilter extends ChoiceFilter
     const TYPE_YEAR = 'year';
 
     /** @var ManagerRegistry */
-    protected $registry;
+    protected $doctrine;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility $util
-     * @param ManagerRegistry $registry
-     */
-    public function __construct(FormFactoryInterface $factory, FilterUtility $util, ManagerRegistry $registry)
+    public function __construct(FormFactoryInterface $factory, FilterUtility $util, ManagerRegistry $doctrine)
     {
         parent::__construct($factory, $util);
-
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -72,8 +69,10 @@ class DateGroupingFilter extends ChoiceFilter
         }
 
         /** @var OrmFilterDatasourceAdapter $ds */
+        /** @var QueryBuilder $qb */
         $qb = $ds->getQueryBuilder();
         $columnName = $this->get(self::COLUMN_NAME);
+        QueryBuilderUtil::checkField($columnName);
 
         switch ($data['value']) {
             case self::TYPE_DAY:
@@ -138,17 +137,12 @@ class DateGroupingFilter extends ChoiceFilter
 
     /**
      * If grouping by Day or Month make sure Year order is in same direction and keep multisort.
-     *
-     * @param OrmDatasource $datasource
-     * @param String $sortKey
-     * @param String $direction
      */
     public function applyOrderBy(OrmDatasource $datasource, String $sortKey, String $direction)
     {
         QueryBuilderUtil::checkField($sortKey);
         $direction = QueryBuilderUtil::getSortOrder($direction);
 
-        /* @var OrmDatasource $datasource */
         $qb = $datasource->getQueryBuilder();
         $added = false;
 
@@ -159,7 +153,7 @@ class DateGroupingFilter extends ChoiceFilter
             /** @var Select $select */
             foreach ($qb->getDQLPart('select') as $select) {
                 foreach ($select->getParts() as $part) {
-                    if ($groupingName === $part) {
+                    if (\in_array($part, [$groupingName, sprintf('%s as %s', $groupingName, $columnName)], true)) {
                         $qb->addOrderBy($columnName, $direction);
                         $added = true;
                     }
@@ -223,12 +217,11 @@ class DateGroupingFilter extends ChoiceFilter
     }
 
     /**
-     * @param mixed $data
-     * @return mixed
+     * {@inheritdoc}
      */
-    protected function parseData($data)
+    protected function parseValue(array $data)
     {
-        if (is_array($data) && !$data['value']) {
+        if (!isset($data['value']) || !$data['value']) {
             $data['value'] = self::TYPE_DAY;
         }
 
@@ -244,9 +237,9 @@ class DateGroupingFilter extends ChoiceFilter
         $extraWhereClauses = !$qb->getDQLPart('where')
             ? null :
             $this->getExtraWhereClauses($qb->getDQLPart('where')->getParts());
-        
+
         $whereClauseParameters = $this->getExtraWhereParameters($qb->getParameters(), $extraWhereClauses);
-        
+
         $usedDates = $this->getUsedDates(
             $filterType,
             'calendarDateTableForGrouping',
@@ -320,8 +313,8 @@ class DateGroupingFilter extends ChoiceFilter
         QueryBuilderUtil::checkIdentifier($joinedTable);
         QueryBuilderUtil::checkIdentifier($joinedColumn);
 
-        /** @var EntityManager $manager */
-        $manager = $this->registry->getManagerForClass(CalendarDate::class);
+        /** @var EntityManagerInterface $manager */
+        $manager = $this->doctrine->getManagerForClass(CalendarDate::class);
 
         $subQueryBuilder = $manager->createQueryBuilder();
         $extraWhereClauses = str_replace(
@@ -376,7 +369,7 @@ class DateGroupingFilter extends ChoiceFilter
     {
         $extraWhereClauses = '';
         foreach ($whereClauseParts as $whereClausePart) {
-            if (strpos($whereClausePart, $this->getDataFieldName()) !== false) {
+            if (str_contains($whereClausePart, $this->getDataFieldName())) {
                 $extraWhereClauses = sprintf('%s AND ( %s )', $extraWhereClauses, $whereClausePart);
             }
         }
@@ -393,9 +386,9 @@ class DateGroupingFilter extends ChoiceFilter
     {
         $extraParameters = new ArrayCollection();
 
+        /* @var Parameter $parameter */
         foreach ($parameters as $parameter) {
-            /* @var $parameter Parameter */
-            if (false !== strpos($whereClauseParts, sprintf(':%s', $parameter->getName()))) {
+            if (str_contains($whereClauseParts, sprintf(':%s', $parameter->getName()))) {
                 $extraParameters->add($parameter);
             }
         }

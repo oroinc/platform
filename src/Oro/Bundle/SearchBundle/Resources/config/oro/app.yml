@@ -9,7 +9,8 @@ doctrine:
                 user:     '%database_user%'
                 password: '%database_password%'
                 options:  '%database_driver_options%'
-                charset:  UTF8
+                charset:  '%database_charset%'
+                server_version: '%database_server_version%'
     orm:
         entity_managers:
             search:
@@ -31,3 +32,15 @@ fos_rest:
             'Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError': true
         codes:
             'Oro\Bundle\SearchBundle\Exception\ExpressionSyntaxError': HTTP_BAD_REQUEST
+
+oro_api:
+    filters:
+        simpleSearch:
+            class: Oro\Bundle\SearchBundle\Api\Filter\SimpleSearchFilter
+            supported_operators: ['=']
+        searchQuery:
+            factory: ['@oro_search.api.filter_factory.search_query', 'createFilter']
+            supported_operators: ['=']
+        searchAggregation:
+            factory: ['@oro_search.api.filter_factory.search_aggregation', 'createFilter']
+            supported_operators: ['=']

@@ -1,86 +1,144 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UpdateDoctrineEventHandlersPass */
-    protected $compiler;
+    private $compiler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
-    protected $container;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compiler = new UpdateDoctrineEventHandlersPass();
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()->getMock();
     }
 
-    /**
-     * @param bool $hasConnectionParameter
-     * @param bool $hasExcludedParameter
-     * @param mixed $connectionParameter
-     * @param mixed $excludedParameter
-     * @param array $tags
-     *
-     * @dataProvider dataProvider
-     */
-    public function testProcess(
-        $hasConnectionParameter,
-        $hasExcludedParameter,
-        $connectionParameter,
-        $excludedParameter,
-        array $tags = []
-    ) {
-        $this->container->expects($this->any())->method('hasParameter')
-            ->willReturnOnConsecutiveCalls($hasConnectionParameter, $hasExcludedParameter);
-        $this->container->expects($this->any())->method('getParameter')
-            ->willReturnOnConsecutiveCalls($connectionParameter, $excludedParameter);
-
-        $this->container->expects($this->any())->method('findTaggedServiceIds')
-            ->willReturn(['id' => ['event' => ['tag1' => []]]]);
-
-        $definition = new Definition();
-        $this->container->expects($this->any())->method('getDefinition')->willReturn($definition);
-
-        $this->compiler->process($this->container);
-
-        $this->assertEquals($tags, $definition->getTags());
-    }
-
-    /** @return array */
-    public function dataProvider()
+    private function createContainer(): ContainerBuilder
     {
-        return [
-            'missing connections' => [false, false, [], [], []],
-            'missing excluded connections' => [true, false, [], [], []],
-            'has parameters' => [true, true, [], [], []],
-            'exclude all' => [true, true, ['connection1' => []], ['connection1'], []],
-            'exclude one' => [
-                true,
-                true,
-                ['connection1' => [], 'connection2' => []],
-                ['connection1'],
-                [
-                    'doctrine.event_subscriber' => [['tag1' => [], 'connection' => 'connection2']],
-                    'doctrine.event_listener' => [['tag1' => [], 'connection' => 'connection2']],
-                ],
+        $container = new ContainerBuilder();
+        $container->setParameter(
+            'doctrine.connections',
+            [
+                'default'  => 'doctrine.dbal.default_connection',
+                'search'   => 'doctrine.dbal.search_connection',
+                'security' => 'doctrine.dbal.security_connection'
+            ]
+        );
+
+        return $container;
+    }
+
+    public function testSetDefaultConnectionWhenEmpty()
+    {
+        $container = $this->createContainer();
+
+        $subscriberDef = $container->register('some_subscriber')
+            ->addTag('doctrine.event_subscriber');
+        $listenerDef = $container->register('some_listener')
+            ->addTag('doctrine.event_listener', ['event' => 'preClose'])
+            ->addTag('doctrine.event_listener', ['event' => 'onClear']);
+
+        $this->compiler->process($container);
+
+        self::assertEquals(
+            [
+                'doctrine.event_subscriber' => [
+                    ['connection' => 'default']
+                ]
             ],
-            'exclude session' => [
-                true,
-                true,
-                ['connection1' => [], 'connection2' => [], 'session' => []],
-                ['connection1'],
-                [
-                    'doctrine.event_subscriber' => [['tag1' => [], 'connection' => 'connection2']],
-                    'doctrine.event_listener' => [['tag1' => [], 'connection' => 'connection2']],
-                ],
+            $subscriberDef->getTags()
+        );
+        self::assertEquals(
+            [
+                'doctrine.event_listener' => [
+                    ['event' => 'preClose', 'connection' => 'default'],
+                    ['event' => 'onClear', 'connection' => 'default']
+                ]
             ],
-        ];
+            $listenerDef->getTags()
+        );
+
+        self::assertFalse($subscriberDef->isDeprecated());
+        self::assertFalse($listenerDef->isDeprecated());
+    }
+
+    public function testSetSpecificConnectionWhenNotEmpty()
+    {
+        $container = $this->createContainer();
+
+        $subscriberDef = $container->register('some_subscriber')
+            ->addTag('doctrine.event_subscriber', ['connection' => 'security']);
+        $listenerDef = $container->register('some_listener')
+            ->addTag('doctrine.event_listener', ['event' => 'preClose', 'connection' => 'security'])
+            ->addTag('doctrine.event_listener', ['event' => 'onClear', 'connection' => 'security']);
+
+        $this->compiler->process($container);
+
+        self::assertEquals(
+            [
+                'doctrine.event_subscriber' => [
+                    ['connection' => 'security']
+                ]
+            ],
+            $subscriberDef->getTags()
+        );
+        self::assertEquals(
+            [
+                'doctrine.event_listener' => [
+                    ['event' => 'preClose', 'connection' => 'security'],
+                    ['event' => 'onClear', 'connection' => 'security']
+                ]
+            ],
+            $listenerDef->getTags()
+        );
+
+        self::assertFalse($subscriberDef->isDeprecated());
+        self::assertFalse($listenerDef->isDeprecated());
+    }
+
+    public function testMarkDeprecatedWhenDefaultConnectionIsSet()
+    {
+        $container = $this->createContainer();
+
+        $subscriberDef = $container->register('some_subscriber')
+            ->addTag('doctrine.event_subscriber', ['connection' => 'default']);
+        $listenerDef = $container->register('some_listener')
+            ->addTag('doctrine.event_listener', ['event' => 'preClose', 'connection' => 'default'])
+            ->addTag('doctrine.event_listener', ['event' => 'onClear', 'connection' => 'default']);
+
+        $this->compiler->process($container);
+
+        self::assertEquals(
+            [
+                'doctrine.event_subscriber' => [
+                    ['connection' => 'default']
+                ]
+            ],
+            $subscriberDef->getTags()
+        );
+        self::assertEquals(
+            [
+                'doctrine.event_listener' => [
+                    ['event' => 'preClose', 'connection' => 'default'],
+                    ['event' => 'onClear', 'connection' => 'default']
+                ]
+            ],
+            $listenerDef->getTags()
+        );
+
+        self::assertTrue($subscriberDef->isDeprecated());
+        self::assertEquals(
+            'Passing "connection: default" to "some_subscriber" tags is default behaviour now.'
+            . ' Specify one of "search, security" or remove default one.',
+            $subscriberDef->getDeprecationMessage('some_subscriber')
+        );
+        self::assertTrue($listenerDef->isDeprecated());
+        self::assertEquals(
+            'Passing "connection: default" to "some_listener" tags is default behaviour now.'
+            . ' Specify one of "search, security" or remove default one.',
+            $listenerDef->getDeprecationMessage('some_listener')
+        );
     }
 }

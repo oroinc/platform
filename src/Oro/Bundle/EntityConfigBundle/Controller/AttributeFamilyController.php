@@ -2,35 +2,40 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
+use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Entity Attribute Family Controller
  * @Route("/attribute/family")
  */
-class AttributeFamilyController extends Controller
+class AttributeFamilyController extends AbstractController
 {
     /**
      * @Route("/create/{alias}", name="oro_attribute_family_create")
-     * @Template("OroEntityConfigBundle:AttributeFamily:update.html.twig")
-     * @param string $alias
-     * @return array|RedirectResponse
+     * @Template("@OroEntityConfig/AttributeFamily/update.html.twig")
      */
-    public function createAction($alias)
+    public function createAction(string $alias): array|RedirectResponse
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
-        $attributeManager = $this->get('oro_entity_config.manager.attribute_manager');
+        $attributeManager = $this->get(AttributeManager::class);
 
         $this->ensureEntityConfigSupported($entityConfigModel);
 
@@ -48,14 +53,15 @@ class AttributeFamilyController extends Controller
             $defaultGroup->addAttributeRelation($attributeGroupRelation);
         }
 
+        $translator = $this->getTranslator();
         $defaultGroup->setDefaultLabel(
-            $this->get('translator')->trans('oro.entity_config.form.default_group_label')
+            $translator->trans('oro.entity_config.form.default_group_label')
         );
         $attributeFamily->addAttributeGroup($defaultGroup);
 
         $response = $this->update(
             $attributeFamily,
-            $this->get('translator')->trans('oro.entity_config.controller.attribute_family.message.saved')
+            $translator->trans('oro.entity_config.controller.attribute_family.message.saved')
         );
 
         if (is_array($response)) {
@@ -67,73 +73,66 @@ class AttributeFamilyController extends Controller
 
     /**
      * @Route("/update/{id}", name="oro_attribute_family_update")
-     * @Template("OroEntityConfigBundle:AttributeFamily:update.html.twig")
-     * @param AttributeFamily $attributeFamily
-     * @return array|RedirectResponse
+     * @Template("@OroEntityConfig/AttributeFamily/update.html.twig")
      */
-    public function updateAction(AttributeFamily $attributeFamily)
+    public function updateAction(AttributeFamily $attributeFamily): array|RedirectResponse
     {
-        $successMsg = $this->get('translator')->trans('oro.entity_config.attribute_family.message.updated');
+        $translator = $this->getTranslator();
+        $successMsg = $translator->trans('oro.entity_config.attribute_family.message.updated');
         $response = $this->update($attributeFamily, $successMsg);
 
-        if (is_array($response)) {
-            $alias = $this->get('oro_entity.entity_alias_resolver')->getAlias($attributeFamily->getEntityClass());
+        if (\is_array($response)) {
+            $alias = $this->get(EntityAliasResolver::class)->getAlias($attributeFamily->getEntityClass());
             $response['entityAlias'] = $alias;
         }
 
         return $response;
     }
 
-    /**
-     * @param AttributeFamily $attributeFamily
-     * @param string $message
-     * @return array|RedirectResponse
-     */
-    protected function update(AttributeFamily $attributeFamily, $message)
+    protected function update(AttributeFamily $attributeFamily, string $message): array|RedirectResponse
     {
         $options['attributeEntityClass'] = $attributeFamily->getEntityClass();
         $form = $this->createForm(AttributeFamilyType::class, $attributeFamily, $options);
 
-        $handler = $this->get('oro_form.model.update_handler');
-
-        return $handler->update($attributeFamily, $form, $message);
+        return $this->get(UpdateHandlerFacade::class)
+            ->update($attributeFamily, $form, $message);
     }
 
     /**
      * @Route("/index/{alias}", name="oro_attribute_family_index")
      * @Template()
-     * @param string $alias
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction($alias)
+    public function indexAction(string $alias): array|RedirectResponse
     {
+        $entityClass = $this->get(EntityAliasResolver::class)->getClassByAlias($alias);
+
         return [
             'params' => [
-                'entity_class' => $this->get('oro_entity.entity_alias_resolver')->getClassByAlias($alias),
+                'entity_class' => $entityClass,
             ],
             'alias' => $alias,
-            'entity_class' => $this->get('oro_entity.entity_alias_resolver')->getClassByAlias($alias),
+            'entity_class' => $entityClass,
             'attributeFamiliesLabel' => sprintf('oro.%s.menu.%s_attribute_families', $alias, $alias)
         ];
     }
 
     /**
-     * @Route("/delete/{id}", name="oro_attribute_family_delete")
-     * @param AttributeFamily $attributeFamily
-     * @return JsonResponse
+     * @Route("/delete/{id}", name="oro_attribute_family_delete", methods={"DELETE"})
+     * @CsrfProtection()
      */
-    public function deleteAction(AttributeFamily $attributeFamily)
+    public function deleteAction(AttributeFamily $attributeFamily): JsonResponse
     {
+        $translator = $this->getTranslator();
         if ($this->isGranted('delete', $attributeFamily)) {
-            $doctrineHelper = $this->get('oro_entity.doctrine_helper');
+            $doctrineHelper = $this->get(DoctrineHelper::class);
             $entityManager = $doctrineHelper->getEntityManagerForClass(AttributeFamily::class);
             $entityManager->remove($attributeFamily);
             $entityManager->flush();
             $successful = true;
-            $message = $this->get('translator')->trans('oro.entity_config.attribute_family.message.deleted');
+            $message = $translator->trans('oro.entity_config.attribute_family.message.deleted');
         } else {
             $successful = false;
-            $message = $this->get('translator')->trans('oro.entity_config.attribute_family.message.cant_delete');
+            $message = $translator->trans('oro.entity_config.attribute_family.message.cant_delete');
         }
 
         return new JsonResponse(['message' => $message, 'successful' => $successful]);
@@ -142,12 +141,10 @@ class AttributeFamilyController extends Controller
     /**
      * @Route("/view/{id}", name="oro_attribute_family_view", requirements={"id"="\d+"})
      * @Template()
-     * @param \Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily $attributeFamily
-     * @return array
      */
-    public function viewAction(AttributeFamily $attributeFamily)
+    public function viewAction(AttributeFamily $attributeFamily): array
     {
-        $aliasResolver = $this->get('oro_entity.entity_alias_resolver');
+        $aliasResolver = $this->get(EntityAliasResolver::class);
 
         return [
             'entity' => $attributeFamily,
@@ -155,26 +152,21 @@ class AttributeFamilyController extends Controller
         ];
     }
 
-    /**
-     * @param string $alias
-     * @return EntityConfigModel
-     */
-    private function getEntityByAlias($alias)
+    private function getEntityByAlias(string $alias): EntityConfigModel
     {
-        $aliasResolver = $this->get('oro_entity.entity_alias_resolver');
+        $aliasResolver = $this->get(EntityAliasResolver::class);
         $entityClass = $aliasResolver->getClassByAlias($alias);
 
-        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
+        $doctrineHelper = $this->get(DoctrineHelper::class);
 
         return $doctrineHelper->getEntityRepository(EntityConfigModel::class)
             ->findOneBy(['className' => $entityClass]);
     }
 
     /**
-     * @param EntityConfigModel $entityConfigModel
      * @throws BadRequestHttpException
      */
-    private function ensureEntityConfigSupported(EntityConfigModel $entityConfigModel)
+    private function ensureEntityConfigSupported(EntityConfigModel $entityConfigModel): void
     {
         /** @var ConfigProvider $extendConfigProvider */
         $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
@@ -185,8 +177,32 @@ class AttributeFamilyController extends Controller
 
         if (!$extendConfig->is('is_extend') || !$attributeConfig->is('has_attributes')) {
             throw new BadRequestHttpException(
-                $this->get('translator')->trans('oro.entity_config.attribute.entity_not_supported')
+                $this->getTranslator()->trans('oro.entity_config.attribute.entity_not_supported')
             );
         }
+    }
+
+    private function getTranslator(): TranslatorInterface
+    {
+        return $this->get(TranslatorInterface::class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                EntityAliasResolver::class,
+                AttributeManager::class,
+                DoctrineHelper::class,
+                'oro_entity_config.provider.extend' => ConfigProvider::class,
+                'oro_entity_config.provider.attribute' => ConfigProvider::class,
+                UpdateHandlerFacade::class
+            ]
+        );
     }
 }

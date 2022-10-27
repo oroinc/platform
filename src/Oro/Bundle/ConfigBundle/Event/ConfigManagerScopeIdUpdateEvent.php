@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ConfigManagerScopeIdUpdateEvent extends Event
 {

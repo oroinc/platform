@@ -9,25 +9,25 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_NODE = 'oro_logger';
-    const LOGS_LEVEL_KEY = 'detailed_logs_level';
-    const LOGS_TIMESTAMP_KEY = 'detailed_logs_end_timestamp';
-    const EMAIL_NOTIFICATION_RECIPIENTS = 'email_notification_recipients';
-    const EMAIL_NOTIFICATION_SUBJECT = 'email_notification_subject';
+    public const ROOT_NODE = 'oro_logger';
+    public const LOGS_LEVEL_KEY = 'detailed_logs_level';
+    public const LOGS_TIMESTAMP_KEY = 'detailed_logs_end_timestamp';
+    public const EMAIL_NOTIFICATION_RECIPIENTS = 'email_notification_recipients';
+    public const EMAIL_NOTIFICATION_SUBJECT = 'email_notification_subject';
 
     /**
      * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
+        $treeBuilder = new TreeBuilder(self::ROOT_NODE);
 
-        $rootNode = $treeBuilder->root(self::ROOT_NODE);
+        $rootNode = $treeBuilder->getRootNode();
 
         SettingsBuilder::append($rootNode, [
             self::LOGS_LEVEL_KEY => [
                 'type' => 'string',
-                'value' => 'notice'
+                'value' => 'error'
             ],
             self::LOGS_TIMESTAMP_KEY => [
                 'type' => 'integer',

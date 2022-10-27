@@ -6,49 +6,47 @@ use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SearchBundle\Entity\IndexDatetime;
-use Oro\Bundle\SearchBundle\Entity\IndexDecimal;
-use Oro\Bundle\SearchBundle\Entity\IndexInteger;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
-use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 trait SearchExtensionTrait
 {
-    /**
-     * @return IndexerInterface
-     */
-    protected function getSearchIndexer()
+    protected static function getSearchIndexer(): IndexerInterface
     {
-        return $this->getContainer()->get('oro_search.search.engine.indexer');
+        return self::getContainer()->get('oro_search.search.engine.indexer');
     }
 
     /**
      * @return ObjectMapper
      */
-    protected function getSearchObjectMapper()
+    protected static function getSearchObjectMapper()
     {
-        return $this->getContainer()->get('oro_search.mapper');
+        return self::getContainer()->get('oro_search.mapper');
     }
 
     /**
-     * Ensure that items are loaded to search index
-     *
-     * @param string $alias
-     * @param int $itemsCount
-     * @param string $searchService
-     * @throws \LogicException
+     * Ensure that items are loaded to search index.
      */
-    protected function ensureItemsLoaded($alias, $itemsCount, $searchService = 'oro_search.search.engine')
-    {
+    protected static function ensureItemsLoaded(
+        string $classOrAlias,
+        int $itemsCount,
+        string $searchService = 'oro_search.search.engine'
+    ): void {
+        if (class_exists($classOrAlias)) {
+            $alias = self::getIndexAlias($classOrAlias, []);
+        } else {
+            $alias = $classOrAlias;
+        }
+
         $query = new Query();
         $query->from($alias);
 
-        $requestCounts = 10;
+        $requestCounts = 30;
         do {
             /** @var Result $result */
-            $result = $this->getContainer()->get($searchService)->search($query);
+            $result = self::getContainer()->get($searchService)->search($query);
             $actualLoaded = $result->getRecordsCount();
             $isLoaded = $actualLoaded === $itemsCount;
             if (!$isLoaded) {
@@ -68,13 +66,20 @@ trait SearchExtensionTrait
         }
     }
 
+    protected static function getIndexAlias(string $className, array $placeholders): string
+    {
+        return self::getContainer()
+            ->get('oro_search.provider.search_mapping')
+            ->getEntityAlias($className);
+    }
+
     /**
      * Remove all data added in fixtures
      */
-    protected function clearTestData()
+    protected static function clearTestData(string $entity = Item::class)
     {
-        $manager = $this->getContainer()->get('doctrine')->getManager();
-        $repository = $manager->getRepository('Oro\Bundle\TestFrameworkBundle\Entity\Item');
+        $manager = self::getContainer()->get('doctrine')->getManager();
+        $repository = $manager->getRepository($entity);
         $repository->createQueryBuilder('qb')
             ->delete()
             ->getQuery()
@@ -98,5 +103,19 @@ trait SearchExtensionTrait
             ->delete()
             ->getQuery()
             ->execute();
+    }
+
+    protected static function resetIndex(array|string|null $class = null, array $context = []): void
+    {
+        self::getSearchIndexer()->resetIndex($class, $context);
+    }
+
+    /**
+     * @param string[]|string|null $class
+     * @param array $context
+     */
+    protected static function reindex(array|string|null $class = null, array $context = []): void
+    {
+        self::getSearchIndexer()->reindex($class, $context);
     }
 }

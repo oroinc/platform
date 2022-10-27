@@ -7,23 +7,19 @@ use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 
 class OroIntegrationExtensionTest extends ExtensionTestCase
 {
-    /**
-     * @var OroIntegrationExtension
-     */
-    protected $extension;
+    private OroIntegrationExtension $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new OroIntegrationExtension();
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $this->loadExtension($this->extension);
 
         $expectedDefinitions = [
             'oro_integration.datagrid.action_configuration',
-            'oro_integration.repository.channel',
             'oro_integration.action_handler.channel_delete',
             'oro_integration.action_handler.channel_disable',
             'oro_integration.action_handler.channel_enable',
@@ -41,5 +37,10 @@ class OroIntegrationExtensionTest extends ExtensionTestCase
         ];
 
         $this->assertDefinitionsLoaded($expectedDefinitions);
+
+        $expectedAliases = [
+            'oro_integration.repository.channel',
+        ];
+        $this->assertAliasesLoaded($expectedAliases);
     }
 }

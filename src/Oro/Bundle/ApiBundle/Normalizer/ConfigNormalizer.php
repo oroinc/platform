@@ -15,10 +15,6 @@ class ConfigNormalizer
 {
     /**
      * Prepares a configuration to be used by ObjectNormalizer
-     *
-     * @param EntityDefinitionConfig $config
-     *
-     * @return EntityDefinitionConfig
      */
     public function normalizeConfig(EntityDefinitionConfig $config)
     {
@@ -28,10 +24,6 @@ class ConfigNormalizer
 
     /**
      * Remembers the current config state before it will be normalized
-     *
-     * @param EntityDefinitionConfig $config
-     *
-     * @return array
      */
     protected function preNormalizeConfig(EntityDefinitionConfig $config)
     {
@@ -65,11 +57,8 @@ class ConfigNormalizer
     /**
      * Performs the normalization of a configuration
      *
-     * @param EntityDefinitionConfig $config
-     *
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function doNormalizeConfig(EntityDefinitionConfig $config)
     {
@@ -83,9 +72,16 @@ class ConfigNormalizer
             $propertyPath = $field->getPropertyPath();
             if ($propertyPath) {
                 if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
-                    $toRemove[] = $fieldName;
-                } elseif (false === strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
-                    $renamedFields[$propertyPath] = $fieldName;
+                    if (null === $field->getAssociationQuery()) {
+                        $toRemove[] = $fieldName;
+                    }
+                } else {
+                    if (!str_contains($propertyPath, ConfigUtil::PATH_DELIMITER)) {
+                        $renamedFields[$propertyPath] = $fieldName;
+                    }
+                    if (!$field->isExcluded()) {
+                        $this->processDependentFields($config, [$propertyPath]);
+                    }
                 }
             }
             if ($field->getDependsOn() && !$field->isExcluded()) {
@@ -146,7 +142,14 @@ class ConfigNormalizer
      */
     protected function processDependentField(EntityDefinitionConfig $config, array $dependsOnPropertyPath)
     {
-        $dependsOnFieldName = $dependsOnPropertyPath[0];
+        $dependsOnFieldName = $config->findFieldNameByPropertyPath($dependsOnPropertyPath[0]);
+        if (!$dependsOnFieldName) {
+            if (\count($dependsOnPropertyPath) > 1) {
+                return;
+            }
+            $dependsOnFieldName = $dependsOnPropertyPath[0];
+        }
+
         $dependsOnField = $config->getOrAddField($dependsOnFieldName);
         if ($dependsOnField->isExcluded()) {
             $dependsOnField->setExcluded(false);
@@ -155,9 +158,9 @@ class ConfigNormalizer
                 $this->processDependentFields($config, $dependsOn);
             }
         }
-        if (count($dependsOnPropertyPath) > 1) {
+        if (\count($dependsOnPropertyPath) > 1) {
             $targetConfig = $dependsOnField->getOrCreateTargetEntity();
-            $this->processDependentField($targetConfig, array_slice($dependsOnPropertyPath, 1));
+            $this->processDependentField($targetConfig, \array_slice($dependsOnPropertyPath, 1));
         }
     }
 }

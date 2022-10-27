@@ -11,9 +11,6 @@ class Metadata implements MetadataInterface
      */
     protected $options;
 
-    /**
-     * @param array $options
-     */
     public function __construct(array $options = [])
     {
         $this->options = $options;

@@ -2,72 +2,72 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Provider\Filter;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ChoiceTreeBusinessUnitProvider */
-    protected $choiceTreeBUProvider;
+    private $choiceTreeBUProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    /** @var ChainOwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $treeProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclHelper;
+    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $qb;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $treeProvider;
+    /** @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject */
+    private $query;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $qb;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->treeProvider = $this->createMock(ChainOwnerTreeProvider::class);
+
+        $this->query = $this->createMock(AbstractQuery::class);
+        $this->qb = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getArrayResult', 'expr', 'setParameter'])
+            ->onlyMethods(['expr', 'setParameter', 'getQuery'])
             ->getMock();
         $this->qb
             ->select('businessUnit')
             ->from('OroOrganizationBundle:BusinessUnit', 'businessUnit');
-        $businessUnitRepository =
-            $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->qb->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($this->query);
+        $businessUnitRepository = $this->createMock(BusinessUnitRepository::class);
         $businessUnitRepository->expects($this->any())
             ->method('getQueryBuilder')
             ->willReturn($this->qb);
 
-        $this->registry       = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->registry
-            ->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getRepository')
             ->with('OroOrganizationBundle:BusinessUnit')
             ->willReturn($businessUnitRepository);
-        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->aclHelper      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->aclHelper->expects($this->any())
-            ->method('apply')
-            ->willReturn($this->qb);
 
-        $this->treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider')
-            ->setMethods(['getTree'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $aclHelper = $this->createMock(AclHelper::class);
+        $aclHelper->expects($this->any())
+            ->method('apply')
+            ->willReturn($this->query);
 
         $this->choiceTreeBUProvider = new ChoiceTreeBusinessUnitProvider(
-            $this->registry,
+            $doctrine,
             $this->tokenAccessor,
-            $this->aclHelper,
+            $aclHelper,
             $this->treeProvider
         );
     }
@@ -75,7 +75,7 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getListDataProvider
      */
-    public function testGetList($userBUIds, $result)
+    public function testGetList(array $userBUIds, array $result)
     {
         $ownerTree = $this->createMock(OwnerTreeInterface::class);
 
@@ -83,35 +83,30 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getTree')
             ->willReturn($ownerTree);
 
-        $ownerTree
-            ->expects($this->once())
+        $ownerTree->expects($this->once())
             ->method('getUserSubordinateBusinessUnitIds')
             ->willReturn($userBUIds);
 
-        $expression = $this->getMockBuilder('Doctrine\ORM\Query\Expr')
-            ->setMethods(['in'])
+        $expression = $this->getMockBuilder(Expr::class)
+            ->onlyMethods(['in'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->qb->expects($this->once())
+        $this->query->expects($this->once())
             ->method('getArrayResult')
             ->willReturn($result);
         $this->qb->expects($this->any())
             ->method('expr')
             ->willReturn($expression);
         $this->qb->expects($this->any())
-            ->method('setParameter');
+            ->method('setParameter')
+            ->willReturnSelf();
 
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->setMethods(['getId', 'getOrganizations'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
-        $organization
-            ->expects($this->once())
+        $organization = $this->createMock(OrganizationInterface::class);
+        $organization->expects($this->once())
             ->method('getId')
             ->willReturn(1);
+        $user = $this->createMock(User::class);
         $user->expects($this->once())
             ->method('getOrganizations')
             ->willReturn([$organization]);
@@ -124,15 +119,12 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $resultedUserBUids);
     }
 
-    /**
-     * @return array
-     */
-    public function getListDataProvider()
+    public function getListDataProvider(): array
     {
         return [
             'Three elements in the list' => [
-                'userBUIds'        => [1, 2, 3],
-                'result'           => [
+                'userBUIds' => [1, 2, 3],
+                'result'    => [
                     [
                         'name'     => 'Main Business Unit 1',
                         'id'       => 1,
@@ -151,8 +143,8 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             'Six elements in the list'   => [
-                'userBUIds'        => [1, 2, 3, 4, 5, 6],
-                'result'           => [
+                'userBUIds' => [1, 2, 3, 4, 5, 6],
+                'result'    => [
                     [
                         'name'     => 'Main Business Unit 1',
                         'id'       => 1,
@@ -191,8 +183,8 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             'empty list'                 => [
-                'userBUIds'        => [],
-                'result'           => []
+                'userBUIds' => [],
+                'result'    => []
             ],
         ];
     }

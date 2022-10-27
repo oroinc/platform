@@ -2,20 +2,29 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\DependencyInjection;
 
+use Oro\Component\Layout\BlockTypeExtensionInterface;
+use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
 use Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension;
 use Oro\Component\Layout\LayoutItemInterface;
+use Oro\Component\Layout\LayoutUpdateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    private $container;
 
     /** @var DependencyInjectionExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->extension = new DependencyInjectionExtension(
             $this->container,
             ['test' => 'block_type_service'],
@@ -26,6 +35,11 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetTypeNames()
+    {
+        $this->assertEquals(['test'], $this->extension->getTypeNames());
+    }
+
     public function testHasType()
     {
         $this->assertTrue($this->extension->hasType('test'));
@@ -34,46 +48,45 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetType()
     {
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
         $type->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
         $this->container->expects($this->once())
             ->method('get')
             ->with('block_type_service')
-            ->will($this->returnValue($type));
+            ->willReturn($type);
 
         $this->assertSame($type, $this->extension->getType('test'));
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The type name specified for the service "block_type_service" does not match the actual name. Expected "test", given "test1".
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetTypeWithInvalidAlias()
     {
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The type name specified for the service "block_type_service" does not match the actual name.'
+            . ' Expected "test", given "test1".'
+        );
+
+        $type = $this->createMock(BlockTypeInterface::class);
         $type->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('test1'));
+            ->willReturn('test1');
 
         $this->container->expects($this->once())
             ->method('get')
             ->with('block_type_service')
-            ->will($this->returnValue($type));
+            ->willReturn($type);
 
         $this->extension->getType('test');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The block type "unknown" is not registered with the service container.
-     */
     public function testGetUnknownType()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The block type "unknown" is not registered with the service container.');
+
         $this->extension->getType('unknown');
     }
 
@@ -85,12 +98,12 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeExtensions()
     {
-        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
 
         $this->container->expects($this->once())
             ->method('get')
             ->with('block_type_extension_service')
-            ->will($this->returnValue($typeExtension));
+            ->willReturn($typeExtension);
 
         $typeExtensions = $this->extension->getTypeExtensions('test');
         $this->assertCount(1, $typeExtensions);
@@ -109,18 +122,20 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 
         // test by alias
         $layoutItem = $this->getLayoutItem('unknown');
-        $layoutItem->expects($this->once())->method('getAlias')->willReturn('test');
+        $layoutItem->expects($this->once())
+            ->method('getAlias')
+            ->willReturn('test');
         $this->assertTrue($this->extension->hasLayoutUpdates($layoutItem));
     }
 
     public function testGetLayoutUpdates()
     {
-        $layoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $layoutUpdate = $this->createMock(LayoutUpdateInterface::class);
 
         $this->container->expects($this->exactly(2))
             ->method('get')
             ->with('layout_update_service')
-            ->will($this->returnValue($layoutUpdate));
+            ->willReturn($layoutUpdate);
 
         $layoutUpdates = $this->extension->getLayoutUpdates($this->getLayoutItem('test'));
         $this->assertCount(1, $layoutUpdates);
@@ -128,7 +143,9 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 
         // test by alias
         $layoutItem = $this->getLayoutItem('unknown');
-        $layoutItem->expects($this->once())->method('getAlias')->willReturn('test');
+        $layoutItem->expects($this->once())
+            ->method('getAlias')
+            ->willReturn('test');
         $this->assertCount(1, $this->extension->getLayoutUpdates($layoutItem));
         $this->assertSame($layoutUpdate, $layoutUpdates[0]);
     }
@@ -145,12 +162,12 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetContextConfigurators()
     {
-        $configurator = $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface');
+        $configurator = $this->createMock(ContextConfiguratorInterface::class);
 
         $this->container->expects($this->once())
             ->method('get')
             ->with('context_configurator_service')
-            ->will($this->returnValue($configurator));
+            ->willReturn($configurator);
 
         $result = $this->extension->getContextConfigurators();
         $this->assertCount(1, $result);
@@ -184,29 +201,28 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->container->expects($this->once())
             ->method('get')
             ->with('data_provider_service')
-            ->will($this->returnValue($dataProvider));
+            ->willReturn($dataProvider);
 
         $this->assertSame($dataProvider, $this->extension->getDataProvider('test'));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The data provider "unknown" is not registered with the service container.
-     */
     public function testGetUnknownDataProvider()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The data provider "unknown" is not registered with the service container.');
+
         $this->extension->getDataProvider('unknown');
     }
 
     /**
-     * @param string $id
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|LayoutItemInterface
+     * @return LayoutItemInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getLayoutItem($id)
+    private function getLayoutItem(string $id)
     {
-        $layoutItem = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItem->expects($this->any())->method('getId')->willReturn($id);
+        $layoutItem = $this->createMock(LayoutItemInterface::class);
+        $layoutItem->expects($this->any())
+            ->method('getId')
+            ->willReturn($id);
 
         return $layoutItem;
     }

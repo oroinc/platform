@@ -9,16 +9,16 @@ class DebugConditionCommandTest extends AbstractDebugCommandTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getFactoryServiceId()
+    protected function getFactoryServiceId(): string
     {
-        return DebugConditionCommand::FACTORY_SERVICE_ID;
+        return 'oro_action.expression.factory';
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getCommandName()
+    protected function getCommandName(): string
     {
-        return DebugConditionCommand::COMMAND_NAME;
+        return DebugConditionCommand::getDefaultName();
     }
 }

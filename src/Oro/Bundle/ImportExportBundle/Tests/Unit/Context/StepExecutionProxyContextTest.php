@@ -1,27 +1,30 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Context;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobInstance;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Entity\Warning;
+use Oro\Bundle\BatchBundle\Item\ExecutionContext;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $stepExecution;
+    /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
+    private $stepExecution;
 
-    /**
-     * @var StepExecutionProxyContext
-     */
-    protected $context;
+    /** @var StepExecutionProxyContext */
+    private $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->stepExecution = $this->createMock(StepExecution::class);
+
         $this->context = new StepExecutionProxyContext($this->stepExecution);
     }
 
@@ -38,11 +41,11 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetErrors()
     {
-        $expected = array('Error message');
+        $expected = ['Error message'];
 
         $this->stepExecution->expects($this->once())
             ->method('getErrors')
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals($expected, $this->context->getErrors());
     }
@@ -52,11 +55,29 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         $this->stepExecution->expects($this->once())
             ->method('setReadCount')
             ->with(2);
-        $this->stepExecution->expects($this->once())
+        $this->stepExecution->expects(self::exactly(3))
             ->method('getReadCount')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
+
+        $jobInstance = $this->createMock(JobInstance::class);
+        $jobInstance->expects(self::exactly(2))
+            ->method('getRawConfiguration')
+            ->willReturnOnConsecutiveCalls(['incremented_read' => false], ['incremented_read' => true]);
+
+        $jobExecution = $this->createMock(JobExecution::class);
+        $jobExecution->expects(self::exactly(2))
+            ->method('getJobInstance')
+            ->willReturn($jobInstance);
+
+        $this->stepExecution->expects(self::exactly(2))
+            ->method('getJobExecution')
+            ->willReturn($jobExecution);
 
         $this->context->incrementReadCount();
+        self::assertEquals(1, $this->context->getReadCount());
+
+        $this->context->incrementReadCount();
+        self::assertEquals(1, $this->context->getReadCount());
     }
 
     public function testGetReadCount()
@@ -65,7 +86,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 
         $this->stepExecution->expects($this->once())
             ->method('getReadCount')
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals($expected, $this->context->getReadCount());
     }
@@ -73,22 +94,22 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider incrementCountDataProvider
      */
-    public function testIncrement($propertyName)
+    public function testIncrement(string $propertyName)
     {
         $expectedCount = 1;
 
-        $executionContext = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
+        $executionContext = $this->createMock(ExecutionContext::class);
 
         $this->stepExecution->expects($this->exactly(2))
             ->method('getExecutionContext')
-            ->will($this->returnValue($executionContext));
+            ->willReturn($executionContext);
 
-        $executionContext->expects($this->at(0))
+        $executionContext->expects($this->once())
             ->method('get')
             ->with($propertyName)
-            ->will($this->returnValue($expectedCount));
+            ->willReturn($expectedCount);
 
-        $executionContext->expects($this->at(1))
+        $executionContext->expects($this->once())
             ->method('put')
             ->with($propertyName, $expectedCount + 1);
 
@@ -96,62 +117,62 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
         $this->context->$method();
     }
 
-    public function incrementCountDataProvider()
+    public function incrementCountDataProvider(): array
     {
-        return array(
-            array('read_offset'),
-            array('update_count'),
-            array('replace_count'),
-            array('delete_count'),
-            array('error_entries_count'),
-            array('add_count')
-        );
+        return [
+            ['read_offset'],
+            ['update_count'],
+            ['replace_count'],
+            ['delete_count'],
+            ['error_entries_count'],
+            ['add_count']
+        ];
     }
 
     /**
      * @dataProvider getCountDataProvider
      */
-    public function testGetCount($propertyName)
+    public function testGetCount(string $propertyName)
     {
         $expectedCount = 1;
 
-        $executionContext = $this->createMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
+        $executionContext = $this->createMock(ExecutionContext::class);
 
         $this->stepExecution->expects($this->once())
             ->method('getExecutionContext')
-            ->will($this->returnValue($executionContext));
+            ->willReturn($executionContext);
 
         $executionContext->expects($this->once())
             ->method('get')
             ->with($propertyName)
-            ->will($this->returnValue($expectedCount));
+            ->willReturn($expectedCount);
 
         $method = 'get' . str_replace('_', '', $propertyName);
         $this->assertEquals($expectedCount, $this->context->$method());
     }
 
-    public function getCountDataProvider()
+    public function getCountDataProvider(): array
     {
-        return array(
-            array('read_offset'),
-            array('update_count'),
-            array('replace_count'),
-            array('delete_count'),
-            array('error_entries_count'),
-            array('add_count')
-        );
+        return [
+            ['read_offset'],
+            ['update_count'],
+            ['replace_count'],
+            ['delete_count'],
+            ['error_entries_count'],
+            ['add_count']
+        ];
     }
 
     public function testGetConfiguration()
     {
-        $expectedConfiguration = array('foo' => 'value');
+        $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
         $this->assertSame($expectedConfiguration, $this->context->getConfiguration());
     }
 
     public function testHasConfigurationOption()
     {
-        $expectedConfiguration = array('foo' => 'value');
+        $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
 
         $this->assertTrue($this->context->hasOption('foo'));
@@ -159,7 +180,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 
     public function testHasConfigurationOptionUnknown()
     {
-        $expectedConfiguration = array('foo' => 'value');
+        $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
 
         $this->assertFalse($this->context->hasOption('unknown'));
@@ -167,7 +188,7 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetConfigurationOption()
     {
-        $expectedConfiguration = array('foo' => 'value');
+        $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
 
         self::assertEquals('value', $this->context->getOption('foo'));
@@ -175,71 +196,61 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 
     public function testGetConfigurationOptionDefault()
     {
-        $expectedConfiguration = array('foo' => 'value');
+        $expectedConfiguration = ['foo' => 'value'];
         $this->expectGetRawConfiguration($expectedConfiguration);
 
         $this->assertEquals('default', $this->context->getOption('unknown', 'default'));
     }
 
-    protected function expectGetRawConfiguration(array $expectedConfiguration, $count = 1)
+    private function expectGetRawConfiguration(array $expectedConfiguration, int $count = 1): void
     {
-        $jobInstance = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\JobInstance')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $jobInstance = $this->createMock(JobInstance::class);
 
-        $jobInstance->expects($this->exactly($count))->method('getRawConfiguration')
-            ->will($this->returnValue($expectedConfiguration));
+        $jobInstance->expects($this->exactly($count))
+            ->method('getRawConfiguration')
+            ->willReturn($expectedConfiguration);
 
-        $jobExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\JobExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $jobExecution = $this->createMock(JobExecution::class);
 
-        $jobExecution->expects($this->exactly($count))->method('getJobInstance')
-            ->will($this->returnValue($jobInstance));
+        $jobExecution->expects($this->exactly($count))
+            ->method('getJobInstance')
+            ->willReturn($jobInstance);
 
-        $this->stepExecution->expects($this->exactly($count))->method('getJobExecution')
-            ->will($this->returnValue($jobExecution));
+        $this->stepExecution->expects($this->exactly($count))
+            ->method('getJobExecution')
+            ->willReturn($jobExecution);
     }
 
     public function testAddErrors()
     {
-        $messages = array('Error 1', 'Error 2');
+        $messages = ['Error 1', 'Error 2'];
 
         $this->stepExecution->expects($this->exactly(2))
-            ->method('addError');
-        $this->stepExecution->expects($this->at(0))
             ->method('addError')
-            ->with($messages[0]);
-        $this->stepExecution->expects($this->at(1))
-            ->method('addError')
-            ->with($messages[1]);
+            ->withConsecutive([$messages[0]], [$messages[1]]);
 
         $this->context->addErrors($messages);
     }
 
     public function testGetFailureExceptions()
     {
-        $exceptions = array(array('message' => 'Error 1'), array('message' => 'Error 2'));
-        $expected = array('Error 1', 'Error 2');
+        $exceptions = [['message' => 'Error 1'], ['message' => 'Error 2']];
+        $expected = ['Error 1', 'Error 2'];
         $this->stepExecution->expects($this->once())
             ->method('getFailureExceptions')
-            ->will($this->returnValue($exceptions));
+            ->willReturn($exceptions);
         $this->assertEquals($expected, $this->context->getFailureExceptions());
     }
 
     public function testGetWarnings()
     {
-        $warning =
-            $this
-                ->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\Warning')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $warning = $this->createMock(Warning::class);
         $expected = new ArrayCollection();
         $expected->add($warning);
 
         $this->stepExecution->expects($this->once())
             ->method('getWarnings')
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $this->assertEquals($expected, $this->context->getWarnings());
     }

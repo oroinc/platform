@@ -2,14 +2,17 @@
 
 namespace Oro\Component\Action\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Exception\NotManageableEntityException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Find an entity based on specified lookup conditions.
+ */
 class RequestEntity extends AbstractAction
 {
     /** @var array */
@@ -18,10 +21,6 @@ class RequestEntity extends AbstractAction
     /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ContextAccessor $contextAccessor, ManagerRegistry $registry)
     {
         parent::__construct($contextAccessor);
@@ -70,6 +69,7 @@ class RequestEntity extends AbstractAction
      * @param array $options
      * @return array
      * @throws InvalidParameterException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function validateConditionOptions(array $options)
     {

@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var ScheduleIntervalsView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
 
-    ScheduleIntervalsView = BaseView.extend({
+    const ScheduleIntervalsView = BaseView.extend({
         options: {
             selectors: {
                 row: '[data-role="schedule-interval-row"]',
@@ -14,14 +13,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ScheduleIntervalsView() {
-            ScheduleIntervalsView.__super__.constructor.apply(this, arguments);
+        constructor: function ScheduleIntervalsView(options) {
+            ScheduleIntervalsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);

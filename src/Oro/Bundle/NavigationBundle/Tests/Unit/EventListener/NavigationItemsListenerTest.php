@@ -2,41 +2,40 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 
+use Knp\Menu\FactoryInterface;
 use Knp\Menu\MenuItem;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\EventListener\NavigationItemsListener;
 
 class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NavigationItemsListener */
-    protected $navigationListener;
+    private $navigationListener;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $featureChecker = $this->getMockBuilder('Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $featureChecker = $this->createMock(FeatureChecker::class);
         $featureChecker->expects($this->any())
             ->method('getDisabledResourcesByType')
-            ->will($this->returnValueMap([
+            ->willReturnMap([[
+                'navigation_items',
                 [
-                    'navigation_items',
-                    [
-                        'root.child2.disabled',
-                        'root > child2_1 > disabled',
-                        'root.child2_2.disabled',
-                        'root > child2_3 > disabled',
-                        'root.child3.disabled',
-                        'root.child3.disabled2',
-                        'root > child3_1 > disabled',
-                        'root > child3_1 > disabled2',
-                        'root.child3_2.disabled',
-                        'root.child3_2.disabled2',
-                        'root > child3_3 > disabled',
-                        'root > child3_3 > disabled2',
-                    ],
+                    'root.child2.disabled',
+                    'root > child2_1 > disabled',
+                    'root.child2_2.disabled',
+                    'root > child2_3 > disabled',
+                    'root.child3.disabled',
+                    'root.child3.disabled2',
+                    'root > child3_1 > disabled',
+                    'root > child3_1 > disabled2',
+                    'root.child3_2.disabled',
+                    'root.child3_2.disabled2',
+                    'root > child3_3 > disabled',
+                    'root > child3_3 > disabled2',
                 ],
-            ]));
+            ],
+        ]);
 
         $this->navigationListener = new NavigationItemsListener($featureChecker);
     }
@@ -55,8 +54,8 @@ class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function onNavigationConfigureProvider()
     {
-        $factory = $this->createMock('Knp\Menu\FactoryInterface');
-        
+        $factory = $this->createMock(FactoryInterface::class);
+
         return [
             [
                 new ConfigureMenuEvent(
@@ -228,13 +227,7 @@ class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param MenuItem $item
-     * @param array $children
-     *
-     * @return MenuItem
-     */
-    protected function addChildren(MenuItem $item, array $children)
+    private function addChildren(MenuItem $item, array $children): MenuItem
     {
         foreach ($children as $child) {
             $item->addChild($child);

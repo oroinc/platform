@@ -8,19 +8,11 @@ use Oro\Bundle\NavigationBundle\Model\UrlAwareInterface;
 
 class PrepareUrlListener
 {
-    /**
-     * @param UrlAwareInterface $entity
-     * @param LifecycleEventArgs $args
-     */
     public function prePersist(UrlAwareInterface $entity, LifecycleEventArgs $args)
     {
         $entity->setUrl($this->prepareUrl($args->getEntityManager(), get_class($entity), $entity->getUrl()));
     }
 
-    /**
-     * @param UrlAwareInterface $entity
-     * @param LifecycleEventArgs $args
-     */
     public function preUpdate(UrlAwareInterface $entity, LifecycleEventArgs $args)
     {
         $entity->setUrl($this->prepareUrl($args->getEntityManager(), get_class($entity), $entity->getUrl()));

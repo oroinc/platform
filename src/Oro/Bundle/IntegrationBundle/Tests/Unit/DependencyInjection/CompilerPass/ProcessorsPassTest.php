@@ -3,84 +3,50 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\ProcessorsPass;
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class ProcessorsPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CompilerPassInterface
-     */
-    protected $pass;
+    /** @var CompilerPassInterface */
+    private $compiler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->pass = new ProcessorsPass();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->pass);
+        $this->compiler = new ProcessorsPass();
     }
 
     public function testProcess()
     {
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_integration.processor_registry');
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder $containerBuilder */
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['getDefinition', 'findTaggedServiceIds'])
-            ->getMock();
-        $containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with(ProcessorsPass::SYNC_PROCESSOR_REGISTRY)
-            ->will($this->returnValue($definition));
+        $container->register('processor_1')
+            ->addTag('oro_integration.sync_processor', ['integration' => 'test']);
 
-        $services = ['testId' => [[ProcessorsPass::INTEGRATION_NAME => 'test']]];
-        $containerBuilder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with(ProcessorsPass::SYNC_PROCESSOR_TAG)
-            ->will($this->returnValue($services));
-        $definition->expects($this->once())
-            ->method('addMethodCall')
-            ->with('addProcessor', ['test', new Reference('testId')]);
+        $this->compiler->process($container);
 
-        $this->pass->process($containerBuilder);
+        self::assertEquals(
+            [
+                ['addProcessor', ['test', new Reference('processor_1')]]
+            ],
+            $registryDef->getMethodCalls()
+        );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\LogicException
-     * @expectedExceptionMessage Could not retrieve type attribute for "testId"
-     */
-    public function testProcessException()
+    public function testProcessWhenNoIntegrationType()
     {
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Could not retrieve type attribute for "processor_1"');
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder $containerBuilder */
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['getDefinition', 'findTaggedServiceIds'])
-            ->getMock();
-        $containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with(ProcessorsPass::SYNC_PROCESSOR_REGISTRY)
-            ->will($this->returnValue($definition));
+        $container = new ContainerBuilder();
+        $container->register('oro_integration.processor_registry');
 
-        $services = ['testId' => [[]]];
-        $containerBuilder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with(ProcessorsPass::SYNC_PROCESSOR_TAG)
-            ->will($this->returnValue($services));
+        $container->register('processor_1')
+            ->addTag('oro_integration.sync_processor');
 
-        $definition->expects($this->never())
-            ->method('addMethodCall');
-
-        $this->pass->process($containerBuilder);
+        $this->compiler->process($container);
     }
 }

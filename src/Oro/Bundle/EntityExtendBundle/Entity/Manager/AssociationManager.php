@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
-use Oro\Bundle\EntityBundle\ORM\UnionQueryBuilder;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -16,7 +14,13 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
+/**
+ * Provides a set of methods to manage multi-target associations.
+ * @link https://doc.oroinc.com/backend/entities/extend-entities/multi-target-associations
+ */
 class AssociationManager
 {
     /** @var ConfigManager */
@@ -34,13 +38,6 @@ class AssociationManager
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param ConfigManager      $configManager
-     * @param ServiceLink        $aclHelperLink
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityNameResolver $entityNameResolver
-     * @param FeatureChecker     $featureChecker
-     */
     public function __construct(
         ConfigManager $configManager,
         ServiceLink $aclHelperLink,
@@ -67,7 +64,7 @@ class AssociationManager
      *                                             $ownerClass and $targetClass is allowed.
      * @param string        $associationType       The type of the association.
      *                                             For example manyToOne or manyToMany
-     *                                             {@see Oro\Bundle\EntityExtendBundle\Extend\RelationType}
+     *                                             {@see \Oro\Bundle\EntityExtendBundle\Extend\RelationType}
      * @param string        $associationKind       The kind of the association.
      *                                             For example 'activity', 'sponsorship' etc
      *                                             Can be NULL for unclassified (default) association
@@ -210,8 +207,8 @@ class AssociationManager
         $criteria = QueryBuilderUtil::normalizeCriteria($filters);
 
         $qb = $this->getUnionQueryBuilder($associationOwnerClass)
-            ->addSelect('id', 'ownerId', Type::INTEGER)
-            ->addSelect('entityId', 'id', Type::INTEGER)
+            ->addSelect('id', 'ownerId', Types::INTEGER)
+            ->addSelect('entityId', 'id', Types::INTEGER)
             ->addSelect('entityClass', 'entity')
             ->addSelect('entityTitle', 'title');
         foreach ($associationTargets as $entityClass => $fieldName) {
@@ -337,7 +334,7 @@ class AssociationManager
         $criteria = QueryBuilderUtil::normalizeCriteria($filters);
 
         $qb = $this->getUnionQueryBuilder($associationTargetClass)
-            ->addSelect('entityId', 'id', Type::INTEGER)
+            ->addSelect('entityId', 'id', Types::INTEGER)
             ->addSelect('entityClass', 'entity')
             ->addSelect('entityTitle', 'title');
         $targetIdFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($associationTargetClass);
@@ -357,8 +354,8 @@ class AssociationManager
     }
 
     /**
-     * Returns a query builder that could be used for fetching the the list of owner side entities
-     * the specified $associationTargetClass associated with
+     * Returns a query builder that could be used for fetching the list of owner side entities
+     * the specified $associationTargetClass associated with.
      *
      * The resulting query would be something like this:
      * <code>
@@ -431,6 +428,7 @@ class AssociationManager
     private function setSorting(UnionQueryBuilder $qb, $orderBy = null)
     {
         if ($orderBy) {
+            QueryBuilderUtil::checkField($orderBy);
             $qb->addOrderBy($orderBy);
         }
     }

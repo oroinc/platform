@@ -5,8 +5,11 @@ namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Layout\Extension;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Extension\FormContextConfigurator;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor;
+use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -14,15 +17,15 @@ use Oro\Component\Layout\LayoutContext;
  */
 class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
     /** @var FormContextConfigurator */
-    protected $contextConfigurator;
+    private $contextConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
 
         $this->contextConfigurator = new FormContextConfigurator($this->container);
     }
@@ -31,24 +34,21 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
 
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $this->container->expects($this->once())
             ->method('get')
             ->with('form_service_id')
-            ->will($this->returnValue($form));
+            ->willReturn($form);
 
-        $context['form']         = 'form_service_id';
-        $context['form_action']  = 'action';
-        $context['form_method']  = 'method';
+        $context['form'] = 'form_service_id';
+        $context['form_action'] = 'action';
+        $context['form_method'] = 'method';
         $context['form_enctype'] = 'enctype';
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertInstanceOf(
-            'Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor',
-            $context['form']
-        );
+        $this->assertInstanceOf(DependencyInjectionFormAccessor::class, $context['form']);
 
         /** @var DependencyInjectionFormAccessor $formAccessor */
         $formAccessor = $context['form'];
@@ -62,20 +62,17 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
 
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
-        $context['form']         = $form;
-        $context['form_action']  = 'action';
-        $context['form_method']  = 'method';
+        $context['form'] = $form;
+        $context['form_action'] = 'action';
+        $context['form_method'] = 'method';
         $context['form_enctype'] = 'enctype';
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertInstanceOf(
-            'Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor',
-            $context['form']
-        );
+        $this->assertInstanceOf(FormAccessor::class, $context['form']);
 
         /** @var FormAccessor $formAccessor */
         $formAccessor = $context['form'];
@@ -89,25 +86,22 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
 
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $this->container->expects($this->once())
             ->method('get')
             ->with('form_service_id')
-            ->will($this->returnValue($form));
+            ->willReturn($form);
 
-        $context['form']                  = 'form_service_id';
-        $context['form_route_name']       = 'route';
+        $context['form'] = 'form_service_id';
+        $context['form_route_name'] = 'route';
         $context['form_route_parameters'] = ['foo' => 'bar'];
-        $context['form_method']           = 'method';
-        $context['form_enctype']          = 'enctype';
+        $context['form_method'] = 'method';
+        $context['form_enctype'] = 'enctype';
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertInstanceOf(
-            'Oro\Bundle\EmbeddedFormBundle\Layout\Form\DependencyInjectionFormAccessor',
-            $context['form']
-        );
+        $this->assertInstanceOf(DependencyInjectionFormAccessor::class, $context['form']);
 
         /** @var DependencyInjectionFormAccessor $formAccessor */
         $formAccessor = $context['form'];
@@ -122,21 +116,18 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
 
-        $form = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
 
-        $context['form']                  = $form;
-        $context['form_route_name']       = 'route';
+        $context['form'] = $form;
+        $context['form_route_name'] = 'route';
         $context['form_route_parameters'] = ['foo' => 'bar'];
-        $context['form_method']           = 'method';
-        $context['form_enctype']          = 'enctype';
+        $context['form_method'] = 'method';
+        $context['form_enctype'] = 'enctype';
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertInstanceOf(
-            'Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor',
-            $context['form']
-        );
+        $this->assertInstanceOf(FormAccessor::class, $context['form']);
 
         /** @var FormAccessor $formAccessor */
         $formAccessor = $context['form'];
@@ -147,14 +138,15 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('enctype', $formAccessor->getEnctype());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form" must be a string, "Symfony\Component\Form\FormInterface" or "Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface", but "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionIfInvalidFormType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The "form" must be a string, "%s" or "%s", but "integer" given.',
+            FormInterface::class,
+            FormAccessorInterface::class
+        ));
+
         $context = new LayoutContext();
 
         $context['form'] = 123;
@@ -177,7 +169,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
 
-        $formAccessor    = $this->createMock('Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor = $this->createMock(FormAccessorInterface::class);
         $context['form'] = $formAccessor;
 
         $this->contextConfigurator->configureContext($context);
@@ -190,21 +182,18 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     {
         $context = new LayoutContext();
 
-        $form       = $this->createMock('Symfony\Component\Form\FormInterface');
+        $form = $this->createMock(FormInterface::class);
         $formAction = FormAction::createEmpty();
 
-        $context['form']         = $form;
-        $context['form_action']  = $formAction;
-        $context['form_method']  = 'method';
+        $context['form'] = $form;
+        $context['form_action'] = $formAction;
+        $context['form_method'] = 'method';
         $context['form_enctype'] = 'enctype';
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
 
-        $this->assertInstanceOf(
-            'Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAccessor',
-            $context['form']
-        );
+        $this->assertInstanceOf(FormAccessor::class, $context['form']);
 
         /** @var FormAccessor $formAccessor */
         $formAccessor = $context['form'];
@@ -214,62 +203,59 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('enctype', $formAccessor->getEnctype());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form_action" must be a string or instance of "Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormAction", but "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
     public function testShouldThrowExceptionIfInvalidFormAction()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The "form_action" must be a string or instance of "%s", but "integer" given.',
+            FormAction::class
+        ));
+
         $context = new LayoutContext();
 
-        $context['form']        = $this->createMock('Symfony\Component\Form\FormInterface');
+        $context['form'] = $this->createMock(FormInterface::class);
         $context['form_action'] = 123;
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form_route_name" must be a string, but "integer" given.
-     */
     public function testShouldThrowExceptionIfInvalidFormRoute()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "form_route_name" must be a string, but "integer" given.');
+
         $context = new LayoutContext();
 
-        $context['form']            = $this->createMock('Symfony\Component\Form\FormInterface');
+        $context['form'] = $this->createMock(FormInterface::class);
         $context['form_route_name'] = 123;
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form_method" must be a string, but "integer" given.
-     */
     public function testShouldThrowExceptionIfInvalidFormMethod()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "form_method" must be a string, but "integer" given.');
+
         $context = new LayoutContext();
 
-        $context['form']        = $this->createMock('Symfony\Component\Form\FormInterface');
+        $context['form'] = $this->createMock(FormInterface::class);
         $context['form_method'] = 123;
 
         $this->contextConfigurator->configureContext($context);
         $context->resolve();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The "form_enctype" must be a string, but "integer" given.
-     */
     public function testShouldThrowExceptionIfInvalidFormEnctype()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "form_enctype" must be a string, but "integer" given.');
+
         $context = new LayoutContext();
 
-        $context['form']         = $this->createMock('Symfony\Component\Form\FormInterface');
+        $context['form'] = $this->createMock(FormInterface::class);
         $context['form_enctype'] = 123;
 
         $this->contextConfigurator->configureContext($context);

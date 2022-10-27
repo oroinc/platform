@@ -10,26 +10,20 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
     {
         $selectedItems = new SelectedItems([], true);
 
-        static::assertTrue($selectedItems->isEmpty());
+        self::assertTrue($selectedItems->isEmpty());
     }
 
     /**
      * @dataProvider notEmptyDataProvider
-     *
-     * @param array $values
-     * @param bool $inset
      */
     public function testIsEmptyWhenNotEmpty(array $values, bool $inset)
     {
         $selectedItems = new SelectedItems($values, $inset);
 
-        static::assertFalse($selectedItems->isEmpty());
+        self::assertFalse($selectedItems->isEmpty());
     }
 
-    /**
-     * @return array
-     */
-    public function notEmptyDataProvider()
+    public function notEmptyDataProvider(): array
     {
         return [
             'inset is true and some values given' => [
@@ -52,36 +46,36 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
         $values = [1, 2, 3];
         $selectedItems = new SelectedItems($values, true);
 
-        static::assertEquals($values, $selectedItems->getValues());
+        self::assertEquals($values, $selectedItems->getValues());
     }
 
     public function testIsInsetWhenTrue()
     {
         $selectedItems = new SelectedItems([], true);
 
-        static::assertTrue($selectedItems->isInset());
+        self::assertTrue($selectedItems->isInset());
     }
 
     public function testIsInsetWhenFalse()
     {
         $selectedItems = new SelectedItems([], false);
 
-        static::assertFalse($selectedItems->isInset());
+        self::assertFalse($selectedItems->isInset());
     }
 
     public function testCreateFromParametersWithDefaultValues()
     {
         $selectedItems = SelectedItems::createFromParameters([]);
 
-        static::assertEquals([], $selectedItems->getValues());
-        static::assertEquals(true, $selectedItems->isInset());
+        self::assertEquals([], $selectedItems->getValues());
+        self::assertEquals(true, $selectedItems->isInset());
     }
 
     public function testCreateFromParametersWithInsetGiven()
     {
         $expectedSelectedItems = new SelectedItems([], false);
 
-        static::assertEquals($expectedSelectedItems, SelectedItems::createFromParameters(['inset' => false]));
+        self::assertEquals($expectedSelectedItems, SelectedItems::createFromParameters(['inset' => false]));
     }
 
     public function testCreateFromParametersWithValuesGiven()
@@ -89,7 +83,7 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
         $values = [2, 9];
         $expectedSelectedItems = new SelectedItems($values, true);
 
-        static::assertEquals($expectedSelectedItems, SelectedItems::createFromParameters(['values' => $values]));
+        self::assertEquals($expectedSelectedItems, SelectedItems::createFromParameters(['values' => $values]));
     }
 
     public function testCreateFromParameters()
@@ -98,7 +92,7 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
         $inset = false;
         $expectedSelectedItems = new SelectedItems($values, $inset);
 
-        static::assertEquals(
+        self::assertEquals(
             $expectedSelectedItems,
             SelectedItems::createFromParameters(['values' => $values, 'inset' => $inset])
         );

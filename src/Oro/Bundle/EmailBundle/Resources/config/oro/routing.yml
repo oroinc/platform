@@ -8,16 +8,214 @@ oro_email_dashboard:
     type:         annotation
     prefix:       /dashboard
 
-oro_email_bundle_api:
-    resource:     "@OroEmailBundle/Resources/config/oro/routing_api.yml"
-    type:         rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest
 oro_mailbox_config:
     resource:     "@OroEmailBundle/Controller/Configuration"
     type:         annotation
     prefix:       /config
+
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_get_emails:
+    path: '/api/rest/{version}/emails.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_email:
+    path: '/api/rest/{version}/emails/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_put_email:
+    path: '/api/rest/{version}/emails/{id}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailController::putAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_post_email:
+    path: '/api/rest/{version}/emails.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_options_emails:
+    path: '/api/rest/{version}/emails.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_delete_autoresponserule:
+    path: '/api/rest/{version}/autoresponserules/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\AutoResponseRuleController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_emailorigins:
+    path: '/api/rest/{version}/emailorigins.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailOriginController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_emailorigin:
+    path: '/api/rest/{version}/emailorigins/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailOriginController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_options_emailorigins:
+    path: '/api/rest/{version}/emailorigins.{_format}'
+    methods: [OPTIONS]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailOriginController::optionsAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_delete_emailtemplate:
+    path: '/api/rest/{version}/emailtemplates/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_emailtemplates:
+    path: '/api/rest/{version}/emailtemplates/list/{entityName}/{includeNonEntity}/{includeSystemTemplates}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController::cgetAction'
+        entityName: null
+        includeNonEntity: false
+        includeSystemTemplates: true
+        _format: json
+        version: latest
+    requirements:
+        entityName: \w+
+        includeNonEntity: \d+
+        includeSystemTemplates: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_emailtemplate_variables:
+    path: '/api/rest/{version}/emailtemplates/variables.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController::getVariablesAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_emailtemplate_compiled:
+    path: '/api/rest/{version}/emailtemplates/compiled/{id}/{entityId}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController::getCompiledAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        entityId: '\d*'
+        _format: json
+        version: latest|v1
+
+oro_api_get_email_activity_relations_by_filters:
+    path: '/api/rest/{version}/activities/emails/relations.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivityController::cgetByFiltersAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_email_activity_relations:
+    path: '/api/rest/{version}/activities/emails/{id}/relations.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivityEntityController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_email_search_relations:
+    path: '/api/rest/{version}/activities/emails/relations/search.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivitySearchController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_activity_email_suggestions:
+    path: '/api/rest/{version}/activities/emails/{id}/suggestions.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivitySuggestionController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1

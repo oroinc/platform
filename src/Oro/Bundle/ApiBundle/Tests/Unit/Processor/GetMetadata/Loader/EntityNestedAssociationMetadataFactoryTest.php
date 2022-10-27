@@ -22,7 +22,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
     /** @var EntityNestedAssociationMetadataFactory */
     private $entityNestedAssociationMetadataFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->nestedAssociationMetadataHelper = $this->createMock(NestedAssociationMetadataHelper::class);
         $this->entityMetadataFactory = $this->createMock(EntityMetadataFactory::class);
@@ -35,7 +35,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedAssociationMetadataWhenNoAssociationDataType()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -49,7 +49,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
         $idField = $targetConfig->addField($idFieldName);
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         $idFieldMetadata = new FieldMetadata();
@@ -110,7 +110,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedAssociationMetadataWhenNoAssociationDataTypeAndIfFieldHasPropertyPath()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -126,7 +126,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
         $idField->setPropertyPath($idFieldPropertyPath);
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         $idFieldMetadata = new FieldMetadata();
@@ -187,7 +187,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedAssociationMetadataWhenNoAssociationDataTypeAndNoManageableFieldForId()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -201,7 +201,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
         $idField = $targetConfig->addField($idFieldName);
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         $idFieldMetadata = new FieldMetadata();
@@ -260,7 +260,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedAssociationMetadataForExcludedTargetField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -276,7 +276,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setDataType('integer');
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         $this->nestedAssociationMetadataHelper->expects(self::once())
@@ -310,7 +310,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedAssociationMetadataForExcludedTargetFieldWithExcludedProperties()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -326,7 +326,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setDataType('integer');
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new FieldMetadata();
 
@@ -375,7 +375,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedAssociationMetadataForField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -390,7 +390,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setDataType('integer');
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new FieldMetadata();
 
@@ -439,7 +439,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedAssociationMetadataForMetaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -455,7 +455,7 @@ class EntityNestedAssociationMetadataFactoryTest extends LoaderTestCase
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setDataType('integer');
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new MetaPropertyMetadata();
 

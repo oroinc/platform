@@ -3,12 +3,13 @@
 namespace Oro\Component\Layout\Tests\Unit\Loader\Visitor;
 
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 
 class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
 {
     public function testShouldValidateConstructParameters()
     {
-        $this->expectException('\Oro\Component\Layout\Exception\UnexpectedTypeException');
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Component\Layout\Loader\Visitor\VisitorInterface",'
             . ' "stdClass" given.'
@@ -19,7 +20,7 @@ class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
     public function testShouldAcceptValidConditionsAsConstructorParameters()
     {
         $collection = new VisitorCollection(
-            [$this->createMock('Oro\Component\Layout\Loader\Visitor\VisitorInterface')]
+            [$this->createMock(VisitorInterface::class)]
         );
 
         $this->assertNotEmpty($collection);
@@ -27,7 +28,7 @@ class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
 
     public function testAppendShouldValidateParameter()
     {
-        $this->expectException('\Oro\Component\Layout\Exception\UnexpectedTypeException');
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Component\Layout\Loader\Visitor\VisitorInterface",'
             . ' "stdClass" given.'
@@ -42,7 +43,7 @@ class VisitorCollectionTest extends \PHPUnit\Framework\TestCase
         $collection = new VisitorCollection();
         $this->assertEmpty($collection);
 
-        $collection->append($this->createMock('Oro\Component\Layout\Loader\Visitor\VisitorInterface'));
+        $collection->append($this->createMock(VisitorInterface::class));
 
         $this->assertNotEmpty($collection);
     }

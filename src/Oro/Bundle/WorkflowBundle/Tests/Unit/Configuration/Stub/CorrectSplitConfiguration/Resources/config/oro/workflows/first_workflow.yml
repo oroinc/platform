@@ -48,8 +48,8 @@ workflows:
                 form_type: custom_workflow_transition
                 display_type: page
                 destination_page: index
-                page_template: Workflow:Test:pageTemplate.html.twig
-                dialog_template: Workflow:Test:dialogTemplate.html.twig
+                page_template: '@OroWorkflow/Test/pageTemplate.html.twig'
+                dialog_template: '@OroWorkflow/Test/dialogTemplate.html.twig'
                 init_entities:
                     - entity1
                 init_routes:
@@ -119,7 +119,3 @@ workflows:
                         message: "Fail upper level"
                 actions:
                     - '@custom_action2': ~
-                pre_conditions:
-                    '@condition1': ~
-                post_actions:
-                    - '@custom_action': ~

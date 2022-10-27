@@ -20,9 +20,6 @@ class OroPageObjectInitializer implements ContextInitializer
      */
     protected $pageFactory;
 
-    /**
-     * @param OroElementFactory $elementFactory
-     */
     public function __construct(OroElementFactory $elementFactory, OroPageFactory $pageFactory)
     {
         $this->elementFactory = $elementFactory;

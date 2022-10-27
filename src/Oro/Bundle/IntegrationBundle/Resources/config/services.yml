@@ -1,50 +1,3 @@
-parameters:
-    oro_integration.entity.class:                                         Oro\Bundle\IntegrationBundle\Entity\Channel
-    oro_integration.fields_changes.class:                                 Oro\Bundle\IntegrationBundle\Entity\FieldsChanges
-
-    oro_integration.form.type.channel.class:                              Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
-    oro_integration.form.type.oro_integration_type_select.class:          Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType
-    oro_integration.form.type.oro_integration_select.class:               Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType
-    oro_integration.form.handler.integration.class:                       Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
-
-    oro_integration.form.subscriber.channel_subscriber.class:             Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber
-    oro_integration.form.subscriber.default_owner_subscriber.class:       Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber
-
-    oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
-    oro_integration.manager.fields_changes.class:                         Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager
-
-    oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
-    oro_integration.processor_registry.class:                             Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry
-    oro_integration.provider.connector_context_mediator.class:            Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
-    oro_integration.importexport.processor.import.class:                  Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareImportProcessor
-    oro_integration.importexport.processor.export.class:                  Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareExportProcessor
-
-    # Import/export utils
-    oro_integration.job_executor.class:                                   Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
-    oro_integration.writer.persistent_batch_writer.class:                 Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
-    oro_integration.helper.default_owner_helper.class:                    Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper
-    oro_integration.reader.entity.by_id.class:                            Oro\Bundle\IntegrationBundle\Reader\EntityReaderById
-
-    oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
-
-    oro_integration.delete_manager.class:                                 Oro\Bundle\IntegrationBundle\Manager\DeleteManager
-    oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
-
-    oro_integration.provider.settings_provider.class:                     Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
-
-    oro_integration.config_resolver.class:                                Oro\Component\Config\Resolver\SystemAwareResolver
-    oro_integration.utils.form_utils.class:                               Oro\Bundle\IntegrationBundle\Utils\FormUtils
-
-    oro_integration.datagrid.status_grid_helper.class:                    Oro\Bundle\IntegrationBundle\Datagrid\StatusGridHelper
-    oro_integration.event_listener.keep_avile.class:                      Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener
-
-    oro_integration.action.save_fields_changes.class:                     Oro\Bundle\IntegrationBundle\Model\Action\SaveFieldsChangesAction
-    oro_integration.action.remove_fields_changes.class:                   Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction
-
-    oro_integration.workflow.condition.has_active_integration.class:      Oro\Bundle\IntegrationBundle\Model\Condition\HasActiveIntegration
-
-    oro_integration.workflow.action.populate_integration_owner.class:     Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner
-
 services:
     oro_integration.form.channel:
         class: Symfony\Component\Form\Form
@@ -52,7 +5,7 @@ services:
         arguments: ["oro_integration_channel_form", Oro\Bundle\IntegrationBundle\Form\Type\ChannelType, null]
 
     oro_integration.form.type.channel:
-        class: '%oro_integration.form.type.channel.class%'
+        class: Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
         arguments:
             - '@oro_integration.form.subscriber.default_owner_subscriber'
             - '@oro_integration.form.subscriber.channel_subscriber'
@@ -60,7 +13,7 @@ services:
             - { name: form.type, alias: oro_integration_channel_form }
 
     oro_integration.form.type.oro_integration_type_select:
-        class: '%oro_integration.form.type.oro_integration_type_select.class%'
+        class: Oro\Bundle\IntegrationBundle\Form\Type\IntegrationTypeSelectType
         arguments:
             - '@oro_integration.manager.types_registry'
             - '@assets.packages'
@@ -68,7 +21,7 @@ services:
             - { name: form.type, alias: oro_integration_type_select }
 
     oro_integration.form.type.oro_integration_select:
-        class: '%oro_integration.form.type.oro_integration_select.class%'
+        class: Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSelectType
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_integration.manager.types_registry'
@@ -77,37 +30,51 @@ services:
         tags:
             - { name: form.type, alias: oro_integration_select }
 
+    oro_integration.form.type.config_integration_select:
+        class: Oro\Bundle\IntegrationBundle\Form\Type\ConfigIntegrationSelectType
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: form.type }
+
     oro_integration.form.subscriber.channel_subscriber:
-        class: '%oro_integration.form.subscriber.channel_subscriber.class%'
+        class: Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber
         arguments:
             - '@oro_integration.manager.types_registry'
             - '@oro_integration.provider.settings_provider'
+            - '@Doctrine\Inflector\Inflector'
 
     oro_integration.form.subscriber.default_owner_subscriber:
-        class: '%oro_integration.form.subscriber.default_owner_subscriber.class%'
+        class: Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber
         arguments:
             - '@oro_security.token_accessor'
             - '@oro_integration.manager.types_registry'
 
+    Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler:
+        alias: oro_integration.form.handler.integration
+
     oro_integration.form.handler.integration:
-        class: '%oro_integration.form.handler.integration.class%'
+        class: Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
+        public: true
         arguments:
             - '@request_stack'
             - '@oro_integration.form.channel'
             - '@doctrine.orm.entity_manager'
             - '@event_dispatcher'
+            - '@form.factory'
 
     oro_integration.manager.types_registry:
-        class: '%oro_integration.manager.types_registry.class%'
+        class: Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
         arguments:
             - []
         lazy: true
+        public: true
 
     oro_integration.manager.fields_changes:
-        class: '%oro_integration.manager.fields_changes.class%'
+        class: Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager
         arguments:
             - '@oro_entity.doctrine_helper'
-            - '%oro_integration.fields_changes.class%'
+            - 'Oro\Bundle\IntegrationBundle\Entity\FieldsChanges'
 
     oro_integration.manager.types_registry.link:
         tags:
@@ -115,17 +82,17 @@ services:
 
     # Import/export utils
     oro_integration.job_executor:
-        class: '%oro_integration.job_executor.class%'
+        class: Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
         arguments:
-            - '@akeneo_batch.connectors'
-            - '@akeneo_batch.job_repository'
+            - '@oro_batch.connector.registry'
+            - '@oro_batch.job.repository'
             - '@oro_importexport.context_registry'
             - '@doctrine'
             - '@oro_importexport.job.context.aggregator_registry'
         lazy: true
 
     oro_integration.writer.persistent_batch_writer:
-        class: '%oro_integration.writer.persistent_batch_writer.class%'
+        class: Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
         arguments:
             - '@doctrine'
             - '@event_dispatcher'
@@ -133,18 +100,19 @@ services:
             - '@oro_integration.logger.strategy'
 
     oro_integration.reader.entity.by_id:
-        class: '%oro_integration.reader.entity.by_id.class%'
+        class: Oro\Bundle\IntegrationBundle\Reader\EntityReaderById
+        public: true
         parent: oro_importexport.reader.entity
 
     oro_integration.helper.default_owner_helper:
-        class: '%oro_integration.helper.default_owner_helper.class%'
+        class: Oro\Bundle\IntegrationBundle\ImportExport\Helper\DefaultOwnerHelper
         arguments:
             - '@doctrine'
             - '@oro_security.owner.ownership_metadata_provider'
 
     # sync processor
     oro_integration.sync.processor:
-        class: '%oro_integration.sync.processor.class%'
+        class: Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
         arguments:
           - '@doctrine'
           - '@oro_importexport.processor.registry'
@@ -154,27 +122,30 @@ services:
           - '@oro_integration.logger.strategy'
         lazy: true
 
+    Oro\Bundle\IntegrationBundle\Provider\SyncProcessor:
+        alias: oro_integration.sync.processor
+
     oro_integration.importexport.processor.import:
-        class: '%oro_integration.importexport.processor.import.class%'
+        class: Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareImportProcessor
         parent: oro_importexport.processor.import_abstract
         abstract: true
         calls:
             - [setContextRegistry, ['@oro_importexport.context_registry']]
 
     oro_integration.importexport.processor.export:
-        class: '%oro_integration.importexport.processor.export.class%'
+        class: Oro\Bundle\IntegrationBundle\ImportExport\Processor\StepExecutionAwareExportProcessor
         parent: oro_importexport.processor.export_abstract
         abstract: true
         calls:
             - [setContextRegistry, ['@oro_importexport.context_registry']]
 
     oro_integration.processor_registry:
-        class: '%oro_integration.processor_registry.class%'
+        class: Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry
         calls:
             - [setDefaultProcessor, ['@oro_integration.sync.processor']]
 
     oro_integration.provider.connector_context_mediator:
-        class: '%oro_integration.provider.connector_context_mediator.class%'
+        class: Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
         arguments:
             - '@oro_integration.manager.types_registry.link'
             - '@doctrine'
@@ -182,26 +153,31 @@ services:
             - { name: doctrine.event_listener, event: onClear }
 
     oro_integration.logger.strategy:
-        class: '%oro_integration.logger.strategy.class%'
+        class: Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
         calls:
             - [setDebug, ['%kernel.debug%']]
 
     oro_integration.delete_manager:
-        class: '%oro_integration.delete_manager.class%'
+        class: Oro\Bundle\IntegrationBundle\Manager\DeleteManager
+        public: true
         arguments: [ '@doctrine.orm.entity_manager' ]
 
     oro_integration.sync_scheduler:
-        class: '%oro_integration.sync_scheduler.class%'
+        class: Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
         arguments:
             - '@oro_message_queue.message_producer'
 
     oro_integration.genuine_sync_scheduler:
-        class: 'Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler'
+        class: Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler
+        public: true
         arguments:
             - '@oro_message_queue.message_producer'
 
+    Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler:
+        alias: oro_integration.genuine_sync_scheduler
+
     oro_integration.reverse_sync.processor:
-        class: 'Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor'
+        class: Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
         arguments:
             - '@doctrine'
             - '@oro_importexport.processor.registry'
@@ -211,28 +187,30 @@ services:
             - '@oro_integration.logger.strategy'
         lazy: true
 
-    oro_integration.sync_scheduler.link:
-        tags:
-            - { name: oro_service_link,  service: oro_integration.sync_scheduler }
-
     oro_integration.provider.settings_provider:
-        class: '%oro_integration.provider.settings_provider.class%'
+        class: Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
+        public: false
+        parent: oro.static_config_provider.abstract
         arguments:
-            - []
+            - '%kernel.cache_dir%/oro/integrations.php'
+            - '%kernel.debug%'
             - '@oro_integration.config_resolver'
 
     oro_integration.config_resolver:
-        class: '%oro_integration.config_resolver.class%'
+        class: Oro\Component\Config\Resolver\SystemAwareResolver
+        public: false
         arguments:
             - '@service_container'
 
     oro_integration.utils.form_utils:
-        class: '%oro_integration.utils.form_utils.class%'
+        class: Oro\Bundle\IntegrationBundle\Utils\FormUtils
+        public: true
         arguments:
             - '@oro_integration.manager.types_registry'
 
     oro_integration.datagrid.status_grid_helper:
-        class: '%oro_integration.datagrid.status_grid_helper.class%'
+        class: Oro\Bundle\IntegrationBundle\Datagrid\StatusGridHelper
+        public: true
         arguments:
             - '@oro_integration.manager.types_registry'
             - '@translator'
@@ -241,14 +219,14 @@ services:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.oro-integration-status-grid, method: statusGridBuildAfter }
 
     oro_integration.event_listener.keep_avile:
-        class: '%oro_integration.event_listener.keep_avile.class%'
+        class: Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener
         arguments:
-            - '@akeneo_batch.job_repository'
+            - '@oro_batch.job.repository'
         tags:
             - { name: kernel.event_listener, event: oro_integration.writer_after_flush, method: onWriterAfterFlush }
 
     oro_integration.workflow.condition.has_active_integration:
-        class: '%oro_integration.workflow.condition.has_active_integration.class%'
+        class: Oro\Bundle\IntegrationBundle\Model\Condition\HasActiveIntegration
         arguments:
             - '@doctrine'
         tags:
@@ -262,19 +240,19 @@ services:
             - [setFieldsChangesManager, ['@oro_integration.manager.fields_changes']]
 
     oro_integration.action.save_fields_changes:
-        class: '%oro_integration.action.save_fields_changes.class%'
+        class: Oro\Bundle\IntegrationBundle\Model\Action\SaveFieldsChangesAction
         parent: oro_integration.action.abstract_fields_changes
         tags:
             - { name: oro_action.action, alias: save_fields_changes }
 
     oro_integration.action.remove_fields_changes:
-        class: '%oro_integration.action.remove_fields_changes.class%'
+        class: Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction
         parent: oro_integration.action.abstract_fields_changes
         tags:
             - { name: oro_action.action, alias: remove_fields_changes }
 
     oro_integration.workflow.action.populate_integration_owner:
-        class: '%oro_integration.workflow.action.populate_integration_owner.class%'
+        class: Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner
         arguments:
             - '@oro_action.expression.context_accessor'
             - '@oro_integration.helper.default_owner_helper'
@@ -285,12 +263,12 @@ services:
         class: Oro\Bundle\IntegrationBundle\Twig\IntegrationExtension
         public: false
         arguments:
-            - '@event_dispatcher'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_integration.async.sync_integration_processor:
-        class: 'Oro\Bundle\IntegrationBundle\Async\SyncIntegrationProcessor'
+        class: Oro\Bundle\IntegrationBundle\Async\SyncIntegrationProcessor
         arguments:
             - '@doctrine'
             - '@security.token_storage'
@@ -301,7 +279,7 @@ services:
             - { name: 'oro_message_queue.client.message_processor' }
 
     oro_integration.async.revers_sync_integration_processor:
-        class: 'Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor'
+        class: Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_integration.reverse_sync.processor'
@@ -314,18 +292,20 @@ services:
 
     oro_integration.datagrid.action_configuration:
         class: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration
+        public: true
         arguments:
             - '@oro_integration.manager.types_registry'
 
     oro_integration.generator.prefixed_identifier_generator:
-        class: 'Oro\Bundle\IntegrationBundle\Generator\Prefixed\PrefixedIntegrationIdentifierGenerator'
+        class: Oro\Bundle\IntegrationBundle\Generator\Prefixed\PrefixedIntegrationIdentifierGenerator
         abstract: true
 
     oro_integration.utils.edit_mode:
-        class: 'Oro\Bundle\IntegrationBundle\Utils\EditModeUtils'
+        class: Oro\Bundle\IntegrationBundle\Utils\EditModeUtils
+        public: true
 
     oro_integration.provider.integration_icon:
-        class: 'Oro\Bundle\IntegrationBundle\Provider\IntegrationIconProvider'
+        class: Oro\Bundle\IntegrationBundle\Provider\IntegrationIconProvider
         arguments:
             - '@oro_integration.manager.types_registry.link'
         public: false

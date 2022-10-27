@@ -3,38 +3,26 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * The factory for configuration resources Finder.
+ */
 class ConfigFinderFactory
 {
-    /** @var array */
-    private $kernelBundles;
-
-    /**
-     * @param array $kernelBundles
-     */
-    public function __construct(array $kernelBundles)
+    public function __construct(private array $kernelBundles, private KernelInterface $kernel)
     {
-        $this->kernelBundles = $kernelBundles;
     }
 
-    /**
-     * @param string $subDir
-     * @param string $filePattern
-     * @return Finder
-     */
-    public function create(string $subDir, string $filePattern): Finder
+    public function create(string $subDir, string $appSubDir, string $filePattern): Finder
     {
         $finder = new Finder();
-        $finder->in($this->getConfigDirectories($subDir))->name($filePattern);
+        $finder->in($this->getConfigDirectories($subDir, $appSubDir))->name($filePattern);
 
         return $finder;
     }
 
-    /**
-     * @param string $subDirectory
-     * @return array
-     */
-    private function getConfigDirectories(string $subDirectory): array
+    private function getConfigDirectories(string $subDirectory, string $appSubDir): array
     {
         $configDirectory = str_replace('/', DIRECTORY_SEPARATOR, $subDirectory);
         $configDirectories = [];
@@ -45,6 +33,10 @@ class ConfigFinderFactory
             if (is_dir($bundleConfigDirectory) && is_readable($bundleConfigDirectory)) {
                 $configDirectories[] = realpath($bundleConfigDirectory);
             }
+        }
+        $appDirectory = $this->kernel->getProjectDir() . $appSubDir;
+        if (is_dir($appDirectory)) {
+            $configDirectories[] = realpath($appDirectory);
         }
 
         return $configDirectories;

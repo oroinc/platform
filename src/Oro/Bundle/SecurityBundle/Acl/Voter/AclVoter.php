@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
@@ -17,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 /**
  * This voter uses ACL to determine whether the access to the particular resource is granted or not.
  */
-class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContextInterface
+class AclVoter extends BaseAclVoter implements AclVoterInterface
 {
     /**
      * @var AclExtensionSelector
@@ -57,17 +56,12 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
 
     /**
      * Sets the ACL extension selector
-     *
-     * @param AclExtensionSelector $selector
      */
     public function setAclExtensionSelector(AclExtensionSelector $selector)
     {
         $this->extensionSelector = $selector;
     }
 
-    /**
-     * @param AclGroupProviderInterface $provider
-     */
     public function setAclGroupProvider(AclGroupProviderInterface $provider)
     {
         $this->groupProvider = $provider;
@@ -75,10 +69,8 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
 
     /**
      * Adds an observer is used to inform a caller about IsGranted operation details
-     *
-     * @param OneShotIsGrantedObserver $observer
      */
-    public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer)
+    public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer): void
     {
         if (null !== $this->oneShotIsGrantedObserver) {
             if (!is_array($this->oneShotIsGrantedObserver)) {
@@ -173,7 +165,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
 
         $identityObject = $object;
         if ($object instanceof DomainObjectWrapper) {
-            $identityObject = $object->getDomainObject();
+            $identityObject = $object->getObjectIdentity();
         }
 
         $group = null;
@@ -203,7 +195,8 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected function getObjectToVote($object)
     {
         return $object instanceof FieldVote
-            ? $object
+            // create new FieldVote with DomainObject that have no information about the group in it.
+            ? new FieldVote($this->object, $object->getField())
             : $this->object;
     }
 

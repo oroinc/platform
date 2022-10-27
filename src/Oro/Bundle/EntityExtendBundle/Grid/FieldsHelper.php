@@ -18,10 +18,6 @@ class FieldsHelper
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(
         ConfigManager $configManager,
         FeatureChecker $featureChecker

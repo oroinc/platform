@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
 {% oro_title_set({params : { "%role%": form.vars.value.label, "%entityName%": 'oro.user.role.entity_label'|trans } }) %}
@@ -7,6 +7,8 @@
 {% set formAction = entityId ? path('oro_user_role_update', { 'id': entityId}) : path('oro_user_role_create') %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {{ parent() }}
     {% if entityId and is_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
@@ -73,11 +75,13 @@
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.user.role.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set id = 'role-profile' %}
 
     {% set dataBlocks = [{
@@ -94,21 +98,7 @@
         ]
     }] %}
 
-    {% set additionalData = [] %}
-    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
-        {% set additionalData = additionalData|merge([form_row(child)]) %}
-    {% endfor %}
-    {% if additionalData is not empty %}
-        {% set dataBlocks = dataBlocks|merge([{
-                'title': 'Additional'|trans,
-                'subblocks': [{
-                    'title': '',
-                    'useSpan': false,
-                    'data' : additionalData
-                }]
-            }]
-        ) %}
-    {% endif %}
+    {% set dataBlocks = dataBlocks|merge(oro_form_additional_data(form, 'Additional'|trans)) %}
 
     {% set rolePermissionsGrid %}
         {% set entityTabPanelId = 'entity-tab-panel-'|uniqid %}
@@ -120,7 +110,7 @@
             module: 'orouser/js/components/role/entity-category-tabs-component',
             options: tabsOptions
         }) }}></div>
-        <div id="{{ entityTabPanelId }}" role="tabpanel">
+        <div id="{{ entityTabPanelId }}" class="tab-content" role="tabpanel">
             {{ dataGrid.renderGrid('role-permission-grid', {role: entity}, { cssClass: 'inner-permissions-grid', themeOptions: {readonly: false} }) }}
             <div {{ UI.renderPageComponentAttributes({
                 module: 'orouser/js/components/role/capability-set-component',

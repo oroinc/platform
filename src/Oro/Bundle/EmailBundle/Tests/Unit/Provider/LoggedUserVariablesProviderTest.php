@@ -4,48 +4,49 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
-
-    /** @var LoggedUserVariablesProvider */
-    protected $provider;
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityNameResolver;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
-    protected function setUp()
+    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $htmlTagHelper;
+
+    /** @var LoggedUserVariablesProvider */
+    private $provider;
+
+    protected function setUp(): void
     {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnArgument(0));
+            ->willReturnArgument(0);
 
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-
-        $this->entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
         $this->provider = new LoggedUserVariablesProvider(
             $translator,
             $this->tokenAccessor,
             $this->entityNameResolver,
-            $this->configManager
+            $this->configManager,
+            $this->htmlTagHelper
         );
     }
 
@@ -53,7 +54,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $result = $this->provider->getVariableDefinitions();
         $this->assertEquals(
@@ -64,11 +65,11 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetVariableDefinitionsForNonOroUser()
     {
-        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock(UserInterface::class);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $result = $this->provider->getVariableDefinitions();
         $this->assertEquals(
@@ -90,14 +91,14 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetVariableDefinitions()
     {
         $organization = new Organization();
-        $user         = new User();
+        $user = new User();
 
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue($organization));
+            ->willReturn($organization);
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $result = $this->provider->getVariableDefinitions();
         $this->assertEquals(
@@ -121,10 +122,10 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $result = $this->provider->getVariableValues();
         $this->assertEquals(
@@ -142,17 +143,17 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetVariableValuesForNonOroUser()
     {
-        $user = $this->createMock('Symfony\Component\Security\Core\User\UserInterface');
+        $user = $this->createMock(UserInterface::class);
         $user->expects($this->once())
             ->method('getUsername')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $result = $this->provider->getVariableValues();
         $this->assertEquals(
@@ -180,20 +181,24 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue($organization));
+            ->willReturn($organization);
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $this->entityNameResolver->expects($this->once())
             ->method('getName')
             ->with($this->identicalTo($user))
-            ->will($this->returnValue('FullName'));
+            ->willReturn('FullName');
 
         $this->configManager->expects($this->once())
             ->method('get')
             ->with('oro_email.signature')
-            ->will($this->returnValue('Signature'));
+            ->willReturn('Signature');
+        $this->htmlTagHelper->expects($this->once())
+            ->method('sanitize')
+            ->with('Signature')
+            ->willReturn('Sanitized Signature');
 
         $result = $this->provider->getVariableValues();
         $this->assertEquals(
@@ -203,7 +208,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
                 'userLastName'     => 'LastName',
                 'userFullName'     => 'FullName',
                 'organizationName' => 'TestOrg',
-                'userSignature'    => 'Signature',
+                'userSignature'    => 'Sanitized Signature',
             ],
             $result
         );

@@ -12,9 +12,6 @@ abstract class AbstractTriggerCronScheduler implements LoggerAwareInterface
     /** @var DeferredScheduler */
     protected $deferredScheduler;
 
-    /**
-     * @param DeferredScheduler $deferredScheduler
-     */
     public function __construct(DeferredScheduler $deferredScheduler)
     {
         $this->deferredScheduler = $deferredScheduler;

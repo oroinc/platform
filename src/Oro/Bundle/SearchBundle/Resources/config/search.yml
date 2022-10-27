@@ -1,0 +1,43 @@
+services:
+    oro_search.engine.parameters:
+        class: Oro\Bundle\SearchBundle\Engine\EngineParameters
+        public: true
+        arguments:
+            - '%oro_search.engine_dsn%'
+
+    oro_search.search.engine:
+        class: 'Oro\Bundle\SearchBundle\Engine\EngineInterface'
+        arguments:
+            - !tagged_locator { tag: 'oro_search.engine', index_by: 'engine_name' }
+            - '@oro_search.engine.parameters'
+        factory: [ 'Oro\Bundle\SearchBundle\Engine\SearchEngineFactory', 'create' ]
+
+    oro_search.search.engine.indexer:
+        class: 'Oro\Bundle\SearchBundle\Engine\IndexerInterface'
+        arguments:
+            - !tagged_locator { tag: 'oro_search.engine.indexer', index_by: 'engine_name' }
+            - '@oro_search.engine.parameters'
+        factory: [ 'Oro\Bundle\SearchBundle\Engine\SearchEngineIndexerFactory', 'create' ]
+
+    ## ORM search engine services setup
+    oro_orm.search.engine:
+        class: Oro\Bundle\SearchBundle\Engine\Orm
+        arguments:
+            - '@doctrine'
+            - '@oro_search.mapper'
+            - '@event_dispatcher'
+        calls:
+            - [ setLogQueries, [ '%oro_search.log_queries%' ] ]
+        tags:
+            - { name: 'oro_search.engine', engine_name: 'orm' }
+
+    oro_orm.search.engine.indexer:
+        class: Oro\Bundle\SearchBundle\Engine\OrmIndexer
+        arguments:
+            - '@doctrine'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_search.text_filtered_mapper'
+            - '@oro_entity.entity_name_resolver'
+            - '@logger'
+        tags:
+            - { name: 'oro_search.engine.indexer', engine_name: 'orm' }

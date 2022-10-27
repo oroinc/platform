@@ -5,59 +5,51 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Config;
 use Oro\Bundle\FormBundle\Config\BlockConfig;
 use Oro\Bundle\FormBundle\Config\FormConfig;
 use Oro\Bundle\FormBundle\Config\SubBlockConfig;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class FormConfigTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  FormConfig  */
+    /** @var FormConfig */
     private $formConfig;
 
-    private $blocks = array();
+    private $blocks = [];
 
-    private $reportingLevel;
-
-    private $testSubBlocksConfig = array(
-        'common' => array(
+    private $testSubBlocksConfig = [
+        'common' => [
             'title'    => 'Common Setting',
             'priority' => 3,
-        ),
-        'custom' => array(
+        ],
+        'custom' => [
             'title'    => 'Custom Setting',
             'priority' => 2,
-        ),
-        'last' => array(
+        ],
+        'last' => [
             'title'    => 'Last SubBlock',
             'priority' => 1,
-        )
-    );
+        ]
+    ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->reportingLevel = error_reporting(E_ALL);
         $this->formConfig = new FormConfig();
-    }
-
-    protected function tearDown()
-    {
-        error_reporting($this->reportingLevel);
     }
 
     public function testAddBlock()
     {
         /** test getBlocks without any adjusted block(s) */
-        $this->assertEquals(array(), $this->formConfig->getBlocks());
+        $this->assertEquals([], $this->formConfig->getBlocks());
 
         /** test hasBlock without any adjusted block(s) */
         $this->assertFalse($this->formConfig->hasBlock('testBlock'));
 
-        /** @var BlockConfig $blockConfig */
         $blockConfig = new BlockConfig('testBlock');
         $blockConfig
             ->setTitle('Test Block')
-            ->setClass('Oro\Bundle\UserBundle\Entity\User')
+            ->setClass(User::class)
             ->setPriority(1);
 
-        $subblocks      = array();
-        $subblocksArray = array();
+        $subBlocks      = [];
+        $subBlocksArray = [];
         foreach ($this->testSubBlocksConfig as $code => $data) {
             $subBlock = new SubBlockConfig($code);
             $subBlock
@@ -65,8 +57,8 @@ class FormConfigTest extends \PHPUnit\Framework\TestCase
                 ->setPriority($data['priority']);
             $blockConfig->addSubBlock($subBlock);
 
-            $subblocks[] = $subBlock;
-            $subblocksArray[] = $subBlock->toArray();
+            $subBlocks[] = $subBlock;
+            $subBlocksArray[] = $subBlock->toArray();
         }
 
         $this->formConfig->addBlock($blockConfig);
@@ -79,18 +71,18 @@ class FormConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($blockConfig, $this->formConfig->getBlock('testBlock'));
 
         /** test getSubBlock */
-        $this->assertEquals($subblocks[0], $this->formConfig->getSubBlocks('testBlock', 'common'));
+        $this->assertEquals($subBlocks[0], $this->formConfig->getSubBlocks('testBlock', 'common'));
 
         /** test toArray() */
         $this->assertEquals(
-            array(
-                array(
+            [
+                [
                     'title'       => 'Test Block',
-                    'class'       => 'Oro\Bundle\UserBundle\Entity\User',
-                    'subblocks'   => $subblocksArray,
+                    'class'       => User::class,
+                    'subblocks'   => $subBlocksArray,
                     'description' => null
-                )
-            ),
+                ]
+            ],
             $this->formConfig->toArray()
         );
 
@@ -100,13 +92,5 @@ class FormConfigTest extends \PHPUnit\Framework\TestCase
             $this->blocks,
             $this->formConfig->getBlocks()
         );
-    }
-
-    public function testException()
-    {
-        /** test getSubBlock Exception */
-        $this->expectException(\PHPUnit\Framework\Error\Notice::class);
-        $this->expectExceptionMessage('Undefined index: testBlock');
-        $this->formConfig->getBlock('testBlock');
     }
 }

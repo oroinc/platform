@@ -15,14 +15,12 @@ class OroTestFrameworkExtension extends Extension implements PrependExtensionInt
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
-
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('importexport_test.yml');
         $loader->load('form_types.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
     }
 
     /**

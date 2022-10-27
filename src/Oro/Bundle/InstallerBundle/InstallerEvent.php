@@ -15,12 +15,6 @@ class InstallerEvent extends ConsoleEvent
     /** @var CommandExecutor */
     protected $commandExecutor;
 
-    /**
-     * @param Command $command
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @param CommandExecutor $commandExecutor
-     */
     public function __construct(
         Command $command,
         InputInterface $input,
@@ -32,9 +26,6 @@ class InstallerEvent extends ConsoleEvent
         $this->commandExecutor = $commandExecutor;
     }
 
-    /**
-     * @return CommandExecutor
-     */
     public function getCommandExecutor(): CommandExecutor
     {
         return $this->commandExecutor;

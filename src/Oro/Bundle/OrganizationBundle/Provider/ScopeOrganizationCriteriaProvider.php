@@ -3,20 +3,20 @@
 namespace Oro\Bundle\OrganizationBundle\Provider;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\ScopeBundle\Manager\AbstractScopeCriteriaProvider;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
+/**
+ * The scope criteria provider for the current organization.
+ */
+class ScopeOrganizationCriteriaProvider implements ScopeCriteriaProviderInterface
 {
-    const SCOPE_KEY = 'organization';
+    public const ORGANIZATION = 'organization';
 
     /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    private $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
@@ -25,26 +25,22 @@ class ScopeOrganizationCriteriaProvider extends AbstractScopeCriteriaProvider
     /**
      * {@inheritdoc}
      */
-    public function getCriteriaForCurrentScope()
+    public function getCriteriaField()
     {
-        $token = $this->tokenStorage->getToken();
-        if (!$token) {
-            return [];
-        }
-
-        if ($token instanceof OrganizationContextTokenInterface) {
-            return [self::SCOPE_KEY => $token->getOrganizationContext()];
-        }
-
-        return [];
+        return self::ORGANIZATION;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCriteriaField()
+    public function getCriteriaValue()
     {
-        return static::SCOPE_KEY;
+        $token = $this->tokenStorage->getToken();
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            return $token->getOrganization();
+        }
+
+        return null;
     }
 
     /**

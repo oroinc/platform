@@ -1,0 +1,10 @@
+/* @theme: admin.oro; */
+
+// Highlight variables
+$highlight-text-color: #ffefa5;
+$highlight-box-shadow:
+    2px -1px 0 0 $highlight-text-color,
+    2px 1px 0 0 $highlight-text-color,
+    -2px 1px 0 0 $highlight-text-color,
+    -2px -1px 0 0 $highlight-text-color !default;
+$highlight-text-items-switcher-inner-offset: 0 !default;

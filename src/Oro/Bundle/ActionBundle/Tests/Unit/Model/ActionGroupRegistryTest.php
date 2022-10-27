@@ -3,61 +3,43 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configurationProvider;
-
-    /** @var ActionGroupAssembler */
-    protected $assembler;
+    private $configurationProvider;
 
     /** @var ActionGroupRegistry */
-    protected $registry;
+    private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configurationProvider =
-            $this->createMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
+        $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ActionFactory $actionFactory */
-        $actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory $conditionFactory */
-        $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ParametersResolver $mockParametersResolver */
-        $mockParametersResolver = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->assembler = new ActionGroupAssembler(
-            $actionFactory,
-            $conditionFactory,
+        $assembler = new ActionGroupAssembler(
+            $this->createMock(ActionFactoryInterface::class),
+            $this->createMock(ExpressionFactory::class),
             new ParameterAssembler(),
-            $mockParametersResolver
+            $this->createMock(ParametersResolver::class)
         );
 
         $this->registry = new ActionGroupRegistry(
             $this->configurationProvider,
-            $this->assembler
+            $assembler
         );
     }
 
     /**
      * @dataProvider findByNameDataProvider
-     *
-     * @param string $actionGroupName
-     * @param string|null $expected
      */
-    public function testFindByName($actionGroupName, $expected)
+    public function testFindByName(string $actionGroupName, ?string $expected)
     {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
@@ -74,10 +56,7 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actionGroup ? $actionGroup->getDefinition()->getName() : $actionGroup);
     }
 
-    /**
-     * @return array
-     */
-    public function findByNameDataProvider()
+    public function findByNameDataProvider(): array
     {
         return [
             'invalid actionGroup name' => [
@@ -108,12 +87,11 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('action_group1', $group->getDefinition()->getName());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException
-     * @expectedExceptionMessage ActionGroup with name "not exists" not found
-     */
     public function testGetException()
     {
+        $this->expectException(ActionGroupNotFoundException::class);
+        $this->expectExceptionMessage('ActionGroup with name "not exists" not found');
+
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->willReturn([]);

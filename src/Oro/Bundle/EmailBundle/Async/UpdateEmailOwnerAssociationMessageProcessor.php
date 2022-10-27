@@ -1,42 +1,28 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Async;
 
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationTopic;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that updates email owner association.
+ */
 class UpdateEmailOwnerAssociationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var AssociationManager
-     */
-    private $associationManager;
+    private AssociationManager $associationManager;
 
-    /**
-     * @var JobRunner
-     */
-    private $jobRunner;
+    private JobRunner $jobRunner;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param AssociationManager $associationManager
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
-    public function __construct(AssociationManager $associationManager, JobRunner $jobRunner, LoggerInterface $logger)
+    public function __construct(AssociationManager $associationManager, JobRunner $jobRunner)
     {
         $this->associationManager = $associationManager;
         $this->jobRunner = $jobRunner;
-        $this->logger = $logger;
     }
 
     /**
@@ -44,13 +30,7 @@ class UpdateEmailOwnerAssociationMessageProcessor implements MessageProcessorInt
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
-
-        if (! isset($data['jobId'], $data['ownerClass'], $data['ownerId'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $data = $message->getBody();
 
         $result = $this->jobRunner->runDelayed($data['jobId'], function () use ($data) {
             $count = $this->associationManager->processUpdateEmailOwner($data['ownerClass'], [$data['ownerId']]);
@@ -66,6 +46,6 @@ class UpdateEmailOwnerAssociationMessageProcessor implements MessageProcessorInt
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::UPDATE_EMAIL_OWNER_ASSOCIATION];
+        return [UpdateEmailOwnerAssociationTopic::getName()];
     }
 }

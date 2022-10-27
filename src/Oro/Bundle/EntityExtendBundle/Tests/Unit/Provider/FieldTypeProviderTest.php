@@ -3,24 +3,18 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 
 class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->configManager);
+        $this->configManager = $this->createMock(ConfigManager::class);
     }
 
     public function testGetSupportedFieldTypes()
@@ -49,31 +43,33 @@ class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $scope = 'testScope';
         $code = 'test_code';
 
-        $providerConfig = [$code => ['options' => [], 'form' => []]];
+        $providerConfig = [
+            $code => [
+                'options' => [],
+                'form' => [],
+                'import_export' => ['import_template' => ['use_in_template' => true]]
+            ]
+        ];
 
-        $propertyConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $propertyConfig->expects($this->once())
+        $propertyConfig = $this->createMock(PropertyConfigContainer::class);
+        $propertyConfig->expects(self::once())
             ->method('hasForm')
             ->with($configType, $fieldType)
             ->willReturn($propertyConfig);
-        $propertyConfig->expects($this->once())
-            ->method('getFormItems')
-            ->with($configType, $fieldType)
+        $propertyConfig->expects(self::once())
+            ->method('getItems')
+            ->with($configType)
             ->willReturn($providerConfig);
 
-        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configProvider->expects($this->once())
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $configProvider->expects(self::once())
             ->method('getPropertyConfig')
             ->willReturn($propertyConfig);
-        $configProvider->expects($this->once())
+        $configProvider->expects(self::once())
             ->method('getScope')
             ->willReturn($scope);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getProviders')
             ->willReturn([$configProvider]);
 

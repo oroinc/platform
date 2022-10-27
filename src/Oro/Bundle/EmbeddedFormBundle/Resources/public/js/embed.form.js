@@ -1,3 +1,4 @@
+/* eslint no-var: off */
 var ORO = (function(ORO) {
     'use strict';
 

@@ -17,9 +17,6 @@ class ByInitialStateFilter extends AbstractFilter
      */
     protected $initialStates;
 
-    /**
-     * @param array $initialStates
-     */
     public function __construct(array $initialStates)
     {
         $this->initialStates = $initialStates;

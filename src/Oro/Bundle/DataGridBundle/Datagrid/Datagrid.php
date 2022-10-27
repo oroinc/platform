@@ -2,15 +2,22 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderAwareInterface;
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderAwareTrait;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 
-class Datagrid implements DatagridInterface
+/**
+ * Represents datagrid.
+ * Provides methods to work with data source, configuration, metadata and data.
+ */
+class Datagrid implements DatagridInterface, MemoryCacheProviderAwareInterface
 {
+    use MemoryCacheProviderAwareTrait;
+
     /** @var DatasourceInterface */
     protected $datasource;
 
@@ -29,8 +36,8 @@ class Datagrid implements DatagridInterface
     /** @var Acceptor */
     protected $acceptor;
 
-    /** @var ResultsObject */
-    protected $cachedResult = null;
+    /** @var MetadataObject|null */
+    protected $metadata;
 
     /**
      * @param string                $name
@@ -86,16 +93,16 @@ class Datagrid implements DatagridInterface
      */
     public function getData()
     {
-        if ($this->cachedResult !== null) {
-            return $this->cachedResult;
-        }
-        /** @var ResultRecordInterface $rows */
-        $rows = $this->getAcceptedDatasource()->getResults();
+        return $this->getMemoryCacheProvider()->get(
+            ['datagrid_results' => $this->getParameters()],
+            function () {
+                $rows = $this->getAcceptedDatasource()->getResults();
+                $results = ResultsObject::create(['data' => $rows]);
+                $this->acceptor->acceptResult($results);
 
-        $this->cachedResult = ResultsObject::create(['data' => $rows]);
-        $this->acceptor->acceptResult($this->cachedResult);
-
-        return $this->cachedResult;
+                return $results;
+            }
+        );
     }
 
     /**
@@ -103,10 +110,12 @@ class Datagrid implements DatagridInterface
      */
     public function getMetadata()
     {
-        $data = MetadataObject::createNamed($this->getName(), []);
-        $this->acceptor->acceptMetadata($data);
+        if (null === $this->metadata) {
+            $this->metadata = MetadataObject::createNamed($this->getName(), []);
+            $this->acceptor->acceptMetadata($this->metadata);
+        }
 
-        return $data;
+        return $this->metadata;
     }
 
     /**
@@ -125,6 +134,7 @@ class Datagrid implements DatagridInterface
      */
     public function setDatasource(DatasourceInterface $source)
     {
+        $this->getMemoryCacheProvider()->reset();
         $this->datasource = $source;
 
         return $this;

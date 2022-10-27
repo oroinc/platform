@@ -7,12 +7,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Compiler pass that collects extensions for services by `oro_email.email_renderer` tag
+ * The base class to register Twig functions, filters and tags for the email templates rendering sandbox.
  */
 abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInterface
 {
-    const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
-    const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.email_renderer';
+    private const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
+    private const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.email_renderer';
 
     /**
      * {@inheritDoc}
@@ -21,58 +21,67 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
     {
         $this->registerFunctions($container);
         $this->registerFilters($container);
-        $this->registerTwigExtensions($container);
+        $this->registerTags($container);
+        $this->registerExtensions($container);
     }
 
     /**
-     * Register functions
-     *
-     * @param ContainerBuilder $container
+     * @return string[]
      */
-    private function registerFunctions(ContainerBuilder $container)
+    abstract protected function getFunctions(): array;
+
+    /**
+     * @return string[]
+     */
+    abstract protected function getFilters(): array;
+
+    /**
+     * @return string[]
+     */
+    abstract protected function getTags(): array;
+
+    /**
+     * @return string[]
+     */
+    abstract protected function getExtensions(): array;
+
+    /**
+     * Registers functions.
+     */
+    private function registerFunctions(ContainerBuilder $container): void
     {
         $functions = $this->getFunctions();
         if ($functions) {
-            $this->registerArgument($container, 4, $functions);
+            $this->addToSandboxSecurityPolicy($container, 4, $functions);
         }
     }
 
     /**
-     * Register filters
-     *
-     * @param ContainerBuilder $container
+     * Registers filters.
      */
-    private function registerFilters(ContainerBuilder $container)
+    private function registerFilters(ContainerBuilder $container): void
     {
         $filters = $this->getFilters();
         if ($filters) {
-            $this->registerArgument($container, 1, $filters);
+            $this->addToSandboxSecurityPolicy($container, 1, $filters);
         }
     }
 
     /**
-     * Register a specific argument
-     *
-     * @param ContainerBuilder $container
-     * @param int $argumentIndex
-     * @param array $argument
+     * Registers tags.
      */
-    private function registerArgument(ContainerBuilder $container, $argumentIndex, $argument)
+    private function registerTags(ContainerBuilder $container): void
     {
-        $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY);
-        $argument = array_merge(
-            $securityPolicyDef->getArgument($argumentIndex),
-            $argument
-        );
-        $securityPolicyDef->replaceArgument($argumentIndex, $argument);
+        $tags = $this->getTags();
+        if ($tags) {
+            $this->addToSandboxSecurityPolicy($container, 0, $tags);
+        }
     }
 
     /**
-     * Register a twig extensions
-     *
-     * @param ContainerBuilder $container
+     * Registers extensions.
      */
-    private function registerTwigExtensions(ContainerBuilder $container)
+    private function registerExtensions(ContainerBuilder $container): void
     {
         $rendererDef = $container->getDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY);
         $extensions = $this->getExtensions();
@@ -82,17 +91,14 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
     }
 
     /**
-     * @return array
+     * Adds the given functions, filters or tags to the sandbox security policy.
      */
-    abstract protected function getFunctions();
-
-    /**
-     * @return array
-     */
-    abstract protected function getExtensions();
-
-    /**
-     * @return array
-     */
-    abstract protected function getFilters();
+    private function addToSandboxSecurityPolicy(ContainerBuilder $container, int $argumentIndex, array $newItems): void
+    {
+        $securityPolicyDef = $container->getDefinition(self::EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY);
+        $securityPolicyDef->replaceArgument(
+            $argumentIndex,
+            array_merge($securityPolicyDef->getArgument($argumentIndex), $newItems)
+        );
+    }
 }

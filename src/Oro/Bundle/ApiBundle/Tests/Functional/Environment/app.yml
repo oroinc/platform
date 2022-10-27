@@ -14,13 +14,13 @@ oro_api:
         test_new_rest_api:
             label: Test API without default api.yml
             headers:
-                Content-Type: application/vnd.api+json
+                Accept: application/vnd.api+json
                 X-Test-Request-Type: test_new
             request_type: ['rest', 'json_api', 'test_new']
         test_override_rest_api:
             label: Test API with additional api.yml
+            underlying_view: rest_json_api
             headers:
-                Content-Type: application/vnd.api+json
                 X-Test-Request-Type: test_override
             request_type: ['rest', 'json_api', 'test_override']
 
@@ -28,3 +28,21 @@ oro_api:
         allow_credentials: true
         allow_origins:
             - 'https://api.test.com'
+
+    batch_api:
+        chunk_size_per_entity:
+            Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment: 3
+        included_data_chunk_size_per_entity:
+            Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment: 5
+
+    form_type_guesses:
+        test_percent_round:
+            form_type: Symfony\Component\Form\Extension\Core\Type\NumberType
+            options:
+                scale: 3
+                rounding_mode: 0 # ROUND_CEILING
+        test_percent_100_round:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\Percent100Type
+            options:
+                scale: 3
+                rounding_mode: 0 # ROUND_CEILING

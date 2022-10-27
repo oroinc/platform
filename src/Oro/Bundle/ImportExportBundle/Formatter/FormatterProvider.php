@@ -5,9 +5,12 @@ namespace Oro\Bundle\ImportExportBundle\Formatter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides TypeFormatterInterface formatters
+ */
 class FormatterProvider
 {
-    const FORMAT_TYPE = 'format_type';
+    public const FORMAT_TYPE = 'formatType';
 
     /** @var array [{formatter_alias} => {formatter_service_id}] */
     protected $formatterIds = [];
@@ -86,7 +89,7 @@ class FormatterProvider
      *
      * @return TypeFormatterInterface
      */
-    protected function getFormatterService($formatterId)
+    protected function getFormatterService(string $formatterId)
     {
         if (!$this->container->has($formatterId)) {
             $message = sprintf('The formatter "%s" is not registered with the service container.', $formatterId);

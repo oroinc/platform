@@ -3,77 +3,92 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
+use Doctrine\DBAL\Types\ConversionException;
+use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateType;
 
 class UTCDateTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var UTCTimeType
-     */
-    protected $type;
+    /** @var UTCDateType */
+    private $type;
 
-    /**
-     * @var AbstractPlatform
-     */
-    protected $platform;
+    /** @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject */
+    private $platform;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        // class has private constructor
-        $this->type = $this->getMockBuilder('Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateType')
-            ->setMethods(null)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->type = new UTCDateType();
 
-        $this->platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getDateFormatString'))
-            ->getMockForAbstractClass();
+        $this->platform = $this->createMock(AbstractPlatform::class);
         $this->platform->expects($this->any())
             ->method('getDateFormatString')
-            ->will($this->returnValue('Y-m-d'));
-    }
-
-    protected function tearDown()
-    {
-        unset($this->type);
-        unset($this->platform);
+            ->willReturn('Y-m-d');
     }
 
     /**
-     * @param \DateTime $source
-     * @param string $expected
-     * @dataProvider convertToDatabaseValueDataProvider
+     * @dataProvider convertToDatabaseValueWhenNoDstDataProvider
      */
-    public function testConvertToDatabaseValue($source, $expected)
+    public function testConvertToDatabaseValueWhenNoDst(string $sourceDate, string $sourceTimeZone, string $expected)
     {
+        $source = new \DateTime($sourceDate . '02:00:00', new \DateTimeZone($sourceTimeZone));
+
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
     }
 
-    /**
-     * @return array
-     */
-    public function convertToDatabaseValueDataProvider()
+    public function convertToDatabaseValueWhenNoDstDataProvider(): array
     {
-        return array(
-            'null' => array(
-                'source'   => null,
-                'expected' => null,
-            ),
-            'UTC' => array(
-                'source' => new \DateTime('2013-01-01', new \DateTimeZone('UTC')),
+        return [
+            'UTC' => [
+                'sourceDate' => '2013-01-01',
+                'sourceTimeZone' => 'UTC',
                 'expected' => '2013-01-01',
-            ),
-            'positive shift' => array(
-                'source' => new \DateTime('2013-01-01', new \DateTimeZone('Europe/Athens')),
-                'expected' => '2012-12-31',
-            ),
-            'negative shift' => array(
-                'source' => new \DateTime('2013-01-01', new \DateTimeZone('America/Los_Angeles')),
+            ],
+            'positive shift' => [
+                'sourceDate' => '2013-01-01',
+                'sourceTimeZone' => 'Europe/Athens',
                 'expected' => '2013-01-01',
-            ),
-        );
+            ],
+            'negative shift' => [
+                'sourceDate' => '2013-01-01',
+                'sourceTimeZone' => 'America/Los_Angeles',
+                'expected' => '2013-01-01',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider convertToDatabaseValueWhenDstDataProvider
+     */
+    public function testConvertToDatabaseValueWhenDst(string $sourceDate, string $sourceTimeZone, string $expected)
+    {
+        $source = new \DateTime($sourceDate . '02:00:00', new \DateTimeZone($sourceTimeZone));
+
+        $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
+    }
+
+    public function convertToDatabaseValueWhenDstDataProvider(): array
+    {
+        return [
+            'UTC' => [
+                'sourceDate' => '2013-06-01',
+                'sourceTimeZone' => 'UTC',
+                'expected' => '2013-06-01',
+            ],
+            'positive shift' => [
+                'sourceDate' => '2013-06-01',
+                'sourceTimeZone' => 'Europe/Athens',
+                'expected' => '2013-05-31',
+            ],
+            'negative shift' => [
+                'sourceDate' => '2013-06-01',
+                'sourceTimeZone' => 'America/Los_Angeles',
+                'expected' => '2013-06-01',
+            ],
+        ];
+    }
+
+    public function testConvertToDatabaseValueWhenNull()
+    {
+        $this->assertNull($this->type->convertToDatabaseValue(null, $this->platform));
     }
 
     public function testConvertToPHPValue()
@@ -84,11 +99,9 @@ class UTCDateTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->type->convertToPHPValue($source, $this->platform));
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Types\ConversionException
-     */
     public function testConvertToPHPValueException()
     {
+        $this->expectException(ConversionException::class);
         $this->type->convertToPHPValue('qwerty', $this->platform);
     }
 }

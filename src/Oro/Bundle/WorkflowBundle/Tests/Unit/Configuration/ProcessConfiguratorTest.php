@@ -2,44 +2,38 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Psr\Log\AbstractLogger;
+use Oro\Component\Testing\ReflectionUtil;
+use Psr\Log\LoggerInterface;
 
 class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition';
+    private const CLASS_NAME = ProcessDefinition::class;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $managerRegistry;
+    private $managerRegistry;
 
     /** @var ProcessDefinitionsConfigurator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $definitionsConfigurator;
+    private $definitionsConfigurator;
 
     /** @var ProcessTriggersConfigurator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $triggersConfigurator;
+    private $triggersConfigurator;
 
     /** @var ProcessConfigurator */
-    protected $processConfigurator;
+    private $processConfigurator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-
-        $this->definitionsConfigurator = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->triggersConfigurator = $this
-            ->getMockBuilder('Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->definitionsConfigurator = $this->createMock(ProcessDefinitionsConfigurator::class);
+        $this->triggersConfigurator = $this->createMock(ProcessTriggersConfigurator::class);
 
         $this->processConfigurator = new ProcessConfigurator(
             $this->managerRegistry,
@@ -65,7 +59,9 @@ class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         //definitions repository mock
         $definitionsRepositoryMock = $this->assertObjectManagerCalledForRepository(self::CLASS_NAME);
-        $definitionsRepositoryMock->expects($this->once())->method('findAll')->willReturn(['...definitions here']);
+        $definitionsRepositoryMock->expects($this->once())
+            ->method('findAll')
+            ->willReturn(['...definitions here']);
 
         $this->triggersConfigurator->expects($this->once())
             ->method('configureTriggers')
@@ -79,14 +75,10 @@ class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetLogger()
     {
-        $reflection = new \ReflectionClass('Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator');
-        $property = $reflection->getProperty('logger');
-        $property->setAccessible(true);
-        /** @var AbstractLogger $logger */
-        $logger = $this->getMockForAbstractClass('Psr\Log\AbstractLogger');
-        $this->assertNotEquals($logger, $property->getValue($this->processConfigurator));
+        $logger = $this->createMock(LoggerInterface::class);
+        $this->assertNotSame($logger, ReflectionUtil::getPropertyValue($this->processConfigurator, 'logger'));
         $this->processConfigurator->setLogger($logger);
-        $this->assertEquals($logger, $property->getValue($this->processConfigurator));
+        $this->assertSame($logger, ReflectionUtil::getPropertyValue($this->processConfigurator, 'logger'));
     }
 
     public function testRemoveProcesses()
@@ -129,9 +121,9 @@ class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
      */
     private function assertObjectManagerCalledForRepository($entityClass)
     {
-        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock(ObjectRepository::class);
 
-        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock(ObjectManager::class);
         $objectManager->expects($this->once())
             ->method('getRepository')
             ->with($entityClass)

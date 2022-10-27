@@ -17,8 +17,6 @@ class AddFirstNameLastNameIndex implements Migration
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addFirstNameLastNameIndex(Schema $schema)

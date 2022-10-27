@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Event;
 
+/**
+ * Workflow and transition events
+ */
 class WorkflowEvents
 {
     const WORKFLOW_BEFORE_UPDATE = 'oro.workflow.before_update';
@@ -13,4 +16,5 @@ class WorkflowEvents
     const WORKFLOW_ACTIVATED = 'oro.workflow.activated';
     const WORKFLOW_BEFORE_DEACTIVATION = 'oro.workflow.before_deactivation';
     const WORKFLOW_DEACTIVATED = 'oro.workflow.deactivated';
+    const NOTIFICATION_TRANSIT_EVENT = 'oro.workflow.event.notification.workflow_transition';
 }

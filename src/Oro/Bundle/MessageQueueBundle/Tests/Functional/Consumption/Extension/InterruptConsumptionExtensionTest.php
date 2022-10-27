@@ -2,83 +2,58 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Extension;
 
-use Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension\TestLogger;
-use Oro\Bundle\TestFrameworkBundle\Async\ChangeConfigProcessor;
-use Oro\Bundle\TestFrameworkBundle\Async\Topics;
+use Oro\Bundle\MessageQueueBundle\Test\Async\ChangeConfigProcessor;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
-use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 
 class InterruptConsumptionExtensionTest extends WebTestCase
 {
-    /**
-     * @var MessageProducerInterface
-     */
-    protected $producer;
+    use MessageQueueExtension;
 
-    /**
-     * @var * MessageProducerInterface
-     */
-    protected $messageProcessor;
-
-    /**
-     * @var TestLogger
-     */
-    protected $logger;
-
-    /**
-     * @var QueueConsumer
-     */
-    protected $consumer;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-        $container = self::getContainer();
-        $this->producer = $container->get('oro_test.client.message_producer');
-        $this->messageProcessor = $container->get('oro_message_queue.client.delegate_message_processor');
-        $this->logger = new TestLogger();
-        $this->consumer = $container->get('oro_test.consumption.queue_consumer');
+
+        self::purgeMessageQueue();
     }
 
-    public function testMessageConsumptionIsNotInterruptedByMessageLimit()
+    protected function tearDown(): void
     {
-        $this->producer->send(Topics::CHANGE_CONFIG, ChangeConfigProcessor::COMMAND_NOOP);
-        $this->producer->send(Topics::CHANGE_CONFIG, ChangeConfigProcessor::COMMAND_NOOP);
-
-        $this->consumer->bind('oro.default', $this->messageProcessor);
-        $this->consumer->consume(new ChainExtension([
-            new LimitConsumedMessagesExtension(4),
-            new LoggerExtension($this->logger)
-        ]));
-
-        $this->assertInterruptionMessage('Consuming interrupted, reason: The message limit reached.');
+        self::purgeMessageQueue();
     }
 
-    public function testMessageConsumptionIsInterruptedByConfigCacheChanged()
+    public function testMessageConsumptionIsInterruptedByMessageLimit(): void
     {
-        $this->producer->send(Topics::CHANGE_CONFIG, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
-        $this->producer->send(Topics::CHANGE_CONFIG, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
+        self::sendMessage(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_NOOP);
+        self::sendMessage(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_NOOP);
 
-        $this->consumer->bind('oro.default', $this->messageProcessor);
-        $this->consumer->consume(new ChainExtension([
-            new LimitConsumedMessagesExtension(4),
-            new LoggerExtension($this->logger)
-        ]));
+        self::getConsumer()
+            ->bind('oro.default')
+            ->consume(new ChainExtension([new LimitConsumedMessagesExtension(2)]));
 
-        $this->assertInterruptionMessage('Consuming interrupted, reason: The cache has changed.');
+        $this->assertInterruptionMessage(
+            'Consuming interrupted. Queue: "oro.default", reason: "The message limit reached."'
+        );
     }
 
-    /**
-     * @param string $expectedMessage
-     */
-    private function assertInterruptionMessage(string $expectedMessage)
+    public function testMessageConsumptionIsInterruptedByConfigCacheChanged(): void
     {
-        $logs = $this->logger->getLogs('warning');
+        self::sendMessage(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
+        self::sendMessage(ChangeConfigProcessor::TEST_TOPIC, ChangeConfigProcessor::COMMAND_CHANGE_CACHE);
 
-        self::assertEquals($expectedMessage, reset($logs));
+        self::getConsumer()
+            ->bind('oro.default')
+            ->consume(new ChainExtension([new LimitConsumedMessagesExtension(2)]));
+
+        $this->assertInterruptionMessage(
+            'Consuming interrupted. Queue: "oro.default", reason: "The cache has changed."'
+        );
+    }
+
+    private function assertInterruptionMessage(string $expectedMessage): void
+    {
+        self::assertTrue(self::getLoggerTestHandler()->hasRecord($expectedMessage, 'warning'));
     }
 }

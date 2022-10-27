@@ -2,58 +2,36 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 
-class AddressHandler
+/**
+ * The handler for Address form.
+ */
+class AddressHandler implements FormHandlerInterface
 {
     use RequestHandlerTrait;
 
-    /**
-     * @var FormInterface
-     */
-    protected $form;
+    protected ObjectManager $manager;
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var ObjectManager
-     */
-    protected $manager;
-
-    /**
-     *
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     */
-    public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $manager)
+    public function __construct(ObjectManager $manager)
     {
-        $this->form = $form;
-        $this->requestStack = $requestStack;
         $this->manager = $manager;
     }
 
     /**
-     * Process form
-     *
-     * @param AbstractAddress $entity
-     * @return bool True on successful processing, false otherwise
+     * {@inheritDoc}
      */
-    public function process(AbstractAddress $entity)
+    public function process($entity, FormInterface $form, Request $request)
     {
-        $this->form->setData($entity);
-
-        $request = $this->requestStack->getCurrentRequest();
-        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->submitPostPutRequest($this->form, $request);
-            if ($this->form->isValid()) {
+        $form->setData($entity);
+        if (\in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+            $this->submitPostPutRequest($form, $request);
+            if ($form->isValid()) {
                 $this->onSuccess($entity);
 
                 return true;
@@ -65,10 +43,8 @@ class AddressHandler
 
     /**
      * "Success" form handler
-     *
-     * @param AbstractAddress $address
      */
-    protected function onSuccess(AbstractAddress $address)
+    protected function onSuccess(AbstractAddress $address): void
     {
         $this->manager->persist($address);
         $this->manager->flush();

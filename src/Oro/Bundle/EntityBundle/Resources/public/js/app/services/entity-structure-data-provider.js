@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var EntityStructureDataProvider;
-    var _ = require('underscore');
-    var EntityError = require('oroentity/js/entity-error');
-    var errorHandler = require('oroentity/js/app/services/entity-structure-error-handler');
+    const _ = require('underscore');
+    const EntityError = require('oroentity/js/entity-error');
+    const errorHandler = require('oroentity/js/app/services/entity-structure-error-handler');
     var EntityTreeNode = require('oroentity/js/app/services/entity-tree-node');
     /** @type {Registry} */
-    var registry = require('oroui/js/app/services/registry');
-    var EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
-    var fieldFilterers = require('oroentity/js/app/services/entity-field-filterers');
-    var BaseClass = require('oroui/js/base-class');
+    const registry = require('oroui/js/app/services/registry');
+    const EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
+    const fieldFilterers = require('oroentity/js/app/services/entity-field-filterers');
+    const BaseClass = require('oroui/js/base-class');
 
     /**
      * Filter function for entity fields
@@ -100,7 +99,7 @@ define(function(require) {
      * @typedef {string} propertyPath
      */
 
-    EntityStructureDataProvider = BaseClass.extend(/** @lends EntityStructureDataProvider.prototype */{
+    const EntityStructureDataProvider = BaseClass.extend(/** @lends EntityStructureDataProvider.prototype */{
         cidPrefix: 'esdp',
 
         /**
@@ -215,14 +214,14 @@ define(function(require) {
         fieldsFilterer: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityStructureDataProvider(options) {
             EntityStructureDataProvider.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @param {Object} options
          * @param {EntityStructuresCollection} options.collection
          * @param {string} [options.rootEntity] class name of root entity
@@ -261,7 +260,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             delete this.collection;
@@ -273,7 +272,7 @@ define(function(require) {
          * Handles collection sync action and updates the provider
          */
         onCollectionSync: function() {
-            var className = this.rootEntityClassName;
+            const className = this.rootEntityClassName;
             if (!this.disposed && className && (!this.rootEntity || this.rootEntity.get('className') !== className)) {
                 this.setRootEntityClassName(className);
             }
@@ -324,7 +323,7 @@ define(function(require) {
          */
         setOptionsFilter: function(optionsFilter) {
             this.optionsFilter = optionsFilter || {};
-            var specialOptions = ['exclude', 'unidirectional', 'auditable', 'relation'];
+            const specialOptions = ['exclude', 'unidirectional', 'auditable', 'relation'];
             this.regularOptionsFilter = _.omit(this.optionsFilter, specialOptions);
             this._toggleFilterer('options', !_.isEmpty(this.regularOptionsFilter));
             _.each(specialOptions, function(option) {
@@ -480,6 +479,9 @@ define(function(require) {
         _extractFieldData: function(entityData, fieldData) {
             fieldData = _.clone(fieldData);
             fieldData.parentEntity = entityData;
+            if (entityData.className) {
+                fieldData.entityClassName = entityData.className;
+            }
             if (fieldData.relationType && _.contains(['enum', 'multiEnum'], fieldData.type)) {
                 // @todo, should be fixed in API
                 // `enum` or `multiEnum` field has to be with empty relationType
@@ -536,12 +538,12 @@ define(function(require) {
          * @throws {EntityError} -- in case invalid fieldId
          */
         pathToEntityChain: function(fieldId) {
-            var entityModel;
+            let entityModel;
             if (!this.rootEntity) {
                 return [];
             }
 
-            var chain = [{
+            const chain = [{
                 entity: this._extractEntityData(this.rootEntity),
                 path: '',
                 basePath: ''
@@ -553,9 +555,9 @@ define(function(require) {
 
             try {
                 _.each(fieldId.split('+'), function(part, i) {
-                    var fieldName;
-                    var entityClassName;
-                    var pos;
+                    let fieldName;
+                    let entityClassName;
+                    let pos;
 
                     if (i === 0) {
                         // first item is always just a field name
@@ -603,7 +605,7 @@ define(function(require) {
          * @return {EntityFieldChain}
          */
         pathToEntityChainSafely: function(fieldId) {
-            var chain;
+            let chain;
 
             try {
                 chain = this.pathToEntityChain(fieldId);
@@ -621,7 +623,7 @@ define(function(require) {
          * @return {boolean}
          */
         validatePath: function(fieldId) {
-            var isValid = true;
+            let isValid = true;
 
             try {
                 this.pathToEntityChain(fieldId);
@@ -641,7 +643,7 @@ define(function(require) {
          * @throws {EntityError} -- in case invalid fieldId
          */
         pathToEntityChainExcludeTrailingField: function(fieldId) {
-            var chain = this.pathToEntityChain(fieldId);
+            const chain = this.pathToEntityChain(fieldId);
             // if last item in the chain is a field -- trim it
             return _.last(chain).entity === void 0 ? chain.slice(0, -1) : chain;
         },
@@ -654,7 +656,7 @@ define(function(require) {
          * @return {EntityFieldChain}
          */
         pathToEntityChainExcludeTrailingFieldSafely: function(fieldId) {
-            var chain;
+            let chain;
 
             try {
                 chain = this.pathToEntityChainExcludeTrailingField(fieldId);
@@ -674,11 +676,9 @@ define(function(require) {
          * @throws {EntityError} -- in case invalid chain
          */
         entityChainToPath: function(chain) {
-            var path;
-
             try {
                 chain = _.map(chain.slice(1), function(part) {
-                    var result = part.field.name;
+                    let result = part.field.name;
                     if (part.entity) {
                         result += '+' + part.entity.className;
                     }
@@ -688,7 +688,7 @@ define(function(require) {
                 throw new EntityError('Can not build field path from given chain');
             }
 
-            path = chain.join('::');
+            const path = chain.join('::');
 
             return path;
         },
@@ -701,7 +701,7 @@ define(function(require) {
          * @return {fieldId}
          */
         entityChainToPathSafely: function(chain) {
-            var path;
+            let path;
 
             try {
                 path = this.entityChainToPath(chain);
@@ -720,9 +720,8 @@ define(function(require) {
          * @return {FieldSignature|null}
          */
         getFieldSignatureSafely: function(fieldId) {
-            var signature = null;
-            var chain;
-            var part;
+            let signature = null;
+            let chain;
 
             if (!fieldId) {
                 return signature;
@@ -735,7 +734,7 @@ define(function(require) {
                 return signature;
             }
 
-            part = _.last(chain);
+            const part = _.last(chain);
             if (part && part.field) {
                 signature = _.pick(part.field, 'type', 'relationType');
                 if (_.result(part.field.options, 'identifier')) {
@@ -758,9 +757,9 @@ define(function(require) {
          * @return {propertyPath}
          */
         getRelativePropertyPathByPath: function(fieldId) {
-            var fields = [];
+            const fields = [];
             _.each(fieldId.split('+'), function(part, i) {
-                var field;
+                let field;
                 if (i === 0) {
                     // first item is always just a field name
                     fields.push(part);
@@ -787,13 +786,13 @@ define(function(require) {
          * @throws {EntityError} -- in case invalid property path
          */
         getPathByRelativePropertyPath: function(propertyPath) {
-            var parts;
-            var properties = propertyPath.split('.');
-            var entityModel = this.rootEntity;
+            let parts;
+            const properties = propertyPath.split('.');
+            let entityModel = this.rootEntity;
             try {
                 parts = _.map(properties.slice(0, properties.length - 1), function(fieldName) {
-                    var part = fieldName;
-                    var fieldData = _.find(entityModel.get('fields'), {name: fieldName});
+                    let part = fieldName;
+                    const fieldData = _.find(entityModel.get('fields'), {name: fieldName});
                     if (fieldData.relatedEntityName) {
                         entityModel = this.collection.getEntityModelByClassName(fieldData.relatedEntityName);
                         part += '+' + fieldData.relatedEntityName;
@@ -816,7 +815,7 @@ define(function(require) {
          * @return {fieldId}
          */
         getPathByRelativePropertyPathSafely: function(propertyPath) {
-            var fieldId;
+            let fieldId;
 
             try {
                 fieldId = this.getPathByRelativePropertyPath(propertyPath);
@@ -1003,13 +1002,13 @@ define(function(require) {
          * @static
          */
         createDataProvider: function(options, applicant) {
-            var collection = registry.fetch(EntityStructuresCollection.prototype.globalId, applicant);
+            let collection = registry.fetch(EntityStructuresCollection.prototype.globalId, applicant);
             if (!collection) {
                 collection = new EntityStructuresCollection();
                 registry.put(collection, applicant);
             }
 
-            var provider = new EntityStructureDataProvider(_.defaults({
+            const provider = new EntityStructureDataProvider(_.defaults({
                 collection: collection
             }, options));
             provider.listenToOnce(applicant, 'dispose', provider.dispose);

@@ -1,34 +1,24 @@
 <?php
+
 namespace Oro\Bundle\ImapBundle\Async;
 
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface;
+use Oro\Bundle\ImapBundle\Async\Topic\SyncEmailTopic;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that synchronizes single email via IMAP.
+ */
 class SyncEmailMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var EmailSynchronizerInterface
-     */
-    private $emailSynchronizer;
+    private EmailSynchronizerInterface $emailSynchronizer;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param EmailSynchronizerInterface $emailSynchronizer
-     * @param LoggerInterface $logger
-     */
-    public function __construct(EmailSynchronizerInterface $emailSynchronizer, LoggerInterface $logger)
+    public function __construct(EmailSynchronizerInterface $emailSynchronizer)
     {
         $this->emailSynchronizer = $emailSynchronizer;
-        $this->logger = $logger;
     }
 
     /**
@@ -36,15 +26,7 @@ class SyncEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
-
-        if (! isset($data['id'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
-
-        $this->emailSynchronizer->syncOrigins([$data['id']]);
+        $this->emailSynchronizer->syncOrigins([$message->getBody()['id']]);
 
         return self::ACK;
     }
@@ -54,6 +36,6 @@ class SyncEmailMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::SYNC_EMAIL];
+        return [SyncEmailTopic::getName()];
     }
 }

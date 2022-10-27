@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
- * Prepares JSON.API request data to be processed by Symfony Forms.
+ * Prepares JSON:API request data to be processed by Symfony Forms.
  */
 class NormalizeRequestData extends AbstractNormalizeRequestData
 {
@@ -26,6 +26,7 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
                 try {
                     $context->setRequestData(
                         $this->normalizeData(
+                            '',
                             $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::DATA),
                             $requestData[JsonApiDoc::DATA],
                             $context->getMetadata()

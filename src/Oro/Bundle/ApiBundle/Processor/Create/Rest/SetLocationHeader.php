@@ -6,13 +6,12 @@ use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
+use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Sets the location of the newly created entity to the "Location" response header.
@@ -21,11 +20,11 @@ class SetLocationHeader implements ProcessorInterface
 {
     public const RESPONSE_HEADER_NAME = 'Location';
 
-    /** @var RestRoutes */
-    private $routes;
+    /** @var RestRoutesRegistry */
+    private $routesRegistry;
 
-    /** @var RouterInterface */
-    private $router;
+    /** @var UrlGeneratorInterface */
+    private $urlGenerator;
 
     /** @var ValueNormalizer */
     private $valueNormalizer;
@@ -33,20 +32,14 @@ class SetLocationHeader implements ProcessorInterface
     /** @var EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
-    /**
-     * @param RestRoutes                  $routes
-     * @param RouterInterface             $router
-     * @param ValueNormalizer             $valueNormalizer
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(
-        RestRoutes $routes,
-        RouterInterface $router,
+        RestRoutesRegistry $routesRegistry,
+        UrlGeneratorInterface $urlGenerator,
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerRegistry $entityIdTransformerRegistry
     ) {
-        $this->routes = $routes;
-        $this->router = $router;
+        $this->routesRegistry = $routesRegistry;
+        $this->urlGenerator = $urlGenerator;
         $this->valueNormalizer = $valueNormalizer;
         $this->entityIdTransformerRegistry = $entityIdTransformerRegistry;
     }
@@ -83,8 +76,8 @@ class SetLocationHeader implements ProcessorInterface
         );
         $entityId = $this->getEntityIdTransformer($requestType)->transform($entityId, $metadata);
 
-        $location = $this->router->generate(
-            $this->routes->getItemRouteName(),
+        $location = $this->urlGenerator->generate(
+            $this->routesRegistry->getRoutes($requestType)->getItemRouteName(),
             ['entity' => $entityType, 'id' => $entityId],
             UrlGeneratorInterface::ABSOLUTE_URL
         );
@@ -92,11 +85,6 @@ class SetLocationHeader implements ProcessorInterface
         $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, $location);
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);

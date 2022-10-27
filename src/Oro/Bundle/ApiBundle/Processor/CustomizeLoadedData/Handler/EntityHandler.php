@@ -3,8 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Handler;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Config\Extra\RootPathConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 /**
@@ -27,6 +30,12 @@ class EntityHandler
     /** @var EntityDefinitionConfig */
     private $config;
 
+    /** @var ConfigExtraInterface[] */
+    private $configExtras;
+
+    /** @var bool */
+    private $collection;
+
     /** @var callable|null */
     private $previousHandler;
 
@@ -36,6 +45,8 @@ class EntityHandler
      * @param RequestType              $requestType
      * @param string                   $entityClass
      * @param EntityDefinitionConfig   $config
+     * @param ConfigExtraInterface[]   $configExtras
+     * @param bool                     $collection
      * @param callable|null            $previousHandler
      */
     public function __construct(
@@ -44,6 +55,8 @@ class EntityHandler
         RequestType $requestType,
         string $entityClass,
         EntityDefinitionConfig $config,
+        array $configExtras,
+        bool $collection,
         ?callable $previousHandler = null
     ) {
         $this->customizationProcessor = $customizationProcessor;
@@ -51,27 +64,37 @@ class EntityHandler
         $this->requestType = $requestType;
         $this->entityClass = $entityClass;
         $this->config = $config;
+        $this->configExtras = $configExtras;
+        $this->collection = $collection;
         $this->previousHandler = $this->getPreviousHandler($previousHandler);
     }
 
     /**
      * Handles the given data.
      *
-     * @param mixed $data
+     * @param array $data
+     * @param array $context
      *
      * @return mixed
      */
-    public function __invoke($data)
+    public function __invoke(array $data, array $context)
     {
         if (null !== $this->previousHandler) {
-            $data = \call_user_func($this->previousHandler, $data);
+            $data = \call_user_func($this->previousHandler, $data, $context);
         }
 
         $customizationContext = $this->createCustomizationContext();
+        $this->adjustPropertyPath($customizationContext);
         $customizationContext->setResult($data);
         $customizationContext->setIdentifierOnly(
-            $this->isIdentifierOnly($customizationContext->getConfig())
+            $this->isIdentifierOnlyRequested($customizationContext->getConfig())
         );
+        $customizationContext->setSharedData($context['sharedData']);
+
+        $group = $this->collection ? 'collection' : 'item';
+        $customizationContext->setFirstGroup($group);
+        $customizationContext->setLastGroup($group);
+
         $this->customizationProcessor->process($customizationContext);
 
         return $customizationContext->getResult();
@@ -79,8 +102,6 @@ class EntityHandler
 
     /**
      * Creates the customization context based on the state of this handler.
-     *
-     * @return CustomizeLoadedDataContext
      */
     protected function createCustomizationContext(): CustomizeLoadedDataContext
     {
@@ -90,6 +111,7 @@ class EntityHandler
         $customizationContext->getRequestType()->set($this->requestType);
         $customizationContext->setClassName($this->entityClass);
         $customizationContext->setConfig($this->config);
+        $customizationContext->setConfigExtras($this->configExtras);
 
         return $customizationContext;
     }
@@ -97,10 +119,6 @@ class EntityHandler
     /**
      * Checks whether this handler does the same work as the given handler
      * and can be used instead of it.
-     *
-     * @param callable $handler
-     *
-     * @return bool
      */
     protected function isRedundantHandler(callable $handler): bool
     {
@@ -111,12 +129,27 @@ class EntityHandler
             && \is_a($this->entityClass, $handler->entityClass, true);
     }
 
+    private function adjustPropertyPath(CustomizeLoadedDataContext $customizationContext): void
+    {
+        /** @var RootPathConfigExtra|null $rootPathConfigExtra */
+        $rootPathConfigExtra = $customizationContext->getConfigExtra(RootPathConfigExtra::NAME);
+        if (null !== $rootPathConfigExtra) {
+            /**
+             * loading of additional entities, e.g.:
+             * @see \Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ExpandMultiTargetAssociations
+             */
+            $rootPath = $rootPathConfigExtra->getPath();
+            $propertyPath = $customizationContext->getPropertyPath();
+            if ($propertyPath) {
+                $customizationContext->setPropertyPath($rootPath . ConfigUtil::PATH_DELIMITER . $propertyPath);
+            } else {
+                $customizationContext->setPropertyPath($rootPath);
+            }
+        }
+    }
+
     /**
      * Returns a previous handler to be executed.
-     *
-     * @param callable|null $previousHandler
-     *
-     * @return callable|null
      */
     private function getPreviousHandler(?callable $previousHandler): ?callable
     {
@@ -136,33 +169,10 @@ class EntityHandler
         return $result;
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return bool
-     */
-    private function isIdentifierOnly(?EntityDefinitionConfig $config): bool
+    private function isIdentifierOnlyRequested(?EntityDefinitionConfig $config): bool
     {
-        if (null === $config) {
-            return false;
-        }
-        $idFieldNames = $config->getIdentifierFieldNames();
-        if (empty($idFieldNames)) {
-            return false;
-        }
-        $fields = $config->getFields();
-        if (\count($fields) !== \count($idFieldNames)) {
-            return false;
-        }
-
-        $isIdentifierOnly = true;
-        foreach ($idFieldNames as $idFieldName) {
-            if (!isset($fields[$idFieldName])) {
-                $isIdentifierOnly = false;
-                break;
-            }
-        }
-
-        return $isIdentifierOnly;
+        return
+            null !== $config
+            && $config->isIdentifierOnlyRequested();
     }
 }

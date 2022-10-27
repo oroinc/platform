@@ -21,11 +21,6 @@ class ImpersonationSuccessListener
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param Processor $mailProcessor
-     * @param FlashBagInterface $flashBag
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         Processor $mailProcessor,
         FlashBagInterface $flashBag,
@@ -36,9 +31,6 @@ class ImpersonationSuccessListener
         $this->logger = $logger;
     }
 
-    /**
-     * @param ImpersonationSuccessEvent $event
-     */
     public function onImpersonationSuccess(ImpersonationSuccessEvent $event)
     {
         if (!$event->getImpersonation()->hasNotify()) {

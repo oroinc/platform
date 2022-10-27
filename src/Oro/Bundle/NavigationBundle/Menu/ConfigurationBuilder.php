@@ -4,14 +4,19 @@ namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\NavigationBundle\Config\MenuConfiguration;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Builds menu items based on configuration.
+ */
 class ConfigurationBuilder implements BuilderInterface
 {
     const DEFAULT_SCOPE_TYPE = 'menu_default_visibility';
+
+    const NO_CHILDREN_IN_CONFIG = 'no_children_in_config';
 
     /** @var ResolverInterface */
     protected $resolver;
@@ -22,25 +27,19 @@ class ConfigurationBuilder implements BuilderInterface
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
 
-    /** @var MenuConfiguration */
-    protected $menuConfiguration;
+    /** @var ConfigurationProvider */
+    protected $configurationProvider;
 
-    /**
-     * @param ResolverInterface        $resolver
-     * @param FactoryInterface         $factory
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param MenuConfiguration        $menuConfiguration
-     */
     public function __construct(
         ResolverInterface $resolver,
         FactoryInterface $factory,
         EventDispatcherInterface $eventDispatcher,
-        MenuConfiguration $menuConfiguration
+        ConfigurationProvider $configurationProvider
     ) {
         $this->resolver = $resolver;
         $this->factory = $factory;
         $this->eventDispatcher = $eventDispatcher;
-        $this->menuConfiguration = $menuConfiguration;
+        $this->configurationProvider = $configurationProvider;
     }
 
     /**
@@ -52,7 +51,7 @@ class ConfigurationBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
-        $tree = $this->menuConfiguration->getTree();
+        $tree = $this->configurationProvider->getMenuTree();
 
         if (array_key_exists($alias, $tree)) {
             $treeData = $tree[$alias];
@@ -71,21 +70,18 @@ class ConfigurationBuilder implements BuilderInterface
         }
 
         $event = new ConfigureMenuEvent($this->factory, $menu);
-        $this->eventDispatcher->dispatch(ConfigureMenuEvent::getEventName($alias), $event);
+        $this->eventDispatcher->dispatch($event, ConfigureMenuEvent::getEventName($alias));
     }
 
     /**
-     * @param ItemInterface $menu
-     * @param array $sliceData
-     * @param array $options
-     * @param array $existingNames
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function appendChildData(ItemInterface $menu, array $sliceData, array $options, array &$existingNames)
     {
         // If menu doesn't have children, it should be disabled
         $isAllowed = false;
 
-        $items = $this->menuConfiguration->getItems();
+        $items = $this->configurationProvider->getMenuItems();
 
         foreach ($sliceData as $itemName => $itemData) {
             // Throw exception if duplicated item name was found in menu tree
@@ -122,8 +118,12 @@ class ConfigurationBuilder implements BuilderInterface
             $isAllowed = $isAllowed || $newMenuItem->getExtra('isAllowed');
         }
 
-        if ($menu->getExtra('isAllowed')) {
+        //If flag isAllowed is False because no one child exist or allowed
+        //And current menu isAllowed option is True as well as displayChildren
+        //We set isAllowed to False to not show menu in the UI
+        if (!$isAllowed && $menu->getExtra('isAllowed') && $menu->getDisplayChildren()) {
             $menu->setExtra('isAllowed', $isAllowed);
+            $menu->setExtra(self::NO_CHILDREN_IN_CONFIG, true);
         }
     }
 

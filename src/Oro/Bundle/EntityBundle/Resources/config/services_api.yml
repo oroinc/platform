@@ -1,16 +1,14 @@
 services:
     oro_entity.api.entity_structure_normalizer:
         class: Oro\Bundle\EntityBundle\Api\EntityStructureNormalizer
-        public: false
 
     oro_entity.api.validate_entity_fallback:
         class: Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback
         arguments:
             - '@oro_entity.fallback.resolver.entity_fallback_resolver'
-            - '@oro_api.value_normalizer'
+            - '@oro_api.form_property_accessor'
         tags:
-            - { name: oro.api.processor, action: create, group: normalize_input, priority: -32 }
-            - { name: oro.api.processor, action: update, group: normalize_input, priority: -32 }
+            - { name: oro.api.processor, action: customize_form_data, event: post_validate, class: Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue }
 
     oro_entity.api.load_entity_structure:
         class: Oro\Bundle\EntityBundle\Api\Processor\LoadEntityStructure

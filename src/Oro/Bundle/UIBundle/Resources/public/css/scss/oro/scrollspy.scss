@@ -11,7 +11,21 @@
         background: $scrollspy-nav-background;
         border-radius: $scrollspy-nav-border-radius;
 
+        position: $scrollspy-nav-position;
+        z-index: $scrollspy-nav-z-index;
+
         @include clearfix();
+
+        &::after {
+            content: '';
+            position: absolute;
+            pointer-events: none;
+            bottom: -$scrollspy-nav-gradient-height;
+            left: 0;
+            right: 0;
+            height: $scrollspy-nav-gradient-height;
+            background: $scrollspy-nav-gradient;
+        }
 
         &-target {
             height: $scrollspy-nav-target-height;

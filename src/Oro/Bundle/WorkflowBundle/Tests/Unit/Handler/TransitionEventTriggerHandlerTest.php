@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
 use Oro\Bundle\WorkflowBundle\Configuration\FeatureConfigurationExtension;
@@ -19,14 +19,12 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const ENTITY_CLASS = 'stdClass';
-    const WORKFLOW_NAME = 'test_workflow';
-    const TRANSITION_NAME = 'test_transition';
+    private const ENTITY_CLASS = 'stdClass';
+    private const WORKFLOW_NAME = 'test_workflow';
+    private const TRANSITION_NAME = 'test_transition';
 
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
     /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowManager;
@@ -40,22 +38,18 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionEventTrigger */
     private $trigger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowManager = $this->getMockBuilder(WorkflowManager::class)->disableOriginalConstructor()->getMock();
-
+        $this->workflowManager = $this->createMock(WorkflowManager::class);
         $this->objectManager = $this->createMock(ObjectManager::class);
 
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
-        $registry = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
+        $registry = $this->createMock(ManagerRegistry::class);
         $registry->expects($this->any())
             ->method('getManagerForClass')
             ->with(self::ENTITY_CLASS)
             ->willReturn($this->objectManager);
 
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->handler = new TransitionEventTriggerHandler($this->workflowManager, $registry, $this->featureChecker);
 
@@ -177,10 +171,7 @@ class TransitionEventTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function processExceptionDataProvider()
+    public function processExceptionDataProvider(): array
     {
         $id = ['test' => 1];
 

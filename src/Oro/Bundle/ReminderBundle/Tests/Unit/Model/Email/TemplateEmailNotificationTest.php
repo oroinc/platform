@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\Email;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -19,27 +19,19 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $objectManager;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    /**
-     * @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityNameResolver;
 
-    /**
-     * @var TemplateEmailNotification
-     */
+    /** @var TemplateEmailNotification */
     private $templateEmailNotification;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = $this->createMock(ObjectManager::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
@@ -114,20 +106,16 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $entityRepository = $this->createMock(EntityRepository::class);
-        $entityRepository
-            ->expects($this->any())
+        $entityRepository->expects($this->any())
             ->method('find')
             ->with($entityId)
             ->willReturn($expectedEntity);
 
-        $this->objectManager
-            ->expects($this->any())
+        $this->objectManager->expects($this->any())
             ->method('getRepository')
-            ->willReturnMap(
-                [
-                    [User::class, $entityRepository]
-                ]
-            );
+            ->willReturnMap([
+                [User::class, $entityRepository]
+            ]);
 
         $this->templateEmailNotification->setReminder($reminder);
         self::assertEquals($expectedEntity, $this->templateEmailNotification->getEntity());
@@ -142,8 +130,7 @@ class TemplateEmailNotificationTest extends \PHPUnit\Framework\TestCase
         /** @var Reminder $reminder */
         $reminder = $this->getEntity(Reminder::class, ['sender' => $sender]);
 
-        $this->entityNameResolver
-            ->expects($this->any())
+        $this->entityNameResolver->expects($this->any())
             ->method('getName')
             ->with($sender)
             ->willReturn($senderName);

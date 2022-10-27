@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 /**
@@ -11,30 +10,8 @@ use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
  */
 class TestEntitiesMigrationListener
 {
-    /** @var ConfigManager */
-    private $configManager;
-
-    /**
-     * @param ConfigManager $configManager
-     */
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
-    }
-
-    /**
-     * @param PostMigrationEvent $event
-     */
     public function onPostUp(PostMigrationEvent $event)
     {
         $event->addMigration(new AddAttributesToTestActivityTargetMigration());
-    }
-
-    /**
-     * @param PostMigrationEvent $event
-     */
-    public function updateAttributes(PostMigrationEvent $event)
-    {
-        $event->addMigration(new UpdateAttributesForTestActivityTargetMigration($this->configManager));
     }
 }

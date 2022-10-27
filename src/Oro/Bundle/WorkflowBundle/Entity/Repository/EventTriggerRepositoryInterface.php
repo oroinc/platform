@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 
 interface EventTriggerRepositoryInterface extends ObjectRepository

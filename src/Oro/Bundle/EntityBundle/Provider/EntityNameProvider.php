@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -19,31 +19,29 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class EntityNameProvider implements EntityNameProviderInterface
 {
     /** @var string[] */
-    protected $fieldGuesses = ['firstName', 'name', 'title', 'subject'];
+    private array $fieldGuesses;
+    private ManagerRegistry $doctrine;
+    private ConfigProvider $configProvider;
+    private Inflector $inflector;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var ConfigProvider  */
-    protected $configProvider;
-
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param ConfigProvider  $configProvider
-     */
-    public function __construct(ManagerRegistry $doctrine, ConfigProvider $configProvider)
-    {
+    public function __construct(
+        array $fieldGuesses,
+        ManagerRegistry $doctrine,
+        ConfigProvider $configProvider,
+        Inflector $inflector
+    ) {
+        $this->fieldGuesses = $fieldGuesses;
         $this->doctrine = $doctrine;
         $this->configProvider = $configProvider;
+        $this->inflector = $inflector;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName($format, $locale, $entity)
     {
-        if (!in_array($format, [self::SHORT, self::FULL])) {
-            // unsupported format
+        if (!$this->isFormatSupported($format)) {
             return false;
         }
 
@@ -51,20 +49,25 @@ class EntityNameProvider implements EntityNameProviderInterface
 
         $fieldNames = self::FULL === $format
             ? $this->getFieldNames($className)
-            : (array) $this->guessFieldName($className);
-
+            : (array)$this->guessFieldName($className);
         if (empty($fieldNames)) {
             // no suitable fields
             return false;
         }
 
-        if ($name = $this->getConstructedName($entity, $fieldNames)) {
+        $name = $this->getConstructedName($entity, $fieldNames);
+        if ($name) {
             return $name;
         }
 
         // field value is empty, try with id
-        if ($idFiledName = $this->getSingleIdFieldName($className)) {
-            return $this->getFieldValue($entity, $idFiledName);
+        $idFiledName = $this->getSingleIdFieldName($className);
+        if ($idFiledName) {
+            $idValue = $this->getFieldValue($entity, $idFiledName);
+
+            return null === $idValue || \is_string($idValue)
+                ? $idValue
+                : (string)$idValue;
         }
 
         // no identifier column
@@ -72,12 +75,11 @@ class EntityNameProvider implements EntityNameProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getNameDQL($format, $locale, $className, $alias)
     {
-        if (!in_array($format, [self::SHORT, self::FULL])) {
-            // unsupported format
+        if (!$this->isFormatSupported($format)) {
             return false;
         }
 
@@ -87,17 +89,14 @@ class EntityNameProvider implements EntityNameProviderInterface
                 return false;
             }
 
-            $nameDQL = $alias . '.' . $guessFieldName;
-
-            return $this->addIdFallback($nameDQL, $alias, $className);
+            return $this->addIdFallback($alias . '.' . $guessFieldName, $alias, $className);
         }
 
         $fieldNames = $this->getFieldNames($className);
-        if (0 === count($fieldNames)) {
+        if (!$fieldNames) {
             return false;
         }
 
-        // prepend table alias
         $fieldNames = array_map(
             function ($fieldName) use ($alias) {
                 return $alias . '.' . $fieldName;
@@ -105,9 +104,7 @@ class EntityNameProvider implements EntityNameProviderInterface
             $fieldNames
         );
 
-
         $nameDQL = reset($fieldNames);
-
         if (count($fieldNames) > 1) {
             $nameDQL = sprintf("CONCAT_WS(' ', %s)", implode(', ', $fieldNames));
         }
@@ -115,14 +112,12 @@ class EntityNameProvider implements EntityNameProviderInterface
         return $this->addIdFallback($nameDQL, $alias, $className);
     }
 
-    /**
-     * Return single class Identifier Field Name or null if there a multiple or none
-     *
-     * @param $className
-     *
-     * @return string|null
-     */
-    protected function getSingleIdFieldName($className)
+    private function isFormatSupported(string $format): bool
+    {
+        return self::FULL === $format || self::SHORT === $format;
+    }
+
+    private function getSingleIdFieldName(string $className): ?string
     {
         $metadata = $this->getClassMetadata($className);
         if (!$metadata) {
@@ -130,7 +125,6 @@ class EntityNameProvider implements EntityNameProviderInterface
         }
 
         $identifierFieldNames = $metadata->getIdentifierFieldNames();
-
         if (count($identifierFieldNames) !== 1) {
             return null;
         }
@@ -138,19 +132,9 @@ class EntityNameProvider implements EntityNameProviderInterface
         return reset($identifierFieldNames);
     }
 
-    /**
-     * Adds the identifier column to the DQL as name fallback (if identifier exists and is only one)
-     *
-     * @param $nameDQL
-     * @param $alias
-     * @param $className
-     *
-     * @return string
-     */
-    protected function addIdFallback($nameDQL, $alias, $className)
+    private function addIdFallback(string $nameDQL, string $alias, string $className): string
     {
         $idFieldName = $this->getSingleIdFieldName($className);
-
         if (null === $idFieldName) {
             return $nameDQL;
         }
@@ -159,14 +143,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         return sprintf('COALESCE(CAST(%s AS string), CAST(%s AS string))', $nameDQL, $alias . '.' . $idFieldName);
     }
 
-    /**
-     * Return metadata of className
-     *
-     * @param string $className
-     *
-     * @return ClassMetadata|null
-     */
-    protected function getClassMetadata($className)
+    private function getClassMetadata(string $className): ?ClassMetadata
     {
         $manager = $this->doctrine->getManagerForClass($className);
         if (null === $manager) {
@@ -176,14 +153,7 @@ class EntityNameProvider implements EntityNameProviderInterface
         return $manager->getClassMetadata($className);
     }
 
-    /**
-     * Return first string field from the fieldGuesses or null
-     *
-     * @param string $className
-     *
-     * @return string|null
-     */
-    protected function guessFieldName($className)
+    private function guessFieldName(string $className): ?string
     {
         $metadata = $this->getClassMetadata($className);
 
@@ -200,62 +170,32 @@ class EntityNameProvider implements EntityNameProviderInterface
         return null;
     }
 
-    /**
-     * @param object $entity
-     * @param string $fieldName
-     *
-     * @return mixed
-     */
-    protected function getFieldValue($entity, $fieldName)
+    private function getFieldValue(object $entity, string $fieldName): mixed
     {
-        $getterName = 'get' . Inflector::classify($fieldName);
-
+        $getterName = 'get' . $this->inflector->classify($fieldName);
         if (method_exists($entity, $getterName)) {
             return $entity->{$getterName}();
         }
 
-        if (isset($entity->{$fieldName})) {
-            return $entity->{$fieldName};
-        }
-
-        return null;
+        return $entity->{$fieldName} ?? null;
     }
 
-    /**
-     * Return string field names of className
-     * Return first string field match from fieldGuesses or all string fields
-     *
-     * @param  string $className
-     *
-     * @return array
-     */
-    protected function getFieldNames($className)
+    private function getFieldNames(string $className): array
     {
         $metadata = $this->getClassMetadata($className);
-
-        if (!$metadata) {
+        if (null === $metadata) {
             return [];
         }
 
-        $fieldNames = array_filter(
-            (array) $metadata->getFieldNames(),
+        return array_filter(
+            (array)$metadata->getFieldNames(),
             function ($fieldName) use ($metadata) {
                 return $this->isFieldSupported($metadata, $fieldName);
             }
         );
-
-        return $fieldNames;
     }
 
-    /**
-     * Constructs and returns a name from the values of the fieldNames
-     *
-     * @param $entity
-     * @param $fieldNames
-     *
-     * @return string|bool Constructed Name or FALSE if fails
-     */
-    protected function getConstructedName($entity, $fieldNames)
+    private function getConstructedName(object $entity, array $fieldNames): ?string
     {
         $values = [];
         foreach ($fieldNames as $field) {
@@ -264,21 +204,12 @@ class EntityNameProvider implements EntityNameProviderInterface
 
         $values = array_filter($values);
 
-        return empty($values) ? false : implode(' ', $values);
+        return empty($values) ? null : implode(' ', $values);
     }
 
-    /**
-     * Returns whether field is available to be used as entity name
-     *
-     * @param ClassMetadata $metadata
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    protected function isFieldSupported(ClassMetadata $metadata, $fieldName)
+    private function isFieldSupported(ClassMetadata $metadata, string $fieldName): bool
     {
         $isFieldSupported = $metadata->hasField($fieldName) && $metadata->getTypeOfField($fieldName) === 'string';
-
         if ($isFieldSupported && $this->configProvider->hasConfig($metadata->getName(), $fieldName)) {
             $fieldConfig = $this->configProvider->getConfig($metadata->getName(), $fieldName);
             $isFieldSupported = ExtendHelper::isFieldAccessible($fieldConfig);

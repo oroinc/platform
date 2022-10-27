@@ -9,7 +9,7 @@ class TrueTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\TrueCondition */
     protected $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\TrueCondition();
     }
@@ -24,12 +24,11 @@ class TrueTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->condition, $this->condition->initialize([]));
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options are prohibited
-     */
     public function testInitializeFails()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options are prohibited');
+
         $this->condition->initialize(['anything']);
     }
 

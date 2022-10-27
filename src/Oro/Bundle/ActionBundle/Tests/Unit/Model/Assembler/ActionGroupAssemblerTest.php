@@ -3,37 +3,30 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
+use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Component\Action\Action\ActionFactory;
+use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ActionGroupAssembler */
-    protected $assembler;
+    private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->assembler = new ActionGroupAssembler(
-            $this->getActionFactory(),
-            $this->getConditionFactory(),
-            $this->getParameterAssembler(),
-            $this->getParametersResolver()
+            $this->createMock(ActionFactoryInterface::class),
+            $this->createMock(ConditionFactory::class),
+            new ParameterAssembler(),
+            $this->createMock(ParametersResolver::class)
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->assembler);
-    }
-
     /**
-     * @param array $configuration
-     * @param array $expected
-     *
      * @dataProvider assembleProvider
      */
     public function testAssemble(array $configuration, array $expected)
@@ -44,16 +37,14 @@ class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function assembleProvider()
+    public function assembleProvider(): array
     {
-        $parameterAssembler = $this->getParameterAssembler();
-        $parametersResolver = $this->getParametersResolver();
-        $actionFactory = $this->getActionFactory();
-        $conditionFactory = $this->getConditionFactory();
+        $parameterAssembler = new ParameterAssembler();
+        $parametersResolver = $this->createMock(ParametersResolver::class);
+        $actionFactory = $this->createMock(ActionFactoryInterface::class);
+        $conditionFactory = $this->createMock(ConditionFactory::class);
 
         $definition1 = new ActionGroupDefinition();
         $definition1
@@ -103,7 +94,7 @@ class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
                     'minimum_name' => [
                         'label' => 'My Label',
                         'entities' => [
-                            '\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'
+                            TestEntity1::class
                         ]
                     ]
                 ]
@@ -178,51 +169,5 @@ class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ActionFactory
-     */
-    protected function getActionFactory()
-    {
-        return $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConditionFactory
-     */
-    protected function getConditionFactory()
-    {
-        return $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
-    protected function getDoctrineHelper()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    /**
-     * @return ParameterAssembler
-     */
-    protected function getParameterAssembler()
-    {
-        return new ParameterAssembler();
-    }
-
-    /**
-     * @return ActionGroup\ParametersResolver|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getParametersResolver()
-    {
-        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors, scss/selector-no-redundant-nesting-selector */
+
 body:not(.login-page) {
     min-width: $width-body-page;
 }
@@ -8,18 +10,44 @@ body:not(.login-page) {
 .app-page,
 .app-page__central-panel {
     height: 100%;
-    overflow: hidden; // prevents scroll bar appearance
+    // prevents scroll bar appearance
+    overflow: hidden;
 }
 
 & {
+    --responsive-section-container-minimal-width-threshold: #{$responsive-section-container-minimal-width-threshold};
+
     overflow-x: auto;
+}
+
+.responsive-section-container-minimal {
+    min-width: calc(var(--responsive-section-container-minimal-width-threshold) * 1px);
+    width: fit-content;
 }
 
 .responsive-section {
     .responsive-cell {
-        &:nth-last-child(1),
-        &:nth-last-child(2) {
+        &:nth-last-child(1n),
+        &:nth-last-child(2n) {
             margin-bottom: 0;
+        }
+    }
+
+    &.responsive-big {
+        .responsive-cell {
+            &:not(:only-child) {
+                .responsive-block {
+                    padding-left: 0;
+                    padding-right: 0;
+                }
+            }
+        }
+    }
+
+    &.responsive-small {
+        .responsive-block {
+            padding-left: 0;
+            padding-right: 0;
         }
     }
 }
@@ -28,24 +56,26 @@ body:not(.login-page) {
     min-width: 340px;
 
     &:first-child {
-        padding-#{$end}: $content-padding-small;
+        padding-right: $content-padding-small;
     }
 
     &:last-child {
-        padding-#{$start}: $content-padding-small;
+        padding-left: $content-padding-small;
     }
+
     &:only-child {
         padding: 0;
     }
 
     &.border-right {
-        border-#{$end}: 2px solid $primary-860;
+        border-right: 2px solid $primary-860;
     }
 }
 
 .app-page {
     box-sizing: border-box;
     display: flex;
+    min-height: 0;
 
     &__content-side {
         flex-shrink: 0;
@@ -54,66 +84,151 @@ body:not(.login-page) {
     &__content {
         flex-grow: 1;
         overflow: inherit;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     &__main {
         display: flex;
         width: 100%;
+        height: 100%;
+        align-items: stretch;
+        justify-content: stretch;
+        flex-grow: 1;
+        flex-shrink: 1;
+        min-height: 0;
     }
 
     &__left-panel,
     &__right-panel {
+        position: relative;
         overflow: visible;
     }
 
     &__central-panel {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
         flex-grow: 1;
     }
 }
 
-
 .layout-content {
     > .scrollable-container {
-        padding-#{$start}: $content-padding;
-        padding-#{$end}: $content-padding;
+        padding-left: $content-padding;
+        padding-right: $content-padding;
     }
 
     // Update offset on pages with sidebar
     > .sidebar-container .category-data {
-        padding-#{$start}: $content-padding;
+        padding-left: $content-padding;
+        padding-right: $content-padding;
+        margin-right: -$content-padding;
     }
 
     //  Update offset on view pages
     .layout-content .scrollspy-main-container > .scrollable-container {
-        margin-#{$start}: -$content-padding;
-        margin-#{$end}: -$content-padding;
-        padding-#{$start}: $content-padding;
-        padding-#{$end}: $content-padding;
+        margin-left: -$content-padding;
+        margin-right: -$content-padding;
+        padding-left: $content-padding;
+        padding-right: $content-padding;
+    }
+}
+
+#container,
+.scrollspy-main-container,
+.scrollable-container > form,
+.layout-content,
+.layout-content > *:only-child,
+.layout-content > .responsive-form-inner,
+.content-with-sidebar--content .category-data {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 100%;
+    min-height: 0;
+}
+
+.scrollable-container {
+    overflow: auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 100%;
+    min-height: 0;
+}
+
+.container-fluid {
+    > .responsive-section {
+        &:not(.responsive-small) {
+            .responsive-cell {
+                &:first-child {
+                    .user-fieldset,
+                    .widget-title {
+                        margin-left: $content-padding-medium;
+                    }
+                }
+
+                &:nth-child(2) {
+                    .inner-grid {
+                        // stylelint-disable-next-line max-nesting-depth
+                        .grid-views {
+                            margin-left: 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        &.responsive-medium {
+            &:not(.responsive-section-no-blocks) {
+                .responsive-cell {
+                    .user-fieldset,
+                    .widget-title {
+                        margin-left: $content-padding-medium;
+                    }
+                }
+            }
+        }
+
+        &.responsive-small {
+            .responsive-cell {
+                .user-fieldset,
+                .widget-title {
+                    margin-left: $content-padding-medium;
+                }
+            }
+        }
     }
 }
 
 //  Update offset on create / update pages
 form > .layout-content {
-    padding-#{$start}: $content-padding;
-    padding-#{$end}: $content-padding;
+    padding-left: $content-padding;
+    padding-right: $content-padding;
 
     .scrollspy-main-container > .scrollable-container {
-        margin-#{$start}: -$content-padding;
-        margin-#{$end}: -$content-padding;
-        padding-#{$start}: $content-padding;
-        padding-#{$end}: $content-padding;
+        margin-left: -$content-padding;
+        margin-right: -$content-padding;
+        padding-left: $content-padding;
+        padding-right: $content-padding;
     }
 }
 
-.page-title + [data-bound-component*="datagrid"] {
-    padding-#{$start}: $content-padding;
-    padding-#{$end}: $content-padding;
+.page-title + [data-bound-component*='datagrid'] {
+    padding-left: $content-padding;
+    padding-right: $content-padding;
 }
 
 .oro-page {
     &.collapsible-sidebar {
         .oro-page-sidebar {
             > .dropdown-menu {
+                // stylelint-disable-next-line declaration-no-important
                 display: block !important;
                 z-index: inherit;
                 width: 100%;

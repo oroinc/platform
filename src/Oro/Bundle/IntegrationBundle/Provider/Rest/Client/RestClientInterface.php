@@ -4,6 +4,9 @@ namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException;
 
+/**
+ * An interface for extended HTTP client based on Guzzle for simplifying REST API based integrations
+ */
 interface RestClientInterface
 {
     /**
@@ -16,7 +19,7 @@ interface RestClientInterface
      * @return RestResponseInterface
      * @throws RestException
      */
-    public function get($resource, array $params = array(), array $headers = array(), array $options = array());
+    public function get($resource, array $params = [], array $headers = [], array $options = []);
 
     /**
      * Send GET request and return decoded JSON as array
@@ -28,7 +31,7 @@ interface RestClientInterface
      * @return array
      * @throws RestException
      */
-    public function getJSON($resource, array $params = array(), array $headers = array(), array $options = array());
+    public function getJSON($resource, array $params = [], array $headers = [], array $options = []);
 
     /**
      * Send POST request
@@ -40,7 +43,7 @@ interface RestClientInterface
      * @return RestResponseInterface
      * @throws RestException
      */
-    public function post($resource, $data, array $headers = array(), array $options = array());
+    public function post($resource, $data, array $headers = [], array $options = []);
 
     /**
      * Send DELETE request
@@ -49,11 +52,9 @@ interface RestClientInterface
      * @param mixed $headers
      * @param mixed $options
      * @return RestResponseInterface
-     * @param mixed $headers
-     * @param mixed $options
      * @throws RestException
      */
-    public function delete($resource, array $headers = array(), array $options = array());
+    public function delete($resource, array $headers = [], array $options = []);
 
     /**
      * Send PUT request
@@ -65,7 +66,7 @@ interface RestClientInterface
      * @return RestResponseInterface
      * @throws RestException
      */
-    public function put($resource, $data, array $headers = array(), array $options = array());
+    public function put($resource, $data, array $headers = [], array $options = []);
 
     /**
      * Get last response object

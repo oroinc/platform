@@ -53,10 +53,6 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
         return $this->lastName;
     }
 
-    public function getClass()
-    {
-    }
-
     public function getEmailFields()
     {
     }

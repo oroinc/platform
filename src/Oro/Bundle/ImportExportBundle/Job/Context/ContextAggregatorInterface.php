@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job\Context;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
 /**

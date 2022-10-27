@@ -2,17 +2,22 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Client;
 
+use Gos\Bundle\WebSocketBundle\Client\Auth\WebsocketAuthenticationProviderInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorage;
-use Gos\Bundle\WebSocketBundle\Client\Driver\DriverInterface;
+use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\ClientNotFoundException;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
+use GuzzleHttp\Psr7\Request;
+use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
 use Oro\Bundle\SyncBundle\Client\ClientManipulator;
+use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
+use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\UserBundle\Security\UserProvider;
-use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
+use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -20,50 +25,42 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private const CONNECTION_RESOURCE_ID = 45654;
+    private const CONNECTION_RESOURCE_ID = '45654';
     private const USERNAME = 'sampleUsername';
     private const CLIENT_STORAGE_TTL = 100;
 
-    /**
-     * @var ClientManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ClientManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $decoratedClientManipulator;
 
-    /**
-     * @var ClientStorage
-     */
+    /** @var ClientStorage */
     private $clientStorage;
 
-    /**
-     * @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $storageDriver;
-
-    /**
-     * @var UserProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var UserProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $userProvider;
 
-    /**
-     * @var ClientManipulator
-     */
+    /** @var TicketProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ticketProvider;
+
+    /** @var WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $websocketAuthenticationProvider;
+
+    /** @var ClientManipulator */
     private $clientManipulator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->decoratedClientManipulator = $this->createMock(ClientManipulatorInterface::class);
-
-        // We cannot properly mock ClientStorageInterface because of static method getStorageId().
-        $this->clientStorage = new ClientStorage(self::CLIENT_STORAGE_TTL, $this->createMock(LoggerInterface::class));
-        $this->storageDriver = $this->createMock(DriverInterface::class);
-        $this->clientStorage->setStorageDriver($this->storageDriver);
-
+        $this->clientStorage = $this->createMock(ClientStorageInterface::class);
         $this->userProvider = $this->createMock(UserProvider::class);
+        $this->ticketProvider = $this->createMock(TicketProviderInterface::class);
+        $this->websocketAuthenticationProvider = $this->createMock(WebsocketAuthenticationProviderInterface::class);
 
         $this->clientManipulator = new ClientManipulator(
             $this->decoratedClientManipulator,
             $this->clientStorage,
-            $this->userProvider
+            $this->userProvider,
+            $this->ticketProvider,
+            $this->websocketAuthenticationProvider
         );
 
         $this->setUpLoggerMock($this->clientManipulator);
@@ -71,26 +68,37 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetClientStorageException(): void
     {
-        $this->storageDriver
-            ->expects(self::once())
-            ->method('fetch')
+        $connection = $this->createConnection();
+
+        $this->clientStorage->expects(self::any())
+            ->method('getStorageId')
+            ->with($connection)
+            ->willReturn(self::CONNECTION_RESOURCE_ID);
+
+        $this->clientStorage->expects(self::once())
+            ->method('getClient')
             ->with(self::CONNECTION_RESOURCE_ID)
-            ->willThrowException(new \Exception());
+            ->willThrowException(new StorageException());
 
         $this->expectException(StorageException::class);
 
         $this->assertLoggerErrorMethodCalled();
 
-        $this->clientManipulator->getClient($this->createConnection());
+        $this->clientManipulator->getClient($connection);
     }
 
     public function testGetClientNotFoundExceptionAndCannotRenew(): void
     {
-        $this->storageDriver
-            ->expects(self::once())
-            ->method('fetch')
+        $connection = $this->createConnection();
+
+        $this->clientStorage->expects(self::any())
+            ->method('getStorageId')
+            ->with($connection)
+            ->willReturn(self::CONNECTION_RESOURCE_ID);
+        $this->clientStorage->expects(self::once())
+            ->method('getClient')
             ->with(self::CONNECTION_RESOURCE_ID)
-            ->willReturn(false);
+            ->willThrowException(new ClientNotFoundException());
 
         $this->expectException(ClientNotFoundException::class);
 
@@ -102,85 +110,111 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetClientCanRenewAnonymous(): void
     {
-        $this->storageDriver
-            ->expects(self::exactly(2))
-            ->method('fetch')
-            ->withConsecutive([self::CONNECTION_RESOURCE_ID], [self::CONNECTION_RESOURCE_ID])
-            ->willReturnOnConsecutiveCalls(false, serialize(self::USERNAME));
-
-        $this->assertLoggerDebugMethodCalled();
-
         $connection = $this->createConnection();
         $connection->WAMP->username = self::USERNAME;
+        $connection->httpRequest = new Request('GET', '/test/?ticket=abc');
+        $token = new AnonymousTicketToken(
+            'sampleTicketDigest',
+            AuthenticationProviderInterface::USERNAME_NONE_PROVIDED
+        );
 
-        $this->userProvider
-            ->expects(self::once())
+        $this->clientStorage->expects(self::any())
+            ->method('getStorageId')
+            ->with($connection)
+            ->willReturn(self::CONNECTION_RESOURCE_ID);
+
+        $call = 0;
+        $this->clientStorage->expects(self::exactly(2))
+            ->method('getClient')
+            ->with(self::CONNECTION_RESOURCE_ID)
+            ->willReturnCallback(static function () use (&$call, $token) {
+                if ($call === 0) {
+                    $call++;
+                    throw new ClientNotFoundException();
+                }
+
+                return $token;
+            });
+
+        $this->userProvider->expects(self::once())
             ->method('loadUserByUsername')
+            ->with(self::USERNAME)
             ->willThrowException(new UsernameNotFoundException());
 
-        $this->storageDriver
-            ->expects(self::once())
-            ->method('save')
-            ->with(self::CONNECTION_RESOURCE_ID, serialize(self::USERNAME), self::CLIENT_STORAGE_TTL)
-            ->willReturn(true);
+        $this->ticketProvider->expects($this->once())
+            ->method('generateTicket')
+            ->with(null)
+            ->willReturn('new_ticket');
 
-        self::assertEquals(self::USERNAME, $this->clientManipulator->getClient($connection));
-    }
-
-    public function testGetClientCanRenew(): void
-    {
-        $user = $this->createMock(UserInterface::class);
-
-        $this->storageDriver
-            ->expects(self::exactly(2))
-            ->method('fetch')
-            ->withConsecutive([self::CONNECTION_RESOURCE_ID], [self::CONNECTION_RESOURCE_ID])
-            ->willReturnOnConsecutiveCalls(false, serialize($user));
+        $this->websocketAuthenticationProvider->expects(self::once())
+            ->method('authenticate')
+            ->with($connection)
+            ->willReturn($token);
+        $this->clientStorage->expects(self::once())
+            ->method('addClient')
+            ->with(self::CONNECTION_RESOURCE_ID, $token);
 
         $this->assertLoggerDebugMethodCalled();
-
-        $connection = $this->createConnection();
-        $connection->WAMP->username = self::USERNAME;
-
-        $this->userProvider
-            ->expects(self::once())
-            ->method('loadUserByUsername')
-            ->willReturn($user);
-
-        $this->storageDriver
-            ->expects(self::once())
-            ->method('save')
-            ->with(self::CONNECTION_RESOURCE_ID, serialize($user), self::CLIENT_STORAGE_TTL)
-            ->willReturn(true);
-
-        self::assertEquals($user, $this->clientManipulator->getClient($connection));
+        self::assertEquals($token, $this->clientManipulator->getClient($connection));
+        self::assertNotEquals('ticket=abc', $connection->httpRequest->getUri()->getQuery());
     }
 
-    public function testFindByUserName()
+    public function testGetUserCanRenew(): void
     {
-        $username = self::USERNAME;
-        /** @var Topic $topic */
-        $topic = $this->createMock(Topic::class);
+        $connection = $this->createConnection();
+        $connection->WAMP->username = self::USERNAME;
+        $connection->httpRequest = new Request('GET', '/test/?ticket=abc');
+        $user = $this->createMock(UserInterface::class);
+        $token = new TicketToken($user, 'credentials', 'providerKey');
 
-        $expectedResult = ['connection' => new \stdClass(), 'user' => new \stdClass()];
-        $this->decoratedClientManipulator
-            ->expects(self::once())
-            ->method('findByUsername')
-            ->with($topic, $username)
-            ->willReturn($expectedResult);
+        $this->clientStorage->expects(self::any())
+            ->method('getStorageId')
+            ->with($connection)
+            ->willReturn(self::CONNECTION_RESOURCE_ID);
 
-        self::assertEquals($expectedResult, $this->clientManipulator->findByUsername($topic, $username));
+        $call = 0;
+        $this->clientStorage->expects(self::exactly(2))
+            ->method('getClient')
+            ->with(self::CONNECTION_RESOURCE_ID)
+            ->willReturnCallback(static function () use (&$call, $token) {
+                if ($call === 0) {
+                    $call++;
+                    throw new ClientNotFoundException();
+                }
+
+                return $token;
+            });
+
+        $this->userProvider->expects(self::once())
+            ->method('loadUserByUsername')
+            ->with(self::USERNAME)
+            ->willReturn($user);
+
+        $this->ticketProvider->expects($this->once())
+            ->method('generateTicket')
+            ->with($user)
+            ->willReturn('new_ticket');
+
+        $this->websocketAuthenticationProvider->expects(self::once())
+            ->method('authenticate')
+            ->with($connection)
+            ->willReturn($token);
+        $this->clientStorage->expects(self::once())
+            ->method('addClient')
+            ->with(self::CONNECTION_RESOURCE_ID, $token);
+
+        $this->assertLoggerDebugMethodCalled();
+        self::assertEquals($user, $this->clientManipulator->getUser($connection));
+        self::assertNotEquals('ticket=abc', $connection->httpRequest->getUri()->getQuery());
     }
 
     public function testGetAll()
     {
         $anonymous = false;
-        /** @var Topic $topic */
         $topic = $this->createMock(Topic::class);
 
         $expectedResult = [new \stdClass(), new \stdClass()];
-        $this->decoratedClientManipulator
-            ->expects(self::once())
+        $this->decoratedClientManipulator->expects(self::once())
             ->method('getAll')
             ->with($topic, $anonymous)
             ->willReturn($expectedResult);
@@ -191,12 +225,10 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
     public function testFindByRoles()
     {
         $roles = ['sampleRole'];
-        /** @var Topic $topic */
         $topic = $this->createMock(Topic::class);
 
         $expectedResult = [new \stdClass(), new \stdClass()];
-        $this->decoratedClientManipulator
-            ->expects(self::once())
+        $this->decoratedClientManipulator->expects(self::once())
             ->method('findByRoles')
             ->with($topic, $roles)
             ->willReturn($expectedResult);
@@ -204,13 +236,10 @@ class ClientManipulatorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedResult, $this->clientManipulator->findByRoles($topic, $roles));
     }
 
-    /**
-     * @return ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function createConnection(): ConnectionInterface
     {
         $connection = $this->createMock(ConnectionInterface::class);
-        $connection->WAMP = (object) ['sessionId' => '12345', 'prefixes' => []];
+        $connection->WAMP = (object)['sessionId' => '12345', 'prefixes' => []];
         $connection->remoteAddress = 'localhost';
         $connection->resourceId = self::CONNECTION_RESOURCE_ID;
 

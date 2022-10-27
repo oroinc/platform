@@ -4,15 +4,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Performance\Acl\Fixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\UserBundle\Entity\Role;
 
 class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
      * Load roles full_access_role
-     *
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

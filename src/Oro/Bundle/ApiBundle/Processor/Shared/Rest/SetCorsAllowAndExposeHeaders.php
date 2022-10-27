@@ -6,12 +6,15 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeletedCountHeader;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader;
+use Oro\Bundle\ApiBundle\Request\Rest\CorsHeaders;
+use Oro\Bundle\ApiBundle\Request\Rest\CorsSettings;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Sets "Access-Control-Allow-Headers" response header
  * to allow including the following headers on CORS preflight requests:
+ * * Authorization
  * * Content-Type
  * * X-Include
  * Sets "Access-Control-Expose-Headers" response header
@@ -24,25 +27,12 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetCorsAllowAndExposeHeaders implements ProcessorInterface
 {
-    /** @var string[] */
-    private $allowedHeaders;
+    /** @var CorsSettings */
+    private $corsSettings;
 
-    /** @var string[] */
-    private $exposableHeaders;
-
-    /** @var bool */
-    private $isCredentialsAllowed;
-
-    /**
-     * @param string[] $allowedHeaders
-     * @param string[] $exposableHeaders
-     * @param bool     $isCredentialsAllowed
-     */
-    public function __construct(array $allowedHeaders, array $exposableHeaders, bool $isCredentialsAllowed)
+    public function __construct(CorsSettings $corsSettings)
     {
-        $this->allowedHeaders = $allowedHeaders;
-        $this->exposableHeaders = $exposableHeaders;
-        $this->isCredentialsAllowed = $isCredentialsAllowed;
+        $this->corsSettings = $corsSettings;
     }
 
     /**
@@ -60,10 +50,11 @@ class SetCorsAllowAndExposeHeaders implements ProcessorInterface
                 CorsHeaders::ACCESS_CONTROL_ALLOW_HEADERS,
                 self::getHeaders(
                     [
+                        'Authorization',
                         'Content-Type',
                         Context::INCLUDE_HEADER
                     ],
-                    $this->allowedHeaders
+                    $this->corsSettings->getAllowedHeaders()
                 )
             );
         }
@@ -76,11 +67,13 @@ class SetCorsAllowAndExposeHeaders implements ProcessorInterface
                         SetTotalCountHeader::RESPONSE_HEADER_NAME,
                         SetDeletedCountHeader::RESPONSE_HEADER_NAME
                     ],
-                    $this->exposableHeaders
+                    $this->corsSettings->getExposableHeaders()
                 )
             );
         }
-        if ($this->isCredentialsAllowed && !$responseHeaders->has(CorsHeaders::ACCESS_CONTROL_ALLOW_CREDENTIALS)) {
+        if ($this->corsSettings->isCredentialsAllowed()
+            && !$responseHeaders->has(CorsHeaders::ACCESS_CONTROL_ALLOW_CREDENTIALS)
+        ) {
             $responseHeaders->set(CorsHeaders::ACCESS_CONTROL_ALLOW_CREDENTIALS, 'true');
         }
     }

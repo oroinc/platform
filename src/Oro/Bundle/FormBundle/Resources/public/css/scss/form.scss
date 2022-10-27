@@ -1,114 +1,60 @@
 /* @theme: admin.oro; */
 
-.mce-tinymce {
-    .mce-panel {
-        background: $mce-tinymce-panel-background;
-        border: $mce-tinymce-panel-border;
-    }
-
-    &.mce-panel {
-        border: $mce-panel-border !important;
-        border-radius: $mce-panel-border-radius;
-        padding: $mce-panel-inner-offset;
-        box-sizing: $mce-panel-box-sizing;
-    }
-
-    &.mce-fullscreen {
-        width: $mce-tinymce-fullscreen-width !important;
-        max-width: $mce-tinymce-fullscreen-max-width !important;
-        bottom: $mce-tinymce-fullscreen-bottom;
-    }
-
-    .mce-toolbar-grp {
-        border-top-left-radius: $mce-tinymce-toolbar-grp-border-top-left-radius;
-        border-top-right-radius: $mce-tinymce-toolbar-grp-border-top-right-radius;
-    }
-
-    .mce-edit-area {
-        border-bottom-left-radius: $mce-tinymce-edit-area-border-bottom-left-radius;
-        border-bottom-right-radius: $mce-tinymce-edit-area-border-bottom-right-radius;
-        overflow: $mce-tinymce-edit-area-overflow;
-    }
-}
-
-.mce-fullscreen-overlay {
-    display: $mce-fullscreen-overlay-display;
-    content: $mce-fullscreen-overlay-content;
-    position: $mce-fullscreen-overlay-position;
-    top: $mce-fullscreen-overlay-top;
-    left: $mce-fullscreen-overlay-left;
-    right: $mce-fullscreen-overlay-right;
-    bottom: $mce-fullscreen-overlay-bottom;
-    z-index: $mce-fullscreen-overlay-z-index;
-    background-color: $mce-fullscreen-overlay-background-color;
-    opacity: $mce-fullscreen-overlay-opacity;
-}
-
-.mce-bdesk {
-    font-size: $mce-bdesk-font-size !important;
-    padding: $mce-bdesk-inner-offset !important;
-    line-height: $mce-bdesk-line-height !important;
-
-    & &-image {
-        width: $mce-bdesk-image-width;
-        line-height: $mce-bdesk-image-line-height;
-    }
-}
-
-.mce-window-head {
-    .mce-ico {
-        display: $mce-window-head-mce-ico-display;
-        border-right: $mce-window-head-mce-ico-border-right;
-        width: $mce-window-head-mce-ico-width;
-        height: $mce-window-head-mce-ico-height;
-        color: $mce-window-head-mce-ico-color;
-        font: $mce-window-head-mce-ico-font;
-        text-align: $mce-window-head-mce-ico-text-align;
-        line-height: $mce-window-head-mce-ico-line-height;
-        text-shadow: $mce-window-head-mce-ico-text-shadow;
-    }
-
-    .mce-i-remove {
-        &:before {
-            content: $mce-window-head-mce-ico-remove-content;
-
-        }
-    }
-}
-
-.mce-window {
-    .mce-btn:not(.mce-menubtn) {
-        button {
-            line-height: $mce-window-line-height;
-        }
-    }
-
-    .mce-primary:not(.mce-menubtn) {
-        .mce-txt {
-            color: $mce-window-color;
-        }
-    }
-
-    .mce-default:not(.mce-menubtn) {
-        width: $mce-window-width;
-    }
-}
-
 .entities.list-group {
+    flex-direction: $entities-list-flex-direction;
+    flex-wrap: $entities-list-flex-wrap;
+    margin-top: $entities-list-offset-top;
+    margin-left: -#{$entities-list-group-item-offset-start};
+
     .list-group-item {
         padding: $entities-list-group-item-inner-offset;
-        margin-left: $entities-list-group-item-offset-left;
-        margin-right: $entities-list-group-item-offset-right.5%;
+        margin-left: $entities-list-group-item-offset-start;
+        margin-bottom: $entities-list-group-item-offset-bottom;
+        margin-right: $entities-list-group-item-offset-end;
+        border: $entities-list-group-item-border;
+        background-color: $entities-list-group-item-background-color;
+        position: $entities-list-group-item-position;
+
+        border-radius: $entities-list-group-item-border-radius;
+
         width: $entities-list-group-item-width;
-        border-top-style: $entities-list-group-item-border-top-style;
-    }
+        flex-shrink: 0;
 
-    .list-group-item h4 {
-        margin: $entities-list-group-item-h-offset;
-    }
+        &__header {
+            display: flex;
+            margin-bottom: $entities-list-group-item-header-offset-bottom;
+            padding-right: $entities-list-group-item-header-inner-offset-end;
+        }
 
-    .default-selector {
-        margin-right: $entities-list-group-default-selector-offset-right;
+        &__title {
+            margin: $entities-list-group-item-title-offset;
+            font-size: $entities-list-group-item-title-font-size;
+            font-weight: $entities-list-group-item-title-font-weight;
+            align-self: $entities-list-group-item-title-align-self;
+            overflow: $entities-list-group-item-title-overflow;
+            flex-shrink: 1;
+        }
+
+        &__link {
+            display: block;
+            overflow: $entities-list-group-item-link-overflow;
+            text-overflow: $entities-list-group-item-link-text-overflow;
+        }
+
+        &__default {
+            margin-right: $entities-list-group-default-offset-end;
+            flex-shrink: 0;
+        }
+
+        &__extra-info {
+            line-height: $entities-list-item-extra-info-line-height;
+        }
+
+        .remove-btn {
+            position: $entities-list-group-item-remove-btn-position;
+            top: $entities-list-group-item-remove-btn-top;
+            right: $entities-list-group-item-remove-btn-end;
+        }
     }
 }
 
@@ -122,11 +68,22 @@
         td {
             padding-top: $controls-list-group-inner-offset-top;
             padding-bottom: $controls-list-group-inner-offset-bottom;
-            vertical-align: $controls-list-group-vertical-align;
 
             &:first-child,
             &.fallback-item-value {
                 padding-left: $controls-list-group-fallback-item-value-inner-offset-left;
+            }
+
+            &.float-holder-label {
+                padding: $controls-list-group-float-holder-label-inner-offset;
+
+                &:first-child {
+                    padding-left: 0;
+                }
+
+                &:last-child {
+                    padding-right: 0;
+                }
             }
 
             label {
@@ -136,11 +93,6 @@
     }
 }
 
-.expanded-text-field textarea,
-.expanded-text-field .mce-tinymce {
-    width: 100%;
-}
-
 .control-group.collapsible {
     .collapse-expand-action-container {
         display: $control-group-collapsible-display;
@@ -148,10 +100,10 @@
         .collapse-action {
             color: $control-group-collapsible-collapse-action-color;
             font-size: $control-group-collapsible-collapse-action-font-size;
-            font-family: $control-group-collapsible-collapse-action-font-family, Arial, sans-serif;
+            font-family: $control-group-collapsible-collapse-action-font-family;
             font-weight: $control-group-collapsible-collapse-action-font-weight;
 
-            &:before {
+            &::before {
                 content: $control-group-collapsible-collapse-action-icon-content;
                 display: $control-group-collapsible-collapse-action-icon-display;
                 width: $control-group-collapsible-collapse-action-icon-width;
@@ -167,7 +119,7 @@
                 background: $control-group-collapsible-collapse-action-icon-background;
             }
 
-            &.collapsed:before {
+            &.collapsed::before {
                 content: $control-group-collapsible-collapse-action-icon-collapsed-content;
             }
         }
@@ -178,7 +130,7 @@
     }
 
     &.collapsed {
-        .collapse-expand-action-container .collapse-action:before {
+        .collapse-expand-action-container .collapse-action::before {
             content: $control-group-collapsible-collapsed-content;
         }
     }
@@ -189,6 +141,8 @@
     border-radius: $oro-hint-border-radius;
     border: $oro-hint-border;
     color: $oro-hint-color;
+    font-size: $oro-hint-font-size;
+    line-height: $oro-hint-line-height;
     margin: $oro-hint-offset;
     padding: $oro-hint-inner-offset;
     text-shadow: $oro-hint-text-shadow;
@@ -234,4 +188,69 @@
     margin-top: $section-content-offset-top;
     padding-top: $section-content-inner-offset-top;
     padding-bottom: $section-content-inner-offset-bottom;
+
+    .row-fluid {
+        margin: $row-fluid-inner-offset;
+
+        .row-fluid {
+            margin: 0;
+        }
+    }
+}
+
+.responsive-form-inner {
+    .float-holder {
+        margin-right: ($content-padding-small * .5);
+    }
+}
+
+.floating-error-message {
+    $arrow-height: 6px;
+
+    padding: 4px 8px 5px 30px;
+    margin-bottom: $arrow-height;
+    border-radius: $input-field-border-radius;
+    font-size: $base-font-size - 1;
+    line-height: $floating-error-message-line-height;
+    background-color: $danger-lighten;
+    color: $danger-ultra-dark;
+    z-index: 2;
+
+    .arrow {
+        display: block;
+        position: absolute;
+        top: 100%;
+        width: 0;
+
+        &::after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 10px;
+            border-style: solid;
+            border-color: $danger-lighten transparent;
+            border-width: $arrow-height ($arrow-height - 1) 0;
+        }
+    }
+
+    .content {
+        @include fa-icon($fa-var-times, before, true) {
+            position: absolute;
+            left: 9px;
+            top: 3px;
+            font-size: $icon-font-size;
+            line-height: 1;
+            color: $danger-darken;
+        }
+    }
+
+    &[x-out-of-boundaries] {
+        // Avoid 'display: none' to ability getting real size of popper element before showing
+
+        position: fixed;
+
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+    }
 }

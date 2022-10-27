@@ -11,16 +11,14 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggerCronVerif
 class TransitionCronTriggerAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TransitionTriggerCronVerifier|\PHPUnit\Framework\MockObject\MockObject */
-    protected $verifier;
+    private $verifier;
 
     /** @var TransitionCronTriggerAssembler */
-    protected $assembler;
+    private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->verifier = $this->getMockBuilder(TransitionTriggerCronVerifier::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->verifier = $this->createMock(TransitionTriggerCronVerifier::class);
 
         $this->assembler = new TransitionCronTriggerAssembler($this->verifier);
     }

@@ -1,4 +1,7 @@
-assets:
-    css:
-        'oroentitypagination':
-            - 'bundles/oroentitypagination/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oroentitypagination/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroentitypagination/css/scss/main.scss'

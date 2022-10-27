@@ -3,17 +3,29 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
-class FormatExtension extends \Twig_Extension
+/**
+ * Provides Twig functions to render files:
+ *   - asset_path
+ *   - oro_format_filename
+ *
+ * Provides Twig filters for content formatting:
+ *   - oro_format
+ *   - age
+ *   - age_string
+ */
+class FormatExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -24,7 +36,7 @@ class FormatExtension extends \Twig_Extension
      */
     protected function getTranslator()
     {
-        return $this->container->get('translator');
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**
@@ -36,14 +48,22 @@ class FormatExtension extends \Twig_Extension
     }
 
     /**
+     * @return UrlWithoutFrontControllerProvider
+     */
+    protected function getUrlWithoutFrontControllerProvider()
+    {
+        return $this->container->get('oro_ui.provider.url_without_front_controller');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('oro_format', [$this, 'format'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFilter('age', [$this, 'getAge']),
-            new \Twig_SimpleFilter('age_string', [$this, 'getAgeAsString']),
+            new TwigFilter('oro_format', [$this, 'format'], ['is_safe' => ['html']]),
+            new TwigFilter('age', [$this, 'getAge']),
+            new TwigFilter('age_string', [$this, 'getAgeAsString']),
         ];
     }
 
@@ -53,17 +73,9 @@ class FormatExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('asset_path', [$this, 'generateUrlWithoutFrontController']),
-            new \Twig_SimpleFunction('oro_format_filename', [$this, 'formatFilename']),
+            new TwigFunction('asset_path', [$this, 'generateUrlWithoutFrontController']),
+            new TwigFunction('oro_format_filename', [$this, 'formatFilename']),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_formatter_extension';
     }
 
     /**
@@ -85,17 +97,7 @@ class FormatExtension extends \Twig_Extension
      */
     public function generateUrlWithoutFrontController($name, $parameters = [])
     {
-        $router = $this->container->get('router');
-
-        $prevBaseUrl = $router->getContext()->getBaseUrl();
-        $baseUrlWithoutFrontController = preg_replace('/\/[\w_]+\.php$/', '', $prevBaseUrl);
-        $router->getContext()->setBaseUrl($baseUrlWithoutFrontController);
-
-        $url = $router->generate($name, $parameters);
-
-        $router->getContext()->setBaseUrl($prevBaseUrl);
-
-        return $url;
+        return $this->getUrlWithoutFrontControllerProvider()->generate($name, $parameters);
     }
 
     /**
@@ -132,12 +134,13 @@ class FormatExtension extends \Twig_Extension
         if (!$date) {
             return null;
         }
+
         $dateDiff = $this->getDateDiff($date, $options);
         if ($dateDiff->invert) {
             return null;
-        } else {
-            return $dateDiff->y;
         }
+
+        return $dateDiff->y;
     }
 
     /**
@@ -148,19 +151,19 @@ class FormatExtension extends \Twig_Extension
      *
      * @return string
      */
-    public function getAgeAsString($date, $options)
+    public function getAgeAsString($date, $options = [])
     {
         if (!$date) {
             return '';
         }
         $dateDiff = $this->getDateDiff($date, $options);
         if ($dateDiff->invert) {
-            return isset($options['default']) ? $options['default'] : '';
+            return $options['default'] ?? '';
         }
 
         $age = $dateDiff->y;
 
-        return $this->getTranslator()->transChoice('oro.age', $age, ['%count%' => $age], 'messages');
+        return $this->getTranslator()->trans('oro.age', ['%count%' => $age], 'messages');
     }
 
     /**
@@ -175,7 +178,7 @@ class FormatExtension extends \Twig_Extension
             return null;
         }
         if (!$date instanceof \DateTime) {
-            $format = isset($options['format']) ? $options['format'] : 'Y-m-d';
+            $format = $options['format'] ?? 'Y-m-d';
             $tz = isset($options['timezone'])
                 ? new \DateTimeZone($options['timezone'])
                 : new \DateTimeZone('UTC');
@@ -183,5 +186,17 @@ class FormatExtension extends \Twig_Extension
         }
 
         return $date->diff(new \DateTime('now'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return [
+            TranslatorInterface::class,
+            'oro_ui.formatter' => FormatterManager::class,
+            'oro_ui.provider.url_without_front_controller' => UrlWithoutFrontControllerProvider::class,
+        ];
     }
 }

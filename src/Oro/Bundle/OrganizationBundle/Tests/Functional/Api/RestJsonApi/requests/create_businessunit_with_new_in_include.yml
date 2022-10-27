@@ -1,0 +1,26 @@
+data:
+    type: businessunits
+    attributes:
+        extend_description: null
+        name: 'test bu'
+    relationships:
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@organization->id)>'
+        owner:
+            data:
+                type: businessunits
+                id: 'test-include-id'
+included:
+    -
+        type: businessunits
+        id: 'test-include-id'
+        attributes:
+            extend_description: null
+            name: 'test included bu'
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'

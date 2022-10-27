@@ -24,41 +24,82 @@
         padding-left: 10px;
     }
 
-    .entity-create-or-select-container {
-        margin-left: 4px;
-        width: 294px;
-    }
-
     .oro-item-collection {
-        .row-oro {
+        .row-oro.oro-multiselect-holder {
             position: relative;
-            padding: 10px 10px 10px 40px;
-            margin-bottom: 10px;
-            border: 1px solid #e6e6e6;
+            padding: ($content-padding + 4) $content-padding-medium $content-padding-medium;
+            margin-bottom: $content-padding-medium;
             background: $primary-900;
             border-radius: 4px;
+
+            .desktop-version & {
+                padding: ($content-padding + 4) $content-padding $content-padding;
+            }
+
+            @include clearfix();
         }
 
         .removeRow {
             position: absolute;
-            width: 28px;
             top: 4px;
             right: 4px;
             text-decoration: none;
         }
     }
 
-    div[data-validation-optional-group=""] {
-        padding-right: 20px;
-        display: inline-block;
-    }
-
-    .oro-multiselect-holder {
-        padding-right: 50px !important;
-    }
-
     .form-horizontal {
         max-width: none;
+        display: block;
+        margin-left: -20px;
+
+        @include clearfix();
+
+        .control-group-container {
+            float: left;
+            width: 100%;
+            margin-bottom: -$content-padding-medium;
+        }
+
+        .control-group {
+            display: block;
+            padding-left: 20px;
+            float: left;
+            margin-bottom: $content-padding-medium;
+            width: 50%;
+
+            @include media-breakpoint-down(sm) {
+                width: 100%;
+            }
+
+            .desktop-version & {
+                width: auto;
+            }
+
+            .controls {
+                margin-left: 0;
+            }
+
+            &:not(.attribute-row) > .control-label {
+                width: auto;
+                padding-top: 0;
+                padding-bottom: 4px;
+                margin-right: $btn-icon-mobile-width + 4 - $content-padding-medium;
+                line-height: 1.25;
+                text-align: left;
+
+                // stylelint-disable-next-line selector-max-compound-selectors
+                .desktop-version & {
+                    margin-right: $btn-icon-width + 4 - $content-padding;
+                }
+            }
+
+            &:nth-child(2n + 1) {
+                .responsive-section.responsive-small &,
+                .responsive-section.responsive-medium & {
+                    clear: left;
+                }
+            }
+        }
     }
 }
 
@@ -74,6 +115,7 @@
         }
 
         .group-label {
+            // stylelint-disable-next-line declaration-no-important
             width: auto !important;
         }
 

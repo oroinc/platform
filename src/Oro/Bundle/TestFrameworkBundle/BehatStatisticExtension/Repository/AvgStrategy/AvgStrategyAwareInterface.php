@@ -4,8 +4,5 @@ namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\AvgS
 
 interface AvgStrategyAwareInterface
 {
-    /**
-     * @param AvgStrategyInterface $strategy
-     */
     public function setAvgStrategy(AvgStrategyInterface $strategy);
 }

@@ -1,0 +1,22 @@
+/* @theme: default; */
+$datagrid-header-cell-border-width: 1px 0 !default;
+
+$datagrid-header-cell-mass-action-offset-inner: 0 ($offset-y-m + 2px) 0 !default;
+
+$datagrid-header-cell-action-column-width: 50px !default;
+$datagrid-header-cell-action-column-text-align: right !default;
+$datagrid-header-cell-action-column-offset-inner: $datagrid-header-cell-mass-action-offset-inner !default;
+$datagrid-header-cell-action-column-disabled-color: get-color('additional', 'middle') !default;
+
+$datagrid-header-cell-link-font-size: $base-font-size !default;
+$datagrid-header-cell-link-font-weight: font-weight('semi-bold') !default;
+$datagrid-header-cell-link-line-height: 1 !default;
+$datagrid-header-cell-link-color: get-color('additional', 'dark') !default;
+$datagrid-header-cell-link-position: relative !default;
+$datagrid-header-cell-link-hover-color: get-color('additional', 'dark') !default;
+$datagrid-header-cell-link-hover-text-decoration: none !default;
+
+$datagrid-header-cell-sortable-icon-color: get-color('additional', 'dark') !default;
+$datagrid-header-cell-sortable-icon-size: 4px !default;
+
+$datagrid-header-cell-sortable-icon-left: $offset-y-s !default;

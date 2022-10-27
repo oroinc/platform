@@ -1,0 +1,15 @@
+operations:
+    test_action1:
+        replace:
+            - routes
+        routes:
+            - test_route_bundle3
+
+    test_action2:
+        label: Test Action2 Bundle3
+        extends: test_action1
+
+    test_action3:
+        extends: test_action2
+        routes:
+            - test_route_bundle3_new

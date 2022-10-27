@@ -1,8 +1,9 @@
-{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
+{% extends '@OroNavigation/Menu/menu.html.twig' %}
 
 {% block list %}
-    {% if item.hasChildren and options.depth is not sameas(0) and item.displayChildren %}
-        {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
+    {% import '@OroNavigation/Menu/menu.html.twig' as oro_menu %}
+    {% if item.hasChildren and options.depth is not same as(0) and item.displayChildren %}
+        {% import '@OroNavigation/Menu/menu.html.twig' as oro_menu %}
         {% set listAttributes = listAttributes|merge(
         {'class': oro_menu.add_attribute_values(listAttributes, 'class', ['nav', 'nav-tabs'])})
         %}
@@ -20,7 +21,7 @@
 {% endblock %}
 
 {% block linkElement %}
-    {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
+    {% import '@OroNavigation/Menu/menu.html.twig' as oro_menu %}
     {% set itemLink = item.uri %}
     {% if item.hasChildren and item.displayChildren %}
         {% set linkAttributes = linkAttributes|merge({'data-toggle': 'tab'}) %}

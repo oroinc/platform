@@ -12,7 +12,7 @@ class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $action;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
     private $metadata;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDefinitionConfig */
@@ -24,7 +24,7 @@ class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var ApiDocMetadata */
     private $apiDocMetadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = 'testAction';
         $this->metadata = $this->createMock(EntityMetadata::class);
@@ -56,6 +56,6 @@ class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testSerialize()
     {
-        self::assertSame('', $this->apiDocMetadata->serialize());
+        self::assertSame([], $this->apiDocMetadata->__serialize());
     }
 }

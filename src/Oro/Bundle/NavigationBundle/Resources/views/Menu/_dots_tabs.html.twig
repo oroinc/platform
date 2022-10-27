@@ -1,4 +1,4 @@
-{% extends 'OroNavigationBundle:Menu:_htabs.html.twig' %}
+{% extends '@OroNavigation/Menu/_htabs.html.twig' %}
 
 {% block item %}
     {{ block('item_renderer') }}
@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block linkElement %}
-    {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
+    {% import '@OroNavigation/Menu/menu.html.twig' as oro_menu %}
     {% set class = [''] %}
     {% set linkAttributes = item.linkAttributes %}
     {% if item.extras.active_if_first_is_empty is defined and item.extras.active_if_first_is_empty %}

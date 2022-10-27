@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set importProcessorAliasesToConfirmMessage = [] %}
 
@@ -19,31 +19,35 @@
 <div class="widget-content import-widget-content" {{ UI.renderPageComponentAttributes(ImportValidateViewOptions) }}>
     {% set tabId = 'import-tablist-'|uniqid %}
     {% if configsWithForm|length > 1 %}
-        <ul class="nav nav-tabs" role="tablist">
-            {% for configWithForm in configsWithForm %}
-                {% set config = configWithForm.configuration %}
-                {% set shortEntityName = config.entityClass|basename %}
+        <div  {{ UI.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/tabs-component'
+        }) }}>
+            <ul class="nav nav-tabs" role="tablist">
+                {% for configWithForm in configsWithForm %}
+                    {% set config = configWithForm.configuration %}
+                    {% set shortEntityName = config.entityClass|basename %}
 
-                {% if config.importEntityLabel is defined and config.importEntityLabel is not empty %}
-                    {% set entityLabel = config.importEntityLabel %}
-                {% else %}
-                    {% set entityLabel = shortEntityName %}
-                {% endif %}
+                    {% if config.importEntityLabel is defined and config.importEntityLabel is not empty %}
+                        {% set entityLabel = config.importEntityLabel %}
+                    {% else %}
+                        {% set entityLabel = shortEntityName %}
+                    {% endif %}
 
-                {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
+                    {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
 
-                <li class="nav-item">
-                    <a id="importExport{{ shortEntityName ~ tabId }}-tab"
-                       href="#importExport{{ shortEntityName ~ tabId }}"
-                       class="nav-link{% if isActiveEntity %} active{% endif %}"
-                       data-toggle="tab"
-                       aria-selected="{% if isActiveEntity %}true{% else %}false{% endif %}"
-                       aria-controls="importExport{{ shortEntityName ~ tabId }}"
-                       role="tab"
-                    >{{ entityLabel }}</a>
-                </li>
-            {% endfor %}
-        </ul>
+                    <li class="nav-item">
+                        <a id="importExport{{ shortEntityName ~ tabId }}-tab"
+                           href="#importExport{{ shortEntityName ~ tabId }}"
+                           class="nav-link{% if isActiveEntity %} active{% endif %}"
+                           data-toggle="tab"
+                           aria-selected="{% if isActiveEntity %}true{% else %}false{% endif %}"
+                           aria-controls="importExport{{ shortEntityName ~ tabId }}"
+                           role="tab"
+                        >{{ entityLabel }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
 
     {% if configsWithForm|length > 1 %}
@@ -65,12 +69,9 @@
                 <div class="alert alert-info import-notice" role="alert">
                     <b>{{ 'oro.importexport.import.importance'|trans }}</b>:
                     {{ 'oro.importexport.import.columns_notice'|trans }}
-                    {% if config.importAdditionalNotices is defined %}
-                        {% for importAdditionalNotice in config.importAdditionalNotices %}
-                            {{ importAdditionalNotice|nl2br }}
-                        {% endfor %}
-                    {% endif %}
                 </div>
+
+                {% placeholder import_validate_export_messages with { alias: alias, config: config, options: options } %}
 
                 <div class="form-container">
                     {{ form_start(form, {
@@ -94,10 +95,13 @@
                         <input type="hidden" name="isValidateJob" value="false" />
 
                         <fieldset class="form">
-                            <div class="import-file">
-                                {{ form_row(form.file, {'label': 'oro.importexport.import.file'}) }}
+                            <div class="control-group-container import-file">
+                                {{ form_row(form.file, {
+                                    'label': 'oro.importexport.import.file',
+                                    'attr': {'data-validation-ignore-onblur': true}
+                                }) }}
                             </div>
-                            <div {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
+                            <div class="control-group-container" {% if form.processorAlias.vars.choices|length <= 1 %}style="display: none;"{% endif %}>
                                 {{ form_row(form.processorAlias, {
                                     'label': 'oro.importexport.import.strategy',
                                     'tooltip': strategyTooltip
@@ -137,6 +141,7 @@
 
                                             {{ UI.dropdownButton({
                                                 'label': 'oro.importexport.export_template.label'|trans,
+                                                'placement': 'bottom-start',
                                                 'elements': exportTemplateButtons
                                             }) }}
                                         {% else %}

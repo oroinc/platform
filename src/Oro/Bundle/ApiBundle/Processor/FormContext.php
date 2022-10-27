@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormInterface;
  * An interface for form related execution contexts,
  * like contexts for such actions as "create", "update" and modify relationships.
  */
-interface FormContext extends ContextInterface
+interface FormContext extends ContextInterface, ChangeContextInterface
 {
     /**
      * Returns request data.
@@ -22,8 +22,6 @@ interface FormContext extends ContextInterface
 
     /**
      * Sets request data.
-     *
-     * @param array $requestData
      */
     public function setRequestData(array $requestData);
 
@@ -36,8 +34,6 @@ interface FormContext extends ContextInterface
 
     /**
      * Sets additional data included into the request.
-     *
-     * @param array $includedData
      */
     public function setIncludedData(array $includedData);
 
@@ -50,10 +46,32 @@ interface FormContext extends ContextInterface
 
     /**
      * Sets a collection contains additional entities included into the request.
-     *
-     * @param IncludedEntityCollection|null $includedEntities
      */
     public function setIncludedEntities(IncludedEntityCollection $includedEntities = null);
+
+    /**
+     * Gets the list of additional entities involved to the request processing.
+     *
+     * @return object[]
+     */
+    public function getAdditionalEntities(): array;
+
+    /**
+     * Adds an entity to the list of additional entities involved to the request processing.
+     * For example when an association is represented as a field,
+     * a target entity of this association does not exist in the list of included entities
+     * and need to be persisted manually, so, it should be added to the list of additional entities.
+     *
+     * @param object $entity
+     */
+    public function addAdditionalEntity($entity): void;
+
+    /**
+     * Removes an entity from the list of additional entities involved to the request processing.
+     *
+     * @param object $entity
+     */
+    public function removeAdditionalEntity($entity): void;
 
     /**
      * Gets a service that can be used to convert an entity object to a model object and vise versa.
@@ -64,8 +82,6 @@ interface FormContext extends ContextInterface
 
     /**
      * Sets a service that can be used to convert an entity object to a model object and vise versa.
-     *
-     * @param EntityMapper|null $entityMapper
      */
     public function setEntityMapper(EntityMapper $entityMapper = null);
 
@@ -85,8 +101,6 @@ interface FormContext extends ContextInterface
 
     /**
      * Sets the form builder.
-     *
-     * @param FormBuilderInterface|null $formBuilder
      */
     public function setFormBuilder(FormBuilderInterface $formBuilder = null);
 
@@ -106,8 +120,6 @@ interface FormContext extends ContextInterface
 
     /**
      * Sets the form.
-     *
-     * @param FormInterface|null $form
      */
     public function setForm(FormInterface $form = null);
 

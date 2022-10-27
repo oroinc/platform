@@ -5,6 +5,9 @@ namespace Oro\Bundle\ActionBundle\Button;
 use Oro\Bundle\ActionBundle\Exception\ButtonCollectionMapException;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 
+/**
+ * The list of ordered actions buttons
+ */
 class ButtonsCollection implements \IteratorAggregate, \Countable
 {
     /** @var \SplObjectStorage (ButtonInterface -> ButtonProviderExtensionInterface) */
@@ -18,10 +21,6 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
         $this->buttonsMap = new \SplObjectStorage();
     }
 
-    /**
-     * @param ButtonInterface $button
-     * @param ButtonProviderExtensionInterface $extension
-     */
     protected function addButton(ButtonInterface $button, ButtonProviderExtensionInterface $extension)
     {
         //map modified so initialized list should be cleared
@@ -117,6 +116,11 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
         $this->buttonsList = $this->toArray();
 
         usort($this->buttonsList, function (ButtonInterface $b1, ButtonInterface $b2) {
+            if ($b1->getOrder() === $b2->getOrder()) {
+                # For PHP 7 we returned 0, but for PHP 8, to preserve the order after sort, we should return -1.
+                # This is just a workaround that should be replaced with the explicit order for actions.
+                return -1;
+            }
             return $b1->getOrder() - $b2->getOrder();
         });
 
@@ -126,7 +130,7 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->toList());
     }
@@ -134,7 +138,7 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return count($this->toArray());
     }

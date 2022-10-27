@@ -4,8 +4,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -48,7 +48,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserData'];
+        return [LoadUserData::class];
     }
 
     /**
@@ -56,8 +56,8 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
      */
     public function load(ObjectManager $manager)
     {
-        $this->em           = $manager;
-        $this->organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $this->em = $manager;
+        $this->organization = $manager->getRepository(Organization::class)->getFirst();
 
         $user1 = $this->createUser('Richard', 'Bradley');
         $user2 = $this->createUser('Brenda', 'Brock');
@@ -119,7 +119,9 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
             $date,
             Email::NORMAL_IMPORTANCE,
             $cc,
-            $bcc
+            $bcc,
+            null,
+            $this->organization
         );
         $emailUser->addFolder($folder);
         $emailUser->getEmail()->setMessageId($messageId);
@@ -136,7 +138,8 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
      */
     protected function createUser($firstName, $lastName)
     {
-        $user = new User();
+        /** @var User $user */
+        $user = $this->userManager->createUser();
         $user->setOrganization($this->organization);
         $user->setFirstName($firstName);
         $user->setLastName($lastName);

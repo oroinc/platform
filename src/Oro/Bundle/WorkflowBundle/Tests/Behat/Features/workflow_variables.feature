@@ -1,13 +1,9 @@
 @fixture-OroWorkflowBundle:Users.yml
 @fixture-OroWorkflowBundle:TestWorkflow.yml
 Feature: Workflow variables
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
+
   Scenario: Set up workflow variable configuration
     Given I login as administrator
-    When go to System/ Localization/ Translations
-    And click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
-
     When I go to System/ User Management/ Users
     And I click "View" on row "User1 First Name User1 Last Name" in grid
     And I click "first transition"
@@ -27,10 +23,10 @@ Feature: Workflow variables
     When I go to System/ Workflows
     And I click "Configuration" on row "Test Workflow" in grid
     And I fill form with:
-      | count         | 100000                                                       |
-      | user          | User2 First Name User2 Last Name - user2@example.com (user2) |
-      | guest         | User1 First Name User1 Last Name - user1@example.com (user1) |
-      | Test Bool Var | false                                                        |
+      | count         | 100000 |
+      | user          | user2  |
+      | guest         | user1  |
+      | Test Bool Var | false  |
     And I save and close form
     Then I should see "Workflow configuration successfully updated" flash message
 

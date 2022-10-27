@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class TaggableControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
     }
@@ -17,7 +17,7 @@ class TaggableControllerTest extends WebTestCase
             'oro_api_post_taggable',
             ['entity' => 'user', 'entityId' => 1]
         );
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $url,
             [

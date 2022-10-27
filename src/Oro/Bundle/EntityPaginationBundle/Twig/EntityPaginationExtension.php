@@ -5,19 +5,23 @@ namespace Oro\Bundle\EntityPaginationBundle\Twig;
 use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class EntityPaginationExtension extends \Twig_Extension
+/**
+ * Provides Twig functions for entity pagination:
+ *   - oro_entity_pagination_pager
+ *   - oro_entity_pagination_collect_data
+ *   - oro_entity_pagination_show_info_message
+ */
+class EntityPaginationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_entity_pagination';
-
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -52,7 +56,7 @@ class EntityPaginationExtension extends \Twig_Extension
      */
     protected function getRequestStack()
     {
-        return $this->container->get('request_stack');
+        return $this->container->get(RequestStack::class);
     }
 
     /**
@@ -61,9 +65,9 @@ class EntityPaginationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_entity_pagination_pager', [$this, 'getPager']),
-            new \Twig_SimpleFunction('oro_entity_pagination_collect_data', [$this, 'collectData']),
-            new \Twig_SimpleFunction('oro_entity_pagination_show_info_message', [$this, 'showInfoMessage']),
+            new TwigFunction('oro_entity_pagination_pager', [$this, 'getPager']),
+            new TwigFunction('oro_entity_pagination_collect_data', [$this, 'collectData']),
+            new TwigFunction('oro_entity_pagination_show_info_message', [$this, 'showInfoMessage']),
         ];
     }
 
@@ -119,8 +123,13 @@ class EntityPaginationExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::NAME;
+        return [
+            'oro_entity_pagination.navigation' => EntityPaginationNavigation::class,
+            'oro_entity_pagination.storage.data_collector' => StorageDataCollector::class,
+            'oro_entity_pagination.message_manager' => MessageManager::class,
+            RequestStack::class,
+        ];
     }
 }

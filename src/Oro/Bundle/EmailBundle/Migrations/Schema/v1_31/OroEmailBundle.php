@@ -18,9 +18,6 @@ class OroEmailBundle implements Migration
         $queries->addPostQuery('DROP TABLE oro_email_response_rule_cond');
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroAutoResponseRuleTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_auto_response_rule');

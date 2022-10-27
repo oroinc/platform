@@ -2,136 +2,96 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobStorage;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSendImportNotificationProcessCanBeConstructedWithRequiredAttributes()
+    public function testSendImportNotificationProcessCanBeConstructedWithRequiredAttributes(): void
     {
         $chunkHttpImportMessageProcessor = new SendImportNotificationMessageProcessor(
-            $this->createMessageProducerInterfaceMock(),
-            $this->createLoggerInterfaceMock(),
-            $this->createJobStorageMock(),
-            $this->createImportJobSummaryResultServiceMock(),
-            $this->createNotificationSettings(),
-            $this->createDoctrineMock()
+            $this->createMock(MessageProducerInterface::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(ImportExportResultSummarizer::class),
+            $this->createMock(NotificationSettings::class),
+            $this->createMock(ManagerRegistry::class)
         );
 
-        $this->assertInstanceOf(MessageProcessorInterface::class, $chunkHttpImportMessageProcessor);
-        $this->assertInstanceOf(TopicSubscriberInterface::class, $chunkHttpImportMessageProcessor);
+        self::assertInstanceOf(MessageProcessorInterface::class, $chunkHttpImportMessageProcessor);
+        self::assertInstanceOf(TopicSubscriberInterface::class, $chunkHttpImportMessageProcessor);
     }
 
-    public function testSendImportNotificationProcessShouldReturnSubscribedTopics()
+    public function testSendImportNotificationProcessShouldReturnSubscribedTopics(): void
     {
-        $expectedSubscribedTopics = [Topics::SEND_IMPORT_NOTIFICATION,];
-        $this->assertEquals($expectedSubscribedTopics, SendImportNotificationMessageProcessor::getSubscribedTopics());
-    }
-
-    public function testShouldLogErrorAndRejectMessageIfMessageWasInvalid()
-    {
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with('Invalid message')
-        ;
-
-        $processor = new SendImportNotificationMessageProcessor(
-            $this->createMessageProducerInterfaceMock(),
-            $logger,
-            $this->createJobStorageMock(),
-            $this->createImportJobSummaryResultServiceMock(),
-            $this->createNotificationSettings(),
-            $this->createDoctrineMock()
+        self::assertEquals(
+            [SendImportNotificationTopic::getName()],
+            SendImportNotificationMessageProcessor::getSubscribedTopics()
         );
-
-        $message = $this->createMessageMock();
-        $message
-            ->expects($this->once())
-            ->method('getBody')
-            ->willReturn('[]')
-        ;
-        $result = $processor->process($message, $this->createSessionMock());
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldLogErrorAndRejectMessageIfUserNotFound()
+    public function testShouldLogErrorAndRejectMessageIfUserNotFound(): void
     {
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
             ->method('error')
-            ->with('User not found. Id: 1')
-        ;
+            ->with('User not found. Id: 1');
 
-        $userRepo = $this->createUserRepositoryMock();
-        $userRepo
-            ->expects($this->once())
+        $jobRepository = $this->createMock(JobRepository::class);
+        $jobRepository->expects(self::once())
+            ->method('findJobById')
+            ->with(1)
+            ->willReturn(new Job());
+
+        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn(null);
-        ;
 
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getRepository')
-            ->with(User::class)
-            ->will($this->returnValue($userRepo))
-        ;
-
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
-            ->expects($this->once())
-            ->method('findJobById')
-            ->with(1)
-            ->willReturn(new Job())
-            ;
+            ->willReturnMap([[User::class, null, $userRepo], [Job::class, null, $jobRepository]]);
 
         $processor = new SendImportNotificationMessageProcessor(
-            $this->createMessageProducerInterfaceMock(),
+            $this->createMock(MessageProducerInterface::class),
             $logger,
-            $jobStorage,
-            $this->createImportJobSummaryResultServiceMock(),
-            $this->createNotificationSettings(),
+            $this->createMock(ImportExportResultSummarizer::class),
+            $this->createMock(NotificationSettings::class),
             $doctrine
         );
 
-        $message = $this->createMessageMock();
-        $message
-            ->expects($this->once())
+        $message = $this->createMock(MessageInterface::class);
+        $message->expects(self::once())
             ->method('getBody')
-            ->willReturn(json_encode([
-                        'rootImportJobId' => 1,
-                        'filePath' => 'filePath',
-                        'originFileName' => 'originFileName',
-                        'userId' => 1,
-                        'process' => ProcessorRegistry::TYPE_IMPORT,
-                       ]))
-        ;
-        $result = $processor->process($message, $this->createSessionMock());
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+            ->willReturn([
+                'rootImportJobId' => 1,
+                'originFileName' => 'originFileName',
+                'userId' => 1,
+                'process' => ProcessorRegistry::TYPE_IMPORT,
+            ]);
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
+        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldProcessAndReturnAck()
+    public function testShouldProcessAndReturnAck(): void
     {
         $job = new Job();
         $job->setId(1);
@@ -139,156 +99,70 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
         $user->setId(1);
         $user->setFirstName('John');
         $user->setEmail('user@email.com');
-        $logger = $this->createLoggerInterfaceMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
             ->method('info')
             ->with('Sent notification message.');
-        $logger
-            ->expects($this->any())
+        $logger->expects(self::any())
             ->method('error');
-        $logger
-            ->expects($this->any())
+        $logger->expects(self::any())
             ->method('critical');
 
-        $userRepo = $this->createUserRepositoryMock();
-        $userRepo
-            ->expects($this->once())
-            ->method('find')
-            ->with(1)
-            ->willReturn($user);
-        $doctrine = $this->createDoctrineMock();
-        $doctrine
-            ->expects($this->once())
-            ->method('getRepository')
-            ->with(User::class)
-            ->will($this->returnValue($userRepo));
-        $jobStorage = $this->createJobStorageMock();
-        $jobStorage
-            ->expects($this->once())
+        $jobRepository = $this->createMock(JobRepository::class);
+        $jobRepository->expects(self::once())
             ->method('findJobById')
             ->with(1)
             ->willReturn($job);
-        $consolidateImportJobResultNotification = $this->createImportJobSummaryResultServiceMock();
-        $consolidateImportJobResultNotification
-            ->expects($this->once())
+        $userRepo = $this->createMock(UserRepository::class);
+        $userRepo->expects(self::once())
+            ->method('find')
+            ->with(1)
+            ->willReturn($user);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->willReturnMap([[User::class, null, $userRepo], [Job::class, null, $jobRepository]]);
+        $consolidateImportJobResultNotification = $this->createMock(ImportExportResultSummarizer::class);
+        $consolidateImportJobResultNotification->expects(self::once())
             ->method('getSummaryResultForNotification')
             ->with($job, 'import.csv')
             ->willReturn(['data' => 'summary import information']);
 
         $sender = From::emailAddress('test@mail.com', 'John');
-        $notificationsSettings = $this->createNotificationSettings();
-        $notificationsSettings
-            ->expects($this->once())
+        $notificationsSettings = $this->createMock(NotificationSettings::class);
+        $notificationsSettings->expects(self::once())
             ->method('getSender')
             ->willReturn($sender);
 
-        $producer = $this->createMessageProducerInterfaceMock();
-        $producer
-            ->expects($this->once())
+        $producer = $this->createMock(MessageProducerInterface::class);
+        $producer->expects(self::once())
             ->method('send')
             ->with(
-                $this->equalTo(NotificationTopics::SEND_NOTIFICATION_EMAIL),
-                $this->equalTo([
-                    'sender' => $sender->toArray(),
-                    'toEmail' => $user->getEmail(),
-                    'body' => ['data' => 'summary import information'],
-                    'contentType' => 'text/html',
+                SendEmailNotificationTemplateTopic::getName(),
+                [
+                    'from' => $sender->toString(),
+                    'templateParams' => ['data' => 'summary import information'],
                     'recipientUserId' => 1,
                     'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
-                ])
+                ]
             );
         $processor = new SendImportNotificationMessageProcessor(
             $producer,
             $logger,
-            $jobStorage,
             $consolidateImportJobResultNotification,
             $notificationsSettings,
             $doctrine
         );
-        $message = new NullMessage();
-        $message->setBody(json_encode([
+        $message = new Message();
+        $message->setBody([
             'rootImportJobId' => 1,
-            'filePath' => 'filePath',
             'originFileName' => 'import.csv',
             'userId' => 1,
             'process' => ProcessorRegistry::TYPE_IMPORT,
-        ]));
+        ]);
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
-     */
-    protected function createMessageProducerInterfaceMock()
-    {
-        return $this->createMock(MessageProducerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    protected function createLoggerInterfaceMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobStorage
-     */
-    protected function createJobStorageMock()
-    {
-        return $this->createMock(JobStorage::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ImportExportResultSummarizer
-     */
-    protected function createImportJobSummaryResultServiceMock()
-    {
-        return $this->createMock(ImportExportResultSummarizer::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|NotificationSettings
-     */
-    private function createNotificationSettings()
-    {
-        return $this->createMock(NotificationSettings::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|RegistryInterface
-     */
-    protected function createDoctrineMock()
-    {
-        return $this->createMock(RegistryInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageInterface
-     */
-    private function createMessageMock()
-    {
-        return $this->createMock(MessageInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|UserRepository
-     */
-    private function createUserRepositoryMock()
-    {
-        return $this->createMock(UserRepository::class);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 }

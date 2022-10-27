@@ -1,0 +1,105 @@
+services:
+    oro_api.update_list.processor:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateListProcessor
+        arguments:
+            - '@oro_api.processor_bag'
+            - update_list
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
+
+    #
+    # initialize
+    #
+
+    oro_api.update_list.initialize_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\InitializeConfigExtras
+        tags:
+            - { name: oro.api.processor, action: update_list, group: initialize, priority: 10 }
+
+    #
+    # resource_check
+    #
+
+    #
+    # normalize_input
+    #
+
+    #
+    # security_check
+    #
+
+    #
+    # load_data
+    #
+
+    oro_api.update_list.generate_target_file_name:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\GenerateTargetFileName
+        arguments:
+            - '@oro_api.batch.file_name_provider'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: load_data, priority: 10 }
+
+    oro_api.update_list.store_request_data:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\StoreRequestData
+        arguments:
+            - '@oro_api.batch.file_manager.source_data'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: load_data, priority: -10 }
+
+    #
+    # save_data
+    #
+
+    oro_api.update_list.create_async_operation:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\CreateAsyncOperation
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@security.authorization_checker'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: save_data, priority: 10 }
+
+    oro_api.update_list.start_async_operation:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\StartAsyncOperation
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_api.batch.chunk_size_provider'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: save_data, priority: -10 }
+
+    #
+    # finalize
+    #
+
+    oro_api.update_list.set_content_location_header:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\SetContentLocationHeader
+        arguments:
+            - '@oro_api.rest.routes_registry'
+            - '@router'
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: finalize, requestType: rest, priority: -10 }
+
+    oro_api.update_list.load_normalized_async_operation:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\LoadNormalizedAsyncOperation
+        arguments:
+            - '@oro_api.action_processor_bag'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: finalize, priority: -20 }
+
+    #
+    # normalize_result
+    #
+
+    oro_api.update_list.delete_target_file_if_async_operation_not_started:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\DeleteTargetFileIfAsyncOperationNotStarted
+        arguments:
+            - '@oro_api.batch.file_manager.source_data'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: 200 }
+
+    oro_api.update_list.set_http_response_status_code:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
+        arguments:
+            - 202 # HTTP_ACCEPTED
+        tags:
+            - { name: oro.api.processor, action: update_list, group: normalize_result, requestType: rest, priority: -30 }

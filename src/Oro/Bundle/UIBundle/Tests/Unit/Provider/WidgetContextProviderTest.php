@@ -8,30 +8,23 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var WidgetContextProvider */
-    protected $provider;
-
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
-    protected function setUp()
+    /** @var WidgetContextProvider */
+    private $provider;
+
+    protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
-        $this->provider = new WidgetContextProvider($this->requestStack);
-    }
 
-    protected function tearDown()
-    {
-        unset($this->provider);
+        $this->provider = new WidgetContextProvider($this->requestStack);
     }
 
     /**
      * @dataProvider isActiveProvider
-     *
-     * @param bool    $expectedValue
-     * @param Request $request
      */
-    public function testIsActive($expectedValue, Request $request = null)
+    public function testIsActive(bool $expectedValue, Request $request = null)
     {
         if ($request) {
             $this->requestStack->push($request);
@@ -40,10 +33,7 @@ class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValue, $this->provider->isActive());
     }
 
-    /**
-     * @return array
-     */
-    public function isActiveProvider()
+    public function isActiveProvider(): array
     {
         return [
             'normal request, should be inactive'                   => [
@@ -63,11 +53,8 @@ class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider widgetIdentifierProvider
-     *
-     * @param bool    $expectedValue
-     * @param Request $request
      */
-    public function testGetWid($expectedValue, Request $request = null)
+    public function testGetWid(string|bool $expectedValue, Request $request = null)
     {
         if ($request) {
             $this->requestStack->push($request);
@@ -76,10 +63,7 @@ class WidgetContextProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedValue, $this->provider->getWid());
     }
 
-    /**
-     * @return array
-     */
-    public function widgetIdentifierProvider()
+    public function widgetIdentifierProvider(): array
     {
         return [
             'normal request, should return false'                   => [

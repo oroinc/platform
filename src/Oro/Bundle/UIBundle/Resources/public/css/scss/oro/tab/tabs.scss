@@ -1,0 +1,9 @@
+/* @theme: admin.oro; */
+
+.tab-content {
+    padding-top: $tabs-content-offset;
+
+    &-without-offset {
+        padding-top: 0;
+    }
+}

@@ -8,9 +8,15 @@ oro.imap:
         smtp:
             success: SMTP connection is established successfully
             error:   Could not establish the SMTP connection
+        microsoft.oauth:
+            error:
+                access_deny: Access deny
+                request: Something has gone wrong.
+                closed_auth: Something has gone wrong. Please address your administrator to check the API key settings.
+                blocked_popup: Something has gone wrong. Please make sure that pop-ups are enabled.
+                token: Authentication was unsuccessful. If you provided invalid Microsoft credentials, please verify them with your system administrator. If you failed to grant Microsoft access to the application, please try connecting again to accept their access request.
         google.oauth:
             error:
-                emptyClientId: Client id parameter value is empty in the Google Integration Settings. Please, configure Google settings in the application system configuration to proceed with Google OAuth.
                 access_deny: Access deny
                 request: Something has gone wrong.
                 closed_auth: Something has gone wrong. Please address your administrator to check the google API key settings.

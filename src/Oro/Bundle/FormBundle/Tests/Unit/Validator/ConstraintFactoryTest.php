@@ -9,22 +9,15 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param string $expected
-     * @param string $name
-     * @param mixed  $options
-     *
      * @dataProvider createDataProvider
      */
-    public function testCreate($expected, $name, $options)
+    public function testCreate(object $expected, string $name, ?array $options)
     {
         $factory = new ConstraintFactory();
         $this->assertEquals($expected, $factory->create($name, $options));
     }
 
-    /**
-     * @return array
-     */
-    public function createDataProvider()
+    public function createDataProvider(): array
     {
         return [
             'short name'        => [
@@ -33,38 +26,30 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
                 'options'       => null,
             ],
             'custom class name' => [
-                'expectedClass' => new Length(['min' => 2, 'max' => 255]),
-                'name'          => 'Symfony\Component\Validator\Constraints\Length',
+                'expectedClass' => new Length(['min' => 2, 'max' => 255, 'allowEmptyString' => false]),
+                'name'          => Length::class,
                 'options'       => ['min' => 2, 'max' => 255],
             ],
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCreateInvalidConstraint()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $factory = new ConstraintFactory();
         $factory->create('test');
     }
 
     /**
-     * @param array $constraints
-     * @param array $expected
-     *
      * @dataProvider constraintsProvider
      */
-    public function testParse($constraints, $expected)
+    public function testParse(array $constraints, array $expected)
     {
         $factory = new ConstraintFactory();
         $this->assertEquals($expected, $factory->parse($constraints));
     }
 
-    /**
-     * @return array
-     */
-    public function constraintsProvider()
+    public function constraintsProvider(): array
     {
         return [
             'empty'              => [
@@ -92,35 +77,27 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
             'by full class name' => [
                 'constraints' => [
                     [
-                        'Symfony\Component\Validator\Constraints\Length' => [
-                            'min' => 1,
-                            'max' => 2,
-                        ]
+                        Length::class => ['min' => 1, 'max' => 2]
                     ]
                 ],
                 'expected'    => [
-                    new Length(['min' => 1, 'max' => 2])
+                    new Length(['min' => 1, 'max' => 2, 'allowEmptyString' => false])
                 ]
             ],
         ];
     }
 
     /**
-     * @param array $constraints
-     *
      * @dataProvider invalidConstraintsProvider
-     * @expectedException \InvalidArgumentException
      */
-    public function testParseWithInvalidArgument($constraints)
+    public function testParseWithInvalidArgument(array $constraints)
     {
+        $this->expectException(\InvalidArgumentException::class);
         $factory = new ConstraintFactory();
         $factory->parse($constraints);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidConstraintsProvider()
+    public function invalidConstraintsProvider(): array
     {
         return [
             [

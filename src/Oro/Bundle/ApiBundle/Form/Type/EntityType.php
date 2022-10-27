@@ -9,7 +9,6 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
-use Symfony\Bridge\Doctrine\Form\EventListener\MergeDoctrineCollectionListener;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -25,10 +24,6 @@ class EntityType extends AbstractType
     /** @var EntityLoader */
     protected $entityLoader;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EntityLoader   $entityLoader
-     */
     public function __construct(DoctrineHelper $doctrineHelper, EntityLoader $entityLoader)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -48,7 +43,6 @@ class EntityType extends AbstractType
         $includedEntities = $options['included_entities'];
         if ($metadata->isCollection()) {
             $builder
-                ->addEventSubscriber(new MergeDoctrineCollectionListener())
                 ->addViewTransformer(
                     new CollectionToArrayTransformer(
                         new EntityToIdTransformer(
@@ -80,7 +74,10 @@ class EntityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
-            ->setDefaults(['compound' => false, 'entity_mapper' => null, 'included_entities' => null])
+            ->setDefault('compound', false)
+            ->setDefault('multiple', true)
+            ->setDefault('entity_mapper', null)
+            ->setDefault('included_entities', null)
             ->setRequired(['metadata'])
             ->setAllowedTypes('metadata', [AssociationMetadata::class])
             ->setAllowedTypes('entity_mapper', ['null', EntityMapper::class])

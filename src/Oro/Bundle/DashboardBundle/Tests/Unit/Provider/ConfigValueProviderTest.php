@@ -4,18 +4,22 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Provider\TestConverter;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class ConfigValueProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigValueProvider */
-    protected $provider;
+    private $provider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $converter = new TestConverter();
 
-        $this->provider = new ConfigValueProvider();
-        $this->provider->addConverter('test_form_type', $converter);
+        $container = TestContainerBuilder::create()
+            ->add('test_form_type', $converter)
+            ->getContainer($this);
+
+        $this->provider = new ConfigValueProvider($container);
     }
 
     public function testGetConvertedValueUnsupported()
@@ -44,7 +48,7 @@ class ConfigValueProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFormValue()
     {
-        $value          = 'test';
+        $value = 'test';
         $convertedValue = 'converted';
         $this->assertSame(
             $convertedValue,

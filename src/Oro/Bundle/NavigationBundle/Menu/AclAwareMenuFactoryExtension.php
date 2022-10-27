@@ -6,9 +6,10 @@ use Knp\Menu\Factory;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Authorization\ClassAuthorizationChecker;
+use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -16,42 +17,25 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 {
-    /** @var Router */
-    private $router;
+    private UrlMatcherInterface $urlMatcher;
+    private ControllerClassProvider $controllerClassProvider;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private ClassAuthorizationChecker $classAuthorizationChecker;
+    private TokenAccessorInterface $tokenAccessor;
+    private LoggerInterface $logger;
+    private array $aclCheckCache = [];
+    private array $controllerAclCheckCache = [];
 
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var ClassAuthorizationChecker */
-    private $classAuthorizationChecker;
-
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var array */
-    private $existingAclChecks = [];
-
-    /** @var array */
-    private $declaredRoutes = [];
-
-    /**
-     * @param Router                        $router
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ClassAuthorizationChecker     $classAuthorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param LoggerInterface               $logger
-     */
     public function __construct(
-        Router $router,
+        UrlMatcherInterface $urlMatcher,
+        ControllerClassProvider $controllerClassProvider,
         AuthorizationCheckerInterface $authorizationChecker,
         ClassAuthorizationChecker $classAuthorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         LoggerInterface $logger
     ) {
-        $this->router = $router;
+        $this->urlMatcher = $urlMatcher;
+        $this->controllerClassProvider = $controllerClassProvider;
         $this->authorizationChecker = $authorizationChecker;
         $this->classAuthorizationChecker = $classAuthorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
@@ -61,27 +45,27 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function buildItem(ItemInterface $item, array $options)
+    public function buildItem(ItemInterface $item, array $options): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildOptions(array $options = [])
+    public function buildOptions(array $options): array
     {
-        if ($this->getExtraOption($options, 'isAllowed') === false) {
+        if (isset($options['extras']['isAllowed'])) {
             return $options;
         }
 
         $options['extras']['isAllowed'] = true;
 
-        if ($this->getOption($options, 'check_access') === false) {
+        if (!($options['check_access'] ?? true)) {
             return $options;
         }
 
         if ($this->skipAccessCheck($options)) {
-            $options['extras']['isAllowed'] = (bool)$this->getExtraOption($options, 'show_non_authorized', false);
+            $options['extras']['isAllowed'] = (bool)($options['extras']['show_non_authorized'] ?? false);
 
             return $options;
         }
@@ -90,7 +74,7 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             return $options;
         }
 
-        $aclResourceId = $this->getExtraOption($options, 'acl_resource_id');
+        $aclResourceId = $options['extras']['acl_resource_id'] ?? null;
         if ($aclResourceId) {
             $options['extras']['isAllowed'] = $this->isGranted($aclResourceId);
 
@@ -99,75 +83,56 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 
         $options['extras']['isAllowed'] = $this->isRouteAvailable(
             $options,
-            $this->getExtraOption($options, 'acl_policy', $options['extras']['isAllowed'])
+            $options['extras']['acl_policy'] ?? $options['extras']['isAllowed']
         );
 
         return $options;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return bool
-     */
-    private function skipAccessCheck(array $options)
+    private function skipAccessCheck(array $options): bool
     {
         return
-            !$this->getOption($options, 'check_access_not_logged_in')
+            !($options['check_access_not_logged_in'] ?? false)
             && !$this->tokenAccessor->hasUser();
     }
 
-    /**
-     * @param string $aclResourceId
-     *
-     * @return bool
-     */
-    private function isGranted($aclResourceId)
+    private function isGranted(string $aclResourceId): bool
     {
-        if (array_key_exists($aclResourceId, $this->existingAclChecks)) {
-            return $this->existingAclChecks[$aclResourceId];
+        if (isset($this->aclCheckCache[$aclResourceId])) {
+            return $this->aclCheckCache[$aclResourceId];
         }
 
         $isAllowed = $this->authorizationChecker->isGranted($aclResourceId);
-        $this->existingAclChecks[$aclResourceId] = $isAllowed;
+        $this->aclCheckCache[$aclResourceId] = $isAllowed;
 
         return $isAllowed;
     }
 
-    /**
-     * @param array $options
-     * @param bool  $defaultValue
-     *
-     * @return bool
-     */
-    private function isRouteAvailable(array $options, $defaultValue)
+    private function isRouteAvailable(array $options, bool $defaultValue): bool
     {
         $controller = $this->getController($options);
-        if (!$controller) {
+        if (null === $controller) {
             return $defaultValue;
         }
 
-        if (array_key_exists($controller, $this->existingAclChecks)) {
-            return $this->existingAclChecks[$controller];
-        }
+        [$class, $method] = $controller;
 
-        $parts = explode('::', $controller);
-        if (count($parts) !== 2) {
+        // invokable controller given (for example, with the single __invoke method)
+        if (null === $method) {
             return $defaultValue;
         }
 
-        $isAllowed = $this->classAuthorizationChecker->isClassMethodGranted($parts[0], $parts[1]);
-        $this->existingAclChecks[$controller] = $isAllowed;
+        if (isset($this->controllerAclCheckCache[$class][$method])) {
+            return $this->controllerAclCheckCache[$class][$method];
+        }
+
+        $isAllowed = $this->classAuthorizationChecker->isClassMethodGranted($class, $method);
+        $this->controllerAclCheckCache[$class][$method] = $isAllowed;
 
         return $isAllowed;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return string|null
-     */
-    private function getController(array $options)
+    private function getController(array $options): ?array
     {
         if (!empty($options['route'])) {
             return $this->getControllerByRouteName($options['route']);
@@ -179,82 +144,23 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
         return null;
     }
 
-    /**
-     * @param string $routeName
-     *
-     * @return string|null
-     */
-    private function getControllerByRouteName($routeName)
+    private function getControllerByRouteName(string $routeName): ?array
     {
-        if (!$this->declaredRoutes) {
-            $generator = $this->router->getGenerator();
-
-            $reflectionClass = new \ReflectionClass($generator);
-            $property = $reflectionClass->getProperty('declaredRoutes');
-            $property->setAccessible(true);
-
-            $this->declaredRoutes = $property->getValue($generator);
-        }
-
-        if (!empty($this->declaredRoutes[$routeName][1]['_controller'])) {
-            return $this->declaredRoutes[$routeName][1]['_controller'];
-        }
-
-        return null;
+        return $this->controllerClassProvider->getControllers()[$routeName] ?? null;
     }
 
-    /**
-     * @param string $uri
-     *
-     * @return string|null
-     */
-    private function getControllerByUri($uri)
+    private function getControllerByUri(string $uri): ?array
     {
         if ('#' !== $uri) {
             try {
-                $route = $this->router->match($uri);
+                $route = $this->urlMatcher->match($uri);
 
-                return $route['_controller'];
+                return explode('::', $route['_controller']);
             } catch (RoutingException $e) {
                 $this->logger->debug($e->getMessage(), ['pathinfo' => $uri]);
             }
         }
 
         return null;
-    }
-
-    /**
-     * @param array  $options
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    private function getOption(array $options, $key, $default = null)
-    {
-        if (array_key_exists($key, $options)) {
-            return $options[$key];
-        }
-
-        return $default;
-    }
-
-    /**
-     * @param array  $options
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    private function getExtraOption(array $options, $key, $default = null)
-    {
-        if (array_key_exists('extras', $options)) {
-            $extras = $options['extras'];
-            if (array_key_exists($key, $extras)) {
-                return $extras[$key];
-            }
-        }
-
-        return $default;
     }
 }

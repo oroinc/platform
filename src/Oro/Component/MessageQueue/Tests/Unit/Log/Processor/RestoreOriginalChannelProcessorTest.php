@@ -9,7 +9,7 @@ class RestoreOriginalChannelProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var RestoreOriginalChannelProcessor */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new RestoreOriginalChannelProcessor();
     }

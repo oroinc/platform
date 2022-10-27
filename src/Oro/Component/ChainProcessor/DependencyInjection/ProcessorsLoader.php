@@ -18,24 +18,22 @@ class ProcessorsLoader
      *
      * @return array [action => [priority => [[processor service id, processor attributes], ...], ...], ...]
      */
-    public static function loadProcessors(ContainerBuilder $container, $processorTagName)
+    public static function loadProcessors(ContainerBuilder $container, string $processorTagName): array
     {
         $processors = [];
         $isDebug = $container->getParameter('kernel.debug');
         $taggedServices = $container->findTaggedServiceIds($processorTagName);
+        $decoratedServices = self::getDecorators($container, $taggedServices);
         foreach ($taggedServices as $id => $taggedAttributes) {
             foreach ($taggedAttributes as $attributes) {
-                $action = '';
-                if (!empty($attributes['action'])) {
-                    $action = $attributes['action'];
-                }
+                $action = $attributes['action'] ?? '';
                 unset($attributes['action']);
 
                 $group = null;
-                if (!empty($attributes['group'])) {
-                    $group = $attributes['group'];
-                } else {
+                if (empty($attributes['group'])) {
                     unset($attributes['group']);
+                } else {
+                    $group = $attributes['group'];
                 }
 
                 if (!$action && $group) {
@@ -46,27 +44,51 @@ class ProcessorsLoader
                     ));
                 }
 
-                $container->getDefinition($id)->setPublic(true);
-
-                $priority = 0;
-                if (isset($attributes['priority'])) {
-                    $priority = $attributes['priority'];
-                }
+                $priority = $attributes['priority'] ?? 0;
                 if (!$isDebug) {
                     unset($attributes['priority']);
                 }
 
-                $attributes = array_map(
-                    function ($val) {
-                        return ExpressionParser::parse($val);
-                    },
-                    $attributes
-                );
+                foreach ($attributes as $name => $value) {
+                    $attributes[$name] = ExpressionParser::parse($value);
+                }
 
-                $processors[$action][$priority][] = [$id, $attributes];
+                $processors[$action][$priority][] = [$decoratedServices[$id] ?? $id, $attributes];
             }
         }
 
         return $processors;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $processors
+     *
+     * @return array [decorated service id => decorator service id, ...]
+     */
+    private static function getDecorators(ContainerBuilder $container, array $processors): array
+    {
+        $decorators = [];
+        $priorities = [];
+        $definitions = $container->getDefinitions();
+        foreach ($definitions as $id => $definition) {
+            $decorated = $definition->getDecoratedService();
+            if (!$decorated) {
+                continue;
+            }
+
+            $decoratedId = $decorated[0];
+            if (!isset($processors[$decoratedId])) {
+                continue;
+            }
+
+            $priority = $decorated[2];
+            if (!isset($decorators[$decoratedId]) || $priority <= $priorities[$decoratedId]) {
+                $decorators[$decoratedId] = $id;
+                $priorities[$decoratedId] = $priority;
+            }
+        }
+
+        return $decorators;
     }
 }

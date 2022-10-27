@@ -3,32 +3,28 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\SecurityBundle\EventListener\FieldAclConfigListener;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
 class FieldAclConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FieldAclConfigListener */
-    protected $listener;
+    private $listener;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $metadataProvider;
+    private $metadataProvider;
 
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->metadataProvider = $this->createMock(EntitySecurityMetadataProvider::class);
         $this->listener = new FieldAclConfigListener($this->metadataProvider);
     }
 
@@ -46,7 +42,6 @@ class FieldAclConfigListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertNull($securityConfig->get('field_acl_supported'));
     }
-
 
     public function testPreFlushOnSystemEntity()
     {

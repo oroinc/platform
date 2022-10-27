@@ -14,9 +14,6 @@ class MailboxProcessStorage
     /** @var MailboxProcessProviderInterface[] */
     protected $processes = [];
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;

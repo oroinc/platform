@@ -7,6 +7,16 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
+/**
+ * Presents Action for calling service method
+ * Usage:
+ * actions: # list of actions that should be executed
+ *     - '@call_service_method':
+ *         service: serviceName
+ *         method: methodName
+ *         method_parameters: [$.parameterName]
+ *         attribute: $.typeOfParameterName
+ */
 class CallServiceMethod extends AbstractAction
 {
     /** @var ContainerInterface */
@@ -15,10 +25,6 @@ class CallServiceMethod extends AbstractAction
     /** @var array */
     protected $options;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param ContainerInterface $container
-     */
     public function __construct(ContextAccessor $contextAccessor, ContainerInterface $container)
     {
         parent::__construct($contextAccessor);
@@ -88,7 +94,7 @@ class CallServiceMethod extends AbstractAction
      */
     protected function getService($context)
     {
-        $service = $this->contextAccessor->getValue($context, $this->options['service']);
+        $service = (string) $this->contextAccessor->getValue($context, $this->options['service']);
 
         if (!$this->container->has($service)) {
             throw new InvalidParameterException(sprintf('Undefined service with name "%s"', $service));

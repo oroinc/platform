@@ -17,10 +17,6 @@ class BuildFormBuilder extends BaseBuildFormBuilder
     /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
-    /**
-     * @param FormHelper                $formHelper
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(FormHelper $formHelper, PropertyAccessorInterface $propertyAccessor)
     {
         parent::__construct($formHelper);

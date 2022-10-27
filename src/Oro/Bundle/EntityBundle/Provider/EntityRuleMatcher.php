@@ -26,10 +26,6 @@ class EntityRuleMatcher
     /** @var array [data type => true, ...] */
     private $typeRules;
 
-    /**
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param array                            $rules
-     */
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
         array $rules
@@ -40,10 +36,6 @@ class EntityRuleMatcher
 
     /**
      * Checks if an entity matches at least one rule this matcher contains.
-     *
-     * @param string $entityClass
-     *
-     * @return bool
      */
     public function isEntityMatched(string $entityClass): bool
     {
@@ -64,12 +56,6 @@ class EntityRuleMatcher
 
     /**
      * Checks if an entity field matches at least one rule this matcher contains.
-     *
-     * @param string      $entityClass
-     * @param string      $fieldName
-     * @param string|null $fieldType
-     *
-     * @return bool
      */
     public function isFieldMatched(string $entityClass, string $fieldName, string $fieldType = null): bool
     {

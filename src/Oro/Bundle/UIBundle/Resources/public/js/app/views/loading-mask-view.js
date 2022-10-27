@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var LoadingMaskView;
-    var BaseView = require('./base/view');
-    var template = require('tpl!oroui/templates/loading-mask-view.html');
-    var $ = require('jquery');
-    var _ = require('underscore');
+    const BaseView = require('./base/view');
+    const template = require('tpl-loader!oroui/templates/loading-mask-view.html');
+    const $ = require('jquery');
+    const _ = require('underscore');
 
-    LoadingMaskView = BaseView.extend({
+    const LoadingMaskView = BaseView.extend({
         autoRender: true,
 
         /** @property {string|Function} */
@@ -42,31 +41,31 @@ define(function(require) {
         hideTimeoutId: undefined,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function LoadingMaskView() {
-            LoadingMaskView.__super__.constructor.apply(this, arguments);
+        constructor: function LoadingMaskView(options) {
+            LoadingMaskView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['loadingHint', 'hideDelay']));
             $(window).on(
                 'pagehide' + this.eventNamespace(),
-                _.bind(function() {
+                () => {
                     this.hide();
-                }, this)
+                }
             );
-            LoadingMaskView.__super__.initialize.apply(this, arguments);
+            LoadingMaskView.__super__.initialize.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
-            var data = {
+            const data = {
                 loadingHint: this.loadingHint
             };
             return data;
@@ -108,7 +107,7 @@ define(function(require) {
             } else {
                 // defer hiding if mask is visible and it is not deferred already
                 if (this.isShown() && !this.hideTimeoutId) {
-                    this.hideTimeoutId = setTimeout(_.bind(this._hide, this), this.hideDelay);
+                    this.hideTimeoutId = setTimeout(this._hide.bind(this), this.hideDelay);
                 }
             }
         },
@@ -160,14 +159,14 @@ define(function(require) {
          * @param {string} newHint
          */
         setLoadingHint: function(newHint) {
-            var oldHint = this.loadingHint;
+            const oldHint = this.loadingHint;
             this.loadingHint = newHint;
             this.render();
             return oldHint;
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -175,7 +174,7 @@ define(function(require) {
             }
             $(window).off('pagehide' + this.eventNamespace());
             this.hide(true);
-            LoadingMaskView.__super__.dispose.apply(this, arguments);
+            LoadingMaskView.__super__.dispose.call(this);
         }
     });
 

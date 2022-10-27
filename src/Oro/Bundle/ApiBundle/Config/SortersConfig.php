@@ -3,27 +3,24 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\EntityConfigInterface;
+use Oro\Component\EntitySerializer\FieldConfigInterface;
+use Oro\Component\EntitySerializer\FindFieldUtil;
 
 /**
  * Represents the configuration of all fields that can be used to sort data.
  */
 class SortersConfig implements EntityConfigInterface
 {
-    /** @var string|null */
-    protected $exclusionPolicy;
-
-    /** @var array */
-    protected $items = [];
-
+    private ?string $exclusionPolicy = null;
+    private array $items = [];
     /** @var SorterFieldConfig[] */
-    protected $fields = [];
+    private array $fields = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = ConfigUtil::convertItemsToArray($this->items);
         if (null !== $this->exclusionPolicy && ConfigUtil::EXCLUSION_POLICY_NONE !== $this->exclusionPolicy) {
@@ -39,10 +36,8 @@ class SortersConfig implements EntityConfigInterface
 
     /**
      * Indicates whether the entity does not have a configuration.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return
             null === $this->exclusionPolicy
@@ -61,10 +56,8 @@ class SortersConfig implements EntityConfigInterface
 
     /**
      * Indicates whether the configuration of at least one sorter exists.
-     *
-     * @return bool
      */
-    public function hasFields()
+    public function hasFields(): bool
     {
         return !empty($this->fields);
     }
@@ -74,73 +67,48 @@ class SortersConfig implements EntityConfigInterface
      *
      * @return SorterFieldConfig[] [field name => config, ...]
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
 
     /**
      * Indicates whether the configuration of the sorter exists.
-     *
-     * @param string $fieldName
-     *
-     * @return bool
      */
-    public function hasField($fieldName)
+    public function hasField(string $fieldName): bool
     {
         return isset($this->fields[$fieldName]);
     }
 
     /**
      * Gets the configuration of the sorter.
-     *
-     * @param string $fieldName
-     *
-     * @return SorterFieldConfig|null
      */
-    public function getField($fieldName)
+    public function getField(string $fieldName): ?SorterFieldConfig
     {
-        if (!isset($this->fields[$fieldName])) {
-            return null;
-        }
-
-        return $this->fields[$fieldName];
+        return $this->fields[$fieldName] ?? null;
     }
 
     /**
      * Finds the configuration of the sorter by its name or property path.
      * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
-     *
-     * @param string $fieldName
-     * @param bool   $findByPropertyPath
-     *
-     * @return SorterFieldConfig|null
      */
-    public function findField($fieldName, $findByPropertyPath = false)
+    public function findField(string $fieldName, bool $findByPropertyPath = false): ?SorterFieldConfig
     {
         return FindFieldUtil::doFindField($this->fields, $fieldName, $findByPropertyPath);
     }
 
     /**
      * Finds the name of the sorter by its property path.
-     *
-     * @param string $propertyPath
-     *
-     * @return string|null
      */
-    public function findFieldNameByPropertyPath($propertyPath)
+    public function findFieldNameByPropertyPath(string $propertyPath): ?string
     {
         return FindFieldUtil::doFindFieldNameByPropertyPath($this->fields, $propertyPath);
     }
 
     /**
      * Gets the configuration of existing sorter or adds new sorter for a given field.
-     *
-     * @param string $fieldName
-     *
-     * @return SorterFieldConfig
      */
-    public function getOrAddField($fieldName)
+    public function getOrAddField(string $fieldName): SorterFieldConfig
     {
         $field = $this->getField($fieldName);
         if (null === $field) {
@@ -152,13 +120,8 @@ class SortersConfig implements EntityConfigInterface
 
     /**
      * Adds the configuration of the sorter.
-     *
-     * @param string                 $fieldName
-     * @param SorterFieldConfig|null $field
-     *
-     * @return SorterFieldConfig
      */
-    public function addField($fieldName, $field = null)
+    public function addField(string $fieldName, FieldConfigInterface $field = null): SorterFieldConfig
     {
         if (null === $field) {
             $field = new SorterFieldConfig();
@@ -171,26 +134,24 @@ class SortersConfig implements EntityConfigInterface
 
     /**
      * Removes the configuration of the sorter.
-     *
-     * @param string $fieldName
      */
-    public function removeField($fieldName)
+    public function removeField(string $fieldName): void
     {
         unset($this->fields[$fieldName]);
     }
 
     /**
-     * {@inheritdoc}
+     * Indicates whether the configuration attribute exists.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the configuration value.
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (!\array_key_exists($key, $this->items)) {
             return $defaultValue;
@@ -200,9 +161,9 @@ class SortersConfig implements EntityConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the configuration value.
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
             $this->items[$key] = $value;
@@ -212,27 +173,27 @@ class SortersConfig implements EntityConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Removes the configuration value.
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets names of all configuration attributes.
+     *
+     * @return string[]
      */
-    public function keys()
+    public function keys(): array
     {
-        return \array_keys($this->items);
+        return array_keys($this->items);
     }
 
     /**
      * Indicates whether the exclusion policy is set explicitly.
-     *
-     * @return bool
      */
-    public function hasExclusionPolicy()
+    public function hasExclusionPolicy(): bool
     {
         return null !== $this->exclusionPolicy;
     }
@@ -242,13 +203,9 @@ class SortersConfig implements EntityConfigInterface
      *
      * @return string An exclusion strategy, e.g. "none" or "all"
      */
-    public function getExclusionPolicy()
+    public function getExclusionPolicy(): string
     {
-        if (null === $this->exclusionPolicy) {
-            return ConfigUtil::EXCLUSION_POLICY_NONE;
-        }
-
-        return $this->exclusionPolicy;
+        return $this->exclusionPolicy ?? ConfigUtil::EXCLUSION_POLICY_NONE;
     }
 
     /**
@@ -257,17 +214,15 @@ class SortersConfig implements EntityConfigInterface
      * @param string|null $exclusionPolicy An exclusion strategy, e.g. "none" or "all",
      *                                     or NULL to remove this option
      */
-    public function setExclusionPolicy($exclusionPolicy)
+    public function setExclusionPolicy(?string $exclusionPolicy): void
     {
         $this->exclusionPolicy = $exclusionPolicy;
     }
 
     /**
      * Indicates whether all fields are not configured explicitly should be excluded.
-     *
-     * @return bool
      */
-    public function isExcludeAll()
+    public function isExcludeAll(): bool
     {
         return ConfigUtil::EXCLUSION_POLICY_ALL === $this->exclusionPolicy;
     }
@@ -275,7 +230,7 @@ class SortersConfig implements EntityConfigInterface
     /**
      * Sets the exclusion strategy to exclude all fields are not configured explicitly.
      */
-    public function setExcludeAll()
+    public function setExcludeAll(): void
     {
         $this->exclusionPolicy = ConfigUtil::EXCLUSION_POLICY_ALL;
     }
@@ -283,7 +238,7 @@ class SortersConfig implements EntityConfigInterface
     /**
      * Sets the exclusion strategy to exclude only fields are marked as excluded.
      */
-    public function setExcludeNone()
+    public function setExcludeNone(): void
     {
         $this->exclusionPolicy = ConfigUtil::EXCLUSION_POLICY_NONE;
     }

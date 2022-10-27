@@ -2,130 +2,136 @@
 
 namespace Oro\Bundle\LocaleBundle\Manager;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
+use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
+use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Provides localization entities by passed ids.
+ * For the methods with argument useCache - disable using cache,
+ * if you like to persist, delete, or assign Localization objects.
+ * Cache should be enabled, only if you want to read from the Localization
  */
-class LocalizationManager
+class LocalizationManager implements WarmableConfigCacheInterface, ClearableConfigCacheInterface
 {
-    const CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
+    private const ENTITIES_CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA';
+    private const SIMPLE_CACHE_NAMESPACE = 'ORO_LOCALE_LOCALIZATION_DATA_SIMPLE';
 
-    /**
-     * @var DoctrineHelper
-     */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
+    private ConfigManager $configManager;
+    private CacheItemPoolInterface $cacheProvider;
 
-    /**
-     * @var LocalizationRepository
-     */
-    private $repository;
-
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
-
-    /**
-     * @var CacheProvider
-     */
-    private $cacheProvider;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigManager $configManager
-     * @param CacheProvider $cacheProvider
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager,
-        CacheProvider $cacheProvider
+        CacheItemPoolInterface $cacheProvider
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager = $configManager;
         $this->cacheProvider = $cacheProvider;
     }
 
-    /**
-     * @param int $id
-     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
-     *                       Cache should be enabled, only if you want to read from the Localization.
-     *
-     * @return null|Localization
-     */
-    public function getLocalization($id, $useCache = true)
+    public function getLocalization(int $id, bool $useCache = true): ?Localization
     {
-        $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey($id)) : false;
-
-        if ($cache !== false && array_key_exists($id, $cache)) {
-            // make doctrine know about entity from cache
-            $this->doctrineHelper
-                ->getEntityManager(Localization::class)
-                ->getUnitOfWork()
-                ->merge($cache[$id]);
-
-            return $cache[$id];
+        $cacheKey = static::getCacheKey($id);
+        $localizations = false;
+        if ($useCache) {
+            $cacheItem = $this->cacheProvider->getItem($cacheKey);
+            $localizations = $cacheItem->isHit() ? $cacheItem->get() : false;
         }
 
-        /** @var Localization $cache */
-        $cache = $this->getRepository()->find($id);
+        if (isset($localizations[$id])) {
+            return $localizations[$id];
+        }
 
-        if ($cache === null) {
+        $localization = $this->getRepository()->find($id);
+        if ($localization === null) {
             return null;
         }
 
         if ($useCache) {
-            $this->cacheProvider->save(static::getCacheKey($id), [$id => $cache]);
+            $cacheItem->set([$id => $localization]);
+            $this->cacheProvider->save($cacheItem);
         }
 
-        return $cache;
+        return $localization;
     }
 
     /**
-     * @param array|null $ids
-     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
-     *                       Cache should be enabled, only if you want to read from the Localization.
-     *
-     * @return array|Localization[]
+     * The application must have possibility to get available localization's data without warming Doctrine metadata.
+     * It requires for building the applications cache from the scratch, because in any time the application may need to
+     * get this data. But after loading Doctrine metadata for some entities, extended functionality for these entities
+     * will not work.
      */
-    public function getLocalizations(array $ids = null, $useCache = true)
+    public function getLocalizationData(int $id, bool $useCache = true): array
     {
-        $cache = $useCache ? $this->cacheProvider->fetch(static::getCacheKey()) : false;
-
+        $cache = false;
+        if ($useCache) {
+            $cacheItem = $this->cacheProvider->getItem(self::SIMPLE_CACHE_NAMESPACE);
+            $cache = $cacheItem->isHit() ? $cacheItem->get() : false;
+        }
         if ($cache === false) {
-            $cache = $this->getRepository()->findBy([], ['name' => 'ASC']);
-            $cache = $this->associateLocalizationsArray($cache);
+            $sql = 'SELECT loc.id, loc.formatting_code AS formatting, lang.code AS language, loc.rtl_mode AS rtl ' .
+                'FROM oro_localization AS loc ' .
+                'INNER JOIN oro_language AS lang ON lang.id = loc.language_id';
+            $stmt = $this->doctrineHelper->getEntityManager(Localization::class)
+                ->getConnection()
+                ->executeQuery($sql);
+            $cache = [];
+            foreach ($stmt->fetchAllAssociative() as $row) {
+                $cache[$row['id']] = [
+                    'languageCode' => $row['language'],
+                    'formattingCode' => $row['formatting'],
+                    'rtlMode' => (bool)$row['rtl'], # cast to boolean as Mysql stores value as TINYINT(1)
+                ];
+            }
+        }
+
+        if ($useCache) {
+            $cacheItem->set($cache);
+            $this->cacheProvider->save($cacheItem);
+        }
+
+        return $cache[$id] ?? [];
+    }
+
+    public function getLocalizations(array $ids = null, bool $useCache = true): array
+    {
+        $cacheKey = static::getCacheKey();
+        $localizations = false;
+        if ($useCache) {
+            $cacheItem = $this->cacheProvider->getItem($cacheKey);
+            $localizations = $cacheItem->isHit() ? $cacheItem->get() : false;
+        }
+        if ($localizations === false) {
+            $localizations = $this->getRepository()->findAllIndexedById();
 
             if ($useCache) {
-                $this->cacheProvider->save(static::getCacheKey(), $cache);
+                $cacheItem->set($localizations);
+                $this->cacheProvider->saveDeferred($cacheItem);
 
-                foreach ($cache as $id => $localization) {
-                    $this->cacheProvider->save(static::getCacheKey($id), [$id => $localization]);
+                foreach ($localizations as $id => $localization) {
+                    $cachePoolItem = $this->cacheProvider->getItem(static::getCacheKey($id));
+                    $cachePoolItem->set([$id => $localization]);
+                    $this->cacheProvider->saveDeferred($cachePoolItem);
                 }
+                $this->cacheProvider->commit();
             }
         }
 
         if (null === $ids) {
-            return $cache;
+            return $localizations;
         }
 
-        $keys = $this->filterOnlyExistingKeys($ids, $cache);
-
-        return array_intersect_key($cache, array_flip($keys));
+        return array_intersect_key($localizations, array_flip($ids));
     }
 
-    /**
-     * @param bool $useCache disable using cache, if you like to persist, delete, or assign Localization objects.
-     *                       Cache should be enabled, only if you want to read from the Localization.
-     *
-     * @return Localization
-     */
-    public function getDefaultLocalization($useCache = true)
+    public function getDefaultLocalization(bool $useCache = true): ?Localization
     {
         $id = (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION));
 
@@ -142,79 +148,27 @@ class LocalizationManager
         return null;
     }
 
-    /**
-     * @return bool
-     */
-    public function clearCache()
+    public function clearCache(): void
     {
-        return $this->cacheProvider->deleteAll();
+        $this->cacheProvider->clear();
     }
 
-    public function warmUpCache()
+    public function warmUpCache(): void
     {
         $this->clearCache();
         $this->getLocalizations();
+        $this->getLocalizationData(0);
     }
 
-    /**
-     * @param int $localizationId
-     * @return string
-     */
-    public static function getCacheKey($localizationId = null)
+    protected static function getCacheKey(?int $localizationId = null): string
     {
         return $localizationId !== null
-            ? sprintf('%s_%s', static::CACHE_NAMESPACE, $localizationId)
-            : static::CACHE_NAMESPACE;
+            ? sprintf('%s_%s', self::ENTITIES_CACHE_NAMESPACE, $localizationId)
+            : self::ENTITIES_CACHE_NAMESPACE;
     }
 
-    /**
-     * @return LocalizationRepository
-     */
-    protected function getRepository()
+    protected function getRepository(): LocalizationRepository
     {
-        if (!$this->repository) {
-            $this->repository = $this->doctrineHelper->getEntityRepositoryForClass(Localization::class);
-        }
-
-        return $this->repository;
-    }
-
-    /**
-     * Set ids of the localizations as keys
-     *
-     * @param Localization[] $localizations
-     * @return Localization[]
-     */
-    private function associateLocalizationsArray(array $localizations)
-    {
-        $localizations = array_combine(
-            array_map(
-                function (Localization $element) {
-                    return $element->getId();
-                },
-                $localizations
-            ),
-            $localizations
-        );
-
-        return $localizations;
-    }
-
-    /**
-     * @param array $ids
-     * @param Localization[] $localizations
-     * @return array
-     */
-    private function filterOnlyExistingKeys(array $ids, $localizations)
-    {
-        $keys = array_filter(
-            array_keys($localizations),
-            function ($key) use ($ids) {
-                // strict comparing is not allowed because ID might be represented by a string
-                return in_array($key, $ids);
-            }
-        );
-
-        return $keys;
+        return $this->doctrineHelper->getEntityRepositoryForClass(Localization::class);
     }
 }

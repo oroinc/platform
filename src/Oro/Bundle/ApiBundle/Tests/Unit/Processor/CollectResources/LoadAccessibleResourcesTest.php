@@ -16,7 +16,7 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
     /** @var LoadAccessibleResources */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
 
@@ -26,14 +26,16 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenAccessibleResourcesAreAlreadyBuilt()
     {
         $context = new CollectResourcesContext();
-        $context->setAccessibleResources(['Test\Entity']);
+        $context->setAccessibleResources(['Test\Entity1', 'Test\Entity2']);
+        $context->setAccessibleAsAssociationResources(['Test\Entity1']);
 
         $this->entityOverrideProviderRegistry->expects(self::never())
             ->method('getEntityOverrideProvider');
 
         $this->processor->process($context);
 
-        self::assertEquals(['Test\Entity'], $context->getAccessibleResources());
+        self::assertEquals(['Test\Entity1', 'Test\Entity2'], $context->getAccessibleResources());
+        self::assertEquals(['Test\Entity1'], $context->getAccessibleAsAssociationResources());
     }
 
     public function testProcessAccessibleResource()
@@ -55,9 +57,10 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
 
         self::assertEquals(['Test\Entity'], $context->getAccessibleResources());
+        self::assertEquals(['Test\Entity'], $context->getAccessibleAsAssociationResources());
     }
 
-    public function testProcessForNotAccessibleResourceBecauseGetActionIsExcluded()
+    public function testProcessForNotAccessibleAsAssociationResourceBecauseGetActionIsExcluded()
     {
         $context = new CollectResourcesContext();
 
@@ -69,15 +72,39 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
         $this->entityOverrideProviderRegistry->expects(self::any())
             ->method('getEntityOverrideProvider')
             ->willReturn($entityOverrideProvider);
+        $entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with('Test\Entity')
+            ->willReturn(null);
+
+        $this->processor->process($context);
+
+        self::assertEquals(['Test\Entity'], $context->getAccessibleResources());
+        self::assertEquals([], $context->getAccessibleAsAssociationResources());
+    }
+
+    public function testProcessForNotAccessibleResourceBecauseGetAndGetListActionsAreExcluded()
+    {
+        $context = new CollectResourcesContext();
+
+        $resources = $context->getResult();
+        $resources->add(new ApiResource('Test\Entity'));
+        $resources->get('Test\Entity')->setExcludedActions(['get', 'get_list']);
+
+        $entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
+        $this->entityOverrideProviderRegistry->expects(self::any())
+            ->method('getEntityOverrideProvider')
+            ->willReturn($entityOverrideProvider);
         $entityOverrideProvider->expects(self::never())
             ->method('getSubstituteEntityClass');
 
         $this->processor->process($context);
 
         self::assertEquals([], $context->getAccessibleResources());
+        self::assertEquals([], $context->getAccessibleAsAssociationResources());
     }
 
-    public function testProcessForNotAccessibleResourceBecauseItIsOverridden()
+    public function testProcessForNotAccessibleAsAssociationResourceResourceBecauseItIsOverridden()
     {
         $context = new CollectResourcesContext();
 
@@ -96,5 +123,29 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
 
         self::assertEquals([], $context->getAccessibleResources());
+        self::assertEquals([], $context->getAccessibleAsAssociationResources());
+    }
+
+    public function testProcessForNotAccessibleBecauseItIsOverridden()
+    {
+        $context = new CollectResourcesContext();
+
+        $resources = $context->getResult();
+        $resources->add(new ApiResource('Test\Entity'));
+        $resources->get('Test\Entity')->setExcludedActions(['get']);
+
+        $entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
+        $this->entityOverrideProviderRegistry->expects(self::any())
+            ->method('getEntityOverrideProvider')
+            ->willReturn($entityOverrideProvider);
+        $entityOverrideProvider->expects(self::once())
+            ->method('getSubstituteEntityClass')
+            ->with('Test\Entity')
+            ->willReturn('Test\AnotherEntity');
+
+        $this->processor->process($context);
+
+        self::assertEquals([], $context->getAccessibleResources());
+        self::assertEquals([], $context->getAccessibleAsAssociationResources());
     }
 }

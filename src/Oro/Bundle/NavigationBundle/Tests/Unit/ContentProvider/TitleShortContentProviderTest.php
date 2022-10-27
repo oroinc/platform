@@ -3,23 +3,19 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\ContentProvider;
 
 use Oro\Bundle\NavigationBundle\ContentProvider\TitleShortContentProvider;
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 
 class TitleShortContentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $titleService;
+    /** @var TitleServiceInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $titleService;
 
-    /**
-     * @var TitleShortContentProvider
-     */
-    protected $provider;
+    /** @var TitleShortContentProvider */
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->titleService = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface')
-            ->getMock();
+        $this->titleService = $this->createMock(TitleServiceInterface::class);
 
         $this->provider = new TitleShortContentProvider($this->titleService);
     }
@@ -28,13 +24,9 @@ class TitleShortContentProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->titleService->expects($this->once())
             ->method('render')
-            ->with(array(), null, null, null, true, true)
-            ->will($this->returnValue('title_content'));
-        $this->assertEquals('title_content', $this->provider->getContent());
-    }
+            ->with([], null, null, null, true, true)
+            ->willReturn('title_content');
 
-    public function testGetName()
-    {
-        $this->assertEquals('titleShort', $this->provider->getName());
+        $this->assertEquals('title_content', $this->provider->getContent());
     }
 }

@@ -2,318 +2,278 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\ORMInvalidArgumentException;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
-use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
+use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BaseUserManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
-    private const TEST_NAME  = 'Jack';
-    private const TEST_EMAIL = 'jack@jackmail.net';
+    /** @var UserLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $userLoader;
 
-    /** @var User */
-    protected $user;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var EncoderFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $encoderFactory;
 
     /** @var BaseUserManager */
-    protected $userManager;
+    private $userManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    protected $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UserRepository */
-    protected $repository;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $registry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EncoderFactoryInterface */
-    protected $ef;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->ef = $this->createMock(EncoderFactoryInterface::class);
-        $class = $this->createMock(ClassMetadata::class);
-        $this->em = $this->createMock(EntityManager::class);
-        $this->repository = $this->createMock(UserRepository::class);
+        $this->userLoader = $this->createMock(UserLoaderInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->encoderFactory = $this->createMock(EncoderFactoryInterface::class);
 
-        $this->em->expects(self::any())
-            ->method('getRepository')
-            ->withAnyParameters()
-            ->willReturn($this->repository);
+        $this->userLoader->expects(self::any())
+            ->method('getUserClass')
+            ->willReturn(User::class);
 
-        $this->em->expects(self::any())
-            ->method('getClassMetadata')
-            ->with(self::USER_CLASS)
-            ->willReturn($class);
-
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->registry->expects(self::any())
-            ->method('getManagerForClass')
-            ->willReturn($this->em);
-
-        $class->expects(self::any())
-            ->method('getName')
-            ->willReturn(self::USER_CLASS);
-
-        $this->userManager = new BaseUserManager(self::USER_CLASS, $this->registry, $this->ef);
+        $this->userManager = new BaseUserManager(
+            $this->userLoader,
+            $this->doctrine,
+            $this->encoderFactory
+        );
     }
 
-    public function testGetClass()
+    /**
+     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function expectGetEntityManager()
     {
-        self::assertEquals(self::USER_CLASS, $this->userManager->getClass());
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects(self::atLeastOnce())
+            ->method('getManagerForClass')
+            ->with(User::class)
+            ->willReturn($em);
+
+        return $em;
+    }
+
+    /**
+     * @param EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em
+     *
+     * @return EntityRepository|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function expectGetRepository($em)
+    {
+        $repository = $this->createMock(EntityRepository::class);
+        $em->expects(self::atLeastOnce())
+            ->method('getRepository')
+            ->with(User::class)
+            ->willReturn($repository);
+
+        return $repository;
+    }
+
+    /**
+     * @param UserInterface $user
+     *
+     * @return PasswordEncoderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private function expectGetPasswordEncoder(UserInterface $user)
+    {
+        $encoder = $this->createMock(PasswordEncoderInterface::class);
+        $this->encoderFactory->expects(self::once())
+            ->method('getEncoder')
+            ->with($user)
+            ->willReturn($encoder);
+
+        return $encoder;
+    }
+
+    public function findUserDataProvider(): array
+    {
+        return [
+            [$this->createMock(User::class)],
+            [null]
+        ];
     }
 
     public function testCreateUser()
     {
-        self::assertInstanceOf(self::USER_CLASS, $this->getUser());
+        self::assertInstanceOf(User::class, $this->userManager->createUser());
+    }
+
+    public function testUpdateUserWithPlainPassword()
+    {
+        $password = 'password';
+        $encodedPassword = 'encodedPassword';
+        $salt = 'salt';
+
+        $user = new User();
+        $user->setPlainPassword($password);
+        $user->setSalt($salt);
+
+        $encoder = $this->expectGetPasswordEncoder($user);
+        $encoder->expects(self::once())
+            ->method('encodePassword')
+            ->with($password, $salt)
+            ->willReturn($encodedPassword);
+
+        $em = $this->expectGetEntityManager();
+        $em->expects(self::once())
+            ->method('persist')
+            ->with(self::identicalTo($user));
+        $em->expects(self::once())
+            ->method('flush');
+
+        $this->userManager->updateUser($user);
+
+        self::assertNull($user->getPlainPassword());
+        self::assertEquals($encodedPassword, $user->getPassword());
+    }
+
+    public function testUpdateUserWithoutPlainPassword()
+    {
+        $user = new User();
+
+        $em = $this->expectGetEntityManager();
+        $em->expects(self::once())
+            ->method('persist')
+            ->with(self::identicalTo($user));
+        $em->expects(self::once())
+            ->method('flush');
+
+        $this->userManager->updateUser($user);
+
+        self::assertNull($user->getPlainPassword());
+        self::assertNull($user->getPassword());
+    }
+
+    public function testGeneratePasswordWithDefaultLength()
+    {
+        $password = $this->userManager->generatePassword();
+        self::assertNotEmpty($password);
+        self::assertMatchesRegularExpression('/[\w\-]+/', $password);
+        self::assertLessThanOrEqual(30, strlen($password));
+
+        self::assertNotEquals($password, $this->userManager->generatePassword());
+    }
+
+    public function testGeneratePasswordWithCustomLength()
+    {
+        $maxLength = 10;
+        $password = $this->userManager->generatePassword($maxLength);
+        self::assertNotEmpty($password);
+        self::assertMatchesRegularExpression('/[\w\-]+/', $password);
+        self::assertLessThanOrEqual($maxLength, strlen($password));
+
+        self::assertNotEquals($password, $this->userManager->generatePassword($maxLength));
     }
 
     public function testDeleteUser()
     {
-        $user = $this->getUser();
+        $user = $this->createMock(User::class);
 
-        $this->em->expects(self::once())
+        $em = $this->expectGetEntityManager();
+        $em->expects(self::once())
             ->method('remove')
             ->with(self::identicalTo($user));
-        $this->em->expects(self::once())
+        $em->expects(self::once())
             ->method('flush');
 
         $this->userManager->deleteUser($user);
     }
 
-    public function testUpdateUser()
+    /**
+     * @dataProvider findUserDataProvider
+     */
+    public function testFindUserBy($user)
     {
-        $password = 'password';
-        $encodedPassword = 'encodedPassword';
-
-        $user = $this->getUser(true);
-        $user->setUsername(self::TEST_NAME);
-        $user->setEmail(self::TEST_EMAIL);
-        $user->setPlainPassword($password);
-
-        $encoder = $this->createMock(PasswordEncoderInterface::class);
-        $encoder->expects(self::once())
-            ->method('encodePassword')
-            ->with($user->getPlainPassword(), $user->getSalt())
-            ->willReturn($encodedPassword);
-
-        $this->ef->expects(self::once())
-            ->method('getEncoder')
-            ->with($user)
-            ->willReturn($encoder);
-
-        $this->em->expects(self::once())
-            ->method('persist')
-            ->with(self::identicalTo($user));
-        $this->em->expects(self::once())
-            ->method('flush');
-
-        $this->userManager->updateUser($user);
-
-        self::assertEquals(self::TEST_EMAIL, $user->getEmail());
-        self::assertEquals($encodedPassword, $user->getPassword());
-    }
-
-    public function testFindUserBy()
-    {
-        $user = $this->getUser();
         $criteria = ['id' => 1];
 
-        $this->repository->expects(self::once())
+        $em = $this->expectGetEntityManager();
+        $repository = $this->expectGetRepository($em);
+        $repository->expects(self::once())
             ->method('findOneBy')
             ->with($criteria)
             ->willReturn($user);
 
-        self::assertSame($user, $this->userManager->findUserBy(['id' => 1]));
+        self::assertSame($user, $this->userManager->findUserBy($criteria));
     }
 
-    public function testFindUserByUsername()
+    /**
+     * @dataProvider findUserDataProvider
+     */
+    public function testFindUserByEmail($user)
     {
-        $user = $this->getUser();
-        $criteria = ['username' => self::TEST_NAME];
+        $email = 'test@example.com';
 
-        $this->repository->expects(self::once())
+        $this->userLoader->expects(self::once())
+            ->method('loadUserByEmail')
+            ->with($email)
+            ->willReturn($user);
+
+        self::assertSame($user, $this->userManager->findUserByEmail($email));
+    }
+
+    /**
+     * @dataProvider findUserDataProvider
+     */
+    public function testFindUserByUsername($user)
+    {
+        $username = 'test';
+
+        $this->userLoader->expects(self::once())
+            ->method('loadUserByUsername')
+            ->with($username)
+            ->willReturn($user);
+
+        self::assertSame($user, $this->userManager->findUserByUsername($username));
+    }
+
+    /**
+     * @dataProvider findUserDataProvider
+     */
+    public function testFindUserByUsernameOrEmail($user)
+    {
+        $usernameOrEmail = 'test@test.com';
+
+        $this->userLoader->expects(self::once())
+            ->method('loadUser')
+            ->with($usernameOrEmail)
+            ->willReturn($user);
+
+        self::assertSame($user, $this->userManager->findUserByUsernameOrEmail($usernameOrEmail));
+    }
+
+    /**
+     * @dataProvider findUserDataProvider
+     */
+    public function testFindUserByConfirmationToken($user)
+    {
+        $confirmationToken = 'test';
+
+        $em = $this->expectGetEntityManager();
+        $repository = $this->expectGetRepository($em);
+        $repository->expects(self::once())
             ->method('findOneBy')
-            ->with($criteria)
+            ->with(['confirmationToken' => $confirmationToken])
             ->willReturn($user);
 
-        self::assertSame($user, $this->userManager->findUserByUsername(self::TEST_NAME));
-    }
-
-    public function testFindUserByEmail()
-    {
-        $user = $this->getUser();
-
-        $this->repository->expects(self::once())
-            ->method('findUserByEmail')
-            ->with(self::TEST_EMAIL, false)
-            ->willReturn($user);
-
-        self::assertSame($user, $this->userManager->findUserByEmail(self::TEST_EMAIL));
-    }
-
-    public function testFindUserByToken()
-    {
-        $user = $this->getUser();
-        $criteria = ['confirmationToken' => self::TEST_NAME];
-
-        $this->repository->expects(self::once())
-            ->method('findOneBy')
-            ->with($criteria)
-            ->willReturn($user);
-
-        self::assertSame($user, $this->userManager->findUserByConfirmationToken(self::TEST_NAME));
+        self::assertSame($user, $this->userManager->findUserByConfirmationToken($confirmationToken));
     }
 
     public function testReloadUser()
     {
-        $user = $this->getUser();
+        $user = $this->createMock(User::class);
 
-        $this->em->expects(self::once())
+        $em = $this->expectGetEntityManager();
+        $em->expects(self::once())
             ->method('refresh')
             ->with(self::identicalTo($user));
 
         $this->userManager->reloadUser($user);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
-    public function testRefreshUserNotFound()
-    {
-        $user = $this->createMock(User::class);
-        $user->expects(self::any())
-            ->method('getId')
-            ->willReturn(42);
-
-        $this->em->expects(self::once())
-            ->method('refresh')
-            ->with($user)
-            ->willThrowException(new ORMInvalidArgumentException('Not managed'));
-
-        $this->repository->expects(self::once())
-            ->method('find')
-            ->with(42)
-            ->willReturn(null);
-
-        $this->userManager->refreshUser($user);
-    }
-
-    public function testRefreshUserManaged()
-    {
-        $user = $this->createMock(User::class);
-        $user->expects(self::any())
-            ->method('getId')
-            ->willReturn(42);
-
-        $this->em->expects(self::once())
-            ->method('refresh')
-            ->with(self::identicalTo($user));
-
-        $this->repository->expects(self::never())
-            ->method('find');
-
-        $this->userManager->refreshUser($user);
-    }
-
-    public function testRefreshManagedUser()
-    {
-        $user = $this->createMock(User::class);
-        $user->expects(self::any())
-            ->method('getId')
-            ->willReturn(42);
-
-        $this->em->expects(self::once())
-            ->method('refresh')
-            ->with(self::identicalTo($user))
-            ->willThrowException(new ORMInvalidArgumentException('Not managed'));
-
-        $this->repository->expects(self::once())
-            ->method('find')
-            ->with(42)
-            ->willReturn($user);
-
-        $this->userManager->refreshUser($user);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UnsupportedUserException
-     * @expectedExceptionMessage Account is not supported
-     */
-    public function testRefreshUserNotSupported()
-    {
-        $user = $this->createMock(UserInterface::class);
-        $this->userManager->refreshUser($user);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UnsupportedUserException
-     * @expectedExceptionMessage Expected an instance of Oro\Bundle\UserBundle\Entity\UserInterface, but got
-     */
-    public function testRefreshUserNotOroUser()
-    {
-        $user = $this->createMock(UserInterface::class);
-        $userManager = new BaseUserManager(UserInterface::class, $this->registry, $this->ef);
-
-        $userManager->refreshUser($user);
-    }
-
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\UsernameNotFoundException
-     */
-    public function testLoadUserByUsernameNotFound()
-    {
-        $criteria = ['username' => self::TEST_NAME];
-
-        $this->repository->expects(self::once())
-            ->method('findOneBy')
-            ->with($criteria)
-            ->willReturn(null);
-
-        $this->userManager->loadUserByUsername(self::TEST_NAME);
-    }
-
-    public function testLoadUserByUsername()
-    {
-        $user = $this->getUser();
-        $criteria = ['username' => self::TEST_NAME];
-
-        $this->repository->expects(self::once())
-            ->method('findOneBy')
-            ->with($criteria)
-            ->willReturn($user);
-
-        self::assertSame($user, $this->userManager->loadUserByUsername(self::TEST_NAME));
-    }
-
-    public function testSupportsClass()
-    {
-        self::assertTrue($this->userManager->supportsClass(self::USER_CLASS));
-        self::assertFalse($this->userManager->supportsClass('stdClass'));
-    }
-
-    /**
-     * @param bool $withRole
-     *
-     * @return User
-     */
-    protected function getUser($withRole = false)
-    {
-        $user = $this->userManager->createUser();
-        if ($withRole) {
-            $role = new Role(User::ROLE_ADMINISTRATOR);
-            $user->addRole($role);
-        }
-
-        return $user;
     }
 }

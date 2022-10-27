@@ -3,18 +3,24 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\Query\Parameter;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityIdHelperTest extends OrmRelatedTestCase
 {
     /** @var EntityIdHelper */
     private $entityIdHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->entityIdHelper = new EntityIdHelper();
@@ -24,8 +30,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = 123;
         $entity = $this->createMock(Entity\Group::class);
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -40,8 +45,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = 123;
         $entity = new Entity\EntityWithoutGettersAndSetters();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -53,8 +57,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['id' => 123, 'title' => 'test'];
         $entity = $this->createMock(Entity\CompositeKeyEntity::class);
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -73,8 +76,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['renamedId' => 123, 'renamedTitle' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
         $entityMetadata->addField(new FieldMetadata('renamedTitle'))->setPropertyPath('title');
@@ -88,8 +90,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = 123;
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -110,8 +111,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['id' => 123, 'title1' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -131,8 +131,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['id' => 123, 'title1' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title1'));
@@ -152,8 +151,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\User::class;
         $entityId = 123;
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -176,8 +174,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\User::class;
         $entityId = 123;
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['renamedId']);
         $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
 
@@ -196,18 +193,17 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId, $parameter->getValue());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The entity identifier cannot be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" has single identifier.
-     */
-    // @codingStandardsIgnoreEnd
     public function testApplyEntityIdentifierRestrictionForSingleIdEntityWithArrayId()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The entity identifier cannot be an array because the entity "%s" has single identifier.',
+            User::class
+        ));
+
         $entityClass = Entity\User::class;
         $entityId = [1, 2];
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -221,8 +217,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['id' => 123, 'title' => 'test'];
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -250,8 +245,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['renamedId' => 123, 'renamedTitle' => 'test'];
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['renamedId', 'renamedTitle']);
         $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
         $entityMetadata->addField(new FieldMetadata('renamedTitle'))->setPropertyPath('title');
@@ -275,18 +269,17 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId['renamedTitle'], $titleParameter->getValue());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The entity identifier must be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite identifier.
-     */
-    // @codingStandardsIgnoreEnd
     public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithScalarId()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The entity identifier must be an array because the entity "%s" has composite identifier.',
+            CompositeKeyEntity::class
+        ));
+
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = 123;
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -297,18 +290,17 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper->applyEntityIdentifierRestriction($qb, $entityId, $entityMetadata);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The entity identifier array must have the key "title" because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite identifier.
-     */
-    // @codingStandardsIgnoreEnd
     public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithWrongId()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The entity identifier array must have the key "title" because the entity "%s" has composite identifier.',
+            CompositeKeyEntity::class
+        ));
+
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['id' => 123];
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -317,5 +309,36 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $qb->from($entityClass, 'e')->select('e');
 
         $this->entityIdHelper->applyEntityIdentifierRestriction($qb, $entityId, $entityMetadata);
+    }
+
+    /**
+     * @dataProvider isEntityIdentifierEmptyDataProvider
+     */
+    public function testIsEntityIdentifierEmpty(int|string|array|null $id, bool $expected)
+    {
+        self::assertSame($expected, $this->entityIdHelper->isEntityIdentifierEmpty($id));
+    }
+
+    public function isEntityIdentifierEmptyDataProvider(): array
+    {
+        return [
+            [null, true],
+            [[], true],
+            [['id1' => null], true],
+            [['id1' => null, 'id2' => null], true],
+            [0, false],
+            [1, false],
+            ['', false],
+            ['test', false],
+            [['id1' => 0], false],
+            [['id1' => 1], false],
+            [['id1' => ''], false],
+            [['id1' => 'test'], false],
+            [['id1' => null, 'id2' => 0], false],
+            [['id1' => null, 'id2' => 1], false],
+            [['id1' => null, 'id2' => ''], false],
+            [['id1' => null, 'id2' => 'test'], false],
+            [['id1' => 1, 'id2' => 2], false]
+        ];
     }
 }

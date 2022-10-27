@@ -13,111 +13,147 @@
     padding-left: 0;
 }
 
-.container-fluid.page-title {
-    margin-bottom: 10px;
-
-    @include safe-area-offset(padding, $content-padding);
-
-    padding: 0 $content-padding;
+.title-buttons-container {
+    .box-type1 {
+        margin: 0;
+    }
 }
 
-.navbar-extra {
-    & > .row > [class^='span'] {
-        margin: 0;
-        width: auto;
-    }
+.container-fluid.page-title {
+    margin-bottom: $mobile-page-title-margin-bottom;
 
-    .user-info-state {
-        display: none;
-    }
+    @include safe-area-offset(padding, 0 $content-padding);
 
-    .user-info-state + .title-buttons-container:not(:empty) {
-        margin-top: 10px;
-    }
+    .navbar-extra {
+        /* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
+        > .row {
+            display: flex;
+            align-items: center;
+            flex-flow: row wrap;
+            justify-content: flex-end;
 
-    .pull-left-extra {
-        margin-left: 0;
-    }
+            &__nowrap {
+                flex-wrap: nowrap;
+            }
 
-    .grid-views {
-        margin-left: 0;
+            &.inline-info {
+                flex-wrap: wrap-reverse;
+            }
 
-        .oro-subtitle {
-            display: inline-block;
-        }
+            > .pull-left + .pull-right {
+                max-width: none;
+            }
 
-        .views-group {
-            vertical-align: baseline;
-
-            & > .dropdown-toggle {
-                height: auto;
-                vertical-align: baseline;
+            > div {
+                margin: 0;
             }
         }
 
-        .actions-group {
+        .pull-left-extra {
+            flex-grow: 1;
             margin-left: 0;
-            vertical-align: baseline;
         }
 
-        .edited-label,
-        .actions-group .dropdown-toggle {
-            vertical-align: baseline;
+        > .pull-right {
+            flex-shrink: 0;
         }
+        /* stylelint-enable no-descending-specificity, selector-max-compound-selectors */
     }
 }
 
 .page-title {
-    h1 {
-        font-size: $base-font-size--xl;
-        font-weight: bold;
-        margin: 0;
-        line-height: $base-font-size * 2.5;
-        display: block;
-    }
+    margin-top: 19px;
 
     .sub-title {
         float: none;
-        font-size: $base-font-size--xl;
+        font-size: $base-font-size;
+        display: block;
+        margin-bottom: 3px;
 
-        & + .separator {
+        + .separator {
             display: none;
         }
+    }
 
-        a {
-            color: #006acc;
+    .oro-subtitle {
+        font-size: $base-font-size--xl;
+    }
+
+    &__path {
+        display: inline-block;
+        padding-top: 3px;
+    }
+
+    &__entity-title {
+        font-size: $base-font-size--xl;
+        font-weight: font-weight('light');
+        display: inline;
+        word-break: break-word;
+    }
+
+    &__icon {
+        top: 2px;
+        width: $mobile-page-title-icon-offset;
+
+        &:empty::before {
+            font-size: $mobile-page-title-icon-size;
+            height: $mobile-page-title-icon-size;
+        }
+
+        img {
+            width: $mobile-page-title-icon-size;
         }
     }
 
-    ul.inline li {
-        line-height: 18px;
-        display: block;
-        font-size: $base-font-size--s;
-        padding: 0;
-        border: 0;
+    .title-buttons-container:not(.buttons-grouped) {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
     }
 
-    .status-enabled {
-        margin-bottom: 10px;
-        margin-left: 0;
-    }
-}
+    .title-buttons-container:not(:empty) {
+        .btn-more-actions {
+            @include fa-icon($page-title-btn-more-actions-icon, 'before', true) {
+                display: block;
+                font-size: $base-font-size--m;
+                font-weight: font-weight('light');
+                text-indent: 0;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
 
-.title-buttons-container,
-.ui-dialog-buttonpane .widget-actions {
-    .btn [class*="fa-"].hide-text,
-    .btn-group > .dropdown-menu li [class^="fa-"] {
-        width: 20px;
-        text-align: center;
+            &.sticky {
+                background-color: $page-title-btn-more-actions-submittable-bg-color;
+                border-color: $page-title-btn-more-actions-submittable-bg-color;
+                color: $page-title-btn-more-actions-submittable-color;
+                z-index: 4;
 
-        &:before {
-            font-size: $base-font-size--l;
+                @include fa-icon($page-title-btn-more-actions-submittable-icon, 'before', true) {
+                    margin-top: -2px;
+                }
+
+                &:not(:disabled):not(.disabled):active,
+                &:not(:disabled):not(.disabled).active {
+                    background-color: $page-title-btn-more-actions-submittable-bg-color-active;
+                    border-color: $page-title-btn-more-actions-submittable-bg-color-active;
+                }
+            }
         }
     }
 
-    .dropdown-toggle {
-        .caret {
-            margin-left: 5px;
+    &__entity-info-state {
+        display: none;
+    }
+
+    .inline li,
+    .inline-decorate li {
+        margin: 0 2px 4px 0;
+        border-width: 0;
+
+        &:last-of-type {
+            margin-bottom: 0;
         }
     }
 }

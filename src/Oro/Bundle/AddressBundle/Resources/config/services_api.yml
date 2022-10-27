@@ -1,0 +1,31 @@
+services:
+    oro_address.api.manager.address_type:
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+        public: true
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - Oro\Bundle\AddressBundle\Entity\AddressType
+            - "@doctrine.orm.entity_manager"
+
+    oro_address.api.manager.country:
+        class: Oro\Bundle\AddressBundle\Entity\Manager\CountryApiEntityManager
+        public: true
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - Oro\Bundle\AddressBundle\Entity\Country
+            - "@doctrine.orm.entity_manager"
+
+    oro_address.api.manager.region:
+        class: Oro\Bundle\AddressBundle\Entity\Manager\RegionApiEntityManager
+        public: true
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - Oro\Bundle\AddressBundle\Entity\Region
+            - "@doctrine.orm.entity_manager"
+
+    oro_address.api.form.type.address_type:
+        class: Oro\Bundle\AddressBundle\Api\Form\Type\AddressTypeType
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.form.type, alias: Oro\Bundle\AddressBundle\Api\Form\Type\AddressTypeType }

@@ -1,0 +1,53 @@
+data:
+    -
+        type: users
+        id: '<toString(@simple_user->id)>'
+        attributes:
+            phone: null
+            title: null
+            googleId: null
+            username: simple_user
+            email: simple_user@example.com
+            namePrefix: null
+            firstName: Elley
+            middleName: null
+            lastName: Towards
+            nameSuffix: null
+            birthday: null
+            enabled: true
+            lastLogin: null
+            createdAt: '@simple_user->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@simple_user->updatedAt->format("Y-m-d\TH:i:s\Z")'
+            loginCount: 0
+            passwordRequestedAt: null
+            passwordChangedAt: null
+            emails: {  }
+        relationships:
+            groups:
+                data: []
+            owner:
+                data:
+                    type: businessunits
+                    id: '<toString(@business_unit->id)>'
+            businessUnits:
+                data: []
+            organizations:
+                data:
+                    -
+                        type: organizations
+                        id: '<toString(@organization->id)>'
+            userRoles:
+                data:
+                    -
+                        type: userroles
+                        id: '<toString(@ROLE_USER->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            avatar:
+                data: null
+            auth_status:
+                data:
+                    type: userauthstatuses
+                    id: active

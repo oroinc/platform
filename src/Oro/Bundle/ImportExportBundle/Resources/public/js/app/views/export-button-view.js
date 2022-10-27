@@ -1,12 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var ExportButtonView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var _ = require('underscore');
-    var ImportExportManager = require('oroimportexport/js/importexport-manager');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const ImportExportManager = require('oroimportexport/js/importexport-manager');
 
-    ExportButtonView = BaseView.extend({
+    const ExportButtonView = BaseView.extend({
         /**
          * @property {Object}
          */
@@ -26,14 +25,14 @@ define(function(require) {
         importExportManager: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ExportButtonView() {
-            ExportButtonView.__super__.constructor.apply(this, arguments);
+        constructor: function ExportButtonView(options) {
+            ExportButtonView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -42,7 +41,7 @@ define(function(require) {
                 return;
             }
 
-            this.$el.on('click' + this.eventNamespace(), _.bind(this.onExportClick, this));
+            this.$el.on('click' + this.eventNamespace(), this.onExportClick.bind(this));
             this.importExportManager = new ImportExportManager(this.options);
         },
 

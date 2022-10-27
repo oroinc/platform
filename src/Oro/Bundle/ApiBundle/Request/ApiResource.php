@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * Represents Data API resource.
+ * Represents API resource.
  */
 class ApiResource
 {
@@ -13,9 +13,6 @@ class ApiResource
     /** @var string[] */
     private $excludedActions = [];
 
-    /**
-     * @param $entityClass
-     */
     public function __construct($entityClass)
     {
         $this->entityClass = $entityClass;

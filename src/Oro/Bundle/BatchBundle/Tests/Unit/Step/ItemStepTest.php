@@ -2,86 +2,63 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step;
 
-use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
-use Akeneo\Bundle\BatchBundle\Job\ExitStatus;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Job\BatchStatus;
+use Oro\Bundle\BatchBundle\Job\ExitStatus;
+use Oro\Bundle\BatchBundle\Job\JobRepositoryInterface;
 use Oro\Bundle\BatchBundle\Step\ItemStep;
+use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\ProcessorStub;
+use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\ReaderStub;
+use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\WriterStub;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Tests related to the ItemStep class
- *
- */
 class ItemStepTest extends \PHPUnit\Framework\TestCase
 {
-    const STEP_NAME = 'test_step_name';
+    private const STEP_NAME = 'test_step_name';
 
-    /**
-     * @var ItemStep
-     */
-    protected $itemStep = null;
+    private ItemStep $itemStep;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $eventDispatcher = null;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $jobRepository = null;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->eventDispatcher = $this->createMock('Symfony\\Component\\EventDispatcher\\EventDispatcherInterface');
-        $this->jobRepository   = $this->createMock('Akeneo\\Bundle\\BatchBundle\\Job\\JobRepositoryInterface');
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $jobRepository = $this->createMock(JobRepositoryInterface::class);
 
         $this->itemStep = new ItemStep(self::STEP_NAME);
-
-        $this->itemStep->setEventDispatcher($this->eventDispatcher);
-        $this->itemStep->setJobRepository($this->jobRepository);
+        $this->itemStep->setEventDispatcher($eventDispatcher);
+        $this->itemStep->setJobRepository($jobRepository);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
-        $stepExecution = $this->getMockBuilder('Akeneo\\Bundle\\BatchBundle\\Entity\\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $stepExecution->expects($this->any())
+        $stepExecution = $this->createMock(StepExecution::class);
+        $stepExecution->expects(self::any())
             ->method('getStatus')
-            ->will($this->returnValue(new BatchStatus(BatchStatus::STARTING)));
-        $stepExecution->expects($this->any())
+            ->willReturn(new BatchStatus(BatchStatus::STARTING));
+        $stepExecution->expects(self::any())
             ->method('getExitStatus')
-            ->will($this->returnValue(new ExitStatus()));
+            ->willReturn(new ExitStatus());
 
-        $reader = $this->getMockBuilder('Akeneo\\Bundle\\BatchBundle\\Tests\\Unit\\Step\\Stub\\ReaderStub')
-            ->setMethods(array('setStepExecution', 'read'))
-            ->getMock();
-        $reader->expects($this->once())
+        $reader = $this->createMock(ReaderStub::class);
+        $reader->expects(self::once())
             ->method('setStepExecution')
             ->with($stepExecution);
-        $reader->expects($this->exactly(8))
+        $reader->expects(self::exactly(8))
             ->method('read')
-            ->will($this->onConsecutiveCalls(1, 2, 3, 4, 5, 6, 7, null));
+            ->willReturnOnConsecutiveCalls(1, 2, 3, 4, 5, 6, 7, null);
 
-        $processor = $this->getMockBuilder('Akeneo\\Bundle\\BatchBundle\\Tests\\Unit\\Step\\Stub\\ProcessorStub')
-            ->setMethods(array('setStepExecution', 'process'))
-            ->getMock();
-        $processor->expects($this->once())
+        $processor = $this->createMock(ProcessorStub::class);
+        $processor->expects(self::once())
             ->method('setStepExecution')
             ->with($stepExecution);
-        $processor->expects($this->exactly(7))
+        $processor->expects(self::exactly(7))
             ->method('process')
-            ->will($this->onConsecutiveCalls(1, 2, 3, 4, 5, 6, 7));
+            ->willReturnOnConsecutiveCalls(1, 2, 3, 4, 5, 6, 7);
 
-        $writer = $this->getMockBuilder('Akeneo\\Bundle\\BatchBundle\\Tests\\Unit\\Step\\Stub\\WriterStub')
-            ->setMethods(array('setStepExecution', 'write'))
-            ->getMock();
-        $writer->expects($this->once())
+        $writer = $this->createMock(WriterStub::class);
+        $writer->expects(self::once())
             ->method('setStepExecution')
             ->with($stepExecution);
-        $writer->expects($this->exactly(2))
+        $writer->expects(self::exactly(2))
             ->method('write');
 
         $this->itemStep->setReader($reader);
@@ -91,13 +68,13 @@ class ItemStepTest extends \PHPUnit\Framework\TestCase
         $this->itemStep->execute($stepExecution);
     }
 
-    /**
-     * Assert the entity tested
-     *
-     * @param object $entity
-     */
-    protected function assertEntity($entity)
+    public function testGetBatchSize(): void
     {
-        $this->assertInstanceOf('Oro\\Bundle\\BatchBundle\\Step\\ItemStep', $entity);
+        self::assertNull($this->itemStep->getBatchSize());
+
+        $batchSize = 100;
+        $this->itemStep->setBatchSize($batchSize);
+
+        self::assertSame($batchSize, $this->itemStep->getBatchSize());
     }
 }

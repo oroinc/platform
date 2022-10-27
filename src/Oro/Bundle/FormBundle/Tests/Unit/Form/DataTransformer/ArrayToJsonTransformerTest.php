@@ -1,89 +1,97 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToJsonTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ArrayToJsonTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider transformDataProvider
-     * @param mixed $value
-     * @param mixed $expectedValue
-     */
-    public function testTransform($value, $expectedValue)
+    private function getTestTransformer(bool $allowNull = false): ArrayToJsonTransformer
     {
-        $transformer = $this->createTestTransfomer();
-        $this->assertEquals($expectedValue, $transformer->transform($value));
+        return new ArrayToJsonTransformer($allowNull);
     }
 
-    public function transformDataProvider()
+    public function testTransformForNullValue(): void
     {
-        return array(
-            'default' => array(
-                array(1, 2, 3, 4),
-                json_encode(array(1, 2, 3, 4)),
-            ),
-            'null' => array(
-                null,
-                ''
-            ),
-        );
+        self::assertSame('', $this->getTestTransformer()->transform(null));
+        self::assertSame('', $this->getTestTransformer(true)->transform(null));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "array", "string" given
-     */
-    public function testTransformFailsWhenUnexpectedType()
+    public function testTransformForEmptyArrayValue(): void
     {
-        $transformer = $this->createTestTransfomer();
-        $transformer->transform('');
+        self::assertSame('', $this->getTestTransformer()->transform([]));
+        self::assertSame('', $this->getTestTransformer(true)->transform([]));
     }
 
-    /**
-     * @dataProvider reverseTransformDataProvider
-     * @param mixed $value
-     * @param mixed $expectedValue
-     */
-    public function testReverseTransform($value, $expectedValue)
+    public function testTransformForNotEmptyArray(): void
     {
-        $transformer = $this->createTestTransfomer();
-        $this->assertEquals($expectedValue, $transformer->reverseTransform($value));
+        self::assertSame('[1,2]', $this->getTestTransformer()->transform([1, 2]));
     }
 
-    public function reverseTransformDataProvider()
+    public function testTransformForNotEmptyAssociativeArray(): void
     {
-        return array(
-            'default' => array(
-                '[1,2,3,4]',
-                array('1', '2', '3', '4')
-            ),
-            'null' => array(
-                json_encode(null),
-                ''
-            ),
-            'empty' => array(
-                null,
-                []
-            ),
-        );
+        self::assertSame('{"key":"value"}', $this->getTestTransformer()->transform(['key' => 'value']));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "array" given
-     */
-    public function testReverseTransformFailsWhenUnexpectedType()
+    public function testTransformForNotArrayValue(): void
     {
-        $this->createTestTransfomer()->reverseTransform(array());
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected an array.');
+
+        $this->getTestTransformer()->transform(123);
     }
 
-    /**
-     * @return ArrayToJsonTransformer
-     */
-    private function createTestTransfomer()
+    public function testReverseTransformForNullValue(): void
     {
-        return new ArrayToJsonTransformer();
+        self::assertSame([], $this->getTestTransformer()->reverseTransform(null));
+        self::assertNull($this->getTestTransformer(true)->reverseTransform(null));
+    }
+
+    public function testReverseTransformForEmptyStringValue(): void
+    {
+        self::assertSame([], $this->getTestTransformer()->reverseTransform(''));
+        self::assertNull($this->getTestTransformer(true)->reverseTransform(''));
+    }
+
+    public function testReverseTransformForEmptyJsonArrayStringValue(): void
+    {
+        self::assertSame([], $this->getTestTransformer()->reverseTransform('[]'));
+        self::assertNull($this->getTestTransformer(true)->reverseTransform('[]'));
+    }
+
+    public function testReverseTransformForEmptyJsonObjectStringValue(): void
+    {
+        self::assertSame([], $this->getTestTransformer()->reverseTransform('{}'));
+        self::assertNull($this->getTestTransformer(true)->reverseTransform('{}'));
+    }
+
+    public function testReverseTransformForNotEmptyJsonArrayStringValue(): void
+    {
+        self::assertSame([1, 2], $this->getTestTransformer()->reverseTransform('[1,2]'));
+    }
+
+    public function testReverseTransformForNotEmptyJsonObjectStringValue(): void
+    {
+        self::assertSame(['key' => 'value'], $this->getTestTransformer()->reverseTransform('{"key":"value"}'));
+    }
+
+    public function testReverseTransformForNotStringValue(): void
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a string.');
+
+        $this->getTestTransformer()->reverseTransform(123);
+    }
+
+    public function testReverseTransformForNotInvalidJsonStringValue(): void
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('The malformed JSON.');
+
+        $this->getTestTransformer()->reverseTransform('{"key":}');
     }
 }

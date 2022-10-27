@@ -3,31 +3,21 @@
 namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 
 use Doctrine\ORM\ORMException;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
-use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * The base class for transformers for different kind of entity associations.
  */
-abstract class AbstractEntityAssociationTransformer implements DataTransformerInterface
+abstract class AbstractEntityAssociationTransformer extends AbstractAssociationTransformer
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    protected DoctrineHelper $doctrineHelper;
+    protected EntityLoader $entityLoader;
+    protected AssociationMetadata $metadata;
 
-    /** @var EntityLoader */
-    protected $entityLoader;
-
-    /** @var AssociationMetadata */
-    protected $metadata;
-
-    /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityLoader        $entityLoader
-     * @param AssociationMetadata $metadata
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityLoader $entityLoader,
@@ -39,77 +29,24 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function transform($value)
+    protected function getAcceptableEntityClassNames(): ?array
     {
-        return null;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     */
-    public function reverseTransform($value)
-    {
-        if (null === $value || '' === $value) {
-            return null;
-        }
-        if (!\is_array($value)) {
-            throw new TransformationFailedException('Expected an array.');
-        }
-        if (empty($value)) {
-            return null;
-        }
-
-        if (empty($value['class'])) {
-            throw new TransformationFailedException('Expected an array with "class" element.');
-        }
-        if (empty($value['id'])) {
-            throw new TransformationFailedException('Expected an array with "id" element.');
-        }
-
-        $entityClass = $value['class'];
         $acceptableClassNames = $this->metadata->getAcceptableTargetClassNames();
-        if (empty($acceptableClassNames)) {
-            if (!$this->metadata->isEmptyAcceptableTargetsAllowed()) {
-                throw new TransformationFailedException('There are no acceptable classes.');
-            }
-        } elseif (!\in_array($entityClass, $acceptableClassNames, true)) {
-            throw new TransformationFailedException(
-                \sprintf(
-                    'The "%s" class is not acceptable. Acceptable classes: %s.',
-                    $entityClass,
-                    \implode(',', $acceptableClassNames)
-                )
-            );
+        if (!$acceptableClassNames && $this->metadata->isEmptyAcceptableTargetsAllowed()) {
+            return null;
         }
 
-        return $this->getEntity($entityClass, $value['id']);
+        return $acceptableClassNames;
     }
 
-    /**
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return object
-     */
-    abstract protected function getEntity($entityClass, $entityId);
-
-    /**
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return object
-     */
-    protected function loadEntity($entityClass, $entityId)
+    protected function loadEntity(string $entityClass, mixed $entityId): object
     {
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            throw new TransformationFailedException(
-                \sprintf(
-                    'The "%s" class must be a managed Doctrine entity.',
-                    $entityClass
-                )
+            throw FormUtil::createTransformationFailedException(
+                sprintf('The "%s" class must be a managed Doctrine entity.', $entityClass),
+                'oro.api.form.not_manageable_entity'
             );
         }
         $entity = null;
@@ -117,54 +54,46 @@ abstract class AbstractEntityAssociationTransformer implements DataTransformerIn
             $entity = $this->entityLoader->findEntity($entityClass, $entityId, $this->metadata->getTargetMetadata());
         } catch (ORMException $e) {
             throw new TransformationFailedException(
-                \sprintf(
+                sprintf(
                     'An "%s" entity with "%s" identifier cannot be loaded.',
                     $entityClass,
                     $this->humanizeEntityId($entityId)
                 ),
                 0,
-                $e
+                $e,
+                'oro.api.form.load_entity_failed'
             );
         }
         if (null === $entity) {
-            throw new TransformationFailedException(
-                \sprintf(
+            throw FormUtil::createTransformationFailedException(
+                sprintf(
                     'An "%s" entity with "%s" identifier does not exist.',
                     $entityClass,
                     $this->humanizeEntityId($entityId)
-                )
+                ),
+                'oro.api.form.entity_does_not_exist'
             );
         }
 
         return $entity;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return string
-     */
-    protected function resolveEntityClass($entityClass)
+    protected function resolveEntityClass(string $entityClass): string
     {
         $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
 
         return $resolvedEntityClass ?? $entityClass;
     }
 
-    /**
-     * @param mixed $entityId
-     *
-     * @return string
-     */
-    protected function humanizeEntityId($entityId)
+    protected function humanizeEntityId(mixed $entityId): string
     {
         if (\is_array($entityId)) {
             $elements = [];
             foreach ($entityId as $fieldName => $fieldValue) {
-                $elements[] = \sprintf('%s = %s', $fieldName, $fieldValue);
+                $elements[] = sprintf('%s = %s', $fieldName, $fieldValue);
             }
 
-            return \sprintf('array(%s)', \implode(', ', $elements));
+            return sprintf('array(%s)', implode(', ', $elements));
         }
 
         return (string)$entityId;

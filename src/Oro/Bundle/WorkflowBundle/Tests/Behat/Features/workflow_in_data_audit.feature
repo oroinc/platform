@@ -35,15 +35,11 @@ Feature: Workflow in Data Audit
     And I click "Apply"
     And I save and close form
     Then I should see "Workflow saved" flash message
-    And I should see "Translation cache update is required. Click here to update" flash message
 
   Scenario: Prepare workflow to usage with audit
     When I click "Activate"
-    And I click "Activate"
+    And I click "Activate" in modal window
     Then I should see "Workflow activated" flash message
-    When I go to System / Localization / Translations
-    And I click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Changes in workflow steps for Organization entity should be showed in data audit
     When I go to System / User Management / Organizations

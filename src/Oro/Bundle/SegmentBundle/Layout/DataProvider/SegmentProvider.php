@@ -10,9 +10,6 @@ class SegmentProvider
     /** @var SegmentManager */
     private $manager;
 
-    /**
-     * @param SegmentManager $manager
-     */
     public function __construct(SegmentManager $manager)
     {
         $this->manager = $manager;

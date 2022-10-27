@@ -5,32 +5,32 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilter;
 use Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilterFactory;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 class ExtendedAssociationFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
-    private $associationManager;
+    /** @var ExtendedAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendedAssociationProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderRegistry */
+    /** @var EntityOverrideProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $entityOverrideProviderRegistry;
 
     /** @var ExtendedAssociationFilterFactory */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
-        $this->associationManager = $this->createMock(AssociationManager::class);
+        $this->extendedAssociationProvider = $this->createMock(ExtendedAssociationProvider::class);
         $this->entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
 
         $this->factory = new ExtendedAssociationFilterFactory(
             $this->valueNormalizer,
-            $this->associationManager,
+            $this->extendedAssociationProvider,
             $this->entityOverrideProviderRegistry
         );
     }
@@ -41,7 +41,7 @@ class ExtendedAssociationFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $expectedFilter = new ExtendedAssociationFilter($dataType);
         $expectedFilter->setValueNormalizer($this->valueNormalizer);
-        $expectedFilter->setAssociationManager($this->associationManager);
+        $expectedFilter->setExtendedAssociationProvider($this->extendedAssociationProvider);
         $expectedFilter->setEntityOverrideProviderRegistry($this->entityOverrideProviderRegistry);
 
         self::assertEquals(

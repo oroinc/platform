@@ -14,7 +14,7 @@ class CompositeIdentifierFilterFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var CompositeIdentifierFilterFactory */
     private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
 

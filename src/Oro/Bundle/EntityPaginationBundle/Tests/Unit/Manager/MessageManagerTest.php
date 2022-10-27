@@ -4,74 +4,40 @@ namespace Oro\Bundle\EntityPaginationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
+use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
+use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Session
-     */
-    protected $session;
+    /** @var Session */
+    private $session;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var EntityPaginationNavigation|\PHPUnit\Framework\MockObject\MockObject */
+    private $navigation;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $navigation;
+    /** @var EntityPaginationStorage|\PHPUnit\Framework\MockObject\MockObject */
+    private $storage;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $storage;
+    /** @var MessageManager */
+    private $manager;
 
-    /**
-     * @var MessageManager
-     */
-    protected $manager;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->session = new Session(new MockArraySessionStorage());
+        $this->navigation = $this->createMock(EntityPaginationNavigation::class);
+        $this->storage = $this->createMock(EntityPaginationStorage::class);
 
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
             ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($id, array $parameters = []) {
-                        return str_replace(array_keys($parameters), array_values($parameters), $id . '.trans');
-                    }
-                )
-            );
-        $this->translator->expects($this->any())
-            ->method('transChoice')
-            ->will(
-                $this->returnCallback(
-                    function ($id, $count, array $parameters = []) {
-                        return str_replace(
-                            array_keys($parameters),
-                            array_values($parameters),
-                            $id . '.trans.' . $count
-                        );
-                    }
-                )
-            );
+            ->willReturnCallback(function ($id, array $parameters = []) {
+                return str_replace(array_keys($parameters), array_values($parameters), $id . '.trans');
+            });
 
-        $this->navigation =
-            $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $this->storage = $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->manager = new MessageManager($this->session, $this->translator, $this->navigation, $this->storage);
+        $this->manager = new MessageManager($this->session, $translator, $this->navigation, $this->storage);
     }
 
     public function testAddFlashMessage()
@@ -85,27 +51,21 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $expected
-     * @param string $scope
-     * @param int|null $count
      * @dataProvider getNotAvailableMessageDataProvider
      */
-    public function testGetNotAvailableMessage($expected, $scope, $count = null)
+    public function testGetNotAvailableMessage(string $expected, string $scope, int $count = null)
     {
         $entity = new \stdClass();
 
         $this->navigation->expects($this->once())
             ->method('getTotalCount')
             ->with($entity, $scope)
-            ->will($this->returnValue($count));
+            ->willReturn($count);
 
         $this->assertEquals($expected, $this->manager->getNotAvailableMessage($entity, $scope));
     }
 
-    /**
-     * @return array
-     */
-    public function getNotAvailableMessageDataProvider()
+    public function getNotAvailableMessageDataProvider(): array
     {
         return [
             'no count' => [
@@ -115,59 +75,52 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
             'view with count' => [
                 'expected' =>
                     'oro.entity_pagination.message.not_available.trans ' .
-                    'oro.entity_pagination.message.stats_number_view_12_record|stats_number_view_12_records.trans.12',
+                    'oro.entity_pagination.message.stats_number_view_12_record|stats_number_view_12_records.trans',
                 'scope' => EntityPaginationManager::VIEW_SCOPE,
                 'count' => 12,
             ],
             'edit with count' => [
                 'expected' =>
                     'oro.entity_pagination.message.not_available.trans ' .
-                    'oro.entity_pagination.message.stats_number_edit_23_record|stats_number_edit_23_records.trans.23',
+                    'oro.entity_pagination.message.stats_number_edit_23_record|stats_number_edit_23_records.trans',
                 'scope' => EntityPaginationManager::EDIT_SCOPE,
                 'count' => 23,
             ],
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Scope "invalid" is not available.
-     */
     public function testGetStatsMessageForInvalidScope()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Scope "invalid" is not available.');
+
         $entity = new \stdClass();
         $scope = 'invalid';
 
         $this->navigation->expects($this->once())
             ->method('getTotalCount')
             ->with($entity, $scope)
-            ->will($this->returnValue(1));
+            ->willReturn(1);
 
         $this->manager->getNotAvailableMessage($entity, $scope);
     }
 
     /**
-     * @param string $expected
-     * @param string $scope
-     * @param int|null $count
      * @dataProvider getNotAccessibleMessageDataProvider
      */
-    public function testGetNotAccessibleMessage($expected, $scope, $count = null)
+    public function testGetNotAccessibleMessage(string $expected, string $scope, int $count = null)
     {
         $entity = new \stdClass();
 
         $this->navigation->expects($this->once())
             ->method('getTotalCount')
             ->with($entity, $scope)
-            ->will($this->returnValue($count));
+            ->willReturn($count);
 
         $this->assertEquals($expected, $this->manager->getNotAccessibleMessage($entity, $scope));
     }
 
-    /**
-     * @return array
-     */
-    public function getNotAccessibleMessageDataProvider()
+    public function getNotAccessibleMessageDataProvider(): array
     {
         return [
             'no count' => [
@@ -177,14 +130,14 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
             'view with count' => [
                 'expected' =>
                     'oro.entity_pagination.message.not_accessible.trans ' .
-                    'oro.entity_pagination.message.stats_number_view_12_record|stats_number_view_12_records.trans.12',
+                    'oro.entity_pagination.message.stats_number_view_12_record|stats_number_view_12_records.trans',
                 'scope' => EntityPaginationManager::VIEW_SCOPE,
                 'count' => 12,
             ],
             'edit with count' => [
                 'expected' =>
                     'oro.entity_pagination.message.not_accessible.trans ' .
-                    'oro.entity_pagination.message.stats_number_edit_23_record|stats_number_edit_23_records.trans.23',
+                    'oro.entity_pagination.message.stats_number_edit_23_record|stats_number_edit_23_records.trans',
                 'scope' => EntityPaginationManager::EDIT_SCOPE,
                 'count' => 23,
             ],
@@ -192,34 +145,30 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string|null $expected
-     * @param string $scope
-     * @param bool $shown
-     * @param int|null $viewCount
-     * @param int|null $editCount
      * @dataProvider getInfoMessageDataProvider
      */
-    public function testGetInfoMessage($expected, $scope, $shown, $viewCount = null, $editCount = null)
-    {
+    public function testGetInfoMessage(
+        ?string $expected,
+        string $scope,
+        bool $shown,
+        int $viewCount = null,
+        int $editCount = null
+    ) {
         $entity = new \stdClass();
         $entityName = get_class($entity);
 
         $this->storage->expects($this->once())
             ->method('isInfoMessageShown')
             ->with($entityName, $scope)
-            ->will($this->returnValue($shown));
+            ->willReturn($shown);
 
         $this->navigation->expects($this->any())
             ->method('getTotalCount')
             ->with($entity, $this->isType('string'))
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$entity, EntityPaginationManager::VIEW_SCOPE, $viewCount],
-                        [$entity, EntityPaginationManager::EDIT_SCOPE, $editCount],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$entity, EntityPaginationManager::VIEW_SCOPE, $viewCount],
+                [$entity, EntityPaginationManager::EDIT_SCOPE, $editCount],
+            ]);
 
         if ($expected) {
             $this->storage->expects($this->once())
@@ -233,10 +182,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->manager->getInfoMessage($entity, $scope));
     }
 
-    /**
-     * @return array
-     */
-    public function getInfoMessageDataProvider()
+    public function getInfoMessageDataProvider(): array
     {
         return [
             'message already shown' => [
@@ -279,7 +225,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
             ],
             'edit to view increased' => [
                 'expected' =>
-                    'oro.entity_pagination.message.stats_number_view_5_record|stats_number_view_5_records.trans.5',
+                    'oro.entity_pagination.message.stats_number_view_5_record|stats_number_view_5_records.trans',
                 'scope' => EntityPaginationManager::VIEW_SCOPE,
                 'shown' => false,
                 'viewCount' => 5,
@@ -287,7 +233,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
             ],
             'edit to view decreased' => [
                 'expected' =>
-                    'oro.entity_pagination.message.stats_number_view_10_record|stats_number_view_10_records.trans.10',
+                    'oro.entity_pagination.message.stats_number_view_10_record|stats_number_view_10_records.trans',
                 'scope' => EntityPaginationManager::VIEW_SCOPE,
                 'shown' => false,
                 'viewCount' => 10,
@@ -295,7 +241,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
             ],
             'view to edit increased' => [
                 'expected' =>
-                    'oro.entity_pagination.message.stats_number_edit_10_record|stats_number_edit_10_records.trans.10',
+                    'oro.entity_pagination.message.stats_number_edit_10_record|stats_number_edit_10_records.trans',
                 'scope' => EntityPaginationManager::EDIT_SCOPE,
                 'shown' => false,
                 'viewCount' => 5,
@@ -304,7 +250,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
             'view to edit decreased' => [
                 'expected' =>
                     'oro.entity_pagination.message.stats_changed_view_to_edit.trans ' .
-                    'oro.entity_pagination.message.stats_number_edit_5_record|stats_number_edit_5_records.trans.5',
+                    'oro.entity_pagination.message.stats_number_edit_5_record|stats_number_edit_5_records.trans',
                 'scope' => EntityPaginationManager::EDIT_SCOPE,
                 'shown' => false,
                 'viewCount' => 10,

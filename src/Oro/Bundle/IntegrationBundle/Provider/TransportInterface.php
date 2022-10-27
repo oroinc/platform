@@ -6,9 +6,6 @@ use Oro\Bundle\IntegrationBundle\Entity\Transport;
 
 interface TransportInterface
 {
-    /**
-     * @param Transport $transportEntity
-     */
     public function init(Transport $transportEntity);
 
     /**

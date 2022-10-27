@@ -8,46 +8,33 @@ use Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson;
 
 class BasePersonTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_STRING = 'testString';
-    const TEST_ID     = 123;
+    private const TEST_STRING = 'testString';
+    private const TEST_ID = 123;
 
-    /** @var BasePerson */
-    protected $entity;
+    private BasePerson $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new BasePerson();
     }
 
-    protected function tearDown()
-    {
-        unset($this->entity);
-    }
-
     /**
      * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
-     * @param mixed  $expected
      */
-    public function testSetGet($property, $value = null, $expected = null)
+    public function testSetGet(string $property, mixed $value = null, mixed $expected = null)
     {
         if ($value !== null) {
-            call_user_func_array(array($this->entity, 'set' . ucfirst($property)), array($value));
+            call_user_func([$this->entity, 'set' . ucfirst($property)], $value);
         }
 
-        $this->assertEquals($expected, call_user_func_array(array($this->entity, 'get' . ucfirst($property)), array()));
+        $this->assertEquals($expected, call_user_func_array([$this->entity, 'get' . ucfirst($property)], []));
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function getSetDataProvider(): array
     {
         $birthday = new \DateTime('now');
-        $created  = new \DateTime('now');
-        $updated  = new \DateTime('now');
+        $created = new \DateTime('now');
+        $updated = new \DateTime('now');
 
         return [
             'id'         => ['id', self::TEST_ID, self::TEST_ID],
@@ -64,44 +51,29 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetGetAddress()
-    {
-        /** @var AbstractAddress $address */
-        $address = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
-        $this->entity->addAddress($address);
-        $this->assertAttributeEquals($this->entity->getAddresses(), 'addresses', $this->entity);
-    }
-
     public function testHasAddress()
     {
-        /** @var AbstractAddress $address */
-        $address = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
+        $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $this->entity->addAddress($address);
         $this->assertTrue($this->entity->hasAddress($address));
     }
 
     public function testResetGetAddresses()
     {
-        /** @var ArrayCollection $address */
-        $addresses = new ArrayCollection(
-            array(
-                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress'),
-                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress')
-            )
-        );
+        $addresses = new ArrayCollection([
+            $this->getMockForAbstractClass(AbstractAddress::class),
+            $this->getMockForAbstractClass(AbstractAddress::class)
+        ]);
         $this->entity->resetAddresses($addresses);
         $this->assertEquals($addresses, $this->entity->getAddresses());
     }
 
     public function testRemoveAddresses()
     {
-        /** @var ArrayCollection $address */
-        $addresses = new ArrayCollection(
-            array(
-                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress'),
-                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress')
-            )
-        );
+        $addresses = new ArrayCollection([
+            $this->getMockForAbstractClass(AbstractAddress::class),
+            $this->getMockForAbstractClass(AbstractAddress::class)
+        ]);
         $this->entity->resetAddresses($addresses);
         $this->entity->removeAddress($addresses->first());
         $this->assertFalse($this->entity->hasAddress($addresses->first()));
@@ -110,13 +82,10 @@ class BasePersonTest extends \PHPUnit\Framework\TestCase
 
     public function testCloneAddresses()
     {
-        /** @var ArrayCollection $address */
-        $addresses = new ArrayCollection(
-            array(
-                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress'),
-                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress')
-            )
-        );
+        $addresses = new ArrayCollection([
+            $this->getMockForAbstractClass(AbstractAddress::class),
+            $this->getMockForAbstractClass(AbstractAddress::class)
+        ]);
         $this->entity->resetAddresses($addresses);
 
         $newEntity = clone $this->entity;

@@ -3,9 +3,15 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
+/**
+ * Doctrine repository for AttributeFamily entity
+ */
 class AttributeFamilyRepository extends EntityRepository
 {
     /**
@@ -27,36 +33,39 @@ class AttributeFamilyRepository extends EntityRepository
     }
 
     /**
-     * @param array
+     * @param array $attributes
      * @return array ['<attributeId>' => [<'familyId'>, <'familyId'>], ...]
      */
-    public function getFamilyIdsForAttributes(array $attributes)
+    public function getFamilyIdsForAttributes(array $attributes): array
     {
-        $qb = $this->createQueryBuilder('f');
+        return $this->getFamilyIds($this->getFamilyIdsForAttributesQb($attributes));
+    }
 
-        $attributes = array_map(
-            function ($attribute) {
-                return $attribute instanceof FieldConfigModel ? $attribute->getId() : $attribute;
-            },
-            $attributes
-        );
-
-        $result = $qb
+    public function getFamilyIdsForAttributesQb(array $attributes): QueryBuilder
+    {
+        return $this->createQueryBuilder('f')
             ->resetDQLPart('select')
             ->select('f.id AS familyId, r.entityConfigFieldId AS attributeId')
             ->innerJoin('f.attributeGroups', 'g')
             ->innerJoin('g.attributeRelations', 'r')
             ->where('r.entityConfigFieldId IN (:ids)')
-            ->setParameter('ids', $attributes)
-            ->getQuery()
-            ->getArrayResult();
+            ->setParameter('ids', $this->prepareAttributes($attributes));
+    }
 
-        $attributeIds = [];
-        foreach ($result as $item) {
-            $attributeIds[(int) $item['attributeId']][] = (int) $item['familyId'];
-        }
+    /**
+     * @param array $attributes
+     * @param OrganizationInterface $organization
+     * @return array ['<attributeId>' => [<'familyId'>, <'familyId'>], ...]
+     */
+    public function getFamilyIdsForAttributesByOrganization(
+        array $attributes,
+        OrganizationInterface $organization
+    ): array {
+        $qb = $this->getFamilyIdsForAttributesQb($attributes);
+        $qb->andWhere($qb->expr()->eq('f.owner', ':organization'))
+            ->setParameter('organization', $organization);
 
-        return $attributeIds;
+        return $this->getFamilyIds($qb);
     }
 
     /**
@@ -67,11 +76,47 @@ class AttributeFamilyRepository extends EntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('family');
 
-        return (int) $queryBuilder
+        return (int)$queryBuilder
             ->select($queryBuilder->expr()->count('family.id'))
             ->andWhere($queryBuilder->expr()->eq('family.entityClass', ':entityClass'))
             ->setParameter('entityClass', $entityClass)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * @param array $attributes
+     * @return array|int[]
+     */
+    private function prepareAttributes(array $attributes): array
+    {
+        return array_map(
+            static function ($attribute) {
+                return $attribute instanceof FieldConfigModel ? $attribute->getId() : $attribute;
+            },
+            $attributes
+        );
+    }
+
+    private function getFamilyIds(QueryBuilder $qb): array
+    {
+        $result = $qb->getQuery()->getArrayResult();
+
+        $attributeIds = [];
+        foreach ($result as $item) {
+            $attributeIds[(int)$item['attributeId']][] = (int)$item['familyId'];
+        }
+
+        return $attributeIds;
+    }
+
+    public function getFamilyByCode(string $attributeFamilyCode, AclHelper $aclHelper): ?AttributeFamily
+    {
+        $qb = $this->createQueryBuilder('f');
+        $qb->andWhere($qb->expr()->eq('f.code', ':familyCode'))
+            ->setParameter('familyCode', $attributeFamilyCode)
+            ->setMaxResults(1);
+
+        return $aclHelper->apply($qb)->getOneOrNullResult();
     }
 }

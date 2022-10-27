@@ -1,6 +1,9 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Async;
 
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationTopic;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -8,9 +11,11 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that updates multiple emails for email owner.
+ */
 class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -28,11 +33,6 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
      */
     private $logger;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
     public function __construct(MessageProducerInterface $producer, JobRunner $jobRunner, LoggerInterface $logger)
     {
         $this->producer = $producer;
@@ -45,13 +45,7 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
-
-        if (! isset($data['ownerClass'], $data['ownerIds']) || ! is_array($data['ownerIds'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $data = $message->getBody();
 
         asort($data['ownerIds']);
 
@@ -70,11 +64,14 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
                     $jobRunner->createDelayed(
                         sprintf('%s:%s:%s', 'oro.email.update_email_owner_association', $data['ownerClass'], $id),
                         function (JobRunner $jobRunner, Job $child) use ($data, $id) {
-                            $this->producer->send(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, [
-                                'ownerId' => $id,
-                                'ownerClass' => $data['ownerClass'],
-                                'jobId' => $child->getId()
-                            ]);
+                            $this->producer->send(
+                                UpdateEmailOwnerAssociationTopic::getName(),
+                                [
+                                    'ownerId' => $id,
+                                    'ownerClass' => $data['ownerClass'],
+                                    'jobId' => $child->getId(),
+                                ]
+                            );
                         }
                     );
                 }
@@ -96,6 +93,6 @@ class UpdateEmailOwnerAssociationsMessageProcessor implements MessageProcessorIn
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS];
+        return [UpdateEmailOwnerAssociationsTopic::getName()];
     }
 }

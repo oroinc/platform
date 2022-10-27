@@ -1,158 +1,136 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\TranslationBundle\Download\TranslationMetricsProviderInterface;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType;
-use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Intl\Locales;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AddLanguageTypeTest extends FormIntegrationTestCase
 {
+    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
+
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
+
+    /** @var TranslationMetricsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationStatisticProvider;
+
     /** @var AddLanguageType */
-    protected $formType;
+    private $formType;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageRepository */
-    protected $repository;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
-    protected $localeSettings;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationStatisticProvider */
-    protected $translationStatisticProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->repository = $this->getMockBuilder(LanguageRepository::class)->disableOriginalConstructor()->getMock();
+        $this->repository = $this->createMock(LanguageRepository::class);
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->translationStatisticProvider = $this->createMock(TranslationMetricsProviderInterface::class);
 
-        $this->localeSettings = $this->getMockBuilder(LocaleSettings::class)->disableOriginalConstructor()->getMock();
-
-        $this->translationStatisticProvider = $this->getMockBuilder(TranslationStatisticProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->getMockForAbstractClass(TranslatorInterface::class);
-        $this->translator->expects($this->any())
+        $translator = $this->getMockForAbstractClass(TranslatorInterface::class);
+        $translator->expects(self::any())
             ->method('trans')
-            ->willReturnCallback(function ($key) {
-                return $key;
-            });
+            ->willReturnArgument(0);
 
         $this->formType = new AddLanguageType(
             $this->repository,
             $this->localeSettings,
             $this->translationStatisticProvider,
-            $this->translator
+            $translator
         );
+
         parent::setUp();
     }
 
-    protected function tearDown()
+    public function testGetBlockPrefix(): void
     {
-        parent::tearDown();
-        unset(
-            $this->repository,
-            $this->localeSettings,
-            $this->formType,
-            $this->translationStatisticProvider,
-            $this->translator
-        );
+        self::assertEquals('oro_translation_add_language', $this->formType->getBlockPrefix());
     }
 
-    public function testGetBlockPrefix()
+    public function testGetParent(): void
     {
-        $this->assertEquals('oro_translation_add_language', $this->formType->getBlockPrefix());
+        self::assertEquals(OroChoiceType::class, $this->formType->getParent());
     }
 
-    public function testGetParent()
+    public function testBuildForm(): void
     {
-        $this->assertEquals(OroChoiceType::class, $this->formType->getParent());
-    }
+        $metrics = [
+            'uk_UA' => [
+                'code' => 'uk_UA',
+                'translationStatus' => 100,
+                'lastBuildDate' => '2020-08-24T00:00:00+0300'
+            ],
+            'de_DE' => [
+                'code' => 'de_DE',
+                'altCode' => 'de',
+                'translationStatus' => 90,
+                'lastBuildDate' => '2020-10-03T23:59:59+0100'
+            ],
+            'fr_FR' => [
+                'code' => 'fr_FR',
+                'altCode' => 'fr',
+                'translationStatus' => 80,
+                'lastBuildDate' => '2020-07-14T00:00:00+0200'
+            ],
+        ];
 
-    /**
-     * @dataProvider buildFormProvider
-     *
-     * @param array $currentCodes
-     * @param array $crowdinLangs
-     * @param array $codesExpected
-     */
-    public function testBuildForm(array $currentCodes, array $crowdinLangs, array $codesExpected)
-    {
-        //        IntlTestHelper::requireIntl($this);
+        $defaultLocale = 'de';
+        $installedLanguages = ['en' => true, 'en_US' => true, 'uk_UA' => true];
+        $allIntlLanguages = Locales::getNames($defaultLocale);
+        $this->repository->expects(self::any())
+            ->method('getAvailableLanguageCodesAsArrayKeys')
+            ->willReturn($installedLanguages);
+        $this->localeSettings->expects(self::any())
+            ->method('getLanguage')
+            ->willReturn($defaultLocale);
 
-        $this->repository->expects($this->once())->method('getAvailableLanguageCodes')->willReturn($currentCodes);
-        $this->localeSettings->expects($this->once())->method('getLanguage')->willReturn('de');
-        $this->translationStatisticProvider->expects($this->once())->method('get')->willReturn($crowdinLangs);
+        $this->translationStatisticProvider->expects(self::any())
+            ->method('getAll')
+            ->willReturn($metrics);
 
         $form = $this->factory->create(AddLanguageType::class);
         $choices = $form->getConfig()->getOption('choices');
 
-        foreach ($codesExpected as $value) {
-            $this->assertContains($value, $choices['oro.translation.language.form.select.group.crowdin']);
-            $this->assertNotContains($value, $choices['oro.translation.language.form.select.group.intl']);
-        }
+        $expectedWithTranslations = [
+            'de_DE' => $allIntlLanguages['de_DE'],
+            'fr_FR' => $allIntlLanguages['fr_FR'],
+        ];
+        $expectedWithoutTranslations = array_diff_key(
+            $allIntlLanguages,
+            $expectedWithTranslations,
+            $installedLanguages
+        );
 
-        foreach ($currentCodes as $value) {
-            $this->assertNotContains($value, $choices['oro.translation.language.form.select.group.crowdin']);
-            $this->assertNotContains($value, $choices['oro.translation.language.form.select.group.intl']);
-        }
+        self::assertSame(
+            array_keys($expectedWithTranslations),
+            array_values($choices['oro.translation.language.form.select.group.crowdin'])
+        );
+        self::assertSame(
+            array_keys($expectedWithoutTranslations),
+            array_values($choices['oro.translation.language.form.select.group.intl'])
+        );
     }
 
-    /**
-     * @return array
-     */
-    public function buildFormProvider()
-    {
-        $crowdInLangs = [
-            ['code' => 'en_US', 'realCode' => 'en'],
-            ['code' => 'fr_FR', 'realCode' => 'fr'],
-            ['code' => 'pl_PL', 'realCode' => 'pl'],
-        ];
-
-        return [
-            'no current languages' => [
-                'currentCodes' => [],
-                'crowdinLangs' => $crowdInLangs,
-                'codesExpected' => ['en_US', 'fr_FR', 'pl_PL'],
-            ],
-            '1 current language' => [
-                'currentCodes' => ['en_US'],
-                'crowdinLangs' => $crowdInLangs,
-                'codesExpected' => ['fr_FR', 'pl_PL'],
-            ],
-            '2 current languages' => [
-                'currentCodes' => ['fr_FR', 'pl_PL'],
-                'crowdinLangs' => $crowdInLangs,
-                'codesExpected' => ['en_US'],
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $choiceType = $this->getMockBuilder(OroChoiceType::class)
-            ->setMethods(['configureOptions', 'getParent'])
+            ->onlyMethods(['configureOptions', 'getParent'])
             ->disableOriginalConstructor()
             ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
+        $choiceType->expects(self::any())
+            ->method('getParent')
+            ->willReturn(ChoiceType::class);
 
         return [
             new PreloadedExtension(
-                [
-                    $this->formType,
-                    OroChoiceType::class => $choiceType,
-                ],
+                [$this->formType, OroChoiceType::class => $choiceType],
                 []
             )
         ];

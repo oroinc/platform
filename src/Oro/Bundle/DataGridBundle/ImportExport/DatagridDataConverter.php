@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Formatter\TypeFormatterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Converts exported records to plain format.
@@ -51,11 +51,6 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      */
     private $gridColumns = [];
 
-    /**
-     * @param DatagridColumnsFromContextProviderInterface $datagridColumnsFromContextProvider
-     * @param TranslatorInterface $translator
-     * @param FormatterProvider $formatterProvider
-     */
     public function __construct(
         DatagridColumnsFromContextProviderInterface $datagridColumnsFromContextProvider,
         TranslatorInterface $translator,
@@ -77,7 +72,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         foreach ($columns as $columnName => $column) {
             $val = array_key_exists($columnName, $exportedRecord) ? $exportedRecord[$columnName] : null;
             $val = $this->applyFrontendFormatting($val, $column);
-            $columnLabel = $this->translator->trans($column['label']);
+            $columnLabel = isset($column['label']) ? $this->translator->trans($column['label']) : '';
 
             $label = $columnLabel;
             if (array_key_exists($columnLabel, $result)) {
@@ -90,9 +85,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     }
 
     /**
-     * Returns columns from either:
-     * 1) datagrid columns stored in context;
-     * 2) columns from datagrid configuration;
+     * Returns columns from the datagrid configuration.
      * Caches grid columns in gridColumns property until the new context is set.
      *
      * @return array
@@ -119,6 +112,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
      * @param array $options
      *
      * @return string|null
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function applyFrontendFormatting($val, $options)
     {
@@ -171,7 +165,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             str_replace(
                 "\xC2\xA0", // non-breaking space (&nbsp;)
                 ' ',
-                html_entity_decode(strip_tags($val))
+                html_entity_decode(strip_tags($val), CREDITS_ALL)
             )
         );
         if ($exportType === 'list') {

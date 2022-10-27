@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 
+use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 class AclManagerSidTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AclSidManager */
-    private $manager;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $aclProvider;
 
-    protected function setUp()
+    /** @var AclSidManager */
+    private $manager;
+
+    protected function setUp(): void
     {
-        $this->aclProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->aclProvider = $this->createMock(MutableAclProvider::class);
 
         $this->manager = new AclSidManager(
             $this->aclProvider
@@ -27,9 +27,7 @@ class AclManagerSidTest extends \PHPUnit\Framework\TestCase
     {
         $manager = new AclSidManager();
         $this->assertFalse($manager->isAclEnabled());
-        $aclProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $aclProvider = $this->createMock(MutableAclProvider::class);
         $manager = new AclSidManager($aclProvider);
 
         $this->assertTrue($manager->isAclEnabled());
@@ -37,7 +35,7 @@ class AclManagerSidTest extends \PHPUnit\Framework\TestCase
 
     public function testUpdateSid()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('updateSecurityIdentity')
             ->with($this->identicalTo($sid), $this->equalTo('old'));
@@ -47,7 +45,7 @@ class AclManagerSidTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteSid()
     {
-        $sid = $this->createMock('Symfony\Component\Security\Acl\Model\SecurityIdentityInterface');
+        $sid = $this->createMock(SecurityIdentityInterface::class);
         $this->aclProvider->expects($this->once())
             ->method('deleteSecurityIdentity')
             ->with($this->identicalTo($sid));

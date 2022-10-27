@@ -4,7 +4,7 @@
 .inline-editing-help-wrapper {
     z-index: 10000;
     border-radius: 50px;
-    background: #fff;
+    background: $primary-inverse;
     width: 38px;
     height: 38px;
     position: absolute;
@@ -14,12 +14,13 @@
 
     .inline-editing-help-content {
         width: 474px;
-        background: #fff;
+        background: $additional-extra-light;
         top: 39px;
+        // stylelint-disable-next-line declaration-no-important
         margin-left: -415px !important;
         max-width: 457px;
         z-index: 10000;
-        color: #444;
+        color: $additional-lighten;
         font-size: 13px;
         padding: 15px;
 
@@ -33,10 +34,10 @@
     border-radius: 50px;
     width: 30px;
     height: 30px;
-    background: rgb(108, 146, 209);
-    color: #fff;
+    background: $secondary;
+    color: $primary-inverse;
     font-size: 24px;
     text-align: center;
     line-height: 31px;
-    font-weight: normal;
+    font-weight: font-weight('light');
 }

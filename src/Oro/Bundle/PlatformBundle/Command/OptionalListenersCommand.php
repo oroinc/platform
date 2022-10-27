@@ -1,33 +1,58 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\PlatformBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class OptionalListenersCommand extends ContainerAwareCommand
+/**
+ * Lists Doctrine listeners that can be disabled.
+ */
+class OptionalListenersCommand extends Command
 {
-    const NAME = 'oro:platform:optional-listeners';
+    protected static $defaultName = 'oro:platform:optional-listeners';
 
-    /**
-     * {@inheritdoc}
-     */
+    private OptionalListenerManager $optionalListenerManager;
+
+    public function __construct(OptionalListenerManager $optionalListenerManager)
+    {
+        $this->optionalListenerManager = $optionalListenerManager;
+
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setName(self::NAME)
-            ->setDescription('Get list of Doctrine listeners which can be disabled during process console command');
+        $this
+            ->setDescription('Lists Doctrine listeners that can be disabled.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command lists optional Doctrine listeners
+that can be disabled when running console commands by using
+the <comment>--disabled-listeners</comment> option.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $listeners = $this->getContainer()->get('oro_platform.optional_listeners.manager')->getListeners();
         $output->writeln('List of optional listeners:');
-        foreach ($listeners as $listener) {
+        foreach ($this->optionalListenerManager->getListeners() as $listener) {
             $output->writeln(sprintf('  <comment>> %s</comment>', $listener));
         }
+
+        return 0;
     }
 }

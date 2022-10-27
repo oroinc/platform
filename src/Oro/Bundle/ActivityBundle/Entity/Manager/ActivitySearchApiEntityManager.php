@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
@@ -15,11 +15,6 @@ class ActivitySearchApiEntityManager extends ApiEntityManager
     /** @var ActivityManager */
     protected $activityManager;
 
-    /**
-     * @param ObjectManager   $om
-     * @param ActivityManager $activityManager
-     * @param SearchIndexer   $searchIndexer
-     */
     public function __construct(
         ObjectManager $om,
         ActivityManager $activityManager,

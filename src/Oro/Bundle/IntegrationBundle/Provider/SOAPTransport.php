@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use FOS\RestBundle\Util\Codes;
-use Guzzle\Http\Url;
-use Guzzle\Parser\ParserRegistry;
+use Exception;
+use GuzzleHttp\Psr7\Message;
+use GuzzleHttp\Psr7\Uri;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @package Oro\Bundle\IntegrationBundle
+ * Base class for interacting with 3rd party system using SOAP
  */
 abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 {
@@ -51,9 +52,12 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $action
+     * @param array  $params
+     * @return mixed
+     * @throws SoapConnectionException
      */
-    public function call($action, $params = [])
+    public function call(string $action, array $params = [])
     {
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
@@ -61,8 +65,9 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 
         try {
             $result = $this->client->__soapCall($action, $params);
-        } catch (\Exception $e) {
-            $isUnknownMethod = strpos($e->getMessage(), 'is not a valid method') !== false
+        } catch (Exception $e) {
+            $isUnknownMethod =
+                str_contains($e->getMessage(), 'is not a valid method')
                 || $e->getMessage() === sprintf("Procedure '%s' not present", $action);
 
             if (!$isUnknownMethod && $this->isAttemptNecessary()) {
@@ -74,7 +79,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
                     $this->getLastResponse(),
                     $e,
                     $this->getLastRequest(),
-                    $this->getLastResponseHeaders()
+                    $this->getLastResponseStatusCode()
                 );
             }
         }
@@ -85,7 +90,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     }
 
     /**
-     * @return string last SOAP response
+     * @return null|string last SOAP response
      */
     public function getLastResponse()
     {
@@ -127,9 +132,6 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
         $this->multipleAttemptsEnabled = $multipleAttemptsEnabled;
     }
 
-    /**
-     * @param array $sleepBetweenAttempt
-     */
     public function setSleepBetweenAttempt(array $sleepBetweenAttempt)
     {
         $this->sleepBetweenAttempt = $sleepBetweenAttempt;
@@ -152,7 +154,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
             $options['password'] = $urlParts['pass'];
             unset($urlParts['user'], $urlParts['pass']);
         }
-        $wsdlUrl = Url::buildUrl($urlParts);
+        $wsdlUrl = Uri::fromParts($urlParts);
 
         return new NonPrintableCharsSanitizedSoapClient($wsdlUrl, $options);
     }
@@ -167,8 +169,12 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 
     /**
      * Make new attempt
+     * @param string $action
+     * @param array  $params
+     * @return mixed
+     * @throws SoapConnectionException
      */
-    protected function makeNewAttempt($action, $params)
+    protected function makeNewAttempt(string $action, array $params)
     {
         $this->logAttempt();
         sleep($this->getSleepBetweenAttempt());
@@ -179,59 +185,37 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 
     /**
      * Get last request headers as array
-     *
-     * @return array
      */
-    protected function getLastResponseHeaders()
+    protected function getLastResponseStatusCode(): ?int
     {
-        return ParserRegistry::getInstance()->getParser('message')
-            ->parseResponse($this->client->__getLastResponseHeaders());
-    }
+        try {
+            $response = Message::parseResponse($this->client->__getLastResponseHeaders()."\n");
 
-    /**
-     * @param array $headers
-     *
-     * @return bool
-     */
-    protected function isResultOk(array $headers = [])
-    {
-        if (Codes::HTTP_OK === $this->getHttpStatusCode($headers)) {
-            return true;
+            return $response->getStatusCode();
+        } catch (\InvalidArgumentException $e) {
+            return null;
         }
-
-        return false;
-    }
-
-    /**
-     * @param array $headers
-     *
-     * @return int
-     */
-    protected function getHttpStatusCode(array $headers = [])
-    {
-        return (!empty($headers['code'])) ? (int)$headers['code'] : 0;
     }
 
     /**
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function isAttemptNecessary()
     {
         $couldPerform = $this->multipleAttemptsEnabled && ($this->attempted < count($this->sleepBetweenAttempt) - 1);
 
         if ($couldPerform) {
-            $headers = $this->getLastResponseHeaders();
+            $statusCode = $this->getLastResponseStatusCode();
             $response = $this->getLastResponse();
 
-            if (!empty($headers) && !$this->isResultOk($headers)) {
-                $statusCode = $this->getHttpStatusCode($headers);
-
-                if (in_array($statusCode, $this->getHttpStatusesForAttempt())) {
-                    return true;
-                }
-            } elseif (!empty($headers) && $this->isResultOk($headers) && strpos($response, '<?xml') !== 0) {
+            if (\in_array($statusCode, $this->getHttpStatusesForAttempt())) {
                 return true;
-            } elseif (empty($headers)) {
+            }
+            if (Response::HTTP_OK === $statusCode && !str_starts_with($response, '<?xml')) {
+                return true;
+            }
+            if (null === $statusCode) {
                 return true;
             }
         }
@@ -245,9 +229,9 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     protected function getHttpStatusesForAttempt()
     {
         return [
-            Codes::HTTP_BAD_GATEWAY,
-            Codes::HTTP_SERVICE_UNAVAILABLE,
-            Codes::HTTP_GATEWAY_TIMEOUT,
+            Response::HTTP_BAD_GATEWAY,
+            Response::HTTP_SERVICE_UNAVAILABLE,
+            Response::HTTP_GATEWAY_TIMEOUT,
         ];
     }
 

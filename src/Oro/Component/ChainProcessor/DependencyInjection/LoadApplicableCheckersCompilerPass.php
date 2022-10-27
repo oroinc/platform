@@ -45,22 +45,13 @@ class LoadApplicableCheckersCompilerPass implements CompilerPassInterface
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition       $processorBagServiceDef
-     */
     protected function registerApplicableCheckers(ContainerBuilder $container, Definition $processorBagServiceDef)
     {
         $taggedServices = $container->findTaggedServiceIds($this->applicableCheckerTagName);
         foreach ($taggedServices as $id => $taggedAttributes) {
-            $priority = 0;
-            if (isset($taggedAttributes[0]['priority'])) {
-                $priority = $taggedAttributes[0]['priority'];
-            }
-
             $processorBagServiceDef->addMethodCall(
                 'addApplicableChecker',
-                [new Reference($id), $priority]
+                [new Reference($id), $taggedAttributes[0]['priority'] ?? 0]
             );
         }
     }

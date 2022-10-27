@@ -5,7 +5,10 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
-interface ConfigInterface extends \Serializable
+/**
+ * Provides interface for entity configuration data
+ */
+interface ConfigInterface
 {
     /**
      * Returns id of an object for which an instance of this class stores configuration data.
@@ -53,7 +56,7 @@ interface ConfigInterface extends \Serializable
     public function has($code);
 
     /**
-     * Checks id a value of a configuration attribute equals to $value.
+     * Checks if a value of a configuration attribute equals to $value.
      *
      * @param string $code
      * @param mixed  $value

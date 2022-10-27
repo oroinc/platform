@@ -7,22 +7,14 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
- * Entity attribute type for enum field type
+ * Provides metadata about enum attribute type.
  */
 class EnumAttributeType implements AttributeTypeInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
-        return 'enum';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSearchable(FieldConfigModel $attribute = null)
+    public function isSearchable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -30,7 +22,7 @@ class EnumAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isFilterable(FieldConfigModel $attribute = null)
+    public function isFilterable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -38,7 +30,7 @@ class EnumAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -72,7 +64,7 @@ class EnumAttributeType implements AttributeTypeInterface
         /** @var AbstractEnumValue $originalValue */
         $this->ensureSupportedType($originalValue);
 
-        $key = sprintf('%s_%s', $attribute->getFieldName(), $originalValue->getId());
+        $key = sprintf('%s_enum.%s', $attribute->getFieldName(), $originalValue->getId());
 
         return [$key => 1];
     }

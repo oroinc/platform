@@ -1,47 +1,36 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\JsTree;
 
-use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\UIBundle\Model\TreeItem;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MenuUpdateTreeHandler
-     */
-    protected $handler;
+    /** @var MenuFactory */
+    private $factory;
 
-    /**
-     * @var MenuFactory
-     */
-    protected $factory;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var MenuUpdateTreeHandler */
+    private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = $this->createMock(TranslatorInterface::class);
-
         $this->factory = new MenuFactory();
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->handler = new MenuUpdateTreeHandler($this->translator);
     }
 
     /**
      * @dataProvider getTreeDataProvider
-     * @param bool  $includeRoot
-     * @param array $expectedTree
      */
-    public function testCreateTree($includeRoot, array $expectedTree)
+    public function testCreateTree(bool $includeRoot, array $expectedTree)
     {
-        /** @var ItemInterface $root */
         $root = $this->factory->createItem('root');
         $root
             ->addChild('item1')
@@ -57,12 +46,9 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getTreeDataProvider
-     * @param bool  $includeRoot
-     * @param array $expectedTreeItemList
      */
-    public function testGetTreeItemList($includeRoot, array $expectedTreeItemList)
+    public function testGetTreeItemList(bool $includeRoot, array $expectedTreeItemList)
     {
-        /** @var ItemInterface $root */
         $root = $this->factory->createItem('root');
         $root
             ->addChild('item1')
@@ -73,10 +59,7 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedTreeItemList, $tree);
     }
 
-    /**
-     * @return array
-     */
-    public function getTreeDataProvider()
+    public function getTreeDataProvider(): array
     {
         return [
             'include root' => [
@@ -162,16 +145,12 @@ class MenuUpdateTreeHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function getTreeItemListDataProvider()
+    public function getTreeItemListDataProvider(): array
     {
         $root = new TreeItem('root', 'root');
         $item1 = new TreeItem('item1', 'item1');
         $item11 = new TreeItem('item1-1', 'item1-1');
         $item2 = new TreeItem('item2', 'item2');
-
 
         return [
             'include root' => [

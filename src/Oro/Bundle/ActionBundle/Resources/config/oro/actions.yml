@@ -2,7 +2,7 @@ operations:
     CRUD_ACTION:
         label: CRUD_ACTION
         button_options:
-            template: OroActionBundle:Operation:crud-button.html.twig
+            template: '@OroAction/Operation/crud-button.html.twig'
         preconditions:
             '@and':
                 - '@not_blank': $.data
@@ -77,6 +77,8 @@ operations:
         label: oro.action.delete
         frontend_options:
             title: oro.action.delete_entity
+            options:
+                ariaLabel: oro.action.delete_entity.aria_label
             confirmation:
                 title: oro.action.delete_entity
                 message: oro.action.delete_confirm

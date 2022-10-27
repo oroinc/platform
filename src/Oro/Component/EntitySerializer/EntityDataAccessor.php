@@ -64,8 +64,8 @@ class EntityDataAccessor implements DataAccessorInterface
         $value = null;
         if (!$this->tryGetValue($object, $property, $value)) {
             $message = \is_array($object)
-                ? \sprintf('Cannot get a value of "%s" field.', $property)
-                : \sprintf(
+                ? sprintf('Cannot get a value of "%s" field.', $property)
+                : sprintf(
                     'Cannot get a value of "%s" field from "%s" entity.',
                     $property,
                     ClassUtils::getClass($object)
@@ -85,7 +85,7 @@ class EntityDataAccessor implements DataAccessorInterface
      */
     protected function camelize($string)
     {
-        return \strtr(\ucwords(\strtr($string, ['_' => ' '])), [' ' => '']);
+        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
     }
 
     /**
@@ -147,7 +147,7 @@ class EntityDataAccessor implements DataAccessorInterface
         if ($this->isGetter($reflClass, $getter)) {
             return $getter;
         }
-        $getter = \lcfirst($camelized);
+        $getter = lcfirst($camelized);
         if ($this->isGetter($reflClass, $getter)) {
             return $getter;
         }

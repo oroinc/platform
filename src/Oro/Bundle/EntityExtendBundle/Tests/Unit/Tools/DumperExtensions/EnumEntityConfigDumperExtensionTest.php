@@ -4,50 +4,56 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\EnumEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 
 class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $relationBuilder;
+    /** @var RelationBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $relationBuilder;
 
     /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
-
-    /** @var EnumEntityConfigDumperExtension */
-    protected $extension;
+    private $nameGenerator;
 
     /** @var ExtendEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $extendEntityConfigProvider;
+    private $extendEntityConfigProvider;
 
-    public function setUp()
+    /** @var EnumEntityConfigDumperExtension */
+    private $extension;
+
+    protected function setUp(): void
     {
-        $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->relationBuilder = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->nameGenerator   = new ExtendDbIdentifierNameGenerator();
-
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->relationBuilder = $this->createMock(RelationBuilder::class);
+        $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
         $this->extendEntityConfigProvider = $this->createMock(ExtendEntityConfigProviderInterface::class);
+
+        $entityExtendConfigurationProvider = $this->createMock(EntityExtendConfigurationProvider::class);
+        $entityExtendConfigurationProvider->expects(self::any())
+            ->method('getUnderlyingTypes')
+            ->willReturn(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']);
 
         $this->extension = new EnumEntityConfigDumperExtension(
             $this->configManager,
             $this->relationBuilder,
-            new FieldTypeHelper(['enum' => 'manyToOne', 'multiEnum' => 'manyToMany']),
+            new FieldTypeHelper($entityExtendConfigurationProvider),
             $this->nameGenerator,
             $this->extendEntityConfigProvider
         );
@@ -96,127 +102,116 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $enumFieldConfig5 = new Config(new FieldConfigId('enum', 'Test\EnumValue1', 'field5', 'enum'));
 
         $entityConfigs = [$entityConfig1, $entityConfig2];
-        $fieldConfigs  = [$fieldConfig1, $fieldConfig2, $fieldConfig3, $fieldConfig4, $fieldConfig5];
+        $fieldConfigs = [$fieldConfig1, $fieldConfig2, $fieldConfig3, $fieldConfig4, $fieldConfig5];
 
-        $enumCode1           = ExtendHelper::buildEnumCode('Test Enum 1');
-        $enumCode2           = ExtendHelper::buildEnumCode('Test Enum 2');
-        $enumCode5           = ExtendHelper::generateEnumCode('Test\EnumValue1', 'field5');
+        $enumCode1 = ExtendHelper::buildEnumCode('Test Enum 1');
+        $enumCode2 = ExtendHelper::buildEnumCode('Test Enum 2');
+        $enumCode5 = ExtendHelper::generateEnumCode('Test\EnumValue1', 'field5');
         $enumValueClassName1 = ExtendHelper::buildEnumValueClassName($enumCode1);
         $enumValueClassName2 = ExtendHelper::buildEnumValueClassName($enumCode2);
         $enumValueClassName5 = ExtendHelper::buildEnumValueClassName($enumCode5);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $enumConfigProvider   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['enum', $enumConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['enum', $enumConfigProvider],
+            ]);
         $this->extendEntityConfigProvider->expects($this->once())
             ->method('getExtendEntityConfigs')
-            ->will($this->returnValue($entityConfigs));
-        $extendConfigProvider->expects($this->at(0))
+            ->willReturn($entityConfigs);
+        $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->with($entityConfig1->getId()->getClassName())
-            ->will($this->returnValue($fieldConfigs));
-        $extendConfigProvider->expects($this->at(1))
-            ->method('getConfigs')
-            ->with($entityConfig2->getId()->getClassName())
-            ->will($this->returnValue([]));
-        $enumConfigProvider->expects($this->at(0))
+            ->willReturnMap([
+                [$entityConfig1->getId()->getClassName(), false, $fieldConfigs],
+                [$entityConfig2->getId()->getClassName(), false, []]
+            ]);
+        $enumConfigProvider->expects($this->exactly(3))
             ->method('getConfig')
-            ->with($entityConfig1->getId()->getClassName(), 'field1')
-            ->will($this->returnValue($enumFieldConfig1));
-        $enumConfigProvider->expects($this->at(1))
-            ->method('getConfig')
-            ->with($entityConfig1->getId()->getClassName(), 'field2')
-            ->will($this->returnValue($enumFieldConfig2));
-        $enumConfigProvider->expects($this->at(2))
-            ->method('getConfig')
-            ->with($entityConfig1->getId()->getClassName(), 'field5')
-            ->will($this->returnValue($enumFieldConfig5));
+            ->willReturnMap([
+                [$entityConfig1->getId()->getClassName(), 'field1', $enumFieldConfig1],
+                [$entityConfig1->getId()->getClassName(), 'field2', $enumFieldConfig2],
+                [$entityConfig1->getId()->getClassName(), 'field5', $enumFieldConfig5]
+            ]);
 
         $this->configManager->expects($this->exactly(3))
             ->method('hasConfigEntityModel')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$enumValueClassName1, false],
-                        [$enumValueClassName2, true],
-                        [$enumValueClassName5, true],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$enumValueClassName1, false],
+                [$enumValueClassName2, true],
+                [$enumValueClassName5, true],
+            ]);
 
-        $configManagerAt = 3;
-        $this->configManager->expects($this->at($configManagerAt++))
+        $this->configManager->expects($this->once())
             ->method('createConfigEntityModel')
             ->with($enumValueClassName1, ConfigModel::MODE_HIDDEN);
 
-        $relationBuilderAt = 0;
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
+        $this->setAddEnumValueEntityFieldsExpectations($enumValueClassName1, $enumCode1);
+
+        $this->relationBuilder->expects($this->exactly(2))
             ->method('updateEntityConfigs')
-            ->with(
-                $enumValueClassName1,
+            ->withConsecutive(
                 [
-                    'entity'     => [
-                        'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode1),
-                        'plural_label' => ExtendHelper::getEnumTranslationKey('plural_label', $enumCode1),
-                        'description'  => ExtendHelper::getEnumTranslationKey('description', $enumCode1)
-                    ],
-                    'extend'     => [
-                        'owner'     => ExtendScope::OWNER_SYSTEM,
-                        'is_extend' => true,
-                        'table'     => $this->nameGenerator->generateEnumTableName($enumCode1),
-                        'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
-                    ],
-                    'enum'       => [
-                        'code'     => $enumCode1,
-                        'public'   => true,
-                        'multiple' => false
-                    ]
-                ]
-            );
-        $this->setAddEnumValueEntityFieldsExpectations(
-            $enumValueClassName1,
-            $enumCode1,
-            $configManagerAt,
-            $relationBuilderAt
-        );
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
-            ->method('addManyToOneRelation')
-            ->with(
-                $this->identicalTo($entityConfig1),
-                $enumValueClassName1,
-                'field1',
-                'name',
-                [
-                    'enum'         => [
-                        'enum_code' => $enumCode1
+                    $enumValueClassName1,
+                    [
+                        'entity' => [
+                            'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode1),
+                            'plural_label' => ExtendHelper::getEnumTranslationKey('plural_label', $enumCode1),
+                            'description'  => ExtendHelper::getEnumTranslationKey('description', $enumCode1)
+                        ],
+                        'extend' => [
+                            'owner'     => ExtendScope::OWNER_SYSTEM,
+                            'is_extend' => true,
+                            'table'     => $this->nameGenerator->generateEnumTableName($enumCode1),
+                            'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
+                        ],
+                        'enum'   => [
+                            'code'     => $enumCode1,
+                            'public'   => true,
+                            'multiple' => false
+                        ]
                     ]
                 ],
-                'enum'
-            );
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
-            ->method('updateEntityConfigs')
-            ->with(
-                $enumValueClassName2,
                 [
-                    'enum' => [
-                        'public' => true
+                    $enumValueClassName2,
+                    [
+                        'enum' => [
+                            'public' => true
+                        ]
                     ]
                 ]
             );
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
+        $this->relationBuilder->expects($this->exactly(2))
+            ->method('addManyToOneRelation')
+            ->withConsecutive(
+                [
+                    $this->identicalTo($entityConfig1),
+                    $enumValueClassName1,
+                    'field1',
+                    'name',
+                    [
+                        'enum' => [
+                            'enum_code' => $enumCode1
+                        ]
+                    ],
+                    'enum'
+                ],
+                [
+                    $this->identicalTo($entityConfig1),
+                    $enumValueClassName5,
+                    'field5',
+                    'name',
+                    [
+                        'enum' => [
+                            'enum_code' => $enumCode5
+                        ]
+                    ],
+                    'enum'
+                ]
+            );
+        $this->relationBuilder->expects($this->once())
             ->method('addManyToManyRelation')
             ->with(
                 $this->identicalTo($entityConfig1),
@@ -226,28 +221,14 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                 ['name'],
                 ['name'],
                 [
-                    'enum'         => [
+                    'enum'   => [
                         'enum_code' => $enumCode2
                     ],
-                    'extend'       => [
+                    'extend' => [
                         'without_default' => true
                     ]
                 ],
                 'multiEnum'
-            );
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
-            ->method('addManyToOneRelation')
-            ->with(
-                $this->identicalTo($entityConfig1),
-                $enumValueClassName5,
-                'field5',
-                'name',
-                [
-                    'enum'         => [
-                        'enum_code' => $enumCode5
-                    ]
-                ],
-                'enum'
             );
 
         $this->extension->preUpdate();
@@ -267,85 +248,67 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $enumFieldConfig1 = new Config(new FieldConfigId('enum', 'Test\EnumValue1', 'field1', 'enum'));
 
         $entityConfigs = [$entityConfig1];
-        $fieldConfigs  = [$fieldConfig1];
+        $fieldConfigs = [$fieldConfig1];
 
-        $enumCode1           = ExtendHelper::generateEnumCode('Test\EnumValue1', 'field1');
+        $enumCode1 = ExtendHelper::generateEnumCode('Test\EnumValue1', 'field1');
         $enumValueClassName1 = ExtendHelper::buildEnumValueClassName($enumCode1);
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $enumConfigProvider   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->any())
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['enum', $enumConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['enum', $enumConfigProvider],
+            ]);
         $this->extendEntityConfigProvider->expects($this->once())
             ->method('getExtendEntityConfigs')
-            ->will($this->returnValue($entityConfigs));
-        $extendConfigProvider->expects($this->at(0))
+            ->willReturn($entityConfigs);
+        $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($entityConfig1->getId()->getClassName())
-            ->will($this->returnValue($fieldConfigs));
-        $enumConfigProvider->expects($this->at(0))
+            ->willReturn($fieldConfigs);
+        $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($entityConfig1->getId()->getClassName(), 'field1')
-            ->will($this->returnValue($enumFieldConfig1));
+            ->willReturn($enumFieldConfig1);
 
         $this->configManager->expects($this->once())
             ->method('hasConfigEntityModel')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$enumValueClassName1, false],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                [$enumValueClassName1, false],
+            ]);
 
-        $configManagerAt = 3;
-        $this->configManager->expects($this->at($configManagerAt++))
+        $this->configManager->expects($this->once())
             ->method('createConfigEntityModel')
             ->with($enumValueClassName1, ConfigModel::MODE_HIDDEN);
 
-        $relationBuilderAt = 0;
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
+        $this->setAddEnumValueEntityFieldsExpectations($enumValueClassName1, $enumCode1);
+
+        $this->relationBuilder->expects($this->once())
             ->method('updateEntityConfigs')
             ->with(
                 $enumValueClassName1,
                 [
-                    'entity'     => [
+                    'entity' => [
                         'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode1),
                         'plural_label' => ExtendHelper::getEnumTranslationKey('plural_label', $enumCode1),
                         'description'  => ExtendHelper::getEnumTranslationKey('description', $enumCode1)
                     ],
-                    'extend'     => [
+                    'extend' => [
                         'owner'     => ExtendScope::OWNER_SYSTEM,
                         'is_extend' => true,
                         'table'     => $this->nameGenerator->generateEnumTableName($enumCode1, true),
                         'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                     ],
-                    'enum'       => [
+                    'enum'   => [
                         'code'     => $enumCode1,
                         'public'   => false,
                         'multiple' => false
                     ]
                 ]
             );
-        $this->setAddEnumValueEntityFieldsExpectations(
-            $enumValueClassName1,
-            $enumCode1,
-            $configManagerAt,
-            $relationBuilderAt
-        );
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
+        $this->relationBuilder->expects($this->once())
             ->method('addManyToOneRelation')
             ->with(
                 $this->identicalTo($entityConfig1),
@@ -353,7 +316,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
                 'field1',
                 'name',
                 [
-                    'enum'         => [
+                    'enum' => [
                         'enum_code' => $enumCode1
                     ]
                 ],
@@ -363,91 +326,73 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->preUpdate();
     }
 
-    /**
-     * @param $enumValueClassName
-     * @param $enumCode
-     * @param $configManagerAt
-     * @param $relationBuilderAt
-     */
-    protected function setAddEnumValueEntityFieldsExpectations(
-        $enumValueClassName,
-        $enumCode,
-        &$configManagerAt,
-        &$relationBuilderAt
-    ) {
-        $this->configManager->expects($this->at($configManagerAt++))
+    private function setAddEnumValueEntityFieldsExpectations(string $enumValueClassName, string $enumCode): void
+    {
+        $this->configManager->expects($this->exactly(4))
             ->method('createConfigFieldModel')
-            ->with($enumValueClassName, 'id', 'string');
-        $this->configManager->expects($this->at($configManagerAt++))
-            ->method('createConfigFieldModel')
-            ->with($enumValueClassName, 'name', 'string');
-        $this->configManager->expects($this->at($configManagerAt++))
-            ->method('createConfigFieldModel')
-            ->with($enumValueClassName, 'priority', 'integer');
-        $this->configManager->expects($this->at($configManagerAt++))
-            ->method('createConfigFieldModel')
-            ->with($enumValueClassName, 'default', 'boolean');
+            ->withConsecutive(
+                [$enumValueClassName, 'id', 'string'],
+                [$enumValueClassName, 'name', 'string'],
+                [$enumValueClassName, 'priority', 'integer'],
+                [$enumValueClassName, 'default', 'boolean']
+            );
 
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
+        $this->relationBuilder->expects($this->exactly(4))
             ->method('updateFieldConfigs')
-            ->with(
-                $enumValueClassName,
-                'id',
+            ->withConsecutive(
                 [
-                    'entity' => [
-                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
-                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
-                    ],
-                    'importexport' => [
-                        'identity' => false,
-                    ],
-                ]
-            );
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
-            ->method('updateFieldConfigs')
-            ->with(
-                $enumValueClassName,
-                'name',
-                [
-                    'entity' => [
-                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
-                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
-                    ],
-                    'datagrid' => [
-                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
-                    ],
-                    'importexport' => [
-                        'identity' => true,
-                    ],
-                ]
-            );
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
-            ->method('updateFieldConfigs')
-            ->with(
-                $enumValueClassName,
-                'priority',
-                [
-                    'entity' => [
-                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
-                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
-                    ],
-                    'datagrid' => [
-                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                    $enumValueClassName,
+                    'id',
+                    [
+                        'entity'       => [
+                            'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
+                            'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
+                        ],
+                        'importexport' => [
+                            'identity' => false,
+                        ],
                     ]
-                ]
-            );
-        $this->relationBuilder->expects($this->at($relationBuilderAt++))
-            ->method('updateFieldConfigs')
-            ->with(
-                $enumValueClassName,
-                'default',
+                ],
                 [
-                    'entity' => [
-                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
-                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
-                    ],
-                    'datagrid' => [
-                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                    $enumValueClassName,
+                    'name',
+                    [
+                        'entity'       => [
+                            'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
+                            'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
+                        ],
+                        'datagrid'     => [
+                            'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                        ],
+                        'importexport' => [
+                            'identity' => true,
+                        ],
+                    ]
+                ],
+                [
+                    $enumValueClassName,
+                    'priority',
+                    [
+                        'entity'   => [
+                            'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
+                            'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
+                        ],
+                        'datagrid' => [
+                            'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                        ]
+                    ]
+                ],
+                [
+                    $enumValueClassName,
+                    'default',
+                    [
+                        'entity'   => [
+                            'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
+                            'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
+                        ],
+                        'datagrid' => [
+                            'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                        ]
                     ]
                 ]
             );
@@ -464,7 +409,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'doctrine' => [
                     'Test\EnumValue2' => [
-                        'repositoryClass' => 'Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository'
+                        'repositoryClass' => EnumValueRepository::class
                     ]
                 ]
             ]
@@ -472,16 +417,14 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $entityConfigs = [$entityConfig1, $entityConfig2];
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $this->extendEntityConfigProvider->expects($this->once())
             ->method('getExtendEntityConfigs')
-            ->will($this->returnValue($entityConfigs));
+            ->willReturn($entityConfigs);
 
         $this->configManager->expects($this->once())
             ->method('persist')
@@ -493,10 +436,10 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'doctrine' => [
                     'Test\EnumValue1' => [
-                        'repositoryClass' => 'Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository',
+                        'repositoryClass' => EnumValueRepository::class,
                         'gedmo'           => [
                             'translation' => [
-                                'entity' => 'Oro\Bundle\EntityExtendBundle\Entity\EnumValueTranslation'
+                                'entity' => EnumValueTranslation::class
                             ]
                         ]
                     ]
@@ -532,22 +475,20 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig3 = new Config(new FieldConfigId('extend', 'Test\EnumValue1', 'field3', 'enum'));
 
         $entityConfigs = [$entityConfig1, $entityConfig2];
-        $fieldConfigs  = [$fieldConfig1, $fieldConfig2, $fieldConfig3];
+        $fieldConfigs = [$fieldConfig1, $fieldConfig2, $fieldConfig3];
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $this->extendEntityConfigProvider->expects($this->once())
             ->method('getExtendEntityConfigs')
-            ->will($this->returnValue($entityConfigs));
-        $extendConfigProvider->expects($this->at(0))
+            ->willReturn($entityConfigs);
+        $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($entityConfig1->getId()->getClassName())
-            ->will($this->returnValue($fieldConfigs));
+            ->willReturn($fieldConfigs);
 
         $this->configManager->expects($this->once())
             ->method('persist')
@@ -606,22 +547,20 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig3 = new Config(new FieldConfigId('extend', 'Extend\EnumValue1', 'field3', 'enum'));
 
         $entityConfigs = [$entityConfig1, $entityConfig2];
-        $fieldConfigs  = [$fieldConfig1, $fieldConfig2, $fieldConfig3];
+        $fieldConfigs = [$fieldConfig1, $fieldConfig2, $fieldConfig3];
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $this->extendEntityConfigProvider->expects($this->once())
             ->method('getExtendEntityConfigs')
-            ->will($this->returnValue($entityConfigs));
-        $extendConfigProvider->expects($this->at(0))
+            ->willReturn($entityConfigs);
+        $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($entityConfig1->getId()->getClassName())
-            ->will($this->returnValue($fieldConfigs));
+            ->willReturn($fieldConfigs);
 
         $this->configManager->expects($this->once())
             ->method('persist')
@@ -678,22 +617,20 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig->set('is_deleted', true);
 
         $entityConfigs = [$entityConfig];
-        $fieldConfigs  = [$fieldConfig];
+        $fieldConfigs = [$fieldConfig];
 
-        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $this->extendEntityConfigProvider->expects($this->once())
             ->method('getExtendEntityConfigs')
-            ->will($this->returnValue($entityConfigs));
-        $extendConfigProvider->expects($this->at(0))
+            ->willReturn($entityConfigs);
+        $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with($entityConfig->getId()->getClassName())
-            ->will($this->returnValue($fieldConfigs));
+            ->willReturn($fieldConfigs);
 
         $this->configManager->expects($this->once())
             ->method('persist')

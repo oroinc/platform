@@ -3,129 +3,126 @@
 namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
 use Doctrine\Common\Annotations\Reader as AnnotationReader;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
+use Oro\Component\Config\ResourcesContainerInterface;
 
+/**
+ * Loads ACL annotations from PHP classes of controllers.
+ */
 class AclAnnotationLoader implements AclAnnotationLoaderInterface
 {
-    const ANNOTATION_CLASS = 'Oro\Bundle\SecurityBundle\Annotation\Acl';
-    const ANCESTOR_CLASS   = 'Oro\Bundle\SecurityBundle\Annotation\AclAncestor';
+    private const ANNOTATION_CLASS = Acl::class;
+    private const ANCESTOR_CLASS   = AclAncestor::class;
 
-    /**
-     * @var AnnotationReader
-     */
+    /** @var ControllerClassProvider */
+    private $controllerClassProvider;
+
+    /** @var AnnotationReader */
     private $reader;
 
-    /**
-     * Constructor
-     *
-     * @param AnnotationReader $reader
-     */
-    public function __construct(AnnotationReader $reader)
+    public function __construct(ControllerClassProvider $controllerClassProvider, AnnotationReader $reader)
     {
+        $this->controllerClassProvider = $controllerClassProvider;
         $this->reader = $reader;
     }
 
     /**
-     * Loads ACL annotations from PHP files
-     *
-     * @param AclAnnotationStorage $storage
+     * {@inheritdoc}
      */
-    public function load(AclAnnotationStorage $storage)
+    public function load(AclAnnotationStorage $storage, ResourcesContainerInterface $resourcesContainer): void
     {
-        $configLoader = self::getAclAnnotationResourceLoader();
-        $resources    = $configLoader->load();
-        foreach ($resources as $resource) {
-            foreach ($resource->data as $file) {
-                $className = $this->getClassName($file);
-                if ($className !== null) {
-                    $reflection = $this->getReflectionClass($className);
-                    // read annotations from class
-                    $annotation = $this->reader->getClassAnnotation($reflection, self::ANNOTATION_CLASS);
-                    if ($annotation) {
-                        $storage->add($annotation, $reflection->getName());
-                    } else {
-                        $ancestor = $this->reader->getClassAnnotation($reflection, self::ANCESTOR_CLASS);
-                        if ($ancestor) {
-                            $storage->addAncestor($ancestor, $reflection->getName());
-                        }
-                    }
-                    // read annotations from methods
-                    foreach ($reflection->getMethods() as $reflectionMethod) {
-                        $annotation = $this->reader->getMethodAnnotation($reflectionMethod, self::ANNOTATION_CLASS);
-                        if ($annotation) {
-                            $storage->add($annotation, $reflection->getName(), $reflectionMethod->getName());
-                        } else {
-                            $ancestor = $this->reader->getMethodAnnotation($reflectionMethod, self::ANCESTOR_CLASS);
-                            if ($ancestor) {
-                                $storage->addAncestor($ancestor, $reflection->getName(), $reflectionMethod->getName());
-                            }
-                        }
+        $controllerActions = [];
+        $controllers = $this->controllerClassProvider->getControllers();
+        foreach ($controllers as list($controller, $method)) {
+            $controllerActions[$controller][] = $method;
+        }
+        $resourcesContainer->addResource($this->controllerClassProvider->getCacheResource());
+
+        $processedClasses = [];
+        foreach ($controllerActions as $class => $methods) {
+            $parentClass = null;
+            $classHierarchy = $this->getClassHierarchy($class);
+            foreach ($classHierarchy as $className) {
+                // class already processed
+                if (array_key_exists($className, $processedClasses)) {
+                    continue;
+                }
+
+                $initialBindings = $storage->getBindings($className);
+                $storage->removeBindings($className);
+
+                // copy parent class annotation bindings to current class bindings
+                if ($parentClass && $storage->isKnownClass($parentClass)) {
+                    foreach ($storage->getBindings($parentClass) as $method => $annotationName) {
+                        $storage->addBinding($annotationName, $className, $method);
                     }
                 }
+
+                $this->loadClassAnnotations($className, $storage);
+
+                // apply initial bindings
+                foreach ($initialBindings as $method => $annotationName) {
+                    $storage->removeBinding($className, $method);
+                    $storage->addBinding($annotationName, $className, $method);
+                }
+
+                $processedClasses[$className] = true;
+                $parentClass = $className;
             }
         }
     }
 
     /**
-     * Gets a class name from the given file.
+     * @param string $className
      *
-     * Restrictions:
-     *      - only one class must be declared in a file
-     *      - a namespace must be declared in a file
-     *
-     * @param  string $fileName
-     * @return null|string the fully qualified class name or null if the class name cannot be extracted
+     * @return string[]
      */
-    protected function getClassName($fileName)
+    private function getClassHierarchy(string $className): array
     {
-        $src = $this->getFileContent($fileName);
-        if (!preg_match('#' . str_replace("\\", "\\\\", self::ANNOTATION_CLASS) . '#', $src)) {
-            return null;
-        }
+        $classHierarchy = array_reverse(class_parents($className));
+        $classHierarchy[] = $className;
 
-        if (!preg_match('/\bnamespace\s+([^;]+);/s', $src, $match)) {
-            return null;
-        }
-        $namespace = $match[1];
-
-        if (!preg_match('/\bclass\s+([^\s]+)\s+(?:extends|implements|{)/s', $src, $match)) {
-            return null;
-        }
-
-        return $namespace . '\\' . $match[1];
+        return $classHierarchy;
     }
 
     /**
-     * Creates ReflectionClass object
-     *
-     * @param  string $className
-     * @return \ReflectionClass
+     * Loads annotations from given class.
      */
-    protected function getReflectionClass($className)
+    private function loadClassAnnotations(string $className, AclAnnotationStorage $storage): void
     {
-        return new \ReflectionClass($className);
-    }
+        $reflection = new \ReflectionClass($className);
 
-    /**
-     * Reads the given file into a string
-     *
-     * @param  string $fileName
-     * @return string
-     */
-    protected function getFileContent($fileName)
-    {
-        return file_get_contents($fileName);
-    }
+        // read annotations from class
+        $storage->removeBinding($reflection->getName());
+        /** @var Acl|null $annotation */
+        $annotation = $this->reader->getClassAnnotation($reflection, self::ANNOTATION_CLASS);
+        if ($annotation) {
+            $storage->add($annotation, $reflection->getName());
+        } else {
+            /** @var AclAncestor|null $ancestor */
+            $ancestor = $this->reader->getClassAnnotation($reflection, self::ANCESTOR_CLASS);
+            if ($ancestor) {
+                $storage->addAncestor($ancestor, $reflection->getName());
+            }
+        }
 
-    /**
-     * @return CumulativeConfigLoader
-     */
-    public static function getAclAnnotationResourceLoader()
-    {
-        return new CumulativeConfigLoader(
-            'oro_acl_annotation',
-            new AclAnnotationCumulativeResourceLoader(['Controller'])
-        );
+        // read annotations from methods
+        foreach ($reflection->getMethods() as $reflectionMethod) {
+            $storage->removeBinding($reflection->getName(), $reflectionMethod->getName());
+            /** @var Acl|null $annotation */
+            $annotation = $this->reader->getMethodAnnotation($reflectionMethod, self::ANNOTATION_CLASS);
+            if ($annotation) {
+                $storage->add($annotation, $reflection->getName(), $reflectionMethod->getName());
+            } else {
+                /** @var AclAncestor|null $ancestor */
+                $ancestor = $this->reader->getMethodAnnotation($reflectionMethod, self::ANCESTOR_CLASS);
+                if ($ancestor) {
+                    $storage->addAncestor($ancestor, $reflection->getName(), $reflectionMethod->getName());
+                }
+            }
+        }
     }
 }

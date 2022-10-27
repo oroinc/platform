@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Handler;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
@@ -11,22 +11,13 @@ use Psr\Log\LoggerInterface;
 
 class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FileManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $fileManager;
+    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * @var ExportHandler
-     */
-    private $exportHandler;
+    private ExportHandler $exportHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -36,7 +27,6 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $this->exportHandler->setFileManager($this->fileManager);
         $this->exportHandler->setLogger($this->logger);
     }
-
 
     public function testHandleExceptionsAreAddedToContext()
     {
@@ -54,6 +44,11 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
             ->expects(self::once())
             ->method('read')
             ->willThrowException($exception);
+
+        $this->fileManager
+            ->expects(self::once())
+            ->method('deleteFile')
+            ->with(self::matchesRegularExpression('/\/.+?\/datagrid_.+?\.'.$format.'/'));
 
         $result = $this->exportHandler->handle($reader, $processor, $writer, $contextParameters, $batchSize, $format);
 

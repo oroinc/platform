@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
+/**
+ * Common interface for translation templates.
+ */
 interface TranslationKeyTemplateInterface
 {
     /**
@@ -12,7 +15,7 @@ interface TranslationKeyTemplateInterface
     /**
      * @return string
      */
-    public function getTemplate();
+    public function getTemplate(): string;
 
     /**
      * @return array

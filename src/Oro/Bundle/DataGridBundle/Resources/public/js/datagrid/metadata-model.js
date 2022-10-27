@@ -1,8 +1,6 @@
 define(['backbone'], function(Backbone) {
     'use strict';
 
-    var MetadataModel;
-
     /**
      * Datagrid metadata model
      *
@@ -10,7 +8,7 @@ define(['backbone'], function(Backbone) {
      * @class   orodatagrid.datagrid.MetadataModel
      * @extends Backbone.Model
      */
-    MetadataModel = Backbone.Model.extend({
+    const MetadataModel = Backbone.Model.extend({
         defaults: {
             columns: [],
             options: {},
@@ -21,10 +19,10 @@ define(['backbone'], function(Backbone) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function MetadataModel() {
-            MetadataModel.__super__.constructor.apply(this, arguments);
+        constructor: function MetadataModel(attrs, options) {
+            MetadataModel.__super__.constructor.call(this, attrs, options);
         }
     });
 

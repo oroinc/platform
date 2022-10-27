@@ -18,17 +18,11 @@ class DemoDataFixturesListener
     /** @var OptionalListenerManager */
     private $listenerManager;
 
-    /**
-     * @param OptionalListenerManager $listenerManager
-     */
     public function __construct(OptionalListenerManager $listenerManager)
     {
         $this->listenerManager = $listenerManager;
     }
 
-    /**
-     * @param MigrationDataFixturesEvent $event
-     */
     public function onPreLoad(MigrationDataFixturesEvent $event)
     {
         if ($event->isDemoFixtures()) {
@@ -36,9 +30,6 @@ class DemoDataFixturesListener
         }
     }
 
-    /**
-     * @param MigrationDataFixturesEvent $event
-     */
     public function onPostLoad(MigrationDataFixturesEvent $event)
     {
         if ($event->isDemoFixtures()) {

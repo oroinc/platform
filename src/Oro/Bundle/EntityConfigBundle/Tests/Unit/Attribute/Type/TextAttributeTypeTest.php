@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\TextAttributeType;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class TextAttributeTypeTest extends AttributeTypeTestCase
 {
@@ -13,11 +13,6 @@ class TextAttributeTypeTest extends AttributeTypeTestCase
     protected function getAttributeType()
     {
         return new TextAttributeType();
-    }
-
-    public function testGetType()
-    {
-        $this->assertEquals('text', $this->getAttributeType()->getType());
     }
 
     /**
@@ -39,7 +34,7 @@ class TextAttributeTypeTest extends AttributeTypeTestCase
         $this->assertSame(
             $string,
             $this->getAttributeType()
-                ->getSearchableValue($this->attribute, new StubEnumValue('id', $string), $this->localization)
+                ->getSearchableValue($this->attribute, new TestEnumValue('id', $string), $this->localization)
         );
     }
 
@@ -50,16 +45,15 @@ class TextAttributeTypeTest extends AttributeTypeTestCase
         $this->assertSame(
             $string,
             $this->getAttributeType()
-                ->getFilterableValue($this->attribute, new StubEnumValue('id', $string), $this->localization)
+                ->getFilterableValue($this->attribute, new TestEnumValue('id', $string), $this->localization)
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetSortableValue()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->getAttributeType()->getSortableValue($this->attribute, true, $this->localization);
     }
 }

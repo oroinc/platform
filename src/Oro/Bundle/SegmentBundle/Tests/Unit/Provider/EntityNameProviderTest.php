@@ -8,16 +8,14 @@ use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityNameProvider */
-    protected $provider;
+    private $provider;
 
     /** @var AbstractQueryDesigner|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entity;
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entity = $this->getMockBuilder('Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner')
-            ->setMethods(['getEntity'])
-            ->getMockForAbstractClass();
+        $this->entity = $this->createMock(AbstractQueryDesigner::class);
 
         $this->provider = new EntityNameProvider();
     }
@@ -29,7 +27,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $entityName = 'Acme\Entity\Test\Entity';
         $this->entity->expects($this->once())
             ->method('getEntity')
-            ->will($this->returnValue($entityName));
+            ->willReturn($entityName);
 
         $this->provider->setCurrentItem($this->entity);
         $this->assertEquals($entityName, $this->provider->getEntityName());

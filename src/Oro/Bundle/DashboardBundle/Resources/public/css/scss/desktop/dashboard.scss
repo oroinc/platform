@@ -1,0 +1,17 @@
+/* @theme: admin.oro; */
+
+.dashboard-widget-items {
+    .controls.items-table-container {
+        max-width: calc(100% - #{$form-horizontal-control-label-width} - #{$form-horizontal-control-margin-start});
+    }
+}
+
+@media only screen and (max-width: 855px) {
+    .dashboard-widget-items {
+        .controls.items-table-container {
+            .actions-wrap {
+                float: right;
+            }
+        }
+    }
+}

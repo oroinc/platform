@@ -12,15 +12,12 @@ use Oro\Bundle\IntegrationBundle\Test\FakeRestResponse as Response;
  */
 class FakeRestClientTest extends \PHPUnit\Framework\TestCase
 {
-    const FAKE_RESOURCE = '/foo';
+    private const FAKE_RESOURCE = '/foo';
 
     /** @var FakeRestClient */
-    protected $client;
+    private $client;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->client = new FakeRestClient();
     }
@@ -63,29 +60,28 @@ class FakeRestClientTest extends \PHPUnit\Framework\TestCase
     {
         $this->client->setDefaultResponse(new Response(200, [], '[]'));
 
-        $this->assertTrue(is_array($this->client->getJSON(self::FAKE_RESOURCE)));
+        $this->assertIsArray($this->client->getJSON(self::FAKE_RESOURCE));
     }
 
     public function testSetResponseList()
     {
         $this->client->setResponseList([
             '/foo' => new Response(200),
-            '/bar' => new Response(302),
+            '/bar' => new Response(304),
         ]);
 
         $this->assertCorrectRestResponse(200, $this->client->get(self::FAKE_RESOURCE));
-        $this->assertCorrectRestResponse(302, $this->client->get('/bar'));
+        $this->assertCorrectRestResponse(304, $this->client->get('/bar'));
     }
 
     /**
      * Asserts that client returned valid RestResponse with expected status code
-     *
-     * @param int $expectedStatusCode expected status code
-     * @param mixed $restResponse actual response from client
-     * @param string $errorMessage message which will be shown in case of failed assertion
      */
-    private function assertCorrectRestResponse($expectedStatusCode, $restResponse, $errorMessage = null)
-    {
+    private function assertCorrectRestResponse(
+        int $expectedStatusCode,
+        mixed $restResponse,
+        string $errorMessage = ''
+    ): void {
         $this->assertInstanceOf(RestResponseInterface::class, $restResponse, $errorMessage);
         /** @var RestResponseInterface $restResponse */
         $this->assertEquals($expectedStatusCode, $restResponse->getStatusCode(), $errorMessage);

@@ -9,6 +9,9 @@ use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 
+/**
+ * Provides basic implementation for entities which implement MenuUpdateInterface.
+ */
 trait MenuUpdateTrait
 {
     use FallbackTrait;
@@ -61,7 +64,7 @@ trait MenuUpdateTrait
     /**
      * @var string
      *
-     * @ORM\Column(name="uri", type="string", length=1023, nullable=true)
+     * @ORM\Column(name="uri", type="string", length=8190, nullable=true)
      */
     protected $uri;
 
@@ -322,7 +325,6 @@ trait MenuUpdateTrait
         return $this;
     }
 
-
     /**
      * @return boolean
      */
@@ -388,17 +390,14 @@ trait MenuUpdateTrait
      */
     public function prePersist()
     {
-        if ($this->key === null) {
-            $this->key = $this->generateKey();
-        }
+        $this->generateKey();
     }
 
-    /**
-     * @return string
-     */
-    private function generateKey()
+    public function generateKey()
     {
-        return uniqid('menu_item_');
+        if ($this->key === null) {
+            $this->key = uniqid('menu_item_');
+        }
     }
 
     /**

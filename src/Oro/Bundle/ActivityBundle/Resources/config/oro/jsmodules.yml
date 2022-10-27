@@ -1,0 +1,6 @@
+dynamic-imports:
+    commons:
+        - oroactivity/js/app/components/activity-context-activity-component
+        - oroactivity/js/app/views/activity-context-activity-view
+    orodatagrid:
+        - oroactivity/js/app/components/activity-context-component

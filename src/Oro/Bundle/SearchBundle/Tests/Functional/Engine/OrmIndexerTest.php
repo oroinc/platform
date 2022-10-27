@@ -2,6 +2,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
@@ -17,16 +18,19 @@ class OrmIndexerTest extends WebTestCase
 {
     use SearchExtensionTrait;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
-        if ($this->getContainer()->getParameter('oro_search.engine') != 'orm') {
+        $engine = static::getContainer()
+            ->get('oro_search.engine.parameters')
+            ->getEngineName();
+        if ($engine != 'orm') {
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->clearIndexTextTable();
     }
@@ -249,10 +253,7 @@ class OrmIndexerTest extends WebTestCase
         $this->assertCount(0, $indexItemRepository->findBy(['entity' => Item::class]));
     }
 
-    /**
-     * @return \Doctrine\Bundle\DoctrineBundle\Registry
-     */
-    protected function getDoctrine()
+    private function getDoctrine(): ManagerRegistry
     {
         return $this->getContainer()->get('doctrine');
     }
@@ -260,7 +261,7 @@ class OrmIndexerTest extends WebTestCase
     /**
      * @return \Oro\Bundle\SearchBundle\Engine\OrmIndexer
      */
-    protected function getSearchIndexer()
+    private function getSearchIndexer()
     {
         return $this->getContainer()->get('oro_search.search.engine.indexer');
     }

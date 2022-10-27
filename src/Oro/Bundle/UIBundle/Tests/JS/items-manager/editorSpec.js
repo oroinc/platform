@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('oroui/js/items-manager/editor');
-    var Backbone = require('backbone');
+    const $ = require('oroui/js/items-manager/editor');
+    const Backbone = require('backbone');
 
     describe('oroui/js/items-manager/editor', function() {
-        var $el;
+        let $el;
 
         beforeEach(function() {
             $el = $('<div>');
@@ -69,7 +69,7 @@ define(function(require) {
         });
 
         it('sets inputs from edited model', function() {
-            var collection = new Backbone.Collection([{
+            const collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
                 desc: 'Description'
@@ -87,7 +87,7 @@ define(function(require) {
         });
 
         it('updates edited model on button click', function() {
-            var collection = new Backbone.Collection([{
+            const collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
                 desc: 'Description'
@@ -111,7 +111,7 @@ define(function(require) {
         });
 
         it('does not update edited model on button click', function() {
-            var collection = new Backbone.Collection([{
+            const collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
                 desc: 'Description'
@@ -135,7 +135,7 @@ define(function(require) {
         });
 
         it('creates model on button click', function() {
-            var collection = new Backbone.Collection();
+            const collection = new Backbone.Collection();
 
             $el.itemsManagerEditor({
                 collection: collection
@@ -153,7 +153,7 @@ define(function(require) {
         });
 
         it('does not create model on button click', function() {
-            var collection = new Backbone.Collection();
+            const collection = new Backbone.Collection();
 
             $el.itemsManagerEditor({
                 collection: collection
@@ -169,7 +169,7 @@ define(function(require) {
         });
 
         it('resets inputs if model removed', function() {
-            var collection = new Backbone.Collection([{
+            const collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
                 desc: 'Description'
@@ -188,7 +188,7 @@ define(function(require) {
         });
 
         it('hides edit button if new model', function() {
-            var collection = new Backbone.Collection([{
+            const collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
                 desc: 'Description'
@@ -202,7 +202,7 @@ define(function(require) {
         });
 
         it('hides add button if editing model', function() {
-            var collection = new Backbone.Collection([{
+            const collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
                 desc: 'Description'
@@ -218,7 +218,7 @@ define(function(require) {
         });
 
         it('calls setter for each input', function() {
-            var collection = new Backbone.Collection([{
+            const collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
                 desc: 'Description'
@@ -248,7 +248,7 @@ define(function(require) {
         });
 
         it('calls getter for each input', function() {
-            var collection = new Backbone.Collection([{
+            const collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
                 desc: 'Description'

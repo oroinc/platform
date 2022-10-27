@@ -3,27 +3,24 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\DataGrid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\Config as EntityConfig;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\EventListener\DataGrid\MergeMassActionListener;
 
 class MergeMassActionListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MergeMassActionListener
-     */
-    private $mergeMassActionListener;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigProvider;
 
-    protected function setUp()
+    /** @var MergeMassActionListener */
+    private $mergeMassActionListener;
+
+    protected function setUp(): void
     {
-        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
 
         $this->mergeMassActionListener = new MergeMassActionListener($this->entityConfigProvider);
     }
@@ -98,28 +95,18 @@ class MergeMassActionListenerTest extends \PHPUnit\Framework\TestCase
         $this->mergeMassActionListener->onBuildBefore($event);
     }
 
-    /**
-     * @param DatagridConfiguration $datagridConfig
-     *
-     * @return BuildBefore
-     */
-    protected function getBuildBeforeEvent(DatagridConfiguration $datagridConfig)
+    private function getBuildBeforeEvent(DatagridConfiguration $datagridConfig): BuildBefore
     {
         return new BuildBefore(
-            $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface'),
+            $this->createMock(DatagridInterface::class),
             $datagridConfig
         );
     }
 
-    /**
-     * @param array $values
-     *
-     * @return EntityConfig
-     */
-    protected function getEntityConfig(array $values = [])
+    private function getEntityConfig(array $values = []): EntityConfig
     {
         return new EntityConfig(
-            $this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
+            $this->createMock(ConfigIdInterface::class),
             $values
         );
     }

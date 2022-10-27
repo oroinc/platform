@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\ImportExport\TemplateFixture\Provider;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\ImportExport\TemplateFixture;
 
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\AddressTypeFixture;
@@ -9,19 +9,17 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
 class AddressTypeFixtureTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AddressTypeFixture
-     */
-    protected $fixture;
+    /** @var AddressTypeFixture */
+    private $fixture;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->fixture = new AddressTypeFixture();
     }
 
     public function testGetEntityClass()
     {
-        $this->assertEquals('Oro\Bundle\AddressBundle\Entity\AddressType', $this->fixture->getEntityClass());
+        $this->assertEquals(AddressType::class, $this->fixture->getEntityClass());
     }
 
     public function testCreateEntity()

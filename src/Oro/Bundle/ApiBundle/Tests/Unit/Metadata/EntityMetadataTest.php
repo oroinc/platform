@@ -2,19 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName('Test\Class');
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setInheritedType(true);
         $entityMetadata->setHasIdentifierGenerator(true);
         $entityMetadata->setIdentifierFieldNames(['field1']);
@@ -28,6 +33,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->addField($field1);
         $association1 = new AssociationMetadata('association1');
         $entityMetadata->addAssociation($association1);
+        $entityMetadata->addLink('link1', new ExternalLinkMetadata('url1'));
 
         $entityMetadataClone = clone $entityMetadata;
 
@@ -40,7 +46,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testCloneForEmptyEntityMetadata()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
 
         $entityMetadataClone = clone $entityMetadata;
 
@@ -49,8 +55,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testToArray()
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName('Test\Class');
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setInheritedType(true);
         $entityMetadata->setHasIdentifierGenerator(true);
         $entityMetadata->setIdentifierFieldNames(['field1']);
@@ -67,6 +72,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $association1 = new AssociationMetadata('association1');
         $association1->setDataType('testDataType');
         $entityMetadata->addAssociation($association1);
+        $entityMetadata->addLink('link1', new ExternalLinkMetadata('url1'));
 
         self::assertEquals(
             [
@@ -79,6 +85,11 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
                 'meta_properties'          => [
                     'metaProperty1' => [
                         'data_type' => 'testDataType'
+                    ]
+                ],
+                'links'                    => [
+                    'link1' => [
+                        'url_template' => 'url1'
                     ]
                 ],
                 'fields'                   => [
@@ -102,26 +113,26 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testToArrayForEmptyEntityMetadata()
     {
-        $associationMetadata = new EntityMetadata();
+        $associationMetadata = new EntityMetadata('Test\Class');
 
         self::assertEquals(
-            [],
+            ['class' => 'Test\Class'],
             $associationMetadata->toArray()
         );
     }
 
     public function testClassName()
     {
-        $entityMetadata = new EntityMetadata();
-        self::assertNull($entityMetadata->getClassName());
-
-        $entityMetadata->setClassName('Test\Class');
+        $entityMetadata = new EntityMetadata('Test\Class');
         self::assertEquals('Test\Class', $entityMetadata->getClassName());
+
+        $entityMetadata->setClassName('Test\AnotherClass');
+        self::assertEquals('Test\AnotherClass', $entityMetadata->getClassName());
     }
 
     public function testIdentifierFieldNames()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         self::assertEmpty($entityMetadata->getIdentifierFieldNames());
         self::assertFalse($entityMetadata->hasIdentifierFields());
 
@@ -132,7 +143,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testInheritedType()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         self::assertFalse($entityMetadata->isInheritedType());
 
         $entityMetadata->setInheritedType(true);
@@ -144,7 +155,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testIdentifierGenerator()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         self::assertFalse($entityMetadata->hasIdentifierGenerator());
 
         $entityMetadata->setHasIdentifierGenerator(true);
@@ -154,9 +165,37 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($entityMetadata->hasIdentifierGenerator());
     }
 
+    public function testGetPropertyPath()
+    {
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $entityMetadata->addMetaProperty(new MetaPropertyMetadata('property1'));
+        $entityMetadata->addMetaProperty(new MetaPropertyMetadata('renamedProperty2'))
+            ->setPropertyPath('property2');
+        $entityMetadata->addField(new FieldMetadata('field1'));
+        $entityMetadata->addField(new FieldMetadata('renamedField2'))
+            ->setPropertyPath('field2');
+        $entityMetadata->addAssociation(new AssociationMetadata('association1'));
+        $entityMetadata->addAssociation(new AssociationMetadata('renamedAssociation2'))
+            ->setPropertyPath('association2');
+
+        self::assertEquals('property1', $entityMetadata->getPropertyPath('property1'));
+        self::assertEquals('property2', $entityMetadata->getPropertyPath('renamedProperty2'));
+        self::assertNull($entityMetadata->getPropertyPath('property2'));
+
+        self::assertEquals('field1', $entityMetadata->getPropertyPath('field1'));
+        self::assertEquals('field2', $entityMetadata->getPropertyPath('renamedField2'));
+        self::assertNull($entityMetadata->getPropertyPath('field2'));
+
+        self::assertEquals('association1', $entityMetadata->getPropertyPath('association1'));
+        self::assertEquals('association2', $entityMetadata->getPropertyPath('renamedAssociation2'));
+        self::assertNull($entityMetadata->getPropertyPath('association2'));
+
+        self::assertNull($entityMetadata->getPropertyPath('unknown'));
+    }
+
     public function testMetaProperties()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         self::assertCount(0, $entityMetadata->getMetaProperties());
         self::assertFalse($entityMetadata->hasProperty('unknown'));
         self::assertFalse($entityMetadata->hasMetaProperty('unknown'));
@@ -187,7 +226,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testFields()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         self::assertCount(0, $entityMetadata->getFields());
         self::assertFalse($entityMetadata->hasProperty('unknown'));
         self::assertFalse($entityMetadata->hasField('unknown'));
@@ -218,7 +257,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testAssociations()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         self::assertCount(0, $entityMetadata->getAssociations());
         self::assertFalse($entityMetadata->hasProperty('unknown'));
         self::assertFalse($entityMetadata->hasAssociation('unknown'));
@@ -249,7 +288,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testRenameMetaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $property1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('property1'));
         $property1->setDataType('string');
 
@@ -268,7 +307,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testRenameMetaPropertyViaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $property1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('property1'));
         $property1->setDataType('string');
 
@@ -287,7 +326,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testRenameField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $field1 = $entityMetadata->addField(new FieldMetadata('field1'));
         $field1->setDataType('string');
 
@@ -306,7 +345,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testRenameFieldViaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $field1 = $entityMetadata->addField(new FieldMetadata('field1'));
         $field1->setDataType('string');
 
@@ -325,7 +364,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testRenameAssociation()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $association1 = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
         $association1->setDataType('string');
 
@@ -344,7 +383,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testRenameAssociationViaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $association1 = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
         $association1->setDataType('string');
 
@@ -363,7 +402,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPropertyByPropertyPathWhenPropertyPathEqualsToName()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $field1 = $entityMetadata->addField(new FieldMetadata('field1'));
         $association1 = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
         $metaProperty1 = $entityMetadata->addMetaProperty(new MetaPropertyMetadata('metaProperty1'));
@@ -376,7 +415,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPropertyByPropertyPathWhenPropertyPathIsNotEqualToName()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $field1 = $entityMetadata->addField(new FieldMetadata('field1'));
         $field1->setPropertyPath('realField1');
         $association1 = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
@@ -392,7 +431,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPropertyByPropertyPathForIgnoredPropertyPath()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $field1 = $entityMetadata->addField(new FieldMetadata('field1'));
         $field1->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
         $association1 = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
@@ -407,7 +446,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testAttributes()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         self::assertFalse($entityMetadata->has('attribute1'));
         self::assertNull($entityMetadata->get('attribute1'));
 
@@ -423,15 +462,41 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($entityMetadata->get('attribute1'));
     }
 
+    public function testLinks()
+    {
+        $entityMetadata = new EntityMetadata('Test\Class');
+        self::assertCount(0, $entityMetadata->getLinks());
+        self::assertFalse($entityMetadata->hasLink('unknown'));
+        self::assertNull($entityMetadata->getLink('unknown'));
+
+        $link1 = new ExternalLinkMetadata('url1');
+        self::assertSame($link1, $entityMetadata->addLink('link1', $link1));
+        $link2 = new ExternalLinkMetadata('url2');
+        self::assertSame($link2, $entityMetadata->addLink('link2', $link2));
+        self::assertCount(2, $entityMetadata->getLinks());
+
+        self::assertTrue($entityMetadata->hasLink('link1'));
+        self::assertSame($link1, $entityMetadata->getLink('link1'));
+
+        $entityMetadata->removeLink('link1');
+        self::assertCount(1, $entityMetadata->getLinks());
+        self::assertFalse($entityMetadata->hasLink('link1'));
+        self::assertTrue($entityMetadata->hasLink('link2'));
+
+        $entityMetadata->removeLink('link2');
+        self::assertCount(0, $entityMetadata->getLinks());
+        self::assertFalse($entityMetadata->hasLink('link2'));
+    }
+
     public function testHasIdentifierFieldsOnlyForEmptyMetadata()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
     public function testHasIdentifierFieldsOnlyWithoutFields()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setIdentifierFieldNames(['id']);
 
         self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
@@ -439,7 +504,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsOnlyWithoutIdentifierFieldNames()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->addField(new FieldMetadata('id'));
 
         self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
@@ -447,7 +512,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsOnlySingleIdentityField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -456,7 +521,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsSingleIdentityFieldAndMetaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addMetaProperty(new MetaPropertyMetadata('meta'));
@@ -466,7 +531,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsOnlyCompositeIdentityFields()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setIdentifierFieldNames(['id1', 'id2']);
         $entityMetadata->addField(new FieldMetadata('id1'));
         $entityMetadata->addField(new FieldMetadata('id2'));
@@ -476,7 +541,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsOnlyCompositeIdentityFieldsReverseOrderOfFields()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setIdentifierFieldNames(['id1', 'id2']);
         $entityMetadata->addField(new FieldMetadata('id2'));
         $entityMetadata->addField(new FieldMetadata('id1'));
@@ -486,7 +551,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsCompositeIdentityFieldsAndMetaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setIdentifierFieldNames(['id1', 'id2']);
         $entityMetadata->addField(new FieldMetadata('id1'));
         $entityMetadata->addField(new FieldMetadata('id2'));
@@ -497,7 +562,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsAdditionField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('field1'));
@@ -507,7 +572,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsOnlyWhenMetadataContainsAssociation()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Class');
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addAssociation(new AssociationMetadata('association1'));
@@ -515,29 +580,16 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($entityMetadata->hasIdentifierFieldsOnly());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected argument of type "object", "integer" given.
-     */
-    public function testGetIdentifierValueForInvalidInputEntity()
-    {
-        $entityMetadata = new EntityMetadata();
-
-        $entityMetadata->getIdentifierValue(123);
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have identifier field(s).
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetIdentifierValueForEntityWithoutId()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have identifier field(s).'
+        );
+
         $entity = new Group();
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(Group::class);
+        $entityMetadata = new EntityMetadata(Group::class);
 
         $entityMetadata->getIdentifierValue($entity);
     }
@@ -547,8 +599,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entity = new Group();
         $entity->setId(123);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(Group::class);
+        $entityMetadata = new EntityMetadata(Group::class);
         $entityMetadata->setIdentifierFieldNames(['id']);
 
         self::assertSame(
@@ -562,8 +613,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entity = new Group();
         $entity->setId(123);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(Group::class);
+        $entityMetadata = new EntityMetadata(Group::class);
         $entityMetadata->setIdentifierFieldNames(['renamedId']);
         $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
 
@@ -573,19 +623,18 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The class "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have property "unknownProperty".
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetIdentifierValueForEntityWithSingleIdWhenIdPropertyDoesNotExist()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The class "%s" does not have property "unknownProperty".',
+            Group::class
+        ));
+
         $entity = new Group();
         $entity->setId(123);
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(Group::class);
+        $entityMetadata = new EntityMetadata(Group::class);
         $entityMetadata->setIdentifierFieldNames(['unknownProperty']);
 
         $entityMetadata->getIdentifierValue($entity);
@@ -597,8 +646,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entity->setId(123);
         $entity->setName('test');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(Group::class);
+        $entityMetadata = new EntityMetadata(Group::class);
         $entityMetadata->setIdentifierFieldNames(['id', 'name']);
 
         self::assertSame(
@@ -613,8 +661,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entity->setId(123);
         $entity->setName('test');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(Group::class);
+        $entityMetadata = new EntityMetadata(Group::class);
         $entityMetadata->setIdentifierFieldNames(['renamedId', 'renamedName']);
         $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
         $entityMetadata->addField(new FieldMetadata('renamedName'))->setPropertyPath('name');
@@ -625,20 +672,19 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The class "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have property "unknownProperty".
-     */
-    // @codingStandardsIgnoreEnd
     public function testGetIdentifierValueForEntityWithRenamedCompositeIdWhenIdPropertyDoesNotExist()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The class "%s" does not have property "unknownProperty".',
+            Group::class
+        ));
+
         $entity = new Group();
         $entity->setId(123);
         $entity->setName('test');
 
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(Group::class);
+        $entityMetadata = new EntityMetadata(Group::class);
         $entityMetadata->setIdentifierFieldNames(['id', 'unknownProperty']);
 
         $entityMetadata->getIdentifierValue($entity);

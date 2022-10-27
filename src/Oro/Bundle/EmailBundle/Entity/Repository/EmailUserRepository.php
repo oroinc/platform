@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -62,10 +63,12 @@ class EmailUserRepository extends EntityRepository
         $qb
             ->join('eu.folders', 'f')
             ->join('f.origin', 'o')
-            ->andWhere($qb->expr()->eq('eu.owner', $user->getId()))
-            ->andWhere($qb->expr()->eq('eu.organization', $organization->getId()))
+            ->andWhere($qb->expr()->eq('eu.owner', ':owner'))
+            ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
             ->andWhere($qb->expr()->eq('o.isActive', ':active'))
-            ->setParameter('active', true);
+            ->setParameter('active', true)
+            ->setParameter('owner', $user)
+            ->setParameter('organization', $organization);
 
         if ($folderTypes) {
             $qb->andWhere($qb->expr()->in('f.type', ':folderTypes'))->setParameter('folderTypes', $folderTypes);
@@ -102,7 +105,7 @@ class EmailUserRepository extends EntityRepository
 
         if ($date) {
             $qb->andWhere($qb->expr()->gt('email_user.receivedAt', ':date'))
-                ->setParameter('date', $date);
+                ->setParameter('date', $date, Types::DATETIME_MUTABLE);
         }
 
         $emailUserIds = $qb->getQuery()->getArrayResult();
@@ -308,7 +311,7 @@ class EmailUserRepository extends EntityRepository
      * @param Email        $email
      * @param User         $user
      * @param Organization $organization
-     * @param bool|false   $checkThread
+     * @param bool         $checkThread
      *
      * @return EmailUser[]
      */

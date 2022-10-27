@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -13,31 +12,19 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * The base class for processors responsible to build a response using the response document builder
- * and add the filled document builder to the context
+ * The base class for processors responsible to build the response
+ * using the response document builder from the context.
  */
 abstract class BuildResultDocument implements ProcessorInterface
 {
-    /** @var DocumentBuilderFactory */
-    protected $documentBuilderFactory;
-
     /** @var ErrorCompleterRegistry */
     protected $errorCompleterRegistry;
 
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param DocumentBuilderFactory $documentBuilderFactory
-     * @param ErrorCompleterRegistry $errorCompleterRegistry
-     * @param LoggerInterface        $logger
-     */
-    public function __construct(
-        DocumentBuilderFactory $documentBuilderFactory,
-        ErrorCompleterRegistry $errorCompleterRegistry,
-        LoggerInterface $logger
-    ) {
-        $this->documentBuilderFactory = $documentBuilderFactory;
+    public function __construct(ErrorCompleterRegistry $errorCompleterRegistry, LoggerInterface $logger)
+    {
         $this->errorCompleterRegistry = $errorCompleterRegistry;
         $this->logger = $logger;
     }
@@ -49,8 +36,12 @@ abstract class BuildResultDocument implements ProcessorInterface
     {
         /** @var Context $context */
 
+        $documentBuilder = $context->getResponseDocumentBuilder();
+        if (null === $documentBuilder) {
+            return;
+        }
+
         if ($context->hasErrors()) {
-            $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder($context->getRequestType());
             try {
                 $documentBuilder->setErrorCollection($context->getErrors());
                 // remove errors from the context to avoid processing them by other processors
@@ -60,26 +51,22 @@ abstract class BuildResultDocument implements ProcessorInterface
                 $context->resetErrors();
             }
             $context->setResponseDocumentBuilder($documentBuilder);
+            $context->removeResult();
         } elseif ($context->hasResult()) {
-            $responseStatusCode = $context->getResponseStatusCode();
-            if (null === $responseStatusCode || $responseStatusCode < Response::HTTP_BAD_REQUEST) {
-                $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder($context->getRequestType());
-                try {
-                    $this->processResult($documentBuilder, $context);
-                } catch (\Exception $e) {
-                    $this->processException($documentBuilder, $context, $e);
-                }
-                $context->setResponseDocumentBuilder($documentBuilder);
+            $infoRecords = $context->getInfoRecords();
+            if (null !== $infoRecords) {
+                $documentBuilder->setMetadata($infoRecords);
             }
+            try {
+                $this->processResult($documentBuilder, $context);
+            } catch (\Exception $e) {
+                $this->processException($documentBuilder, $context, $e);
+                $context->removeResult();
+            }
+            $context->setResponseDocumentBuilder($documentBuilder);
         }
-        $context->removeResult();
     }
 
-    /**
-     * @param DocumentBuilderInterface $documentBuilder
-     * @param Context                  $context
-     * @param \Exception               $e
-     */
     protected function processException(DocumentBuilderInterface $documentBuilder, Context $context, \Exception $e)
     {
         $context->setResponseStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -91,17 +78,22 @@ abstract class BuildResultDocument implements ProcessorInterface
 
         $this->logger->error(
             sprintf('Building of the result document failed.'),
-            [
-                'exception' => $e,
-                'action'    => $context->getAction(),
-                'entity'    => $context->getClassName()
-            ]
+            array_merge(['exception' => $e], $this->getExceptionLoggingContext($context))
         );
     }
 
     /**
-     * @param DocumentBuilderInterface $documentBuilder
-     * @param Context                  $context
+     * @param Context $context
+     *
+     * @return array [key => value, ...]
      */
+    protected function getExceptionLoggingContext(Context $context): array
+    {
+        return [
+            'action' => $context->getAction(),
+            'entity' => $context->getClassName()
+        ];
+    }
+
     abstract protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context);
 }

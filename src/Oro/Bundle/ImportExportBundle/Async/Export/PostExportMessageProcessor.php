@@ -2,20 +2,22 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\JobStorage;
-use Oro\Component\MessageQueue\Transport\Exception\Exception;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,61 +25,34 @@ use Psr\Log\LoggerInterface;
  */
 class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var ExportHandler
-     */
-    private $exportHandler;
+    private ExportHandler $exportHandler;
 
-    /**
-     * @var MessageProducerInterface
-     */
-    private $producer;
+    private MessageProducerInterface $producer;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var JobStorage
-     */
-    private $jobStorage;
+    private DoctrineHelper $doctrineHelper;
 
-    /**
-     * @var ImportExportResultSummarizer
-     */
-    private $importExportResultSummarizer;
+    private JobManagerInterface $jobManager;
 
-    /**
-     * @var NotificationSettings
-     */
-    private $notificationSettings;
+    private ImportExportResultSummarizer $importExportResultSummarizer;
 
-    /**
-     * @var int
-     */
-    private $recipientUserId;
+    private NotificationSettings $notificationSettings;
 
-    /**
-     * @param ExportHandler $exportHandler
-     * @param MessageProducerInterface $producer
-     * @param LoggerInterface $logger
-     * @param JobStorage $jobStorage
-     * @param ImportExportResultSummarizer $importExportResultSummarizer
-     * @param NotificationSettings $notificationSettings
-     */
     public function __construct(
         ExportHandler $exportHandler,
         MessageProducerInterface $producer,
         LoggerInterface $logger,
-        JobStorage $jobStorage,
+        DoctrineHelper $doctrineHelper,
+        JobManagerInterface $jobManager,
         ImportExportResultSummarizer $importExportResultSummarizer,
         NotificationSettings $notificationSettings
     ) {
         $this->exportHandler = $exportHandler;
         $this->producer = $producer;
         $this->logger = $logger;
-        $this->jobStorage = $jobStorage;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->jobManager = $jobManager;
         $this->importExportResultSummarizer = $importExportResultSummarizer;
         $this->notificationSettings = $notificationSettings;
     }
@@ -87,13 +62,10 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
+        $messageBody = $message->getBody();
 
-        if (! isset($body['jobId'], $body['jobName'], $body['exportType'], $body['outputFormat'], $body['email'])) {
-            $this->logger->critical('Invalid message');
-        }
-
-        if (! ($job = $this->jobStorage->findJobById($body['jobId']))) {
+        $job = $this->getJobRepository()->findJobById($messageBody['jobId']);
+        if ($job === null) {
             $this->logger->critical('Job not found');
 
             return self::REJECT;
@@ -103,7 +75,7 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         $files = [];
 
         foreach ($job->getChildJobs() as $childJob) {
-            if (! empty($childJob->getData()) && ($file = $childJob->getData()['file'])) {
+            if (!empty($childJob->getData()) && ($file = $childJob->getData()['file'])) {
                 $files[] = $file;
             }
         }
@@ -111,9 +83,9 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         $fileName = null;
         try {
             $fileName = $this->exportHandler->exportResultFileMerge(
-                $body['jobName'],
-                $body['exportType'],
-                $body['outputFormat'],
+                $messageBody['jobName'],
+                $messageBody['exportType'],
+                $messageBody['outputFormat'],
                 $files
             );
         } catch (RuntimeException $e) {
@@ -124,12 +96,25 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         if ($fileName !== null) {
+            $job->setData(array_merge($job->getData(), ['file' => $fileName]));
+            $this->jobManager->saveJob($job);
+
             $summary = $this->importExportResultSummarizer->processSummaryExportResultForNotification($job, $fileName);
 
-            $this->recipientUserId = $body['recipientUserId'] ?? null;
-            $this->sendEmailNotification($body['email'], $summary, $body['notificationTemplate'] ?? null);
+            $this->sendEmailNotification(
+                $messageBody['recipientUserId'],
+                $summary,
+                $messageBody['notificationTemplate'] ?? ''
+            );
 
-            $this->logger->info('Sent notification email.');
+            $this->producer->send(
+                SaveImportExportResultTopic::getName(),
+                [
+                    'jobId' => $job->getId(),
+                    'type' => $messageBody['exportType'],
+                    'entity' => $messageBody['entity'],
+                ]
+            );
         }
 
         return self::ACK;
@@ -140,34 +125,25 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::POST_EXPORT];
+        return [PostExportTopic::getName()];
     }
 
-    /**
-     * @param string $toEmail
-     * @param array $summary
-     * @param string $notificationTemplate
-     *
-     * @throws Exception
-     */
-    protected function sendEmailNotification($toEmail, array $summary, $notificationTemplate = null)
+    private function sendEmailNotification(int $recipientUserId, array $summary, string $templateName = ''): void
     {
-        $sender = $this->notificationSettings->getSender();
         $message = [
-            'sender' => $sender->toArray(),
-            'toEmail' => $toEmail,
-            'body' => $summary,
-            'contentType' => 'text/html',
-            'template' => $notificationTemplate ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+            'from' => $this->notificationSettings->getSender()->toString(),
+            'recipientUserId' => $recipientUserId,
+            'template' => $templateName ?: ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+            'templateParams' => $summary,
         ];
 
-        if ($this->recipientUserId) {
-            $message['recipientUserId'] = $this->recipientUserId;
-        }
+        $this->producer->send(SendEmailNotificationTemplateTopic::getName(), $message);
 
-        $this->producer->send(
-            NotificationTopics::SEND_NOTIFICATION_EMAIL,
-            $message
-        );
+        $this->logger->info('Sent notification email.');
+    }
+
+    private function getJobRepository(): JobRepository
+    {
+        return $this->doctrineHelper->getEntityRepository(Job::class);
     }
 }

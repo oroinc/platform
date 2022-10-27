@@ -12,17 +12,12 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
     private $listenersManager;
 
-    /**
-     * @var OptionalListenersGlobalOptionsProvider
-     */
-    private $provider;
+    private OptionalListenersGlobalOptionsProvider $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listenersManager = $this->createMock(OptionalListenerManager::class);
         $this->provider = new OptionalListenersGlobalOptionsProvider($this->listenersManager);
@@ -78,7 +73,7 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
         $input->expects($this->once())
             ->method('getOption')
             ->with(OptionalListenersGlobalOptionsProvider::DISABLE_OPTIONAL_LISTENERS)
-            ->willReturn([OptionalListenersGlobalOptionsProvider::ALL_OPTIONAL_LISTENERS_VALUE]);
+            ->willReturn(['all']);
 
         $listeners = ['some_listener_service'];
         $this->listenersManager->expects($this->once())

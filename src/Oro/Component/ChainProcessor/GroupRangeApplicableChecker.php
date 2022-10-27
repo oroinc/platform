@@ -29,6 +29,7 @@ class GroupRangeApplicableChecker implements ApplicableCheckerInterface, Process
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isApplicable(ContextInterface $context, array $processorAttributes)
     {

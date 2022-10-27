@@ -7,6 +7,9 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * Validates default relation field.
+ */
 class DefaultRelationFieldValidator extends AbstractFieldValidator
 {
     const ALIAS = 'oro_entity_extend.validator.default_relation_field';
@@ -23,13 +26,13 @@ class DefaultRelationFieldValidator extends AbstractFieldValidator
         $className = $value->getEntity()->getClassName();
         $fieldName = $value->getFieldName();
 
-        if (strpos(strtolower($fieldName), trim(ExtendConfigDumper::DEFAULT_PREFIX, '_')) === 0) {
-            $guessedName = substr($fieldName, strlen(trim(ExtendConfigDumper::DEFAULT_PREFIX, '_')));
+        if (str_starts_with(strtolower($fieldName), trim(ExtendConfigDumper::DEFAULT_PREFIX, '_'))) {
+            $guessedName = substr($fieldName, \strlen(trim(ExtendConfigDumper::DEFAULT_PREFIX, '_')));
             if (!empty($guessedName)) {
                 // note, that we cant create ONE_TO_MANY & MANY_TO_MANY fields via CSV import, so next search is enough
-                $fieldConfig = $this->validationHelper->findExtendFieldConfig($className, $guessedName);
+                $fieldConfig = $this->validationHelper->findFieldConfig($className, $guessedName);
                 if ($fieldConfig
-                    && in_array(
+                    && \in_array(
                         $fieldConfig->getId()->getFieldType(),
                         [RelationType::ONE_TO_MANY, RelationType::MANY_TO_MANY],
                         true
@@ -43,7 +46,7 @@ class DefaultRelationFieldValidator extends AbstractFieldValidator
                     );
                 }
             }
-        } elseif (in_array($value->getType(), [RelationType::ONE_TO_MANY, RelationType::MANY_TO_MANY], true)) {
+        } elseif (\in_array($value->getType(), [RelationType::ONE_TO_MANY, RelationType::MANY_TO_MANY], true)) {
             $guessedName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
             $existingFieldName = $this->validationHelper->getSimilarExistingFieldData($className, $guessedName);
             if ($existingFieldName) {

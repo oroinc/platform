@@ -1,0 +1,19 @@
+layout:
+    actions:
+        - '@add':
+            id: logo
+            parentId: middle_bar_logo
+            blockType: logo
+            options:
+                width: 167
+                height: 32
+
+        - '@add':
+            id: logo_print
+            blockType: logo
+            parentId: page_container
+            siblingId: page_header
+            options:
+                attr:
+                    class: 'logo--print-only'
+                renderLink: false

@@ -1,7 +1,10 @@
 services:
+    _defaults:
+        public: true
+
     oro_test.kernel_service_factory:
         class: Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\KernelServiceFactory
-        arguments: ['@symfony2_extension.kernel']
+        arguments: ['@fob_symfony.kernel']
 
     oro_entity.entity_alias_resolver:
         class: Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
@@ -17,3 +20,16 @@ services:
         class: Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
         factory: ['@oro_test.kernel_service_factory', get]
         arguments: ['oro_config.global']
+
+    property_accessor:
+        class: Symfony\Component\PropertyAccess\PropertyAccessor
+
+    doctrine.orm.entity_manager:
+        class: Doctrine\ORM\EntityManager
+        factory: ['@oro_test.kernel_service_factory', get]
+        arguments: ['doctrine.orm.entity_manager']
+
+    file_locator:
+        class: Symfony\Component\HttpKernel\Config\FileLocator
+        arguments:
+            - '@fob_symfony.kernel'

@@ -1,0 +1,21 @@
+navigation:
+    menu_config:
+        items:
+            digital_asset_list:
+                label: 'oro.digitalasset.entity_plural_label'
+                route: 'oro_digital_asset_index'
+                position: 110
+                extras:
+                    routes: ['/^oro_digital_asset/']
+
+        tree:
+            application_menu:
+                children:
+                    system_tab:
+                        children:
+                            digital_asset_list: ~
+
+    titles:
+        oro_digital_asset_index: ~
+        oro_digital_asset_update: '%title% - oro.ui.edit'
+        oro_digital_asset_create: 'oro.ui.create'

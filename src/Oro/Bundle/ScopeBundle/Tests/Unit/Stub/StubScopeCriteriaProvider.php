@@ -6,33 +6,41 @@ use Oro\Bundle\ScopeBundle\Manager\ScopeCriteriaProviderInterface;
 
 class StubScopeCriteriaProvider implements ScopeCriteriaProviderInterface
 {
-    const STUB_FIELD = 'scopeField';
-    const STUB_VALUE = 'stub_value';
-    const STUB_CLASS = '\stdClass';
+    /** @var string */
+    private $criteriaField;
+
+    /** @var object|null */
+    private $criteriaValue;
+
+    /** @var string */
+    private $criteriaValueType;
 
     /**
-     * @param array|object $context
-     * @return array
+     * @param string      $criteriaField
+     * @param object|null $criteriaValue
+     * @param string      $criteriaValueType
      */
-    public function getCriteriaByContext($context)
+    public function __construct(string $criteriaField, $criteriaValue, string $criteriaValueType)
     {
-        return [self::STUB_FIELD => $context[self::STUB_FIELD]];
+        $this->criteriaField = $criteriaField;
+        $this->criteriaValue = $criteriaValue;
+        $this->criteriaValueType = $criteriaValueType;
     }
 
     /**
-     * @return array
-     */
-    public function getCriteriaForCurrentScope()
-    {
-        return [self::STUB_FIELD => self::STUB_VALUE];
-    }
-
-    /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getCriteriaField()
     {
-        return self::STUB_FIELD;
+        return $this->criteriaField;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCriteriaValue()
+    {
+        return $this->criteriaValue;
     }
 
     /**
@@ -40,6 +48,6 @@ class StubScopeCriteriaProvider implements ScopeCriteriaProviderInterface
      */
     public function getCriteriaValueType()
     {
-        return self::STUB_CLASS;
+        return $this->criteriaValueType;
     }
 }

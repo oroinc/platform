@@ -11,16 +11,14 @@ class PlatformExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $versionHelper;
+    private $versionHelper;
 
     /** @var PlatformExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->versionHelper = $this->getMockBuilder(VersionHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->versionHelper = $this->createMock(VersionHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_platform.composer.version_helper', $this->versionHelper)
@@ -29,26 +27,17 @@ class PlatformExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new PlatformExtension($container);
     }
 
-    /**
-     * @return string
-     */
     public function testGetVersion()
     {
+        $undefinedVersion = 'N/A';
+
         $this->versionHelper->expects($this->once())
             ->method('getVersion')
-            ->will($this->returnValue(VersionHelper::UNDEFINED_VERSION));
+            ->willReturn($undefinedVersion);
 
         $this->assertEquals(
-            VersionHelper::UNDEFINED_VERSION,
+            $undefinedVersion,
             self::callTwigFunction($this->extension, 'oro_version', [])
         );
-    }
-
-    /**
-     * @return string The extension name
-     */
-    public function testGetName()
-    {
-        $this->assertEquals(PlatformExtension::EXTENSION_NAME, $this->extension->getName());
     }
 }

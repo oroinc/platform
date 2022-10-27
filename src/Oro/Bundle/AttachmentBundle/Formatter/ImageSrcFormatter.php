@@ -4,19 +4,19 @@ namespace Oro\Bundle\AttachmentBundle\Formatter;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * The formatter that returns image URL.
+ */
 class ImageSrcFormatter implements FormatterInterface
 {
-    const WIDTH_ATTRIBUTE  = 'width';
-    const HEIGHT_ATTRIBUTE = 'height';
+    private const WIDTH_ATTRIBUTE  = 'width';
+    private const HEIGHT_ATTRIBUTE = 'height';
 
     /** @var AttachmentManager */
-    protected $manager;
+    private $manager;
 
-    /**
-     * @param AttachmentManager $manager
-     */
     public function __construct(AttachmentManager $manager)
     {
         $this->manager = $manager;
@@ -25,15 +25,7 @@ class ImageSrcFormatter implements FormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormatterName()
-    {
-        return 'image_src';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function format($parameter, array $formatterArguments = [])
+    public function format($value, array $formatterArguments = [])
     {
         $height = AttachmentManager::DEFAULT_IMAGE_HEIGHT;
         if (array_key_exists(self::HEIGHT_ATTRIBUTE, $formatterArguments)) {
@@ -45,7 +37,7 @@ class ImageSrcFormatter implements FormatterInterface
             $width = (int)$formatterArguments[self::WIDTH_ATTRIBUTE];
         }
 
-        return $this->manager->getResizedImageUrl($parameter, $width, $height, Router::ABSOLUTE_URL);
+        return $this->manager->getResizedImageUrl($value, $width, $height, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     /**
@@ -54,21 +46,5 @@ class ImageSrcFormatter implements FormatterInterface
     public function getDefaultValue()
     {
         return '#';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSupportedTypes()
-    {
-        return ['image'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isDefaultFormatter()
-    {
-        return false;
     }
 }

@@ -1,5 +1,9 @@
 label: Oro Theme
 logo: bundles/oroui/themes/oro/images/oro-platform-logo.svg
 icon: bundles/oroui/themes/oro/images/favicon.ico
+rtl_support: true
 styles:
-    - bundles/oroui/themes/oro/css/style.css
+    css:
+        inputs:
+            - bundles/oroui/themes/oro/css/style.css
+        output: css/oro.css

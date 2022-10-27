@@ -26,8 +26,6 @@ class OroAddressBundle implements Migration
 
     /**
      * Generate table oro_address
-     *
-     * @param Schema $schema
      */
     public static function oroAddressTable(Schema $schema)
     {
@@ -58,8 +56,6 @@ class OroAddressBundle implements Migration
 
     /**
      * Generate table oro_address_type
-     *
-     * @param Schema $schema
      */
     public static function oroAddressTypeTable(Schema $schema)
     {
@@ -74,8 +70,6 @@ class OroAddressBundle implements Migration
 
     /**
      * Generate table oro_address_type_translation
-     *
-     * @param Schema $schema
      */
     public static function oroAddressTypeTranslationTable(Schema $schema)
     {
@@ -94,8 +88,6 @@ class OroAddressBundle implements Migration
 
     /**
      * Generate table oro_dictionary_country
-     *
-     * @param Schema $schema
      */
     public static function oroDictionaryCountryTable(Schema $schema)
     {

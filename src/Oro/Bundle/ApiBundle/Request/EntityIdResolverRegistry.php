@@ -3,10 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
- * Contains resolvers for all predefined identifiers of Data API resources
+ * Contains resolvers for all predefined identifiers of API resources
  * and allows to get a transformer suitable for a specific predefined identifier, entity and request type.
  */
 class EntityIdResolverRegistry
@@ -20,11 +20,6 @@ class EntityIdResolverRegistry
     /** @var RequestExpressionMatcher */
     private $matcher;
 
-    /**
-     * @param array                    $resolvers
-     * @param ContainerInterface       $container
-     * @param RequestExpressionMatcher $matcher
-     */
     public function __construct(
         array $resolvers,
         ContainerInterface $container,
@@ -62,7 +57,7 @@ class EntityIdResolverRegistry
     }
 
     /**
-     * Gets descriptions of all predefined identifiers of Data API resources
+     * Gets descriptions of all predefined identifiers of API resources
      * that can be resolved by all registered resolvers for the given request type.
      * These descriptions are used in auto-generated documentation, including API sandbox.
      *
@@ -97,11 +92,6 @@ class EntityIdResolverRegistry
         return !$expression || $this->matcher->matchValue($expression, $requestType);
     }
 
-    /**
-     * @param string $serviceId
-     *
-     * @return EntityIdResolverInterface
-     */
     private function instantiateResolver(string $serviceId): EntityIdResolverInterface
     {
         return $this->container->get($serviceId);

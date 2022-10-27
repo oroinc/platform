@@ -15,11 +15,22 @@ class ErrorCompleter extends AbstractErrorCompleter
     /**
      * {@inheritdoc}
      */
-    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null)
+    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
     {
         $this->completeStatusCode($error);
         $this->completeCode($error);
         $this->completeTitle($error);
         $this->completeDetail($error);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fixIncludedEntityPath(
+        string $entityPath,
+        Error $error,
+        RequestType $requestType,
+        EntityMetadata $metadata = null
+    ): void {
     }
 }

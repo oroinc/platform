@@ -11,11 +11,11 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides totals aggregation, which will be shown in grid's footer.
@@ -33,7 +33,7 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var NumberFormatter */
     protected $numberFormatter;
 
-    /** @var DateTimeFormatter */
+    /** @var DateTimeFormatterInterface */
     protected $dateTimeFormatter;
 
     /** @var AclHelper */
@@ -42,16 +42,10 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var array */
     protected $groupParts = [];
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param NumberFormatter     $numberFormatter
-     * @param DateTimeFormatter   $dateTimeFormatter
-     * @param AclHelper           $aclHelper
-     */
     public function __construct(
         TranslatorInterface $translator,
         NumberFormatter $numberFormatter,
-        DateTimeFormatter $dateTimeFormatter,
+        DateTimeFormatterInterface $dateTimeFormatter,
         AclHelper $aclHelper
     ) {
         $this->translator        = $translator;
@@ -106,7 +100,9 @@ class OrmTotalsExtension extends AbstractExtension
         $totals    = $config->offsetGetByPath(Configuration::TOTALS_PATH);
         if (null !== $totals && $result->getData()) {
             foreach ($totals as $rowName => $rowConfig) {
-                if ($onlyOnePage && $rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY]) {
+                if ($rowConfig[Configuration::TOTALS_DISABLED]
+                    || ($onlyOnePage && $rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY])
+                ) {
                     unset($totals[$rowName]);
                     continue;
                 }
@@ -222,6 +218,7 @@ class OrmTotalsExtension extends AbstractExtension
      *
      * @param QueryBuilder $query
      * @return array with root entities config
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getRootIds(QueryBuilder $query)
     {
@@ -339,7 +336,7 @@ class OrmTotalsExtension extends AbstractExtension
         } else {
             $data = $pageData->getData();
         }
-        foreach ($rootIdentifiers as $identifier) {
+        foreach ($rootIdentifiers as $idx => $identifier) {
             $ids = \array_column($data, $identifier['alias']);
 
             $field = isset($identifier['entityAlias'])
@@ -351,7 +348,8 @@ class OrmTotalsExtension extends AbstractExtension
                 continue;
             }
 
-            $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
+            $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, ':ids' . $idx));
+            $dataQueryBuilder->setParameter('ids' . $idx, $ids);
         }
     }
 

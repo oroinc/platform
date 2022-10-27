@@ -1,16 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var EmailEditorView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var $ = require('jquery');
-    var routing = require('routing');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const routing = require('routing');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
 
-    EmailEditorView = BaseView.extend({
+    const EmailEditorView = BaseView.extend({
+        templatesProvider: null,
+        editorComponentName: null,
         readyPromise: null,
         domCache: null,
 
@@ -21,10 +22,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailEditorView() {
-            EmailEditorView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailEditorView(options) {
+            EmailEditorView.__super__.constructor.call(this, options);
         },
 
         /**
@@ -32,8 +33,9 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
-            EmailEditorView.__super__.initialize.apply(this, arguments);
+            EmailEditorView.__super__.initialize.call(this, options);
             this.templatesProvider = options.templatesProvider;
+            this.editorComponentName = options.editorComponentName;
             this.setupCache();
         },
 
@@ -41,7 +43,7 @@ define(function(require) {
             this.domCache.body.val(this.initBody(this.domCache.body.val()));
             this.addForgedAsterisk();
             this.renderPromise = this.initLayout();
-            this.renderPromise.done(_.bind(this.initFields, this));
+            this.renderPromise.done(this.initFields.bind(this));
             return this;
         },
 
@@ -55,9 +57,9 @@ define(function(require) {
         },
 
         onAddSignatureButtonClick: function() {
-            var url;
-            var message;
-            var signature = this.model.get('signature');
+            let url;
+            let message;
+            const signature = this.model.get('signature');
             if (signature) {
                 if (this.getBodyEditorView().tinymceInstance) {
                     this.addHTMLSignature(signature);
@@ -77,9 +79,9 @@ define(function(require) {
         },
 
         addHTMLSignature: function(signature) {
-            var tinyMCE = this.getBodyEditorView().tinymceInstance;
-            var quoteNode = tinyMCE.getBody().querySelector('.quote');
-            var signatureNode = tinyMCE.dom.create('p', {}, signature);
+            const tinyMCE = this.getBodyEditorView().tinymceInstance;
+            const quoteNode = tinyMCE.getBody().querySelector('.quote');
+            const signatureNode = tinyMCE.dom.create('p', {}, signature);
             tinyMCE.getBody().insertBefore(signatureNode, quoteNode);
             tinyMCE.selection.setCursorLocation(signatureNode);
             signatureNode.scrollIntoView();
@@ -87,11 +89,11 @@ define(function(require) {
         },
 
         addTextSignature: function(signature) {
-            var quoteIndex;
-            var cursorPosition;
-            var value = this.domCache.body.val();
-            var EOL = '\r\n';
-            var firstQuoteLine = this.getBodyEditorView().getFirstQuoteLine();
+            let quoteIndex;
+            let cursorPosition;
+            let value = this.domCache.body.val();
+            const EOL = '\r\n';
+            const firstQuoteLine = this.getBodyEditorView().getFirstQuoteLine();
             signature = signature.replace(/(<([^>]+)>)/ig, '');
             if (firstQuoteLine) {
                 quoteIndex = value.indexOf(firstQuoteLine);
@@ -110,31 +112,49 @@ define(function(require) {
         },
 
         onTemplateChange: function(e) {
-            var templateId = $(e.target).val();
+            const templateId = $(e.target).val();
             if (!templateId) {
                 return;
             }
 
-            var confirm = new ApplyTemplateConfirmation({
+            const confirm = new ApplyTemplateConfirmation({
                 content: __('oro.email.emailtemplate.apply_template_confirmation_content')
             });
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 mediator.execute('showLoading');
                 this.templatesProvider.create(templateId, this.model.get('email').get('relatedEntityId'))
-                    .always(_.bind(mediator.execute, mediator, 'hideLoading'))
-                    .done(_.bind(this.fillForm, this));
-            }, this));
+                    .always(mediator.execute.bind(mediator, 'hideLoading'))
+                    .fail(this.showTemplateErrorMessage.bind(this))
+                    .done(this.fillForm.bind(this));
+            });
             confirm.open();
         },
 
+        showTemplateErrorMessage: function(jqXHR) {
+            const reason = jqXHR && jqXHR.responseJSON ? jqXHR.responseJSON.reason : '';
+            const $errorContainer = this._getErrorContainer();
+
+            $errorContainer.find('.alert-error').remove();
+
+            mediator.execute(
+                'showMessage',
+                'error',
+                reason ? reason : __('oro.email.emailtemplate.load_failed'),
+                {container: $errorContainer}
+            );
+        },
+
         fillForm: function(emailData) {
-            var editorView = this.getBodyEditorView();
+            const editorView = this.getBodyEditorView();
+            const $errorContainer = this._getErrorContainer();
+
+            $errorContainer.find('.alert-error').remove();
 
             if (!this.model.get('parentEmailId') || !this.domCache.subject.val()) {
                 this.domCache.subject.val(emailData.subject);
             }
 
-            var body = this.initBody(emailData.body, false);
+            const body = this.initBody(emailData.body, false);
             this.domCache.body.val(body);
 
             if (editorView.enabled && editorView.tinymceInstance) {
@@ -147,14 +167,15 @@ define(function(require) {
         },
 
         onTypeChange: function(e) {
-            this.getBodyEditorView().setEnabled($(e.target).val() === 'html');
+            this.getBodyEditorView().setIsHtml($(e.target).val() === 'html');
         },
 
         /**
          * Returns wysiwyg editor view
          */
         getBodyEditorView: function() {
-            return this.pageComponent('wrap_oro_email_email_body').view.pageComponent('oro_email_email_body').view;
+            return this.pageComponent('wrap_' + this.editorComponentName).view
+                .pageComponent(this.editorComponentName).view;
         },
 
         initFields: function() {
@@ -164,54 +185,54 @@ define(function(require) {
                 );
             }
             if (!this.model.get('email').get('cc').length) {
-                this.hideField('Cc');
+                this.hideField('Cc', __('oro.email.cc.label'));
             }
             if (!this.model.get('email').get('bcc').length) {
-                this.hideField('Bcc');
+                this.hideField('Bcc', __('oro.email.bcc.label'));
             }
         },
 
-        showField: function(fieldName) {
-            var field = fieldName.toLowerCase();
-            var $field = this.$('[data-ftid$="_email_' + field + '"]');
+        showField: function(fieldName, fieldValue) {
+            const field = fieldName.toLowerCase();
+            const $field = this.$('[data-ftid$="_email_' + field + '"]');
             $field.parents('.control-group.taggable-field').show();
             $field.parents('.controls').find('input.select2-input')
                 .unbind('focusout')
-                .on('focusout', _.bind(function(e) {
-                    setTimeout(_.bind(function() {
+                .on('focusout', e => {
+                    setTimeout(() => {
                         if (!$field.val()) {
-                            this.hideField(fieldName);
+                            this.hideField(fieldName, fieldValue);
                         }
-                    }, this), 200);
-                }, this))
+                    }, 200);
+                })
                 .focus();
 
             this.$('[data-ftid$="_email_to"]')
                 .parents('.control-group.taggable-field')
-                .find('label').html(__('oro.email.to'));
+                .find('label').html(__('oro.email.to.label'));
             this.addForgedAsterisk();
         },
 
-        hideField: function(fieldName) {
-            var field = fieldName.toLowerCase();
-            var $field = this.$('[data-ftid$="_email_' + field + '"]');
+        hideField: function(fieldName, fieldValue) {
+            const field = fieldName.toLowerCase();
+            const $field = this.$('[data-ftid$="_email_' + field + '"]');
             $field.parents('.control-group.taggable-field').hide();
 
             if (this.$('span.show' + fieldName).length > 0) {
                 return;
             }
-            this.$('.cc-bcc-holder').append('<span class="show' + fieldName + '">' + fieldName + '</span>');
-            this.$('.show' + fieldName).on('click', _.bind(function(e) {
+            this.$('.cc-bcc-holder').append('<span class="show' + fieldName + '">' + fieldValue + '</span>');
+            this.$('.show' + fieldName).on('click', e => {
                 e.stopPropagation();
-                var target = e.target;
+                const target = e.target;
                 $(target).remove();
-                this.showField(fieldName);
-            }, this));
+                this.showField(fieldName, fieldValue);
+            });
         },
 
         addForgedAsterisk: function() {
-            var labelTab = this.$('.forged-required').find('label');
-            var emTag = labelTab.find('em');
+            const labelTab = this.$('.forged-required').find('label');
+            const emTag = labelTab.find('em');
 
             if (emTag.length <= 0) {
                 labelTab.append('<em>*</em>');
@@ -222,7 +243,7 @@ define(function(require) {
 
         initBody: function(body, appendSignature) {
             appendSignature = typeof appendSignature !== 'undefined' ? appendSignature : true;
-            var signature = this.model.get('signature');
+            const signature = this.model.get('signature');
             if (this.model.get('appendSignature') && appendSignature) {
                 if (signature && body.indexOf(signature) < 0) {
                     body += '<br/><br/>' + this.model.get('signature');
@@ -233,6 +254,10 @@ define(function(require) {
                 body += this.model.get('bodyFooter') + '</body>';
             }
             return body;
+        },
+
+        _getErrorContainer: function() {
+            return this.$('[name$="[template]"]').parent();
         }
     });
 

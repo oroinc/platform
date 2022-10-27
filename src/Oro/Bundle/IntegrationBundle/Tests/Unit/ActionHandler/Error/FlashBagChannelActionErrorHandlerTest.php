@@ -8,17 +8,13 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class FlashBagChannelActionErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Session|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
     private $session;
 
-    /**
-     * @var FlashBagChannelActionErrorHandler
-     */
+    /** @var FlashBagChannelActionErrorHandler */
     private $errorHandler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->session = $this->createMock(Session::class);
 
@@ -30,12 +26,12 @@ class FlashBagChannelActionErrorHandlerTest extends \PHPUnit\Framework\TestCase
         $errors = ['error1', 'error2'];
 
         $flashBag = new FlashBag();
-        $this->session->expects(static::once())
+        $this->session->expects(self::once())
             ->method('getFlashBag')
             ->willReturn($flashBag);
 
         $this->errorHandler->handleErrors($errors);
 
-        static::assertSame($errors, $flashBag->get('error'));
+        self::assertSame($errors, $flashBag->get('error'));
     }
 }

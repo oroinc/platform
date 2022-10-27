@@ -9,54 +9,51 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\GroupAttributes;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\GroupAttributesValidator;
-use Oro\Component\Testing\Unit\EntityTrait;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class GroupAttributesValidatorTest extends \PHPUnit\Framework\TestCase
+class GroupAttributesValidatorTest extends ConstraintValidatorTestCase
 {
-    use EntityTrait;
+    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeManager;
 
-    /**
-     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
-
-    /**
-     * @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $attributeManager;
-
-    /**
-     * @var GroupAttributesValidator
-     */
-    protected $validator;
-
-    /**
-     * @var GroupAttributes
-     */
-    protected $constraint;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->context = $this->getMockBuilder(ExecutionContextInterface::class)
-            ->getMock();
-        $this->attributeManager = $this->getMockBuilder(AttributeManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->validator = new GroupAttributesValidator($this->attributeManager);
-        $this->validator->initialize($this->context);
-        $this->constraint = new GroupAttributes();
+        $this->attributeManager = $this->createMock(AttributeManager::class);
+        parent::setUp();
+    }
+
+    protected function createValidator(): GroupAttributesValidator
+    {
+        return new GroupAttributesValidator($this->attributeManager);
+    }
+
+    private function getFieldConfigModel(int $id): FieldConfigModel
+    {
+        $model = new FieldConfigModel();
+        ReflectionUtil::setId($model, $id);
+
+        return $model;
+    }
+
+    public function testGetTargets()
+    {
+        $constraint = new GroupAttributes();
+        self::assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testValidateWrongEntity()
     {
         $entity = new \stdClass();
-        $this->context->expects($this->never())
-            ->method('addViolation');
+
         $this->attributeManager->expects($this->never())
             ->method('getSystemAttributesByClass');
 
-        $this->validator->validate($entity, $this->constraint);
+        $constraint = new GroupAttributes();
+        $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValidateDuplicateAttributesMessage()
@@ -66,7 +63,7 @@ class GroupAttributesValidatorTest extends \PHPUnit\Framework\TestCase
         $entity->addAttributeGroup($group1);
         $group2 = new AttributeGroup();
         $entity->addAttributeGroup($group2);
-        
+
         $relation1 = new AttributeGroupRelation();
         $relation1->setEntityConfigFieldId(1);
         $group1->addAttributeRelation($relation1);
@@ -74,14 +71,14 @@ class GroupAttributesValidatorTest extends \PHPUnit\Framework\TestCase
         $relation2->setEntityConfigFieldId(1);
         $group2->addAttributeRelation($relation2);
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with($this->constraint->duplicateAttributesMessage);
-
         $this->attributeManager->expects($this->never())
             ->method('getSystemAttributesByClass');
 
-        $this->validator->validate($entity, $this->constraint);
+        $constraint = new GroupAttributes();
+        $this->validator->validate($entity, $constraint);
+
+        $this->buildViolation($constraint->duplicateAttributesMessage)
+            ->assertRaised();
     }
 
     public function testValidateMissingSystemAttributes()
@@ -99,19 +96,19 @@ class GroupAttributesValidatorTest extends \PHPUnit\Framework\TestCase
         $relation2 = new AttributeGroupRelation();
         $relation2->setEntityConfigFieldId(2);
         $group2->addAttributeRelation($relation2);
-        
-        $systemAttribute = $this->getEntity(FieldConfigModel::class, ['id' => 3]);
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with($this->constraint->missingSystemAttributesMessage);
+        $systemAttribute = $this->getFieldConfigModel(3);
 
         $this->attributeManager->expects($this->once())
             ->method('getSystemAttributesByClass')
             ->with($entity->getEntityClass())
             ->willReturn([$systemAttribute]);
 
-        $this->validator->validate($entity, $this->constraint);
+        $constraint = new GroupAttributes();
+        $this->validator->validate($entity, $constraint);
+
+        $this->buildViolation($constraint->missingSystemAttributesMessage)
+            ->assertRaised();
     }
 
     public function testValidateValid()
@@ -130,15 +127,16 @@ class GroupAttributesValidatorTest extends \PHPUnit\Framework\TestCase
         $relation2->setEntityConfigFieldId(2);
         $group2->addAttributeRelation($relation2);
 
-        $systemAttribute = $this->getEntity(FieldConfigModel::class, ['id' => 2]);
+        $systemAttribute = $this->getFieldConfigModel(2);
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
         $this->attributeManager->expects($this->once())
             ->method('getSystemAttributesByClass')
             ->with($entity->getEntityClass())
             ->willReturn([$systemAttribute]);
 
-        $this->validator->validate($entity, $this->constraint);
+        $constraint = new GroupAttributes();
+        $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
     }
 }

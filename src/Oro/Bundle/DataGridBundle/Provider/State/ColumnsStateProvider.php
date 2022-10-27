@@ -26,11 +26,6 @@ class ColumnsStateProvider extends AbstractStateProvider
     /** @var DatagridParametersHelper */
     private $datagridParametersHelper;
 
-    /**
-     * @param GridViewManager $gridViewManager
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param DatagridParametersHelper $datagridParametersHelper
-     */
     public function __construct(
         GridViewManager $gridViewManager,
         TokenAccessorInterface $tokenAccessor,
@@ -80,12 +75,6 @@ class ColumnsStateProvider extends AbstractStateProvider
         return $this->sanitizeState([], $this->getColumnsConfig($datagridConfiguration));
     }
 
-    /**
-     * @param array $state
-     * @param array $columnsConfig
-     *
-     * @return array
-     */
     private function sanitizeState(array $state, array $columnsConfig): array
     {
         $state = array_intersect_key($state, $columnsConfig);
@@ -133,11 +122,6 @@ class ColumnsStateProvider extends AbstractStateProvider
         return $rawColumnsState;
     }
 
-    /**
-     * @param array $rawColumnsState
-     *
-     * @return array
-     */
     private function getFromNonMinifiedState(array $rawColumnsState): array
     {
         return array_filter(array_map(function ($columnData) {
@@ -153,11 +137,6 @@ class ColumnsStateProvider extends AbstractStateProvider
         }, $rawColumnsState));
     }
 
-    /**
-     * @param string $rawColumnsState
-     *
-     * @return array
-     */
     private function getFromMinifiedState(string $rawColumnsState): array
     {
         if (!$rawColumnsState) {
@@ -169,28 +148,18 @@ class ColumnsStateProvider extends AbstractStateProvider
             // Last char is flag indicating column state, rest part is a column name.
             $columnsState[substr($columnState, 0, -1)] = [
                 self::ORDER_FIELD_NAME => (int)$key,
-                self::RENDER_FIELD_NAME => substr($columnState, -1) === '1',
+                self::RENDER_FIELD_NAME => str_ends_with($columnState, '1'),
             ];
         }
 
         return $columnsState;
     }
 
-    /**
-     * @param DatagridConfiguration $datagridConfiguration
-     *
-     * @return array
-     */
     private function getColumnsConfig(DatagridConfiguration $datagridConfiguration): array
     {
         return (array)$datagridConfiguration->offsetGet(Configuration::COLUMNS_KEY);
     }
 
-    /**
-     * @param array $columnsData
-     *
-     * @return array
-     */
     private function fillRenderableAndWeight(array $columnsData): array
     {
         $weight = 0;

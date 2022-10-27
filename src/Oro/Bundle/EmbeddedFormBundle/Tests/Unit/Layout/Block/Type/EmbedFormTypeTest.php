@@ -7,6 +7,7 @@ use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\LayoutManipulatorInterface;
 
 class EmbedFormTypeTest extends BlockTypeTestCase
 {
@@ -14,13 +15,12 @@ class EmbedFormTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
-        /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
-        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
+        $builder = $this->createMock(BlockBuilderInterface::class);
         $builder->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue('form_id'));
+            ->willReturn('form_id');
 
-        $layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
         $builder->expects($this->exactly(3))
             ->method('getLayoutManipulator')
             ->willReturn($layoutManipulator);
@@ -48,6 +48,7 @@ class EmbedFormTypeTest extends BlockTypeTestCase
                     'embed_form_fields',
                     [
                         'form_name'         => 'test_form',
+                        'render_rest'       => true,
                         'form_prefix'       => 'test_prefix',
                         'form_field_prefix' => 'test_field_prefix',
                         'form_group_prefix' => 'test_group_prefix',
@@ -64,7 +65,6 @@ class EmbedFormTypeTest extends BlockTypeTestCase
                     'embed_form_end',
                     [
                         'form_name'   => 'test_form',
-                        'render_rest' => true,
                         'instance_name' => '',
                         'additional_block_prefixes' => [],
                     ],

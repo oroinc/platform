@@ -1,10 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var tools = {};
-    var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = {};
+    const iOS = /(iPad|iPhone)/.test(navigator.userAgent);
+    const iPadOS = !!(navigator.userAgent.match(/Mac/) && navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
 
     /**
      * @export oroui/js/tools
@@ -26,6 +27,64 @@ define(function(require) {
         },
 
         /**
+         * Pack object to string with query parameters sorted
+         *
+         * Object {foo: 'x', 'bar': 'y'} will be converted to string "foo=x&bar=y".
+         *
+         * @param {Object} object
+         * @return {String}
+         */
+        packToQuerySortedString: function(object) {
+            const self = this;
+            const result = [];
+            const add = function(key, value) {
+                result[result.length] = encodeURIComponent(key) + '=' +
+                    encodeURIComponent(value === null ? '' : value);
+            };
+
+            const buildParams = function(pref, obj) {
+                if (self.isArrayLikeObject(obj)) {
+                    obj = _.toArray(obj);
+                }
+
+                if (_.isArray(obj)) {
+                    obj.sort();
+                    _.each(obj, function(value, key) {
+                        buildParams(pref + '[' + (typeof value === 'object' ? key : '') + ']', value);
+                    });
+                } else if (typeof obj === 'object') {
+                    const keys = _.keys(obj);
+                    keys.sort();
+                    for (let i = 0; i < keys.length; i++) {
+                        const name = keys[i];
+                        buildParams(pref + '[' + name + ']', obj[name]);
+                    }
+                } else {
+                    add(pref, obj);
+                }
+            };
+
+            const keys = _.keys(object);
+            keys.sort();
+            for (let i = 0; i < keys.length; i++) {
+                const prefix = keys[i];
+                buildParams(prefix, object[prefix]);
+            }
+            return result.join('&');
+        },
+
+        createBlankObject() {
+            const {
+                hasOwnProperty,
+                isPrototypeOf,
+                toString,
+                valueOf
+            } = Object.getOwnPropertyDescriptors(Object.prototype);
+            const blankPrototype = Object.create(null, {hasOwnProperty, isPrototypeOf, toString, valueOf});
+            return Object.create(blankPrototype);
+        },
+
+        /**
          * Unpack string to object. Reverse from packToQueryString.
          *
          * @param {String} query
@@ -35,11 +94,15 @@ define(function(require) {
             if (query.charAt(0) === '?') {
                 query = query.slice(1);
             }
-            var setValue = function(root, path, value) {
+            const setValue = function(root, path, value) {
+                if (path[0] === '__proto__') {
+                    // Prevent Object.prototype pollution
+                    return;
+                }
                 if (path.length > 1) {
-                    var dir = path.shift();
+                    const dir = path.shift();
                     if (typeof root[dir] === 'undefined') {
-                        root[dir] = path[0] === '' ? [] : {};
+                        root[dir] = path[0] === '' ? [] : tools.createBlankObject();
                     }
                     setValue(root[dir], path, value);
                 } else {
@@ -50,18 +113,18 @@ define(function(require) {
                     }
                 }
             };
-            var nvp = query.split('&');
-            var data = {};
-            for (var i = 0; i < nvp.length; i++) {
-                var pair = nvp[i].split('=');
+            const nvp = query.split('&');
+            const data = tools.createBlankObject();
+            for (let i = 0; i < nvp.length; i++) {
+                const pair = nvp[i].split('=');
                 if (pair.length < 2) {
                     continue;
                 }
-                var name = this.decodeUriComponent(pair[0]);
-                var value = this.decodeUriComponent(pair[1]);
+                const name = this.decodeUriComponent(pair[0]);
+                const value = this.decodeUriComponent(pair[1]);
 
-                var path = name.match(/(^[^\[]+)(\[.*\]$)?/);
-                var first = path[1];
+                let path = name.match(/(^[^\[]+)(\[.*\]$)?/);
+                const first = path[1];
                 if (path[2]) {
                     // case of 'array[level1]' || 'array[level1][level2]'
                     path = path[2].match(/(?=\[(.*)\]$)/)[1].split('][');
@@ -84,7 +147,7 @@ define(function(require) {
          * @protected
          */
         decodeUriComponent: function(string) {
-            var result = string.replace(/\+/g, '%20');
+            let result = string.replace(/\+/g, '%20');
             result = decodeURIComponent(result);
             return result;
         },
@@ -102,13 +165,13 @@ define(function(require) {
          * @return {Object}
          */
         invertKeys: function(object, keys) {
-            var result = _.extend({}, object);
-            for (var key in keys) {
+            const result = _.extend({}, object);
+            for (const key in keys) {
                 if (!keys.hasOwnProperty(key)) {
                     continue;
                 }
-                var baseKey = key;
-                var mirrorKey = keys[key];
+                const baseKey = key;
+                const mirrorKey = keys[key];
 
                 if (baseKey in result) {
                     result[mirrorKey] = result[baseKey];
@@ -128,7 +191,7 @@ define(function(require) {
         isEqualsLoosely: function(value1, value2) {
             if (!_.isObject(value1)) {
                 if (_.isNumber(value1) || _.isNumber(value2)) {
-                    var toNumber = function(v) {
+                    const toNumber = function(v) {
                         if (_.isString(v) && v === '') {
                             return NaN;
                         }
@@ -138,15 +201,15 @@ define(function(require) {
                 }
                 return ((value1 || '') === (value2 || ''));
             } else if (_.isObject(value1)) {
-                var valueKeys = _.keys(value1);
+                let valueKeys = _.keys(value1);
 
                 if (_.isObject(value2)) {
                     valueKeys = _.unique(valueKeys.concat(_.keys(value2)));
-                    for (var index in valueKeys) {
+                    for (const index in valueKeys) {
                         if (!valueKeys.hasOwnProperty(index)) {
                             continue;
                         }
-                        var key = valueKeys[index];
+                        const key = valueKeys[index];
                         if (!_.has(value2, key) || !this.isEqualsLoosely(value1[key], value2[key])) {
                             return false;
                         }
@@ -187,91 +250,17 @@ define(function(require) {
          * Are we have touch screen
          */
         isTouchDevice: function() {
-            return ('ontouchstart' in window && window.ontouchstart) ||
-                ('DocumentTouch' in window && document instanceof window.DocumentTouch);
+            return 'ontouchstart' in window ||
+                window.DocumentTouch && document instanceof window.DocumentTouch ||
+                navigator.maxTouchPoints > 0 ||
+                window.navigator.msMaxTouchPoints > 0;
         },
 
         /**
          * Are we currently on iOS device
          */
         isIOS: function() {
-            return iOS;
-        },
-
-        /**
-         * Loads dynamic list of modules and execute callback function with passed modules
-         *
-         * @param {Object.<string, string>|Array.<string>|string} modules
-         *  - Object: where keys are formal module names and values are actual
-         *  - Array: module names,
-         *  - string: single module name
-         * @param {function(Object)=} callback
-         * @param {Object=} context
-         * @return {JQueryPromise}
-         */
-        loadModules: function(modules, callback, context) {
-            var requirements;
-            var processModules;
-
-            if (_.isObject(modules) && !_.isArray(modules)) {
-                // if modules is an object of {formal_name: module_name}
-                requirements = _.values(modules);
-                processModules = function(loadedModules) {
-                    // maps loaded modules into original object
-                    _.each(modules, _.partial(function(map, value, key) {
-                        modules[key] = map[value];
-                    }, _.object(requirements, loadedModules)));
-                    return [modules];
-                };
-            } else {
-                // if modules is an array of module_names or single module_name
-                requirements = !_.isArray(modules) ? [modules] : modules;
-                processModules = function(loadedModules) {
-                    return loadedModules;
-                };
-            }
-
-            var deferred = $.Deferred();
-            require(requirements, _.partial(function(processor) {
-                var modules = processor(_.rest(arguments));
-                if (callback) {
-                    callback.apply(context || null, modules);
-                }
-                deferred.resolve.apply(deferred, modules);
-            }, processModules), function(e) {
-                deferred.reject(e);
-            });
-            return deferred.promise();
-        },
-
-        /**
-         * Loads single module through requireJS and returns promise
-         *
-         * @deprecated
-         * @param {string} module name
-         * @return {JQueryPromise}
-         */
-        loadModule: function(module) {
-            return tools.loadModules(module);
-        },
-
-        /**
-         * Loads single module through requireJS and replaces the property
-         *
-         * @param {Object} container where to replace property
-         * @param {string} moduleProperty name to replace module ref to concrete realization
-         * @return {JQueryPromise}
-         */
-        loadModuleAndReplace: function(container, moduleProperty) {
-            if (_.isFunction(container[moduleProperty])) {
-                var deferred = $.Deferred();
-                deferred.resolve(container[moduleProperty]);
-                return deferred.promise();
-            }
-            return this.loadModules(container[moduleProperty]).then(function(realization) {
-                container[moduleProperty] = realization;
-                return realization;
-            });
+            return iOS || iPadOS;
         },
 
         /**
@@ -283,15 +272,34 @@ define(function(require) {
         },
 
         /**
+         * Wrapper over `window.open()` method
+         * @param url
+         * @param target?
+         */
+        windowOpen(url, target = undefined) {
+            if (!target) {
+                window.open(url);
+            } else {
+                // Solution with `window.open(url, '_blank');` does not work in iOS Safari
+                const a = document.createElement('a');
+                a.style = 'display: none';
+                a.href = url;
+                a.target = target;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        },
+
+        /**
          * Creates safe regexp expression from string
          *
          * @param {string} str
          * @param {string} flags
          */
         safeRegExp: function(str, flags) {
-            var expression;
             str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
-            expression = new RegExp('(' + str + ')', flags);
+            const expression = new RegExp('(' + str + ')', flags);
             return expression;
         },
 
@@ -301,8 +309,8 @@ define(function(require) {
          */
         createRandomUUID: function() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0;
-                var v = c === 'x' ? r : (r & 0x3 | 0x8);
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
         },
@@ -317,21 +325,61 @@ define(function(require) {
         },
 
         /**
+         * Check is this object can be represented as an array
+         *
+         * @param {Object} object
+         * @returns {boolean}
+         */
+        isArrayLikeObject: function(object) {
+            if (typeof object !== 'object') {
+                return false;
+            }
+            const keys = _.keys(object);
+            for (let i = 0; i < keys.length; i++) {
+                const key = keys[i];
+                if (String(key) !== String(i)) {
+                    return false;
+                }
+            }
+            return true;
+        },
+
+        /**
+         * Checks if passed value represents a number (e.g. 3.5 and '3.5' are numeric)
+         *
+         * @param {*} value
+         * @return {boolean}
+         */
+        isNumeric: function(value) {
+            return !isNaN(parseFloat(value)) && isFinite(value);
+        },
+
+        /**
          * Adds css rules to the first style sheet
          *
          * @param {string} selector
          * @param {string} styles
          */
         addCSSRule: function(selector, styles) {
-            var styleSheet = document.styleSheets[0];
-            styleSheet.insertRule(selector + '{' + styles + '}', styleSheet.cssRules.length);
+            const css = `${selector} { ${styles} }`;
+            const ID = '__runtime-styles';
+            const style = document.getElementById(ID) || (() => {
+                const head = document.head || document.getElementsByTagName('head')[0];
+                const style = document.createElement('style');
+                style.type = 'text/css';
+                style.id = ID;
+                head.appendChild(style);
+                return style;
+            })();
+
+            style.appendChild(document.createTextNode(css));
         },
 
         /**
          * @param {Object} event
          */
         isTargetBlankEvent: function(event) {
-            var mouseMiddleButton = 2;
+            const mouseMiddleButton = 2;
             return event.shiftKey || event.altKey || event.ctrlKey || event.metaKey ||
                 event.which === mouseMiddleButton;
         },
@@ -343,14 +391,15 @@ define(function(require) {
          * @returns {string|null}
          */
         getElementXPath: function(element) {
-            var paths = [];
-            var tagName = element.nodeName.toLowerCase();
+            const paths = [];
+            let tagName;
             if (element && element.id) {
+                tagName = element.nodeName.toLowerCase();
                 return '//' + tagName + '[@id="' + element.id + '"]';
             } else {
                 // Use nodeName (instead of localName) so namespace prefix is included (if any).
                 for (; element && element.nodeType === 1; element = element.parentNode) {
-                    var index = 0;
+                    let index = 0;
                     tagName = element.nodeName.toLowerCase();
                     // EXTRA TEST FOR ELEMENT.ID
                     if (element && element.id) {
@@ -358,7 +407,7 @@ define(function(require) {
                         break;
                     }
 
-                    for (var sibling = element.previousSibling; sibling; sibling = sibling.previousSibling) {
+                    for (let sibling = element.previousSibling; sibling; sibling = sibling.previousSibling) {
                         // Ignore document type declaration.
                         if (sibling.nodeType === Node.DOCUMENT_TYPE_NODE) {
                             continue;
@@ -368,13 +417,69 @@ define(function(require) {
                         }
                     }
 
-                    var pathIndex = '[' + (index + 1) + ']';
-                    var classAttr = element.className ? '[@class="' + element.className + '"]' : '';
+                    const pathIndex = '[' + (index + 1) + ']';
+                    const classAttr = element.className ? '[@class="' + element.className + '"]' : '';
                     paths.splice(0, 0, tagName + pathIndex + classAttr);
                 }
 
                 return paths.length ? '/' + paths.join('/') : null;
             }
+        },
+
+        /**
+         * Gets unique CSS selector for DOM element.
+         *
+         * @param {HTMLElement} element
+         * @param {boolean} [clearPath=true]
+         * @returns {string}
+         */
+        getElementCSSPath: function(element, clearPath = true) {
+            const buildPath = (el, path = []) => {
+                if (el && el.nodeType === Node.ELEMENT_NODE) {
+                    let part = el.nodeName.toLowerCase();
+
+                    if (el.className) {
+                        part += `.${el.className.trim().split(' ')[0]}`;
+                    }
+
+                    if (el.nodeName !== 'HTML') {
+                        part += `:nth-child(${$(el).index() + 1})`;
+                    }
+
+                    return buildPath(el.parentNode, path.concat([part]));
+                } else {
+                    const preparedPath = path.reverse().join(' > ');
+
+                    if (clearPath) {
+                        const regExp = /(\.js-focus-visible|\.focus-visible|\.hide|\.show)/;
+
+                        return preparedPath.replace(new RegExp(regExp, 'g'), '');
+                    }
+
+                    return preparedPath;
+                }
+            };
+
+            return buildPath(element);
+        },
+
+        getPrototypeChain: function(object) {
+            const chain = [];
+            while (object = Object.getPrototypeOf(object)) {
+                chain.unshift(object);
+            }
+            return chain;
+        },
+
+        getAllPropertyVersions: function(object, name) {
+            const versions = [];
+            const prototypeChain = tools.getPrototypeChain(object);
+            prototypeChain.forEach(prototype => {
+                if (prototype.hasOwnProperty(name)) {
+                    versions.push(prototype[name]);
+                }
+            });
+            return versions;
         }
     });
 

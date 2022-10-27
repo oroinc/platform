@@ -13,9 +13,6 @@ class JobExtension extends AbstractExtension
     /** @var ConsumerState */
     private $consumerState;
 
-    /**
-     * @param ConsumerState $consumerState
-     */
     public function __construct(ConsumerState $consumerState)
     {
         $this->consumerState = $consumerState;

@@ -4,29 +4,35 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
-use Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider;
+use Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
+/**
+ * The ACL extension that works with actions (another name is capabilities).
+ */
 class ActionAclExtension extends AbstractAclExtension
 {
-    const NAME = 'action';
+    public const NAME = 'action';
 
-    const PERMISSION_EXECUTE = 'EXECUTE';
+    private const PERMISSION_EXECUTE = 'EXECUTE';
 
-    /** @var ActionMetadataProvider */
+    /** @var ActionSecurityMetadataProvider */
     protected $actionMetadataProvider;
 
-    /**
-     * @param ActionMetadataProvider $actionMetadataProvider
-     */
-    public function __construct(ActionMetadataProvider $actionMetadataProvider)
+    /** @var MaskBuilder */
+    protected $maskBuilder;
+
+    public function __construct(ActionSecurityMetadataProvider $actionMetadataProvider)
     {
         $this->actionMetadataProvider = $actionMetadataProvider;
 
         $this->map = [
             self::PERMISSION_EXECUTE => [ActionMaskBuilder::MASK_EXECUTE]
         ];
+
+        $this->maskBuilder = new ActionMaskBuilder();
     }
 
     /**
@@ -42,12 +48,12 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function supports($type, $id)
     {
-        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            return $id === $this->getExtensionKey();
+        if (ObjectIdentityFactory::ROOT_IDENTITY_TYPE === $type) {
+            return $this->getExtensionKey() === $id;
         }
 
         return
-            $id === $this->getExtensionKey()
+            $this->getExtensionKey() === $id
             && $this->actionMetadataProvider->isKnownAction(ObjectIdentityHelper::removeGroupName($type));
     }
 
@@ -62,9 +68,17 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
+    public function getPermissionGroupMask($mask)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
-        if ($mask === null || !$setOnly || $mask !== 0) {
+        if (null === $mask || !$setOnly || 0 !== $mask) {
             return [self::PERMISSION_EXECUTE];
         }
 
@@ -103,7 +117,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getAccessLevel($mask, $permission = null, $object = null)
     {
-        return $mask === 0
+        return 0 === $mask
             ? AccessLevel::NONE_LEVEL
             : AccessLevel::SYSTEM_LEVEL;
     }
@@ -113,10 +127,10 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function validateMask($mask, $object, $permission = null)
     {
-        if ($mask === 0) {
+        if (0 === $mask) {
             return;
         }
-        if ($mask === ActionMaskBuilder::MASK_EXECUTE) {
+        if (ActionMaskBuilder::MASK_EXECUTE === $mask) {
             return;
         }
 
@@ -129,7 +143,7 @@ class ActionAclExtension extends AbstractAclExtension
     public function getObjectIdentity($val)
     {
         $type = $id = $group = null;
-        if (is_string($val)) {
+        if (\is_string($val)) {
             $this->parseDescriptor($val, $type, $id, $group);
         } elseif ($val instanceof AclAnnotation) {
             $type = $val->getId();
@@ -145,7 +159,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getMaskBuilder($permission)
     {
-        return new ActionMaskBuilder();
+        return clone $this->maskBuilder;
     }
 
     /**
@@ -153,7 +167,7 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getAllMaskBuilders()
     {
-        return [new ActionMaskBuilder()];
+        return [clone $this->maskBuilder];
     }
 
     /**

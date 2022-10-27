@@ -5,30 +5,25 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class ConfigLogTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  ConfigLog */
+    /** @var ConfigLog */
     private $configLog;
 
-    /** @var  ConfigLogDiff */
+    /** @var ConfigLogDiff */
     private $configLogDiff;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configLog     = new ConfigLog();
+        $this->configLog = new ConfigLog();
         $this->configLogDiff = new ConfigLogDiff();
-    }
-
-    protected function tearDown()
-    {
-        $this->configLog     = null;
-        $this->configLogDiff = null;
     }
 
     public function testConfigLog()
     {
-        $userMock = $this->getMockForAbstractClass('Symfony\Component\Security\Core\User\UserInterface');
+        $userMock = $this->createMock(UserInterface::class);
 
         $this->assertEmpty($this->configLog->getId());
 
@@ -42,7 +37,7 @@ class ConfigLogTest extends \PHPUnit\Framework\TestCase
         $this->configLog->addDiff($this->configLogDiff);
         $this->assertEquals($this->configLogDiff, $this->configLog->getDiffs()->first());
 
-        $diffsCollection = new ArrayCollection(array($this->configLogDiff));
+        $diffsCollection = new ArrayCollection([$this->configLogDiff]);
         $this->configLog->setDiffs($diffsCollection);
         $this->assertEquals($diffsCollection, $this->configLog->getDiffs());
     }
@@ -63,7 +58,7 @@ class ConfigLogTest extends \PHPUnit\Framework\TestCase
         $this->configLogDiff->setScope('scope');
         $this->assertEquals('scope', $this->configLogDiff->getScope());
 
-        $this->configLogDiff->setDiff(array('key' => 'value'));
-        $this->assertEquals(array('key' => 'value'), $this->configLogDiff->getDiff());
+        $this->configLogDiff->setDiff(['key' => 'value']);
+        $this->assertEquals(['key' => 'value'], $this->configLogDiff->getDiff());
     }
 }

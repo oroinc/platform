@@ -4,18 +4,18 @@
     #api_type { float: left; font-size: 1.2em; padding: 12px 24px; }
     #api_type a.active { font-weight: bold; color: #3d5b00; }
     .authentication-warning svg { vertical-align: middle; padding-right: 5px; }
-    div.heading ul.options li { text-transform: capitalize; }
     div.motd { padding-top: 10px; }
     div.motd div.documentation { padding: 3px 0; overflow: hidden; }
-    div.motd div.documentation a { font-size: 1.2em; text-decoration: none; }
-    div.motd div.documentation p { padding: 10px 0; }
+    div.motd div.documentation a { text-decoration: none; }
+    div.motd div.documentation a.main { font-size: 1.2em; }
+    div.motd div.documentation p { padding: 10px 0 0 0; }
     div.motd div.documentation ul { padding-left: 10px; list-style-type: disc; list-style-position: inside; }
     #sandbox_configuration { padding-top: 16px; padding-bottom: 5px; }
     #sandbox_configuration .account-info { position: absolute; top: 7px; right: 16px; }
     #sandbox_configuration .account-info em { padding-left: 1em; color: #2c4300; }
     #sandbox_configuration .account-info a { padding-left: 2em; color: #2c4300; text-decoration: underline; }
 </style>
-<script type="text/javascript">
+<script>
     handleResourceLinks = function ($el, apiPrefix) {
         var value = $el.text(),
             prefix = '', suffix = '', links = [], elements, i, j, resourceId;
@@ -33,8 +33,8 @@
             $el.text('');
             elements = value.substr(prefix.length, value.length - prefix.length - suffix.length).split(',');
             for (i = 0; i < elements.length; i++) {
-                resourceId = 'get-' + apiPrefix + '-api-' + elements[i].trim();
-                if ($('#' + resourceId).length) {
+                resourceId = getResourceId('get-' + apiPrefix + '-api-' + elements[i].trim());
+                if (resourceId) {
                     links.push('<a href="#' + resourceId
                         + '" onclick="return gotoResource(\'' + resourceId + '\');">'
                         + elements[i] + '</a>');
@@ -45,8 +45,19 @@
             $el.append(prefix + links.join(', ') + suffix);
         }
     };
+    getResourceId = function (listResourceId) {
+        var itemResourceId = listResourceId + '-{id}';
+        if ($('#' + escapeSelector(itemResourceId)).length) {
+            return itemResourceId;
+        }
+        if ($('#' + escapeSelector(listResourceId)).length) {
+            return listResourceId;
+        }
+        return null;
+    };
     gotoResource = function (resourceId) {
-        var $section = $('#' + resourceId).closest('.section'),
+        var resourceId = escapeSelector(resourceId),
+            $section = $('#' + resourceId).closest('.section'),
             $toggler = $('#' + resourceId + ' > .toggler');
         if (!$section.hasClass('active')) {
             $section.find('h1').trigger('click');
@@ -59,10 +70,24 @@
 
         return false;
     };
+    escapeSelector = function (val) {
+        return val.replace(/(:|\.|\[|\]|\{|\}|,)/g, "\\$1");
+    };
+    getCookieValue = function(name) {
+        var value = '; ' + document.cookie;
+        var parts = value.split('; ' + name + '=');
+        if (parts.length === 2) {
+            return parts.pop().split(';').shift();
+        }
+        return '';
+    };
     $(function() {
-        var userName = {{ userName|json_encode|raw }},
+        var organizations = {{ organizations|json_encode|raw }},
+            organization = {{ organization|json_encode|raw }},
+            userName = {{ userName|json_encode|raw }},
             apiKey = {{ apiKey|json_encode|raw }},
             apiKeyGenerationHint = {{ apiKeyGenerationHint|default('')|json_encode|raw }},
+            switchOrganizationUrl = {{ switchOrganizationRoute ? path(switchOrganizationRoute)|json_encode|raw : 'null' }},
             loginUrl = {{ loginRoute ? path(loginRoute)|json_encode|raw : 'null' }},
             logoutUrl = {{ logoutRoute ? path(logoutRoute)|json_encode|raw : 'null' }},
             sessionAllowed = {{ hasSecurityToken|json_encode|raw }},
@@ -72,12 +97,10 @@
             serverTimeOffset = Date.parse(serverTime) - clientTime,
             $motd = $('.motd').first(),
             $apiDocLink = $('#header a').first(),
+            apiActions = {{ actions|default([])|json_encode|raw }},
             apiType = window.location.pathname.substr('{{ rootPath }}'.length + 1) || '{{ defaultView }}',
             apiPrefix = '',
             operatorMap = {'eq': '=', 'neq': '!=', 'gt': '>', 'lt': '<', 'gte': '>=', 'lte': '<='},
-            escapeSelector = function (val) {
-                return val.replace(/(:|\.|\[|\]|\{|\}|,)/g, "\\$1");
-            },
             escapeHtmlAttribute = function (val) {
                 return val.replace(/"/g,'&quot;');
             },
@@ -115,17 +138,68 @@
             fillHeader = function (header, headerKey, headerValue) {
                 $('input.key', header).val(headerKey);
                 $('input.value', header).val(headerValue);
+            },
+            preSubmitSandboxForm = function () {
+                var authType = $('#authentication_type option:selected').val(),
+                    $headers = $('.headers', this);
+
+                /**
+                 * Remove auto-generated headers
+                 */
+                $('.autogenerated-header', this).remove();
+
+                /**
+                 * Add WSSE authentication related headers
+                 */
+                if (authType === 'wsse') {
+                    $headers.append(
+                        '<div class="tuple autogenerated-header">' +
+                        '<input type="hidden" class="key" placeholder="Key" value="Authorization">' +
+                        '<input type="hidden" class="value authorization-header" placeholder="Value">' +
+                        '</div>' +
+                        '<div class="tuple autogenerated-header">' +
+                        '<input type="hidden" class="key" placeholder="Key" value="X-WSSE">' +
+                        '<input type="hidden" class="value x-wsse-header" placeholder="Value">' +
+                        '</div>'
+                    );
+                    $('input.authorization-header', this).val('WSSE profile="UsernameToken"');
+                    $('input.x-wsse-header', this).val(wsseHeader(userName, apiKey, serverTimeOffset));
+                }
+
+                /**
+                 * Add Session authentication related headers
+                 */
+                if (authType === 'session') {
+                    $headers.append(
+                        '<div class="tuple autogenerated-header">' +
+                        '<input type="hidden" class="key" placeholder="Key" value="X-Requested-With">' +
+                        '<input type="hidden" class="value" placeholder="Value" value="XMLHttpRequest">' +
+                        '</div>' +
+                        '<div class="tuple autogenerated-header">' +
+                        '<input type="hidden" class="key" placeholder="Key" value="X-CSRF-Header">' +
+                        '<input type="hidden" class="value authorization-header" placeholder="Value">' +
+                        '</div>'
+                    );
+                    $('input.authorization-header', this).val(getCookieValue({{ csrfCookieName|json_encode|raw }}));
+                }
+
+                /**
+                 * Add a header contains the id of current operation
+                 * It will be used in ajaxPrefilter and ajaxComplete global handlers
+                 */
+                $headers.append(
+                    '<div class="tuple autogenerated-header">' +
+                    '<input type="hidden" class="key" value="X-API-Sandbox-Operation-ID">' +
+                    '<input type="hidden" class="value operation-header">' +
+                    '</div>'
+                );
+                $('input.operation-header', this).val($(this).closest('.operation').attr('id'));
             };
 
         var apiPrefixMatch = window.location.pathname.match(/\/(\w+)\/api\//i);
         if (apiPrefixMatch) {
             apiPrefix = '-' + apiPrefixMatch[1];
         }
-
-        /**
-         * Set "home" URI
-         */
-        $apiDocLink.attr('href', '{{ rootPath }}');
 
         /**
          * Add the API view selector
@@ -158,7 +232,8 @@
         {% endif -%}
         {%- endfor -%}
         if (documentationUrl) {
-            documentation = '<a href="' + documentationUrl + '" target="_blank">The documentation</a>' + documentation;
+            documentation = '<a href="' + documentationUrl + '" class="main"'
+                + ' target="_blank">The documentation</a>' + documentation;
         }
         if (documentation) {
             $motd.append('<div class="documentation">' + documentation + '</div>');
@@ -183,81 +258,76 @@
             $('#header').css('background-color', '#f7fe2e');
         }
 
+        var accountInfo = '', switchOrganizationAllowed = false;
+
         /**
-         * Add loggin and logout links
+         * Add organization selector
          */
-        var accountInfo = '';
+        if (switchOrganizationUrl && Object.keys(organizations).length > 1) {
+            accountInfo += 'organization: <select id="organization">';
+            for (var org in organizations) {
+                accountInfo += '<option value="' + escapeHtmlAttribute(org)
+                    + '"' + (org == organization ? ' selected=""' : '') + '>'
+                    + $('<div/>').text(organizations[org]).html() + '</option>';
+            }
+            accountInfo += '</select><span id="organization_loading" style="display: none;">Loading...</span>';
+            switchOrganizationAllowed = true;
+        } else if (organization && (organizations[organization] || false)) {
+            accountInfo += 'organization: ' + organizations[organization];
+        }
+
+        /**
+         * Add login and logout links
+         */
         if (userName) {
-            accountInfo = '<em>signed in as: ' + userName + '</em>';
+            accountInfo += '<em>signed in as: ' + userName + '</em>';
             if (logoutUrl) {
                 accountInfo += '<a href="' + logoutUrl + '?_api_view=' + apiType + '">sign out</a>'
             }
         } else if (loginUrl) {
-            accountInfo = '<a href="' + loginUrl + '?_api_view=' + apiType + '">sign in</a>'
+            accountInfo += '<a href="' + loginUrl + '?_api_view=' + apiType + '">sign in</a>'
         }
+
         if (accountInfo) {
             $('#sandbox_configuration').append('<span class="account-info">' + accountInfo + '</span>');
+            if (switchOrganizationAllowed) {
+                $('#organization').on('change', function() {
+                    var $organizationSelector = $(this),
+                        $organizationLoader = $('#organization_loading');
+                    $organizationSelector.hide();
+                    $organizationLoader.show();
+                    $.ajax({
+                        url: switchOrganizationUrl + '/' + this.value + '.json',
+                        type: 'GET',
+                        headers: { 'X-CSRF-Header': getCookieValue({{ csrfCookieName|json_encode|raw }}) },
+                        success: function() {
+                            window.location.reload();
+                        },
+                        error: function() {
+                            $organizationSelector.val(organization);
+                            $organizationLoader.hide();
+                            $organizationSelector.show();
+                            alert('Failed to switch the organization.');
+                        }
+                    });
+                });
+            }
         }
 
         /**
          * Add "Try!" button handler
          */
-        $('.pane.sandbox form').bindFirst('submit', function() {
-            var authType = $('#authentication_type option:selected').val(),
-                $headers = $('.headers', this);
-
-            /**
-             * Remove auto-generated headers
-             */
-            $('.autogenerated-header', this).remove();
-
-            /**
-             * Add WSSE authentication related headers
-             */
-            if (authType === 'wsse') {
-                $headers.append(
-                    '<div class="tuple autogenerated-header">' +
-                    '<input type="hidden" class="key" placeholder="Key" value="Authorization">' +
-                    '<input type="hidden" class="value authorization-header" placeholder="Value">' +
-                    '</div>' +
-                    '<div class="tuple autogenerated-header">' +
-                    '<input type="hidden" class="key" placeholder="Key" value="X-WSSE">' +
-                    '<input type="hidden" class="value x-wsse-header" placeholder="Value">' +
-                    '</div>'
-                );
-                $('input.authorization-header', this).val('WSSE profile="UsernameToken"');
-                $('input.x-wsse-header', this).val(wsseHeader(userName, apiKey, serverTimeOffset));
-            }
-
-            /**
-             * Add Session authentication related headers
-             */
-            if (authType === 'session') {
-                $headers.append(
-                    '<div class="tuple autogenerated-header">' +
-                    '<input type="hidden" class="key" placeholder="Key" value="X-CSRF-Header">' +
-                    '<input type="hidden" class="value authorization-header" placeholder="Value" value="1">' +
-                    '</div>'
-                );
-            }
-
-            /**
-             * Add a header contains the id of current operation
-             * It will be used in ajaxPrefilter and ajaxComplete global handlers
-             */
-            $headers.append(
-                '<div class="tuple autogenerated-header">' +
-                '<input type="hidden" class="key" value="X-API-Sandbox-Operation-ID">' +
-                '<input type="hidden" class="value operation-header">' +
-                '</div>'
-            );
-            $('input.operation-header', this).val($(this).closest('.operation').attr('id'));
+        // for AJAX sandbox
+        $(document).on('api_resource_content:load', function(e) {
+            $(e.target).find('.pane.sandbox form').bindFirst('submit', preSubmitSandboxForm)
         });
+        // for not AJAX sandbox
+        $('.pane.sandbox form').bindFirst('submit', preSubmitSandboxForm);
 
         /**
          * Add sandbox input data handler
          */
-        $('li[data-pane="sandbox"]').on('click', function() {
+        $(document).on('click', 'li[data-pane="sandbox"]', function() {
             /**
              * Fill input requirements: version and _format
              */
@@ -276,13 +346,26 @@
              */
             {% if views is defined and views -%}
                 var $headers = $(this).closest('.content').find('fieldset.headers'),
-                    routePath = $(this).parents('li.operation').find('div.heading span.path').text();
+                    routePath = $(this).parents('li.operation').find('div.heading span.path').text(),
+                    apiAction = apiActions[$(this).closest('.operation').attr('id')] || null,
+                    headerActions = [],
+                    headers = {};
                 {% for name, view in views -%}
                 {% if view.headers is defined and view.headers -%}
                 if (apiType === '{{ name }}' && routePath.indexOf('/api/rest/') === -1) {
-                    {%- for headerName, headerValue in view.headers -%}
-                    addHeader($headers, '{{ headerName }}', '{{ headerValue }}');
-                    {%- endfor -%}
+                    {% for headerName, headerValues in view.headers -%}
+                    {% for headerValue in headerValues -%}
+                    headerActions = {{ headerValue.actions|json_encode|raw }};
+                    if (!apiAction || headerActions.length === 0 || headerActions.indexOf(apiAction) >= 0) {
+                        headers['{{ headerName }}'] = headers['{{ headerName }}']
+                            ? headers['{{ headerName }}'] + ';{{ headerValue.value }}'
+                            : '{{ headerValue.value }}';
+                    }
+                    {% endfor -%}
+                    {% endfor -%}
+                    for (var key in headers) {
+                        addHeader($headers, key, headers[key]);
+                    }
                 }
                 {% endif %}
                 {%- endfor %}
@@ -292,8 +375,8 @@
         /**
          * Add API resource handler
          */
-        $('.toggler').on('click', function() {
-            var $container = $(this).closest('.operation'),
+        $(document).on('api_resource_content:load', function(e) {
+            var $container = $(e.target).closest('.operation'),
                 $filters = $container.find('.pane.content>table>tbody table'),
                 $form = $container.find('.pane.sandbox form');
 
@@ -345,7 +428,7 @@
          * A handler to add operators to the sandbox AJAX requests
          */
         $.ajaxPrefilter(function(options) {
-            if (options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
+            if (options.headers === undefined || options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
                 return;
             }
 
@@ -402,7 +485,7 @@
          * A handler to correct a result of the sandbox AJAX requests
          */
         $(document).ajaxComplete(function(event, jqXHR, options) {
-            if (options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
+            if (options.headers === undefined || options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
                 return;
             }
 
@@ -434,19 +517,13 @@
             /**
              * Update "Curl Command Line" section
              */
-            displayCurl(
-                options.type,
-                decodeURIComponent(options.url),
-                options.headers,
-                options.data,
-                $('.curl-command', $result)
-            );
+            displayCurl(options.type, options.url, options.headers, options.data, $('.curl-command', $result));
         });
 
         /**
          * Add the request body visibility handler
          */
-        $('.pane.sandbox').on('click', '.toggle-request-body', function(e) {
+        $(document).on('click', '.pane.sandbox .toggle-request-body', function(e) {
             $(this).text(
                 $('.request-body', $(this).parents('.result')).toggle().is(':visible') ? 'Hide' : 'Show'
             );

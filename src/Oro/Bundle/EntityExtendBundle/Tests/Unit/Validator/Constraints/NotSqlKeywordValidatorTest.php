@@ -2,69 +2,53 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\DBAL\Platforms\Keywords\MySQLKeywords;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeyword;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotSqlKeywordValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class NotSqlKeywordValidatorTest extends \PHPUnit\Framework\TestCase
+class NotSqlKeywordValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
-
-    /** @var NotSqlKeywordValidator */
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $platform = new MySqlPlatform();
-
+        $connection = $this->createMock(Connection::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getConnection')
-            ->will($this->returnValue($connection));
+            ->willReturn($connection);
         $connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->will($this->returnValue($platform));
+            ->willReturn(new MySqlPlatform());
 
-        $this->validator = new NotSqlKeywordValidator($doctrine);
-        $this->validator->initialize($this->context);
+        return new NotSqlKeywordValidator($doctrine);
     }
 
     /**
      * @dataProvider validateDataProvider
      */
-    public function testValidate($value, $violation)
+    public function testValidate(string $value, bool $valid)
     {
         $constraint = new NotSqlKeyword();
-
-        if ($violation) {
-            $this->context->expects($this->once())
-                ->method('addViolation')
-                ->with($constraint->message);
-        } else {
-            $this->context->expects($this->never())
-                ->method('addViolation');
-        }
-
         $this->validator->validate($value, $constraint);
+
+        if ($valid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation($constraint->message)
+                ->setParameter('{{ value }}', $value)
+                ->assertRaised();
+        }
     }
 
-    public function validateDataProvider()
+    public function validateDataProvider(): array
     {
         return [
-            ['', false],
-            ['test', false],
-            ['select', true],
-            ['SELECT', true],
+            ['', true],
+            ['test', true],
+            ['select', false],
+            ['SELECT', false],
         ];
     }
 }

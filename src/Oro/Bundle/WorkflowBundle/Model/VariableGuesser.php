@@ -2,16 +2,20 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\AbstractGuesser;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Guesses class name and a list of options for creating an instance
+ * of that class for certain variable
+ */
 class VariableGuesser extends AbstractGuesser
 {
     const DEFAULT_CONSTRAINT_NAMESPACE = 'Symfony\\Component\\Validator\\Constraints\\';
@@ -19,13 +23,6 @@ class VariableGuesser extends AbstractGuesser
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param FormRegistry $formRegistry
-     * @param ManagerRegistry $managerRegistry
-     * @param ConfigProvider $entityConfigProvider
-     * @param ConfigProvider $formConfigProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         FormRegistry $formRegistry,
         ManagerRegistry $managerRegistry,
@@ -47,9 +44,9 @@ class VariableGuesser extends AbstractGuesser
     {
         $type = $variable->getType();
         if ('entity' === $type) {
-            list($formType, $formOptions) = $this->getEntityForm($variable);
+            [$formType, $formOptions] = $this->getEntityForm($variable);
 
-            return new TypeGuess($formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
+            return new TypeGuess($formType ?? '', $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
         }
 
         if (!isset($this->formTypeMapping[$type])) {
@@ -105,7 +102,7 @@ class VariableGuesser extends AbstractGuesser
             }
 
             unset($formOptions['constraints'][$constraint]);
-            if (false === strpos($constraint, '\\')) {
+            if (!str_contains($constraint, '\\')) {
                 $constraint = sprintf('%s%s', self::DEFAULT_CONSTRAINT_NAMESPACE, $constraint);
             }
             $formOptions['constraints'][] = new $constraint($constraintOptions);

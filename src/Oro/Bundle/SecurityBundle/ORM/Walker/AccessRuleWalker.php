@@ -2,114 +2,128 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\AST\ConditionalFactor;
-use Doctrine\ORM\Query\AST\ConditionalPrimary;
-use Doctrine\ORM\Query\AST\ConditionalTerm;
-use Doctrine\ORM\Query\AST\Join;
-use Doctrine\ORM\Query\AST\Node;
-use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
-use Doctrine\ORM\Query\AST\SelectStatement;
-use Doctrine\ORM\Query\AST\Subselect;
-use Doctrine\ORM\Query\AST\WhereClause;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\AST;
 use Doctrine\ORM\Query\TreeWalkerAdapter;
 use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
-use Oro\Bundle\SecurityBundle\AccessRule\ChainAccessRule;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Walker that apply access rule conditions to DBAL query.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AccessRuleWalker extends TreeWalkerAdapter
 {
-    public const CONTEXT = 'oro_access_rule.context';
+    public const CONTEXT        = 'oro_access_rule.context';
     public const ORM_RULES_TYPE = 'ORM';
 
-    /** @var ChainAccessRule */
-    private $chainAccessRule;
+    /** @var EntityManagerInterface */
+    private $em;
 
-    /** @var QueryComponent[] */
+    /** @var QueryComponentCollection */
     private $queryComponents;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function walkSelectStatement(SelectStatement $AST)
+    public function walkSelectStatement(AST\SelectStatement $AST)
     {
-        /** @var Query $query */
         $query = $this->_getQuery();
-        $em = $query->getEntityManager();
 
-        $this->collectQueryComponents();
-
-        $context = $query->getHint(self::CONTEXT);
-
-        if ($context->getOption(AclHelper::CHECK_ROOT_ENTITY, true)) {
-            $this->processSelect($AST, $context, $em);
+        $this->em = $query->getEntityManager();
+        $this->queryComponents = $this->collectQueryComponents();
+        try {
+            $this->processSelectStatement($AST, $query->getHint(self::CONTEXT));
+            $this->applyNewQueryComponents($this->queryComponents);
+        } finally {
+            $this->em = null;
+            $this->queryComponents = null;
         }
-        if ($context->getOption(AclHelper::CHECK_RELATIONS, true)) {
-            $this->processJoins($AST, $context, $em);
-        }
-
-        if ($AST->whereClause) {
-            $this->processSubselects($AST, $this->getSubselectContext($context), $em);
-        }
-
-        $this->applyNewQueryComponents();
     }
 
     /**
-     * @param SelectStatement $AST
-     * @param AccessRuleWalkerContext $context
-     * @param ObjectManager $em
+     * Process select or subselect expression.
+     *
+     * @param AST\SelectStatement|AST\Subselect $select
+     * @param AccessRuleWalkerContext           $context
      */
-    private function processSubselects(
-        SelectStatement $AST,
-        AccessRuleWalkerContext $context,
-        ObjectManager $em
-    ): void {
-        $conditionalExpression = $AST->whereClause->conditionalExpression;
-        if (isset($conditionalExpression->conditionalPrimary)) {
-            $conditionalExpression = $conditionalExpression->conditionalPrimary;
+    private function processSelectStatement(AST\Node $select, AccessRuleWalkerContext $context): void
+    {
+        if ($context->getOption(AclHelper::CHECK_ROOT_ENTITY, true)) {
+            $this->processSelect($select, $context);
+        }
+        if ($context->getOption(AclHelper::CHECK_RELATIONS, true)) {
+            $this->processJoins($select, $context);
         }
 
-        if ($conditionalExpression instanceof ConditionalPrimary) {
-            // we have request with only one where condition
-            $expression = $conditionalExpression->simpleConditionalExpression;
-            if (isset($expression->subselect)
-                && $expression->subselect instanceof Subselect
-            ) {
-                $this->processSelect($expression->subselect, $context, $em);
-                $this->processJoins($expression->subselect, $context, $em);
-            }
-        } else {
-            // we have request with many where conditions
-            if (isset($conditionalExpression->conditionalFactors)) {
-                $factors = $conditionalExpression->conditionalFactors;
-            } else {
-                $factors = $conditionalExpression->conditionalTerms;
-            }
-            foreach ($factors as $factorId => $expression) {
-                if (isset($expression->simpleConditionalExpression->subselect)
-                    && $expression->simpleConditionalExpression->subselect instanceof Subselect
-                ) {
-                    $this->processSelect($expression->simpleConditionalExpression->subselect, $context, $em);
-                    $this->processJoins($expression->simpleConditionalExpression->subselect, $context, $em);
+        if ($select->whereClause) {
+            $this->findAndProcessSubselects(
+                $select->whereClause->conditionalExpression,
+                $this->getSubselectContext($context)
+            );
+        }
+        $this->processSubselectsInJoins($select, $this->getSubselectContext($context));
+    }
+
+    /**
+     * Process subselext expressions in join expressions.
+     *
+     * @param AST\SelectStatement|AST\Subselect $select
+     * @param AccessRuleWalkerContext           $context
+     */
+    private function processSubselectsInJoins(AST\Node $select, AccessRuleWalkerContext $context): void
+    {
+        $fromClause = $select instanceof AST\SelectStatement ? $select->fromClause : $select->subselectFromClause;
+        foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
+            if (!empty($identificationVariableDeclaration->joins)) {
+                $i = 0;
+                /** @var AST\Join $join */
+                while ($i < \count($identificationVariableDeclaration->joins)) {
+                    $keys = \array_keys($identificationVariableDeclaration->joins);
+                    $join = $identificationVariableDeclaration->joins[$keys[$i]];
+
+                    if (isset($join->conditionalExpression)) {
+                        $this->findAndProcessSubselects($join->conditionalExpression, $context);
+                    }
+                    $i++;
                 }
             }
         }
     }
 
     /**
-     * @param Node $AST
-     * @param AccessRuleWalkerContext $context
-     * @param ObjectManager $em
+     * Finds and processes subselects in given expression.
      */
-    private function processSelect(Node $AST, AccessRuleWalkerContext $context, ObjectManager $em): void
+    private function findAndProcessSubselects(AST\Node $conditionalExpression, AccessRuleWalkerContext $context): void
     {
-        $fromClause = $AST instanceof SelectStatement ? $AST->fromClause : $AST->subselectFromClause;
+        if (isset($conditionalExpression->conditionalPrimary)) {
+            $conditionalExpression = $conditionalExpression->conditionalPrimary;
+        }
+
+        if ($conditionalExpression instanceof AST\ConditionalPrimary) {
+            $expression = $conditionalExpression->simpleConditionalExpression;
+            if ($expression && isset($expression->subselect)
+                && $expression->subselect instanceof AST\Subselect
+            ) {
+                $this->processSelectStatement($expression->subselect, $context);
+            } elseif (isset($conditionalExpression->conditionalExpression)) {
+                $this->findAndProcessSubselects($conditionalExpression->conditionalExpression, $context);
+            }
+        } else {
+            if (isset($conditionalExpression->conditionalFactors)) {
+                $factors = $conditionalExpression->conditionalFactors;
+            } else {
+                $factors = $conditionalExpression->conditionalTerms;
+            }
+            foreach ($factors as $expression) {
+                $this->findAndProcessSubselects($expression, $context);
+            }
+        }
+    }
+
+    private function processSelect(AST\Node $AST, AccessRuleWalkerContext $context): void
+    {
+        $fromClause = $AST instanceof AST\SelectStatement ? $AST->fromClause : $AST->subselectFromClause;
         foreach ($fromClause->identificationVariableDeclarations as $identificationVariableDeclaration) {
             $rangeVariableDeclaration = $identificationVariableDeclaration->rangeVariableDeclaration;
 
@@ -120,20 +134,14 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
             $criteriaExpression = $criteria->getExpression();
             if ($criteriaExpression) {
-                $visitor = new AstVisitor();
-                $visitor->setAlias($alias);
-                $visitor->setQueryComponents($this->queryComponents);
-                $visitor->setObjectManager($em);
-
+                $visitor = new AstVisitor($this->em, $alias, $this->queryComponents);
                 $whereExpression = null === $AST->whereClause ? null : $AST->whereClause->conditionalExpression;
                 $conditionalExpression = $this->mergeExpressions(
                     $visitor->dispatch($criteria->getExpression()),
                     $whereExpression
                 );
-                $this->queryComponents = $visitor->getQueryComponents();
-
                 if (null === $AST->whereClause) {
-                    $AST->whereClause = new WhereClause($conditionalExpression);
+                    $AST->whereClause = new AST\WhereClause($conditionalExpression);
                 } else {
                     $AST->whereClause->conditionalExpression = $conditionalExpression;
                 }
@@ -142,28 +150,30 @@ class AccessRuleWalker extends TreeWalkerAdapter
     }
 
     /**
-     * @param SelectStatement|Subselect $select
-     * @param AccessRuleWalkerContext $context
-     * @param ObjectManager $em
+     * @param AST\SelectStatement|AST\Subselect $select
+     * @param AccessRuleWalkerContext           $context
      */
-    private function processJoins($select, AccessRuleWalkerContext $context, ObjectManager $em): void
+    private function processJoins($select, AccessRuleWalkerContext $context): void
     {
-        $fromClause = $select instanceof SelectStatement ? $select->fromClause : $select->subselectFromClause;
+        $fromClause = $select instanceof AST\SelectStatement ? $select->fromClause : $select->subselectFromClause;
         foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
             if (!empty($identificationVariableDeclaration->joins)) {
+                $i = 0;
+                /** @var AST\Join $join */
+                while ($i < \count($identificationVariableDeclaration->joins)) {
+                    $keys = \array_keys($identificationVariableDeclaration->joins);
+                    $join = $identificationVariableDeclaration->joins[$keys[$i]];
 
-                /** @var $join Join */
-                foreach ($identificationVariableDeclaration->joins as $joinKey => $join) {
                     $joinAlias = $join->joinAssociationDeclaration->aliasIdentificationVariable;
 
                     $parentClass = null;
                     $parentField = null;
 
                     //check if join in format "join some_table on (some_table.id = parent_table.id)"
-                    if ($join->joinAssociationDeclaration instanceof RangeVariableDeclaration) {
+                    if ($join->joinAssociationDeclaration instanceof AST\RangeVariableDeclaration) {
                         $joinEntity = $join->joinAssociationDeclaration->abstractSchemaName;
                     } else {
-                        $joinQueryComponent = $this->queryComponents[$joinAlias];
+                        $joinQueryComponent = $this->queryComponents->get($joinAlias);
                         $joinEntityMetadata = $joinQueryComponent->getMetadata();
                         $joinEntity = $joinEntityMetadata->name;
 
@@ -185,17 +195,13 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
                     $criteriaExpression = $criteria->getExpression();
                     if ($criteriaExpression) {
-                        $visitor = new AstVisitor();
-                        $visitor->setAlias($joinAlias);
-                        $visitor->setQueryComponents($this->queryComponents);
-                        $visitor->setObjectManager($em);
-
+                        $visitor = new AstVisitor($this->em, $joinAlias, $this->queryComponents);
                         $join->conditionalExpression = $this->mergeExpressions(
                             $visitor->dispatch($criteria->getExpression()),
                             $join->conditionalExpression
                         );
-                        $this->queryComponents = $visitor->getQueryComponents();
                     }
+                    $i++;
                 }
             }
         }
@@ -203,10 +209,6 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
     /**
      * Creates the context for subselects.
-     *
-     * @param AccessRuleWalkerContext $context
-     *
-     * @return AccessRuleWalkerContext
      */
     private function getSubselectContext(AccessRuleWalkerContext $context): AccessRuleWalkerContext
     {
@@ -219,14 +221,6 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
     /**
      * Creates new criteria, process access rules with new criteria and returns it.
-     *
-     * @param string $entityClass
-     * @param AccessRuleWalkerContext $context
-     * @param string $alias
-     * @param bool $isRoot
-     * @param array $options
-     *
-     * @return Criteria
      */
     private function getEntityAccessRulesCriteria(
         string $entityClass,
@@ -243,16 +237,16 @@ class AccessRuleWalker extends TreeWalkerAdapter
             $criteria->setOption($optionName, $optionValue);
         }
 
-        $this->getChainAccessRule($context->getContainer())->process($criteria);
+        $context->getAccessRuleExecutor()->process($criteria);
 
         return $criteria;
     }
 
     /**
-     * @param ConditionalTerm|ConditionalPrimary $ruleExpression
-     * @param ConditionalTerm|ConditionalPrimary|Node null $queryExpression
+     * @param AST\ConditionalTerm|AST\ConditionalPrimary               $ruleExpression
+     * @param AST\ConditionalTerm|AST\ConditionalPrimary|AST\Node|null $queryExpression
      *
-     * @return ConditionalTerm|ConditionalPrimary
+     * @return AST\ConditionalTerm|AST\ConditionalPrimary
      */
     private function mergeExpressions($ruleExpression, $queryExpression = null)
     {
@@ -260,73 +254,60 @@ class AccessRuleWalker extends TreeWalkerAdapter
             return $ruleExpression;
         }
 
-        return new ConditionalTerm(
-            array_merge(
-                $this->getConditionalFactors($queryExpression),
-                $this->getConditionalFactors($ruleExpression)
-            )
-        );
+        return new AST\ConditionalTerm(\array_merge(
+            $this->getConditionalFactors($queryExpression),
+            $this->getConditionalFactors($ruleExpression)
+        ));
     }
 
     /**
-     * @param Node $queryExpression
+     * @param AST\Node $queryExpression
      *
-     * @return ConditionalFactor[]
+     * @return AST\ConditionalFactor[]
      */
-    private function getConditionalFactors(Node $queryExpression): array
+    private function getConditionalFactors(AST\Node $queryExpression): array
     {
         // in case if $queryExpression is some kind if comparison expression
         // - wrap it with ConditionalPrimary expression
-        if (!($queryExpression instanceof ConditionalPrimary) && !($queryExpression instanceof ConditionalTerm)) {
-            $conditionalExpressionPrimary = new ConditionalPrimary();
+        if (!($queryExpression instanceof AST\ConditionalPrimary)
+            && !($queryExpression instanceof AST\ConditionalTerm)
+        ) {
+            $conditionalExpressionPrimary = new AST\ConditionalPrimary();
             $conditionalExpressionPrimary->conditionalExpression = $queryExpression;
             $queryExpression = $conditionalExpressionPrimary;
         }
 
-        return $queryExpression instanceof ConditionalPrimary
+        return $queryExpression instanceof AST\ConditionalPrimary
             ? [$queryExpression]
             : $queryExpression->conditionalFactors;
     }
 
     /**
-     * @param ContainerInterface $container
-     *
-     * @return ChainAccessRule
-     */
-    private function getChainAccessRule(ContainerInterface $container): ChainAccessRule
-    {
-        if (!$this->chainAccessRule) {
-            $this->chainAccessRule = $container->get('oro_security.access_rule.chain_access_rule');
-        }
-
-        return $this->chainAccessRule;
-    }
-
-    /**
      * Collects existing array query components to array of objects.
      */
-    private function collectQueryComponents(): void
+    private function collectQueryComponents(): QueryComponentCollection
     {
-        $result = [];
-        foreach ($this->getQueryComponents() as $alias => $component) {
-            $componentObject = QueryComponent::fromArray($component);
-            if (null !== $componentObject) {
-                $result[$alias] = QueryComponent::fromArray($component);
+        $result = new QueryComponentCollection();
+        $components = $this->getQueryComponents();
+        foreach ($components as $alias => $componentArray) {
+            $component = QueryComponent::fromArray($componentArray);
+            if (null !== $component) {
+                $result->add($alias, $component);
             }
         }
 
-        $this->queryComponents = $result;
+        return $result;
     }
 
     /**
      * Adds new query components to existing query components.
-     *
-     * @throws Query\QueryException
      */
-    private function applyNewQueryComponents(): void
+    private function applyNewQueryComponents(QueryComponentCollection $queryComponents): void
     {
-        foreach ($this->queryComponents as $alias => $queryComponent) {
-            if (!array_key_exists($alias, $this->getQueryComponents())) {
+        /** @var QueryComponent $queryComponent */
+        $components = $queryComponents->toArray();
+        foreach ($components as $alias => $queryComponent) {
+            if (!\array_key_exists($alias, $this->getQueryComponents())) {
                 $this->setQueryComponent($alias, $queryComponent->toArray());
             }
         }

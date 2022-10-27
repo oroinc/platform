@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OperationFormHandler
 {
@@ -31,12 +31,6 @@ class OperationFormHandler
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param FormFactoryInterface $formFactory
-     * @param ContextHelper $contextHelper
-     * @param OperationRegistry $operationRegistry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         FormFactoryInterface $formFactory,
         ContextHelper $contextHelper,

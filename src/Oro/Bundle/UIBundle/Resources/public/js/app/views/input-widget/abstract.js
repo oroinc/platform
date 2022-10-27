@@ -1,16 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var AbstractInputWidgetView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     /**
      * AbstractInputWidgetView is the base class for all input widgets.
      * InputWidget is used to provide a common API for all input widgets.
      * By using this API you provide ability to change input widget to any other or remove it.
      */
-    AbstractInputWidgetView = BaseView.extend({
+    const AbstractInputWidgetView = BaseView.extend({
         /** @property {jQuery} */
         $container: null,
 
@@ -43,21 +42,21 @@ define(function(require) {
         overrideJqueryMethods: ['val', 'hide', 'show', 'focus', 'width'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AbstractInputWidgetView() {
-            AbstractInputWidgetView.__super__.constructor.apply(this, arguments);
+        constructor: function AbstractInputWidgetView(options) {
+            AbstractInputWidgetView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.resolveOptions(options);
             this.initializeWidget();
 
             if (this.isInitialized()) {
-                this.container().addClass(this.containerClass);
+                this.getContainer().addClass(this.containerClass);
             }
 
             this.$el.trigger('input-widget:init');
@@ -71,10 +70,10 @@ define(function(require) {
             }
         },
 
-        delegateEvents: function() {
-            AbstractInputWidgetView.__super__.delegateEvents.apply(this, arguments);
+        delegateEvents: function(events) {
+            AbstractInputWidgetView.__super__.delegateEvents.call(this, events);
             if (this.refreshOnChange) {
-                this._addEvent('change', _.bind(this.refresh, this));
+                this._addEvent('change', this.refresh.bind(this));
             }
         },
 
@@ -96,7 +95,7 @@ define(function(require) {
             this.$el.data('inputWidget', this)
                 .attr('data-bound-input-widget', this.widgetFunctionName || 'no-name');
             if (!this.widgetFunction && this.widgetFunctionName) {
-                this.widgetFunction = _.bind(this.$el[this.widgetFunctionName], this.$el);
+                this.widgetFunction = this.$el[this.widgetFunctionName].bind(this.$el);
             }
 
             if (this.containerClassSuffix) {
@@ -107,7 +106,7 @@ define(function(require) {
         /**
          * Destroy widget
          *
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -120,7 +119,7 @@ define(function(require) {
                 .removeAttr('data-bound-input-widget');
             delete this.$container;
 
-            return AbstractInputWidgetView.__super__.dispose.apply(this, arguments);
+            return AbstractInputWidgetView.__super__.dispose.call(this);
         },
 
         disposeWidget: function() {
@@ -142,14 +141,14 @@ define(function(require) {
          *
          * @returns {jQuery}
          */
-        container: function() {
+        getContainer: function() {
             return this.$container || (this.$container = this.findContainer());
         },
 
         applyWidgetFunction: function(command, args) {
             args = Array.prototype.slice.apply(args);
             args.unshift(command);
-            return this.widgetFunction.apply(this, args);
+            return this.widgetFunction(...args);
         },
 
         /**
@@ -158,7 +157,7 @@ define(function(require) {
          * @param {mixed} width
          */
         width: function(width) {
-            this.container().width(width);
+            this.getContainer().width(width);
         },
 
         /**
@@ -172,14 +171,15 @@ define(function(require) {
                 this.disposeWidget();
                 this.initializeWidget();
             }
+            this.$el.trigger('input-widget:refresh');
         },
 
         hide: function() {
-            this.container().hide();
+            this.getContainer().hide();
         },
 
         show: function() {
-            this.container().show();
+            this.getContainer().show();
         },
 
         _addEvent: function(eventName, callback) {

@@ -18,11 +18,6 @@ class RestrictionManager
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param UserAgentProvider $userAgentProvider
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(
         WorkflowRegistry $workflowRegistry,
         UserAgentProvider $userAgentProvider,

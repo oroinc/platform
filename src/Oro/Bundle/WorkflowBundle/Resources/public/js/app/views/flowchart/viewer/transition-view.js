@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartViewerTransitionView;
-    var _ = require('underscore');
-    var FlowchartJsPlumbBaseView = require('../jsplumb/base-view');
+    const _ = require('underscore');
+    const FlowchartJsPlumbBaseView = require('../jsplumb/base-view');
 
-    FlowchartViewerTransitionView = FlowchartJsPlumbBaseView.extend({
+    const FlowchartViewerTransitionView = FlowchartJsPlumbBaseView.extend({
         /**
          * @type {FlowchartJsPlumbAreaView}
          */
@@ -22,28 +21,31 @@ define(function(require) {
         defaultConnectionOptions: function() {
             return {
                 paintStyle: {
-                    strokeStyle: '#dcdcdc',
+                    strokeStyle: '#bababb',
                     lineWidth: 2,
-                    outlineColor: '#fafafa',
+                    outlineColor: '#ffffff',
                     outlineWidth: 2
+                },
+                EndpointStyle: {
+                    lineWidth: 10
                 }
             };
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function FlowchartViewerTransitionView() {
-            FlowchartViewerTransitionView.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartViewerTransitionView(options) {
+            FlowchartViewerTransitionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.connections = [];
 
-            var optionKeysToCopy = ['areaView', 'stepCollection', 'stepCollectionView', 'transitionOverlayView'];
+            const optionKeysToCopy = ['areaView', 'stepCollection', 'stepCollectionView', 'transitionOverlayView'];
             if (optionKeysToCopy.length !== _.intersection(optionKeysToCopy, _.keys(options)).length) {
                 throw new Error(optionKeysToCopy.join(', ') + ' options are required');
             }
@@ -54,24 +56,26 @@ define(function(require) {
                 options.connectionOptions || {}
             );
 
-            FlowchartViewerTransitionView.__super__.initialize.apply(this, arguments);
+            FlowchartViewerTransitionView.__super__.initialize.call(this, options);
         },
 
         render: function() {
             this.updateStepTransitions();
-            if (!this.isConnected) {
-                this.isConnected = true;
+            if (!this.isConnected && !this.isConnecting) {
+                this.isConnecting = true;
                 this.connect();
+                this.isConnected = true;
+                delete this.isConnecting;
             }
             return this;
         },
 
         connect: function() {
-            var debouncedUpdate = _.debounce(_.bind(function() {
+            const debouncedUpdate = _.debounce(() => {
                 if (!this.disposed) {
                     this.updateStepTransitions();
                 }
-            }, this), 50);
+            }, 50);
             this.listenTo(this.model, 'change', debouncedUpdate);
             this.listenTo(this.stepCollection, 'add', debouncedUpdate);
             this.listenTo(this.stepCollection, 'change', debouncedUpdate);
@@ -83,8 +87,8 @@ define(function(require) {
         },
 
         findConnectionByStartStep: function(startStep) {
-            var connection;
-            for (var i = 0; i < this.connections.length; i++) {
+            let connection;
+            for (let i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
                 if (connection.startStep === startStep) {
                     return connection;
@@ -93,14 +97,14 @@ define(function(require) {
         },
 
         updateStepTransitions: function() {
-            var i;
-            var startStep;
-            var connection;
-            var name = this.model.get('name');
-            var startSteps = this.stepCollection.filter(function(item) {
+            let i;
+            let startStep;
+            let connection;
+            const name = this.model.get('name');
+            const startSteps = this.stepCollection.filter(function(item) {
                 return item.get('allowed_transitions').indexOf(name) !== -1;
             });
-            var endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
+            const endStep = this.stepCollection.findWhere({name: this.model.get('step_to')});
             this.addStaleMark();
             for (i = 0; i < startSteps.length; i++) {
                 startStep = startSteps[i];
@@ -113,24 +117,24 @@ define(function(require) {
             }
             this.removeStaleConnections();
 
-            this.areaView.stepCollectionView.getItemView(endStep).updateStepMinWidth();
+            this.stepCollectionView.getItemView(endStep).updateStepMinWidth();
             for (i = 0; i < startSteps.length; i++) {
                 startStep = startSteps[i];
-                this.areaView.stepCollectionView.getItemView(startStep).updateStepMinWidth();
+                this.stepCollectionView.getItemView(startStep).updateStepMinWidth();
             }
         },
 
         addStaleMark: function() {
-            var connection;
-            for (var i = 0; i < this.connections.length; i++) {
+            let connection;
+            for (let i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
                 connection.stale = true;
             }
         },
 
         removeStaleConnections: function() {
-            var connection;
-            for (var i = 0; i < this.connections.length; i++) {
+            let connection;
+            for (let i = 0; i < this.connections.length; i++) {
                 connection = this.connections[i];
                 if (connection.stale && connection.jsplumbConnection._jsPlumb) {
                     this.areaView.jsPlumbInstance.detach(connection.jsplumbConnection);
@@ -147,15 +151,14 @@ define(function(require) {
         },
 
         createConnection: function(startStep, endStep) {
-            var jsplumbConnection;
-            var overlayView;
-            var transitionModel = this.model;
-            var areaView = this.areaView;
-            var overlayIsVisible = areaView.flowchartState.get('transitionLabelsVisible');
-            var endEl = this.findElByStep(endStep);
-            var startEl = this.findElByStep(startStep);
-            var anchors = this.areaView.jsPlumbManager.getAnchors(startEl, endEl);
-            var connectionOptions = _.defaults({
+            let overlayView;
+            const transitionModel = this.model;
+            const areaView = this.areaView;
+            const overlayIsVisible = areaView.flowchartState.get('transitionLabelsVisible');
+            const endEl = this.findElByStep(endStep);
+            const startEl = this.findElByStep(startStep);
+            const anchors = this.areaView.jsPlumbManager.getAnchors(startEl, endEl);
+            const connectionOptions = _.defaults({
                 source: startEl,
                 target: endEl,
                 connector: ['Smartline', {cornerRadius: 3, midpoint: 0.5}],
@@ -165,8 +168,8 @@ define(function(require) {
                 overlays: [
                     ['Custom', {
                         id: 'overlay',
-                        create: _.bind(function(connection) {
-                            var overlay = connection.getOverlay('overlay');
+                        create: connection => {
+                            const overlay = connection.getOverlay('overlay');
                             connection.overlayView = overlayView = new this.transitionOverlayView({
                                 model: transitionModel,
                                 overlay: overlay,
@@ -176,14 +179,14 @@ define(function(require) {
                             overlayView.render();
                             overlay.cssClass = _.result(overlayView, 'className');
                             return overlayView.$el;
-                        }, this),
+                        },
                         visible: overlayIsVisible,
                         location: 0.5
                     }]
                 ]
             }, this.defaultConnectionOptions);
 
-            jsplumbConnection = this.areaView.jsPlumbInstance.connect(connectionOptions);
+            const jsplumbConnection = this.areaView.jsPlumbInstance.connect(connectionOptions);
             jsplumbConnection.overlayView = overlayView;
             this.connections.push({
                 startStep: startStep,
@@ -195,7 +198,6 @@ define(function(require) {
         cleanup: function() {
             this.addStaleMark();
             this.removeStaleConnections();
-            this.stopListening();
         }
     });
 

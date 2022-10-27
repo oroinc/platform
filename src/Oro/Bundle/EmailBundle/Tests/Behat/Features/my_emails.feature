@@ -8,7 +8,7 @@ Feature: My emails 
   Scenario: Filter emails
     Given I login as administrator
       And I click My Emails in user menu
-    When I follow "Compose"
+    When I click "Compose"
       And fill "Email Form" with:
       | Body    | This is very simple test mail |
       | To      | Charlie Sheen                 |
@@ -22,7 +22,7 @@ Feature: My emails 
       And I should see following grid:
         | Subject               | Date        |
         | There is no spoon     | 2010-10-31 |
-      And I should see "Total Of 1 Records"
+      And I should see "Total Of 1 Record"
 
   Scenario: Filter emails by From field
     Given I login as administrator
@@ -31,4 +31,4 @@ Feature: My emails 
       And I should see following grid:
         | Subject               | Date        |
         | There is no spoon     | 2010-10-31 |
-      And I should see "Total Of 1 Records"
+      And I should see "Total Of 1 Record"

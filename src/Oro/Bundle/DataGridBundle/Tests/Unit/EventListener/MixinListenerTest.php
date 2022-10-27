@@ -2,86 +2,67 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\DataGridBundle\EventListener\MixinListener;
+use Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper;
 
 class MixinListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const MIXIN_NAME = 'new-mixin-for-test-grid';
+    private const MIXIN_NAME = 'new-mixin-for-test-grid';
+
+    /** @var MixinConfigurationHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $mixinConfigurationHelper;
 
     /** @var MixinListener */
-    protected $listener;
+    private $listener;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $mixinConfigurationHelper;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->mixinConfigurationHelper = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->mixinConfigurationHelper = $this->createMock(MixinConfigurationHelper::class);
 
         $this->listener = new MixinListener($this->mixinConfigurationHelper);
     }
 
     /**
-     * @param string $gridName
-     * @param bool   $hasParameter
-     * @param bool   $isApplicable
-     *
      * @dataProvider preBuildDataProvider
      */
-    public function testOnPreBuild($gridName, $hasParameter, $isApplicable)
+    public function testOnPreBuild(string $gridName, bool $hasParameter, bool $isApplicable)
     {
-        $event = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Event\PreBuild')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(PreBuild::class);
 
-        $config = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(DatagridConfiguration::class);
 
         $parameters = [];
         if ($hasParameter) {
             $parameters = [MixinListener::GRID_MIXIN => self::MIXIN_NAME];
         }
 
-        $event
-            ->expects($this->once())
+        $event->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue(new ParameterBag($parameters)));
-        $event
-            ->expects($this->once())
+            ->willReturn(new ParameterBag($parameters));
+        $event->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($config));
-
+            ->willReturn($config);
 
         if ($hasParameter && $isApplicable) {
-            $config
-                ->expects($this->once())
+            $config->expects($this->once())
                 ->method('getName')
-                ->will($this->returnValue($gridName));
+                ->willReturn($gridName);
 
-            $this->mixinConfigurationHelper
-                ->expects($this->once())
+            $this->mixinConfigurationHelper->expects($this->once())
                 ->method('extendConfiguration')
-                ->with($this->equalTo($config), $this->equalTo(self::MIXIN_NAME));
+                ->with($config, self::MIXIN_NAME);
         } else {
-            $this->mixinConfigurationHelper
-                ->expects($this->never())
+            $this->mixinConfigurationHelper->expects($this->never())
                 ->method('extendConfiguration');
         }
 
         $this->listener->onPreBuild($event);
     }
 
-    /**
-     * @return array
-     */
-    public function preBuildDataProvider()
+    public function preBuildDataProvider(): array
     {
         return [
             'grid no parameters'   => ['gridName', false, false],

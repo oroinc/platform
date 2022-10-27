@@ -13,4 +13,6 @@ interface LocalizationProviderInterface
      * @return Localization|null
      */
     public function getCurrentLocalization();
+
+    public function setCurrentLocalization(?Localization $localization): void;
 }

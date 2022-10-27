@@ -20,7 +20,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "field_acl_supported" = "true"
+ *              "field_acl_supported"=true
  *          }
  *      }
  * )
@@ -66,49 +66,31 @@ class TestSecurityProduct implements TestFrameworkEntityInterface
         $this->orders = new ArrayCollection();
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
     public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return Organization
-     */
     public function getOwner(): Organization
     {
         return $this->owner;
     }
 
-    /**
-     * @param Organization $owner
-     */
     public function setOwner(Organization $owner): void
     {
         $this->owner = $owner;

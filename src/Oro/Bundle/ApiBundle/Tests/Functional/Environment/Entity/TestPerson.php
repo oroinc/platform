@@ -11,7 +11,8 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\DiscriminatorMap({
- *     "employee" = "Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee"
+ *     "employee" = "Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee",
+ *     "buyer" = "Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestBuyer"
  * })
  */
 abstract class TestPerson implements TestFrameworkEntityInterface

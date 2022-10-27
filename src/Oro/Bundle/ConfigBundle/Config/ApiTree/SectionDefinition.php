@@ -65,9 +65,6 @@ class SectionDefinition
             : array_values($variables);
     }
 
-    /**
-     * @param VariableDefinition $variable
-     */
     public function addVariable(VariableDefinition $variable)
     {
         $this->variables[$variable->getKey()] = $variable;
@@ -106,9 +103,6 @@ class SectionDefinition
         return $result;
     }
 
-    /**
-     * @param SectionDefinition $subSection
-     */
     public function addSubSection(SectionDefinition $subSection)
     {
         $this->subSections[$subSection->getName()] = $subSection;

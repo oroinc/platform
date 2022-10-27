@@ -2,63 +2,52 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action;
 
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionFactory;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class ActionFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
-    /** @var ActionFactory */
-    protected $actionFactory;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    private function getActionFactory(array $actions): ActionFactory
     {
-        $this->container = $this->createMock(ContainerInterface::class);
+        $containerBuilder = TestContainerBuilder::create();
+        foreach ($actions as $type => $action) {
+            $containerBuilder->add($type, $action);
+        }
 
-        $this->actionFactory = new ActionFactory($this->container);
+        return new ActionFactory($containerBuilder->getContainer($this));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "type" option must be defined. Action: action1.
-     */
     public function testCreateActionWithoutType()
     {
-        $this->actionFactory->createAction('action1', []);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "type" option must be defined. Action: action1.');
+
+        $factory = $this->getActionFactory([]);
+        $factory->createAction('action1', []);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage Unknown action type "type1". Action: action1.
-     */
     public function testCreateUnregisteredAction()
     {
-        $this->actionFactory->createAction('action1', ['type' => 'type1']);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Unknown action type "type1". Action: action1.');
+
+        $factory = $this->getActionFactory([]);
+        $factory->createAction('action1', ['type' => 'type1']);
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\DataGridBundle\Exception\RuntimeException
-     * @expectedExceptionMessage An action should be an instance of "Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface", got "stdClass".
-     */
-    // @codingStandardsIgnoreEnd
     public function testCreateActionForInvalidActionClass()
     {
-        $this->actionFactory->registerAction('type1', 'action_service.type1');
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
+            'An action should be an instance of "%s", got "stdClass".',
+            ActionInterface::class
+        ));
 
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('action_service.type1')
-            ->willReturn(new \stdClass());
-
-        $this->actionFactory->createAction('action1', ['type' => 'type1']);
+        $factory = $this->getActionFactory(['type1' => new \stdClass()]);
+        $factory->createAction('action1', ['type' => 'type1']);
     }
 
     public function testCreateAction()
@@ -67,12 +56,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
         $actionName = 'action1';
         $actionConfig = ['type' => 'type1'];
 
-        $this->actionFactory->registerAction('type1', 'action_service.type1');
-
-        $this->container->expects(self::once())
-            ->method('get')
-            ->with('action_service.type1')
-            ->willReturn($action);
+        $factory = $this->getActionFactory(['type1' => $action]);
 
         $action->expects(self::once())
             ->method('setOptions')
@@ -80,7 +64,7 @@ class ActionFactoryTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame(
             $action,
-            $this->actionFactory->createAction($actionName, $actionConfig)
+            $factory->createAction($actionName, $actionConfig)
         );
     }
 }

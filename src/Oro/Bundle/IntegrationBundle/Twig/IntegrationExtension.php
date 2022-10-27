@@ -4,22 +4,28 @@ namespace Oro\Bundle\IntegrationBundle\Twig;
 
 use Oro\Bundle\IntegrationBundle\Event\LoadIntegrationThemesEvent;
 use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class IntegrationExtension extends \Twig_Extension
+/**
+ * Provides Twig functions used for rendering of integration settings forms:
+ *   - oro_integration_themes
+ *   - oro_integration_is_switch_enabled
+ *   - oro_integration_is_delete_enabled
+ */
+class IntegrationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const DEFAULT_THEME = 'OroIntegrationBundle:Form:fields.html.twig';
+    private const DEFAULT_THEME = '@OroIntegration/Form/fields.html.twig';
 
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
+    private ContainerInterface $container;
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(ContainerInterface $container)
     {
-        $this->dispatcher = $dispatcher;
+        $this->container = $container;
     }
 
     /**
@@ -28,9 +34,9 @@ class IntegrationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_integration_themes', [$this, 'getThemes']),
-            new \Twig_SimpleFunction('oro_integration_is_switch_enabled', [$this, 'isSwitchEnabled']),
-            new \Twig_SimpleFunction('oro_integration_is_delete_enabled', [$this, 'isDeleteEnabled']),
+            new TwigFunction('oro_integration_themes', [$this, 'getThemes']),
+            new TwigFunction('oro_integration_is_switch_enabled', [$this, 'isSwitchEnabled']),
+            new TwigFunction('oro_integration_is_delete_enabled', [$this, 'isDeleteEnabled']),
         ];
     }
 
@@ -41,13 +47,14 @@ class IntegrationExtension extends \Twig_Extension
      */
     public function getThemes(FormView $view)
     {
-        $themes = [static::DEFAULT_THEME];
-        if (!$this->dispatcher->hasListeners(LoadIntegrationThemesEvent::NAME)) {
+        $themes = [self::DEFAULT_THEME];
+        $eventDispatcher = $this->getEventDispatcher();
+        if (!$eventDispatcher->hasListeners(LoadIntegrationThemesEvent::NAME)) {
             return $themes;
         }
 
         $event = new LoadIntegrationThemesEvent($view, $themes);
-        $this->dispatcher->dispatch(LoadIntegrationThemesEvent::NAME, $event);
+        $eventDispatcher->dispatch($event, LoadIntegrationThemesEvent::NAME);
 
         return $event->getThemes();
     }
@@ -76,8 +83,15 @@ class IntegrationExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return 'oro_integration';
+        return [
+            EventDispatcherInterface::class,
+        ];
+    }
+
+    private function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->container->get(EventDispatcherInterface::class);
     }
 }

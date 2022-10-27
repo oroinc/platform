@@ -2,43 +2,38 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Builder;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
+use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
 class ManagerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurationProvider;
+
+    /** @var Builder|\PHPUnit\Framework\MockObject\MockObject */
+    private $builder;
+
+    /** @var RequestParameterBagFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $parametersFactory;
+
+    /** @var NameStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $nameStrategy;
+
     /** @var Manager */
-    protected $manager;
+    private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $builder;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configurationProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $parametersFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $nameStrategy;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configurationProvider =
-            $this->getMockBuilder('Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface')
-                ->disableOriginalConstructor()->getMock();
-
-        $this->builder = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Builder')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->parametersFactory =
-            $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $this->nameStrategy =
-            $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);
+        $this->builder = $this->createMock(Builder::class);
+        $this->parametersFactory = $this->createMock(RequestParameterBagFactory::class);
+        $this->nameStrategy = $this->createMock(NameStrategyInterface::class);
 
         $this->nameStrategy->expects($this->any())
             ->method('getGridUniqueName')
@@ -57,48 +52,49 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetDatagridByRequestParamsWorksWithoutScope()
     {
         $datagridName = 'test_grid';
-        $additionalParameters = array('foo' => 'bar');
+        $additionalParameters = ['foo' => 'bar'];
 
-        $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
-        $parameters->expects($this->once())->method('add')->with($additionalParameters);
+        $parameters = $this->createMock(ParameterBag::class);
+        $parameters->expects($this->once())
+            ->method('add')
+            ->with($additionalParameters);
 
         $this->nameStrategy->expects($this->atLeastOnce())
             ->method('parseGridScope')
             ->with($datagridName)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->nameStrategy->expects($this->atLeastOnce())
             ->method('parseGridName')
             ->with($datagridName)
-            ->will($this->returnValue($datagridName));
+            ->willReturn($datagridName);
 
         $this->parametersFactory->expects($this->once())
             ->method('createParameters')
             ->with($datagridName)
-            ->will($this->returnValue($parameters));
+            ->willReturn($parameters);
 
-        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configuration = $this->createMock(DatagridConfiguration::class);
 
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock(DatagridInterface::class);
 
         $this->configurationProvider->expects($this->exactly(2))
             ->method('getConfiguration')
             ->with($datagridName)
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
         $configuration->expects($this->once())
             ->method('offsetGetOr')
             ->with('scope')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $configuration->expects($this->never())
             ->method('offsetSet');
 
-        $this->builder->expects($this->once())->method('build')
+        $this->builder->expects($this->once())
+            ->method('build')
             ->with($configuration, $parameters, $additionalParameters)
-            ->will($this->returnValue($datagrid));
+            ->willReturn($datagrid);
 
         $this->assertEquals(
             $datagrid,
@@ -111,37 +107,34 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         $gridFullName = 'test_grid:test_scope';
         $gridName = 'test_grid';
         $gridScope = 'test_scope';
-        $additionalParameters = array('foo' => 'bar');
+        $additionalParameters = ['foo' => 'bar'];
 
-        $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
-        $parameters->expects($this->once())->method('add')->with($additionalParameters);
-        $parameters->expects($this->once())->method('all')->will($this->returnValue([]));
+        $parameters = $this->createMock(ParameterBag::class);
+        $parameters->expects($this->once())
+            ->method('add')
+            ->with($additionalParameters);
+        $parameters->expects($this->once())
+            ->method('all')
+            ->willReturn([]);
 
         $this->nameStrategy->expects($this->atLeastOnce())
             ->method('parseGridScope')
             ->with($gridFullName)
-            ->will($this->returnValue($gridScope));
+            ->willReturn($gridScope);
 
         $this->nameStrategy->expects($this->atLeastOnce())
             ->method('parseGridName')
             ->with($gridFullName)
-            ->will($this->returnValue($gridName));
+            ->willReturn($gridName);
 
-        $this->parametersFactory->expects($this->at(0))
+        $this->parametersFactory->expects($this->exactly(2))
             ->method('createParameters')
-            ->with($gridFullName)
-            ->will($this->returnValue($parameters));
-        $this->parametersFactory->expects($this->at(1))
-            ->method('createParameters')
-            ->with($gridName)
-            ->will($this->returnValue($parameters));
-        $this->parametersFactory
-            ->expects($this->exactly(2))
-            ->method('createParameters');
+            ->willReturnMap([
+                [$gridFullName, $parameters],
+                [$gridName, $parameters]
+            ]);
 
-        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configuration = $this->createMock(DatagridConfiguration::class);
 
         $configuration->expects($this->never())
             ->method('offsetGetOr');
@@ -150,16 +143,17 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->method('offsetSet')
             ->with('scope', $gridScope);
 
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock(DatagridInterface::class);
 
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->with($gridName)
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
-        $this->builder->expects($this->once())->method('build')
+        $this->builder->expects($this->once())
+            ->method('build')
             ->with($configuration, $parameters, $additionalParameters)
-            ->will($this->returnValue($datagrid));
+            ->willReturn($datagrid);
 
         $this->assertEquals(
             $datagrid,
@@ -170,35 +164,34 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetDatagridWithoutScope()
     {
         $datagridName = 'test_grid';
-        $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $parameters = $this->createMock(ParameterBag::class);
 
         $this->nameStrategy->expects($this->once())
             ->method('parseGridScope')
             ->with($datagridName)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->nameStrategy->expects($this->once())
             ->method('parseGridName')
             ->with($datagridName)
-            ->will($this->returnValue($datagridName));
+            ->willReturn($datagridName);
 
-        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configuration = $this->createMock(DatagridConfiguration::class);
 
         $configuration->expects($this->never())
             ->method($this->anything());
 
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock(DatagridInterface::class);
 
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->with($datagridName)
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
-        $this->builder->expects($this->once())->method('build')
+        $this->builder->expects($this->once())
+            ->method('build')
             ->with($configuration, $parameters)
-            ->will($this->returnValue($datagrid));
+            ->willReturn($datagrid);
 
         $this->assertEquals(
             $datagrid,
@@ -211,21 +204,19 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         $gridFullName = 'test_grid:test_scope';
         $gridName = 'test_grid';
         $gridScope = 'test_scope';
-        $parameters = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $parameters = $this->createMock(ParameterBag::class);
 
         $this->nameStrategy->expects($this->once())
             ->method('parseGridScope')
             ->with($gridFullName)
-            ->will($this->returnValue($gridScope));
+            ->willReturn($gridScope);
 
         $this->nameStrategy->expects($this->once())
             ->method('parseGridName')
             ->with($gridFullName)
-            ->will($this->returnValue($gridName));
+            ->willReturn($gridName);
 
-        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configuration = $this->createMock(DatagridConfiguration::class);
 
         $configuration->expects($this->never())
             ->method('offsetGetOr');
@@ -234,16 +225,17 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
             ->method('offsetSet')
             ->with('scope', $gridScope);
 
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock(DatagridInterface::class);
 
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->with($gridName)
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
-        $this->builder->expects($this->once())->method('build')
+        $this->builder->expects($this->once())
+            ->method('build')
             ->with($configuration, $parameters)
-            ->will($this->returnValue($datagrid));
+            ->willReturn($datagrid);
 
         $this->assertEquals(
             $datagrid,
@@ -258,37 +250,36 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         $this->nameStrategy->expects($this->atLeastOnce())
             ->method('parseGridScope')
             ->with($datagridName)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->nameStrategy->expects($this->atLeastOnce())
             ->method('parseGridName')
             ->with($datagridName)
-            ->will($this->returnValue($datagridName));
+            ->willReturn($datagridName);
 
-        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configuration = $this->createMock(DatagridConfiguration::class);
 
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock(DatagridInterface::class);
 
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->with($datagridName)
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
-        $this->builder->expects($this->once())->method('build')
+        $this->builder->expects($this->once())
+            ->method('build')
             ->with(
                 $configuration,
                 $this->callback(
                     function ($parameters) {
-                        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag', $parameters);
-                        $this->assertEquals(array(), $parameters->all());
+                        $this->assertInstanceOf(ParameterBag::class, $parameters);
+                        $this->assertEquals([], $parameters->all());
 
                         return true;
                     }
                 )
             )
-            ->will($this->returnValue($datagrid));
+            ->willReturn($datagrid);
 
         $this->assertEquals(
             $datagrid,
@@ -299,42 +290,41 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetDatagridWithArrayParameters()
     {
         $datagridName = 'test_grid';
-        $parameters = array('foo' => 'bar');
+        $parameters = ['foo' => 'bar'];
 
         $this->nameStrategy->expects($this->atLeastOnce())
             ->method('parseGridScope')
             ->with($datagridName)
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->nameStrategy->expects($this->atLeastOnce())
             ->method('parseGridName')
             ->with($datagridName)
-            ->will($this->returnValue($datagridName));
+            ->willReturn($datagridName);
 
-        $configuration = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configuration = $this->createMock(DatagridConfiguration::class);
 
-        $datagrid = $this->createMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $datagrid = $this->createMock(DatagridInterface::class);
 
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
             ->with($datagridName)
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
-        $this->builder->expects($this->once())->method('build')
+        $this->builder->expects($this->once())
+            ->method('build')
             ->with(
                 $configuration,
                 $this->callback(
                     function ($value) use ($parameters) {
-                        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag', $value);
+                        $this->assertInstanceOf(ParameterBag::class, $value);
                         $this->assertEquals($parameters, $value->all());
 
                         return true;
                     }
                 )
             )
-            ->will($this->returnValue($datagrid));
+            ->willReturn($datagrid);
 
         $this->assertEquals(
             $datagrid,
@@ -342,12 +332,11 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $parameters must be an array or instance of ParameterBag.
-     */
     public function testGetDatagridThrowsException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$parameters must be an array or instance of ParameterBag.');
+
         $datagridName = 'test_grid';
         $parameters = new \stdClass();
 

@@ -14,9 +14,6 @@ class MetadataRegistry
      */
     protected $metadataBuilder;
 
-    /**
-     * @param MetadataBuilder $metadataBuilder
-     */
     public function __construct(MetadataBuilder $metadataBuilder)
     {
         $this->metadataBuilder = $metadataBuilder;

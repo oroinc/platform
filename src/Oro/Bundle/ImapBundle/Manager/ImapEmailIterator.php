@@ -7,6 +7,9 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Iterator for Imap emails.
+ */
 class ImapEmailIterator implements \Iterator, \Countable
 {
     /** @var ImapMessageIterator */
@@ -29,9 +32,6 @@ class ImapEmailIterator implements \Iterator, \Countable
 
     /**
      * Constructor
-     *
-     * @param ImapMessageIterator $iterator
-     * @param ImapEmailManager    $manager
      */
     public function __construct(ImapMessageIterator $iterator, ImapEmailManager $manager)
     {
@@ -66,9 +66,6 @@ class ImapEmailIterator implements \Iterator, \Countable
         $this->iterator->setBatchSize($batchSize);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->iterator->setLogger($logger);
@@ -104,12 +101,13 @@ class ImapEmailIterator implements \Iterator, \Countable
     public function setConvertErrorCallback(\Closure $callback = null)
     {
         $this->onConvertError = $callback;
+        $this->iterator->setConvertErrorCallback($callback);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return $this->iterator->count();
     }
@@ -117,15 +115,15 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
-        return $this->batch[$this->iterationPos];
+        return $this->batch[$this->iterationPos] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->iterationPos++;
 
@@ -143,7 +141,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->iterationPos;
     }
@@ -151,7 +149,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->batch[$this->iterationPos]);
     }
@@ -159,7 +157,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->iterationPos = 0;
         $this->batch        = [];

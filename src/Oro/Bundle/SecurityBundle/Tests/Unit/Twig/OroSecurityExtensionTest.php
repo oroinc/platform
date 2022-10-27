@@ -9,80 +9,64 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension;
+use Oro\Bundle\SecurityBundle\Util\UriSecurityHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    /** @var PermissionManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $permissionManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $permissionManager;
+    /** @var UriSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $uriSecurityHelper;
 
     /** @var OroSecurityExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->permissionManager = $this->createMock(PermissionManager::class);
+        $this->uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
 
         $container = self::getContainerBuilder()
-            ->add('security.authorization_checker', $this->authorizationChecker)
-            ->add('oro_security.token_accessor', $this->tokenAccessor)
+            ->add(TokenAccessorInterface::class, $this->tokenAccessor)
             ->add('oro_security.acl.permission_manager', $this->permissionManager)
+            ->add('oro_security.util.uri_security_helper', $this->uriSecurityHelper)
             ->getContainer($this);
 
         $this->extension = new OroSecurityExtension($container);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_security_extension', $this->extension->getName());
-    }
-
-    /**
-     * @deprecated since 2.3. Use Symfony "is_granted" function instead
-     */
-    public function testCheckResourceIsGranted()
-    {
-        $this->authorizationChecker->expects($this->once())
-            ->method('isGranted')
-            ->with($this->equalTo('test_acl'))
-            ->will($this->returnValue(true));
-
-        $this->assertTrue(
-            self::callTwigFunction($this->extension, 'resource_granted', ['test_acl'])
-        );
     }
 
     public function testGetOrganizations()
     {
         $user = new User();
         $disabledOrganization = new Organization();
+        $disabledOrganization->setEnabled(false);
         $organization = new Organization();
+        $organization->setId(1);
+        $organization->setName('org1');
 
         $organization->setEnabled(true);
 
-        $user->setOrganizations(new ArrayCollection(array($organization, $disabledOrganization)));
+        $user->setOrganizations(new ArrayCollection([$organization, $disabledOrganization]));
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
-        $result = self::callTwigFunction($this->extension, 'get_enabled_organizations', []);
-
-        $this->assertInternalType('array', $result);
-        $this->assertCount(1, $result);
-        $this->assertSame($organization, $result[0]);
+        $this->assertSame(
+            [
+                ['id' => 1, 'name' => 'org1']
+            ],
+            self::callTwigFunction($this->extension, 'get_enabled_organizations', [])
+        );
     }
 
     public function testGetCurrentOrganization()
@@ -91,7 +75,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue($organization));
+            ->willReturn($organization);
 
         $this->assertSame(
             $organization,
@@ -103,7 +87,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertNull(
             self::callTwigFunction($this->extension, 'get_current_organization', [])
@@ -125,6 +109,19 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(
             $permission,
             self::callTwigFunction($this->extension, 'acl_permission', [$aclPermission])
+        );
+    }
+
+    public function testStripDangerousProtocols(): void
+    {
+        $this->uriSecurityHelper->expects($this->once())
+            ->method('stripDangerousProtocols')
+            ->with($uri = 'sample-proto:sample-data')
+            ->willReturn($expectedUri = 'sample-data');
+
+        $this->assertEquals(
+            $expectedUri,
+            self::callTwigFilter($this->extension, 'strip_dangerous_protocols', [$uri])
         );
     }
 }

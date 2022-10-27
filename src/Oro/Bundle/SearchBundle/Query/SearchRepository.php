@@ -27,10 +27,6 @@ class SearchRepository
      */
     protected $queryConfiguration = [];
 
-    /**
-     * @param QueryFactoryInterface $queryFactory
-     * @param AbstractSearchMappingProvider $mappingProvider
-     */
     public function __construct(
         QueryFactoryInterface $queryFactory,
         AbstractSearchMappingProvider $mappingProvider

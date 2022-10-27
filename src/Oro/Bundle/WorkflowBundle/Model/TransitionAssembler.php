@@ -32,13 +32,6 @@ class TransitionAssembler extends BaseAbstractAssembler
     /** @var TransitionOptionsResolver */
     protected $optionsResolver;
 
-    /**
-     * @param FormOptionsAssembler $formOptionsAssembler
-     * @param ConditionFactory $conditionFactory
-     * @param ActionFactoryInterface $actionFactory
-     * @param FormOptionsConfigurationAssembler $formOptionsConfigurationAssembler
-     * @param TransitionOptionsResolver $optionsResolver
-     */
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
         ConditionFactory $conditionFactory,
@@ -190,10 +183,6 @@ class TransitionAssembler extends BaseAbstractAssembler
         return $transition;
     }
 
-    /**
-     * @param Transition $transition
-     * @param array $options
-     */
     protected function processFrontendOptions(Transition $transition, array $options)
     {
         $frontendOptions = $this->getOption($options, 'frontend_options', []);
@@ -213,10 +202,6 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setFrontendOptions($frontendOptions);
     }
 
-    /**
-     * @param Transition $transition
-     * @param array $actions
-     */
     protected function processActions(Transition $transition, array $actions)
     {
         if ($transition->getDisplayType() === WorkflowConfiguration::TRANSITION_DISPLAY_TYPE_PAGE) {

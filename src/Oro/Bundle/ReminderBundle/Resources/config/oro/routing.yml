@@ -1,21 +1,14 @@
-oro_reminder_bundle_api:
-    resource:     "@OroReminderBundle/Controller/Api/Rest/ReminderController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest
+#
+# OLD REST API ROUTES
+#
 
-# deprecated API route
-oro_api_post_reminder_shown_deprecated:
-    path:            /api/rest/{version}/reminder/shown.{_format}
-    methods:         [POST]
+oro_api_post_reminder_shown:
+    path: '/api/rest/{version}/reminders/showns.{_format}'
+    methods: [POST]
     defaults:
-        _controller: Oro\Bundle\ReminderBundle\Controller\Api\Rest\ReminderController::postShownAction
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\ReminderBundle\Controller\Api\Rest\ReminderController::postShownAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json|html
-        version:     latest|v1
+        _format: json
+        version: latest|v1

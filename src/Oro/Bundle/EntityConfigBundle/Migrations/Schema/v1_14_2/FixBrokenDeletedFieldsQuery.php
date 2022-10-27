@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_14_2;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -79,7 +79,7 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $query, $params, $types);
 
         if (!$dryRun) {
-            $this->connection->executeUpdate($query, $params, $types);
+            $this->connection->executeStatement($query, $params, $types);
         }
     }
 
@@ -91,7 +91,7 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
     protected function unsetDeletedFlag(array $fields, LoggerInterface $logger, $dryRun = false)
     {
         $query = 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id';
-        $types = ['data' => Type::TARRAY, 'id' => Type::INTEGER];
+        $types = ['data' => Types::ARRAY, 'id' => Types::INTEGER];
 
         foreach ($fields as $field) {
             $data = $field['data'];
@@ -101,16 +101,11 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
             $this->logQuery($logger, $query, $updateParams, $types);
 
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $updateParams, $types);
+                $this->connection->executeStatement($query, $updateParams, $types);
             }
         }
     }
 
-    /**
-     * @param LoggerInterface $logger
-     *
-     * @return array
-     */
     protected function getFields(LoggerInterface $logger): array
     {
         $sql = 'SELECT id, data FROM oro_entity_config_field';
@@ -118,7 +113,7 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
 
         $result = [];
         foreach ($this->connection->fetchAll($sql) as $field) {
-            $data = $this->connection->convertToPHPValue($field['data'], Type::TARRAY);
+            $data = $this->connection->convertToPHPValue($field['data'], Types::ARRAY);
             $field['data'] = $data;
             $result[] = $field;
         }

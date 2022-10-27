@@ -2,30 +2,28 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Util;
 
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 
 class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityClassResolver;
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassResolver;
 
     /** @var AssociationTypeHelper */
-    protected $typeHelper;
+    private $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
 
         $this->typeHelper = new AssociationTypeHelper($this->configManager, $this->entityClassResolver);
     }
@@ -34,15 +32,15 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Test\Entity';
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('grouping')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $configProvider->expects($this->never())
             ->method('getConfig');
 
@@ -54,31 +52,29 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isDictionaryProvider
      */
-    public function testIsDictionary($groups, $expected)
+    public function testIsDictionary(?array $groups, bool $expected)
     {
         $className = 'Test\Entity';
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('get')
             ->with('groups')
-            ->will($this->returnValue($groups));
+            ->willReturn($groups);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('grouping')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertEquals(
             $expected,
@@ -86,7 +82,7 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function isDictionaryProvider()
+    public function isDictionaryProvider(): array
     {
         return [
             [null, false],
@@ -100,31 +96,29 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isActivitySupport
      */
-    public function testIsActivitySupport($dictionaryOptions, $expected)
+    public function testIsActivitySupport(bool $dictionaryOptions, bool $expected)
     {
         $className = 'Test\Entity';
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('get')
             ->with('activity_support')
-            ->will($this->returnValue($dictionaryOptions));
+            ->willReturn($dictionaryOptions);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('dictionary')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertEquals(
             $expected,
@@ -132,13 +126,11 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function isActivitySupport()
+    public function isActivitySupport(): array
     {
         return [
-            [null, false],
-            [['some'], false],
-            ['true', true],
-            ['false', false],
+            [true, true],
+            [false, false],
         ];
     }
 
@@ -152,14 +144,14 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
 
         $configs = [$config1, $config2, $config3];
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->with('grouping')
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will($this->returnValue($configs));
+            ->willReturn($configs);
 
         $this->assertEquals(
             ['Test\Entity1'],
@@ -175,15 +167,5 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
             ['Test\Entity1', 'Test\Entity2'],
             $this->typeHelper->getOwningSideEntities('another_group')
         );
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

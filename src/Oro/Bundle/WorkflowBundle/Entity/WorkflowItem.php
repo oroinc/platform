@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
@@ -32,9 +31,6 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
  * @Config(
  *      defaultValues={
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },
@@ -47,7 +43,6 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  *      }
  * )
  * @ORM\HasLifecycleCallbacks()
- * @Serializer\ExclusionPolicy("all")
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -60,7 +55,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
      * @ORM\Column(type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Expose()
      */
     protected $id;
 
@@ -70,15 +64,13 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
      * @var string
      *
      * @ORM\Column(name="workflow_name", type="string", length=255)
-     * @Serializer\Expose()
      */
     protected $workflowName;
 
     /**
-     * @var int
+     * @var string
      *
      * @ORM\Column(name="entity_id", type="string", length=255, nullable=true)
-     * @Serializer\Expose()
      */
     protected $entityId;
 
@@ -86,7 +78,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
      * @var int
      *
      * @ORM\Column(name="entity_class", type="string", nullable=true)
-     * @Serializer\Expose()
      */
     protected $entityClass;
 
@@ -198,8 +189,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
 
     /**
      * @var WorkflowResult
-     *
-     * @Serializer\Expose()
      */
     protected $result;
 
@@ -311,7 +300,7 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
      * @return WorkflowItem
      * @throws WorkflowException
      */
-    public function setEntityId($entityId)
+    public function setEntityId(?string $entityId)
     {
         if ($this->entityId !== null && $this->entityId !== $entityId) {
             throw new WorkflowException('Workflow item entity ID can not be changed');
@@ -620,9 +609,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
         return $this->restrictionIdentities;
     }
 
-    /**
-     * @param WorkflowRestrictionIdentity $restrictionIdentity
-     */
     public function addRestrictionIdentity(WorkflowRestrictionIdentity $restrictionIdentity)
     {
         $restrictionIdentity->setWorkflowItem($this);
@@ -630,9 +616,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
         $this->restrictionIdentities->add($restrictionIdentity);
     }
 
-    /**
-     * @param WorkflowRestrictionIdentity $restrictionIdentity
-     */
     public function removeRestrictionIdentity(WorkflowRestrictionIdentity $restrictionIdentity)
     {
         $this->restrictionIdentities->removeElement($restrictionIdentity);
@@ -666,7 +649,6 @@ class WorkflowItem extends ExtendWorkflowItem implements EntityAwareInterface
 
         return $this;
     }
-
 
     /**
      * Get created date/time

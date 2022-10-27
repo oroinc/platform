@@ -1,96 +1,100 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class OrganizationTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Organization */
-    protected $organization;
+    use EntityTestCaseTrait;
 
-    protected function setUp()
+    public function testProperties(): void
     {
-        $this->organization = new Organization();
-    }
-
-    public function testName()
-    {
-        $name = 'testName';
-        $this->assertNull($this->organization->getName());
-        $this->organization->setName($name);
-        $this->assertEquals($name, $this->organization->getName());
-        $this->assertEquals($name, (string)$this->organization);
-    }
-
-    public function testId()
-    {
-        $this->assertNull($this->organization->getId());
-    }
-
-    /**
-     * @dataProvider provider
-     * @param string $property
-     * @param mixed  $value
-     */
-    public function testSettersAndGetters($property, $value)
-    {
-        $obj = new Organization();
-
-        call_user_func_array([$obj, 'set' . ucfirst($property)], [$value]);
-
-        $this->assertEquals(
-            $value,
-            call_user_func_array(
-                [
-                    $obj,
-                    method_exists($obj, 'get' . ucfirst($property))
-                        ? 'get' . ucfirst($property)
-                        : 'is' . ucfirst($property)
-                ],
-                []
-            )
-        );
-    }
-
-    /**
-     * Data provider
-     *
-     * @return array
-     */
-    public function provider()
-    {
-        return [
+        self::assertPropertyAccessors(new Organization(), [
+            ['id', 123],
             ['name', 'test'],
             ['description', 'test'],
-            ['enabled', 1],
-            ['createdAt', new \DateTime()],
-            ['updatedAt', new \DateTime()],
-            ['businessUnits', new ArrayCollection([new BusinessUnit()])],
-            ['users', new ArrayCollection([new User()])]
-        ];
+            ['enabled', true],
+            ['createdAt', new \DateTime('now')],
+            ['updatedAt', new \DateTime('now')],
+        ]);
     }
 
-    public function testAddRemoveUser()
+    public function testCollections(): void
     {
-        $org = new Organization();
+        self::assertPropertyCollections(new Organization(), [
+            ['businessUnits', new BusinessUnit()],
+            ['users', new User()]
+        ]);
+    }
 
-        $user = new User();
-        $user->setId(uniqid());
+    public function testShouldBeEnabledByDefault(): void
+    {
+        $organization = new Organization();
+        self::assertTrue($organization->isEnabled());
+    }
 
-        $this->assertFalse($org->hasUser($user));
+    public function testSerialization(): void
+    {
+        $organization = new Organization();
+        $organization->setId(123);
+        $organization->setName('name');
+        $organization->setEnabled(true);
 
-        $org->addUser($user);
+        /** @var Organization $unserializedOrganization */
+        $unserializedOrganization = unserialize(serialize($organization));
 
-        $users = $org->getUsers()->toArray();
-        $this->assertCount(1, $users);
-        $this->assertTrue($org->hasUser($user));
-        $this->assertEquals($user, reset($users));
+        self::assertSame(123, $unserializedOrganization->getId());
+        self::assertSame('name', $unserializedOrganization->getName());
+        self::assertTrue($unserializedOrganization->isEnabled());
+    }
 
-        $org->removeUser($user);
+    public function testPreUpdate(): void
+    {
+        $organization = new Organization();
 
-        $this->assertFalse($org->hasUser($user));
+        self::assertNull($organization->getUpdatedAt());
+
+        $organization->preUpdate();
+
+        $updatedAt = $organization->getUpdatedAt();
+        self::assertInstanceOf(\DateTime::class, $updatedAt);
+
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        self::assertLessThanOrEqual($now, $updatedAt);
+
+        self::assertNull($organization->getCreatedAt());
+    }
+
+    public function testPrePersist(): void
+    {
+        $organization = new Organization();
+
+        self::assertNull($organization->getCreatedAt());
+        self::assertNull($organization->getUpdatedAt());
+
+        $organization->prePersist();
+
+        $createdAt = $organization->getCreatedAt();
+        $updatedAt = $organization->getUpdatedAt();
+
+        self::assertInstanceOf(\DateTime::class, $organization->getCreatedAt());
+        self::assertInstanceOf(\DateTime::class, $organization->getUpdatedAt());
+
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        self::assertLessThanOrEqual($now, $createdAt);
+        self::assertLessThanOrEqual($now, $updatedAt);
+    }
+
+    public function testToString(): void
+    {
+        $organization = new Organization();
+        $organization->setName('TestOrganization');
+
+        self::assertEquals('TestOrganization', (string)$organization);
     }
 }

@@ -1,4 +1,0 @@
-config:
-    paths:
-        'orosecurity/js/init-organization-selector': 'bundles/orosecurity/js/init-organization-selector'
-        'orosecurity/js/app/components/security-access-levels-component': 'bundles/orosecurity/js/app/components/security-access-levels-component.js'

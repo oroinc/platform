@@ -1,13 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var ButtonManager = require('oroaction/js/button-manager');
-    var tools = require('oroui/js/tools');
-    var _ = require('underscore');
-    var $ = require('jquery');
+    const BaseComponent = require('oroui/js/app/components/base/component');
+    const ButtonManager = require('oroaction/js/button-manager');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const _ = require('underscore');
+    const $ = require('jquery');
 
-    var ButtonComponent = BaseComponent.extend({
+    const ButtonComponent = BaseComponent.extend({
 
         /**
          * @property {Object}
@@ -20,28 +20,28 @@ define(function(require) {
         $button: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ButtonComponent() {
-            ButtonComponent.__super__.constructor.apply(this, arguments);
+        constructor: function ButtonComponent(options) {
+            ButtonComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            ButtonComponent.__super__.initialize.apply(this, arguments);
+            ButtonComponent.__super__.initialize.call(this, options);
 
             this.options = options || {};
 
             this.$button = $(this.options._sourceElement);
             this.$button
-                .on('click', _.bind(this.onClick, this));
+                .on('click', this.onClick.bind(this));
 
-            var buttonOptions = this.$button.data('options') || {};
+            const buttonOptions = this.$button.data('options') || {};
             if (buttonOptions.confirmation && buttonOptions.confirmation.component) {
                 this._deferredInit();
-                tools.loadModules(buttonOptions.confirmation.component)
+                loadModules(buttonOptions.confirmation.component)
                     .then(this._resolveDeferredInit.bind(this));
             }
         },
@@ -50,7 +50,7 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onClick: function(e) {
-            var $target = $(e.currentTarget);
+            const $target = $(e.currentTarget);
             $target.trigger('tohide.bs.dropdown');
             this._getButtonManager($target).execute(e);
 
@@ -64,9 +64,17 @@ define(function(require) {
          */
         _getButtonManager: function($element) {
             if (!$element.data('button-manager')) {
-                var options = $element.data('options') || {};
+                const options = $element.data('options') || {};
+                const redirectUrl = $element.data('redirecturl');
+                if (redirectUrl) {
+                    _.extend(options, {
+                        redirectUrl: redirectUrl,
+                        redirectUrlOptions: $element.data('redirecturloptions') || {}
+                    });
+                }
 
-                $element.data('button-manager', new ButtonManager(options));
+                this.buttonManager = new ButtonManager(options);
+                $element.data('button-manager', this.buttonManager);
             }
 
             return $element.data('button-manager');
@@ -78,6 +86,11 @@ define(function(require) {
             }
 
             this.$button.off();
+
+            if (this.buttonManager && _.isFunction(this.buttonManager.dispose)) {
+                this.buttonManager.dispose();
+                delete this.buttonManager;
+            }
 
             ButtonComponent.__super__.dispose.call(this);
         }

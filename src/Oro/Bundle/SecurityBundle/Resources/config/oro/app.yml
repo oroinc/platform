@@ -1,15 +1,32 @@
 security:
-    acl:
-        connection: default
-        cache:
-            id: security.acl.cache.doctrine
-            prefix: sf2_acl_
+    enable_authenticator_manager: false
 
     access_decision_manager:
         strategy: unanimous
         allow_if_all_abstain: true
 
+acl:
+    connection: default
+    cache:
+        id: security.acl.cache.doctrine
+
 doctrine:
     dbal:
         types:
             crypted_string: Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedStringType
+
+nelmio_security:
+    # prevents framing of the entire site
+    clickjacking:
+        paths:
+            '^/.*': DENY
+
+    # disables content type sniffing for script resources
+    content_type:
+        nosniff: true
+
+    # forces Microsoft's XSS-Protection with
+    # its block mode
+    xss_protection:
+        enabled: true
+        mode_block: true

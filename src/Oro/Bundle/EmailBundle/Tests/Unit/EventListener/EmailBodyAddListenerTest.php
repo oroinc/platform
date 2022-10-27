@@ -3,11 +3,17 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\EventListener\EmailBodyAddListener;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -15,44 +21,38 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailBodyAddListener */
-    protected $listener;
+    private $listener;
 
     /** @var ConfigProvider */
-    protected $configProvider;
+    private $configProvider;
 
     /** @var EmailAttachmentManager */
-    protected $emailAttachmentManager;
+    private $emailAttachmentManager;
 
     /** @var EmailActivityListProvider */
-    protected $activityListProvider;
+    private $activityListProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenStorage;
+    private $tokenStorage;
 
     /** @var ActivityListChainProvider */
-    protected $chainProvider;
+    private $chainProvider;
 
     /** @var EntityManager */
-    protected $entityManager;
+    private $entityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()->getMock();
-        $this->emailAttachmentManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->activityListProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
-            ->disableOriginalConstructor()->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->emailAttachmentManager = $this->createMock(EmailAttachmentManager::class);
+        $this->activityListProvider = $this->createMock(EmailActivityListProvider::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $this->chainProvider =
-            $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-            ->disableOriginalConstructor()->getMock();
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $this->chainProvider = $this->createMock(ActivityListChainProvider::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
 
         $this->listener = new EmailBodyAddListener(
             $this->emailAttachmentManager,
@@ -67,8 +67,7 @@ class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testLinkToScopeIsNotGranted()
     {
-        $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\EmailBodyAdded')
-            ->disableOriginalConstructor()->getMock();
+        $event = $this->createMock(EmailBodyAdded::class);
 
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
@@ -88,16 +87,11 @@ class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testLinkToScope($config, $managerCalls, $attachmentCalls)
     {
-        $attachments = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailAttachment')
-            ->disableOriginalConstructor()->getMock();
-        $emailBody = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailBody')
-            ->disableOriginalConstructor()->getMock();
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()->getMock();
-        $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\EmailBodyAdded')
-            ->disableOriginalConstructor()->getMock();
-        $configInterface = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-            ->disableOriginalConstructor()->getMock();
+        $attachments = $this->createMock(EmailAttachment::class);
+        $emailBody = $this->createMock(EmailBody::class);
+        $email = $this->createMock(Email::class);
+        $event = $this->createMock(EmailBodyAdded::class);
+        $configInterface = $this->createMock(ConfigInterface::class);
 
         $this->tokenStorage->expects($this->once())
             ->method('getToken')
@@ -111,49 +105,46 @@ class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
 
         $configInterface->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($config));
+            ->willReturn($config);
         $this->configProvider
             ->expects($this->once())
             ->method('getConfig')
-            ->will($this->returnValue($configInterface));
+            ->willReturn($configInterface);
 
         $this->emailAttachmentManager
             ->expects($this->exactly($managerCalls))
             ->method('linkEmailAttachmentToTargetEntity');
         $emailBody->expects($this->exactly($attachmentCalls))
             ->method('getAttachments')
-            ->will($this->returnValue([$attachments]));
+            ->willReturn([$attachments]);
         $email->expects($this->exactly($attachmentCalls))
             ->method('getEmailBody')
-            ->will($this->returnValue($emailBody));
-        $event->expects($this->exactly(1))
+            ->willReturn($emailBody);
+        $event->expects($this->once())
             ->method('getEmail')
-            ->will($this->returnValue($email));
+            ->willReturn($email);
 
         $this->listener->linkToScope($event);
     }
 
     public function testUpdateActivityDescription()
     {
-        $activityList = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
-            ->getMock();
+        $activityList = $this->createMock(ActivityList::class);
 
-        $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\EmailBodyAdded')
-            ->disableOriginalConstructor()->getMock();
+        $event = $this->createMock(EmailBodyAdded::class);
 
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()->getMock();
+        $email = $this->createMock(Email::class);
 
-        $event->expects($this->exactly(1))
+        $event->expects($this->once())
             ->method('getEmail')
-            ->will($this->returnValue($email));
+            ->willReturn($email);
 
-        $this->chainProvider->expects($this->exactly(1))
+        $this->chainProvider->expects($this->once())
             ->method('getUpdatedActivityList')
             ->with($this->identicalTo($email), $this->identicalTo($this->entityManager))
-            ->will($this->returnValue($activityList));
+            ->willReturn($activityList);
 
-        $this->entityManager->expects($this->exactly(1))
+        $this->entityManager->expects($this->once())
             ->method('persist')
             ->with($activityList);
 

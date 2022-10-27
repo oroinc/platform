@@ -15,10 +15,6 @@ class ActionPermissionProvider
     /** @var ConfigurationChecker */
     private $configurationChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     * @param ConfigurationChecker $configurationChecker
-     */
     public function __construct(FeatureChecker $featureChecker, ConfigurationChecker $configurationChecker)
     {
         $this->featureChecker = $featureChecker;

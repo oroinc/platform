@@ -13,9 +13,6 @@ class SetTestCurrentDepartmentEntityId implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -29,8 +26,7 @@ class SetTestCurrentDepartmentEntityId implements ProcessorInterface
         /** @var SingleItemContext $context */
 
         $rows = $this->doctrineHelper
-            ->getEntityRepositoryForClass(TestDepartment::class)
-            ->createQueryBuilder('e')
+            ->createQueryBuilder(TestDepartment::class, 'e')
             ->select('e.id')
             ->where('e.name = :name')
             ->setParameter('name', 'Current Department')

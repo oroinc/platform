@@ -13,28 +13,16 @@ class RelationHelper
     /** @var array */
     protected $joins = [];
 
-    /**
-     * @param VirtualRelationProviderInterface $provider
-     */
     public function __construct(VirtualRelationProviderInterface $provider)
     {
         $this->virtualRelationProvider = $provider;
     }
 
-    /**
-     * @param string $entityClass
-     * @return bool
-     */
     public function hasVirtualRelations(string $entityClass): bool
     {
         return count($this->getVirtualJoins($entityClass)) > 0;
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $targetEntityClass
-     * @return int
-     */
     public function getMetadataTypeForVirtualJoin(string $entityClass, string $targetEntityClass): int
     {
         $result = 0;
@@ -50,10 +38,6 @@ class RelationHelper
         return $result;
     }
 
-    /**
-     * @param string $entityClass
-     * @return array
-     */
     protected function getVirtualJoins(string $entityClass): array
     {
         if (!array_key_exists($entityClass, $this->joins)) {
@@ -82,10 +66,6 @@ class RelationHelper
         return $this->joins[$entityClass];
     }
 
-    /**
-     * @param string $type
-     * @return int
-     */
     protected function getMetadataType(string $type): int
     {
         $metadataType = 0;

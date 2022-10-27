@@ -7,7 +7,6 @@ use FOS\RestBundle\View\ViewHandlerInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Processor\Shared\Rest\CorsHeaders;
 use Oro\Bundle\ApiBundle\Request\RequestActionHandler as BaseRequestActionHandler;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessorFactory;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
@@ -66,9 +65,7 @@ class RequestActionHandler extends BaseRequestActionHandler
     protected function prepareContext(Context $context, Request $request): void
     {
         parent::prepareContext($context, $request);
-        if ($request->headers->has(CorsHeaders::ORIGIN)
-            && $request->headers->get(CorsHeaders::ORIGIN) !== $request->getSchemeAndHttpHost()
-        ) {
+        if ($this->isCorsRequest($request)) {
             $context->setCorsRequest(true);
         }
     }
@@ -107,5 +104,12 @@ class RequestActionHandler extends BaseRequestActionHandler
         );
 
         return $this->viewHandler->handle($view);
+    }
+
+    private function isCorsRequest(Request $request): bool
+    {
+        return
+            $request->headers->has(CorsHeaders::ORIGIN)
+            && $request->headers->get(CorsHeaders::ORIGIN) !== $request->getSchemeAndHttpHost();
     }
 }

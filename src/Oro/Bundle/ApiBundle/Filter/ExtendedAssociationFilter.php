@@ -3,82 +3,69 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\Common\Collections\Expr\Expression;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
- * A filter that can be used to filter data by an extended association.
+ * A filter that can be used to filter data by a multi-target association.
  */
-class ExtendedAssociationFilter extends AssociationFilter
+class ExtendedAssociationFilter extends AssociationFilter implements ConfigAwareFilterInterface
 {
-    /** @var AssociationManager */
-    protected $associationManager;
+    private ExtendedAssociationProvider $extendedAssociationProvider;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
+    private string $associationOwnerClass;
+    private string $associationType;
+    private ?string $associationKind = null;
+    private EntityDefinitionConfig $config;
 
-    /** @var EntityOverrideProviderRegistry */
-    protected $entityOverrideProviderRegistry;
-
-    /** @var string */
-    protected $associationOwnerClass;
-
-    /** @var string */
-    protected $associationType;
-
-    /** @var string|null */
-    protected $associationKind;
-
-    /**
-     * @param AssociationManager $associationManager
-     */
-    public function setAssociationManager(AssociationManager $associationManager)
+    public function setExtendedAssociationProvider(ExtendedAssociationProvider $extendedAssociationProvider): void
     {
-        $this->associationManager = $associationManager;
+        $this->extendedAssociationProvider = $extendedAssociationProvider;
     }
 
-    /**
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
-    public function setEntityOverrideProviderRegistry(EntityOverrideProviderRegistry $entityOverrideProviderRegistry)
+    public function setEntityOverrideProviderRegistry(EntityOverrideProviderRegistry $registry): void
     {
-        $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
+        $this->entityOverrideProviderRegistry = $registry;
     }
 
-    /**
-     * @param string $associationOwnerClass
-     */
-    public function setAssociationOwnerClass($associationOwnerClass)
+    public function setAssociationOwnerClass(string $associationOwnerClass): void
     {
         $this->associationOwnerClass = $associationOwnerClass;
     }
 
-    /**
-     * @param string $associationType
-     */
-    public function setAssociationType($associationType)
+    public function setAssociationType(string $associationType): void
     {
         $this->associationType = $associationType;
     }
 
-    /**
-     * @param string $associationKind
-     */
-    public function setAssociationKind($associationKind)
+    public function setAssociationKind(?string $associationKind): void
     {
         $this->associationKind = $associationKind;
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function setConfig(EntityDefinitionConfig $config): void
+    {
+        $this->config = $config;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    protected function doBuildExpression($field, $path, $operator, $value)
+    protected function doBuildExpression(string $field, string $path, string $operator, $value): ?Expression
     {
         $this->assertFilterValuePath($field, $path);
 
-        $fieldName = $this->getFieldName(\substr($path, \strlen($field) + 1));
+        $fieldName = $this->getFieldName(substr($path, \strlen($field) + 1));
         if (RelationType::MANY_TO_MANY === $this->associationType) {
             $expr = $this->buildComparisonExpression($fieldName, Comparison::MEMBER_OF, $value);
-            if (self::NEQ === $operator) {
+            if (FilterOperator::NEQ === $operator) {
                 $expr = $this->buildNotExpression($expr);
             }
 
@@ -88,37 +75,35 @@ class ExtendedAssociationFilter extends AssociationFilter
         return parent::doBuildExpression($fieldName, $path, $operator, $value);
     }
 
-    /**
-     * @param string $filterValueName
-     *
-     * @return string
-     */
-    protected function getFieldName($filterValueName)
+    protected function getFieldName(string $filterValueName): string
     {
-        $targetEntityClass = $this->getEntityClass($filterValueName);
-        $associationTargets = $this->associationManager->getAssociationTargets(
-            $this->associationOwnerClass,
-            null,
-            $this->associationType,
-            $this->associationKind
-        );
-
         $fieldName = null;
-        $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($this->requestType);
-        foreach ($associationTargets as $targetClass => $targetField) {
-            $substituteTargetClass = $entityOverrideProvider->getSubstituteEntityClass($targetClass);
-            if ($substituteTargetClass) {
-                $targetClass = $substituteTargetClass;
-            }
-            if ($targetClass === $targetEntityClass) {
-                $fieldName = $targetField;
-                break;
+        $targetFieldNames = $this->config->getField($this->getField())?->getDependsOn();
+        if ($targetFieldNames) {
+            $targetEntityClass = $this->getEntityClass($filterValueName);
+            $associationTargets = $this->extendedAssociationProvider->filterExtendedAssociationTargets(
+                $this->associationOwnerClass,
+                $this->associationType,
+                $this->associationKind,
+                $targetFieldNames
+            );
+
+            $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider(
+                $this->getRequestType()
+            );
+            foreach ($associationTargets as $targetClass => $targetField) {
+                $substituteTargetClass = $entityOverrideProvider->getSubstituteEntityClass($targetClass);
+                if ($substituteTargetClass) {
+                    $targetClass = $substituteTargetClass;
+                }
+                if ($targetClass === $targetEntityClass) {
+                    $fieldName = $targetField;
+                    break;
+                }
             }
         }
         if (!$fieldName) {
-            throw new RuntimeException(
-                \sprintf('An association with "%s" is not supported.', $filterValueName)
-            );
+            throw new RuntimeException(sprintf('An association with "%s" is not supported.', $filterValueName));
         }
 
         return $fieldName;

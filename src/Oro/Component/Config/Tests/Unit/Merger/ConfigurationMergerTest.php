@@ -3,40 +3,37 @@
 namespace Oro\Component\Config\Tests\Unit\Merger;
 
 use Oro\Component\Config\Merger\ConfigurationMerger;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
 {
-    const BUNDLE1 = 'Oro\Bundle\TestBundle1\TestBundle1';
-    const BUNDLE2 = 'Oro\Bundle\TestBundle1\TestBundle2';
-    const BUNDLE3 = 'Oro\Bundle\TestBundle1\TestBundle3';
+    private const BUNDLE1 = 'Oro\Bundle\TestBundle1\TestBundle1';
+    private const BUNDLE2 = 'Oro\Bundle\TestBundle1\TestBundle2';
+    private const BUNDLE3 = 'Oro\Bundle\TestBundle1\TestBundle3';
 
     /** @var ConfigurationMerger */
-    protected $merger;
+    private $merger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->merger = new ConfigurationMerger([self::BUNDLE1, self::BUNDLE2, self::BUNDLE3]);
     }
 
     /**
      * @dataProvider mergeConfigurationDataProvider
-     *
-     * @param array $rawConfig
-     * @param array $expected
      */
     public function testMergeConfiguration(array $rawConfig, array $expected)
     {
         $configs = $this->merger->mergeConfiguration($rawConfig);
 
-        $this->assertInternalType('array', $configs);
+        $this->assertIsArray($configs);
         $this->assertEquals($expected, $configs);
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function mergeConfigurationDataProvider()
+    public function mergeConfigurationDataProvider(): array
     {
         return [
             'merge configuration from bundles' => [
@@ -264,22 +261,16 @@ class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider mergeConfigurationExceptionDataProvider
-     *
-     * @param array $rawConfig
-     * @param string $expectedMessage
      */
-    public function testMergeConfigurationException(array $rawConfig, $expectedMessage)
+    public function testMergeConfigurationException(array $rawConfig, string $expectedMessage)
     {
-        $this->expectException('Symfony\Component\Config\Definition\Exception\InvalidConfigurationException');
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedMessage);
 
         $this->merger->mergeConfiguration($rawConfig);
     }
 
-    /**
-     * @return array
-     */
-    public function mergeConfigurationExceptionDataProvider()
+    public function mergeConfigurationExceptionDataProvider(): array
     {
         return [
             [

@@ -28,11 +28,6 @@ class WorkflowTranslationHelper
     /** @var array */
     private $values = [];
 
-    /**
-     * @param Translator $translator
-     * @param TranslationManager $translationManager
-     * @param TranslationHelper $translationHelper
-     */
     public function __construct(
         Translator $translator,
         TranslationManager $translationManager,

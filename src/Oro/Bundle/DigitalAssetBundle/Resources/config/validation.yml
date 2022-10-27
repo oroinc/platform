@@ -1,0 +1,14 @@
+Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset:
+    constraints:
+        - Oro\Bundle\DigitalAssetBundle\Validator\Constraints\DigitalAssetSourceFileMimeType: ~
+    properties:
+        sourceFile:
+            - Valid: ~
+        titles:
+            - Valid: ~
+
+Oro\Bundle\AttachmentBundle\Entity\File:
+    properties:
+        file:
+            - Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfig:
+                groups: [DigitalAsset]

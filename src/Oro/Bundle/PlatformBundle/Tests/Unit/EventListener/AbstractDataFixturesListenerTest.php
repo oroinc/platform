@@ -2,21 +2,23 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\EventListener;
 
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
+use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Oro\Bundle\PlatformBundle\EventListener\AbstractDataFixturesListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
 class AbstractDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const LISTENERS = ['test_listener_1', 'test_listener_2'];
+    private const LISTENERS = ['test_listener_1', 'test_listener_2'];
 
     /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $listenerManager;
+    private $listenerManager;
 
     /** @var AbstractDataFixturesListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);
 
@@ -25,48 +27,29 @@ class AbstractDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->disableListener(self::LISTENERS[1]);
     }
 
-    /**
-     * @dataProvider methodsDataProvider
-     *
-     * @param bool $isDemoData
-     */
-    public function testMethods(bool $isDemoData)
+    private function getEvent(string $fixturesType): MigrationDataFixturesEvent
     {
-        /** @var MigrationDataFixturesEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(MigrationDataFixturesEvent::class);
-        $event->expects($this->any())
-            ->method('isDemoFixtures')
-            ->willReturn($isDemoData);
-        $event->expects($this->never())
-            ->method('log');
-
-        $this->assertListenerManagerCalled($isDemoData);
-
-        $this->listener->onPreLoad($event);
-        $this->listener->onPostLoad($event);
+        return new MigrationDataFixturesEvent(
+            $this->createMock(ObjectManager::class),
+            $fixturesType
+        );
     }
 
-    /**
-     * @param bool $isDemoData
-     */
-    protected function assertListenerManagerCalled(bool $isDemoData)
+    public function testOnPreLoad()
     {
-        $this->listenerManager->expects($this->at(0))
+        $this->listenerManager->expects(self::once())
             ->method('disableListeners')
             ->with(self::LISTENERS);
-        $this->listenerManager->expects($this->at(1))
-            ->method('enableListeners')
-            ->with(self::LISTENERS);
+
+        $this->listener->onPreLoad($this->getEvent(DataFixturesExecutorInterface::MAIN_FIXTURES));
     }
 
-    /**
-     * @return array
-     */
-    public function methodsDataProvider()
+    public function testOnPostLoad()
     {
-        return [
-            ['isDemoData' => false],
-            ['isDemoData' => true]
-        ];
+        $this->listenerManager->expects(self::once())
+            ->method('enableListeners')
+            ->with(self::LISTENERS);
+
+        $this->listener->onPostLoad($this->getEvent(DataFixturesExecutorInterface::MAIN_FIXTURES));
     }
 }

@@ -8,21 +8,20 @@ use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\NavigationBundle\EventListener\NavigationListener;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class NavigationListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NavigationListener */
-    protected $navigationListener;
-
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
-    protected function setUp()
+    /** @var NavigationListener */
+    private $navigationListener;
+
+    protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
@@ -35,49 +34,58 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testDisplayIsSet()
     {
-        $item = $this->createMock('Knp\Menu\ItemInterface');
-        $menu = $this->createMock('Knp\Menu\ItemInterface');
+        $item = $this->createMock(ItemInterface::class);
+        $menu = $this->createMock(ItemInterface::class);
 
-        /** @var ConfigureMenuEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->getMockBuilder('\Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $event = $this->createMock(ConfigureMenuEvent::class);
 
-        $event->expects($this->once())->method('getMenu')->willReturn($menu);
-        $menu->expects($this->once())->method('getChild')->willReturn($item);
-        $item->expects($this->once())->method('setDisplay')->with(false);
-        $this->tokenAccessor->expects($this->once())->method('hasUser')->willReturn(true);
-        $this->authorizationChecker->expects($this->once())->method('isGranted')->willReturn(false);
+        $event->expects($this->once())
+            ->method('getMenu')
+            ->willReturn($menu);
+        $menu->expects($this->once())
+            ->method('getChild')
+            ->willReturn($item);
+        $item->expects($this->once())
+            ->method('setDisplay')
+            ->with(false);
+        $this->tokenAccessor->expects($this->once())
+            ->method('hasUser')
+            ->willReturn(true);
+        $this->authorizationChecker->expects($this->once())
+            ->method('isGranted')
+            ->willReturn(false);
 
         $this->navigationListener->onNavigationConfigure($event);
     }
 
     /**
      * @dataProvider displayIsNotSetProvider
-     *
-     * @param ItemInterface|null $item
-     * @param bool $hasUser
-     * @param bool $isGranted
      */
-    public function testDisplayIsNotSet($item, $hasUser, $isGranted)
+    public function testDisplayIsNotSet(?ItemInterface $item, bool $hasUser, bool $isGranted)
     {
-        $menu = $this->createMock('Knp\Menu\ItemInterface');
+        $menu = $this->createMock(ItemInterface::class);
+        $event = $this->createMock(ConfigureMenuEvent::class);
 
-        /** @var ConfigureMenuEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->getMockBuilder('\Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event->expects($this->any())->method('getMenu')->willReturn($menu);
-        $menu->expects($this->any())->method('getChild')->willReturn($item);
-        $menu->expects($this->any())->method('getChildren')->willReturn([]);
-        $this->tokenAccessor->expects($this->any())->method('hasUser')->willReturn($hasUser);
-        $this->authorizationChecker->expects($this->any())->method('isGranted')->willReturn($isGranted);
+        $event->expects($this->any())
+            ->method('getMenu')
+            ->willReturn($menu);
+        $menu->expects($this->any())
+            ->method('getChild')
+            ->willReturn($item);
+        $menu->expects($this->any())
+            ->method('getChildren')
+            ->willReturn([]);
+        $this->tokenAccessor->expects($this->any())
+            ->method('hasUser')
+            ->willReturn($hasUser);
+        $this->authorizationChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturn($isGranted);
 
         $this->navigationListener->onNavigationConfigure($event);
     }
 
-    public function displayIsNotSetProvider()
+    public function displayIsNotSetProvider(): array
     {
         return [
             'with empty item' => [
@@ -86,12 +94,12 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
                 'isGranted' => true,
             ],
             'with no logged user' => [
-                'item' => $this->createMock('Knp\Menu\ItemInterface'),
+                'item' => $this->createMock(ItemInterface::class),
                 'hasUser' => false,
                 'isGranted' => true,
             ],
             'with no access rights' => [
-                'item' => $this->createMock('Knp\Menu\ItemInterface'),
+                'item' => $this->createMock(ItemInterface::class),
                 'hasUser' => true,
                 'isGranted' => false,
             ],
@@ -117,7 +125,7 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($menuListItem->isDisplayed());
     }
 
-    public function testOnNavigationConfigureWhenOroConfigSystemIsNotGnanted()
+    public function testOnNavigationConfigureWhenOroConfigSystemIsNotGranted()
     {
         $this->tokenAccessor->expects($this->once())
             ->method('hasUser')
@@ -125,14 +133,12 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->willReturnMap(
-                [
-                    ['oro_config_system', null, false],
-                    ['oro_navigation_manage_menus', null, true]
-                ]
-            );
+            ->willReturnMap([
+                ['oro_config_system', null, false],
+                ['oro_navigation_manage_menus', null, true]
+            ]);
 
-        $factory     = new MenuFactory();
+        $factory = new MenuFactory();
         $menu  = new MenuItem('parent_item', $factory);
         $menuListItem = new MenuItem('menu_list_default', $factory);
         $menu->addChild($menuListItem);
@@ -150,12 +156,10 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->willReturnMap(
-                [
-                    ['oro_config_system', null, true],
-                    ['oro_navigation_manage_menus', null, false]
-                ]
-            );
+            ->willReturnMap([
+                ['oro_config_system', null, true],
+                ['oro_navigation_manage_menus', null, false]
+            ]);
 
         $factory = new MenuFactory();
         $menu  = new MenuItem('parent_item', $factory);
@@ -175,12 +179,10 @@ class NavigationListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->authorizationChecker->expects($this->any())
             ->method('isGranted')
-            ->willReturnMap(
-                [
-                    ['oro_config_system', null, true],
-                    ['oro_navigation_manage_menus', null, true]
-                ]
-            );
+            ->willReturnMap([
+                ['oro_config_system', null, true],
+                ['oro_navigation_manage_menus', null, true]
+            ]);
 
         $factory = new MenuFactory();
         $menu  = new MenuItem('parent_item', $factory);

@@ -2,11 +2,15 @@ services:
     oro_entity.fallback.resolver.entity_fallback_resolver:
         class: Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver
         arguments:
+            - ~ # service locator for fallback providers
             - "@oro_entity_config.provider.fallback"
             - "@oro_config.provider.system_configuration.form_provider"
             - "@oro_config.manager"
             - "@oro_config.config_bag"
             - '@oro_entity.doctrine_helper'
+
+    Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver:
+        alias: oro_entity.fallback.resolver.entity_fallback_resolver
 
     oro_entity.fallback.provider.abstract_provider:
         class: Oro\Bundle\EntityBundle\Fallback\Provider\AbstractEntityFallbackProvider
@@ -14,10 +18,15 @@ services:
         calls:
             - [setConfigProvider, ["@oro_entity_config.provider.fallback"]]
 
+    oro_entity.fallback.provider.system_config_provider.cache:
+        parent: oro.cache.provider.memory_cache
+
     oro_entity.fallback.provider.system_config_provider:
         class: Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider
         parent: oro_entity.fallback.provider.abstract_provider
         arguments:
             - "@oro_config.manager"
+        calls:
+            - [setMemoryCacheProvider, ['@oro_entity.fallback.provider.system_config_provider.cache']]
         tags:
             - { name: oro_entity.fallback_provider, id: systemConfig }

@@ -1,5 +1,10 @@
-assets:
-    css:
-      'orodatagrid':
-          - 'bundles/orodatagrid/css/scss/main.scss'
-          # - 'bundles/orodatagrid/css/scss/inline-editing-help.scss' component temporary not in use
+css:
+    inputs:
+        # Settings
+        - 'bundles/orodatagrid/css/scss/settings/global-settings.scss'
+        - 'bundles/orodatagrid/css/scss/settings/data-blank-content-config.scss'
+
+        # Styles
+        - 'bundles/orodatagrid/css/scss/main.scss'
+        - 'bundles/orodatagrid/css/scss/data-blank-content.scss'
+        # - 'bundles/orodatagrid/css/scss/inline-editing-help.scss' component temporary not in use

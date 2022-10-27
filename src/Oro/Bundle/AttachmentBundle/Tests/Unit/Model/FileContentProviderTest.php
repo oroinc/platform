@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Model;
 
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Model\FileContentProvider;
 
 class FileContentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_FILE_NAME = 'some_file.txt';
+    private const TEST_FILE_NAME = 'some_file.txt';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fileManager;
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileManager;
 
     /** @var FileContentProvider */
-    protected $fileContentProvider;
+    private $fileContentProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->fileManager = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Manager\FileManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fileManager = $this->createMock(FileManager::class);
 
         $this->fileContentProvider = new FileContentProvider(
             self::TEST_FILE_NAME,

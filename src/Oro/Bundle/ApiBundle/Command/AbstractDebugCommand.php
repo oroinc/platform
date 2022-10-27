@@ -1,22 +1,33 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * The base class for CLI commands that shows a different kind of debug information about Data API configuration.
+ * Base class for CLI commands that show various debug information about API configuration.
  */
-abstract class AbstractDebugCommand extends ContainerAwareCommand
+abstract class AbstractDebugCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    protected ValueNormalizer $valueNormalizer;
+    protected ResourcesProvider $resourcesProvider;
+
+    public function __construct(ValueNormalizer $valueNormalizer, ResourcesProvider $resourcesProvider)
+    {
+        parent::__construct();
+
+        $this->valueNormalizer = $valueNormalizer;
+        $this->resourcesProvider = $resourcesProvider;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
@@ -24,25 +35,42 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
                 'request-type',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'The request type. Use <comment>"any"</comment> to ignore the request type.',
+                'Request type',
                 $this->getDefaultRequestType()
-            );
+            )
+            ->setHelp(
+                // @codingStandardsIgnoreStart
+                $this->getHelp() .
+                <<<'HELP'
+
+The <info>--request-type</info> option can limit the scope to the specified request type(s).
+Omitting this option is equivalent to <info>--request-type=rest --request-type=json_api</info>.
+Available types: <comment>rest</comment>, <comment>json_api</comment>, <comment>batch</comment>, or use <comment>any</comment> to include all request types:
+
+  <info>php %command.full_name% --request-type=rest</info> <fg=green;options=underscore>other options and arguments</>
+  <info>php %command.full_name% --request-type=json_api</info> <fg=green;options=underscore>other options and arguments</>
+  <info>php %command.full_name% --request-type=batch</info> <fg=green;options=underscore>other options and arguments</>
+  <info>php %command.full_name% --request-type=any</info> <fg=green;options=underscore>other options and arguments</>
+
+HELP
+                // @codingStandardsIgnoreEnd
+            )
+            ->addUsage('--request-type=rest [other options and arguments]')
+            ->addUsage('--request-type=json_api [other options and arguments]')
+            ->addUsage('--request-type=batch [other options and arguments]')
+            ->addUsage('--request-type=any [other options and arguments]')
+        ;
     }
 
     /**
      * @return string[]
      */
-    protected function getDefaultRequestType()
+    protected function getDefaultRequestType(): array
     {
         return [RequestType::REST, RequestType::JSON_API];
     }
 
-    /**
-     * @param InputInterface $input
-     *
-     * @return RequestType
-     */
-    protected function getRequestType(InputInterface $input)
+    protected function getRequestType(InputInterface $input): RequestType
     {
         $value = $input->getOption('request-type');
         if (count($value) === 1 && 'any' === $value[0]) {
@@ -54,10 +82,8 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
 
     /**
      * @param mixed $value
-     *
-     * @return string
      */
-    protected function convertValueToString($value)
+    protected function convertValueToString($value): string
     {
         if (null === $value) {
             return 'NULL';
@@ -91,40 +117,31 @@ abstract class AbstractDebugCommand extends ContainerAwareCommand
             return $value == (int)$value
                 ? (int)$value
                 : (float)$value;
-        } elseif (0 === strpos($value, '[') && substr($value, -1) === ']') {
+        } elseif (str_starts_with($value, '[') && str_ends_with($value, ']')) {
             return explode(',', substr($value, 1, -1));
         }
 
         return $value;
     }
 
-    /**
-     * @param string|null $entityName
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return string|null
-     */
-    protected function resolveEntityClass($entityName, $version, RequestType $requestType)
+    protected function resolveEntityClass(?string $entityName, string $version, RequestType $requestType): ?string
     {
         if (!$entityName) {
             return null;
         }
 
         $entityClass = $entityName;
-        if (false === strpos($entityClass, '\\')) {
+        if (!str_contains($entityClass, '\\')) {
             $entityClass = ValueNormalizerUtil::convertToEntityClass(
-                $this->getContainer()->get('oro_api.value_normalizer'),
+                $this->valueNormalizer,
                 $entityName,
                 $requestType
             );
         }
 
-        /** @var ResourcesProvider $resourcesProvider */
-        $resourcesProvider = $this->getContainer()->get('oro_api.resources_provider');
-        if (!$resourcesProvider->isResourceKnown($entityClass, $version, $requestType)) {
+        if (!$this->resourcesProvider->isResourceKnown($entityClass, $version, $requestType)) {
             throw new \RuntimeException(
-                sprintf('The "%s" entity is not configured to be used in Data API.', $entityClass)
+                sprintf('The "%s" entity is not configured to be used in API.', $entityClass)
             );
         }
 

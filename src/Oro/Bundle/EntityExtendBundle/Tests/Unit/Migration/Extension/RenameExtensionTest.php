@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
@@ -11,29 +12,19 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class RenameExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $optionsManager;
+    /** @var ExtendOptionsManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $optionsManager;
 
-    /**
-     * @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $databasePlatform;
+    /** @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject */
+    private $databasePlatform;
 
-    /**
-     * @var RenameExtension
-     */
-    protected $extension;
+    /** @var RenameExtension */
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->optionsManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->databasePlatform = $this->getMockBuilder('Doctrine\DBAL\Platforms\MySqlPlatform')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $this->optionsManager = $this->createMock(ExtendOptionsManager::class);
+        $this->databasePlatform = $this->createMock(MySqlPlatform::class);
 
         $this->extension = new RenameExtension($this->optionsManager);
         $this->extension->setDatabasePlatform($this->databasePlatform);
@@ -69,18 +60,18 @@ class RenameExtensionTest extends \PHPUnit\Framework\TestCase
         $originalColumnOptions = ['key' => 'value', '_target' => ['table_name' => $oldTable]];
         $alteredColumnOptions = ['key' => 'value', '_target' => ['table_name' => $newTable]];
 
-        $this->optionsManager->expects($this->at(0))
+        $this->optionsManager->expects($this->once())
             ->method('getExtendOptions')
             ->willReturn([$oldTable . '!' . $column => $originalColumnOptions]);
-        $this->optionsManager->expects($this->at(1))
+        $this->optionsManager->expects($this->once())
             ->method('removeColumnOptions')
             ->with($oldTable, $column);
-        $this->optionsManager->expects($this->at(2))
+        $this->optionsManager->expects($this->exactly(2))
             ->method('setColumnOptions')
-            ->with($newTable, $column, $originalColumnOptions);
-        $this->optionsManager->expects($this->at(3))
-            ->method('setColumnOptions')
-            ->with($newTable, $column, $alteredColumnOptions);
+            ->withConsecutive(
+                [$newTable, $column, $originalColumnOptions],
+                [$newTable, $column, $alteredColumnOptions]
+            );
 
         $schema = new Schema([new Table($oldTable)]);
         $queries = new QueryBag();

@@ -16,6 +16,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
+ * Represents system mailbox.
+ *
  * @ORM\Table(name="oro_email_mailbox")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository")
  * @UniqueEntity(fields={"email"})
@@ -25,6 +27,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-envelope"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"="",
+ *              "category"=""
  *          },
  *          "ownership"={
  *              "owner_type"="ORGANIZATION",
@@ -264,14 +271,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * {@inheritdoc}
      */
-    public function getClass()
-    {
-        return __CLASS__;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getEmailFields()
     {
         return ['email'];
@@ -492,9 +491,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         return $this->autoResponseRules;
     }
 
-    /**
-     * @param AccountTypeModel|null $accountTypeModel
-     */
     public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
     {
         $this->imapAccountType = $accountTypeModel;
@@ -514,13 +510,9 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
             $accountTypeModel = null;
             if ($userEmailOrigin) {
                 $accountTypeModel = new AccountTypeModel();
-                if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
-                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
-                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
-                } else {
-                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_OTHER);
-                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
-                }
+                $accountType = $userEmailOrigin->getAccountType();
+                $accountTypeModel->setAccountType($accountType);
+                $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
             }
 
             if ($accountTypeModel) {

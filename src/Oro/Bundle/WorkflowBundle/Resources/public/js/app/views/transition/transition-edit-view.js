@@ -1,18 +1,17 @@
 define(function(require) {
     'use strict';
 
-    var TransitionEditView;
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var __ = require('orotranslation/js/translator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var DialogWidget = require('oro/dialog-widget');
-    var helper = require('oroworkflow/js/tools/workflow-helper');
-    var AttributeFormOptionEditView = require('../attribute/attribute-form-option-edit-view');
-    var AttributeFormOptionListView = require('../attribute/attribute-form-option-list-view');
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const __ = require('orotranslation/js/translator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const DialogWidget = require('oro/dialog-widget');
+    const helper = require('oroworkflow/js/tools/workflow-helper');
+    const AttributeFormOptionEditView = require('../attribute/attribute-form-option-edit-view');
+    const AttributeFormOptionListView = require('../attribute/attribute-form-option-list-view');
     require('jquery.validate');
 
-    TransitionEditView = BaseView.extend({
+    const TransitionEditView = BaseView.extend({
         attributes: {
             'class': 'widget-content'
         },
@@ -32,7 +31,7 @@ define(function(require) {
             step_from: null,
             button_example_template: '<button type="button" class="btn <%- button_color %>" ' +
                 'title="<%- button_title %>">' +
-                '<% if (transition_prototype_icon) { %><i class="<%- transition_prototype_icon %>"/> <% } %>' +
+                '<% if (transition_prototype_icon) { %><i class="<%- transition_prototype_icon %>"></i> <% } %>' +
                 '<%- button_label %></button>',
             allowed_button_styles: [
                 {
@@ -77,18 +76,18 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function TransitionEditView() {
-            TransitionEditView.__super__.constructor.apply(this, arguments);
+        constructor: function TransitionEditView(options) {
+            TransitionEditView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = options || {};
-            var requiredMissed = this.requiredOptions.filter(function(option) {
+            const requiredMissed = this.requiredOptions.filter(function(option) {
                 return _.isUndefined(options[option]);
             });
             if (requiredMissed.length) {
@@ -96,34 +95,34 @@ define(function(require) {
             }
             this.options = _.defaults(options, this.options);
 
-            var template = this.options.template || $('#transition-form-template').html();
+            const template = this.options.template || $('#transition-form-template').html();
             this.template = _.template(template);
             this.button_example_template = _.template(this.options.button_example_template);
             this.widget = null;
         },
 
         initDestinationPageView: function(form) {
-            var availableDestinations = this.options.workflow.getAvailableDestinations();
-            var entityRoutes = _.keys(this.options.entityFieldsProvider.getEntityRoutes());
+            const availableDestinations = this.options.workflow.getAvailableDestinations();
+            const entityRoutes = _.keys(this.options.entityFieldsProvider.getEntityRoutes());
             entityRoutes.push('');
 
-            var enabledRedirects = _.intersection(availableDestinations, entityRoutes);
+            const enabledRedirects = _.intersection(availableDestinations, entityRoutes);
 
-            var currentRedirects = $(form).find('[name=destination_page] option');
+            const currentRedirects = $(form).find('[name=destination_page] option');
             _.each(currentRedirects, function(item) {
                 $(item).toggle(_.indexOf(enabledRedirects, $(item).val()) >= 0);
             });
         },
 
         updateDestinationPageView: function() {
-            var $displayType = $(this.widget.form).find('[name=display_type]');
-            var $pageRedirectRow = $(this.widget.form).find('.destination-page-controls');
+            const $displayType = $(this.widget.form).find('[name=display_type]');
+            const $pageRedirectRow = $(this.widget.form).find('.destination-page-controls');
 
             $pageRedirectRow.toggle($displayType.val() === 'page');
         },
 
         updateExampleView: function() {
-            var formData = helper.getFormData(this.widget.form);
+            const formData = helper.getFormData(this.widget.form);
             formData.transition_prototype_icon = formData.transition_prototype_icon || this._getFrontendOption('icon');
             formData.button_label = formData.button_label || formData.label;
             formData.button_title = formData.button_title || formData.button_label;
@@ -136,24 +135,24 @@ define(function(require) {
         },
 
         onTransitionAdd: function() {
-            var formData = helper.getFormData(this.widget.form);
-            var modelUpdateData = _.pick(formData,
+            const formData = helper.getFormData(this.widget.form);
+            const modelUpdateData = _.pick(formData,
                 'label', 'button_label', 'button_title', 'step_to', 'display_type', 'destination_page', 'message');
             if (!this.model.get('name')) {
                 modelUpdateData.name = helper.getNameByString(formData.label, 'transition_');
             }
-            var frontendOptions = this.model.get('frontend_options');
+            const frontendOptions = this.model.get('frontend_options');
             modelUpdateData.frontend_options = _.extend({}, frontendOptions, {
                 'icon': formData.transition_prototype_icon,
                 'class': formData.button_color
             });
             modelUpdateData._is_clone = false;
-            var attributeFields = {};
+            const attributeFields = {};
             _.each(this.subview('attributes-list-view').getCollection(), function(item) {
                 this.options.workflow.ensureAttributeByPropertyPath(item.property_path);
-                var attribute = this.options.workflow.getAttributeByPropertyPath(item.property_path);
-                var attributeName = attribute.get('name');
-                var formOptionsData = _.pick(item, 'options');
+                const attribute = this.options.workflow.getAttributeByPropertyPath(item.property_path);
+                const attributeName = attribute.get('name');
+                const formOptionsData = _.pick(item, 'options');
                 if (item.required) {
                     formOptionsData.options = _.extend({}, formOptionsData.options, {required: true});
                 } else if (formOptionsData.options) {
@@ -177,14 +176,14 @@ define(function(require) {
 
             this.model.set(modelUpdateData);
 
-            var stepFrom = formData.step_from ? formData.step_from : this.options.step_from;
+            const stepFrom = formData.step_from ? formData.step_from : this.options.step_from;
             this.trigger('transitionAdd', this.model, stepFrom);
             this.widget.remove();
         },
 
         _getFrontendOption: function(key) {
-            var result = '';
-            var formOptions = this.model.get('frontend_options');
+            let result = '';
+            const formOptions = this.model.get('frontend_options');
             if (formOptions && formOptions.hasOwnProperty(key)) {
                 result = formOptions[key];
             }
@@ -192,7 +191,7 @@ define(function(require) {
         },
 
         renderAddAttributeForm: function(el) {
-            var attributesFormView = new AttributeFormOptionEditView({
+            const attributesFormView = new AttributeFormOptionEditView({
                 autoRender: true,
                 el: el.find('.transition-attributes-form-container'),
                 workflow: this.options.workflow,
@@ -207,8 +206,8 @@ define(function(require) {
         },
 
         addFormOption: function(data) {
-            var attributeName;
-            var attribute = this.options.workflow.getAttributeByPropertyPath(data.property_path);
+            let attributeName;
+            const attribute = this.options.workflow.getAttributeByPropertyPath(data.property_path);
             if (attribute) {
                 attributeName = attribute.get('name');
             } else {
@@ -224,7 +223,7 @@ define(function(require) {
         },
 
         renderAttributesList: function(el) {
-            var attributesList = new AttributeFormOptionListView({
+            const attributesList = new AttributeFormOptionListView({
                 autoRender: true,
                 el: el.find('.transition-attributes-list-container'),
                 items: this.getFormOptions(),
@@ -242,24 +241,24 @@ define(function(require) {
         },
 
         getFormOptions: function() {
-            var results = [];
-            var entityPropertyPathPrefix = this.options.workflow.get('entity_attribute') + '.';
+            const results = [];
+            const entityPropertyPathPrefix = this.options.workflow.get('entity_attribute') + '.';
             _.each(this.model.get('form_options').attribute_fields, function(formOption, attributeName) {
                 formOption = formOption || {};
-                var attribute = this.options.workflow.getAttributeByName(attributeName);
-                var propertyPath = attribute.get('property_path');
-                var isEntityAttribute = Boolean(propertyPath);
+                const attribute = this.options.workflow.getAttributeByName(attributeName);
+                let propertyPath = attribute.get('property_path');
+                const isEntityAttribute = Boolean(propertyPath);
                 if (isEntityAttribute && propertyPath.indexOf(entityPropertyPathPrefix) === 0) {
                     propertyPath = propertyPath.substr(entityPropertyPathPrefix.length);
                 }
-                var options = formOption.hasOwnProperty('options') ? formOption.options : {};
-                var isRequired = options.hasOwnProperty('required') ? options.required : false;
+                const options = formOption.hasOwnProperty('options') ? formOption.options : {};
+                const isRequired = options.hasOwnProperty('required') ? options.required : false;
 
-                var label = formOption.hasOwnProperty('label') ? formOption.label : null;
+                let label = formOption.hasOwnProperty('label') ? formOption.label : null;
                 if (!label && options.hasOwnProperty('label')) {
                     label = options.label;
                 }
-                var result = {
+                const result = {
                     itemId: _.uniqueId(),
                     is_entity_attribute: isEntityAttribute,
                     attribute_name: attributeName,
@@ -294,7 +293,7 @@ define(function(require) {
 
         renderWidget: function() {
             if (!this.widget) {
-                var title = this.model.get('name') ? __('Edit transition') : __('Add new transition');
+                let title = this.model.get('name') ? __('Edit transition') : __('Add new transition');
                 if (this.model.get('_is_clone')) {
                     title = __('Clone transition');
                 }
@@ -304,7 +303,7 @@ define(function(require) {
                     stateEnabled: false,
                     incrementalPosition: false,
                     dialogOptions: {
-                        close: _.bind(this.onCancel, this),
+                        close: this.onCancel.bind(this),
                         width: 800,
                         modal: true
                     }
@@ -317,10 +316,10 @@ define(function(require) {
             // Disable widget submit handler and set our own instead
             this.widget.form.off('submit');
             this.widget.form.validate({
-                submitHandler: _.bind(this.onTransitionAdd, this),
+                submitHandler: this.onTransitionAdd.bind(this),
                 ignore: '[type="hidden"]',
                 highlight: function(element) {
-                    var tabContent = $(element).closest('.tab-pane');
+                    const tabContent = $(element).closest('.tab-pane');
                     if (tabContent.is(':hidden')) {
                         tabContent
                             .closest('.oro-tabs')
@@ -333,8 +332,8 @@ define(function(require) {
 
         render: function() {
             this._deferredRender();
-            var data = this.model.toJSON();
-            var steps = this.options.workflow.get('steps').models;
+            const data = this.model.toJSON();
+            const steps = this.options.workflow.get('steps').models;
             data.stepFrom = this.options.step_from;
             if (!data.step_to) {
                 data.step_to = this.options.step_to ? this.options.step_to.get('name') : undefined;
@@ -345,10 +344,10 @@ define(function(require) {
             data.allowedStepsFrom = steps;
             data.allowedStepsTo = steps.slice(1);
 
-            var form = $(this.template(data));
+            const form = $(this.template(data));
 
             this.initDestinationPageView(form);
-            var attributesFormView = this.renderAddAttributeForm(form);
+            const attributesFormView = this.renderAddAttributeForm(form);
             $.when(attributesFormView.getDeferredRenderPromise()).then(function() {
                 this.renderAttributesList(form);
                 this.$el.append(form);

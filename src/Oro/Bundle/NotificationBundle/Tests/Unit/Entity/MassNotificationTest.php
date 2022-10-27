@@ -6,50 +6,39 @@ use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 
 class MassNotificationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MassNotification
-     */
-    protected $massNotification;
+    private MassNotification $massNotification;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->massNotification = new MassNotification();
 
         // get id should return null cause this entity was not loaded from DB
-        $this->assertNull($this->massNotification->getId());
+        self::assertNull($this->massNotification->getId());
     }
 
-    protected function tearDown()
-    {
-        unset($this->massNotification);
-    }
-    
     /**
      * @dataProvider getSetDataProvider
      */
-    public function testGetSet($property, $value, $expected)
+    public function testGetSet(string $property, mixed $value, $expected): void
     {
-        call_user_func_array(array($this->massNotification, 'set' . ucfirst($property)), array($value));
-        $this->assertEquals(
+        call_user_func([$this->massNotification, 'set' . ucfirst($property)], $value);
+        self::assertEquals(
             $expected,
-            call_user_func_array(array($this->massNotification, 'get' . ucfirst($property)), array())
+            call_user_func_array([$this->massNotification, 'get' . ucfirst($property)], [])
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
+    public function getSetDataProvider(): array
     {
         $date = new \DateTime('now');
         return [
-            'email'       => ['email', 'test@test.com', 'test@test.com'],
-            'sender'      => ['sender', 'from@test.com', 'from@test.com'],
-            'body'        => ['body', 'test body', 'test body'],
-            'subject'     => ['subject', 'test title', 'test title'],
+            'email' => ['email', 'test@test.com', 'test@test.com'],
+            'sender' => ['sender', 'from@test.com', 'from@test.com'],
+            'body' => ['body', 'test body', 'test body'],
+            'subject' => ['subject', 'test title', 'test title'],
             'scheduledAt' => ['scheduledAt', $date, $date],
             'processedAt' => ['processedAt', $date, $date],
-            'status'      => ['status', 1, 1],
+            'status' => ['status', 1, 1],
         ];
     }
 }

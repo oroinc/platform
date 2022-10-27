@@ -2,20 +2,23 @@
 
 namespace Oro\Bundle\ActivityListBundle\Placeholder;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 
+/**
+ * Can be used in placeholders to determine applicability of activity to certain entity (e.g. whether this entity has
+ * any applicable activities).
+ * It also serves as a listener on oro.ui.grouping_chain_widget.before event.
+ */
 class PlaceholderFilter
 {
     /** @var ActivityListChainProvider */
     protected $activityListProvider;
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -26,22 +29,14 @@ class PlaceholderFilter
     /** @var array[] */
     protected $applicableCache = [];
 
-    /**
-     * @param ActivityListChainProvider $activityListChainProvider
-     * @param ManagerRegistry           $doctrine
-     * @param DoctrineHelper            $doctrineHelper
-     * @param ConfigManager             $configManager
-     */
     public function __construct(
         ActivityListChainProvider $activityListChainProvider,
-        ManagerRegistry $doctrine,
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager
     ) {
         $this->activityListProvider = $activityListChainProvider;
-        $this->doctrine             = $doctrine;
-        $this->doctrineHelper       = $doctrineHelper;
-        $this->configManager        = $configManager;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -51,6 +46,7 @@ class PlaceholderFilter
      * @param int|null    $pageType
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isApplicable($entity = null, $pageType = null)
     {
@@ -85,9 +81,6 @@ class PlaceholderFilter
         return $result;
     }
 
-    /**
-     * @param BeforeGroupingChainWidgetEvent $event
-     */
     public function isAllowedButton(BeforeGroupingChainWidgetEvent $event)
     {
         $entity   = $event->getEntity();
@@ -147,7 +140,8 @@ class PlaceholderFilter
      */
     protected function isActivityListEmpty($targetEntityClass, $targetEntityId)
     {
-        $repo = $this->doctrine->getRepository('OroActivityListBundle:ActivityList');
+        /** @var ActivityListRepository $repo */
+        $repo = $this->doctrineHelper->getEntityRepositoryForClass(ActivityList::class);
 
         return 0 === $repo->getRecordsCountForTargetClassAndId($targetEntityClass, $targetEntityId);
     }

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Async\Topic\WorkflowTransitionEventTriggerTopic;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
-use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository;
@@ -14,8 +14,11 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Extension for transition event triggers.
+ */
 class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
 {
     /** @var MessageProducerInterface */
@@ -30,13 +33,6 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
     /** @var array */
     protected $scheduled = [];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param EventTriggerCache $triggerCache
-     * @param MessageProducerInterface $producer
-     * @param TransitionEventTriggerHelper $helper
-     * @param TransitionEventTriggerHandler $handler
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EventTriggerCache $triggerCache,
@@ -127,7 +123,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
         $message = TransitionTriggerMessage::create($trigger, $entityId);
 
         if ($trigger->isQueued() || $this->forceQueued) {
-            $this->producer->send(TransitionTriggerProcessor::EVENT_TOPIC_NAME, $message->toArray());
+            $this->producer->send(WorkflowTransitionEventTriggerTopic::getName(), $message->toArray());
         } else {
             $this->handler->process($trigger, $message);
         }
@@ -163,7 +159,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
      */
     private function createEntityFromChangeSet($entity, array $changeSet = null)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
+        $accessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS);
         $newEntity = clone $entity;
 
         if (null === $changeSet) {
@@ -171,7 +167,9 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
         }
 
         foreach ($changeSet as $field => $value) {
-            $accessor->setValue($newEntity, $field, $value['old']);
+            if ($accessor->isWritable($newEntity, $field)) {
+                $accessor->setValue($newEntity, $field, $value['old']);
+            }
         }
 
         return $newEntity;

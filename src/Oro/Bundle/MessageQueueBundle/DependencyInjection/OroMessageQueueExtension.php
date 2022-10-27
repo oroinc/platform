@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection;
 
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\TransportFactoryInterface;
+use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
+use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestMessageBufferManager;
 use Oro\Component\MessageQueue\Client\DbalDriver;
-use Oro\Component\MessageQueue\Client\NullDriver;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
-use Oro\Component\MessageQueue\DependencyInjection\TransportFactoryInterface;
+use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
-use Oro\Component\MessageQueue\Transport\Null\NullConnection;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -18,33 +21,12 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroMessageQueueExtension extends Extension
 {
-    const HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME = 'oro_message_queue.consumer_heartbeat_update_period';
+    /** @var TransportFactoryInterface[] */
+    private array $factories = [];
 
-    /**
-     * @var TransportFactoryInterface[]
-     */
-    private $factories;
-
-    public function __construct()
+    public function addTransportFactory(TransportFactoryInterface $transportFactory): void
     {
-        $this->factories = [];
-    }
-
-    /**
-     * @param TransportFactoryInterface $transportFactory
-     */
-    public function addTransportFactory(TransportFactoryInterface $transportFactory)
-    {
-        $name = $transportFactory->getName();
-
-        if (empty($name)) {
-            throw new \LogicException('Transport factory name cannot be empty');
-        }
-        if (array_key_exists($name, $this->factories)) {
-            throw new \LogicException(sprintf('Transport factory with such name already added. Name %s', $name));
-        }
-
-        $this->factories[$name] = $transportFactory;
+        $this->factories[$transportFactory->getKey()] = $transportFactory;
     }
 
     /**
@@ -52,29 +34,24 @@ class OroMessageQueueExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $config = $this->processConfiguration(new Configuration($this->factories), $configs);
+        $environment = $container->getParameter('kernel.environment');
+        $config = $this->processConfiguration(new Configuration($this->factories, $environment), $configs);
 
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('log.yml');
         $loader->load('job.yml');
         $loader->load('commands.yml');
-
-        // php pcntl extension available only for UNIX like systems
-        if (extension_loaded('pcntl')) {
-            $loader->load('signal_extension.yml');
-        }
-
-        foreach ($config['transport'] as $name => $transportConfig) {
-            $this->factories[$name]->createService($container, $transportConfig);
-        }
+        $loader->load('controllers.yml');
+        $loader->load('controllers_api.yml');
+        $loader->load('mq_topics.yml');
 
         if (isset($config['client'])) {
             $loader->load('client.yml');
+            $loader->load('client_commands.yml');
 
             $driverFactory = $container->getDefinition('oro_message_queue.client.driver_factory');
             $driverFactory->replaceArgument(0, [
-                NullConnection::class => NullDriver::class,
                 DbalConnection::class => DbalDriver::class,
                 DbalLazyConnection::class => DbalDriver::class,
             ]);
@@ -82,38 +59,39 @@ class OroMessageQueueExtension extends Extension
             $configDef = $container->getDefinition('oro_message_queue.client.config');
             $configDef->setArguments([
                 $config['client']['prefix'],
-                $config['client']['router_processor'],
-                $config['client']['router_destination'],
                 $config['client']['default_destination'],
                 $config['client']['default_topic'],
             ]);
 
-            if (false == empty($config['client']['traceable_producer'])) {
+            if (!empty($config['client']['traceable_producer'])) {
                 $producerId = 'oro_message_queue.client.traceable_message_producer';
                 $container->register($producerId, TraceableMessageProducer::class)
                     ->setDecoratedService('oro_message_queue.client.message_producer')
-                    ->addArgument(new Reference('oro_message_queue.client.traceable_message_producer.inner'))
-                ;
+                    ->addArgument(new Reference('.inner'));
             }
 
-            $delayRedeliveredExtension = $container->getDefinition(
-                'oro_message_queue.client.delay_redelivered_message_extension'
-            );
-            $delayRedeliveredExtension->replaceArgument(1, $config['client']['redelivered_delay_time']);
+            $container->setParameter('oro_message_queue.client.noop_status', $config['client']['noop_status']);
         }
 
         if (isset($config['consumer'])) {
             $container->setParameter(
-                self::HEARTBEAT_UPDATE_PERIOD_PARAMETER_NAME,
+                'oro_message_queue.consumer_heartbeat_update_period',
                 $config['consumer']['heartbeat_update_period']
             );
+            $container->setParameter('oro_message_queue.client.noop_status', $config['client']['noop_status']);
         }
 
+        $this->createTransport($config, $container);
+        $this->buildOptionalExtensions($config, $container);
         $this->setPersistenceServicesAndProcessors($config, $container);
         $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
         $this->setJobConfigurationProvider($config, $container);
 
-        if ('test' === $container->getParameter('kernel.environment')) {
+        $container
+            ->registerForAutoconfiguration(TopicInterface::class)
+            ->addTag('oro_message_queue.topic');
+
+        if ('test' === $environment) {
             $loader->load('services_test.yml');
             $this->configureTestEnvironment($container);
         }
@@ -121,26 +99,55 @@ class OroMessageQueueExtension extends Extension
 
     /**
      * {@inheritdoc}
-     *
-     * @return Configuration
      */
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
-        $rc = new \ReflectionClass(Configuration::class);
+        $container->addResource(new FileResource((new \ReflectionClass(Configuration::class))->getFileName()));
 
-        $container->addResource(new FileResource($rc->getFileName()));
+        return new Configuration($this->factories, $container->getParameter('kernel.environment'));
+    }
 
-        return new Configuration($this->factories);
+    private function createTransport(array $config, ContainerBuilder $container): void
+    {
+        $transportKey = $container->getParameter('message_queue_transport');
+        if (!$transportKey) {
+            throw new InvalidConfigurationException('Message queue transport key is not defined.');
+        }
+
+        if (!array_key_exists($transportKey, $this->factories)) {
+            throw new InvalidConfigurationException(
+                sprintf('Message queue transport with key "%s" is not found.', $transportKey)
+            );
+        }
+
+        $transportFactory = $this->factories[$transportKey];
+        $connectionId = $transportFactory->create($container, $config['transport'][$transportKey]);
+
+        $container->setAlias('oro_message_queue.transport.connection', $connectionId);
+    }
+
+    private function buildOptionalExtensions(array $config, ContainerBuilder $container): void
+    {
+        if ($config['client']['redelivery']['enabled']) {
+            $container->getDefinition('oro_message_queue.consumption.redelivery_message_extension')
+                ->replaceArgument(1, $config['client']['redelivery']['delay_time'])
+                // This extension should be called as early as possible as it rejects redelivered message,
+                // so all extensions called before are useless.
+                ->addTag('oro_message_queue.consumption.extension', ['priority' => 512]);
+        }
+
+        // php pcntl extension available only for UNIX like systems
+        if (extension_loaded('pcntl')) {
+            $container->getDefinition('oro_message_queue.consumption.signal_extension')
+                ->addTag('oro_message_queue.consumption.extension', ['persistent' => true]);
+        }
     }
 
     /**
      * Sets the services that should not be reset during container reset and
      * Message Queue processors that can work without container reset to container reset extension.
-     *
-     * @param array            $config
-     * @param ContainerBuilder $container
      */
-    protected function setPersistenceServicesAndProcessors(array $config, ContainerBuilder $container)
+    private function setPersistenceServicesAndProcessors(array $config, ContainerBuilder $container): void
     {
         if (!empty($config['persistent_services'])) {
             $container->getDefinition('oro_message_queue.consumption.container_clearer')
@@ -152,11 +159,7 @@ class OroMessageQueueExtension extends Extension
         }
     }
 
-    /**
-     * @param array            $config
-     * @param ContainerBuilder $container
-     */
-    protected function setSecurityAgnosticTopicsAndProcessors(array $config, ContainerBuilder $container)
+    private function setSecurityAgnosticTopicsAndProcessors(array $config, ContainerBuilder $container): void
     {
         if (!empty($config['security_agnostic_topics'])) {
             $container
@@ -170,28 +173,20 @@ class OroMessageQueueExtension extends Extension
         }
     }
 
-    /**
-     * @param array $config
-     * @param ContainerBuilder $container
-     */
-    protected function setJobConfigurationProvider(array $config, ContainerBuilder $container)
+    private function setJobConfigurationProvider(array $config, ContainerBuilder $container): void
     {
         if (!empty($config['time_before_stale'])) {
-            $jobConfigurationProvider = $container->getDefinition('oro_message_queue.job.configuration_provider');
-            $jobConfigurationProvider->addMethodCall('setConfiguration', [$config['time_before_stale']]);
+            $container->getDefinition('oro_message_queue.job.configuration_provider')
+                ->addMethodCall('setConfiguration', [$config['time_before_stale']]);
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function configureTestEnvironment(ContainerBuilder $container)
+    private function configureTestEnvironment(ContainerBuilder $container): void
     {
-        // oro_message_queue.client.buffered_message_producer
-        $bufferedProducerDef = $container->getDefinition('oro_message_queue.client.buffered_message_producer');
-        $bufferedProducerDef->setClass(
-            'Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer'
-        );
-        $bufferedProducerDef->setPublic(true);
+        $container->getDefinition('oro_message_queue.client.buffered_message_producer')
+            ->setClass(TestBufferedMessageProducer::class)
+            ->setPublic(true);
+        $container->getDefinition('oro_message_queue.client.message_buffer_manager')
+            ->setClass(TestMessageBufferManager::class);
     }
 }

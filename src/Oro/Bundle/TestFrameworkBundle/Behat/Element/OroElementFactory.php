@@ -8,6 +8,9 @@ use Behat\Mink\Mink;
 use Behat\Mink\Selector\SelectorsHandler;
 use Behat\Testwork\Suite\Suite;
 
+/**
+ * Provide a set of methods to manipulate Elements
+ */
 class OroElementFactory implements SuiteAwareInterface
 {
     /**
@@ -38,11 +41,6 @@ class OroElementFactory implements SuiteAwareInterface
     /** @var string[] */
     private $aliases = [];
 
-    /**
-     * @param Mink $mink
-     * @param SelectorsHandler $selectorsHandler
-     * @param array $configuration
-     */
     public function __construct(Mink $mink, SelectorsHandler $selectorsHandler, array $configuration)
     {
         $this->mink = $mink;
@@ -191,7 +189,7 @@ class OroElementFactory implements SuiteAwareInterface
                 return $this->findElementContainsByCss($name, $text, $context);
                 break;
             case 'xpath':
-                return $this->findElementContainsByXPath($name, $text, $context);
+                return $this->findElementContainsByXPath($name, $text, true, $context);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf(
@@ -262,6 +260,10 @@ class OroElementFactory implements SuiteAwareInterface
         $elementSelector = $this->configuration[$configName]['selector'];
         if ($context) {
             $elementSelector = $this->prepend($elementSelector, $context);
+            // Get rid of //html as it will be added by findAll
+            if ($elementSelector['type'] === 'xpath' && strpos($elementSelector['locator'], '//html') !== false) {
+                $elementSelector['locator'] = str_replace('//html', '', $elementSelector['locator']);
+            }
         }
 
         $elements = $this->mink->getSession()->getPage()->findAll(

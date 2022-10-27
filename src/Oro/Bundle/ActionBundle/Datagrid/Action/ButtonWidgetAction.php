@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Datagrid\Action;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonWidgetAction extends AbstractAction
 {
@@ -30,9 +30,6 @@ class ButtonWidgetAction extends AbstractAction
         ]
     ];
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         parent::__construct();

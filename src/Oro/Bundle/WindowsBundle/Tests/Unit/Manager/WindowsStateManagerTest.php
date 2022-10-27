@@ -1,67 +1,107 @@
 <?php
 
-namespace Oro\Bundle\WindowsBundle\Tests\Manager;
+namespace Oro\Bundle\WindowsBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository;
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateManager;
 use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
+use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    protected $tokenStorage;
+    use EntityTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
+    private $tokenStorage;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    private $em;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateRepository */
+    private $repo;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ClassMetadata */
+    private $classMetadata;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateRequestManager */
-    protected $requestStateManager;
+    private $requestStateManager;
 
     /** @var WindowsStateManager */
-    protected $manager;
+    private $manager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->tokenStorage = $this
-            ->createMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
+        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->em = $this->createMock(EntityManager::class);
+        $this->repo = $this->createMock(WindowsStateRepository::class);
+        $this->classMetadata = $this->createMock(ClassMetadata::class);
+        $this->requestStateManager = $this->createMock(WindowsStateRequestManager::class);
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->requestStateManager = $this
-            ->getMockBuilder('Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(WindowsState::class)
+            ->willReturn($this->em);
+        $this->em->expects($this->any())
+            ->method('getRepository')
+            ->with(WindowsState::class)
+            ->willReturn($this->repo);
+        $this->em->expects($this->any())
+            ->method('getClassMetadata')
+            ->with(WindowsState::class)
+            ->willReturn($this->classMetadata);
 
         $this->manager = new WindowsStateManager(
             $this->tokenStorage,
-            $this->doctrineHelper,
+            $doctrine,
             $this->requestStateManager,
-            'Oro\Bundle\WindowsBundle\Entity\WindowsState',
-            'Oro\Bundle\UserBundle\Entity\User'
+            WindowsState::class
         );
+    }
+
+    private function createWindowState(array $data = [], ?int $id = 123): WindowsState
+    {
+        /** @var WindowsState $state */
+        $state = $this->getEntity(WindowsState::class, ['id' => $id]);
+        $state->setData($data);
+
+        return $state;
     }
 
     public function testCreateWindowsState()
     {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->willReturn(new User());
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
-
-        $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn(new User());
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
         $state = new WindowsState();
-        $this->doctrineHelper->expects($this->once())->method('createEntityInstance')->willReturn($state);
-        $this->doctrineHelper->expects($this->once())->method('getEntityManagerForClass')->willReturn($em);
+        $this->classMetadata->expects($this->once())
+            ->method('newInstance')
+            ->willReturn($state);
 
-        $em->expects($this->once())->method('persist')->with($state);
-        $em->expects($this->once())->method('flush')->with($state);
+        $this->em->expects($this->once())
+            ->method('persist')
+            ->with($state);
+        $this->em->expects($this->once())
+            ->method('flush')
+            ->with($state);
 
-        $this->requestStateManager->expects($this->once())->method('getData')->willReturn([]);
+        $this->requestStateManager->expects($this->once())
+            ->method('getData')
+            ->willReturn([]);
+
         $this->manager->createWindowsState();
     }
 
@@ -71,18 +111,21 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $data = ['url' => '/test'];
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->willReturn($user);
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
-        $repo = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->requestStateManager->expects($this->once())
+            ->method('getData')
+            ->willReturn($data);
 
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
-        $this->requestStateManager->expects($this->once())->method('getData')->willReturn($data);
-
-        $repo->expects($this->once())->method('update')->with($user, $windowId, $data);
+        $this->repo->expects($this->once())
+            ->method('update')
+            ->with($user, $windowId, $data);
 
         $this->manager->updateWindowsState($windowId);
     }
@@ -92,19 +135,21 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $windowId = 42;
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->willReturn($user);
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
-        $repo = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->repo->expects($this->once())
+            ->method('delete')
+            ->with($user, $windowId);
 
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
+        $this->requestStateManager->expects($this->never())
+            ->method($this->anything());
 
-        $repo->expects($this->once())->method('delete')->with($user, $windowId);
-
-        $this->requestStateManager->expects($this->never())->method($this->anything());
         $this->manager->deleteWindowsState($windowId);
     }
 
@@ -117,19 +162,22 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
 
         $windowStates = [$windowStateFoo, $windowStateBar];
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->willReturn($user);
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
-        $repo = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->repo->expects($this->once())
+            ->method('findBy')
+            ->with(['user' => $user])
+            ->willReturn($windowStates);
 
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
+        $this->requestStateManager->expects($this->never())
+            ->method($this->anything());
 
-        $repo->expects($this->once())->method('findBy')->with(['user' => $user])->willReturn($windowStates);
-
-        $this->requestStateManager->expects($this->never())->method($this->anything());
         $this->assertSame($windowStates, $this->manager->getWindowsStates());
     }
 
@@ -140,103 +188,64 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
 
         $windowState = $this->createWindowState(['cleanUrl' => 'foo']);
 
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->willReturn($user);
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
-        $repo = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
-
-        $repo->expects($this->once())->method('findBy')->with(['user' => $user, 'id' => $windowStateId])
+        $this->repo->expects($this->once())
+            ->method('findOneBy')
+            ->with(['user' => $user, 'id' => $windowStateId])
             ->willReturn($windowState);
 
-        $this->requestStateManager->expects($this->never())->method($this->anything());
+        $this->requestStateManager->expects($this->never())
+            ->method($this->anything());
+
         $this->assertSame($windowState, $this->manager->getWindowsState($windowStateId));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Wrong $windowId type
-     */
     public function testFilterId()
     {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->willReturn(new User());
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Wrong $windowId type');
 
-        $repo = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn(new User());
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
         $this->manager->getWindowsState('bbb');
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testUserEmptyToken()
     {
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn(null);
+        $this->expectException(AccessDeniedException::class);
 
-        $repo = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn(null);
 
         $this->manager->getWindowsState(42);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccessDeniedException
-     */
     public function testUserEmptyUser()
     {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->willReturn(null);
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
+        $this->expectException(AccessDeniedException::class);
 
-        $repo = $this->getMockBuilder('Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn(null);
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
 
         $this->manager->getWindowsState(42);
-    }
-
-    /**
-     * @param array $data
-     * @return WindowsState
-     */
-    protected function createWindowState(array $data = [])
-    {
-        $state = new WindowsState();
-        $state->setData($data);
-
-        return $state;
-    }
-
-    public function testIsApplicableWithoutUser()
-    {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->willReturn(null);
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
-
-        $this->assertFalse($this->manager->isApplicable());
-    }
-
-    public function testIsApplicable()
-    {
-        $token = $this->createMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->once())->method('getUser')->willReturn(new User());
-        $this->tokenStorage->expects($this->once())->method('getToken')->willReturn($token);
-
-        $this->assertTrue($this->manager->isApplicable());
     }
 }

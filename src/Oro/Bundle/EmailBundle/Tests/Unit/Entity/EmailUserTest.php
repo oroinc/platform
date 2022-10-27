@@ -38,6 +38,10 @@ class EmailUserTest extends \PHPUnit\Framework\TestCase
 
         $emailUser->setOrganization(null);
         $this->assertNull($emailUser->getOrganization());
+
+        $this->assertFalse($emailUser->isEmailPrivate());
+        $emailUser->setIsEmailPrivate(true);
+        $this->assertTrue($emailUser->isEmailPrivate());
     }
 
     public function testBeforeSave()
@@ -57,7 +61,7 @@ class EmailUserTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($emailUser->isIncoming());
     }
 
-    public function outgoingEmailUserProvider()
+    public function outgoingEmailUserProvider(): array
     {
         $user = new User();
 
@@ -103,7 +107,7 @@ class EmailUserTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($emailUser->isOutgoing());
     }
 
-    public function incomingEmailUserProvider()
+    public function incomingEmailUserProvider(): array
     {
         $user = new User();
         $user->setId(1);
@@ -152,7 +156,7 @@ class EmailUserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($emailUser->isOutgoing());
     }
 
-    public function incomingAndOutgoingProvider()
+    public function incomingAndOutgoingProvider(): array
     {
         return [
             'inbox and sent folders' => [

@@ -2,20 +2,44 @@
 
 namespace Oro\Bundle\AttachmentBundle;
 
+use Liip\ImagineBundle\DependencyInjection\LiipImagineExtension;
+use Oro\Bundle\AttachmentBundle\DependencyInjection\Compiler\AddSupportedFieldTypesCompilerPass;
+use Oro\Bundle\AttachmentBundle\DependencyInjection\Compiler\AttachmentProcessorsCompilerPass;
+use Oro\Bundle\AttachmentBundle\DependencyInjection\Compiler\MigrateFileStorageCommandCompilerPass;
+use Oro\Bundle\AttachmentBundle\DependencyInjection\Imagine\Factory\GaufretteResolverFactory;
 use Oro\Bundle\AttachmentBundle\Guesser\MimeTypeExtensionGuesser;
 use Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Mime\MimeTypes;
 
 class OroAttachmentBundle extends Bundle
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function boot()
+    public function boot(): void
     {
-        MimeTypeGuesser::getInstance()->register(new MsMimeTypeGuesser());
-        ExtensionGuesser::getInstance()->register(new MimeTypeExtensionGuesser());
+        parent::boot();
+
+        $mimeTypes = MimeTypes::getDefault();
+        $mimeTypes->registerGuesser(new MsMimeTypeGuesser());
+        $mimeTypes->registerGuesser(new MimeTypeExtensionGuesser());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function build(ContainerBuilder $container): void
+    {
+        parent::build($container);
+
+        $container->addCompilerPass(new AttachmentProcessorsCompilerPass());
+        $container->addCompilerPass(new MigrateFileStorageCommandCompilerPass());
+        $container->addCompilerPass(new AddSupportedFieldTypesCompilerPass());
+
+        /** @var LiipImagineExtension $extension */
+        $extension = $container->getExtension('liip_imagine');
+        $extension->addResolverFactory(new GaufretteResolverFactory());
     }
 }

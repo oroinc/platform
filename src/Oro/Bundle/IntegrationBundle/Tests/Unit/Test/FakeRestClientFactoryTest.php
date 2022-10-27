@@ -11,7 +11,7 @@ use Oro\Bundle\IntegrationBundle\Test\FakeRestClientFactory;
  */
 class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    const FAKE_BASE_URL = 'http://localhost';
+    private const FAKE_BASE_URL = 'http://localhost';
 
     /** @var string */
     private $fixtureFileName;
@@ -19,10 +19,7 @@ class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var FakeRestClientFactory */
     private $factory;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->factory = new FakeRestClientFactory();
         $this->fixtureFileName = __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'foo.yml';
@@ -61,6 +58,6 @@ class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
             $client->get('/baz'),
             'Default response should be returned'
         );
-        $this->assertEquals(302, $client->get('/baz')->getStatusCode());
+        $this->assertEquals(304, $client->get('/baz')->getStatusCode());
     }
 }

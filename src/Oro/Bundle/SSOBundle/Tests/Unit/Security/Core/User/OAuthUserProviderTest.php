@@ -1,360 +1,201 @@
 <?php
 
-namespace Oro\Bundle\SSOBundle\Tests\Entity;
+namespace Oro\Bundle\SSOBundle\Tests\Unit\Security\Core\User;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface;
+use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
+use Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException;
+use Oro\Bundle\SSOBundle\Security\Core\Exception\ResourceOwnerNotAllowedException;
 use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider;
-use Oro\Bundle\SSOBundle\Tests\Unit\Stub\TestingUser;
+use Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProviderInterface;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserManager;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
-use Symfony\Component\Security\Core\Encoder\EncoderFactory;
-use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\LockedException;
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
-    const TEST_NAME  = 'Jack';
-    const TEST_EMAIL = 'jack@jackmail.net';
+    /** @var OAuthUserProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $userProvider;
 
-    /**
-     * @var User
-     */
-    protected $user;
+    /** @var UserCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $userChecker;
 
-    /**
-     * @var UserManager
-     */
-    protected $userManager;
+    /** @var OAuthUserProvider */
+    private $provider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $om;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $repository;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $cm;
-
-    /**
-     * @var OAuthUserProvider
-     */
-    protected $oauthProvider;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $registry;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
-            $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
-        }
+        $this->userProvider = self::createMock(OAuthUserProviderInterface::class);
+        $this->userChecker = self::createMock(UserCheckerInterface::class);
 
-        $ef    = new EncoderFactory([static::USER_CLASS => new MessageDigestPasswordEncoder('sha512')]);
-        $class = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $userProviders = TestContainerBuilder::create()
+            ->add('test_resource_owner', $this->userProvider)
+            ->getContainer($this);
 
-        $this->om         = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
-        $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        $this->provider = new OAuthUserProvider($userProviders, $this->userChecker);
+    }
 
-        $this->om
-            ->expects($this->any())
-            ->method('getRepository')
-            ->withAnyParameters()
-            ->will($this->returnValue($this->repository));
+    private function getUserResponse(
+        string $username = 'username',
+        string $email = 'username@example.com',
+        string $resourceOwner = 'test_resource_owner'
+    ): UserResponseInterface {
+        $userResponse = self::createMock(UserResponseInterface::class);
+        $userResponse->expects(self::any())
+            ->method('getUsername')
+            ->willReturn($username);
+        $userResponse->expects(self::any())
+            ->method('getEmail')
+            ->willReturn($email);
 
-        $this->om
-            ->expects($this->any())
-            ->method('getClassMetadata')
-            ->with($this->equalTo(static::USER_CLASS))
-            ->will($this->returnValue($class));
-
-
-        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($this->om));
-
-        $class->expects($this->any())
+        $resourceOwnerInstance = self::createMock(ResourceOwnerInterface::class);
+        $userResponse->expects(self::any())
+            ->method('getResourceOwner')
+            ->willReturn($resourceOwnerInstance);
+        $resourceOwnerInstance->expects(self::any())
             ->method('getName')
-            ->will($this->returnValue(static::USER_CLASS));
-        /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject $enumValueProvider */
-        $enumValueProvider = $this->getMockBuilder(EnumValueProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $enumValueProvider->method('getDefaultEnumValuesByCode')->willReturn(
-            new StubEnumValue('active', 'active', 0, true)
-        );
-        $enumValueProvider->method('getEnumValueByCode')->willReturnCallback(
-            function ($code, $id) {
-                return new StubEnumValue($id, $id, 0, false);
-            }
-        );
-        $this->userManager = new UserManager(
-            static::USER_CLASS,
-            $this->registry,
-            $ef,
-            $enumValueProvider,
-            $this->createMock(ConfigManager::class)
-        );
+            ->willReturn($resourceOwner);
 
-        $this->oauthProvider = new OAuthUserProvider($this->userManager, $this->cm);
+        return $userResponse;
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage SSO is not enabled
-     */
-    public function testLoadUserByOAuthUserResponseShouldThrowExceptionIfSSOIsDisabled()
+    public function testShouldThrowExceptionIfUserProviderNotFound()
     {
-        $this->cm
-            ->expects($this->any())
-            ->method('get')
-            ->with($this->equalTo('oro_sso.enable_google_sso'))
-            ->will($this->returnValue(false));
+        $this->expectException(ResourceOwnerNotAllowedException::class);
+        $this->expectExceptionMessage('SSO is not supported.');
 
-        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
-
-        $this->oauthProvider->loadUserByOAuthUserResponse($userResponse);
+        $this->provider->loadUserByOAuthUserResponse(
+            $this->getUserResponse('username', 'username@example.com', 'unknown_resource_owner')
+        );
     }
 
-    public function testLoadUserByOAuthShouldReturnUserByOauthIdIfFound()
+    public function testShouldThrowExceptionIfSsoIsDisabled()
     {
-        $this->cm
-            ->expects($this->at(0))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.enable_google_sso'))
-            ->will($this->returnValue(true));
+        $this->expectException(ResourceOwnerNotAllowedException::class);
+        $this->expectExceptionMessage('SSO is not enabled.');
 
-        $this->cm
-            ->expects($this->at(1))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.domains'))
-            ->will($this->returnValue([]));
+        $this->userProvider->expects(self::once())
+            ->method('isEnabled')
+            ->willReturn(false);
 
-        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
-        $userResponse
-            ->expects($this->any())
-            ->method('getUsername')
-            ->will($this->returnValue('username'));
-
-        $userResponse
-            ->expects($this->any())
-            ->method('getResourceOwner')
-            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
-
-        $userResponse
-            ->expects($this->any())
-            ->method('getEmail')
-            ->will($this->returnValue('username@example.com'));
-
-        $user = new TestingUser();
-        $user->addRole(new Role());
-
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo(['Id' => 'username']))
-            ->will($this->returnValue($user))
-        ;
-
-        $loadedUser = $this->oauthProvider->loadUserByOAuthUserResponse($userResponse);
-        $this->assertSame($user, $loadedUser);
+        $this->provider->loadUserByOAuthUserResponse($this->getUserResponse());
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\BadCredentialsException
-     */
-    public function testLoadUserByOAuthShouldReturnExceptionIfUserIsDisabled()
+    public function testShouldReturnUserByOAuthIdWhenUserFound()
     {
-        $this->cm
-            ->expects($this->at(0))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.enable_google_sso'))
-            ->will($this->returnValue(true));
+        $user = new User();
+        $user->addUserRole(new Role());
 
-        $this->cm
-            ->expects($this->at(1))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.domains'))
-            ->will($this->returnValue([]));
+        $userResponse = $this->getUserResponse();
 
-        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
-        $userResponse
-            ->expects($this->any())
-            ->method('getUsername')
-            ->will($this->returnValue('username'));
+        $this->userProvider->expects(self::once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->userProvider->expects(self::once())
+            ->method('getAllowedDomains')
+            ->willReturn([]);
+        $this->userProvider->expects(self::once())
+            ->method('findUser')
+            ->with(self::identicalTo($userResponse))
+            ->willReturn($user);
 
-        $userResponse
-            ->expects($this->any())
-            ->method('getResourceOwner')
-            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+        $loadedUser = $this->provider->loadUserByOAuthUserResponse($userResponse);
+        self::assertSame($user, $loadedUser);
+    }
 
-        $userResponse
-            ->expects($this->any())
-            ->method('getEmail')
-            ->will($this->returnValue('username@example.com'));
+    public function testShouldReturnUserByOAuthIdWhenUserFoundAndEmailIsAllowed()
+    {
+        $user = new User();
+        $user->addUserRole(new Role());
 
-        $user = new TestingUser();
-        $user->addRole(new Role());
+        $userResponse = $this->getUserResponse();
+
+        $this->userProvider->expects(self::once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->userProvider->expects(self::once())
+            ->method('getAllowedDomains')
+            ->willReturn(['example.com']);
+        $this->userProvider->expects(self::once())
+            ->method('findUser')
+            ->with(self::identicalTo($userResponse))
+            ->willReturn($user);
+
+        $loadedUser = $this->provider->loadUserByOAuthUserResponse($userResponse);
+        self::assertSame($user, $loadedUser);
+    }
+
+    public function testShouldThrowExceptionWhenEmailIsNotAllowed()
+    {
+        $this->expectException(EmailDomainNotAllowedException::class);
+        $this->expectExceptionMessage('The user email is not allowed.');
+
+        $this->userProvider->expects(self::once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->userProvider->expects(self::once())
+            ->method('getAllowedDomains')
+            ->willReturn(['another.com']);
+        $this->userProvider->expects(self::never())
+            ->method('findUser');
+
+        $this->provider->loadUserByOAuthUserResponse($this->getUserResponse());
+    }
+
+    public function testShouldThrowExceptionIfUserIsDisabled()
+    {
+        $this->expectException(LockedException::class);
+        $this->expectExceptionMessage('Account is locked.');
+
+        $user = new User();
+        $user->addUserRole(new Role());
         $user->setEnabled(false);
 
-        $this->repository
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo(['Id' => 'username']))
-            ->will($this->returnValue($user))
-        ;
+        $userResponse = $this->getUserResponse();
 
-        $this->oauthProvider->loadUserByOAuthUserResponse($userResponse);
+        $this->userProvider->expects(self::once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->userProvider->expects(self::once())
+            ->method('getAllowedDomains')
+            ->willReturn([]);
+        $this->userProvider->expects(self::once())
+            ->method('findUser')
+            ->with(self::identicalTo($userResponse))
+            ->willReturn($user);
+
+        $exception = new LockedException('Account is locked.');
+        $exception->setUser($user);
+
+        $this->userChecker->expects(self::once())
+            ->method('checkPreAuth')
+            ->with($user)
+            ->willThrowException($exception);
+
+        $this->provider->loadUserByOAuthUserResponse($userResponse);
     }
 
-    public function testLoadUserByOAuthShouldToFindUserByEmailIfLoadingByOauthIdFails()
+    public function testShouldThrowExceptionIfUserNotFound()
     {
-        $this->cm
-            ->expects($this->at(0))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.enable_google_sso'))
-            ->will($this->returnValue(true));
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('The user does not exist.');
 
-        $this->cm
-            ->expects($this->at(1))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.domains'))
-            ->will($this->returnValue([]));
+        $userResponse = $this->getUserResponse();
 
-        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
-        $userResponse
-            ->expects($this->any())
-            ->method('getUsername')
-            ->will($this->returnValue('username'));
+        $this->userProvider->expects(self::once())
+            ->method('isEnabled')
+            ->willReturn(true);
+        $this->userProvider->expects(self::once())
+            ->method('getAllowedDomains')
+            ->willReturn([]);
+        $this->userProvider->expects(self::once())
+            ->method('findUser')
+            ->with(self::identicalTo($userResponse))
+            ->willReturn(null);
 
-        $userResponse
-            ->expects($this->any())
-            ->method('getResourceOwner')
-            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
-
-        $userResponse
-            ->expects($this->any())
-            ->method('getEmail')
-            ->will($this->returnValue('username@example.com'));
-
-        $this->repository
-            ->expects($this->at(0))
-            ->method('findOneBy')
-            ->with($this->equalTo(['Id' => 'username']))
-        ;
-
-        $user = new TestingUser();
-        $user->addRole(new Role());
-
-        $this->repository
-            ->expects($this->at(1))
-            ->method('findOneBy')
-            ->with($this->equalTo(['email' => 'username@example.com']))
-            ->will($this->returnValue($user))
-        ;
-
-        $loadedUser = $this->oauthProvider->loadUserByOAuthUserResponse($userResponse);
-        $this->assertSame($user, $loadedUser);
-    }
-
-    public function testLoadUserByOAuthShouldFindUserByEmailWithRestrictedEmailDomainIfLoadingByOauthIdFails()
-    {
-        $this->cm
-            ->expects($this->at(0))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.enable_google_sso'))
-            ->will($this->returnValue(true));
-
-        $this->cm
-            ->expects($this->at(1))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.domains'))
-            ->will($this->returnValue(['example.com']));
-
-        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
-        $userResponse
-            ->expects($this->any())
-            ->method('getUsername')
-            ->will($this->returnValue('username'));
-
-        $userResponse
-            ->expects($this->any())
-            ->method('getResourceOwner')
-            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
-
-        $userResponse
-            ->expects($this->any())
-            ->method('getEmail')
-            ->will($this->returnValue('username@example.com'));
-
-        $this->repository
-            ->expects($this->at(0))
-            ->method('findOneBy')
-            ->with($this->equalTo(['Id' => 'username']))
-        ;
-
-        $user = new TestingUser();
-        $user->addRole(new Role());
-
-        $this->repository
-            ->expects($this->at(1))
-            ->method('findOneBy')
-            ->with($this->equalTo(['email' => 'username@example.com']))
-            ->will($this->returnValue($user))
-        ;
-
-        $loadedUser = $this->oauthProvider->loadUserByOAuthUserResponse($userResponse);
-        $this->assertSame($user, $loadedUser);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException
-     */
-    public function testLoadUserByOAuthShouldThrowExceptionIfEmailDomainIsDisabled()
-    {
-        $this->cm
-            ->expects($this->at(0))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.enable_google_sso'))
-            ->will($this->returnValue(true));
-
-        $this->cm
-            ->expects($this->at(1))
-            ->method('get')
-            ->with($this->equalTo('oro_sso.domains'))
-            ->will($this->returnValue(['google.com']));
-
-        $userResponse = $this->createMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
-        $userResponse
-            ->expects($this->any())
-            ->method('getUsername')
-            ->will($this->returnValue('username'));
-
-        $userResponse
-            ->expects($this->any())
-            ->method('getResourceOwner')
-            ->will($this->returnValue($this->createMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
-
-        $this->repository
-            ->expects($this->never())
-            ->method('findOneBy')
-        ;
-
-        $this->oauthProvider->loadUserByOAuthUserResponse($userResponse);
+        $this->provider->loadUserByOAuthUserResponse($userResponse);
     }
 }

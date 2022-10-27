@@ -3,15 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityRuleMatcher;
-use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
- * The exclusion provider for entities and fields excluded from Data API
+ * The exclusion provider for entities and fields excluded from API
  * via "Resources/config/oro/api.yml" files.
  */
-class ConfigExclusionProvider implements ExclusionProviderInterface
+class ConfigExclusionProvider extends ChainExclusionProvider
 {
     /** @var EntityHierarchyProviderInterface */
     private $entityHierarchyProvider;
@@ -28,10 +28,6 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
     /** @var array */
     private $cache = [];
 
-    /**
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param ConfigCache                      $configCache
-     */
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
         ConfigCache $configCache
@@ -48,8 +44,11 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
         if ($this->getIncludeMatcher()->isEntityMatched($className)) {
             return false;
         }
+        if ($this->getExcludeMatcher()->isEntityMatched($className)) {
+            return true;
+        }
 
-        return $this->getExcludeMatcher()->isEntityMatched($className);
+        return parent::isIgnoredEntity($className);
     }
 
     /**
@@ -63,11 +62,8 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
 
         $result = false;
         if (!$this->getIncludeMatcher()->isFieldMatched($metadata->name, $fieldName)) {
-            $result = $this->getExcludeMatcher()->isFieldMatched(
-                $metadata->name,
-                $fieldName,
-                $metadata->getTypeOfField($fieldName)
-            );
+            $result = $this->getExcludeMatcher()->isFieldMatched($metadata->name, $fieldName)
+                || parent::isIgnoredField($metadata, $fieldName);
         }
 
         $this->cache[$metadata->name][$fieldName] = $result;
@@ -86,7 +82,8 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
 
         $result = false;
         if (!$this->getIncludeMatcher()->isFieldMatched($metadata->name, $associationName)) {
-            $result = $this->getExcludeMatcher()->isFieldMatched($metadata->name, $associationName);
+            $result = $this->getExcludeMatcher()->isFieldMatched($metadata->name, $associationName)
+                || parent::isIgnoredRelation($metadata, $associationName);
         }
 
         $this->cache[$metadata->name][$associationName] = $result;
@@ -94,9 +91,6 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
         return $result;
     }
 
-    /**
-     * @return EntityRuleMatcher
-     */
     private function getExcludeMatcher(): EntityRuleMatcher
     {
         if (null === $this->excludeMatcher) {
@@ -109,9 +103,6 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
         return $this->excludeMatcher;
     }
 
-    /**
-     * @return EntityRuleMatcher
-     */
     private function getIncludeMatcher(): EntityRuleMatcher
     {
         if (null === $this->includeMatcher) {

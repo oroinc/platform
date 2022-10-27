@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -14,11 +15,9 @@ class AbstractConfigTypeTestCase extends TypeTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->typeHelper = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->typeHelper = $this->createMock(ConfigTypeHelper::class);
 
         parent::setUp();
     }
@@ -72,7 +71,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
             $this->typeHelper->expects($this->once())
                 ->method('getFieldName')
                 ->with($this->identicalTo($configId))
-                ->will($this->returnValue($configId instanceof FieldConfigId ? $configId->getFieldName() : null));
+                ->willReturn($configId instanceof FieldConfigId ? $configId->getFieldName() : null);
             $this->typeHelper->expects($this->once())
                 ->method('isImmutable')
                 ->with(
@@ -80,7 +79,7 @@ class AbstractConfigTypeTestCase extends TypeTestCase
                     $configId->getClassName(),
                     $configId instanceof FieldConfigId ? $configId->getFieldName() : null
                 )
-                ->will($this->returnValue($immutable));
+                ->willReturn($immutable);
         }
     }
 

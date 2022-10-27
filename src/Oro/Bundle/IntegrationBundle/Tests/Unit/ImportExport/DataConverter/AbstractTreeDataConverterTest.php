@@ -2,39 +2,30 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\DataConverter;
 
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\AbstractTreeDataConverter;
+use Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\IntegrationAwareDataConverter;
 
 class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AbstractTreeDataConverter|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $dataConverter;
+    /** @var AbstractTreeDataConverter|\PHPUnit\Framework\MockObject\MockObject */
+    private $dataConverter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->dataConverter = $this->getMockForAbstractClass(
-            'Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\AbstractTreeDataConverter'
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->dataConverter);
+        $this->dataConverter = $this->getMockForAbstractClass(AbstractTreeDataConverter::class);
     }
 
     public function testSetImportExportContext()
     {
-        $context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
+        $context = $this->createMock(ContextInterface::class);
 
-        $awareConverter = $this
-            ->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\DataConverter\IntegrationAwareDataConverter')
-            ->setMethods(['setImportExportContext', 'convertToImportFormat', 'convertToExportFormat'])
-            ->getMockForAbstractClass();
+        $awareConverter = $this->createMock(IntegrationAwareDataConverter::class);
         $awareConverter->expects($this->once())
             ->method('setImportExportContext')
             ->with($context);
-        $simpleConverter = $this->createMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
+        $simpleConverter = $this->createMock(DataConverterInterface::class);
 
         $this->dataConverter->addNodeDataConverter('test1', $awareConverter);
         $this->dataConverter->addNodeDataConverter('test2', $simpleConverter);
@@ -44,7 +35,8 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider importDataDataProvider
-     * @param bool $isMany
+     *
+     * @param bool  $isMany
      * @param array $input
      * @param array $expected
      */
@@ -56,31 +48,30 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
             'key2' => 'val2'
         ];
         $rules = [
-            'key' => 'cKey',
+            'key'    => 'cKey',
             $nodeKey => 'nKey'
         ];
-        $nodeDataConverter = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface')
-            ->setMethods(['convertToImportFormat'])
-            ->getMockForAbstractClass();
+        $nodeDataConverter = $this->createMock(DataConverterInterface::class);
         $this->dataConverter->expects($this->once())
             ->method('getHeaderConversionRules')
-            ->will($this->returnValue($rules));
+            ->willReturn($rules);
 
         if ($isMany) {
-            $rowsCount = count($input[$nodeKey]);
-            $nodeDataConverter->expects($this->exactly($rowsCount))
+            $nodeDataConverter->expects($this->exactly(count($input[$nodeKey])))
                 ->method('convertToImportFormat')
-                ->will($this->returnValue($converted));
-            for ($i = 0; $i < $rowsCount; $i++) {
-                $nodeDataConverter->expects($this->at($i))
-                    ->method('convertToImportFormat')
-                    ->with($input[$nodeKey][$i]);
+                ->willReturn($converted);
+            $nodes = [];
+            foreach ($input[$nodeKey] as $node) {
+                $nodes[] = [$node];
             }
+            $nodeDataConverter->expects($this->exactly(count($input[$nodeKey])))
+                ->method('convertToImportFormat')
+                ->withConsecutive(...$nodes);
         } else {
             $nodeDataConverter->expects($this->once())
                 ->method('convertToImportFormat')
                 ->with($input[$nodeKey])
-                ->will($this->returnValue($converted));
+                ->willReturn($converted);
         }
 
         $this->dataConverter->addNodeDataConverter($nodeKey, $nodeDataConverter, $isMany);
@@ -88,16 +79,13 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->dataConverter->convertToImportFormat($input));
     }
 
-    /**
-     * @return array
-     */
-    public function importDataDataProvider()
+    public function importDataDataProvider(): array
     {
         return [
             [
                 false,
                 [
-                    'key' => 'val',
+                    'key'      => 'val',
                     'test_key' => [
                         'key_1' => 'val1'
                     ]
@@ -113,7 +101,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
             [
                 true,
                 [
-                    'key' => 'val',
+                    'key'      => 'val',
                     'test_key' => [
                         ['key_1' => 'val1'],
                         ['key_1' => 'val2'],
@@ -138,7 +126,8 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider exportDataDataProvider
-     * @param bool $isMany
+     *
+     * @param bool  $isMany
      * @param array $input
      * @param array $expected
      */
@@ -150,34 +139,33 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
             'key2' => 'val2'
         ];
         $rules = [
-            'key' => 'cKey',
+            'key'    => 'cKey',
             $nodeKey => 'nKey'
         ];
-        $nodeDataConverter = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface')
-            ->setMethods(['convertToImportFormat'])
-            ->getMockForAbstractClass();
+        $nodeDataConverter = $this->createMock(DataConverterInterface::class);
         $this->dataConverter->expects($this->atLeastOnce())
             ->method('getHeaderConversionRules')
-            ->will($this->returnValue($rules));
+            ->willReturn($rules);
         $this->dataConverter->expects($this->once())
             ->method('getBackendHeader')
-            ->will($this->returnValue(array_values($rules)));
+            ->willReturn(array_values($rules));
 
         if ($isMany) {
-            $rowsCount = count($input[$rules[$nodeKey]]);
-            $nodeDataConverter->expects($this->exactly($rowsCount))
+            $nodeDataConverter->expects($this->exactly(count($input[$rules[$nodeKey]])))
                 ->method('convertToExportFormat')
-                ->will($this->returnValue($converted));
-            for ($i = 0; $i < $rowsCount; $i++) {
-                $nodeDataConverter->expects($this->at($i))
-                    ->method('convertToExportFormat')
-                    ->with($input[$rules[$nodeKey]][$i]);
+                ->willReturn($converted);
+            $nodes = [];
+            foreach ($input[$rules[$nodeKey]] as $node) {
+                $nodes[] = [$node];
             }
+            $nodeDataConverter->expects($this->exactly(count($input[$rules[$nodeKey]])))
+                ->method('convertToExportFormat')
+                ->withConsecutive(...$nodes);
         } else {
             $nodeDataConverter->expects($this->once())
                 ->method('convertToExportFormat')
                 ->with($input[$rules[$nodeKey]])
-                ->will($this->returnValue($converted));
+                ->willReturn($converted);
         }
 
         $this->dataConverter->addNodeDataConverter($nodeKey, $nodeDataConverter, $isMany);
@@ -185,10 +173,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->dataConverter->convertToExportFormat($input));
     }
 
-    /**
-     * @return array
-     */
-    public function exportDataDataProvider()
+    public function exportDataDataProvider(): array
     {
         return [
             [
@@ -200,7 +185,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 [
-                    'key' => 'val',
+                    'key'      => 'val',
                     'test_key' => [
                         'key1' => 'val1',
                         'key2' => 'val2'
@@ -217,7 +202,7 @@ class AbstractTreeDataConverterTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 [
-                    'key' => 'val',
+                    'key'      => 'val',
                     'test_key' => [
                         [
                             'key1' => 'val1',

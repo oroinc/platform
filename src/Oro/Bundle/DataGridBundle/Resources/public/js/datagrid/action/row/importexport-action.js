@@ -6,7 +6,7 @@ define([
     'use strict';
 
     // TODO: refactor in scope https://magecore.atlassian.net/browse/BAP-11703
-    var ImportExportAction = ModelAction.extend({
+    const ImportExportAction = ModelAction.extend({
         /** @property {Object} */
         configuration: {
             options: {
@@ -33,23 +33,23 @@ define([
         importExportManager: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ImportExportAction() {
-            ImportExportAction.__super__.constructor.apply(this, arguments);
+        constructor: function ImportExportAction(options) {
+            ImportExportAction.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        initialize: function() {
-            ImportExportAction.__super__.initialize.apply(this, arguments);
+        initialize: function(options) {
+            ImportExportAction.__super__.initialize.call(this, options);
 
             if (this.configuration.options.datagridName === null) {
                 this.configuration.options.datagridName = this.datagrid.name;
             }
 
-            var options = $.extend({}, this.configuration.options, {
+            const opts = $.extend({}, this.configuration.options, {
                 entity: this.entity_class,
                 importProcessor: this.importProcessor,
                 importJob: this.importJob,
@@ -59,11 +59,11 @@ define([
                 exportTemplateJob: this.exportTemplateJob
             });
 
-            this.importExportManager = new ImportExportManager(options);
+            this.importExportManager = new ImportExportManager(opts);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         execute: function() {
             switch (this.type) {

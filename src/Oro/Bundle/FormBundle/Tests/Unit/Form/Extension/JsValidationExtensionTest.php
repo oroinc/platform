@@ -1,38 +1,31 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Extension;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints;
 
 class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $constraintsProvider;
+    /** @var ConstraintsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $constraintsProvider;
 
-    /**
-     * @var JsValidationExtension
-     */
-    protected $extension;
+    /** @var JsValidationExtension */
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->constraintsProvider = $this->createMock(ConstraintsProviderInterface::class);
+
         $this->extension = new JsValidationExtension($this->constraintsProvider);
     }
 
     /**
      * @dataProvider finishViewAddOptionalGroupAttributeDataProvider
-     *
-     * @param FormView $view
-     * @param FormInterface $form
-     * @param array $options
-     * @param array $expectedAttributes
      */
     public function testFinishViewAddOptionalGroupAttribute(
         FormView $view,
@@ -42,14 +35,14 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
     ) {
         $this->constraintsProvider->expects($this->once())
             ->method('getFormConstraints')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->extension->finishView($view, $form, $options);
 
         $this->assertEquals($expectedAttributes, $view->vars['attr']);
     }
 
-    public function finishViewAddOptionalGroupAttributeDataProvider()
+    public function finishViewAddOptionalGroupAttributeDataProvider(): array
     {
         return [
             'not_optional_group_without_children' => [
@@ -142,11 +135,6 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider finishViewAddDataValidationAttributeDataProvider
-     *
-     * @param FormView $view
-     * @param FormInterface $form
-     * @param array $expectedConstraints
-     * @param array $expectedAttributes
      */
     public function testFinishViewAddDataValidationAttribute(
         FormView $view,
@@ -156,7 +144,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
     ) {
         $this->constraintsProvider->expects($this->once())
             ->method('getFormConstraints')
-            ->will($this->returnValue($expectedConstraints));
+            ->willReturn($expectedConstraints);
 
         $this->extension->finishView($view, $form, []);
 
@@ -164,11 +152,9 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @SuppressWarnings(PHPMD)
-     *
-     * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function finishViewAddDataValidationAttributeDataProvider()
+    public function finishViewAddDataValidationAttributeDataProvider(): array
     {
         $constraintWithNestedData = new Constraints\NotNull();
         $constraintWithNestedData->message = [
@@ -180,7 +166,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
             'integer' => 1,
         ];
 
-        $constraintWithCustomName = $this->createMock('Symfony\Component\Validator\Constraint');
+        $constraintWithCustomName = $this->createMock(Constraint::class);
         $constraintWithCustomName->foo = 1;
 
         return [
@@ -189,7 +175,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                 'form' => $this->createForm(),
                 'expectedConstraints' => [$constraintWithNestedData],
                 'expectedAttributes' => [
-                    'data-validation' => '{"NotNull":{"message":{"array":{"integer":2},"integer":1},"payload":null}}'
+                    'data-validation' => '{"NotNull":{"payload":null,"message":{"array":{"integer":2},"integer":1}}}'
                 ]
             ],
             'set_custom_name' => [
@@ -206,7 +192,8 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                 'expectedConstraints' => [new Constraints\NotBlank()],
                 'expectedAttributes' => [
                     'data-required'   => 1,
-                    'data-validation' => '{"NotBlank":{"message":"This value should not be blank.","payload":null}}'
+                    'data-validation' => '{"NotBlank":{"payload":null,"message":"This value should not be blank.",' .
+                        '"allowNull":false,"normalizer":null}}'
                 ]
             ],
             'set_similar_constrains' => [
@@ -220,23 +207,23 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                 'form' => $this->createForm(),
                 'expectedConstraints' => [
                     new Constraints\Regex([
-                        'pattern' => "/^[a-z]+[a-z]*$/i",
-                        'message' => "Value should start with a symbol and contain only alphabetic symbols"
+                        'pattern' => '/^[a-z]+[a-z]*$/i',
+                        'message' => 'Value should start with a symbol and contain only alphabetic symbols'
                     ]),
                     new Constraints\Regex([
-                        'pattern' => "/^id$/i",
+                        'pattern' => '/^id$/i',
                         'match' => false,
-                        'message' => "Value cannot be used as a field name."
+                        'message' => 'Value cannot be used as a field name.'
                     ]),
                 ],
                 'expectedAttributes' => [
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"message":"This value should not be null."},' .
-                        '"Regex":[{"message":"Value should start with a symbol and contain only alphabetic symbols",' .
-                        '"pattern":"\/^[a-z]+[a-z]*$\/i","htmlPattern":null,"match":true,"payload":null},' .
-                        '{"message":"Value cannot be used as a field name.",' .
-                        '"pattern":"\/^id$\/i","htmlPattern":null,"match":false,"payload":null}' .
+                        '"Regex":[{"payload":null,"message":"Value should start with a symbol and contain only ' .
+                        'alphabetic symbols","pattern":"\/^[a-z]+[a-z]*$\/i","htmlPattern":null,"match":true,' .
+                        '"normalizer":null},{"payload":null,"message":"Value cannot be used as a field name.",' .
+                        '"pattern":"\/^id$\/i","htmlPattern":null,"match":false,"normalizer":null}' .
                         ']}',
                 ]
             ],
@@ -256,9 +243,10 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"NotNull":{"message":"This value should not be null."}},' .
-                        '"NotBlank":{"message":"This value should not be blank.","payload":null}' .
+                        '"NotBlank":{"payload":null,"message":"This value should not be blank.","allowNull":false,' .
+                        '"normalizer":null}' .
                         '}',
-                    'data-required'   => 1
+                    'data-required'   => true
                 ]
             ],
             'merge_with_json_string' => [
@@ -275,9 +263,10 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"message":"This value should not be null."},' .
-                        '"NotBlank":{"message":"This value should not be blank.","payload":null}' .
+                        '"NotBlank":{"payload":null,"message":"This value should not be blank.","allowNull":false,' .
+                        '"normalizer":null}' .
                         '}',
-                    'data-required'   => 1
+                    'data-required'   => true
                 ]
             ],
             'override_invalid_value' => [
@@ -289,38 +278,35 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ),
                 'form' => $this->createForm(),
-                'expectedConstraints' => [
-                    new Constraints\NotBlank()
-                ],
+                'expectedConstraints' => [new Constraints\NotBlank()],
                 'expectedAttributes' => [
                     'data-validation' =>
-                        '{"NotBlank":{"message":"This value should not be blank.","payload":null}}',
-                    'data-required'   => 1
+                        '{"NotBlank":{"payload":null,"message":"This value should not be blank.","allowNull":false,' .
+                        '"normalizer":null}}',
+                    'data-required'   => true
                 ]
+            ],
+            'not_blank_with_allow_null' => [
+                'view' => $this->createView(),
+                'form' => $this->createForm(),
+                'expectedConstraints' => [new Constraints\NotBlank(['allowNull' => true])],
+                'expectedAttributes' => []
             ],
         ];
     }
 
-    /**
-     * @param array $vars
-     * @param array $children
-     * @param FormView $parent
-     * @return FormView
-     */
-    protected function createView(array $vars = [], array $children = [], FormView $parent = null)
+    private function createView(array $vars = [], array $children = [], FormView $parent = null): FormView
     {
         $result = new FormView();
         $result->vars = array_merge_recursive($result->vars, $vars);
         $result->children = $children;
         $result->parent = $parent;
+
         return $result;
     }
 
-    /**
-     * @return FormInterface
-     */
-    protected function createForm()
+    private function createForm(): FormInterface
     {
-        return $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        return $this->createMock(FormInterface::class);
     }
 }

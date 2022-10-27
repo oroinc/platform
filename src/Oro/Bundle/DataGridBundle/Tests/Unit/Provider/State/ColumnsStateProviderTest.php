@@ -5,14 +5,17 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Provider\State;
 use Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class ColumnsStateProviderTest extends AbstractStateProviderTest
 {
+    use EntityTrait;
+
     /** @var ColumnsStateProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -25,10 +28,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateWhenParameters(array $state, array $columns, array $expectedState): void
     {
@@ -41,40 +40,28 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @param array $state
-     * @param string $minifiedState
-     */
     private function mockParametersState(array $state, string $minifiedState): void
     {
-        $this->datagridParametersHelper
-            ->expects(self::once())
+        $this->datagridParametersHelper->expects(self::once())
             ->method('getFromParameters')
             ->with($this->datagridParameters, ColumnsExtension::COLUMNS_PARAM)
             ->willReturn($state);
 
-        $this->datagridParametersHelper
-            ->expects(self::exactly(1 - (int)$state))
+        $this->datagridParametersHelper->expects(self::exactly(1 - (int)$state))
             ->method('getFromMinifiedParameters')
             ->with($this->datagridParameters, ColumnsExtension::MINIFIED_COLUMNS_PARAM)
             ->willReturn($minifiedState);
     }
 
-    /**
-     * @param array $columns
-     */
     private function mockColumns(array $columns): void
     {
-        $this->datagridConfiguration
-            ->expects(self::once())
+        $this->datagridConfiguration->expects(self::once())
             ->method('offsetGet')
             ->with(Configuration::COLUMNS_KEY)
             ->willReturn($columns);
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function stateDataProvider(): array
@@ -352,10 +339,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider minifiedStateDataProvider
-     *
-     * @param string $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateWhenMinifiedParameters(string $state, array $columns, array $expectedState): void
     {
@@ -368,9 +351,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @return array
-     */
     public function minifiedStateDataProvider(): array
     {
         return [
@@ -447,10 +427,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateWhenCurrentGridView(array $state, array $columns, array $expectedState): void
     {
@@ -461,11 +437,10 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         $this->mockGridName($gridName = 'sample-datagrid');
         $this->mockCurrentGridViewId($viewId = 'sample-view');
 
-        $this->gridViewManager
-            ->expects(self::once())
+        $this->gridViewManager->expects(self::once())
             ->method('getView')
             ->with($viewId, 1, $gridName)
-            ->willReturn($gridView = $this->mockGridView('getColumnsData', $state));
+            ->willReturn($this->mockGridView('getColumnsData', $state));
 
         $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
 
@@ -474,10 +449,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultGridView(array $state, array $columns, array $expectedState): void
     {
@@ -489,16 +460,16 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
         $this->assertNoCurrentGridView();
 
-        $this->tokenAccessor
-            ->expects(self::once())
-            ->method('getUser')
-            ->willReturn($user = $this->createMock(AbstractUser::class));
+        $user  = $this->getEntity(User::class, ['id' => 42]);
 
-        $this->gridViewManager
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->gridViewManager->expects(self::once())
             ->method('getDefaultView')
             ->with($user, $gridName)
-            ->willReturn($gridView = $this->mockGridView('getColumnsData', $state));
+            ->willReturn($this->mockGridView('getColumnsData', $state));
 
         $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
 
@@ -535,9 +506,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @return array
-     */
     private function getDefaultColumnsStates(): array
     {
         return [
@@ -575,10 +543,6 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $columns
-     * @param array $expectedState
      */
     public function testGetStateFromParameters(array $state, array $columns, array $expectedState): void
     {

@@ -2,29 +2,28 @@
 
 namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * Used to pre-process entity and submit form data
+ */
 class EntityApiBaseHandler
 {
-    /** @var Registry */
-    protected $registry;
+    private ManagerRegistry $doctrine;
+    private EntityApiHandlerProcessor $processor;
+    private PropertyAccessorInterface $propertyAccessor;
 
-    /** @var EntityApiHandlerProcessor */
-    protected $processor;
-
-    /**
-     * @param Registry $registry
-     * @param EntityApiHandlerProcessor $processor
-     */
     public function __construct(
-        Registry $registry,
-        EntityApiHandlerProcessor $processor
+        ManagerRegistry $doctrine,
+        EntityApiHandlerProcessor $processor,
+        PropertyAccessorInterface $propertyAccessor
     ) {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->processor = $processor;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -43,7 +42,7 @@ class EntityApiBaseHandler
         $form->setData($entity);
 
         if (in_array($method, ['POST', 'PUT', 'PATCH'], true)) {
-            $form->submit($data);
+            $form->submit($data, 'PATCH' !== $method);
 
             if ($form->isValid()) {
                 $this->processor->beforeProcess($entity);
@@ -67,14 +66,13 @@ class EntityApiBaseHandler
      *
      * @return array
      */
-    protected function initChangeSet($entity, $data)
+    private function initChangeSet($entity, $data)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
         $response = [
             'fields' => $data
         ];
-        if ($accessor->isReadable($entity, 'updatedAt')) {
-            $response['fields']['updatedAt'] = $accessor->getValue($entity, 'updatedAt');
+        if ($this->propertyAccessor->isReadable($entity, 'updatedAt')) {
+            $response['fields']['updatedAt'] = $this->propertyAccessor->getValue($entity, 'updatedAt');
         }
 
         return $response;
@@ -86,7 +84,7 @@ class EntityApiBaseHandler
      *
      * @return array
      */
-    protected function updateChangeSet($changeSet, $update)
+    private function updateChangeSet($changeSet, $update)
     {
         if (is_array($update)) {
             $result = array_replace_recursive($changeSet, $update);
@@ -99,12 +97,10 @@ class EntityApiBaseHandler
 
     /**
      * "Success" form handler
-     *
-     * @param $entity
      */
-    protected function onSuccess($entity)
+    private function onSuccess(object $entity): void
     {
-        $this->registry->getManager()->persist($entity);
-        $this->registry->getManager()->flush();
+        $this->doctrine->getManager()->persist($entity);
+        $this->doctrine->getManager()->flush();
     }
 }

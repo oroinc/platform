@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -11,6 +10,8 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 /**
+ * This class is responsible for checking known email addresses.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, LoggerAwareInterface
@@ -72,6 +73,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAtLeastOneKnownEmailAddress($_)
     {
@@ -110,6 +112,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAtLeastOneUserEmailAddress($userId, $_)
     {
@@ -173,6 +176,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function isAtLeastOneMailboxEmailAddress($mailboxId, $_)
     {
@@ -308,7 +312,11 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
      */
     protected function normalizeEmailAddress($email)
     {
-        return strtolower($this->emailAddressHelper->extractPureEmailAddress($email));
+        $normalizedEmail = $this->emailAddressHelper->extractPureEmailAddress($email);
+        if ($normalizedEmail === null) {
+            return '';
+        }
+        return strtolower($normalizedEmail);
     }
 
     /**

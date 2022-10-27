@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ReminderBundle\Form\Type;
 
-use Oro\Bundle\ReminderBundle\Form\Type\MethodType;
-use Oro\Bundle\ReminderBundle\Form\Type\ReminderIntervalType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;

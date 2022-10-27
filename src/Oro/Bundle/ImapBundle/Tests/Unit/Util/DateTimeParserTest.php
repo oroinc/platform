@@ -9,7 +9,7 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseProvider
      */
-    public function testParse($strDate, $expectedDate = '2011-06-30 23:59:59 UTC')
+    public function testParse(string $strDate, string $expectedDate = '2011-06-30 23:59:59 UTC'): void
     {
         $this->assertEquals(
             new \DateTime($expectedDate),
@@ -17,10 +17,11 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function parseProvider()
+    public function parseProvider(): array
     {
         return [
             ['Thu, 30 Jun 2011 23:59:59'],
+            ['Thu, 30 Jun 2011 23:59:59 0000'],
             ['Thu, 30 Jun 2011 23:59:59 GMT'],
             ['Thu, 30 Jun 2011 23:59:59 UTC'],
             ['Thu, 30 Jun 2011 23:59:59 UT'],
@@ -39,6 +40,8 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
             ['Sum, 30 Jun 2011 21:59:59 -0200'],
             ['Fri,  31 Jun 2011 10:59:59 +1100'],
             ['Fri, 31 Jun 2011 10:59:59 +11: 0'],
+            ['Fri, 31 Jun 2011 10:59:59 +11:'],
+            ['Fri, 31 Jun 2011 10:59:59 +11: UTC'],
             ['Fri, 31 Jun 2011 10:59: 9 +1100', '2011-06-30 23:59:09 UTC'],
             ['Fri, 31 Jun 2011 10: 9: 9 +1100', '2011-06-30 23:09:09 UTC'],
             ['Fri, 31 Jun 2011  1: 9: 9 +1100', '2011-06-30 14:09:09 UTC'],
@@ -52,14 +55,14 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseFailureProvider
      */
-    public function testParseFailure($strDate, $exceptionMessage)
+    public function testParseFailure(string $strDate, string $exceptionMessage)
     {
-        $this->expectException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
         DateTimeParser::parse($strDate);
     }
 
-    public function parseFailureProvider()
+    public function parseFailureProvider(): array
     {
         return [
             [
@@ -78,6 +81,25 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
                 'Sum, 15/06/2012 20:39:26 -0200',
                 'Failed to parse time string "Sum, 15/06/2012 20:39:26 -0200" at position 0:'
                 . ' The timezone could not be found in the database.'
+            ],
+            [
+                '0000-01-01 00:00:00',
+                'Invalid date. Original value: "0000-01-01 00:00:00".'
+            ],
+            [
+                'year-01-01 00:00:00',
+                'Failed to parse time string "year-01-01 00:00:00 UTC" at position 0: The timezone could not be found '
+                . 'in the database. Original value: "year-01-01 00:00:00".',
+            ],
+            [
+                '2019-99-01 00:00:00',
+                'Failed to parse time string "2019-99-01 00:00:00 UTC" at position 6: Unexpected character. Original '
+                . 'value: "2019-99-01 00:00:00".'
+            ],
+            [
+                '2019-01-99 00:00:00',
+                'Failed to parse time string "2019-01-99 00:00:00 UTC" at position 9: Unexpected character. Original '
+                . 'value: "2019-01-99 00:00:00".'
             ],
         ];
     }

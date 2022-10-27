@@ -54,8 +54,6 @@ class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwa
 
     /**
      * Create oro_organization table
-     *
-     * @param Schema $schema
      */
     protected function createOroOrganizationTable(Schema $schema)
     {
@@ -80,8 +78,6 @@ class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwa
 
     /**
      * Create oro_business_unit table
-     *
-     * @param Schema $schema
      */
     protected function createOroBusinessUnitTable(Schema $schema)
     {
@@ -117,8 +113,6 @@ class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwa
 
     /**
      * Add oro_business_unit foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroBusinessUnitForeignKeys(Schema $schema)
     {
@@ -137,9 +131,6 @@ class OroOrganizationBundleInstaller implements Installation, ExtendExtensionAwa
         );
     }
 
-    /**
-     * @param Schema $schema
-     */
     protected function addRelationsToScope(Schema $schema)
     {
         if ($schema->hasTable('oro_scope')) {

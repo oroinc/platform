@@ -1,0 +1,65 @@
+/* @theme: admin.oro; */
+// Main menu
+$menu-animation: all 200ms linear !default;
+$menu-background-color: $primary-200 !default;
+$menu-font-size: $base-font-size !default;
+$menu-background-color-active: $extra-200 !default;
+$menu-header-height: 48px !default;
+
+$menu-icon: var(--fa-var-angle-right) !default;
+$menu-icon-up: $fa-var-angle-up !default;
+$menu-icon-down: $fa-var-angle-down !default;
+$menu-icon-toggler: var(--fa-var-arrow-left) !default;
+$menu-placeholder-size: 17px !default;
+
+$menu-top-icon-start: var(--fa-var-angle-left) !default;
+$menu-top-icon-end: var(--fa-var-angle-right) !default;
+
+$menu-close-botton-background-color: rgba($primary, .55) !default;
+$menu-close-button-color: $primary-inverse !default;
+// Main menu full screen view
+$menu-full-screen-button-color: $primary-750 !default;
+$menu-full-screen-title-color: $primary-200 !default;
+// Main menu side view
+$menu-side-width: 230px !default;
+$menu-side-width-minimized: 80px !default;
+// Main menu dropdown
+$menu-header-background-color: $primary !default;
+$menu-dropdown-background-color: $primary-860 !default;
+$menu-dropdown-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
+$menu-dropdown-background-color-active: $primary-500 !default;
+$menu-dropdown-background-color-light-active: $primary-700 !default;
+
+// Mobile main menu
+$menu-mobile-box-shadow: 0 2px 10px 0 rgba(0 0 0 / 19%) !default;
+
+// Main menu items
+$menu-accordion-icon-color: $primary-550 !default;
+
+$menu-item-first-level-text-color: $primary-inverse !default;
+$menu-item-first-level-text-color-active: $primary-inverse !default;
+$menu-item-text-color: $primary-300 !default;
+$menu-item-text-highlight-color: $extra-200 !default;
+$menu-item-offset: 9px 18px 9px 16px !default;
+$menu-item-divider-color: $primary-800 !default;
+$menu-item-line-height: 18px !default;
+$menu-minimized-item-first-level-text-color-active: $primary-400 !default;
+// Main menu toggler
+$menu-toggler-font-size: 16px !default;
+$menu-toggler-color: $additional-lighten !default;
+$menu-icon-toggler-transform: 0 !default;
+$menu-icon-toggler-transform-active: 180deg !default;
+
+// Main menu overlay
+$side-menu-fill-blur-width: 36px !default;
+
+$side-menu-overlay-header-height: 108px !default;
+$side-menu-overlay-title-font-size: 21px !default;
+$side-menu-overlay-button-font-size: 18px !default;
+$side-menu-overlay-button-offset: null !default;
+
+$side-menu-overlay-ui-helper-text-align: right !default;
+$side-menu-overlay-ui-fill-transform: translate(-100%) !default;
+$side-menu-overlay-ui-fill-width: 300% !default;
+$side-menu-overlay-ui-fill-background-color: rgba($primary-inverse, .5) !default;
+$side-menu-overlay-ui-fill-blur-box-shadow: 2px 2px 2px 0 rgba(0 0 0 / 19%) !default;

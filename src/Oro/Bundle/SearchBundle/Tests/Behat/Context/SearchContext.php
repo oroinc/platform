@@ -32,13 +32,14 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
         $links = [];
 
         /** @var \DOMElement $link */
-        foreach ($crawler->filter('ul li') as $link) {
-            preg_match('/([\w\s]+).(\d+)/', $link->textContent, $matches);
-            $links[trim($matches[1])] = [
-                'number' => $matches[2],
-                'isSelected' => false !== stripos($link->getAttribute('class'), 'selected'),
+        $crawler->filter('ul li')->each(function (Crawler $listItem) use (&$links) {
+            preg_match('/\((\d+)\)/', $listItem->text(), $matches);
+
+            $links[trim($listItem->filter('.search-label')->text())] = [
+                'number' => $matches[1],
+                'isSelected' => false !== stripos($listItem->attr('class'), 'selected'),
             ];
-        }
+        });
 
         foreach ($table as $row) {
             $type = $row['Type'];
@@ -58,6 +59,36 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
                     (bool) $row['isSelected'] ? 'active' : 'not active'
                 )
             );
+        }
+    }
+
+    /**
+     * Checks, that entity types don't exist on search results page
+     * Example: And I should not see following search entity types:
+     *            | Type            |
+     *            | Business Units  |
+     *            | Calendar Events |
+     *            | Organizations   |
+     *
+     * @Then /^(?:|I )should not see following search entity types:$/
+     */
+    public function iShouldNotSeeFollowingSearchEntityTypes(TableNode $table)
+    {
+        $entityTypes = $this->getPage()->find('css', '.search-entity-types-column');
+
+        if ($entityTypes) {
+            $crawler = new Crawler($entityTypes->getHtml());
+            $links = [];
+
+            /** @var \DOMElement $link */
+            foreach ($crawler->filter('ul li') as $link) {
+                $links[trim($link->childNodes->item(1)->textContent)] = $link;
+            }
+
+            foreach ($table as $row) {
+                $type = $row['Type'];
+                self::assertTrue(!array_key_exists($type, $links), sprintf('Type "%s" not found', $type));
+            }
         }
     }
 
@@ -132,6 +163,21 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
         self::assertTrue($option->isValid(), "Type '$type' not found in select entities type");
 
         $option->click();
+    }
+
+    /**
+     * @Given /^(?:|I )should not see "(?P<type>[^"]+)" in search types$/
+     */
+    public function iShouldNotSeeFromSearchTypes($type)
+    {
+        $typeSelectElement = $this->createElement('TypeSelectElement');
+        self::assertTrue($typeSelectElement->isValid());
+
+        $typeSelectElement->press();
+
+        $list = $this->createElement('TypeSelectList');
+        $option = $list->find('xpath', "//li[./*[text()='$type']]");
+        self::assertTrue(null === $option || !$option->isValid(), "Type '$type' found in select entities type");
     }
 
     /**

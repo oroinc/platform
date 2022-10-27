@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TagBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
@@ -55,9 +55,6 @@ class LoadTagsData extends AbstractFixture
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadActivities(ObjectManager $manager)
     {
         $activity = new TestActivity();
@@ -78,9 +75,6 @@ class LoadTagsData extends AbstractFixture
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadTags(ObjectManager $manager)
     {
         $tag = new Tag();

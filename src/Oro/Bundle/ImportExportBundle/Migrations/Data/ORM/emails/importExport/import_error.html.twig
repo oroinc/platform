@@ -2,7 +2,7 @@
 @subject = Cannot Import file {{ originFileName }}
 @isSystem = 1
 @isEditable = 1
-{% spaceless %}
+{% apply spaceless %}
 <style>
     @media (max-width: 480pt) {
         .wrapper{
@@ -17,4 +17,4 @@
     <p>An error occurred while reading file {{ originFileName }}:</p>
     <p>{{ error }}</p>
 </div>
-{% endspaceless %}
+{% endapply %}

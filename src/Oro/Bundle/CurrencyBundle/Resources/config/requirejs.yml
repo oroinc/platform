@@ -1,6 +1,0 @@
-config:
-    paths:
-        'orocurrency/js/app/views/multicurrency-control-view': 'bundles/orocurrency/js/app/views/multicurrency-control-view.js'
-        'orocurrency/js/app/views/editor/multi-currency-editor-view': 'bundles/orocurrency/js/app/views/editor/multi-currency-editor-view.js'
-        'oro/datagrid/cell/multi-currency-cell': 'bundles/orocurrency/js/datagrid/cell/multi-currency-cell.js'
-        'orocurrency/js/datagrid/inline-editing/currency-save-api-accessor': 'bundles/orocurrency/js/datagrid/inline-editing/currency-save-api-accessor.js'

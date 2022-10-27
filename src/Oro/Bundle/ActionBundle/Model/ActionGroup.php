@@ -32,13 +32,6 @@ class ActionGroup
     /** @var Parameter[] */
     private $parameters;
 
-    /**
-     * @param ActionFactoryInterface $actionFactory
-     * @param ConditionFactory $conditionFactory
-     * @param ParameterAssembler $parameterAssembler
-     * @param ParametersResolver $parametersResolver
-     * @param ActionGroupDefinition $definition
-     */
     public function __construct(
         ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
@@ -100,9 +93,6 @@ class ActionGroup
         return true;
     }
 
-    /**
-     * @param ActionData $data
-     */
     protected function executeActions(ActionData $data)
     {
         if ($config = $this->definition->getActions()) {

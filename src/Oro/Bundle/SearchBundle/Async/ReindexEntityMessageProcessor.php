@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Async;
 
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByTypeTopic;
+use Oro\Bundle\SearchBundle\Async\Topic\ReindexTopic;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -9,8 +11,10 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Message queue processor that reindexes search index.
+ */
 class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -28,11 +32,6 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
      */
     private $producer;
 
-    /**
-     * @param IndexerInterface $indexer
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(IndexerInterface $indexer, JobRunner $jobRunner, MessageProducerInterface $producer)
     {
         $this->indexer = $indexer;
@@ -45,19 +44,19 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $classes = JSON::decode($message->getBody());
+        $classes = $message->getBody();
 
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
-            Topics::REINDEX,
+            ReindexTopic::getName(),
             function (JobRunner $jobRunner) use ($classes) {
                 $entityClasses = $this->getClassesForReindex($classes);
 
                 foreach ($entityClasses as $entityClass) {
                     $jobRunner->createDelayed(
-                        sprintf('%s:%s', Topics::INDEX_ENTITY_TYPE, $entityClass),
+                        sprintf('%s:%s', IndexEntitiesByTypeTopic::getName(), $entityClass),
                         function (JobRunner $jobRunner, Job $child) use ($entityClass) {
-                            $this->producer->send(Topics::INDEX_ENTITY_TYPE, [
+                            $this->producer->send(IndexEntitiesByTypeTopic::getName(), [
                                 'entityClass' => $entityClass,
                                 'jobId' => $child->getId(),
                             ]);
@@ -105,6 +104,6 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::REINDEX];
+        return [ReindexTopic::getName()];
     }
 }

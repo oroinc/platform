@@ -20,10 +20,6 @@ class StartWorkflow extends ComponentAbstractAction
      */
     protected $workflowManager;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param WorkflowManager $workflowManager
-     */
     public function __construct(ContextAccessor $contextAccessor, WorkflowManager $workflowManager)
     {
         parent::__construct($contextAccessor);

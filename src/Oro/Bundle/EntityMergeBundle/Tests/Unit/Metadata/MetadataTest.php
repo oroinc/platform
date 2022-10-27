@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
 
 class MetadataTest extends \PHPUnit\Framework\TestCase
@@ -12,12 +13,11 @@ class MetadataTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('value', $metadata->get('code', true));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "code" not exists
-     */
     public function testGetNonExistingStrict()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "code" not exists');
+
         $metadata = new Metadata();
         $this->assertEquals('value', $metadata->get('code', true));
     }

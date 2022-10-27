@@ -7,24 +7,15 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionListConfiguration;
 
 class ProcessDefinitionListConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ProcessDefinitionListConfiguration
-     */
-    protected $configuration;
+    /** @var ProcessDefinitionListConfiguration */
+    private $configuration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configuration = new ProcessDefinitionListConfiguration(new ProcessDefinitionConfiguration());
     }
 
-    protected function tearDown()
-    {
-        unset($this->configuration);
-    }
-
     /**
-     * @param array $input
-     * @param array $expected
      * @dataProvider processDataProvider
      */
     public function testProcess(array $input, array $expected)
@@ -32,50 +23,46 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->configuration->processConfiguration($input));
     }
 
-    /**
-     * @return array
-     */
-    public function processDataProvider()
+    public function processDataProvider(): array
     {
-        return array(
-            array(
-                'input' => array(
-                    'minimum_definition' => array(
+        return [
+            [
+                'input' => [
+                    'minimum_definition' => [
                         'label' => 'My Label',
                         'entity' => 'My\Entity',
-                    ),
-                    'maximum_definition' => array(
+                    ],
+                    'maximum_definition' => [
                         'label' => 'My Label',
                         'enabled' => false,
                         'entity' => 'My\Entity',
                         'order' => 10,
-                        'exclude_definitions'   => array('minimum_definition'),
-                        'actions_configuration' => array('key' => 'value'),
-                        'preconditions' => array('test' => array()),
-                        'pre_conditions' => ['test2' => []]
-                    ),
-                ),
-                'expected' => array(
-                    'minimum_definition' => array(
+                        'exclude_definitions'   => ['minimum_definition'],
+                        'actions_configuration' => ['key' => 'value'],
+                        'preconditions' => ['test' => []],
+                    ],
+                ],
+                'expected' => [
+                    'minimum_definition' => [
                         'label' => 'My Label',
                         'entity' => 'My\Entity',
                         'enabled' => true,
                         'order' => 0,
-                        'exclude_definitions'   => array(),
-                        'actions_configuration' => array(),
-                        'preconditions' => array()
-                    ),
-                    'maximum_definition' => array(
+                        'exclude_definitions'   => [],
+                        'actions_configuration' => [],
+                        'preconditions' => []
+                    ],
+                    'maximum_definition' => [
                         'label' => 'My Label',
                         'enabled' => false,
                         'entity' => 'My\Entity',
                         'order' => 10,
-                        'exclude_definitions'   => array('minimum_definition'),
-                        'actions_configuration' => array('key' => 'value'),
-                        'preconditions' => ['test' => [], 'test2' => []],
-                    )
-                ),
-            )
-        );
+                        'exclude_definitions'   => ['minimum_definition'],
+                        'actions_configuration' => ['key' => 'value'],
+                        'preconditions' => ['test' => []],
+                    ]
+                ],
+            ]
+        ];
     }
 }

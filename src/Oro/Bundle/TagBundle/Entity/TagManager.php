@@ -6,133 +6,107 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
+ * Provides methods to manage tags for entities.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class TagManager
 {
-    const ACL_RESOURCE_CREATE_ID_KEY = 'oro_tag_create';
-    const ACL_RESOURCE_ASSIGN_ID_KEY = 'oro_tag_assign_unassign';
+    private const ACL_RESOURCE_CREATE = 'oro_tag_create';
+    private const ACL_RESOURCE_ASSIGN = 'oro_tag_assign_unassign';
 
-    /** @var EntityManager */
-    protected $em;
+    private ManagerRegistry $doctrine;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private TokenAccessorInterface $tokenAccessor;
+    private UrlGeneratorInterface $urlGenerator;
+    /** @var array [entity class => [entity id => tags (Collection object), ...], ...] */
+    private array $storage = [];
 
-    /** @var string */
-    protected $tagClass;
-
-    /** @var string */
-    protected $taggingClass;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var Router */
-    protected $router;
-
-    /** @var array */
-    protected $storage = [];
-
-    /**
-     * @param EntityManager                 $em
-     * @param string                        $tagClass     - FQCN
-     * @param string                        $taggingClass - FQCN
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param Router                        $router
-     */
     public function __construct(
-        EntityManager $em,
-        $tagClass,
-        $taggingClass,
+        ManagerRegistry $doctrine,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
-        Router $router
+        UrlGeneratorInterface $urlGenerator
     ) {
-        $this->em = $em;
-        $this->tagClass = $tagClass;
-        $this->taggingClass = $taggingClass;
+        $this->doctrine = $doctrine;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
     }
 
     /**
-     * @param @param string $entityClassName The FQCN of the entity
-     * @param array $ids
+     * Gets tags by the given entity IDs.
+     *
+     * @param string $entityClass
+     * @param array  $ids
      *
      * @return array [id, name, entityId, owner]
      */
-    public function getTagsByEntityIds($entityClassName, array $ids)
+    public function getTagsByEntityIds(string $entityClass, array $ids): array
     {
-        $repository = $this->getTagsRepository();
+        $user = $this->getUser();
+        if (!$user) {
+            return [];
+        }
 
-        return $repository->getTagsByEntityIds($entityClassName, $ids, $this->getUser());
+        return $this->getRepository()->getTagsByEntityIds($entityClass, $ids, $user);
     }
 
     /**
-     * Sets tags for $entity
+     * Sets tags for the given entity.
      *
      * @param object           $entity
      * @param Collection|Tag[] $tags
      */
-    public function setTags($entity, $tags)
+    public function setTags(object $entity, Collection|array $tags): void
     {
         if ($entity instanceof Taggable) {
             $entity->setTags($tags);
         } else {
-            $entityClassName = ClassUtils::getClass($entity);
-            $entityId        = TaggableHelper::getEntityId($entity);
-
-            $this->storage[$entityClassName][$entityId] = $tags;
+            $entityClass = ClassUtils::getClass($entity);
+            $entityId = TaggableHelper::getEntityId($entity);
+            $this->storage[$entityClass][$entityId] = \is_array($tags) ? new ArrayCollection($tags) : $tags;
         }
     }
 
     /**
-     * Get tags for entity
-     *
-     * @param object $entity
-     *
-     * @return Collection|array
+     * Gets tags for the given entity.
      */
-    public function getTags($entity)
+    public function getTags(object $entity): Collection
     {
         if ($entity instanceof Taggable) {
             return $entity->getTags();
         }
 
-        $entityClassName = ClassUtils::getClass($entity);
-        $entityId        = TaggableHelper::getEntityId($entity);
-        if (!isset($this->storage[$entityClassName][$entityId])) {
-            $this->storage[$entityClassName][$entityId] = $this->fetchTags(
-                $entity,
-                null
-            );
+        $entityClass = ClassUtils::getClass($entity);
+        $entityId = TaggableHelper::getEntityId($entity);
+        if (!isset($this->storage[$entityClass][$entityId])) {
+            $this->storage[$entityClass][$entityId] = $this->fetchTags($entity);
         }
 
-        return $this->storage[$entityClassName][$entityId];
+        return $this->storage[$entityClass][$entityId];
     }
 
     /**
-     * Adds multiple tags on the given entity
+     * Adds multiple tags for the given entity.
      *
-     * @param Collection|Tag[] $tags   Array of Tag objects
-     * @param object           $entity entity
+     * @param Collection|Tag[] $tags
+     * @param object           $entity
      */
-    public function addTags($tags, $entity)
+    public function addTags(Collection|array $tags, object $entity): void
     {
         foreach ($tags as $tag) {
             $this->addTag($tag, $entity);
@@ -140,12 +114,9 @@ class TagManager
     }
 
     /**
-     * Add tag for entity
-     *
-     * @param Tag    $tag
-     * @param object $entity
+     * Adds a tag for the given entity.
      */
-    public function addTag(Tag $tag, $entity)
+    public function addTag(Tag $tag, object $entity): void
     {
         $tags = $this->getTags($entity);
         if (!$tags->contains($tag)) {
@@ -154,57 +125,33 @@ class TagManager
     }
 
     /**
-     * Remove tagging related to tags by params
+     * Deletes multiple tags for the given entity.
      *
-     * @param object                 $entity
-     * @param User|null              $owner
-     * @param Collection|Tag[]|int[] $tags
-     *
-     * @return int
+     * @param Collection|Tag[] $tags
+     * @param object           $entity
      */
-    public function deleteTagging($entity, $tags, User $owner = null)
+    public function deleteTags(Collection|array $tags, object $entity): void
     {
-        $tagIds     = $this->prepareTagIds($tags);
-        $repository = $this->getTagsRepository();
-
-        return $repository->deleteTaggingByParams(
-            $tagIds,
-            ClassUtils::getClass($entity),
-            TaggableHelper::getEntityId($entity),
-            $owner
-        );
+        foreach ($tags as $tag) {
+            $this->deleteTag($tag, $entity);
+        }
     }
 
     /**
-     * Remove tagging related to tags by params
-     *
-     * @param Collection|Tag[]|int[] $tagIds
-     * @param string                 $entityName
-     * @param int                    $recordId
-     * @param User                   $createdBy
-     *
-     * @return int
-     *
-     * @deprecated Use {@see deleteTagging} instead
+     * Deletes a tag for the given entity.
      */
-    public function deleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy = null)
+    public function deleteTag(Tag $tag, object $entity): void
     {
-        /** @var TagRepository $repository */
-        $repository = $this->em->getRepository($this->tagClass);
-        $tagIds     = $this->prepareTagIds($tagIds);
-
-        return $repository->deleteTaggingByParams($tagIds, $entityName, $recordId, $createdBy);
+        $tags = $this->getTags($entity);
+        if ($tags->contains($tag)) {
+            $tags->removeElement($tag);
+        }
     }
 
     /**
-     * Loads or creates tag by name
-     *
-     * @param string            $name         Name of tag
-     * @param Organization|null $organization Current organization if not specified
-     *
-     * @return Tag[]
+     * Loads or creates a tag by name.
      */
-    public function loadOrCreateTag($name, Organization $organization = null)
+    public function loadOrCreateTag(string $name, Organization $organization = null): Tag
     {
         $tags = $this->loadOrCreateTags([$name], $organization);
 
@@ -212,25 +159,24 @@ class TagManager
     }
 
     /**
-     * Loads or creates multiples tags from a list of tag names
+     * Loads or creates multiples tags by names.
      *
-     * @param array             $names        Array of tag names
-     * @param Organization|null $organization Current organization if not specified
+     * @param string[]          $names The names of tags
+     * @param Organization|null $organization
      *
      * @return Tag[]
      */
-    public function loadOrCreateTags(array $names, Organization $organization = null)
+    public function loadOrCreateTags(array $names, Organization $organization = null): array
     {
         if (empty($names)) {
             return [];
         }
 
-        $usedOrganization = $organization ?: $this->getOrganization();
-
         $names = array_unique(array_map('trim', $names));
-        $tags  = $this->em->getRepository($this->tagClass)->findBy(
-            ['name' => $names, 'organization' => $usedOrganization]
-        );
+        $tags = $this->getRepository()->findBy([
+            'name'         => $names,
+            'organization' => $organization ?? $this->getOrganization()
+        ]);
 
         $loadedNames = [];
         /** @var Tag $tag */
@@ -241,9 +187,7 @@ class TagManager
         $missingNames = array_udiff($names, $loadedNames, 'strcasecmp');
         if (sizeof($missingNames)) {
             foreach ($missingNames as $name) {
-                $tag = $this->createTag($name);
-
-                $tags[] = $tag;
+                $tags[] = new Tag($name);
             }
         }
 
@@ -251,33 +195,38 @@ class TagManager
     }
 
     /**
-     * Prepare array
+     * Gets entities that are marked by the given tag.
      *
-     * @param object            $entity
-     * @param Collection|null   $tags
-     * @param Organization|null $organization Current organization if not specified
+     * @param Tag $tag
      *
-     * @return array
+     * @return object[]
      */
-    public function getPreparedArray($entity, $tags = null, Organization $organization = null)
+    public function getEntities(Tag $tag): array
+    {
+        return $this->getRepository()->getEntities($tag);
+    }
+
+    public function getPreparedArray(object $entity, Collection $tags = null, Organization $organization = null): array
     {
         if (null === $tags) {
             $this->loadTagging($entity, $organization);
             $tags = $this->getTags($entity);
         }
-        $result = [];
 
+        $result = [];
         /** @var Tag $tag */
         foreach ($tags as $tag) {
             $entry = [
-                'name' => $tag->getName()
+                'name'           => $tag->getName(),
+                'ownerFirstName' => null,
+                'ownerLastName'  => null
             ];
             if ($tag->getId()) {
                 $entry = array_merge(
                     $entry,
                     [
                         'id'    => $tag->getId(),
-                        'url'   => $this->router->generate('oro_tag_search', ['id' => $tag->getId()]),
+                        'url'   => $this->urlGenerator->generate('oro_tag_search', ['id' => $tag->getId()]),
                         'owner' => false
                     ]
                 );
@@ -301,10 +250,13 @@ class TagManager
 
             /** @var Tagging $tagging */
             foreach ($taggingCollection as $tagging) {
-                if ($owner = $tagging->getOwner()) {
-                    if ($this->getUser()->getId() == $owner->getId()) {
+                $owner = $tagging->getOwner();
+                if ($owner) {
+                    if ($this->getUser()->getId() === $owner->getId()) {
                         $entry['owner'] = true;
                     }
+                    $entry['ownerFirstName'] = $owner->getFirstName();
+                    $entry['ownerLastName'] = $owner->getLastName();
                 }
             }
 
@@ -318,248 +270,142 @@ class TagManager
     }
 
     /**
-     * Saves tags for the given taggable entity
-     *
-     * @param object       $entity       entity
-     * @param bool         $flush        Whether to flush the changes (default true)
-     * @param Organization $organization Current one if not specified
+     * Saves tags for the given entity.
      */
-    public function saveTagging($entity, $flush = true, Organization $organization = null)
+    public function saveTagging(object $entity, bool $flush = true, Organization $organization = null): void
     {
         // Tags stored for the entity.
-        $oldAllTags = $this->fetchTags($entity, null, false, $organization);
+        $oldAllTags = $this->fetchTags($entity, false, $organization);
 
         // Actual tags for current entity, could contains new tags, or does not contains tags that need to remove.
         $tags = $this->getTags($entity);
 
         // Get all tags that should be added
-        $tagsToAdd = $tags->filter(
-            function ($tag) use ($oldAllTags) {
-                return !$oldAllTags->exists($this->getComparePredicate($tag));
-            }
-        );
+        $tagsToAdd = $tags->filter(function ($tag) use ($oldAllTags) {
+            return !$oldAllTags->exists($this->getComparePredicate($tag));
+        });
         if (!$tagsToAdd->isEmpty()) {
             $this->persistTags($entity, $tagsToAdd);
         }
 
         // Get all tags that should be deleted
-        $tagsToDelete = $oldAllTags->filter(
-            function (Tag $tag) use ($tags) {
-                return !$tags->exists($this->getComparePredicate($tag));
-            }
-        );
+        $tagsToDelete = $oldAllTags->filter(function (Tag $tag) use ($tags) {
+            return !$tags->exists($this->getComparePredicate($tag));
+        });
         if (!$tagsToDelete->isEmpty()) {
             $this->persistDeleteTags($entity, $tagsToDelete);
         }
 
         if ($flush) {
-            $this->em->flush();
+            $this->getEntityManager()->flush();
         }
     }
 
     /**
-     * @param object     $entity
-     * @param Collection $tags
+     * Loads all tags for the given entity.
      */
-    protected function persistDeleteTags($entity, Collection $tags)
+    public function loadTagging(object $entity, Organization $organization = null): void
+    {
+        $tags = $this->fetchTags($entity, false, $organization);
+        $this->setTags($entity, $tags);
+    }
+
+    /**
+     * Deletes all tags for the given entity.
+     *
+     * @param object                 $entity
+     * @param User|null              $owner
+     * @param Collection|Tag[]|int[] $tags
+     *
+     * @return int
+     */
+    public function deleteTagging(object $entity, Collection|array $tags, User $owner = null): int
+    {
+        $entityClass = ClassUtils::getClass($entity);
+        $entityId = TaggableHelper::getEntityId($entity);
+
+        unset($this->storage[$entityClass][$entityId]);
+
+        if ($tags instanceof Collection) {
+            $tags = $tags->toArray();
+        }
+
+        return $this->getRepository()->deleteTaggingByParams($tags, $entityClass, $entityId, $owner);
+    }
+
+    /**
+     * Deletes all tags for all entities of the given type.
+     */
+    public function deleteAllTagging(string $entityClass): int
+    {
+        return $this->getRepository()->deleteRelations($entityClass);
+    }
+
+    private function persistDeleteTags(object $entity, Collection $tags): void
     {
         if (!$tags->isEmpty()) {
-            if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
-                throw new AccessDeniedException("User does not have access to assign/unassign tags.");
+            if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_ASSIGN)) {
+                throw new AccessDeniedException('User does not have access to assign/unassign tags.');
             }
             $this->deleteTagging($entity, $tags);
         }
     }
 
-    /**
-     * Loads all tags for the given entity
-     *
-     * @param object       $entity       entity
-     * @param Organization $organization Organization to load tags for or current one if not specified
-     *
-     * @return $this
-     * @throws \Exception
-     */
-    public function loadTagging($entity, Organization $organization = null)
+    private function getComparePredicate(Tag $tag): \Closure
     {
-        $tags = $this->fetchTags($entity, null, false, $organization);
-        $this->setTags($entity, $tags);
-
-        return $this;
-    }
-
-    /**
-     * @param Tag $tag
-     *
-     * @return callable
-     *
-     * @deprecated Use {@see getComparePredicate} instead
-     */
-    public function compareCallback($tag)
-    {
-        return $this->getComparePredicate($tag);
-    }
-
-    /**
-     * Deletes tags relations for given entity class.
-     *
-     * @param string $entityClassName
-     *
-     * @return int
-     */
-    public function deleteRelations($entityClassName)
-    {
-        return $this->getTagsRepository()->deleteRelations($entityClassName);
-    }
-
-    /**
-     * @param Tag $tag
-     *
-     * @return \Closure
-     */
-    protected function getComparePredicate(Tag $tag)
-    {
-        return function ($index, $item) use ($tag) {
-            /** @var Tag $item */
+        return function ($index, Tag $item) use ($tag) {
             return $item->getName() === $tag->getName();
         };
     }
 
-    /**
-     * @param object           $entity
-     * @param Collection|Tag[] $tags
-     */
-    protected function persistTags($entity, $tags)
+    private function persistTags(object $entity, Collection $tags): void
     {
-        if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_ASSIGN_ID_KEY)) {
-            throw new AccessDeniedException("User does not have access to assign/unassign tags.");
+        if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_ASSIGN)) {
+            throw new AccessDeniedException('User does not have access to assign/unassign tags.');
         }
 
+        $em = $this->getEntityManager();
+        /** @var Tag $tag */
         foreach ($tags as $tag) {
-            if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_CREATE_ID_KEY) && !$tag->getId()) {
-                throw new AccessDeniedException("User does not have access to create tags.");
+            if (!$this->authorizationChecker->isGranted(self::ACL_RESOURCE_CREATE) && !$tag->getId()) {
+                throw new AccessDeniedException('User does not have access to create tags.');
             }
 
-            $tagging = $this->createTagging($tag, $entity);
-
-            $this->em->persist($tag);
-            $this->em->persist($tagging);
+            $em->persist($tag);
+            $em->persist(new Tagging($tag, $entity));
         }
     }
 
-    /**
-     * Creates a new Tag object
-     *
-     * @param  string $name Tag name
-     *
-     * @return Tag
-     */
-    protected function createTag($name)
+    private function fetchTags(object $entity, bool $all = false, Organization $organization = null): Collection
     {
-        return new $this->tagClass($name);
-    }
-
-    /**
-     * Creates a new Tagging object
-     *
-     * @param  Tag    $tag    Tag object
-     * @param  object $entity entity
-     *
-     * @return Tagging
-     */
-    protected function createTagging(Tag $tag, $entity)
-    {
-        return new $this->taggingClass($tag, $entity);
-    }
-
-    /**
-     * Fetch tags for the given entity
-     *
-     * @param object       $entity entity
-     * @param User         $owner
-     * @param bool         $all
-     * @param Organization $organization
-     *
-     * @return Collection
-     */
-    protected function fetchTags($entity, $owner, $all = false, Organization $organization = null)
-    {
-        $repository       = $this->getTagsRepository();
-        $usedOrganization = $organization ?: $this->getOrganization();
-
-        $elements = $repository->getTags(
+        $elements = $this->getRepository()->getTags(
             ClassUtils::getClass($entity),
             TaggableHelper::getEntityId($entity),
-            $owner,
+            null,
             $all,
-            $usedOrganization
+            $organization ?: $this->getOrganization()
         );
 
         return new ArrayCollection($elements);
     }
 
-    /**
-     * @return null|OrganizationInterface
-     */
-    protected function getOrganizationByUser()
-    {
-        $user = $this->getUser();
-
-        return $user ? $user->getOrganization() : null;
-    }
-
-    /**
-     * Return current user
-     *
-     * @return User
-     */
-    protected function getUser()
+    private function getUser(): ?User
     {
         return $this->tokenAccessor->getUser();
     }
 
-    /**
-     * Return current organization
-     *
-     * @return OrganizationInterface
-     */
-    protected function getOrganization()
+    private function getOrganization(): ?Organization
     {
-        return $this->tokenAccessor->getOrganization()
-            ? $this->tokenAccessor->getOrganization()
-            : $this->getOrganizationByUser();
+        return $this->tokenAccessor->getOrganization() ?? $this->getUser()?->getOrganization();
     }
 
-    /**
-     * @param Collection|int[] $tagIds
-     *
-     * @return int[]
-     */
-    protected function prepareTagIds($tagIds)
+    private function getEntityManager(): EntityManagerInterface
     {
-        if ($tagIds instanceof Collection) {
-            return array_map(
-                function (Tag $item) {
-                    return $item->getId();
-                },
-                $tagIds->toArray()
-            );
-        }
-
-        if (is_array($tagIds)) {
-            return $tagIds;
-        }
-
-        return [];
+        return $this->doctrine->getManagerForClass(Tag::class);
     }
 
-    /**
-     * @return TagRepository
-     */
-    protected function getTagsRepository()
+    private function getRepository(): TagRepository
     {
-        $repository = $this->em->getRepository($this->tagClass);
-
-        return $repository;
+        return $this->doctrine->getRepository(Tag::class);
     }
 }

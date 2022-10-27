@@ -9,12 +9,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DuplicateQueriesDataCollectorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DuplicateQueriesDataCollector
-     */
-    protected $collector;
+    /** @var DuplicateQueriesDataCollector */
+    private $collector;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->collector = new DuplicateQueriesDataCollector();
     }
@@ -26,21 +24,15 @@ class DuplicateQueriesDataCollectorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider collectDataProvider
-     * @param array $loggers
-     * @param int $expectedCount
-     * @param array $expectedIdentical
-     * @param array $expectedSimilar
      */
-    public function testCollect(array $loggers, $expectedCount, array $expectedIdentical, array $expectedSimilar)
+    public function testCollect(array $loggers, int $expectedCount, array $expectedIdentical, array $expectedSimilar)
     {
         foreach ($loggers as $loggerName => $queries) {
             $logger = new DebugStack();
             $logger->queries = $queries;
             $this->collector->addLogger($loggerName, $logger);
         }
-        /** @var Request $request */
         $request = $this->createMock(Request::class);
-        /** @var Response $response */
         $response = $this->createMock(Response::class);
         $this->collector->collect($request, $response);
         $this->assertEquals($expectedCount, $this->collector->getQueriesCount());
@@ -50,10 +42,7 @@ class DuplicateQueriesDataCollectorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(count($expectedSimilar), $this->collector->getSimilarQueriesCount());
     }
 
-    /**
-     * @return array
-     */
-    public function collectDataProvider()
+    public function collectDataProvider(): array
     {
         return [
             [

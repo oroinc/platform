@@ -1,20 +1,80 @@
 services:
+    oro_layout.layout.service_locator:
+        class: Symfony\Component\DependencyInjection\ServiceLocator
+        public: false
+        arguments:
+            - [] # services. Will be set in Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass
+        tags:
+            - { name: container.service_locator }
+
     oro_layout.extension:
         public: false
         class: Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
-            - '@service_container'
+            - '@oro_layout.layout.service_locator'
             - {} # types
             - {} # type extensions
             - {} # layout updates
             - {} # context configurators
             - {} # data providers
 
+    oro_layout.cache.block_type_extension:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\CacheBlockTypeExtension
+        tags:
+            - {name: layout.block_type_extension,  alias: block, priority: 256}
+
+    oro_layout.cache.render_cache:
+        class: Oro\Bundle\LayoutBundle\Cache\RenderCache
+        arguments:
+            - '@cache.oro_layout.render'
+            - '@oro_layout.cache.metadata_provider'
+            - '@request_stack'
+            - !tagged_iterator layout.cache.extension
+
+    oro_layout.cache.extension.localization:
+        class: Oro\Bundle\LayoutBundle\Cache\Extension\LocalizationRenderCacheExtension
+        arguments:
+            - '@oro_locale.provider.current_localization'
+        tags: [layout.cache.extension]
+
+    oro_layout.cache.extension.theme:
+        class: Oro\Bundle\LayoutBundle\Cache\Extension\ThemeRenderCacheExtension
+        arguments:
+            - '@oro_layout.layout_context_holder'
+        tags: [layout.cache.extension]
+
+    oro_layout.cache.metadata_provider.default:
+        class: Oro\Bundle\LayoutBundle\Cache\Metadata\DefaultCacheMetadataProvider
+
+    oro_layout.cache.metadata_provider:
+        class: Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProvider
+        arguments:
+            - '@oro_layout.cache.metadata_provider.default'
+            - !tagged_iterator layout.cache.metadata_provider
+            - '@oro_layout.layout_context_holder'
+            - '@logger'
+            - '%kernel.debug%'
+        tags:
+            - { name: monolog.logger, channel: oro_layout.cache }
+            - { name: kernel.reset, method: reset }
+
+    oro_layout.cache.placeholder_renderer:
+        class: Oro\Bundle\LayoutBundle\Cache\PlaceholderRenderer
+        arguments:
+            - '@oro_layout.layout_manager'
+            - '@oro_layout.layout_context_holder'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_layout.cache }
+            - { name: kernel.reset, method: reset }
+
     oro_layout.layout_factory_builder:
         public: false
-        class: Oro\Component\Layout\LayoutFactoryBuilder
+        class: Oro\Bundle\LayoutBundle\Layout\CacheLayoutFactoryBuilder
         arguments:
             - '@oro_layout.processor.expression'
+            - '@oro_layout.cache.render_cache'
+            - '@oro_layout.cache.metadata_provider'
             - '@oro_layout.cache.block_view_cache'
         calls:
             - [addExtension, ['@oro_layout.extension']]
@@ -28,6 +88,9 @@ services:
             - '@oro_layout.layout_factory_builder'
             - '@oro_layout.layout_context_holder'
             - '@oro_layout.profiler.layout_data_collector'
+
+    Oro\Bundle\LayoutBundle\Layout\LayoutManager:
+        alias: oro_layout.layout_manager
 
     layout:
         alias: oro_layout.layout_manager
@@ -69,7 +132,7 @@ services:
     oro_layout.layout_context_configurator.last_modification_date:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\LastModifiedDateContextConfigurator
         arguments:
-            - '@oro_layout.theme_extension.resource_provider.cache'
+            - '@oro_layout.theme_extension.resource_provider.last_modification_date'
         tags:
             - { name: layout.context_configurator }
 
@@ -83,10 +146,17 @@ services:
     oro_layout.expression.encoder_registry:
         class: Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry
         arguments:
-            - {}
+            - !abstract '$encoders defined in Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ExpressionCompilerPass'
 
     oro_layout.expression_language.expression_manipulator:
         class: Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator
+
+    oro_layout.expression_language.expression_validator:
+        class: Symfony\Component\Validator\Constraints\ExpressionLanguageSyntaxValidator
+        arguments:
+            - '@oro_layout.expression_language'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_layout.expression_language.expression_validator }
 
     oro_layout.expression.json_encoder:
         class: Oro\Component\Layout\ExpressionLanguage\Encoder\JsonExpressionEncoder
@@ -95,60 +165,24 @@ services:
         tags:
             - { name: layout.expression.encoder, format: json }
 
-    oro_layout.assetic.layout_formula_loader:
-        public: false
-        class: '%assetic.cached_formula_loader.class%'
-        arguments:
-            - '@oro_layout.assetic.layout_formula_loader.real'
-            - '@assetic.config_cache'
-            - '%kernel.debug%'
-        tags:
-            - { name: assetic.formula_loader, alias: layout }
-
-    oro_layout.assetic.layout_formula_loader.real:
-        public: false
-        class: Oro\Bundle\LayoutBundle\Assetic\LayoutFormulaLoader
-
-    oro_layout.assetic.layout_resource:
-        public: false
-        class: Oro\Bundle\LayoutBundle\Assetic\LayoutResource
-        arguments:
-            - '@oro_layout.theme_manager'
-            - '@filesystem'
-            - "%kernel.cache_dir%/oro_layout_assets"
-        calls:
-            - ['setLogger', ['@logger']]
-        tags:
-            - { name: assetic.formula_resource, loader: layout }
-
     oro_layout.processor.expression:
-        class: Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor
+        class: Oro\Bundle\LayoutBundle\Layout\CacheExpressionProcessor
         arguments:
             - '@oro_layout.expression_language'
             - '@oro_layout.expression.encoder_registry'
+            - '@oro_layout.cache.render_cache'
 
     oro_layout.provider.image_type:
         class: Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider
         arguments:
             - '@oro_layout.theme_manager'
 
-    oro_layout.provider.requirejs_config:
-        class: Oro\Bundle\LayoutBundle\Provider\RequireJSConfigProvider
-        arguments:
-            - '@templating'
-            - '@oro_requirejs.cache'
-            - '%oro_require_js%'
-            - '%kernel.bundles%'
-            - '%oro_require_js.web_root%'
-        calls:
-            - [ setThemeManager, [ '@oro_layout.theme_manager' ] ]
-            - [ setContextHolder, [ '@oro_layout.layout_context_holder' ] ]
-        tags:
-            - { name: requirejs.config_provider, alias: oro_layout_requirejs_config_provider }
-        lazy: true
+    Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider:
+        alias: oro_layout.provider.image_type
 
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
+        public: true
         arguments:
             - '@request_stack'
 
@@ -159,21 +193,26 @@ services:
     oro_layout.layout_context_holder:
         class: Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder
 
+    oro_layout.cache_warmer.layout_updates:
+        class: Oro\Bundle\LayoutBundle\Cache\LayoutUpdatesCacheWarmer
+        arguments:
+            - '@oro_layout.loader'
+            - '@kernel'
+            - '@oro_layout.layout_factory_builder'
+            - '@oro_layout.expression_language.compiled_cache_warmer'
+        tags:
+            - { name: kernel.cache_warmer }
+
     oro_layout.expression_language.cache:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_layout_expression_language' ] ]
-
-    oro_layout.expression_language.parsed_cache:
-        class: Symfony\Bridge\Doctrine\ExpressionLanguage\DoctrineParserCache
-        arguments:
-            - '@oro_layout.expression_language.cache'
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_layout_expression_language' }
 
     oro_layout.expression_language:
         class: Symfony\Component\ExpressionLanguage\ExpressionLanguage
         arguments:
-            - '@oro_layout.expression_language.parsed_cache'
+            - '@oro_layout.expression_language.cache'
             - []
 
     oro_layout.data_provider.asset:
@@ -190,14 +229,6 @@ services:
             - '@liip_imagine.filter.configuration'
             - '@oro_entity.doctrine_helper'
 
-
-    oro_layout.request.listener.imagine_filter_config:
-        class: Oro\Bundle\LayoutBundle\EventListener\ImagineFilterConfigListener
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: kernel.event_listener, event: kernel.request }
-
     oro_layout.block_view_serializer:
         class: Symfony\Component\Serializer\Serializer
         arguments: [{}, {'json': '@oro_layout.block_view_serializer.json_encoder'}]
@@ -205,14 +236,32 @@ services:
     oro_layout.block_view_serializer.json_encoder:
         class: Symfony\Component\Serializer\Encoder\JsonEncoder
 
+    oro_layout.block_view_serializer.type_name_converter:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\TypeNameConverter
+        arguments:
+            - []
+
     oro_layout.block_view_serializer.block_view_normalizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewNormalizer
+        arguments:
+            - '@oro_layout.block_view_serializer.block_view_vars_normalizer'
+            - '@oro_layout.block_view_serializer.type_name_converter'
         tags:
             - { name: layout.block_view_serializer.normalizer }
 
+    oro_layout.block_view_serializer.block_view_vars_normalizer:
+        class: Oro\Bundle\LayoutBundle\Layout\Serializer\BlockViewVarsNormalizer
+
+    oro_layout.expression_language.compiled_cache:
+        class: Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCache
+        arguments:
+            - '%oro_layout.expression_language_cache_file%'
+            - '@logger'
+
     oro_layout.block_view_serializer.expression_normalizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer
-        arguments: [{}, {}]
+        arguments:
+            - '@oro_layout.expression_language.compiled_cache'
         tags:
             - { name: layout.block_view_serializer.normalizer }
 
@@ -228,9 +277,34 @@ services:
         tags:
             - { name: layout.data_provider, alias: property_accessor }
 
+    oro_layout.layout.data_provider.filtered_image.abstract:
+        class: 'Oro\Bundle\LayoutBundle\Layout\DataProvider\FilteredImageProvider'
+        public: false
+        abstract: true
+
     oro_layout.provider.abstract_form:
         abstract: true
         class: 'Oro\Bundle\LayoutBundle\Layout\DataProvider\AbstractFormProvider'
         arguments:
             - '@form.factory'
             - '@router'
+
+    oro_layout.method_phpdoc_extractor:
+        class: Oro\Bundle\LayoutBundle\Command\Util\MethodPhpDocExtractor
+        public: false
+
+    oro_layout.loader.image_filter.link:
+        tags:
+            - { name: oro_service_link, service: oro_layout.loader.image_filter }
+
+    oro_layout.loader.imagine_filter_configuration_decorator:
+        class: Oro\Bundle\LayoutBundle\Loader\ImagineFilterConfigurationDecorator
+        decorates: liip_imagine.filter.configuration
+        arguments:
+            - '@.inner'
+            - '@oro_layout.loader.image_filter.link'
+
+    oro_layout.expression_language_provider.instanceof:
+        class: 'Oro\Bundle\LayoutBundle\Layout\ExpressionLanguageProvider\InstanceofExpressionFunctionProvider'
+        tags:
+            - { name: layout.expression_language_provider }

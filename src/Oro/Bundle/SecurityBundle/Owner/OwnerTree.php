@@ -274,52 +274,10 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3. Use addBusinessUnit instead
      */
-    public function addLocalEntity($localLevelEntityId, $globalLevelEntityId = null)
+    public function setSubordinateBusinessUnitIds($parentBusinessUnitId, $businessUnitIds)
     {
-        $this->addBusinessUnit($localLevelEntityId, $globalLevelEntityId);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addBusinessUnitRelation($businessUnitId, $parentBusinessUnitId)
-    {
-        $this->subordinateBusinessUnitIds[$businessUnitId] = $parentBusinessUnitId;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3. Use addBusinessUnitRelation instead
-     */
-    public function addDeepEntity($localLevelEntityId, $deepLevelEntityId)
-    {
-        $this->addBusinessUnitRelation($localLevelEntityId, $deepLevelEntityId);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildTree()
-    {
-        $subordinateBusinessUnitIds = [];
-        $calculatedLevels = array_reverse($this->calculateAdjacencyListLevels());
-        foreach ($calculatedLevels as $businessUnitIds) {
-            foreach ($businessUnitIds as $buId) {
-                $parentBuId = $this->subordinateBusinessUnitIds[$buId];
-                if (null !== $parentBuId) {
-                    $subordinateBusinessUnitIds[$parentBuId][] = $buId;
-                    if (isset($subordinateBusinessUnitIds[$buId])) {
-                        $subordinateBusinessUnitIds[$parentBuId] = array_merge(
-                            $subordinateBusinessUnitIds[$parentBuId],
-                            $subordinateBusinessUnitIds[$buId]
-                        );
-                    }
-                }
-            }
-        }
-        $this->subordinateBusinessUnitIds = $subordinateBusinessUnitIds;
+        $this->subordinateBusinessUnitIds[$parentBusinessUnitId] = $businessUnitIds;
     }
 
     /**
@@ -328,57 +286,6 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
     public function getTree()
     {
         return $this;
-    }
-
-    /**
-     * Takes business units adjacency list and calculates tree level for each item in list.
-     *
-     * For details about Adjacency Lists see https://en.wikipedia.org/wiki/Adjacency_list
-     * The performance of the implemented algorithm depends on the order of items in the input list.
-     * The best performance is reached when all children are added to the input list after parents.
-     *
-     * An example:
-     *
-     *  id    -  parentID          Tree                        id    -  parentID  - level
-     * ------------------       --------------------           ----------------------------
-     *  b1    -  null              b1                          b1    -  null         0
-     *  b2    -  null               +-- b11                    b2    -  null         0
-     *  b11   -  b1                 |   +-- b111               b11   -  b1           1
-     *  b12   -  b1                 |       +-- b1111          b12   -  b1           1
-     *  b21   -  b2                 |       +-- b1112          b21   -  b2           1
-     *  b111  -  b11                +-- b12                    b111  -  b11          2
-     *  b121  -  b12                    +-- b121               b121  -  b12          2
-     *  b122  -  b12                    +-- b122               b122  -  b12          2
-     *  b1111 -  b111                       +-- b1221          b1111 -  b111         3
-     *  b1112 -  b111              b2                          b1112 -  b111         3
-     *  b1221 -  b122               +-- b21                    b1221 -  b122         3
-     *
-     * @return array [level => [business unit id, ...], ...]
-     */
-    protected function calculateAdjacencyListLevels()
-    {
-        $levelsData = [];
-        $businessUnits = $this->subordinateBusinessUnitIds;
-        while (!empty($businessUnits)) {
-            $unprocessed = [];
-            foreach ($businessUnits as $buId => $parentBuId) {
-                if (null === $parentBuId) {
-                    $levelsData[$buId] = 0;
-                } elseif (array_key_exists($parentBuId, $levelsData)) {
-                    $levelsData[$buId] = $levelsData[$parentBuId] + 1;
-                } elseif (array_key_exists($parentBuId, $this->subordinateBusinessUnitIds)) {
-                    $unprocessed[$buId] = $parentBuId;
-                }
-            }
-            $businessUnits = $unprocessed;
-        }
-
-        $result = [];
-        foreach ($levelsData as $buId => $level) {
-            $result[$level][] = $buId;
-        }
-
-        return $result;
     }
 
     /**
@@ -397,15 +304,6 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3. Use addUser instead
-     */
-    public function addBasicEntity($basicLevelEntityId, $localLevelEntityId = null)
-    {
-        $this->addUser($basicLevelEntityId, $localLevelEntityId);
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function addUserBusinessUnit($userId, $organizationId, $businessUnitId = null)
     {
@@ -418,28 +316,10 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
 
     /**
      * {@inheritdoc}
-     * @deprecated since 2.3. Use addUserBusinessUnit instead
-     */
-    public function addLocalEntityToBasic($basicLevelEntityId, $localLevelEntityId, $globalLevelEntityId)
-    {
-        $this->addUserBusinessUnit($basicLevelEntityId, $globalLevelEntityId, $localLevelEntityId);
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function addUserOrganization($userId, $organizationId)
     {
         $this->userOrganizationIds[$userId][] = $organizationId;
-    }
-
-    /**
-     * {@inheritdoc}
-     * @deprecated since 2.3. Use addUser instead
-     */
-    public function addGlobalEntity($basicLevelEntityId, $globalLevelEntityId)
-    {
-        $this->addUserOrganization($basicLevelEntityId, $globalLevelEntityId);
     }
 
     /**

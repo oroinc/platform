@@ -2,47 +2,37 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TitleTranslatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $userConfigManager;
-
     /** @var TitleTranslator */
-    protected $titleTranslator;
+    private $titleTranslator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator        = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator->expects($this->any())
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
             ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($id, array $parameters) {
-                        return 'trans!' . strtr($id, $parameters);
-                    }
-                )
-            );
-        $this->userConfigManager->expects($this->any())
+            ->willReturnCallback(function ($id, array $parameters) {
+                return 'trans!' . strtr($id, $parameters);
+            });
+
+        $userConfigManager = $this->createMock(ConfigManager::class);
+        $userConfigManager->expects($this->any())
             ->method('get')
             ->with('oro_navigation.title_delimiter')
-            ->will($this->returnValue('-'));
+            ->willReturn('-');
 
-        $this->titleTranslator = new TitleTranslator($this->translator, $this->userConfigManager);
+        $this->titleTranslator = new TitleTranslator($translator, $userConfigManager);
     }
 
     /**
      * @dataProvider transDataProvider
      */
-    public function testTrans($titleTemplate, $params, $expectedResult)
+    public function testTrans(string $titleTemplate, array $params, string $expectedResult)
     {
         $this->assertEquals(
             $expectedResult,
@@ -50,7 +40,7 @@ class TitleTranslatorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function transDataProvider()
+    public function transDataProvider(): array
     {
         return [
             [

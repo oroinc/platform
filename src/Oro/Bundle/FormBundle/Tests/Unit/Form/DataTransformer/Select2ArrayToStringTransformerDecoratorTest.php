@@ -1,25 +1,22 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\Select2ArrayToStringTransformerDecorator;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class Select2ArrayToStringTransformerDecoratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DataTransformerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DataTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $transformer;
 
-    /**
-     * @var Select2ArrayToStringTransformerDecorator
-     */
+    /** @var Select2ArrayToStringTransformerDecorator */
     private $transformerDecorator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = $this->createMock(DataTransformerInterface::class);
+
         $this->transformerDecorator = new Select2ArrayToStringTransformerDecorator($this->transformer);
     }
 
@@ -27,8 +24,7 @@ class Select2ArrayToStringTransformerDecoratorTest extends \PHPUnit\Framework\Te
     {
         $value = ['some array value'];
 
-        $this->transformer
-            ->expects($this->once())
+        $this->transformer->expects($this->once())
             ->method('transform')
             ->with($value);
 
@@ -39,8 +35,7 @@ class Select2ArrayToStringTransformerDecoratorTest extends \PHPUnit\Framework\Te
     {
         $value = 'some string value';
 
-        $this->transformer
-            ->expects($this->once())
+        $this->transformer->expects($this->once())
             ->method('reverseTransform')
             ->with($value);
 

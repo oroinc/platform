@@ -1,15 +1,21 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .side-menu-overlay {
+    $overlay-header-offset-start: 16px !default;
+    $overlay-header-offset-end: 32px !default;
+    $menu-item-width: 258px !default;
+
     position: absolute;
     top: 0;
     bottom: 0;
-    #{$start}: 100%;
+    left: 100%;
     z-index: -1;
 
-    width: 100vw;
+    width: calc(100vw - #{$menu-side-width-minimized});
     height: 100vh;
-    max-width: 100vw;
+    max-width: calc(100vw - #{$menu-side-width-minimized});
     min-width: $width-body-page;
 
     font-size: $menu-font-size;
@@ -23,7 +29,7 @@
     visibility: hidden;
 
     &.open {
-        z-index: $zindex-dropdown - 70;
+        z-index: $zindex-modal;
 
         visibility: visible;
 
@@ -33,19 +39,20 @@
     &__header {
         position: relative;
 
-        padding: side-values(24px 16px 20px 32px);
-        width: 248px;
+        padding: 24px $overlay-header-offset-start 18px $overlay-header-offset-end;
         height: $side-menu-overlay-header-height;
     }
 
     &__search {
         position: relative;
+
+        width: $menu-item-width - $overlay-header-offset-start - $overlay-header-offset-end;
     }
 
     &__search-icon {
         position: absolute;
-        #{$end}: 8px;
         top: 0;
+        right: 8px;
         padding: 4px;
 
         background-color: transparent;
@@ -58,29 +65,31 @@
             &:hover,
             &:focus {
                 color: $menu-full-screen-button-color;
+                outline: none;
             }
         }
     }
 
     &__field {
         width: 100%;
-        padding-#{$end}: 24px;
+        padding-right: 24px;
         margin: 0;
 
         box-sizing: border-box;
     }
 
-    &__no-result {
-        margin: 8px 0;
-    }
-
     &__title {
+        width: $menu-item-width - $overlay-header-offset-start - $overlay-header-offset-end;
+        margin-bottom: 12px;
+
         font-size: $side-menu-overlay-title-font-size;
         line-height: 1.2;
+
+        @include text-truncate();
     }
 
     &__content {
-        max-width: calc(100vw - #{$side-menu-overlay-header-height});
+        max-width: calc(100vw - #{$menu-side-width-minimized});
         height: calc(100vh - #{$side-menu-overlay-header-height});
         max-height: calc(100vh - #{$side-menu-overlay-header-height});
         padding-bottom: 16px;
@@ -91,7 +100,7 @@
         top: 10px;
         z-index: 1;
 
-        margin-#{$end}: $side-menu-overlay-button-offset;
+        margin-right: $side-menu-overlay-button-offset;
 
         font-size: $side-menu-overlay-button-font-size;
 
@@ -104,11 +113,8 @@
         &:hover,
         &:focus {
             color: $menu-minimized-item-first-level-text-color-active;
+            outline: none;
         }
-    }
-
-    &__ui-helper {
-        direction: $side-menu-overlay-ui-helper-direction;
     }
 
     &__fill,
@@ -142,16 +148,12 @@
     &__fill-blur::after {
         width: $side-menu-fill-blur-width;
 
-        margin-#{$end}: $side-menu-overlay-ui-fill-blur-offset;
-
         background-color: $menu-dropdown-background-color;
         box-shadow: $side-menu-overlay-ui-fill-blur-box-shadow;
     }
 
     &__fill-blur-inner::after {
-        background-color: rgba($primary-inverse, .5);
-
-        transform: $side-menu-overlay-ui-fill-blur-inner-transform;
+        background-color: $side-menu-overlay-ui-fill-background-color;
     }
 
     .menu {
@@ -162,8 +164,8 @@
 
         max-height: inherit;
         max-width: inherit;
-        min-height: 340px;;
-        height: inherit;
+        min-height: 340px;
+        height: 100%;
         margin: 0;
         padding: 0;
         list-style: none;
@@ -173,15 +175,15 @@
     }
 
     .menu-item {
-        width: 248px;
-        padding: 0 15px;
+        width: $menu-item-width;
+        padding: 0 16px;
 
         line-height: 1.3;
 
         &:not(.ui-helper) {
             position: relative;
 
-            &:before {
+            &::before {
                 position: absolute;
                 top: 0;
                 right: 0;
@@ -189,7 +191,7 @@
 
                 width: 1px;
 
-                background-color: $menu-item-first-level-text-color;
+                background-color: $menu-item-divider-color;
 
                 content: '';
             }
@@ -217,7 +219,7 @@
             $selector: '&-level-' + $i;
 
             #{$selector} {
-                padding-#{$start}: $menu-overlay-title-offset * 1px;
+                padding-left: $menu-overlay-title-offset * 1px;
 
                 @if $i == 2 {
                     font-size: ($menu-font-size + 2);
@@ -268,6 +270,10 @@
                 background-color: transparent;
             }
         }
+
+        .highlight {
+            text-decoration: initial;
+        }
     }
 
     .highlight {
@@ -277,5 +283,13 @@
 
     .divider {
         display: none;
+    }
+}
+
+/* Avoid Chrome to see Safari hack */
+@supports (-webkit-touch-callout: none) {
+    .side-menu-overlay__content {
+        /* The hack for Safari */
+        padding-bottom: 32px;
     }
 }

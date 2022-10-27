@@ -1,3 +1,0 @@
-# this bundle should be excluded from automatic loading
-# use \AppKernel to load bundle in test environment only
-bundles: []

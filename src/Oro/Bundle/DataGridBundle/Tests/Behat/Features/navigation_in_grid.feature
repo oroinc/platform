@@ -1,6 +1,5 @@
 @fixture-OroDataGridBundle:grid-navigation.yml
 Feature: Navigation in grid
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
 
   Scenario: User should see previous grid page, after deleting all records on current page
     Given I login as administrator
@@ -10,7 +9,7 @@ Feature: Navigation in grid
       | Buyer1          |
       | Buyer5          |
       | Sales Rep       |
-    And there are 14 records in grid
+    And there are 15 records in grid
     When I select 10 from per page list dropdown
     Then I should see following records in grid:
       | Account Manager   |

@@ -4,13 +4,14 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\StringOptionValueBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     */
     public function testConstructWithInvalidDelimiter()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder(null);
     }
 
@@ -58,38 +59,30 @@ class StringOptionValueBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('val1replaced_val3', $builder->get());
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     */
     public function testAddThrowsExceptionIfInvalidValue()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->add(123);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     */
     public function testRemoveThrowsExceptionIfInvalidValue()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->remove(123);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     */
     public function testReplaceThrowsExceptionIfInvalidOldValue()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->replace(123, 'new');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     */
     public function testReplaceThrowsExceptionIfInvalidNewValue()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
         $builder = new StringOptionValueBuilder();
         $builder->replace('old', 123);
     }

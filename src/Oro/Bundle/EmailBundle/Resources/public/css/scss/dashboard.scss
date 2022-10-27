@@ -1,9 +1,9 @@
 /* @theme: admin.oro; */
 
 .dashboard-widget-content.recent-emails-widget-content {
-    .email-row-is-readed {
+    .email-row-is-read {
         strong {
-            font-weight: normal;
+            font-weight: font-weight('light');
         }
     }
 }

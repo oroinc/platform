@@ -38,7 +38,7 @@ class SpecificationLocatorStub implements SpecificationLocator
         $features = [];
 
         for ($i = 0; $i < $this->featureCount; $i++) {
-            $features[] = new FeatureNode(null, null, [], null, [], '', '', uniqid('', true).'.feature', 0);
+            $features[] = new FeatureNode(null, null, [], null, [], '', '', '/' . uniqid('', true).'.feature', 0);
         }
 
         return new SpecificationArrayIterator($suite, $features);

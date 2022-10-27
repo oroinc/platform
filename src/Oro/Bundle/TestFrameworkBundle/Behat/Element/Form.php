@@ -5,18 +5,20 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Doctrine\Common\Inflector\Inflector;
+use Oro\Bundle\TestFrameworkBundle\Behat\Environment\BehatSecretsReader;
+use Oro\Bundle\TestFrameworkBundle\Exception\BehatSecretsReaderException;
+use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
 /**
  * Form element implementation
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Form extends Element
 {
     /**
-     * @param TableNode $table
      * @throws ElementNotFoundException
      */
     public function fill(TableNode $table)
@@ -26,7 +28,7 @@ class Form extends Element
             $this->getDriver()->switchToIFrame($this->options['embedded-id']);
         }
         foreach ($table->getRows() as $row) {
-            list($label, $value) = $row;
+            [$label, $value] = $row;
             $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $value = self::normalizeValue($value);
 
@@ -43,6 +45,7 @@ class Form extends Element
             $field = $this->wrapField($label, $field);
             $field->setValue($value);
             $field->blur();
+            $this->getDriver()->waitForAjax();
         }
         if ($isEmbeddedForm) {
             $this->getDriver()->switchToWindow();
@@ -59,6 +62,10 @@ class Form extends Element
         $field = null;
         if (isset($this->options['mapping'][$label])) {
             $field = $this->findField($this->options['mapping'][$label]);
+        }
+
+        if (null === $field) {
+            $field = $this->findFieldByLabel($label, false);
         }
 
         if (null === $field) {
@@ -84,13 +91,10 @@ class Form extends Element
         $this->getDriver()->typeIntoInput($field->getXpath(), $value);
     }
 
-    /**
-     * @param TableNode $table
-     */
     public function assertFields(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            list($label, $value) = $row;
+            [$label, $value] = $row;
             $locator = isset($this->options['mapping'][$label]) ? $this->options['mapping'][$label] : $label;
             $field = $this->findField($locator);
             self::assertNotNull($field, sprintf('Field `%s` not found', $label));
@@ -98,8 +102,15 @@ class Form extends Element
             $field = $this->wrapField($label, $field);
 
             $expectedValue = self::normalizeValue($value);
-            $fieldValue = self::normalizeValue($field->getValue());
-            self::assertEquals($expectedValue, $fieldValue, sprintf('Field "%s" value is not as expected', $label));
+
+            $result = $this->spin(function () use ($field, $expectedValue) {
+                $fieldValue = self::normalizeValue($field->getValue());
+
+                // Comparison operator is not strict intentionally.
+                return $expectedValue == $fieldValue;
+            }, 3);
+
+            self::assertTrue($result, sprintf('Field "%s" value is not as expected', $label));
         }
     }
 
@@ -144,7 +155,7 @@ class Form extends Element
      *
      * @param string $actionLocator
      */
-    protected function pressActionButton($actionLocator)
+    public function pressActionButton($actionLocator)
     {
         $button = $this->findButton($actionLocator);
 
@@ -189,9 +200,14 @@ class Form extends Element
         if ($field) {
             $type = $field->getAttribute('type');
             $classes = preg_split('/\s+/', (string)$field->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
+            $isExternalFileField = $field->getAttribute('data-is-external-file') === '1';
 
             if ('file' === $type) {
                 return $this->elementFactory->wrapElement('FileField', $field);
+            }
+
+            if ($isExternalFileField) {
+                return $this->elementFactory->wrapElement('ExternalFileField', $field);
             }
 
             if ('datetime' === $type) {
@@ -201,7 +217,7 @@ class Form extends Element
             if (in_array('custom-checkbox__input', $classes, true)) {
                 return $this->elementFactory->wrapElement(
                     'PrettyCheckbox',
-                    $field->getParent()->find('css', '.custom-checkbox__icon')
+                    $field->getParent()->find('css', '.custom-checkbox__input')
                 );
             }
 
@@ -221,7 +237,23 @@ class Form extends Element
                 return $this->elementFactory->wrapElement('Select', $field);
             }
 
+            if ('textarea' === $field->getTagName()) {
+                $wysiwyg = $field->getParent()->find('css', '.grapesjs');
+                if ($wysiwyg) {
+                    return $this->elementFactory->wrapElement('WysiwygField', $field);
+                }
+            }
+
+            if ('orodigitalasset/js/app/views/digital-asset-choose-form-view'
+                === (string) $field->getParent()->getAttribute('data-bound-view')) {
+                return $this->elementFactory->wrapElement('DigitalAssetManagerField', $field);
+            }
+
             return $field;
+        }
+
+        if (!$field && is_array($locator)) {
+            self::fail(sprintf('Cannot find element by %s locator "%s"', $locator['type'], $locator['locator']));
         }
 
         if ($field = $this->findFieldByLabel($locator)) {
@@ -237,23 +269,31 @@ class Form extends Element
 
     /**
      * @param string $locator Label text
+     * @param bool $failOnError
      * @return NodeElement|null
+     * @throws ElementNotFoundException
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function findFieldByLabel($locator)
+    protected function findFieldByLabel($locator, $failOnError = true)
     {
         if ($label = $this->findLabel($locator)) {
             $sndParent = $label->getParent()->getParent();
             $classes = preg_split('/\s+/', (string)$sndParent->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
 
             if (in_array('control-group-collection', $classes, true)) {
-                $elementName = Inflector::singularize(trim($label->getText())).'Collection';
+                $elementName = InflectorFactory::create()->singularize(trim($label->getText())).'Collection';
                 $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
 
                 return $this->elementFactory->wrapElement($elementName, $sndParent);
             } elseif (in_array('control-group-oro_file', $classes, true)) {
                 $input = $sndParent->find('css', 'input[type="file"]');
+                if ($input !== null) {
+                    return $this->elementFactory->wrapElement('FileField', $input);
+                }
 
-                return $this->elementFactory->wrapElement('FileField', $input);
+                $input = $sndParent->find('css', 'input[data-is-external-file="1"]');
+
+                return $this->elementFactory->wrapElement('ExternalFileField', $input);
             } elseif ($select = $sndParent->find('css', 'select')) {
                 return $select;
             } elseif (in_array('control-group-checkbox', $classes, true)) {
@@ -268,7 +308,7 @@ class Form extends Element
                 && $field = $this->getPage()->find('css', '#'.$label->getAttribute('for'))
             ) {
                 return $field;
-            } else {
+            } elseif ($failOnError) {
                 self::fail(sprintf('Find label "%s", but can\'t determine field type', $locator));
             }
         }
@@ -293,15 +333,8 @@ class Form extends Element
         $value = trim($value);
 
         if (0 === strpos($value, '[')) {
-            return self::normalizeValue(
-                array_map(
-                    'trim',
-                    explode(
-                        ',',
-                        trim($value, '[]')
-                    )
-                )
-            );
+            $value = trim($value, '[]');
+            return self::normalizeValue($value ? explode(',', $value) : []);
         }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}/', trim($value))) {
@@ -324,6 +357,7 @@ class Form extends Element
      *
      * @param $value
      * @return \DateTime|mixed
+     * @throws BehatSecretsReaderException
      */
     protected static function checkAdditionalFunctions($value)
     {
@@ -332,11 +366,14 @@ class Form extends Element
 
         if (!empty($matches['function']) && !empty($matches['value'])) {
             if ('DateTime' === $matches['function']) {
-                $value = new \DateTime($matches['value']);
+                $value = (new \DateTime($matches['value']))->format(\DateTimeInterface::ATOM);
             }
             if ('Date' === $matches['function']) {
                 $parsed =  new \DateTime($matches['value']);
                 $value = str_replace($matches[0], $parsed->format('M j, Y'), $value);
+            }
+            if ('Secret' === $matches['function']) {
+                $value = BehatSecretsReader::getInstance()->getValue($matches['value']);
             }
         }
 
@@ -405,6 +442,43 @@ class Form extends Element
             );
         }
 
+        if (!$errorSpan) {
+            // Get the validation error a level higher than the input
+            $errorSpan = $this->find(
+                'xpath',
+                sprintf(
+                    '%s%s',
+                    $field->getXpath(),
+                    '/ancestor::div[contains(@class, "validation-error")]/span[@class="validation-failed"]'
+                )
+            );
+        }
+
+        if (!$errorSpan) {
+            // Get the validation error when the input in the "div.fields-row"
+            $errorSpan = $this->find(
+                'xpath',
+                sprintf(
+                    '%s%s',
+                    $field->getXpath(),
+                    '/ancestor::div[contains(@class, "fields-row")]/following-sibling::span[@class="validation-failed"]'
+                )
+            );
+        }
+
+        if (!$errorSpan && $field->getAttribute('type') === 'file') {
+            // Get the validation error for file input widget
+            $errorSpan = $this->find(
+                'xpath',
+                sprintf(
+                    '%s%s%s',
+                    $field->getXpath(),
+                    '/ancestor::div[contains(@class, "input-widget-file")]',
+                    '/following-sibling::span[@class="validation-failed"]'
+                )
+            );
+        }
+
         self::assertNotNull($errorSpan, "Field $fieldName has no validation errors");
 
         return $errorSpan->getText();
@@ -441,11 +515,6 @@ class Form extends Element
         }, $errorSpans);
     }
 
-    /**
-     * @param $label
-     * @param NodeElement $field
-     * @return NodeElement
-     */
     private function wrapField($label, NodeElement $field): NodeElement
     {
         if (isset($this->options['mapping'][$label]['element'])) {

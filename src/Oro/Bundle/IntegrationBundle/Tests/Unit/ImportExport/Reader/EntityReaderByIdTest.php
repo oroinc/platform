@@ -5,115 +5,81 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Reader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class EntityReaderByIdTest extends OrmTestCase
 {
-    const TEST_ENTITY_ID = 11;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $managerRegistry;
+    private const TEST_ENTITY_ID = 11;
 
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextRegistry;
+    private $contextRegistry;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     /** @var EntityReaderById */
-    protected $reader;
+    private $reader;
 
-    public function setUp()
+    /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $exportQueryProvider;
+
+    protected function setUp(): void
     {
-        $this->contextRegistry = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextRegistry')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getByStepExecution'))
-            ->getMock();
-
-        $this->managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $reader                = new AnnotationReader();
-        $metadataDriver        = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\IntegrationBundle\Entity'
-        );
-
-        $ownershipMetadataProvider =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $this->exportQueryProvider = $this->createMock(ExportQueryProvider::class);
 
         $this->em = $this->getTestEntityManager();
-        $config   = $this->em->getConfiguration();
-        $config->setMetadataDriverImpl($metadataDriver);
-        $config->setEntityNamespaces(['OroIntegrationBundle' => 'Oro\Bundle\IntegrationBundle\Entity']);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->reader = new EntityReaderById(
             $this->contextRegistry,
-            $this->managerRegistry,
-            $ownershipMetadataProvider
+            $managerRegistry,
+            $ownershipMetadataProvider,
+            $this->exportQueryProvider
         );
-    }
-
-    protected function tearDown()
-    {
-        unset($this->reader, $this->em, $this->managerRegistry, $this->contextRegistry);
     }
 
     public function testInitialization()
     {
-        $entityName = 'OroIntegrationBundle:Channel';
-        $qb         = $this->em->createQueryBuilder()
+        $entityName = Channel::class;
+        $qb = $this->em->createQueryBuilder()
             ->select('e')
             ->from($entityName, 'e');
 
-        $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
+        $context = $this->createMock(ContextInterface::class);
         $context->expects($this->any())
             ->method('hasOption')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['entityName', false],
-                        ['queryBuilder', true],
-                        [EntityReaderById::ID_FILTER, true]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['entityName', false],
+                ['queryBuilder', true],
+                [EntityReaderById::ID_FILTER, true]
+            ]);
         $context->expects($this->any())
             ->method('getOption')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['queryBuilder', null, $qb],
-                        [EntityReaderById::ID_FILTER, null, self::TEST_ENTITY_ID]
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['queryBuilder', null, $qb],
+                [EntityReaderById::ID_FILTER, null, self::TEST_ENTITY_ID]
+            ]);
 
-        $this->reader->setStepExecution($this->getMockStepExecution($context));
-        $this->assertSame('SELECT e FROM OroIntegrationBundle:Channel e WHERE o.id = :id', $qb->getDQL());
-        $this->assertSame(self::TEST_ENTITY_ID, $qb->getParameter('id')->getValue());
-    }
-
-    /**
-     * @param mixed $context
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject+
-     */
-    protected function getMockStepExecution($context)
-    {
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $stepExecution = $this->createMock(StepExecution::class);
         $this->contextRegistry->expects($this->any())
             ->method('getByStepExecution')
             ->with($stepExecution)
-            ->will($this->returnValue($context));
+            ->willReturn($context);
 
-        return $stepExecution;
+        $this->reader->setStepExecution($stepExecution);
+
+        $this->assertSame('SELECT e FROM ' . Channel::class . ' e WHERE o.id = :id', $qb->getDQL());
+        $this->assertSame(self::TEST_ENTITY_ID, $qb->getParameter('id')->getValue());
     }
 }

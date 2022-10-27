@@ -4,9 +4,9 @@ namespace Oro\Bundle\DataGridBundle\Extension\Columns;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
-use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
@@ -25,9 +25,6 @@ class ColumnsExtension extends AbstractExtension
     /** @var DatagridStateProviderInterface|ColumnsStateProvider DatagridStateProviderInterface */
     private $columnsStateProvider;
 
-    /**
-     * @param DatagridStateProviderInterface $columnsStateProvider
-     */
     public function __construct(DatagridStateProviderInterface $columnsStateProvider)
     {
         $this->columnsStateProvider = $columnsStateProvider;
@@ -66,6 +63,7 @@ class ColumnsExtension extends AbstractExtension
 
         $columnsState = $this->columnsStateProvider->getState($datagridConfiguration, $datagridParameters);
         $this->setColumnsState($metadata, $columnsState);
+        $this->updateMetadataVisibility($metadata);
         $this->updateMetadataColumns($metadata, $columnsState);
 
         $defaultColumnsState = $this->columnsStateProvider->getDefaultState($datagridConfiguration);
@@ -73,19 +71,11 @@ class ColumnsExtension extends AbstractExtension
         $this->updateMetadataDefaultGridView($metadata, $defaultColumnsState);
     }
 
-    /**
-     * @param MetadataObject $metadata
-     * @param array $columnsState
-     */
     private function setInitialColumnsState(MetadataObject $metadata, array $columnsState): void
     {
         $metadata->offsetAddToArray('initialState', ['columns' => $columnsState]);
     }
 
-    /**
-     * @param MetadataObject $metadata
-     * @param array $columnsState
-     */
     private function updateMetadataDefaultGridView(MetadataObject $metadata, array $columnsState): void
     {
         $defaultGridViewKey = array_search(
@@ -102,19 +92,11 @@ class ColumnsExtension extends AbstractExtension
         }
     }
 
-    /**
-     * @param MetadataObject $metadata
-     * @param array $columnsState
-     */
     private function setColumnsState(MetadataObject $metadata, array $columnsState): void
     {
         $metadata->offsetAddToArray('state', ['columns' => $columnsState]);
     }
 
-    /**
-     * @param MetadataObject $metadata
-     * @param array $columnsState
-     */
     private function updateMetadataColumns(MetadataObject $metadata, array $columnsState): void
     {
         $columns = $metadata->offsetGetOr('columns', []);
@@ -136,5 +118,19 @@ class ColumnsExtension extends AbstractExtension
                 );
             }
         }
+    }
+
+    private function updateMetadataVisibility(MetadataObject $metadata): void
+    {
+        $columns = $metadata->offsetGetOr(Configuration::COLUMNS_KEY, []);
+        $columns = array_filter(array_map(function ($columnData) {
+            if ($columnData[PropertyInterface::DISABLED_KEY] ?? false) {
+                return null;
+            }
+
+            return $columnData;
+        }, $columns));
+
+        $metadata->offsetSet(Configuration::COLUMNS_KEY, $columns);
     }
 }

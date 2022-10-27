@@ -11,9 +11,6 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
 {
     protected $eventSubscriber;
 
-    /**
-     * @param EventSubscriberInterface $eventSubscriber
-     */
     public function __construct(EventSubscriberInterface $eventSubscriber)
     {
         $this->eventSubscriber = $eventSubscriber;
@@ -30,8 +27,8 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
-    public function getExtendedType()
+    public static function getExtendedTypes(): iterable
     {
-        return ConfigType::class;
+        return [ConfigType::class];
     }
 }

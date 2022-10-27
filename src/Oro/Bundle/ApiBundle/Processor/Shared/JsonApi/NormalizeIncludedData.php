@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -32,8 +32,6 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeIncludedData implements ProcessorInterface
 {
-    const UPDATE_META = 'update';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -61,15 +59,6 @@ class NormalizeIncludedData implements ProcessorInterface
     /** @var EntityMetadata[] */
     private $entityMetadata;
 
-    /**
-     * @param DoctrineHelper              $doctrineHelper
-     * @param EntityInstantiator          $entityInstantiator
-     * @param EntityLoader                $entityLoader
-     * @param ValueNormalizer             $valueNormalizer
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     * @param ConfigProvider              $configProvider
-     * @param MetadataProvider            $metadataProvider
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityInstantiator $entityInstantiator,
@@ -222,15 +211,15 @@ class NormalizeIncludedData implements ProcessorInterface
      */
     protected function getUpdateFlag($pointer, $data)
     {
-        if (empty($data[JsonApiDoc::META]) || !array_key_exists(self::UPDATE_META, $data[JsonApiDoc::META])) {
+        if (empty($data[JsonApiDoc::META]) || !array_key_exists(JsonApiDoc::META_UPDATE, $data[JsonApiDoc::META])) {
             return false;
         }
 
-        $flag = $data[JsonApiDoc::META][self::UPDATE_META];
+        $flag = $data[JsonApiDoc::META][JsonApiDoc::META_UPDATE];
         if (true !== $flag && false !== $flag) {
             $this->addValidationError(
                 Constraint::VALUE,
-                $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), self::UPDATE_META),
+                $this->buildPointer($this->buildPointer($pointer, JsonApiDoc::META), JsonApiDoc::META_UPDATE),
                 'This value should be boolean.'
             );
             $flag = null;
@@ -239,25 +228,18 @@ class NormalizeIncludedData implements ProcessorInterface
         return $flag;
     }
 
-    /**
-     * @param string $pointer
-     * @param string $entityType
-     *
-     * @return string|null
-     */
-    protected function getEntityClass($pointer, $entityType)
+    protected function getEntityClass(string $pointer, string $entityType): ?string
     {
-        $entityClass = ValueNormalizerUtil::convertToEntityClass(
+        $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
             $entityType,
-            $this->context->getRequestType(),
-            false
+            $this->context->getRequestType()
         );
         if ($entityClass) {
             return $entityClass;
         }
 
-        $this->addValidationError(Constraint::ENTITY_TYPE, $pointer);
+        $this->addValidationError(Constraint::ENTITY_TYPE, $pointer, sprintf('Unknown entity type: %s.', $entityType));
 
         return null;
     }
@@ -287,11 +269,6 @@ class NormalizeIncludedData implements ProcessorInterface
         return null;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     protected function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
@@ -372,14 +349,14 @@ class NormalizeIncludedData implements ProcessorInterface
     }
 
     /**
-     * @param string $parentPath
+     * @param string $parentPointer
      * @param string $property
      *
      * @return string
      */
-    protected function buildPointer($parentPath, $property)
+    protected function buildPointer($parentPointer, $property)
     {
-        return $parentPath . '/' . $property;
+        return $parentPointer . '/' . $property;
     }
 
     /**

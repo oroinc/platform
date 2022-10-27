@@ -2,38 +2,36 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\AttributeAssembler;
 use Oro\Component\Action\Exception\AssemblerException;
-use Symfony\Bundle\FrameworkBundle\Tests\Templating\Helper\Fixtures\StubTranslator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TranslatorInterface */
-    protected $translator;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->translator = new StubTranslator();
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(static fn (string $key) => sprintf('[trans]%s[/trans]', $key));
     }
 
     /**
      * @dataProvider invalidOptionsDataProvider
-     *
-     * @param array $configuration
-     * @param string $exception
-     * @param string $message
      */
-    public function testAssembleRequiredOptionException($configuration, $exception, $message)
+    public function testAssembleRequiredOptionException(array $configuration, string $exception, string $message): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
 
-        $assembler = new AttributeAssembler($this->getAttributeGuesser(), $this->translator);
+        $assembler = new AttributeAssembler($this->createMock(AttributeGuesser::class), $this->translator);
         $definition = $this->getWorkflowDefinition();
         $assembler->assemble($definition, $configuration);
     }
@@ -41,133 +39,123 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getWorkflowDefinition()
+    private function getWorkflowDefinition()
     {
         $definition = $this->createMock(WorkflowDefinition::class);
-        $definition->expects($this->any())->method('getLabel')->willReturn('test_workflow_label');
+        $definition->expects($this->any())
+            ->method('getLabel')
+            ->willReturn('test_workflow_label');
 
         return $definition;
     }
 
-    /**
-     * @return AttributeGuesser|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getAttributeGuesser()
+    public function invalidOptionsDataProvider(): array
     {
-        $guesser = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeGuesser')
-            ->disableOriginalConstructor()
-            ->getMock();
-        return $guesser;
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidOptionsDataProvider()
-    {
-        return array(
-            'no_options' => array(
-                array('name' => array('property_path' => null)),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Option "label" is required'
-            ),
-            'no_type' => array(
-                array('name' => array('label' => 'test', 'property_path' => null)),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Option "type" is required'
-            ),
-            'no_label' => array(
-                array('name' => array('type' => 'test', 'property_path' => null)),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Option "label" is required'
-            ),
-            'invalid_type' => array(
-                array('name' => array('label' => 'Label', 'type' => 'text', 'property_path' => null)),
-                'Oro\Component\Action\Exception\AssemblerException',
+        return [
+            'no_options' => [
+                ['name' => ['property_path' => null]],
+                AssemblerException::class,
+                'Option "label" is required',
+            ],
+            'no_type' => [
+                ['name' => ['label' => 'test', 'property_path' => null]],
+                AssemblerException::class,
+                'Option "type" is required',
+            ],
+            'no_label' => [
+                ['name' => ['type' => 'test', 'property_path' => null]],
+                AssemblerException::class,
+                'Option "label" is required',
+            ],
+            'invalid_type' => [
+                ['name' => ['label' => 'Label', 'type' => 'text', 'property_path' => null]],
+                AssemblerException::class,
                 'Invalid attribute type "text", allowed types are "bool", "boolean", "int", "integer", ' .
-                    '"float", "string", "array", "object", "entity"'
-            ),
+                '"float", "string", "array", "object", "entity"',
+            ],
             'can_not_guess_type' => [
                 ['test_name' => ['property_path' => 'test.property']],
                 AssemblerException::class,
                 'Workflow "[trans]test_workflow_label[/trans]": Option "type" for attribute "test_name" ' .
-                'with property path "test.property" can not be guessed'
+                'with property path "test.property" can not be guessed',
             ],
-            'invalid_type_class' => array(
-                array(
-                    'name' => array(
-                        'label' => 'Label', 'type' => 'string', 'options' => array('class' => 'stdClass'),
-                        'property_path' => null
-                    )
-                ),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Option "class" cannot be used in attribute "name"'
-            ),
-            'missing_object_class' => array(
-                array('name' => array('label' => 'Label', 'type' => 'object', 'property_path' => null)),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Option "class" is required in attribute "name"'
-            ),
-            'missing_entity_class' => array(
-                array('name' => array('label' => 'Label', 'type' => 'entity', 'property_path' => null)),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Option "class" is required in attribute "name"'
-            ),
-            'invalid_class' => array(
-                array(
-                    'name' => array(
-                        'label' => 'Label', 'type' => 'object', 'options' => array('class' => 'InvalidClass'),
-                        'property_path' => null
-                    )
-                ),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Class "InvalidClass" referenced by "class" option in attribute "name" not found'
-            ),
-            'not_allowed_entity_acl' => array(
-                array(
-                    'name' => array(
-                        'label' => 'Label', 'type' => 'object', 'options' => array('class' => 'stdClass'),
-                        'entity_acl' => array('update' => false),
-                    )
-                ),
-                'Oro\Component\Action\Exception\AssemblerException',
-                'Attribute "Label" with type "object" can\'t have entity ACL'
-            ),
-        );
+            'invalid_type_class' => [
+                [
+                    'name' => [
+                        'label' => 'Label',
+                        'type' => 'string',
+                        'options' => ['class' => 'stdClass'],
+                        'property_path' => null,
+                    ],
+                ],
+                AssemblerException::class,
+                'Option "class" cannot be used in attribute "name"',
+            ],
+            'missing_object_class' => [
+                ['name' => ['label' => 'Label', 'type' => 'object', 'property_path' => null]],
+                AssemblerException::class,
+                'Option "class" is required in attribute "name"',
+            ],
+            'missing_entity_class' => [
+                ['name' => ['label' => 'Label', 'type' => 'entity', 'property_path' => null]],
+                AssemblerException::class,
+                'Option "class" is required in attribute "name"',
+            ],
+            'invalid_class' => [
+                [
+                    'name' => [
+                        'label' => 'Label',
+                        'type' => 'object',
+                        'options' => ['class' => 'InvalidClass'],
+                        'property_path' => null,
+                    ],
+                ],
+                AssemblerException::class,
+                'Class "InvalidClass" referenced by "class" option in attribute "name" not found',
+            ],
+            'not_allowed_entity_acl' => [
+                [
+                    'name' => [
+                        'label' => 'Label',
+                        'type' => 'object',
+                        'options' => ['class' => 'stdClass'],
+                        'entity_acl' => ['update' => false],
+                    ],
+                ],
+                AssemblerException::class,
+                'Attribute "Label" with type "object" can\'t have entity ACL',
+            ],
+        ];
     }
 
     /**
      * @dataProvider configurationDataProvider
-     * @param array $configuration
-     * @param Attribute $expectedAttribute
-     * @param array $guessedParameters
-     * @param array $transitionConfigurations
      */
     public function testAssemble(
-        $configuration,
-        $expectedAttribute,
+        array $configuration,
+        Attribute $expectedAttribute,
         array $guessedParameters = [],
         array $transitionConfigurations = []
-    ) {
-        $relatedEntity = '\stdClass';
+    ): void {
+        $relatedEntity = \stdClass::class;
 
-        $attributeGuesser = $this->getAttributeGuesser();
+        $attributeGuesser = $this->createMock(AttributeGuesser::class);
         $attributeConfiguration = current($configuration);
         if ($guessedParameters && array_key_exists('property_path', $attributeConfiguration)) {
             $attributeGuesser->expects($this->any())
                 ->method('guessParameters')
                 ->with($relatedEntity, $attributeConfiguration['property_path'])
-                ->will($this->returnValue($guessedParameters));
+                ->willReturn($guessedParameters);
         }
 
         $assembler = new AttributeAssembler($attributeGuesser, $this->translator);
         $definition = $this->getWorkflowDefinition();
         $definition->expects($this->once())
             ->method('getEntityAttributeName')
-            ->will($this->returnValue('entity_attribute'));
+            ->willReturn('entity_attribute');
         $definition->expects($this->any())
             ->method('getRelatedEntity')
-            ->will($this->returnValue($relatedEntity));
+            ->willReturn($relatedEntity);
 
         $expectedAttributesCount = count($configuration) + count($transitionConfigurations);
         if (!array_key_exists('entity_attribute', $configuration)) {
@@ -175,7 +163,7 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
         }
 
         $attributes = $assembler->assemble($definition, $configuration, $transitionConfigurations);
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $attributes);
+        $this->assertInstanceOf(ArrayCollection::class, $attributes);
         $this->assertCount($expectedAttributesCount, $attributes);
         $this->assertTrue($attributes->containsKey($expectedAttribute->getName()));
 
@@ -184,185 +172,203 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function configurationDataProvider()
+    public function configurationDataProvider(): array
     {
-        return array(
-            'string' => array(
-                array(
-                    'attribute_one' => array('label' => 'label', 'type' => 'string', 'property_path' => null)),
-                $this->getAttribute('attribute_one', 'label', 'string')
-            ),
-            'bool' => array(
-                array('attribute_one' => array('label' => 'label', 'type' => 'bool', 'property_path' => null)),
-                $this->getAttribute('attribute_one', 'label', 'bool')
-            ),
-            'boolean' => array(
-                array('attribute_one' => array('label' => 'label', 'type' => 'boolean', 'property_path' => null)),
-                $this->getAttribute('attribute_one', 'label', 'boolean')
-            ),
-            'int' => array(
-                array('attribute_one' => array('label' => 'label', 'type' => 'int', 'property_path' => null)),
-                $this->getAttribute('attribute_one', 'label', 'int')
-            ),
-            'integer' => array(
-                array('attribute_one' => array('label' => 'label', 'type' => 'integer', 'property_path' => null)),
-                $this->getAttribute('attribute_one', 'label', 'integer')
-            ),
-            'float' => array(
-                array('attribute_one' => array('label' => 'label', 'type' => 'float', 'property_path' => null)),
-                $this->getAttribute('attribute_one', 'label', 'float')
-            ),
-            'array' => array(
-                array('attribute_one' => array('label' => 'label', 'type' => 'array', 'property_path' => null)
-                ),
-                $this->getAttribute('attribute_one', 'label', 'array')
-            ),
-            'object' => array(
-                array(
-                    'attribute_one' => array(
+        return [
+            'string' => [
+                [
+                    'attribute_one' => ['label' => 'label', 'type' => 'string', 'property_path' => null],
+                ],
+                $this->getAttribute('attribute_one', 'label', 'string'),
+            ],
+            'bool' => [
+                ['attribute_one' => ['label' => 'label', 'type' => 'bool', 'property_path' => null]],
+                $this->getAttribute('attribute_one', 'label', 'bool'),
+            ],
+            'boolean' => [
+                ['attribute_one' => ['label' => 'label', 'type' => 'boolean', 'property_path' => null]],
+                $this->getAttribute('attribute_one', 'label', 'boolean'),
+            ],
+            'int' => [
+                ['attribute_one' => ['label' => 'label', 'type' => 'int', 'property_path' => null]],
+                $this->getAttribute('attribute_one', 'label', 'int'),
+            ],
+            'integer' => [
+                ['attribute_one' => ['label' => 'label', 'type' => 'integer', 'property_path' => null]],
+                $this->getAttribute('attribute_one', 'label', 'integer'),
+            ],
+            'float' => [
+                ['attribute_one' => ['label' => 'label', 'type' => 'float', 'property_path' => null]],
+                $this->getAttribute('attribute_one', 'label', 'float'),
+            ],
+            'array' => [
+                [
+                    'attribute_one' => ['label' => 'label', 'type' => 'array', 'property_path' => null],
+                ],
+                $this->getAttribute('attribute_one', 'label', 'array'),
+            ],
+            'object' => [
+                [
+                    'attribute_one' => [
                         'label' => 'label',
                         'type' => 'object',
-                        'options' => array('class' => 'stdClass'),
-                        'property_path' => null
-                    )
-                ),
-                $this->getAttribute('attribute_one', 'label', 'object', array('class' => 'stdClass'))
-            ),
-            'entity_minimal' => array(
-                array(
-                    'attribute_one' => array(
+                        'options' => ['class' => 'stdClass'],
+                        'property_path' => null,
+                    ],
+                ],
+                $this->getAttribute('attribute_one', 'label', 'object', ['class' => 'stdClass']),
+            ],
+            'entity_minimal' => [
+                [
+                    'attribute_one' => [
                         'label' => 'label',
                         'type' => 'entity',
-                        'options' => array('class' => 'stdClass'),
-                        'property_path' => null
-                    )
-                ),
+                        'options' => ['class' => 'stdClass'],
+                        'property_path' => null,
+                    ],
+                ],
                 $this->getAttribute(
                     'attribute_one',
                     'label',
                     'entity',
-                    array('class' => 'stdClass')
-                )
-            ),
-            'with_related_entity' => array(
-                array(
-                    'entity_attribute' => array(
+                    ['class' => 'stdClass']
+                ),
+            ],
+            'with_related_entity' => [
+                [
+                    'entity_attribute' => [
                         'label' => 'label',
                         'type' => 'entity',
-                        'options' => array('class' => 'stdClass'),
-                        'property_path' => null
-                    )
-                ),
+                        'options' => ['class' => 'stdClass'],
+                        'property_path' => null,
+                    ],
+                ],
                 $this->getAttribute(
                     'entity_attribute',
                     'label',
                     'entity',
-                    array('class' => 'stdClass')
-                )
-            ),
-            'with_entity_acl' => array(
-                array(
-                    'attribute_one' => array(
+                    ['class' => 'stdClass']
+                ),
+            ],
+            'with_default' => [
+                [
+                    'attribute_one' => [
+                        'label' => 'label',
+                        'type' => 'string',
+                        'options' => [],
+                        'default' => 'sample_value',
+                        'property_path' => null,
+                    ],
+                ],
+                $this->getAttribute(
+                    'attribute_one',
+                    'label',
+                    'string',
+                    [],
+                    'sample_value',
+                    null,
+                    []
+                ),
+            ],
+            'with_entity_acl' => [
+                [
+                    'attribute_one' => [
                         'label' => 'label',
                         'type' => 'entity',
-                        'options' => array('class' => 'stdClass'),
+                        'options' => ['class' => 'stdClass'],
                         'property_path' => null,
-                        'entity_acl' => array('update' => false),
-                    )
-                ),
+                        'entity_acl' => ['update' => false],
+                    ],
+                ],
                 $this->getAttribute(
                     'attribute_one',
                     'label',
                     'entity',
-                    array('class' => 'stdClass'),
+                    ['class' => 'stdClass'],
                     null,
-                    array('update' => false)
-                )
-            ),
-            'entity_minimal_guessed_parameters' => array(
-                array(
-                    'attribute_one' => array(
-                        'property_path' => 'entity.field'
-                    )
+                    null,
+                    ['update' => false]
                 ),
+            ],
+            'entity_minimal_guessed_parameters' => [
+                [
+                    'attribute_one' => [
+                        'property_path' => 'entity.field',
+                    ],
+                ],
                 $this->getAttribute(
                     'attribute_one',
                     'label',
                     'entity',
-                    array('class' => 'stdClass'),
+                    ['class' => 'stdClass'],
+                    null,
                     'entity.field'
                 ),
-                'guessedParameters' => array(
+                'guessedParameters' => [
                     'label' => 'label',
                     'type' => 'entity',
-                    'options' => array('class' => 'stdClass'),
-                ),
-            ),
-            'entity_full_guessed_parameters' => array(
-                array(
-                    'attribute_one' => array(
+                    'options' => ['class' => 'stdClass'],
+                ],
+            ],
+            'entity_full_guessed_parameters' => [
+                [
+                    'attribute_one' => [
                         'label' => 'label',
                         'type' => 'entity',
-                        'options' => array('class' => 'stdClass'),
-                        'property_path' => 'entity.field'
-                    )
-                ),
+                        'options' => ['class' => 'stdClass'],
+                        'property_path' => 'entity.field',
+                    ],
+                ],
                 $this->getAttribute(
                     'attribute_one',
                     'label',
                     'entity',
-                    array('class' => 'stdClass'),
+                    ['class' => 'stdClass'],
+                    null,
                     'entity.field'
                 ),
-                'guessedParameters' => array(
+                'guessedParameters' => [
                     'label' => 'guessed label',
                     'type' => 'object',
-                    'options' => array('class' => 'GuessedClass'),
-                ),
-            ),
-            'add_init_context_attribute' => array(
-                array(),
+                    'options' => ['class' => 'GuessedClass'],
+                ],
+            ],
+            'add_init_context_attribute' => [
+                [],
                 $this->getAttribute(
                     'attribute_one',
                     'attribute_one',
                     'object',
-                    array('class' => ButtonSearchContext::class)
+                    ['class' => ButtonSearchContext::class]
                 ),
-                array(),
-                array(
-                    'transition1' => array('init_context_attribute' => 'attribute_one'),
-                    'transition2' => array('init_context_attribute' => 'source')
-                )
-            ),
-        );
+                [],
+                [
+                    'transition1' => ['init_context_attribute' => 'attribute_one'],
+                    'transition2' => ['init_context_attribute' => 'source'],
+                ],
+            ],
+        ];
     }
 
-    /**
-     * @param string $name
-     * @param string $label
-     * @param string $type
-     * @param array $options
-     * @param string $propertyPath
-     * @param array $entityAcl
-     * @return Attribute
-     */
-    protected function getAttribute(
-        $name,
-        $label,
-        $type,
-        array $options = array(),
-        $propertyPath = null,
-        array $entityAcl = array()
-    ) {
+    private function getAttribute(
+        string $name,
+        string $label,
+        string $type,
+        array $options = [],
+        mixed $default = null,
+        string $propertyPath = null,
+        array $entityAcl = []
+    ): Attribute {
         $attribute = new Attribute();
         $attribute->setName($name);
         $attribute->setLabel($label);
         $attribute->setType($type);
         $attribute->setOptions($options);
+        $attribute->setDefault($default);
         $attribute->setPropertyPath($propertyPath);
         $attribute->setEntityAcl($entityAcl);
+
         return $attribute;
     }
 }

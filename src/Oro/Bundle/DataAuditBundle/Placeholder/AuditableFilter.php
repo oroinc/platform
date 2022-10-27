@@ -10,9 +10,6 @@ class AuditableFilter
     /** @var ConfigProvider */
     protected $configProvider;
 
-    /**
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;

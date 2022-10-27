@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type which can be used for autocomplete search any email recipient.
+ */
 class EmailAddressRecipientsType extends AbstractType
 {
     const NAME = 'oro_email_email_address_recipients';
@@ -20,9 +23,6 @@ class EmailAddressRecipientsType extends AbstractType
     /** @var ConfigManager */
     protected $cm;
 
-    /**
-     * @param ConfigManager $cm
-     */
     public function __construct(ConfigManager $cm)
     {
         $this->cm = $cm;
@@ -77,6 +77,7 @@ class EmailAddressRecipientsType extends AbstractType
                 'multiple'           => true,
                 'separator'          => EmailRecipientsHelper::EMAIL_IDS_SEPARATOR,
                 'route_name'         => 'oro_email_autocomplete_recipient',
+                'type'               => 'POST',
                 'minimumInputLength' => $this->cm->get('oro_email.minimum_input_length'),
                 'per_page'           => 100,
                 'containerCssClass'  => 'taggable-email',

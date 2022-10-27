@@ -4,44 +4,29 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UserBundle\Model\Gender;
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GenderProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var GenderProvider
-     */
-    protected $genderProvider;
+    /** @var GenderProvider */
+    private $genderProvider;
 
-    /**
-     * @var array
-     */
-    protected $expectedChoices = [
+    /** @var array */
+    private $expectedChoices = [
         'oro.user.gender.male.translated' => Gender::MALE,
         'oro.user.gender.female.translated' => Gender::FEMALE,
     ];
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(['trans'])
-            ->getMockForAbstractClass();
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->exactly(2))
             ->method('trans')
-            ->will(
-                $this->returnCallback(
-                    function ($id) {
-                        return $id . '.translated';
-                    }
-                )
-            );
+            ->willReturnCallback(function ($id) {
+                return $id . '.translated';
+            });
 
         $this->genderProvider = new GenderProvider($translator);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->genderProvider);
     }
 
     public function testGetChoices()
@@ -57,12 +42,11 @@ class GenderProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedLabel, $this->genderProvider->getLabelByName(Gender::MALE));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Unknown gender with name "alien"
-     */
     public function testGetLabelByNameUnknownGender()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Unknown gender with name "alien"');
+
         $this->genderProvider->getLabelByName('alien');
     }
 }

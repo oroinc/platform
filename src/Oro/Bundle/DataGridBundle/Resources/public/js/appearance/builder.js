@@ -1,11 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var tools = require('oroui/js/tools');
-    var error = require('oroui/js/error');
+    const $ = require('jquery');
+    const tools = require('oroui/js/tools');
+    const error = require('oroui/js/error');
+    const loadModules = require('oroui/js/app/services/load-modules');
 
-    var appearanceBuilder = {
+    const appearanceBuilder = {
         /**
          * Prepares and preloads all required class implementations for specified appearances
          *
@@ -23,7 +24,7 @@ define(function(require) {
                 deferred.resolve();
                 return;
             }
-            $.when.apply($, this.prepareAppearances(options.metadata.options.appearances, options))
+            $.when(...this.prepareAppearances(options.metadata.options.appearances, options))
                 .done(function() {
                     deferred.resolve();
                 }).fail(function(e) {
@@ -52,9 +53,8 @@ define(function(require) {
                 if (!appearance.plugin) {
                     return;
                 }
-                return tools.loadModuleAndReplace(appearance, 'plugin').then(function() {
-                    return appearance.plugin.processMetadata(appearance, gridConfiguration);
-                });
+                return loadModules.fromObjectProp(appearance, 'plugin')
+                    .then(() => appearance.plugin.processMetadata(appearance, gridConfiguration));
             });
         }
     };

@@ -4,7 +4,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
 
@@ -33,10 +33,10 @@ class LoadCountryRegionData extends AbstractFixture implements DependentFixtureI
     public function load(ObjectManager $manager)
     {
         foreach ($this->data as $regionReference => $countryReference) {
-            /** @var $region Region */
+            /** @var Region $region */
             $region = $this->getRegion($manager, $regionReference);
 
-            /** @var $country Country */
+            /** @var Country $country */
             $country = $this->getReference($countryReference);
             $country->addRegion($region);
         }

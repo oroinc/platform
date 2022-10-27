@@ -5,7 +5,6 @@ namespace Oro\Bundle\UserBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as JMS;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -13,6 +12,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Model\ExtendGroup;
 
 /**
+ * User group entity
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\GroupRepository")
  * @ORM\Table(
  *      name="oro_access_group",
@@ -33,9 +34,6 @@ use Oro\Bundle\UserBundle\Model\ExtendGroup;
  *              "group_name"="",
  *              "category"="account_management"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "activity"={
  *              "immutable"=true
  *          },
@@ -44,7 +42,6 @@ use Oro\Bundle\UserBundle\Model\ExtendGroup;
  *          }
  *      }
  * )
- * @JMS\ExclusionPolicy("ALL")
  */
 class Group extends ExtendGroup
 {
@@ -52,15 +49,11 @@ class Group extends ExtendGroup
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=30, nullable=false)
-     * @JMS\Type("string")
-     * @JMS\Expose
      * @ConfigField(
      *  defaultValues={
      *    "importexport"={
@@ -72,6 +65,8 @@ class Group extends ExtendGroup
     protected $name;
 
     /**
+     * @var Collection
+     *
      * @ORM\ManyToMany(targetEntity="Role")
      * @ORM\JoinTable(name="oro_user_access_group_role",
      *      joinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")},

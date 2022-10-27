@@ -11,18 +11,14 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Validates that the request data contains valid JSON.API object.
+ * Validates that the request data contains valid JSON:API object.
  */
 class ValidateRequestData implements ProcessorInterface
 {
     public const OPERATION_NAME = 'validate_request_data';
 
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
-    /**
-     * @param ValueNormalizer $valueNormalizer
-     */
     public function __construct(ValueNormalizer $valueNormalizer)
     {
         $this->valueNormalizer = $valueNormalizer;
@@ -56,12 +52,7 @@ class ValidateRequestData implements ProcessorInterface
     {
         $requestType = $context->getRequestType();
         $validator = new TypedRequestDataValidator(function ($entityType) use ($requestType) {
-            return ValueNormalizerUtil::convertToEntityClass(
-                $this->valueNormalizer,
-                $entityType,
-                $requestType,
-                false
-            );
+            return ValueNormalizerUtil::tryConvertToEntityClass($this->valueNormalizer, $entityType, $requestType);
         });
 
         if ($context->hasIdentifierFields()) {

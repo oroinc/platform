@@ -4,7 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GroupSearchProvider implements SearchProviderInterface
 {
@@ -14,10 +14,6 @@ class GroupSearchProvider implements SearchProviderInterface
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param ConfigBag $configBag
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ConfigBag $configBag, TranslatorInterface $translator)
     {
         $this->configBag = $configBag;

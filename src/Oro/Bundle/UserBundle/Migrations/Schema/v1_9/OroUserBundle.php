@@ -18,9 +18,6 @@ class OroUserBundle implements Migration
         self::addTitleColumn($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function addTitleColumn(Schema $schema)
     {
         $userTable = $schema->getTable('oro_user');

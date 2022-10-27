@@ -5,23 +5,18 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Serializer;
 use Oro\Bundle\LayoutBundle\Layout\Serializer\OptionValueBagNormalizer;
 use Oro\Component\Layout\OptionValueBag;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Serializer;
 
 class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var NormalizerInterface|DenormalizerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $serializer;
-
     /** @var OptionValueBagNormalizer */
-    protected $normalizer;
+    private $normalizer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->normalizer = new OptionValueBagNormalizer();
-        $this->serializer = new Serializer([$this->normalizer], [new JsonEncoder()]);
-        $this->normalizer->setSerializer($this->serializer);
+        $serializer = new Serializer([$this->normalizer], [new JsonEncoder()]);
+        $this->normalizer->setSerializer($serializer);
     }
 
     public function testSupportsNormalization()
@@ -35,12 +30,11 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testSupportsDenormalization()
     {
-        $this->assertFalse($this->normalizer->supportsDenormalization([], new \stdClass()));
+        $this->assertFalse($this->normalizer->supportsDenormalization([], \stdClass::class));
         $this->assertTrue($this->normalizer->supportsDenormalization([], OptionValueBag::class));
     }
 
     /**
-     * @param OptionValueBag $bag
      * @dataProvider optionsDataProvider
      */
     public function testNormalizeDenormalize(OptionValueBag $bag)
@@ -51,10 +45,7 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($bag, $denormalized);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'empty bag' => [
@@ -101,11 +92,7 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array $actions
-     * @return OptionValueBag
-     */
-    protected function createOptionValueBag(array $actions)
+    private function createOptionValueBag(array $actions): OptionValueBag
     {
         $bag = new OptionValueBag();
         foreach ($actions as $action) {

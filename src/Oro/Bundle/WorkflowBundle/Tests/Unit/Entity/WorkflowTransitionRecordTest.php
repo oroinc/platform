@@ -3,23 +3,18 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
+use Oro\Component\Testing\ReflectionUtil;
 
 class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowTransitionRecord
-     */
-    protected $transitionRecord;
+    /** @var WorkflowTransitionRecord */
+    private $transitionRecord;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transitionRecord = new WorkflowTransitionRecord();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->transitionRecord);
     }
 
     public function testGetId()
@@ -27,10 +22,8 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->transitionRecord->getId());
 
         $value = 42;
-        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord', 'id');
-        $idReflection->setAccessible(true);
-        $idReflection->setValue($this->transitionRecord, $value);
-        $this->assertEquals($value, $this->transitionRecord->getId());
+        ReflectionUtil::setId($this->transitionRecord, $value);
+        $this->assertSame($value, $this->transitionRecord->getId());
     }
 
     public function testGetSetWorkflowItem()
@@ -55,9 +48,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNull($this->transitionRecord->getStepFrom());
 
-        $value = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $value = $this->createMock(WorkflowStep::class);
         $this->assertEquals($this->transitionRecord, $this->transitionRecord->setStepFrom($value));
         $this->assertEquals($value, $this->transitionRecord->getStepFrom());
     }
@@ -66,9 +57,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNull($this->transitionRecord->getStepTo());
 
-        $value = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $value = $this->createMock(WorkflowStep::class);
         $this->assertEquals($this->transitionRecord, $this->transitionRecord->setStepTo($value));
         $this->assertEquals($value, $this->transitionRecord->getStepTo());
     }
@@ -77,7 +66,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertNull($this->transitionRecord->getTransitionDate());
         $this->transitionRecord->prePersist();
-        $this->assertInstanceOf('\DateTime', $this->transitionRecord->getTransitionDate());
-        $this->assertEquals(time(), $this->transitionRecord->getTransitionDate()->getTimestamp(), '', 5);
+        $this->assertInstanceOf(\DateTime::class, $this->transitionRecord->getTransitionDate());
+        $this->assertEqualsWithDelta(time(), $this->transitionRecord->getTransitionDate()->getTimestamp(), 5);
     }
 }

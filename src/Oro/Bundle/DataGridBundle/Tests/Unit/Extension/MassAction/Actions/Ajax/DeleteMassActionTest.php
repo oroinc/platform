@@ -10,12 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 class DeleteMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DeleteMassAction */
-    protected $action;
+    private $action;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = new DeleteMassAction();
     }

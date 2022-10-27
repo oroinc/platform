@@ -5,7 +5,11 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
 
-class MigrationQueryExecutor
+/**
+ * Executes the given query, pass the Connection to the Migration that implements ConnectionAwareInterface and
+ * processing dryRun
+ */
+class MigrationQueryExecutor implements MigrationQueryExecutorInterface
 {
     /**
      * @var Connection
@@ -17,9 +21,6 @@ class MigrationQueryExecutor
      */
     protected $logger;
 
-    /**
-     * @param Connection $connection
-     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
@@ -27,20 +28,16 @@ class MigrationQueryExecutor
 
     /**
      * Sets a logger
-     *
-     * @param LoggerInterface $logger
      */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
 
     /**
      * Gets a connection object this migration query executor works with
-     *
-     * @return Connection
      */
-    public function getConnection()
+    public function getConnection(): Connection
     {
         return $this->connection;
     }
@@ -51,7 +48,7 @@ class MigrationQueryExecutor
      * @param string|MigrationQuery $query
      * @param bool                  $dryRun
      */
-    public function execute($query, $dryRun)
+    public function execute($query, $dryRun): void
     {
         if ($query instanceof MigrationQuery) {
             if ($query instanceof ConnectionAwareInterface) {

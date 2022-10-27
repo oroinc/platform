@@ -1,13 +1,16 @@
 search:
     Oro\Bundle\UserBundle\Entity\User:
         alias:                          oro_user
-        title_fields:                   [username]
         route:
             name:                       oro_user_view
             parameters:
                 id:                     id
-        search_template:                OroUserBundle:Search:result.html.twig
+        search_template:                '@OroUser/Search/result.html.twig'
         fields:
+            -
+                name:                   id
+                target_type:            integer
+                target_fields:          [oro_user_id]
             -
                 name:                   username
                 target_type:            text
@@ -62,12 +65,17 @@ search:
                         target_fields: [email]
     Oro\Bundle\UserBundle\Entity\Role:
         alias:                          oro_access_role
-        title_fields:                   [label]
-        search_template:                OroUserBundle:Role:Search\result.html.twig
+        search_template:                '@OroUser/Role/Search/result.html.twig'
         route:
-            name:                       oro_user_role_index
+            name:                       oro_user_role_view
+            parameters:
+                id:                     id
         fields:
             -
                 name:                   label
                 target_type:            text
                 target_fields:          [label]
+            -
+                name:                   role
+                target_type:            text
+                target_fields:          [role]

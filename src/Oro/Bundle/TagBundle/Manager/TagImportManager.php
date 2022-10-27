@@ -28,11 +28,7 @@ class TagImportManager
      * @var array of ['tag_name' => Tag]
      */
     protected $loadedTags = [];
-    
-    /**
-     * @param TagStorage $tagStorage
-     * @param TaggableHelper $taggableHelper
-     */
+
     public function __construct(TagStorage $tagStorage, TaggableHelper $taggableHelper)
     {
         $this->tagStorage = $tagStorage;

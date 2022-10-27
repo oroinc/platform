@@ -31,9 +31,6 @@ abstract class AbstractAvgTimeProvider implements StatisticRepositoryAwareInterf
      */
     protected $averageTime = 0;
 
-    /**
-     * @param CriteriaArrayCollection $criteria
-     */
     public function __construct(CriteriaArrayCollection $criteria)
     {
         $this->criteria = $criteria;

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification;
 
+/**
+ * Find the relative path for the behat feature
+ */
 class FeaturePathLocator
 {
     /**

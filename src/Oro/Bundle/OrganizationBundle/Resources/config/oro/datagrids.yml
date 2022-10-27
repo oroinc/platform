@@ -1,12 +1,12 @@
 datagrids:
     business-unit-grid:
-        extended_entity_name: '%oro_organization.business_unit.entity.class%'
+        extended_entity_name: 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
         options:
-            entityHint: business units
+            entityHint: oro.organization.businessunit.entity_plural_label
             entity_pagination: true
-            mass_actions:
-                delete:
-                    enabled: false
+        mass_actions:
+            delete:
+                disabled: true
         source:
             type: orm
             skip_acl_apply: true
@@ -19,7 +19,7 @@ datagrids:
                     - u.createdAt
                     - owner.name as ownerName
                 from:
-                    - { table: '%oro_organization.business_unit.entity.class%', alias: u }
+                    - { table: 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit', alias: u }
                 join:
                     left:
                         owner:
@@ -93,7 +93,7 @@ datagrids:
                     data_name: u.createdAt
 
             default:
-                name: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                name: ASC
 
         filters:
             columns:
@@ -151,8 +151,8 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         filters:
             columns:
                 hasCurrentBusinessUnit:
@@ -176,16 +176,16 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1
         sorters:
             columns:
                 hasCurrentBusinessUnit:
                     data_name: hasCurrentBusinessUnit
             default:
-                hasCurrentBusinessUnit: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC'
+                hasCurrentBusinessUnit: DESC
         options:
-            entityHint: users
+            entityHint: oro.user.entity_plural_label
             rowSelection:
                 dataField: id
                 columnName: hasCurrentBusinessUnit
@@ -196,7 +196,7 @@ datagrids:
     bu-view-users-grid:
         extends: user-relation-grid
         options:
-            entityHint: users
+            entityHint: oro.user.entity_plural_label
         acl_resource: oro_business_unit_view
         source:
             query:
@@ -218,11 +218,11 @@ datagrids:
                 label: oro.user.enabled.label
                 frontend_type: select
                 choices:
-                   Disabled: 0
-                   Enabled: 1
+                    oro.user.datagrid.user.columns.disabled: 0
+                    oro.user.datagrid.user.columns.enabled: 1
         sorters:
             default:
-                lastName: '%oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC'
+                lastName: ASC
 
         filters:
             columns:
@@ -244,5 +244,5 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                Disabled: 2
-                                Enabled: 1
+                                oro.user.datagrid.user.filters.disabled: 2
+                                oro.user.datagrid.user.filters.enabled: 1

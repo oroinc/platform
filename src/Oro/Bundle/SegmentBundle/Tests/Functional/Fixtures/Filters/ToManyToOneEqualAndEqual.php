@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\UserBundle\Entity\Email;
@@ -57,7 +58,8 @@ class ToManyToOneEqualAndEqual implements FixtureInterface
             ->setOwner($businessUnitA)
             ->setBusinessUnits(new ArrayCollection([
                 $businessUnitA,
-            ]));
+            ]))
+            ->setOrganization($organization);
         $user2 = (new User())
             ->setUsername('u2')
             ->setEmail('u2@example.com')
@@ -70,7 +72,8 @@ class ToManyToOneEqualAndEqual implements FixtureInterface
             ->setBusinessUnits(new ArrayCollection([
                 $businessUnitA,
                 $businessUnitB,
-            ]));
+            ]))
+            ->setOrganization($organization);
 
         $em->persist($businessUnitA);
         $em->persist($businessUnitB);
@@ -96,7 +99,7 @@ class ToManyToOneEqualAndEqual implements FixtureInterface
                     ->findOneByName(SegmentType::TYPE_DYNAMIC)
             )
             ->setEntity(BusinessUnit::class)
-            ->setDefinition(json_encode([
+            ->setDefinition(QueryDefinitionUtil::encodeDefinition([
                 'columns' => [
                     [
                         'name' => 'name',

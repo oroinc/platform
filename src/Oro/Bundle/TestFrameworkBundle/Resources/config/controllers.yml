@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\TestFrameworkBundle\Controller\ItemController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\TestFrameworkBundle\Controller\ItemValueController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\TestFrameworkBundle\Controller\WorkflowAwareEntityController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

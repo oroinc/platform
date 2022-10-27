@@ -1,0 +1,5 @@
+imports:
+    - { resource: parameters.yml }
+
+parameters:
+    configParam1: configParam1GlobalValue

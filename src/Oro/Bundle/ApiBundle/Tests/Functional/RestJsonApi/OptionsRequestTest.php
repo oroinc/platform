@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OptionsRequestTest extends RestJsonApiTestCase
 {
     public function testOptionsMethodForItemRoute()
@@ -25,7 +28,7 @@ class OptionsRequestTest extends RestJsonApiTestCase
             $this->getListRouteName(),
             ['entity' => $entityType]
         );
-        self::assertAllowResponseHeader($response, 'OPTIONS, GET, POST, DELETE');
+        self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, POST, DELETE');
     }
 
     public function testOptionsMethodForToOneRelationshipRoute()
@@ -203,14 +206,7 @@ class OptionsRequestTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testTryOptionsMethodForSubresourceRouteWithUnknownAssociation()
@@ -222,13 +218,6 @@ class OptionsRequestTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 }

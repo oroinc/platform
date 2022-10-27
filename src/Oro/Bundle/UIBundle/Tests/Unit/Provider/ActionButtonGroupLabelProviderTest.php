@@ -3,18 +3,19 @@
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetLabelWithDefaultGroupAndWithoutEntityClass()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $provider   = new ActionButtonGroupLabelProvider($translator);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $provider = new ActionButtonGroupLabelProvider($translator);
 
         $translator->expects($this->once())
             ->method('trans')
             ->with(ActionButtonGroupLabelProvider::DEFAULT_LABEL)
-            ->will($this->returnValue('Label'));
+            ->willReturn('Label');
 
         $this->assertEquals(
             'Label',
@@ -24,13 +25,13 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLabelWithoutEntityClass()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $provider   = new ActionButtonGroupLabelProvider($translator);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $provider = new ActionButtonGroupLabelProvider($translator);
 
         $translator->expects($this->once())
             ->method('trans')
             ->with(sprintf(ActionButtonGroupLabelProvider::DEFAULT_GROUP_LABEL, 'test_group'))
-            ->will($this->returnValue('Label'));
+            ->willReturn('Label');
 
         $this->assertEquals(
             'Label',
@@ -40,13 +41,13 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLabelWithoutEntityPlaceholder()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $provider   = new ActionButtonGroupLabelProvider($translator);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $provider = new ActionButtonGroupLabelProvider($translator);
 
         $translator->expects($this->once())
             ->method('trans')
             ->with(ActionButtonGroupLabelProvider::DEFAULT_LABEL)
-            ->will($this->returnValue('Label'));
+            ->willReturn('Label');
 
         $this->assertEquals(
             'Label',
@@ -61,17 +62,19 @@ class ActionButtonGroupLabelProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLabel()
     {
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
-        $provider   = new ActionButtonGroupLabelProvider($translator);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $provider = new ActionButtonGroupLabelProvider($translator);
 
-        $translator->expects($this->at(0))
+        $translator->expects($this->exactly(2))
             ->method('trans')
-            ->with(ActionButtonGroupLabelProvider::DEFAULT_LABEL)
-            ->will($this->returnValue(ActionButtonGroupLabelProvider::ENTITY_NAME_PLACEHOLDER . ' Label'));
-        $translator->expects($this->at(1))
-            ->method('trans')
-            ->with('acme.product.entity_label')
-            ->will($this->returnValue('Product'));
+            ->withConsecutive(
+                [ActionButtonGroupLabelProvider::DEFAULT_LABEL],
+                ['acme.product.entity_label']
+            )
+            ->willReturnOnConsecutiveCalls(
+                ActionButtonGroupLabelProvider::ENTITY_NAME_PLACEHOLDER . ' Label',
+                'Product'
+            );
 
         $this->assertEquals(
             'Product Label',

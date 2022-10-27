@@ -54,7 +54,10 @@
                     {% block form %}
                         {{ form_start(form, {
                             'method': 'POST',
-                            'action': app.request.uri,
+                            'action': path(
+                                app.request.attributes.get('_route'),
+                                app.request.query.all|merge(app.request.request.all)|merge(app.request.attributes.get('_route_params'))|filter((v, k) => k != form.vars.name)
+                            ),
                             'attr': {
                                 'class': 'form-dialog',
                                 'data-nohash': 'true',

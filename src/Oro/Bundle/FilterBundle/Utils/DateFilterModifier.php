@@ -29,9 +29,6 @@ class DateFilterModifier
         DateModifierInterface::PART_YEAR  => 'Y',
     ];
 
-    /**
-     * @param Compiler $compiler
-     */
     public function __construct(Compiler $compiler)
     {
         $this->dateCompiler = $compiler;
@@ -42,7 +39,7 @@ class DateFilterModifier
      *
      * @param array $data
      * @param array $valueKeys
-     * @param bool  $compile
+     * @param bool $compile
      *
      * @return array
      */
@@ -62,12 +59,12 @@ class DateFilterModifier
             $data = $this->mapValues($valueKeys, $data, $this->getCompileClosure());
         }
 
-        $data['part'] = isset($data['part']) ? $data['part'] : null;
+        $data['part'] = $data['part'] ?? null;
 
         // change value type depending on date part
         if (array_key_exists($data['part'], static::$partFormatsMap)) {
             $format = static::$partFormatsMap[$data['part']];
-            $data   = $this->mapValues($valueKeys, $data, $this->getDatePartAccessorClosure($format));
+            $data = $this->mapValues($valueKeys, $data, $this->getDatePartAccessorClosure($format));
         } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
             $data = $this->mapValues($valueKeys, $data, $this->getQuarterMapValuesClosure());
         } elseif ($compile) {
@@ -104,6 +101,7 @@ class DateFilterModifier
      * @param array $data
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function modifyDateForEqualType(array $data)
     {
@@ -122,6 +120,7 @@ class DateFilterModifier
                     case DateModifierInterface::VAR_SOY:
                         $data['type'] = $this->convertEqualToBetweenType($isEqualType);
                         if ($isEqualType) {
+                            $data['value']['start'] = $this->dateFormat($result->getValue());
                             $data['value']['end'] = $this->modifyDate($result->getValue(), '1 day');
                         } else {
                             $data['value']['start'] = $data['value']['end'];
@@ -134,8 +133,10 @@ class DateFilterModifier
                             $data['value']['start'] = $data['value']['end'];
                         }
                         if (ExpressionResult::TYPE_DATE === $result->getSourceType()) {
+                            $data['value']['start'] = $this->dateFormat($result->getValue());
                             $data['value']['end'] = $this->modifyDate($result->getValue(), '1 day');
                         } else {
+                            $data['value']['start'] = $this->dateFormat($result->getValue());
                             $data['value']['end'] = $this->modifyDate($result->getValue(), '1 minute');
                         }
                         break;
@@ -185,6 +186,7 @@ class DateFilterModifier
      * @param array $data
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function modifyDateForBetweenType(array $data)
     {
@@ -251,20 +253,27 @@ class DateFilterModifier
 
     /**
      * @param \DateTime $date
-     * @param string    $modify
+     * @param string $modify
      *
      * @return string
      */
     protected function modifyDate(\DateTime $date, $modify)
     {
-        return (clone $date)->modify($modify)->format('Y-m-d H:i');
+        $date = (clone $date)->modify($modify);
+
+        return $this->dateFormat($date);
+    }
+
+    protected function dateFormat(\DateTime $date): string
+    {
+        return $date->format('Y-m-d H:i');
     }
 
     /**
      * Call callback for each of given value, used instead of array_map to walk safely through array
      *
-     * @param array    $keys
-     * @param array    $data
+     * @param array $keys
+     * @param array $data
      * @param \Closure $callback
      *
      * @return array
@@ -300,7 +309,7 @@ class DateFilterModifier
                     // returns values from 0 to 365.
                     // @see http://php.net/manual/en/function.date.php
                     if ('z' === $part) {
-                        $result ++;
+                        $result++;
                     }
                     return $result;
                     break;
@@ -316,7 +325,7 @@ class DateFilterModifier
     protected function getCompileClosure()
     {
         return function ($data) {
-            return $this->dateCompiler->compile($data);
+            return $this->dateCompiler->compile($data, false);
         };
     }
 
@@ -326,13 +335,12 @@ class DateFilterModifier
     protected function getQuarterMapValuesClosure()
     {
         return function ($data) {
-            $quarter = null;
             switch (true) {
                 case is_numeric($data):
                     $quarter = (int)$data;
                     break;
                 case ($data instanceof \DateTime):
-                    $month   = (int)$data->format('m');
+                    $month = (int)$data->format('m');
                     $quarter = ceil($month / 3);
                     break;
                 default:
@@ -349,9 +357,14 @@ class DateFilterModifier
     protected function getValueMapValuesClosure()
     {
         return function ($data) {
-            // html5 format for intl
-            return $data instanceof \DateTime ? $data->format('Y-m-d H:i') :
-                (is_numeric($data) ? sprintf('2015-%\'.02d-01 00:00', $data) : $data);
+            if ($data instanceof \DateTime) {
+                return (clone $data)->format('Y-m-d H:i:00\Z');
+            }
+            if (is_numeric($data)) {
+                return sprintf('2015-%02d-01 00:00:00\Z', $data);
+            }
+
+            return $data;
         };
     }
 }

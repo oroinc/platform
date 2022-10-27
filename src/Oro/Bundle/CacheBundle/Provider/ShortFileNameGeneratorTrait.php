@@ -7,9 +7,9 @@ namespace Oro\Bundle\CacheBundle\Provider;
  *
  * This trait can be used in a cache implementation bases on \Doctrine\Common\Cache\FileCache
  *
- * @method string getDirectory
- * @method string getExtension
- * @method string getNamespace
+ * @method string getDirectory()
+ * @method string getExtension()
+ * @method string getNamespace()
  */
 trait ShortFileNameGeneratorTrait
 {
@@ -22,8 +22,8 @@ trait ShortFileNameGeneratorTrait
     protected function getFilename($id)
     {
         $namespace = $this->getNamespace();
-        if ($namespace && strpos($id, $namespace) === 0) {
-            $id = substr($id, strlen($namespace));
+        if ($namespace && str_starts_with($id, $namespace)) {
+            $id = substr($id, \strlen($namespace));
         }
         $id = $this->removeSpecialChars($id);
 
@@ -44,6 +44,6 @@ trait ShortFileNameGeneratorTrait
      */
     protected function removeSpecialChars($str)
     {
-        return preg_replace('@[\\\/:"*?<>|]+@', '', $str);
+        return preg_replace('@[\\\/\:\"\*\?\<\>\|]+@', '', $str);
     }
 }

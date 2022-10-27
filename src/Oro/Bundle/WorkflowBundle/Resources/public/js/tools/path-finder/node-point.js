@@ -2,7 +2,7 @@ define(['./extends', './point2d', './directions', './connection'
 ], function(__extends, Point2d, directions, Connection) {
     'use strict';
 
-    var directionIds = [
+    const directionIds = [
         directions.BOTTOM_TO_TOP.id,
         directions.TOP_TO_BOTTOM.id,
         directions.LEFT_TO_RIGHT.id,
@@ -33,7 +33,7 @@ define(['./extends', './point2d', './directions', './connection'
     Object.defineProperty(NodePoint.prototype, 'recommendedX', {
         get: function() {
             if (this.vAxis) {
-                var recommendation = this.vAxis.recommendedPosition;
+                const recommendation = this.vAxis.recommendedPosition;
                 if (recommendation !== undefined) {
                     return recommendation;
                 }
@@ -52,7 +52,7 @@ define(['./extends', './point2d', './directions', './connection'
     Object.defineProperty(NodePoint.prototype, 'recommendedY', {
         get: function() {
             if (this.hAxis) {
-                var recommendation = this.hAxis.recommendedPosition;
+                const recommendation = this.hAxis.recommendedPosition;
                 if (recommendation !== undefined) {
                     return recommendation;
                 }
@@ -97,8 +97,8 @@ define(['./extends', './point2d', './directions', './connection'
      * @param {Function} fn
      */
     NodePoint.prototype.eachConnection = function(fn) {
-        for (var i = 0; i < directionIds.length; i++) {
-            var conn = this.connections[directionIds[i]];
+        for (let i = 0; i < directionIds.length; i++) {
+            const conn = this.connections[directionIds[i]];
             if (conn) {
                 fn(conn);
             }
@@ -112,8 +112,8 @@ define(['./extends', './point2d', './directions', './connection'
      * @param {Function} fn
      */
     NodePoint.prototype.eachTraversableConnection = function(from, fn) {
-        for (var i = 0; i < directionIds.length; i++) {
-            var conn = this.connections[directionIds[i]];
+        for (let i = 0; i < directionIds.length; i++) {
+            const conn = this.connections[directionIds[i]];
             if (conn && conn !== from && conn.traversable) {
                 fn(conn.second(this), conn);
             }
@@ -126,7 +126,7 @@ define(['./extends', './point2d', './directions', './connection'
      * @returns {NodePoint}
      */
     NodePoint.prototype.clone = function() {
-        var node = new NodePoint(this.x, this.y);
+        const node = new NodePoint(this.x, this.y);
         node.vAxis = this.vAxis;
         node.hAxis = this.hAxis;
         return node;
@@ -139,7 +139,7 @@ define(['./extends', './point2d', './directions', './connection'
      * @returns {NodePoint}
      */
     NodePoint.prototype.nextNode = function(direction) {
-        var connection = this.connections[direction.id];
+        const connection = this.connections[direction.id];
         return connection ? connection.second(this) : null;
     };
 

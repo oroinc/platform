@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 /**
+ * Container for entities' definition and their relations
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class PropertyConfigContainer
@@ -36,9 +37,6 @@ class PropertyConfigContainer
         return $this->config;
     }
 
-    /**
-     * @param $config
-     */
     public function setConfig($config)
     {
         $this->config = $config;
@@ -58,55 +56,6 @@ class PropertyConfigContainer
         return isset($this->config[$type]['items'])
             ? $this->config[$type]['items']
             : [];
-    }
-
-    /**
-     * @param string|ConfigIdInterface $type
-     * @param string|null              $fieldType
-     *
-     * @return array
-     */
-    public function getDefaultValues($type = self::TYPE_ENTITY, $fieldType = null)
-    {
-        $type = $this->getConfigType($type);
-
-        if (empty($this->config[$type]['items'])) {
-            return [];
-        }
-
-        if ($fieldType) {
-            if (isset($this->cache['defaults'][$type][$fieldType])) {
-                return $this->cache['defaults'][$type][$fieldType];
-            }
-        } else {
-            if (isset($this->cache['defaults'][$type])) {
-                return $this->cache['defaults'][$type];
-            }
-        }
-
-        $result = [];
-        if ($fieldType) {
-            foreach ($this->config[$type]['items'] as $code => $item) {
-                if (isset($item['options']['default_value'])
-                    && (
-                        !isset($item['options']['allowed_type'])
-                        || in_array($fieldType, $item['options']['allowed_type'], true)
-                    )
-                ) {
-                    $result[$code] = $item['options']['default_value'];
-                }
-            }
-            $this->cache['defaults'][$type][$fieldType] = $result;
-        } else {
-            foreach ($this->config[$type]['items'] as $code => $item) {
-                if (isset($item['options']['default_value'])) {
-                    $result[$code] = $item['options']['default_value'];
-                }
-            }
-            $this->cache['defaults'][$type] = $result;
-        }
-
-        return $result;
     }
 
     /**
@@ -200,6 +149,7 @@ class PropertyConfigContainer
      * @param string|null              $fieldType
      *
      * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function hasForm($type = self::TYPE_ENTITY, $fieldType = null)
     {
@@ -251,6 +201,7 @@ class PropertyConfigContainer
      * @param string|null              $fieldType
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getFormItems($type = self::TYPE_ENTITY, $fieldType = null)
     {
@@ -407,12 +358,12 @@ class PropertyConfigContainer
      *
      * @return array
      */
-    public function getRequireJsModules($type = self::TYPE_ENTITY)
+    public function getJsModules($type = self::TYPE_ENTITY)
     {
         $type = $this->getConfigType($type);
 
-        return isset($this->config[$type]['require_js'])
-            ? $this->config[$type]['require_js']
+        return isset($this->config[$type]['jsmodules'])
+            ? $this->config[$type]['jsmodules']
             : [];
     }
 

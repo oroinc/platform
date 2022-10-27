@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone()
@@ -127,14 +130,13 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The possible values for the direction are "input-only", "output-only" or "bidirectional".
-     */
-    // @codingStandardsIgnoreEnd
     public function testSetInvalidDirection()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'The possible values for the direction are "input-only", "output-only" or "bidirectional".'
+        );
+
         $config = new ActionFieldConfig();
 
         $config->setDirection('another');
@@ -200,5 +202,67 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config->addFormConstraint(new NotBlank());
         self::assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
         self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
+    }
+
+    public function testRemoveFormConstraint()
+    {
+        $config = new ActionFieldConfig();
+
+        self::assertNull($config->getFormOptions());
+        self::assertNull($config->getFormConstraints());
+
+        $config->removeFormConstraint(NotNull::class);
+        self::assertNull($config->getFormConstraints());
+
+        $config->setFormOption(
+            'constraints',
+            [
+                new NotNull(),
+                new NotBlank(),
+                [NotNull::class => ['message' => 'test']]
+            ]
+        );
+
+        $config->removeFormConstraint(NotNull::class);
+        self::assertEquals(['constraints' => [new NotBlank()]], $config->getFormOptions());
+
+        $config->removeFormConstraint(NotBlank::class);
+        self::assertNull($config->getFormOptions());
+    }
+
+    public function testPostProcessor()
+    {
+        $config = new ActionFieldConfig();
+        self::assertFalse($config->hasPostProcessor());
+        self::assertNull($config->getPostProcessor());
+
+        $config->setPostProcessor('test');
+        self::assertTrue($config->hasPostProcessor());
+        self::assertEquals('test', $config->getPostProcessor());
+        self::assertEquals(['post_processor' => 'test'], $config->toArray());
+
+        $config->setPostProcessor(null);
+        self::assertTrue($config->hasPostProcessor());
+        self::assertNull($config->getPostProcessor());
+        self::assertEquals(['post_processor' => null], $config->toArray());
+
+        $config->removePostProcessor();
+        self::assertFalse($config->hasPostProcessor());
+        self::assertNull($config->getPostProcessor());
+        self::assertEquals([], $config->toArray());
+    }
+
+    public function testPostProcessorOptions()
+    {
+        $config = new ActionFieldConfig();
+        self::assertNull($config->getPostProcessorOptions());
+
+        $config->setPostProcessorOptions(['key' => 'val']);
+        self::assertEquals(['key' => 'val'], $config->getPostProcessorOptions());
+        self::assertEquals(['post_processor_options' => ['key' => 'val']], $config->toArray());
+
+        $config->setPostProcessorOptions(null);
+        self::assertNull($config->getPostProcessorOptions());
+        self::assertEquals([], $config->toArray());
     }
 }

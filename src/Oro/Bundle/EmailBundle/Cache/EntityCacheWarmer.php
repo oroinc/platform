@@ -6,7 +6,13 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmer;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
+/**
+ * Generates proxy classes for EmailAddress entity to dynamically extend it
+ * based on configuration of available email owner providers.
+ */
 class EntityCacheWarmer extends CacheWarmer
 {
     /**
@@ -87,24 +93,21 @@ class EntityCacheWarmer extends CacheWarmer
     }
 
     /**
-     * Create Twig_Environment object
+     * Create Environment object
      *
-     * @return \Twig_Environment
+     * @return Environment
      */
     protected function createTwigEnvironment()
     {
         $entityTemplateDir = $this->kernel->locateResource('@OroEmailBundle/Resources/cache/Entity');
 
-        return new \Twig_Environment(new \Twig_Loader_Filesystem($entityTemplateDir));
+        return new Environment(new FilesystemLoader($entityTemplateDir));
     }
 
     /**
      * Create a proxy class for EmailAddress entity and save it in cache
-     *
-     * @param Filesystem        $fs
-     * @param \Twig_Environment $twig
      */
-    protected function processEmailAddressTemplate(Filesystem $fs, \Twig_Environment $twig)
+    protected function processEmailAddressTemplate(Filesystem $fs, Environment $twig)
     {
         // Ensure the cache directory exists
         if (!$fs->exists($this->entityCacheDir)) {

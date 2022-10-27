@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Doctrine\ORM\Query;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
 {
     public function testGrouping()
     {
-        $en               = 'Acme\Entity\TestEntity';
-        $definition       = [
+        $en = 'Acme\Entity\TestEntity';
+        $definition = [
             'columns'          => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => 'DESC'],
                 [
@@ -28,7 +29,7 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
             'filters'          => [],
             'grouping_columns' => [['name' => 'column1']],
         ];
-        $doctrine         = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => ['column1' => 'string', 'column2' => 'string']
             ]
@@ -44,11 +45,9 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, $functionProvider);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -71,12 +70,6 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                         'column1'                          => 'c1',
                         'column2(Count,string,aggregates)' => 'c2'
                     ],
-                ],
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
-                    ]
                 ]
             ],
             'columns' => [
@@ -107,14 +100,13 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage The grouping column "column2" must be declared in SELECT clause.
-     */
     public function testInvalidGrouping()
     {
-        $en               = 'Acme\Entity\TestEntity';
-        $definition       = [
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The grouping column "column2" must be declared in SELECT clause.');
+
+        $en = 'Acme\Entity\TestEntity';
+        $definition = [
             'columns'          => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => 'DESC'],
                 [
@@ -131,7 +123,7 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
             'filters'          => [],
             'grouping_columns' => [['name' => 'column2']],
         ];
-        $doctrine         = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => ['column1' => 'string'],
                 $en => ['column2' => 'string']
@@ -148,9 +140,7 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $this
             ->createDatagridConfigurationBuilder($model, $doctrine, $functionProvider)
             ->getConfiguration();
@@ -161,10 +151,10 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
      */
     public function testComplexQuery()
     {
-        $en         = 'Acme\Entity\TestEntity';
-        $en1        = 'Acme\Entity\TestEntity1';
-        $en2        = 'Acme\Entity\TestEntity2';
-        $en3        = 'Acme\Entity\TestEntity3';
+        $en = 'Acme\Entity\TestEntity';
+        $en1 = 'Acme\Entity\TestEntity1';
+        $en2 = 'Acme\Entity\TestEntity2';
+        $en3 = 'Acme\Entity\TestEntity3';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => 'DESC'],
@@ -208,7 +198,7 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                 ],
             ],
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en  => [
                     'column1' => 'string',
@@ -224,11 +214,9 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -292,12 +280,6 @@ class GroupingColumnsTest extends DatagridConfigurationBuilderTestCase
                                 ]
                             ],
                         ]
-                    ]
-                ],
-                'hints'        => [
-                    [
-                        'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
-                        'value' => 'Oro\Bundle\QueryDesignerBundle\QueryDesigner\SqlWalker',
                     ]
                 ]
             ],

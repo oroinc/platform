@@ -6,26 +6,22 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Component\Action\Action\Substring;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class SubstringTest extends \PHPUnit\Framework\TestCase
 {
-    const ATTRIBUTE_PATH = 'attribute';
-    const TEST_STRING = 'some test string';
+    private const ATTRIBUTE_PATH = 'attribute';
+    private const TEST_STRING = 'some test string';
 
-    /**
-     * @var Substring
-     */
+    /** @var Substring */
     private $action;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->action = new Substring(new ContextAccessor());
-
-        /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->createMock(EventDispatcher::class);
-        $this->action->setDispatcher($dispatcher);
+        $this->action->setDispatcher($this->createMock(EventDispatcher::class));
     }
 
     public function testInitialize()
@@ -38,26 +34,20 @@ class SubstringTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->action->initialize($options);
-        $this->assertAttributeEquals($options, 'options', $this->action);
+        self::assertEquals($options, ReflectionUtil::getPropertyValue($this->action, 'options'));
     }
 
     /**
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      * @dataProvider initializeExceptionDataProvider
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
         $this->action->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
         return [
             'no attribute' => [
@@ -101,24 +91,19 @@ class SubstringTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
-     * @param string $expected
      * @dataProvider optionsDataProvider
      */
-    public function testExecute(array $options, $expected)
+    public function testExecute(array $options, string $expected)
     {
         $context = new ActionData([]);
         $this->action->initialize($options);
         $this->action->execute($context);
 
         $attributePath = self::ATTRIBUTE_PATH;
-        $this->assertEquals($expected, $context->$attributePath);
+        self::assertEquals($expected, $context->{$attributePath});
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             'no startPos and length given' => [

@@ -1,30 +1,23 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command\Provider;
 
-use Composer\Question\StrictConfirmationQuestion;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
+/**
+ * Provides functionality for getting input values from the application console when a command is executed.
+ */
 class InputOptionProvider
 {
-    /** @var OutputInterface */
-    protected $output;
+    protected OutputInterface $output;
+    protected InputInterface $input;
+    protected QuestionHelper $questionHelper;
 
-    /** @var InputInterface */
-    protected $input;
-
-    /** @var QuestionHelper */
-    protected $questionHelper;
-
-    /**
-     * @param OutputInterface $output
-     * @param InputInterface $input
-     * @param QuestionHelper $questionHelper
-     */
     public function __construct(OutputInterface $output, InputInterface $input, QuestionHelper $questionHelper)
     {
         $this->output = $output;
@@ -33,7 +26,7 @@ class InputOptionProvider
     }
 
     /**
-     * Gets a value of the specified option. If needed an user can be asked to enter the value
+     * Gets a value of a specified option. If needed a user can be asked to enter the value
      *
      * @param string      $name              The option name
      * @param string      $questionMessage   The ask question message
@@ -43,7 +36,7 @@ class InputOptionProvider
      *
      * @return mixed boolean for ConfirmationQuestion, string for others
      */
-    public function get($name, $questionMessage, $default = null, $options = [])
+    public function get(string $name, string $questionMessage, ?string $default = null, array $options = [])
     {
         $value          = $this->input->getOption($name);
         $hasOptionValue = !empty($value);
@@ -76,23 +69,16 @@ class InputOptionProvider
         return $value;
     }
 
-    /**
-     * @param array $options
-     * @return bool
-     */
-    private function isConfirmationQuestion(array $options)
+    private function isConfirmationQuestion(array $options): bool
     {
         if (!isset($options['class'])) {
             return false;
         }
 
-        return is_a($options['class'], ConfirmationQuestion::class, true)
-            || is_a($options['class'], StrictConfirmationQuestion::class, true);
+        return is_a($options['class'], ConfirmationQuestion::class, true);
     }
 
     /**
-     * @param string $message
-     * @param array $options
      * @return mixed
      */
     private function createQuestion(string $message, array $options)
@@ -107,18 +93,15 @@ class InputOptionProvider
             $question->{'set'. ucfirst($setterName)}(...$parameters);
         }
 
+        $question->setMaxAttempts(5);
+
         return $question;
     }
 
     /**
      * Returns a string represents a question for console dialog helper
-     *
-     * @param string      $text
-     * @param string|null $defaultValue
-     *
-     * @return string
      */
-    protected function buildQuestion($text, $defaultValue = null)
+    protected function buildQuestion(string $text, ?string $defaultValue = null): string
     {
         return empty($defaultValue)
             ? sprintf('<question>%s:</question> ', $text)

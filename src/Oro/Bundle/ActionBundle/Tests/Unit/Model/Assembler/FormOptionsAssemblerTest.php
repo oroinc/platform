@@ -2,36 +2,40 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
+use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigurationPassInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configurationPass;
+    /** @var ConfigurationPassInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurationPass;
 
-    /**
-     * @var FormOptionsAssembler
-     */
-    protected $assembler;
+    /** @var FormOptionsAssembler */
+    private $assembler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configurationPass = $this->createMock(
-            'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
-        );
+        $this->configurationPass = $this->createMock(ConfigurationPassInterface::class);
 
         $this->assembler = new FormOptionsAssembler();
         $this->assembler->addConfigurationPass($this->configurationPass);
     }
 
+    private function createAttribute(string $name): Attribute
+    {
+        $attribute = new Attribute();
+        $attribute->setName($name);
+
+        return $attribute;
+    }
+
     public function testAssemble()
     {
-        $options = array(
+        $options = [
             'attribute_fields' => [
                 'attribute_one' => ['form_type' => 'text'],
                 'attribute_two' => ['form_type' => 'text'],
@@ -40,66 +44,56 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
                 'attribute_one' => '$foo',
                 'attribute_two' => '$bar',
             ],
-        );
+        ];
 
-        $expectedOptions = array(
-            'attribute_fields' => array(
-                'attribute_one' => array('form_type' => 'text'),
-                'attribute_two' => array('form_type' => 'text'),
-            ),
-            'attribute_default_values' => array(
+        $expectedOptions = [
+            'attribute_fields' => [
+                'attribute_one' => ['form_type' => 'text'],
+                'attribute_two' => ['form_type' => 'text'],
+            ],
+            'attribute_default_values' => [
                 'attribute_one' => new PropertyPath('data.foo'),
                 'attribute_two' => new PropertyPath('data.bar'),
-            ),
-        );
+            ],
+        ];
 
-        $attributes = array(
+        $attributes = [
             $this->createAttribute('attribute_one'),
             $this->createAttribute('attribute_two'),
-        );
+        ];
 
-        $this->configurationPass->expects($this->at(0))
+        $this->configurationPass->expects($this->exactly(2))
             ->method('passConfiguration')
-            ->with($options['attribute_fields'])
-            ->will($this->returnValue($expectedOptions['attribute_fields']));
-
-        $this->configurationPass->expects($this->at(1))
-            ->method('passConfiguration')
-            ->with($options['attribute_default_values'])
-            ->will($this->returnValue($expectedOptions['attribute_default_values']));
+            ->withConsecutive(
+                [$options['attribute_fields']],
+                [$options['attribute_default_values']]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $expectedOptions['attribute_fields'],
+                $expectedOptions['attribute_default_values']
+            );
 
         $this->assertEquals(
             $expectedOptions,
-            $this->assembler->assemble(
-                $options,
-                $attributes
-            )
+            $this->assembler->assemble($options, $attributes)
         );
     }
 
     /**
-     * @param array $options
-     * @param array $attributes
-     * @param string $expectedException
-     * @param string $expectedExceptionMessage
-     *
      * @dataProvider invalidOptionsDataProvider
      */
     public function testAssembleRequiredOptionException(
         array $options,
         array $attributes,
-        $expectedException,
-        $expectedExceptionMessage
+        string $expectedException,
+        string $expectedExceptionMessage
     ) {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->assembler->assemble($options, $attributes);
     }
 
-    /**
-     * @return array
-     */
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
         return [
             'attribute_not_exist_at_attribute_fields' => [
@@ -109,7 +103,7 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'attributes' => [],
-                'expectedException' => 'Oro\Bundle\ActionBundle\Exception\UnknownAttributeException',
+                'expectedException' => UnknownAttributeException::class,
                 'expectedExceptionMessage' => 'Unknown attribute "attribute_one".'
             ],
             'attribute_not_exist_at_attribute_default_values' => [
@@ -119,7 +113,7 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'attributes' => [],
-                'expectedException' => 'Oro\Bundle\ActionBundle\Exception\UnknownAttributeException',
+                'expectedException' => UnknownAttributeException::class,
                 'expectedExceptionMessage' => 'Unknown attribute "attribute_one".'
             ],
             'attribute_default_value_not_in_attribute_fields' => [
@@ -135,23 +129,11 @@ class FormOptionsAssemblerTest extends \PHPUnit\Framework\TestCase
                     $this->createAttribute('attribute_one'),
                     $this->createAttribute('attribute_two'),
                 ],
-                'expectedException' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
+                'expectedException' => InvalidConfigurationException::class,
                 'expectedExceptionMessage' =>
                     'Form options doesn\'t have attribute which is referenced in ' .
                     '"attribute_default_values" option.'
             ],
         ];
-    }
-
-    /**
-     * @param string $name
-     * @return Attribute
-     */
-    protected function createAttribute($name)
-    {
-        $attribute = new Attribute();
-        $attribute->setName($name);
-
-        return $attribute;
     }
 }

@@ -5,17 +5,16 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class OroIconTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroIconType
-     */
+    /** @var OroIconType */
     private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->type = new OroIconType($this->createMock('Symfony\Component\HttpKernel\KernelInterface'));
+        $this->type = new OroIconType($this->createMock(KernelInterface::class));
     }
 
     public function testParameters()

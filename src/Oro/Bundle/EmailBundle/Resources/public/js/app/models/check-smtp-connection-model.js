@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var CheckSmtpConnectionModel;
-    var BaseModel = require('oroui/js/app/models/base/model');
+    const BaseModel = require('oroui/js/app/models/base/model');
 
-    CheckSmtpConnectionModel = BaseModel.extend({
+    const CheckSmtpConnectionModel = BaseModel.extend({
         defaults: {
             host: '',
             port: null,
@@ -14,10 +13,10 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function CheckSmtpConnectionModel() {
-            CheckSmtpConnectionModel.__super__.constructor.apply(this, arguments);
+        constructor: function CheckSmtpConnectionModel(...args) {
+            CheckSmtpConnectionModel.__super__.constructor.apply(this, args);
         }
     });
     return CheckSmtpConnectionModel;

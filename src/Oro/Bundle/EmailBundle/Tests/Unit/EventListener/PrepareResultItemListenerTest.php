@@ -2,92 +2,77 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlGenerator;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
     /** @var PrepareResultItemListener */
-    protected $listener;
+    private $listener;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Router */
-    protected $router;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Item */
-    protected $item;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->router = $this->getMockBuilder('Symfony\Component\Routing\Router')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->item = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->listener = new PrepareResultItemListener($this->router, $this->doctrineHelper);
+        $this->listener = new PrepareResultItemListener($this->urlGenerator, $this->doctrine);
     }
 
-    public function testPrepareEmailItemDataEventSkippEntity()
+    public function testPrepareResultItemForNotEmailUserEntity()
     {
-        $this->item->expects($this->once())
-            ->method('getEntityName')
-            ->willReturn('test');
-
-        $event = new PrepareResultItemEvent($this->item);
-        $this->listener->prepareEmailItemDataEvent($event);
+        $event = new PrepareResultItemEvent(new Item('test'));
+        $this->listener->prepareResultItem($event);
+        $this->assertEquals('test', $event->getResultItem()->getEntityName());
     }
 
-    public function testPrepareEmailItemDataEvent()
+    public function testPrepareResultItem()
     {
-        $entity = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailId = 100;
+        $emailUrl = 'test-email-url';
 
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->item->expects($this->exactly(1))
-            ->method('getId');
-
-        $this->item->expects($this->exactly(1))
-            ->method('getEntityName')
-            ->willReturn(EmailUser::ENTITY_CLASS);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepository')
-            ->with(EmailUser::ENTITY_CLASS)
-            ->willReturn($repository);
-
-        $repository->expects($this->once())
-            ->method('find')
-            ->willReturn($entity);
-
+        $email = $this->createMock(Email::class);
+        $email->expects($this->once())
+            ->method('getId')
+            ->willReturn($emailId);
+        $entity = $this->createMock(EmailUser::class);
         $entity->expects($this->once())
             ->method('getEmail')
             ->willReturn($email);
 
-        $email->expects($this->once())
-            ->method('getId');
+        $item = new Item(EmailUser::class, 123);
 
-        $event = new PrepareResultItemEvent($this->item);
-        $this->listener->prepareEmailItemDataEvent($event);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
+            ->method('find')
+            ->with(EmailUser::class, $item->getId())
+            ->willReturn($entity);
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(EmailUser::class)
+            ->willReturn($em);
+
+        $this->urlGenerator->expects($this->once())
+            ->method('generate')
+            ->with('oro_email_thread_view', ['id' => $emailId], UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn($emailUrl);
+
+        $event = new PrepareResultItemEvent($item);
+        $this->listener->prepareResultItem($event);
+
+        $this->assertEquals(Email::class, $event->getResultItem()->getEntityName());
+        $this->assertEquals($emailId, $event->getResultItem()->getRecordId());
+        $this->assertEquals($emailUrl, $event->getResultItem()->getRecordUrl());
     }
 }

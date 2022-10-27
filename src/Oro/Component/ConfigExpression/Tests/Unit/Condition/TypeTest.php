@@ -15,18 +15,17 @@ class TypeTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\Type();
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
-    /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Option "left" must be property path
-     */
     public function testInitializeWithException()
     {
+        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Option "left" must be property path');
+
         $this->condition->initialize([1, 2]);
     }
 
@@ -124,9 +123,6 @@ class TypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider errorMessagesProvider
      */
     public function testErrorMessages(array $inputData, array $expectedData)

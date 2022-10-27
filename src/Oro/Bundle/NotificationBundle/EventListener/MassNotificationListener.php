@@ -2,66 +2,69 @@
 
 namespace Oro\Bundle\NotificationBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Bundle\NotificationBundle\Model\MassNotificationSender;
+use Symfony\Component\Mime\Address as SymfonyAddress;
+use Symfony\Component\Mime\Email as SymfonyEmail;
 
+/**
+ * Adds notifications items with MassNotificationSender::NOTIFICATION_LOG_TYPE log type to the database.
+ * @see \Oro\Bundle\NotificationBundle\Model\MassNotificationSender::NOTIFICATION_LOG_TYPE
+ */
 class MassNotificationListener
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    private ManagerRegistry $doctrine;
 
-    /**
-     * @param EntityManager $em
-     */
-    public function __construct(EntityManager $em)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param NotificationSentEvent $event
-     */
-    public function logMassNotification(NotificationSentEvent $event)
+    public function logMassNotification(NotificationSentEvent $event): void
     {
-        $spoolItem = $event->getSpoolItem();
-        $sentCount = $event->getSentCount();
-        if ($spoolItem->getLogType() === MassNotificationSender::NOTIFICATION_LOG_TYPE) {
-            $logEntity = new MassNotification();
-            $this->updateFromSwiftMessage($logEntity, $spoolItem->getMessage(), $sentCount);
-            $this->em->persist($logEntity);
-            $this->em->flush($logEntity);
+        if ($event->getType() !== MassNotificationSender::NOTIFICATION_LOG_TYPE) {
+            return;
         }
+
+        $message = $event->getMessage();
+        if (!$message instanceof SymfonyEmail) {
+            // Skips as listener is not designed for non-email messages.
+            return;
+        }
+
+        $massNotification = $this->createMassNotification($message, $event->getSentCount());
+        $entityManager = $this->doctrine->getManagerForClass(MassNotification::class);
+        $entityManager->persist($massNotification);
+        $entityManager->flush($massNotification);
+    }
+
+    private function createMassNotification(SymfonyEmail $symfonyEmail, int $sentCount): MassNotification
+    {
+        $to = $symfonyEmail->getTo();
+        $from = $symfonyEmail->getFrom() ?: [$symfonyEmail->getSender()];
+        $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
+
+        return (new MassNotification())
+            ->setEmail($this->formatEmail($to))
+            ->setSender($this->formatEmail($from))
+            ->setSubject($symfonyEmail->getSubject())
+            ->setStatus($sentCount > 0 ? MassNotification::STATUS_SUCCESS : MassNotification::STATUS_FAILED)
+            ->setScheduledAt($symfonyEmail->getDate() ?: $dateTime)
+            ->setProcessedAt($dateTime)
+            ->setBody($symfonyEmail->getHtmlBody() ?: $symfonyEmail->getTextBody());
     }
 
     /**
-     * @param MassNotification $entity
-     * @param \Swift_Mime_Message $message
-     * @param int $sentCount
+     * @param SymfonyAddress[] $symfonyAddresses
+     *
+     * @return string|null
      */
-    protected function updateFromSwiftMessage(MassNotification $entity, $message, $sentCount)
+    private function formatEmail(array $symfonyAddresses): ?string
     {
-        $dateScheduled = new \DateTime();
-        $dateScheduled->setTimestamp($message->getDate());
+        $symfonyEmail = array_shift($symfonyAddresses);
 
-        $entity->setEmail($this->formatEmail($message->getTo()));
-        $entity->setSender($this->formatEmail($message->getFrom()));
-        $entity->setSubject($message->getSubject());
-        $entity->setStatus($sentCount > 0 ? MassNotification::STATUS_SUCCESS : MassNotification::STATUS_FAILED);
-        $entity->setScheduledAt($dateScheduled);
-        $entity->setProcessedAt(new \DateTime());
-        $entity->setBody($message->getBody());
-    }
-
-    /**
-     * @param array $email
-     * @return string
-     */
-    protected function formatEmail($email)
-    {
-        return current($email) . ' <' . key($email) . '>';
+        return $symfonyEmail ? $symfonyEmail->getName() . ' <' . $symfonyEmail->getAddress() . '>' : null;
     }
 }

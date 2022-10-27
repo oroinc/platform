@@ -3,20 +3,19 @@ define([
 ], function(PageRegionView) {
     'use strict';
 
-    var PageUserMenuView;
-
-    PageUserMenuView = PageRegionView.extend({
-        /**
-         * @inheritDoc
-         */
-        constructor: function PageUserMenuView() {
-            PageUserMenuView.__super__.constructor.apply(this, arguments);
-        },
-
+    const PageUserMenuView = PageRegionView.extend({
         template: function(data) {
-            return data.userMenu;
+            return data.usermenu;
         },
-        pageItems: ['userMenu']
+
+        pageItems: ['usermenu'],
+
+        /**
+         * @inheritdoc
+         */
+        constructor: function PageUserMenuView(options) {
+            PageUserMenuView.__super__.constructor.call(this, options);
+        }
     });
 
     return PageUserMenuView;

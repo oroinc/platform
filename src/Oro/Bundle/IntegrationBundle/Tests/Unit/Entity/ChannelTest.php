@@ -2,78 +2,47 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
-use Doctrine\Common\Util\Inflector;
-use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Config\Common\ConfigObject;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ChannelTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_STRING  = 'testString';
-    const TEST_BOOLEAN = true;
+    use EntityTestCaseTrait;
 
-    /** @var array */
-    protected static $testConnectors = ['customer', 'product'];
+    /** @var Channel */
+    private $entity;
 
-    /** @var Integration */
-    protected $entity;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entity = new Integration();
+        $this->entity = new Channel();
     }
 
-    protected function tearDown()
+    public function testProperties()
     {
-        unset($this->entity);
-    }
+        $transport = $this->createMock(Transport::class);
 
-    /**
-     * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
-     * @param mixed  $expected
-     */
-    public function testSetGet($property, $value = null, $expected = null)
-    {
-        if ($value !== null) {
-            call_user_func_array([$this->entity, 'set' . ucfirst($property)], [$value]);
-        }
-
-        $this->assertEquals($expected, call_user_func_array([$this->entity, 'get' . ucfirst($property)], []));
-    }
-
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
-    {
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-
-        return [
-            'id'               => ['id'],
-            'name'             => ['name', self::TEST_STRING, self::TEST_STRING],
-            'type'             => ['type', self::TEST_STRING, self::TEST_STRING],
-            'connectors'       => ['connectors', self::$testConnectors, self::$testConnectors],
-            'defaultUserOwner' => ['defaultUserOwner', $user, $user],
-            'enabled'          => ['enabled', self::TEST_BOOLEAN, self::TEST_BOOLEAN],
-            'organization'     => ['organization', $organization, $organization],
-            'editMode'         => ['editMode', Integration::EDIT_MODE_ALLOW, Integration::EDIT_MODE_ALLOW]
+        $properties = [
+            ['id', 123],
+            ['name', 'test'],
+            ['type', 'test'],
+            ['transport', $transport],
+            ['connectors', ['customer', 'product']],
+            ['enabled', true, false],
+            ['previouslyEnabled', true],
+            ['defaultUserOwner', new User()],
+            ['defaultBusinessUnitOwner', new BusinessUnit()],
+            ['organization', new Organization()],
+            ['editMode', Channel::EDIT_MODE_ALLOW, false],
         ];
-    }
 
-    public function testTransportRelation()
-    {
-        $transport = $this->getMockForAbstractClass('Oro\Bundle\IntegrationBundle\Entity\Transport');
-        $this->assertAttributeEmpty('transport', $this->entity);
-
-        $this->entity->setTransport($transport);
-        $this->assertSame($transport, $this->entity->getTransport());
-
-        $this->entity->clearTransport();
-        $this->assertAttributeEmpty('transport', $this->entity);
+        $this->assertPropertyAccessors(new Channel(), $properties);
     }
 
     /**
@@ -83,14 +52,14 @@ class ChannelTest extends \PHPUnit\Framework\TestCase
      */
     public function testIntegrationSettings($fieldName)
     {
-        $accessor        = PropertyAccess::createPropertyAccessor();
-        $referenceGetter = Inflector::camelize('get_' . $fieldName . '_reference');
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $referenceGetter = (new InflectorFactory())->build()->camelize('get_' . $fieldName . '_reference');
         $this->assertTrue(method_exists($this->entity, $referenceGetter));
 
         $value = $accessor->getValue($this->entity, $fieldName);
         $this->assertNotEmpty($value);
 
-        $this->assertInstanceOf('Oro\Component\Config\Common\ConfigObject', $value);
+        $this->assertInstanceOf(ConfigObject::class, $value);
 
         $newValue = ConfigObject::create([]);
         $accessor->setValue($this->entity, $fieldName, $newValue);
@@ -101,14 +70,11 @@ class ChannelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($newValue, $this->entity->$referenceGetter());
     }
 
-    /**
-     * @return array
-     */
-    public function integrationSettingFieldsProvider()
+    public function integrationSettingFieldsProvider(): array
     {
         return [
             ['synchronizationSettings'],
-            ['mappingSettings']
+            ['mappingSettings'],
         ];
     }
 }

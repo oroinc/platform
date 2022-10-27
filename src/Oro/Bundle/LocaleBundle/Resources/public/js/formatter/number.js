@@ -1,10 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var numeral = require('numeral');
-    var localeSettings = require('../locale-settings');
-    var configuration = require('oroconfig/js/configuration');
+    const _ = require('underscore');
+    const numeral = require('numeral');
+    const localeSettings = require('../locale-settings');
 
     /**
      * Number Formatter
@@ -12,13 +11,13 @@ define(function(require) {
      * @export orolocale/js/formatter/number
      * @name   orolocale.formatter.number
      */
-    var numberFormatter = function() {
-        var createFormat = function(options) {
-            var format = !options.grouping_used ? '0' : '0,0';
+    const numberFormatter = function() {
+        const createFormat = function(options) {
+            let format = !options.grouping_used ? '0' : '0,0';
 
             if (options.max_fraction_digits > 0) {
                 format += '.';
-                for (var i = 0; i < options.max_fraction_digits; ++i) {
+                for (let i = 0; i < options.max_fraction_digits; ++i) {
                     if (options.min_fraction_digits === i) {
                         format += '[';
                     }
@@ -36,11 +35,11 @@ define(function(require) {
             return format;
         };
 
-        var formatters = {
+        const formatters = {
             numeralFormat: function(value, options) {
-                var originLocale = numeral.locale();
+                const originLocale = numeral.locale();
                 numeral.locale(localeSettings.getLocale());
-                var result = numeral(value).format(createFormat(options));
+                let result = numeral(value).format(createFormat(options));
                 if (result === '0') {
                     result = options.zero_digit_symbol;
                 }
@@ -48,8 +47,8 @@ define(function(require) {
                 return result;
             },
             addPrefixSuffix: function(formattedNumber, options, originalNumber) {
-                var prefix = '';
-                var suffix = '';
+                let prefix = '';
+                let suffix = '';
                 if (originalNumber >= 0) {
                     prefix = options.positive_prefix;
                     suffix = options.positive_suffix;
@@ -58,11 +57,15 @@ define(function(require) {
                     prefix = options.negative_prefix;
                     suffix = options.negative_suffix;
                 }
-                return prefix + formattedNumber + suffix;
+                const result = prefix + formattedNumber + suffix;
+
+                // Fixes the case when sometimes (depending on ICU version) prefix/suffix contain XXX instead
+                // of currency symbol.
+                return result.replace('XXX', options.currency_symbol);
             },
             replaceMonetarySeparator: function(formattedNumber, options) {
-                var defaultGroupingSeparator = ',';
-                var defaultDecimalSeparator = '.';
+                const defaultGroupingSeparator = ',';
+                const defaultDecimalSeparator = '.';
                 if (defaultGroupingSeparator !== options.monetary_grouping_separator_symbol) {
                     formattedNumber = formattedNumber
                         .replace(defaultGroupingSeparator, options.monetary_grouping_separator_symbol);
@@ -77,38 +80,70 @@ define(function(require) {
                 return formattedNumber.replace('%', '');
             },
             replaceCurrency: function(formattedNumber, options) {
-                var currencyLayout = configuration.get('currency-view-type') === 'symbol'
-                    ? localeSettings.getCurrencySymbol(options.currency_code) : options.currency_code;
+                let currencyLayout = localeSettings.getCurrencyViewType() === 'symbol'
+                    ? localeSettings.getCurrencySymbol(options.currency_code)
+                    : options.currency_code;
 
-                var isPrepend = configuration.get('is-currency-symbol-prepend');
+                const isPrepend = localeSettings.isCurrencySymbolPrepend();
 
-                if (configuration.get('currency-view-type') !== 'symbol' && isPrepend) {
+                if (localeSettings.getCurrencyViewType() !== 'symbol' && isPrepend) {
                     currencyLayout += '\u00A0';
                 }
 
                 return formattedNumber.replace(options.currency_symbol, currencyLayout);
+            },
+            dynamicPrecision: function(formattedNumber, options, originalNumber) {
+                const originFractionDigits = getFractionDigits(originalNumber, options.min_fraction_digits);
+                const formattedFractionDigits = getFractionDigits(formattedNumber, options.min_fraction_digits);
+
+                if (originFractionDigits > formattedFractionDigits) {
+                    originalNumber = String(originalNumber).replace(/0+$/, '');
+                    const originalSplittedValue = originalNumber.split('.');
+
+                    const originStyle = options.style;
+                    const originMinFractionDigits = options.min_fraction_digits;
+                    options.style = 'decimal';
+                    options.min_fraction_digits = 0;
+                    const formattedIntegralPart = doFormat(
+                        originalSplittedValue[0],
+                        options,
+                        [formatters.numeralFormat]
+                    );
+                    options.style = originStyle;
+                    options.min_fraction_digits = originMinFractionDigits;
+
+                    if (originalSplittedValue[1]) {
+                        return formattedIntegralPart.concat(
+                            options.decimal_separator_symbol,
+                            originalSplittedValue[1]
+                        );
+                    }
+                }
+
+                return formattedNumber;
             }
         };
 
-        var doFormat = function(value, options, formattersChain) {
-            var result = value;
+        const doFormat = function(value, options, formattersChain) {
+            let result = value;
             if (formattersChain.length) {
                 result = Number(result);
             }
-            for (var i = 0; i < formattersChain.length; ++i) {
-                var formatter = formattersChain[i];
+            for (let i = 0; i < formattersChain.length; ++i) {
+                const formatter = formattersChain[i];
                 result = formatter.call(this, result, options, value);
             }
             return result;
         };
 
-        var allowedCustomOptions = [
+        const allowedCustomOptions = [
             'grouping_used',
             'min_fraction_digits',
-            'max_fraction_digits'
+            'max_fraction_digits',
+            'scale_percent_by_100'
         ];
 
-        var prepareCustomOptions = function(opts) {
+        const prepareCustomOptions = function(opts) {
             if (!_.isObject(opts)) {
                 return {};
             }
@@ -116,63 +151,90 @@ define(function(require) {
             return _.pick(opts, allowedCustomOptions);
         };
 
+        const getFractionDigits = function(value, defaultFractionDigits) {
+            const numberValue = Number(value);
+            const digits = !Number.isNaN(numberValue) && Number.isFinite(numberValue) && numberValue % 1 !== 0
+                ? value.toString().split('.')[1].length || 0
+                : 0;
+
+            return digits > defaultFractionDigits ? digits : defaultFractionDigits;
+        };
+
         return {
             formatDecimal: function(value, opts) {
-                var customOptions = prepareCustomOptions(opts);
-                var formatOptions = this.formatOptions || {};
-                var decimalOptions = localeSettings.getNumberFormats('decimal');
-                var options = _.extend({}, decimalOptions, formatOptions, customOptions);
+                const customOptions = prepareCustomOptions(opts);
+                const formatOptions = this.formatOptions || {};
+                const decimalOptions = localeSettings.getNumberFormats('decimal');
+                const options = _.extend({}, decimalOptions, formatOptions, customOptions);
                 options.style = 'decimal';
-                var formattersChain = [
+                const formattersChain = [
                     formatters.numeralFormat,
+                    formatters.dynamicPrecision,
                     formatters.addPrefixSuffix
                 ];
+
                 return doFormat(value, options, formattersChain);
             },
             formatMonetary: function(value, opts) {
-                var customOptions = prepareCustomOptions(opts);
-                var decimalOptions = localeSettings.getNumberFormats('decimal');
-                var fractionDigitsOptions = _.pick(localeSettings.getNumberFormats('currency'),
+                const customOptions = prepareCustomOptions(opts);
+                const decimalOptions = localeSettings.getNumberFormats('decimal');
+                const fractionDigitsOptions = _.pick(localeSettings.getNumberFormats('currency'),
                     ['max_fraction_digits', 'min_fraction_digits']);
-                var options = _.extend({}, decimalOptions, fractionDigitsOptions, customOptions);
+                const options = _.extend({}, decimalOptions, fractionDigitsOptions, customOptions);
                 options.style = 'decimal';
-                var formattersChain = [
+                const formattersChain = [
                     formatters.numeralFormat,
                     formatters.addPrefixSuffix
                 ];
                 return doFormat(value, options, formattersChain);
             },
             formatInteger: function(value) {
-                var options = _.extend({}, localeSettings.getNumberFormats('decimal'));
+                const options = _.extend({}, localeSettings.getNumberFormats('decimal'));
                 options.style = 'integer';
                 options.max_fraction_digits = 0;
                 options.min_fraction_digits = 0;
-                var formattersChain = [
+                const formattersChain = [
                     formatters.numeralFormat,
                     formatters.addPrefixSuffix
                 ];
                 return doFormat(value, options, formattersChain);
             },
-            formatPercent: function(value) {
-                var options = localeSettings.getNumberFormats('percent');
+            formatPercent: function(value, opts) {
+                const customOptions = prepareCustomOptions(opts);
+                const percentOptions = localeSettings.getNumberFormats('percent');
+                const options = _.extend({}, percentOptions, customOptions);
                 options.style = 'percent';
-                var formattersChain = [
+                const formattersChain = [
                     formatters.numeralFormat,
-                    formatters.clearPercent,
-                    formatters.addPrefixSuffix
+                    formatters.clearPercent
                 ];
-                return doFormat(value, options, formattersChain);
+                const originScalePercentBy100 = numeral.options.scalePercentBy100;
+                if (options.scale_percent_by_100 === false) {
+                    numeral.options.scalePercentBy100 = false;
+                    formattersChain.push(formatters.dynamicPrecision);
+                } else {
+                    options.max_fraction_digits = getFractionDigits(value, percentOptions.max_fraction_digits);
+                }
+                formattersChain.push(formatters.addPrefixSuffix);
+                const result = doFormat(value, options, formattersChain);
+                numeral.options.scalePercentBy100 = originScalePercentBy100;
+                return result;
             },
             formatCurrency: function(value, currency, opts) {
-                var customOptions = prepareCustomOptions(opts);
-                var currencyOptions = localeSettings.getNumberFormats('currency');
+                const customOptions = prepareCustomOptions(opts);
+                const currencyOptions = localeSettings.getNumberFormats('currency');
                 if (!currency) {
                     currency = localeSettings.getCurrency();
                 }
-                var options = _.extend({}, currencyOptions, customOptions);
+                const options = _.extend({}, currencyOptions, customOptions);
+                options.min_fraction_digits = getFractionDigits(
+                    Number(value),
+                    localeSettings.getCurrencyMinFractionDigits()
+                );
+                options.max_fraction_digits = options.min_fraction_digits;
                 options.style = 'currency';
                 options.currency_code = currency;
-                var formattersChain = [
+                const formattersChain = [
                     formatters.numeralFormat,
                     formatters.addPrefixSuffix,
                     formatters.replaceCurrency
@@ -187,11 +249,11 @@ define(function(require) {
              * @return {string}
              */
             formatDuration: function(value) {
-                var result = [];
+                const result = [];
                 result.push(Math.floor(value / 3600)); // hours
                 result.push(Math.floor(value / 60) % 60); // minutes
                 result.push(value % 60); // seconds
-                for (var i = 0; i < result.length; i++) {
+                for (let i = 0; i < result.length; i++) {
                     result[i] = String(result[i]);
                     if (result[i].length < 2) {
                         result[i] = '0' + result[i];
@@ -207,7 +269,7 @@ define(function(require) {
              * @return {number}
              */
             unformatDuration: function(value) {
-                var result = value.split(':');
+                let result = value.split(':');
                 result[0] = parseInt(result[0], 10) * 3600; // hours
                 result[1] = parseInt(result[1], 10) * 60; // minutes
                 result[2] = parseInt(result[2], 10); // seconds
@@ -217,8 +279,8 @@ define(function(require) {
                 return result;
             },
             unformat: function(value) {
-                var result = String(value);
-                var originLocale = numeral.locale();
+                let result = String(value);
+                const originLocale = numeral.locale();
                 numeral.locale(localeSettings.getLocale());
                 result = numeral(result).value();
                 numeral.locale(originLocale);
@@ -226,10 +288,10 @@ define(function(require) {
                 return result;
             },
             unformatStrict: function(value) {
-                var numberFormats = localeSettings.getNumberFormats('decimal');
-                var groupingSeparator = numberFormats.grouping_separator_symbol;
-                var decimalSeparator = numberFormats.decimal_separator_symbol;
-                var defaultDecimalSeparator = '.';
+                const numberFormats = localeSettings.getNumberFormats('decimal');
+                const groupingSeparator = numberFormats.grouping_separator_symbol;
+                const decimalSeparator = numberFormats.decimal_separator_symbol;
+                const defaultDecimalSeparator = '.';
                 value = String(value);
                 if (/^\s+$/.test(groupingSeparator)) {
                     // to avoid an error when grouping separator of current locale looks like space but has another code

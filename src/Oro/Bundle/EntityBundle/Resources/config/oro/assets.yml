@@ -1,4 +1,7 @@
-assets:
-    css:
-        'oroentity':
-            - 'bundles/oroentity/css/scss/main.scss'
+css:
+    inputs:
+        # Variables
+        - 'bundles/oroentity/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroentity/css/scss/main.scss'

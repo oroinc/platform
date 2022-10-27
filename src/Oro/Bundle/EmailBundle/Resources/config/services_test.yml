@@ -1,0 +1,19 @@
+services:
+    oro_email.tests.emailtemplate.variable_provider:
+        class: Oro\Bundle\EmailBundle\Tests\Functional\Environment\TestEntityVariablesProvider
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_provider, scope: entity }
+
+    oro_email.tests.emailtemplate.variable_processor:
+        class: Oro\Bundle\EmailBundle\Tests\Functional\Environment\TestVariableProcessor
+        public: false
+        tags:
+            - { name: oro_email.emailtemplate.variable_processor, alias: tests.processor }
+
+    oro_email.tests.public_email_owner_provider_stub:
+        class: Oro\Bundle\EmailBundle\Tests\Functional\Stub\PublicEmailOwnerProviderStub
+        decorates: oro_email.public_email_owner_provider
+        decoration_priority: -256 # should be at the top of the decoration chain
+        arguments:
+            - '@.inner'

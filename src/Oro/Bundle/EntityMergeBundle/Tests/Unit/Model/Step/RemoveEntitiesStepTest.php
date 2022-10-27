@@ -2,92 +2,60 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Model\Step\RemoveEntitiesStep;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class RemoveEntitiesStepTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var RemoveEntitiesStep
-     */
-    protected $step;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityManager;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var RemoveEntitiesStep */
+    private $step;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->constraintViolation = $this
-            ->getMockBuilder('Symfony\Component\Validator\ConstraintViolationList')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->step = new RemoveEntitiesStep($this->entityManager, $this->doctrineHelper);
     }
 
     public function testRun()
     {
-        $data = $this->createEntityData();
-
         $foo = new EntityStub(1);
         $bar = new EntityStub(2);
         $baz = new EntityStub(3);
 
-        $entities = array($foo, $bar, $baz);
-
+        $data = $this->createMock(EntityData::class);
         $data->expects($this->once())
             ->method('getMasterEntity')
-            ->will($this->returnValue($foo));
-
+            ->willReturn($foo);
         $data->expects($this->once())
             ->method('getEntities')
-            ->will($this->returnValue($entities));
+            ->willReturn([$foo, $bar, $baz]);
 
-        $this->doctrineHelper->expects($this->at(0))
+        $this->doctrineHelper->expects($this->exactly(3))
             ->method('isEntityEqual')
-            ->with($foo, $foo)
-            ->will($this->returnValue(true));
+            ->willReturnMap([
+                [$foo, $foo, true],
+                [$foo, $bar, false],
+                [$foo, $baz, false]
+            ]);
 
-        $this->doctrineHelper->expects($this->at(1))
-            ->method('isEntityEqual')
-            ->with($foo, $bar)
-            ->will($this->returnValue(false));
-
-        $this->doctrineHelper->expects($this->at(2))
-            ->method('isEntityEqual')
-            ->with($foo, $baz)
-            ->will($this->returnValue(false));
-
-        $this->entityManager->expects($this->at(0))
+        $this->entityManager->expects($this->exactly(2))
             ->method('remove')
-            ->with($bar);
-
-        $this->entityManager->expects($this->at(1))
-            ->method('remove')
-            ->with($baz);
+            ->withConsecutive(
+                [$this->identicalTo($bar)],
+                [$this->identicalTo($baz)]
+            );
 
         $this->step->run($data);
-    }
-
-    protected function createEntityData()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

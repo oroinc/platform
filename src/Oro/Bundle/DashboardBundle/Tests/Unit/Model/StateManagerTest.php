@@ -4,27 +4,28 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\DashboardBundle\Entity\Widget;
+use Oro\Bundle\DashboardBundle\Entity\WidgetState;
+use Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject;
 use Oro\Bundle\DashboardBundle\Model\StateManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class StateManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $widget;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
     /** @var StateManager */
-    protected $stateManager;
+    private $stateManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->repository = $this->createMock(EntityRepository::class);
@@ -38,87 +39,79 @@ class StateManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWidgetStateNotLoggedUser()
     {
-        $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
+        $widget = $this->createMock(Widget::class);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
-        $this->repository->expects($this->never())->method($this->anything());
-        $this->entityManager->expects($this->never())->method($this->anything());
-
+        $this->repository->expects($this->never())
+            ->method($this->anything());
+        $this->entityManager->expects($this->never())
+            ->method($this->anything());
 
         $state = $this->stateManager->getWidgetState($widget);
 
-        $this->assertInstanceOf('Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject', $state);
+        $this->assertInstanceOf(WidgetStateNullObject::class, $state);
         $this->assertEquals($widget, $state->getWidget());
     }
 
     public function testGetWidgetStateExist()
     {
-        $widgetState = $this->createMock('Oro\Bundle\DashboardBundle\Entity\WidgetState');
-        $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $widgetState = $this->createMock(WidgetState::class);
+        $widget = $this->createMock(Widget::class);
+        $user = $this->createMock(User::class);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $this->entityManager->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($this->repository));
+            ->willReturn($this->repository);
 
         $this->repository->expects($this->once())
             ->method('findOneBy')
-            ->with(
-                array(
-                    'owner'  => $user,
-                    'widget' => $widget
-                )
-            )
-            ->will($this->returnValue($widgetState));
+            ->with(['owner' => $user, 'widget' => $widget])
+            ->willReturn($widgetState);
 
         $this->assertEquals($widgetState, $this->stateManager->getWidgetState($widget));
     }
 
     public function testGetWidgetStateNew()
     {
-        $widget = $this->createMock('Oro\Bundle\DashboardBundle\Entity\Widget');
-        $user = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $widget = $this->createMock(Widget::class);
+        $user = $this->createMock(User::class);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $this->entityManager->expects($this->once())
             ->method('getRepository')
-            ->will($this->returnValue($this->repository));
+            ->willReturn($this->repository);
 
         $this->repository->expects($this->once())
             ->method('findOneBy')
-            ->with(
-                array(
-                    'owner'  => $user,
-                    'widget' => $widget
-                )
-            )
-            ->will($this->returnValue(null));
+            ->with(['owner' => $user, 'widget' => $widget])
+            ->willReturn(null);
 
         $this->entityManager->expects($this->once())
             ->method('persist')
             ->with(
                 $this->callback(
                     function ($entity) use ($widget, $user) {
-                        $this->assertInstanceOf('Oro\Bundle\DashboardBundle\Entity\WidgetState', $entity);
+                        $this->assertInstanceOf(WidgetState::class, $entity);
                         $this->assertEquals($widget, $entity->getWidget());
                         $this->assertEquals($user, $entity->getOwner());
+
                         return true;
                     }
                 )
             );
 
         $this->assertInstanceOf(
-            'Oro\Bundle\DashboardBundle\Entity\WidgetState',
+            WidgetState::class,
             $this->stateManager->getWidgetState($widget)
         );
     }

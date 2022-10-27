@@ -5,6 +5,11 @@ parameters:
     oro_sync.websocket_ping.interval: 50
 
 services:
+    oro_sync.manager.topic_manager:
+        class: Oro\Bundle\SyncBundle\Manager\TopicManager
+        parent: gos_web_socket.wamp.topic_manager
+        decorates: gos_web_socket.wamp.topic_manager
+
     oro_sync.periodic.db_ping:
         class: Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic
         arguments:
@@ -29,16 +34,21 @@ services:
 
     oro_sync.twig.sync_extension:
         class: Oro\Bundle\SyncBundle\Twig\OroSyncExtension
-        public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
     oro_sync.client.connection_checker:
         class: Oro\Bundle\SyncBundle\Client\ConnectionChecker
+        public: true
         arguments:
             - '@oro_sync.websocket_client.basic'
+            - '@oro_distribution.handler.application_status'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
 
     oro_sync.event_listener.maintenance:
         class: Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
@@ -57,27 +67,36 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
-    oro_sync.authentication.origin.origin_provider_chain:
-        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginProviderChain
-        public: false
+    oro_sync.authentication.origin_provider:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\ChainOriginProvider
+        arguments:
+            - !tagged_iterator oro_sync.origin_provider
 
-    oro_sync.authentication.origin.application_origin_provider:
+    oro_sync.authentication.application_origin_provider:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\ApplicationOriginProvider
-        public: false
         arguments:
             - '@oro_config.global'
-            - '@oro_sync.authentication.origin.extractor'
+            - '@oro_sync.authentication.origin_extractor'
         tags:
             - { name: oro_sync.origin_provider }
 
-    oro_sync.authentication.origin.origin_registry_decorator:
-        decorates: gos_web_socket.origins.registry
-        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginRegistryDecorator
-        public: false
+    oro_sync.authentication.origin_registry.factory:
+        class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginRegistryFactory
         arguments:
-            - '@oro_sync.authentication.origin.origin_registry_decorator.inner'
-            - '@oro_sync.authentication.origin.origin_provider_chain'
+            - '@oro_sync.authentication.origin_provider'
 
-    oro_sync.authentication.origin.extractor:
+    oro_sync.loader.yaml:
+        class:  Oro\Bundle\SyncBundle\Loader\YamlFileLoader
+        parent: gos_pubsub_router.loader.yaml
+        tags:
+            - { name: gos_pubsub_router.routing.loader }
+
+    oro_sync.authentication.origin_extractor:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor
-        public: false
+
+    oro_sync.log.handler.websocket_server_console:
+        class: Oro\Bundle\SyncBundle\Log\Handler\WebsocketServerConsoleHandler
+        # Decorated handler service is specified along with the websocket monolog handler in Oro\Bundle\SyncBundle\DependencyInjection\OroSyncExtension
+        # decorates: monolog.handler.websocket
+        arguments:
+            - '@.inner'

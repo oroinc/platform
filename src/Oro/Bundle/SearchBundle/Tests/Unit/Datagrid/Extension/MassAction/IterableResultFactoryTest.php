@@ -12,32 +12,28 @@ use Oro\Bundle\SearchBundle\Datagrid\Extension\MassAction\IterableResultFactory;
 
 class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var IterableResultFactory
-     */
-    protected $iterableResultFactory;
+    /** @var IterableResultFactory */
+    private $iterableResultFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->iterableResultFactory = new IterableResultFactory();
     }
 
     public function testIsApplicableWhenNotApplicable()
     {
-        static::assertFalse($this->iterableResultFactory->isApplicable(new ArrayDatasource()));
+        self::assertFalse($this->iterableResultFactory->isApplicable(new ArrayDatasource()));
     }
 
     public function testIsApplicable()
     {
-        /** @var SearchDatasource $datasource */
         $datasource = $this->createMock(SearchDatasource::class);
 
-        static::assertTrue($this->iterableResultFactory->isApplicable($datasource));
+        self::assertTrue($this->iterableResultFactory->isApplicable($datasource));
     }
 
     public function testCreateIterableResultWhenDatasourceNotSupported()
     {
-        /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $gridConfiguration **/
         $gridConfiguration = $this->createMock(DatagridConfiguration::class);
         $selectedItems = SelectedItems::createFromParameters([]);
 

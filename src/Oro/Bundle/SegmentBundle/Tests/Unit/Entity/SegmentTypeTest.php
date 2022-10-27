@@ -6,19 +6,14 @@ use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 
 class SegmentTypeTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_NAME = 'name_test';
+    private const TEST_NAME = 'name_test';
 
     /** @var SegmentType */
-    protected $entity;
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new SegmentType(self::TEST_NAME);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entity);
     }
 
     public function testGettersAndSetters()

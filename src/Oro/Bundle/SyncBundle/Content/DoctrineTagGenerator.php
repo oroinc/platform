@@ -2,25 +2,30 @@
 
 namespace Oro\Bundle\SyncBundle\Content;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Generates tags for content.
+ */
 class DoctrineTagGenerator implements TagGeneratorInterface
 {
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
-    public function __construct(ManagerRegistry $doctrine)
+    /** @var EntityClassResolver */
+    protected $entityClassResolver;
+
+    public function __construct(ManagerRegistry $doctrine, EntityClassResolver $entityClassResolver)
     {
         $this->doctrine = $doctrine;
+        $this->entityClassResolver = $entityClassResolver;
     }
 
     /**
@@ -89,7 +94,7 @@ class DoctrineTagGenerator implements TagGeneratorInterface
                 }
             }
         } else {
-            $class = ClassUtils::getRealClass($data);
+            $class = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($data));
         }
 
         if ($includeCollectionTag) {

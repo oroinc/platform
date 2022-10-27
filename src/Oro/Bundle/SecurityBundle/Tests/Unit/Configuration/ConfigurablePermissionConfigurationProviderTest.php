@@ -3,14 +3,16 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider;
-use Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionListConfiguration;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle1\TestBundle1;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Configuration\Stub\TestBundle2\TestBundle2;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /**
      * @dataProvider bundlesProvider
      *
@@ -24,8 +26,14 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit\Framework
             $resourceBundles[$bundle->getName()] = get_class($bundle);
         }
 
-        $provider = $this->createConfigurationProvider($resourceBundles);
-        CumulativeResourceManager::getInstance()->clear()->setBundles($resourceBundles);
+        CumulativeResourceManager::getInstance()
+            ->clear()
+            ->setBundles($resourceBundles);
+
+        $provider = new ConfigurablePermissionConfigurationProvider(
+            $this->getTempFile('ConfigurablePermissionConfigurationProvider'),
+            false,
+        );
 
         $this->assertEquals($expected, $provider->getConfiguration());
     }
@@ -85,21 +93,5 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit\Framework
                 ]
             ],
         ];
-    }
-
-    /**
-     * @param array $bundles
-     * @return ConfigurablePermissionConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createConfigurationProvider(array $bundles)
-    {
-        $provider = $this->getMockBuilder(ConfigurablePermissionConfigurationProvider::class)
-            ->setConstructorArgs([new ConfigurablePermissionListConfiguration(), $bundles])
-            ->setMethods(['getConfigPath'])
-            ->getMock();
-
-        $provider->expects($this->any())->method('getConfigPath')->willReturn('configurable_permissions.yml');
-
-        return $provider;
     }
 }

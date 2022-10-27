@@ -6,6 +6,10 @@ use Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Provide select user list
+ * create select field
+ */
 class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
 {
     const NAME = 'oro_type_widget_user_select';
@@ -22,11 +26,10 @@ class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
                 'autocomplete_alias' => 'widget_owner_users',
                 'configs'            => [
                     'multiple'                => true,
-                    'width'                   => '400px',
                     'placeholder'             => 'oro.user.form.choose_user',
                     'allowClear'              => true,
-                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/Widget/result.html.twig',
-                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/Widget/selection.html.twig',
+                    'result_template_twig'    => '@OroUser/User/Autocomplete/Widget/result.html.twig',
+                    'selection_template_twig' => '@OroUser/User/Autocomplete/Widget/selection.html.twig',
                 ]
             ]
         );

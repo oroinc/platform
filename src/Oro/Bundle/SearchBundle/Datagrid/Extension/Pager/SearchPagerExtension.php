@@ -10,14 +10,14 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 
+/**
+ * Responsibility of this extension is to apply pagination on query for Search datasource
+ */
 class SearchPagerExtension extends OrmPagerExtension
 {
     /** @var IndexerPager */
     protected $pager;
 
-    /**
-     * @param IndexerPager $pager
-     */
     public function __construct(IndexerPager $pager)
     {
         $this->pager = $pager;
@@ -46,7 +46,7 @@ class SearchPagerExtension extends OrmPagerExtension
         $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
 
         if ($onePage) {
-            $this->pager->setMaxPerPage(0);
+            $this->pager->setMaxPerPage(self::SOFT_LIMIT);
         } else {
             $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
         }

@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class TestEntity
 {
@@ -11,6 +13,12 @@ class TestEntity
 
     /** @var Organization */
     protected $organization;
+
+    /** @var User */
+    protected $userOwner;
+
+    /** @var BusinessUnit */
+    protected $businessUnitOwner;
 
     /**
      * @return int
@@ -42,5 +50,31 @@ class TestEntity
     public function setOrganization($organization)
     {
         $this->organization = $organization;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUserOwner(): ?User
+    {
+        return $this->userOwner;
+    }
+
+    public function setUserOwner(User $userOwner): void
+    {
+        $this->userOwner = $userOwner;
+    }
+
+    /**
+     * @return BusinessUnit
+     */
+    public function getBusinessUnitOwner(): ?BusinessUnit
+    {
+        return $this->businessUnitOwner;
+    }
+
+    public function setBusinessUnitOwner(BusinessUnit $businessUnitOwner): void
+    {
+        $this->businessUnitOwner = $businessUnitOwner;
     }
 }

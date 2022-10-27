@@ -1,23 +1,22 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var $ = require('../side-menu');
-    var mediator = require('../mediator');
-    var persistentStorage = require('oroui/js/persistent-storage');
-    var SideMenuOverlay = require('oroui/js/desktop/side-menu-overlay');
+    const _ = require('underscore');
+    const $ = require('../side-menu');
+    const mediator = require('../mediator');
+    const persistentStorage = require('oroui/js/persistent-storage');
+    const SideMenuOverlay = require('oroui/js/desktop/side-menu-overlay');
+    const ScrollingOverlay = require('oroui/js/app/views/scrolling-overlay-view');
 
-    var STATE_STORAGE_KEY = 'main-menu-state';
-    var MAXIMIZED_STATE = 'maximized';
-    var MINIMIZED_STATE = 'minimized';
-    var ENTER_KEY_CODE = 13;
+    const STATE_STORAGE_KEY = 'main-menu-state';
+    const MAXIMIZED_STATE = 'maximized';
+    const MINIMIZED_STATE = 'minimized';
 
     $.widget('oroui.desktopSideMenu', $.oroui.sideMenu, {
         options: {
             menuSelector: '#main-menu',
             innerMenuSelector: '.menu:eq(0)',
-            innerMenuItemClassName: 'menu-item',
-            invisibleClassName: 'invisible'
+            innerMenuItemClassName: 'menu-item'
         },
 
         overlay: null,
@@ -25,8 +24,6 @@ define(function(require) {
         dropdownIndex: null,
 
         timeout: 50,
-
-        timer: null,
 
         /**
          * Do initial changes
@@ -36,49 +33,41 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _create: function() {
             this._super();
 
-            this.listener
-                .listenTo(mediator, 'layout:reposition', _.debounce(this.onChangeReposition, this.timeout).bind(this));
-
             this.$menu = this.element.find(this.options.menuSelector);
-            this.$menuScrollContent = this.element.find('.nav-multilevel');
-            this.$scrollHandles = this.element.find('[data-role="scroll-trigger"]');
-            this.scrollStep = this.getScrollStep();
 
             this._on(this.element, {
                 'click .dropdown-level-1': this.onMenuOpen,
-                'keydown [data-role="scroll-trigger"]': this.onMenuScroll,
-                'mousedown [data-role="scroll-trigger"]': this.onMenuHoldScroll,
-                'mouseup [data-role="scroll-trigger"]': this.undoMenuHoldScroll,
-                'mouseout [data-role="scroll-trigger"]': this.undoMenuHoldScroll,
                 'transitionend .accordion': function() {
                     mediator.trigger('layout:reposition');
+                },
+                'mainMenuUpdated'() {
+                    this.scrollingOverlay.setScrollingContent(this.element.find('.nav-multilevel'));
                 }
             });
-            this._on(this.$menuScrollContent, {
-                scroll: _.debounce(this.toggleScrollTriggers, this.timeout)
-            });
 
+            this.scrollingOverlay = new ScrollingOverlay({
+                autoRender: true,
+                scrollStep: this.getHeightOfFirstMenuItem(),
+                $scrollingContent: this.element.find('.nav-multilevel')
+            });
             this.overlay = new SideMenuOverlay();
+            this.overlay
+                .on('open', this._attachHandlersFormDocument.bind(this))
+                .on('close', this._removeHandlersFormDocument.bind(this));
             this.overlay.render();
             this.$menu.after(this.overlay.$el);
-
-            $(document).on('focusout' + this.eventNamespace, _.debounce(function() {
-                if (!$.contains(this.$menu.parent()[0], document.activeElement)) {
-                    this.overlay.trigger('leave-focus');
-                }
-            }.bind(this), this.timeout));
         },
 
         /**
          * Updates menu's minimized/maximized view
          */
         _update: function() {
-            var isMinimized = this.isMinimized();
+            const isMinimized = this.isMinimized();
 
             this.element.toggleClass('minimized', isMinimized);
 
@@ -101,7 +90,11 @@ define(function(require) {
             );
             this._update();
             mediator.trigger('layout:adjustHeight');
-            this.scrollStep = this.getScrollStep();
+            this.scrollingOverlay.setScrollStep(this.getHeightOfFirstMenuItem());
+        },
+
+        getHeightOfFirstMenuItem: function() {
+            return Math.ceil(this.element.find('.nav-multilevel').children().first().outerHeight());
         },
 
         /**
@@ -112,56 +105,42 @@ define(function(require) {
         _destroy: function() {
             this._super();
 
+            this.overlay.off();
             this.overlay.dispose();
             delete this.overlay;
             delete this.dropdownIndex;
+            this.scrollingOverlay.dispose();
+            delete this.scrollingOverlay;
 
+            this._removeHandlersFormDocument();
+        },
+
+        /**
+         * Attach event handlers for document
+         * @private
+         */
+        _attachHandlersFormDocument: function() {
+            let actionInMenu = true;
+            const menuContainer = this.$menu.parent()[0];
+
+            $(document)
+                .on('click' + this.eventNamespace + ' keydown' + this.eventNamespace, _.debounce(function(e) {
+                    // event was fired on scope of menu or not
+                    actionInMenu = $.contains(menuContainer, e.target);
+                }, this.timeout))
+                .on('keyup' + this.eventNamespace, _.debounce(function() {
+                    if (actionInMenu && !$.contains(menuContainer, document.activeElement)) {
+                        this.overlay.trigger('leave-focus');
+                    }
+                }.bind(this), this.timeout));
+        },
+
+        /**
+         * Remove all event handlers for document
+         * @private
+         */
+        _removeHandlersFormDocument: function() {
             $(document).off(this.eventNamespace);
-        },
-
-        /**
-         * Change sidebar width for minimized state
-         */
-        onChangeReposition: function() {
-            this.toggleScrollTriggers();
-        },
-
-        /**
-         * Show / hide scroll handles
-         */
-        toggleScrollTriggers: function() {
-            var bottomPosition = _.reduce(this.$menuScrollContent.children(), function(result, item) {
-                return result + $(item).outerHeight();
-            }, 0);
-            var scrollContentHeight = this.$menuScrollContent.outerHeight();
-            var scrollTop = this.$menuScrollContent.scrollTop();
-
-            this.$scrollHandles.removeClass(this.options.invisibleClassName);
-
-            if (scrollContentHeight >= bottomPosition) {
-                this.$scrollHandles.addClass(this.options.invisibleClassName);
-                return;
-            }
-
-            this.$scrollHandles
-                .filter('[data-direction="up"]')
-                .toggleClass(this.options.invisibleClassName,
-                    scrollTop === 0
-                );
-
-            this.$scrollHandles
-                .filter('[data-direction="down"]')
-                .toggleClass(
-                    this.options.invisibleClassName,
-                    scrollTop >= bottomPosition - scrollContentHeight
-                );
-        },
-
-        /**
-         * @returns {number}
-         */
-        getScrollStep: function() {
-            return Math.ceil(this.$menuScrollContent.children().first().outerHeight());
         },
 
         /**
@@ -174,14 +153,14 @@ define(function(require) {
                 return;
             }
 
-            var index = $(event.currentTarget).index();
+            const index = $(event.currentTarget).index();
 
             this.highlightDropdown($(event.currentTarget));
 
             if (this.dropdownIndex === index && this.overlay.isOpen) {
                 this.overlay.close();
             } else {
-                var $menu = $(event.currentTarget).find(this.options.innerMenuSelector);
+                const $menu = $(event.currentTarget).find(this.options.innerMenuSelector);
 
                 if (!$menu.length) {
                     return;
@@ -200,48 +179,6 @@ define(function(require) {
             }
 
             this.dropdownIndex = index;
-        },
-
-        /**
-         * Handle menu scroll action
-         *
-         * @param {Event} event
-         */
-        onMenuScroll: function(event) {
-            if (typeof event.keyCode === 'number' && event.keyCode !== ENTER_KEY_CODE) {
-                return;
-            }
-
-            this.toggleScrollTriggers();
-
-            switch ($(event.currentTarget).data('direction')) {
-                case 'up':
-                    this.$menuScrollContent.scrollTop(this.$menuScrollContent.scrollTop() - this.scrollStep);
-                    break;
-                case 'down':
-                    this.$menuScrollContent.scrollTop(this.$menuScrollContent.scrollTop() + this.scrollStep);
-                    break;
-            }
-        },
-
-        /**
-         * Undo scroll
-         */
-        undoMenuHoldScroll: function() {
-            clearInterval(this.timer);
-        },
-
-        /**
-         * Handle menu hold scroll action
-         *
-         * @param {Event} event
-         */
-        onMenuHoldScroll: function(event) {
-            this.onMenuScroll(event);
-
-            this.timer = setInterval(function() {
-                this.onMenuScroll(event);
-            }.bind(this), 150);
         },
 
         /**
@@ -268,17 +205,17 @@ define(function(require) {
          * @returns {*|jQuery}
          */
         convertToFlatStructure: function($menu) {
-            var self = this;
-            var collection = [];
+            const self = this;
+            const collection = [];
 
-            var createFlatStructure = function($menu, parentIndex, parentGroupIndex) {
-                var $items = $menu.children();
+            const createFlatStructure = function($menu, parentIndex, parentGroupIndex) {
+                const $items = $menu.children();
 
                 $items.each(function(index, menuItem) {
-                    var $menuItem = $(menuItem).clone(true, true);
-                    var $nestedMenuItem = null;
-                    var uniqueIndex = null;
-                    var uniqueGroupIndex = null;
+                    const $menuItem = $(menuItem).clone(true, true);
+                    let $nestedMenuItem = null;
+                    let uniqueIndex = null;
+                    let uniqueGroupIndex = null;
 
                     if (!parentIndex) {
                         uniqueIndex = 'id:' + index;
@@ -300,9 +237,8 @@ define(function(require) {
 
                     $menuItem
                         .attr('data-index', uniqueIndex)
-                        .attr('data-original-text', $menuItem.text())
+                        .attr('data-original-text', _.escape($menuItem.text()))
                         .addClass(self.options.innerMenuItemClassName);
-
                     collection.push($menuItem[0]);
 
                     if ($nestedMenuItem) {

@@ -3,42 +3,33 @@
 namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
- * The factory to create Data API metadata based on ORM metadata.
+ * The factory to create API metadata based on ORM metadata.
  */
 class EntityMetadataFactory
 {
-    private const TYPE          = 'type';
-    private const NULLABLE      = 'nullable';
-    private const LENGTH        = 'length';
+    private const TYPE = 'type';
+    private const NULLABLE = 'nullable';
+    private const LENGTH = 'length';
     private const TARGET_ENTITY = 'targetEntity';
-    private const JOIN_COLUMNS  = 'joinColumns';
+    private const JOIN_COLUMNS = 'joinColumns';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     *
-     * @return EntityMetadata
-     */
     public function createEntityMetadata(ClassMetadata $classMetadata): EntityMetadata
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($classMetadata->name);
+        $entityMetadata = new EntityMetadata($classMetadata->name);
         $entityMetadata->setIdentifierFieldNames($classMetadata->getIdentifierFieldNames());
         $entityMetadata->setHasIdentifierGenerator($classMetadata->usesIdGenerator());
         $entityMetadata->setInheritedType(!$classMetadata->isInheritanceTypeNone());
@@ -46,13 +37,6 @@ class EntityMetadataFactory
         return $entityMetadata;
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     * @param string        $propertyPath
-     * @param string|null   $fieldType
-     *
-     * @return MetaPropertyMetadata
-     */
     public function createMetaPropertyMetadata(
         ClassMetadata $classMetadata,
         string $propertyPath,
@@ -60,7 +44,7 @@ class EntityMetadataFactory
     ): MetaPropertyMetadata {
         /** @var ClassMetadata $classMetadata */
         /** @var string $fieldName */
-        list($classMetadata, $fieldName) = $this->getTargetClassMetadata($classMetadata, $propertyPath);
+        [$classMetadata, $fieldName] = $this->getTargetClassMetadata($classMetadata, $propertyPath);
         if (!$fieldType && $classMetadata->hasField($fieldName)) {
             $fieldType = $this->getFieldType($classMetadata->getFieldMapping($fieldName));
         }
@@ -71,13 +55,6 @@ class EntityMetadataFactory
         return $fieldMetadata;
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     * @param string        $propertyPath
-     * @param string|null   $fieldType
-     *
-     * @return FieldMetadata
-     */
     public function createFieldMetadata(
         ClassMetadata $classMetadata,
         string $propertyPath,
@@ -85,31 +62,37 @@ class EntityMetadataFactory
     ): FieldMetadata {
         /** @var ClassMetadata $classMetadata */
         /** @var string $fieldName */
-        list($classMetadata, $fieldName) = $this->getTargetClassMetadata($classMetadata, $propertyPath);
-        $mapping = $classMetadata->getFieldMapping($fieldName);
-        if (!$fieldType) {
+        [$classMetadata, $fieldName] = $this->getTargetClassMetadata($classMetadata, $propertyPath);
+        $mapping = $classMetadata->hasField($fieldName)
+            ? $classMetadata->getFieldMapping($fieldName)
+            : null;
+        if (!$fieldType && $mapping) {
             $fieldType = $this->getFieldType($mapping);
+        }
+        if (!$fieldType) {
+            throw new \InvalidArgumentException(sprintf(
+                'The data type for "%s::%s" is not defined.',
+                $classMetadata->name,
+                $fieldName
+            ));
         }
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
         $fieldMetadata->setDataType($fieldType);
-        if (!empty($mapping[self::NULLABLE])) {
+        if ($mapping) {
+            if (!empty($mapping[self::NULLABLE])) {
+                $fieldMetadata->setIsNullable(true);
+            }
+            if (isset($mapping[self::LENGTH])) {
+                $fieldMetadata->setMaxLength($mapping[self::LENGTH]);
+            }
+        } else {
             $fieldMetadata->setIsNullable(true);
-        }
-        if (isset($mapping[self::LENGTH])) {
-            $fieldMetadata->setMaxLength($mapping[self::LENGTH]);
         }
 
         return $fieldMetadata;
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     * @param string        $propertyPath
-     * @param string|null   $associationDataType
-     *
-     * @return AssociationMetadata
-     */
     public function createAssociationMetadata(
         ClassMetadata $classMetadata,
         string $propertyPath,
@@ -117,14 +100,13 @@ class EntityMetadataFactory
     ): AssociationMetadata {
         /** @var ClassMetadata $classMetadata */
         /** @var string $associationName */
-        list($classMetadata, $associationName) = $this->getTargetClassMetadata($classMetadata, $propertyPath);
+        [$classMetadata, $associationName] = $this->getTargetClassMetadata($classMetadata, $propertyPath);
         $mapping = $classMetadata->getAssociationMapping($associationName);
 
         $targetClass = $mapping[self::TARGET_ENTITY];
 
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
-        $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setAssociationType($this->getAssociationType($mapping));
         if (!($mapping[self::TYPE] & ClassMetadata::TO_ONE)) {
             $associationMetadata->setIsCollection(true);
@@ -139,7 +121,7 @@ class EntityMetadataFactory
             $associationMetadata->setDataType($associationDataType);
         } else {
             $targetIdFields = $targetMetadata->getIdentifierFieldNames();
-            if (count($targetIdFields) === 1) {
+            if (\count($targetIdFields) === 1) {
                 $associationMetadata->setDataType(
                     $this->getFieldType($targetMetadata->getFieldMapping(\reset($targetIdFields)))
                 );
@@ -148,29 +130,22 @@ class EntityMetadataFactory
             }
         }
         if ($targetMetadata->isInheritanceTypeNone()) {
+            $associationMetadata->setTargetClassName($targetClass);
             $associationMetadata->addAcceptableTargetClassName($targetClass);
         } else {
+            $associationMetadata->setTargetClassName(EntityIdentifier::class);
+            $associationMetadata->setBaseTargetClassName($targetClass);
             $associationMetadata->setAcceptableTargetClassNames($targetMetadata->subClasses);
         }
 
         return $associationMetadata;
     }
 
-    /**
-     * @param array $fieldMapping
-     *
-     * @return string
-     */
     private function getFieldType(array $fieldMapping): string
     {
         return (string)$fieldMapping[self::TYPE];
     }
 
-    /**
-     * @param array $associationMapping
-     *
-     * @return string|null
-     */
     private function getAssociationType(array $associationMapping): ?string
     {
         switch ($associationMapping[self::TYPE]) {
@@ -187,11 +162,6 @@ class EntityMetadataFactory
         }
     }
 
-    /**
-     * @param array $associationMapping
-     *
-     * @return bool
-     */
     private function isNullableAssociation(array $associationMapping): bool
     {
         $isNullable = true;
@@ -217,7 +187,7 @@ class EntityMetadataFactory
     private function getTargetClassMetadata(ClassMetadata $classMetadata, string $propertyPath): array
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
-        if (count($path) === 1) {
+        if (\count($path) === 1) {
             return [$classMetadata, $propertyPath];
         }
 
@@ -233,9 +203,9 @@ class EntityMetadataFactory
             );
         }
         if (null === $targetClassMetadata) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'Cannot find metadata by path "%s" starting with class "%s"',
-                \implode(ConfigUtil::PATH_DELIMITER, $path),
+                implode(ConfigUtil::PATH_DELIMITER, $path),
                 $classMetadata->name
             ));
         }

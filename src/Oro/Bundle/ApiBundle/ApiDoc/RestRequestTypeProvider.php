@@ -3,16 +3,20 @@
 namespace Oro\Bundle\ApiBundle\ApiDoc;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Provides the request type for the current API view.
  */
-class RestRequestTypeProvider implements RequestTypeProviderInterface, RestDocViewDetectorAwareInterface
+class RestRequestTypeProvider implements
+    RequestTypeProviderInterface,
+    RestDocViewDetectorAwareInterface,
+    ResetInterface
 {
     /** @var array [view name => [request type, ...], ...] */
     private $requestTypeMap = [];
 
-    /** @var RestDocViewDetector */
+    /** @var RestDocViewDetector|null */
     private $docViewDetector;
 
     /**
@@ -32,6 +36,14 @@ class RestRequestTypeProvider implements RequestTypeProviderInterface, RestDocVi
     public function setRestDocViewDetector(RestDocViewDetector $docViewDetector): void
     {
         $this->docViewDetector = $docViewDetector;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function reset()
+    {
+        $this->docViewDetector = null;
     }
 
     /**

@@ -8,7 +8,6 @@ namespace Oro\Component\Testing\Unit\Constraint;
  */
 class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constraint
 {
-
     /**
      * @var string
      */
@@ -30,7 +29,6 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
      */
     public function __construct($propertyName, $testValue)
     {
-        parent::__construct();
         $this->propertyName = $propertyName;
         $this->testValue = $testValue;
     }
@@ -38,33 +36,33 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
     /**
      * {@inheritdoc}
      */
-    public function toString()
+    public function toString(): string
     {
         return sprintf(
             'getter %s for property %s returns the previously set value %s',
             $this->getterName,
             $this->propertyName,
-            $this->exporter->export($this->testValue)
+            $this->exporter()->export($this->testValue)
         );
     }
     /**
      * {@inheritdoc}
      */
-    protected function failureDescription($other)
+    protected function failureDescription($other): string
     {
         return sprintf(
             'getter %s for property %s of class %s returns the previously set value %s',
             $this->getterName,
             $this->propertyName,
             get_class($other),
-            $this->exporter->export($this->testValue)
+            $this->exporter()->export($this->testValue)
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function matches($other)
+    protected function matches($other): bool
     {
         $setter = 'set' . ucfirst($this->propertyName);
         if (method_exists($other, $setter)) {
@@ -75,7 +73,6 @@ class PropertyGetterReturnsSetValue extends \PHPUnit\Framework\Constraint\Constr
             $prop->setAccessible(true);
             $prop->setValue($other, $this->testValue);
         }
-
 
         $this->getterName = 'get' . ucfirst($this->propertyName);
         if (!method_exists($other, $this->getterName)) {

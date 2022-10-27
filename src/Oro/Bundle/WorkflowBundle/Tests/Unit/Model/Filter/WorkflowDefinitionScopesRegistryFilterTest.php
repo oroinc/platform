@@ -3,8 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
@@ -22,10 +22,9 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit\Framework\Test
     /** @var WorkflowDefinitionScopesRegistryFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->scopeManager = $this->getMockBuilder(ScopeManager::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->scopeManager = $this->createMock(ScopeManager::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->filter = new WorkflowDefinitionScopesRegistryFilter($this->scopeManager, $this->doctrine);
@@ -33,10 +32,6 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit\Framework\Test
 
     /**
      * @dataProvider filterDataProvider
-     * @param ArrayCollection $incomingDefinitions
-     * @param array $scopedWorkflowNames
-     * @param array $matchingScopesDefinitionsResult
-     * @param ArrayCollection $expectedResult
      */
     public function testFilter(
         ArrayCollection $incomingDefinitions,
@@ -44,13 +39,16 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit\Framework\Test
         array $matchingScopesDefinitionsResult,
         ArrayCollection $expectedResult
     ) {
-        $scopeCriteria = $this->getMockBuilder(ScopeCriteria::class)->disableOriginalConstructor()->getMock();
+        $scopeCriteria = $this->createMock(ScopeCriteria::class);
 
         $this->scopeManager->expects($this->once())
-            ->method('getCriteria')->with('workflow_definition')->willReturn($scopeCriteria);
+            ->method('getCriteria')
+            ->with('workflow_definition')
+            ->willReturn($scopeCriteria);
 
         $this->repositoryMocked()->expects($this->once())
-            ->method('getScopedByNames')->with($scopedWorkflowNames, $scopeCriteria)
+            ->method('getScopedByNames')
+            ->with($scopedWorkflowNames, $scopeCriteria)
             ->willReturn($matchingScopesDefinitionsResult);
 
         $this->assertSame(
@@ -65,26 +63,24 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit\Framework\Test
      */
     private function repositoryMocked()
     {
-        $repository = $this->getMockBuilder(WorkflowDefinitionRepository::class)
-            ->disableOriginalConstructor()->getMock();
+        $repository = $this->createMock(WorkflowDefinitionRepository::class);
 
         $manager = $this->createMock(ObjectManager::class);
 
         $this->doctrine->expects($this->once())
-            ->method('getManagerForClass')->with(WorkflowDefinition::class)
+            ->method('getManagerForClass')
+            ->with(WorkflowDefinition::class)
             ->willReturn($manager);
 
         $manager->expects($this->once())
-            ->method('getRepository')->with(WorkflowDefinition::class)
+            ->method('getRepository')
+            ->with(WorkflowDefinition::class)
             ->willReturn($repository);
 
         return $repository;
     }
 
-    /**
-     * @return array
-     */
-    public function filterDataProvider()
+    public function filterDataProvider(): array
     {
         $wd1 = (new WorkflowDefinition)->setName('wd1')->setConfiguration(['scopes' => ['a' => 1]]);
         $wd2 = (new WorkflowDefinition)->setName('wd2')->setConfiguration(['scopes' => ['a' => 1]]);

@@ -1,0 +1,13 @@
+aliases:
+    oro/select2-entity-field-choice-component$: oroentity/js/components/select2-entity-field-choice-component
+    oro/select2-entity-field-component$: oroentity/js/components/select2-entity-field-component
+    oro/select2-entity-field-select-component$: oroentity/js/components/select2-entity-field-select-component
+app-modules:
+    - oroentity/js/app/modules/entity-model-module
+dynamic-imports:
+    commons:
+        - oroentity/js/app/views/displayable-priority-view
+        - oroentity/js/app/views/entity-field-fallback
+        - oroentity/js/app/views/field-choice-view
+        - oroentity/js/app/views/form-hide-related-field
+        - oroentity/js/tools/entity-select-search-api-accessor

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event allow to change activity target ids

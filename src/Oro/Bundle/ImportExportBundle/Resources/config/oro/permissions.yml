@@ -1,0 +1,16 @@
+oro_permissions:
+    EDIT:
+        exclude_entities:
+            - Oro\Bundle\ImportExportBundle\Entity\ImportExportResult
+
+    DELETE:
+        exclude_entities:
+            - Oro\Bundle\ImportExportBundle\Entity\ImportExportResult
+
+    ASSIGN:
+        exclude_entities:
+            - Oro\Bundle\ImportExportBundle\Entity\ImportExportResult
+
+    CREATE:
+        exclude_entities:
+            - Oro\Bundle\ImportExportBundle\Entity\ImportExportResult

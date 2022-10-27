@@ -7,8 +7,6 @@ define([
 ], function(_, messenger, __, DeleteConfirmation, ModelAction) {
     'use strict';
 
-    var DeleteAction;
-
     /**
      * Delete action with confirm dialog, triggers REST DELETE request
      *
@@ -16,7 +14,7 @@ define([
      * @class   oro.datagrid.action.DeleteAction
      * @extends oro.datagrid.action.ModelAction
      */
-    DeleteAction = ModelAction.extend({
+    const DeleteAction = ModelAction.extend({
 
         /** @property {Function} */
         confirmModalConstructor: DeleteConfirmation,
@@ -30,29 +28,30 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DeleteAction() {
-            DeleteAction.__super__.constructor.apply(this, arguments);
+        constructor: function DeleteAction(options) {
+            DeleteAction.__super__.constructor.call(this, options);
         },
 
         /**
          * Execute delete model
          */
         execute: function() {
-            this.getConfirmDialog(_.bind(this.doDelete, this)).open();
+            this.getConfirmDialog(() => {
+                this.doDelete(this.messages);
+            }).open();
         },
 
         /**
          * Confirm delete item
          */
-        doDelete: function() {
+        doDelete: function(messages) {
             this.model.destroy({
                 url: this.getLink(),
                 wait: true,
                 success: function() {
-                    var messageText = __('Item deleted');
-                    messenger.notificationFlashMessage('success', messageText);
+                    messenger.notificationFlashMessage('success', __(messages.success));
                 }
             });
         }

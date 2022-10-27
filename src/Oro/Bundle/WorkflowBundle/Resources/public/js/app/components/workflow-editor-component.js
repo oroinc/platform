@@ -2,25 +2,24 @@
 define(function(require) {
     'use strict';
 
-    var WorkflowEditorComponent;
-    var WorkflowViewerComponent = require('./workflow-viewer-component');
-    var HistoryNavigationComponent = require('oroui/js/app/components/history-navigation-component');
-    var FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view');
-    var mediator = require('oroui/js/mediator');
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var messenger = require('oroui/js/messenger');
-    var routing = require('routing');
-    var helper = require('oroworkflow/js/tools/workflow-helper');
-    var WorkflowManagementView = require('../views/workflow-management-view');
-    var TransitionModel = require('../models/transition-model');
-    var TransitionEditFormView = require('../views/transition/transition-edit-view');
-    var StepEditView = require('../views/step/step-edit-view');
-    var StepModel = require('../models/step-model');
-    var workflowModelFactory = require('../../tools/workflow-model-factory');
-    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    const WorkflowViewerComponent = require('./workflow-viewer-component');
+    const HistoryNavigationComponent = require('oroui/js/app/components/history-navigation-component');
+    const FlowchartEditorWorkflowView = require('../views/flowchart/editor/workflow-view');
+    const mediator = require('oroui/js/mediator');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const messenger = require('oroui/js/messenger');
+    const routing = require('routing');
+    const helper = require('oroworkflow/js/tools/workflow-helper');
+    const WorkflowManagementView = require('../views/workflow-management-view');
+    const TransitionModel = require('../models/transition-model');
+    const TransitionEditFormView = require('../views/transition/transition-edit-view');
+    const StepEditView = require('../views/step/step-edit-view');
+    const StepModel = require('../models/step-model');
+    const workflowModelFactory = require('../../tools/workflow-model-factory');
+    const EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    const DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     /**
      * Builds workflow editor UI.
@@ -28,9 +27,11 @@ define(function(require) {
      * @class WorkflowEditorComponent
      * @augments WorkflowViewerComponent
      */
-    WorkflowEditorComponent = WorkflowViewerComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
+    const WorkflowEditorComponent = WorkflowViewerComponent.extend(/** @lends WorkflowEditorComponent.prototype */{
+        FlowchartWorkflowView: FlowchartEditorWorkflowView,
+
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'requestAddTransition model': 'addNewStepTransition',
@@ -47,36 +48,45 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function WorkflowEditorComponent() {
-            WorkflowEditorComponent.__super__.constructor.apply(this, arguments);
+        constructor: function WorkflowEditorComponent(options) {
+            WorkflowEditorComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            this._deferredInit();
-            var providerOptions = {
+            const providerOptions = {
                 filterPreset: 'workflow'
             };
-            var entity = _.result(options, 'entity') || _.result(this.options, 'entity');
+
+            const entity = _.result(options, 'entity');
             if (entity) {
                 providerOptions.rootEntity = _.result(entity, 'entity');
             }
-            EntityStructureDataProvider.createDataProvider(providerOptions, this).then(function(provider) {
-                this.entityFieldsProvider = provider;
-                this._resolveDeferredInit();
-            }.bind(this));
+
+            const providerPromise = EntityStructureDataProvider.createDataProvider(providerOptions, this)
+                .then(function(provider) {
+                    this.entityFieldsProvider = provider;
+                    this.initManagementView(options._sourceElement);
+                }.bind(this));
+
+            this._initPromises.push(providerPromise);
 
             WorkflowEditorComponent.__super__.initialize.call(this, options);
+
+            this.historyManager = new HistoryNavigationComponent({
+                observedModel: this.model,
+                _sourceElement: options._sourceElement.find('.workflow-history-container')
+            });
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        initViews: function($el, flowchartOptions) {
+        initManagementView: function($el) {
             this.workflowManagementView = new WorkflowManagementView({
                 autoRender: true,
                 el: $el,
@@ -84,23 +94,14 @@ define(function(require) {
                 model: this.model,
                 entityFieldsProvider: this.entityFieldsProvider
             });
-            this.historyManager = new HistoryNavigationComponent({
-                observedModel: this.model,
-                _sourceElement: $el.find('.workflow-history-container')
-            });
-            if (this.flowchartEnabled) {
-                this.FlowchartWorkflowView = FlowchartEditorWorkflowView;
-            }
-            WorkflowEditorComponent.__super__.initViews.call(this, $el, flowchartOptions);
         },
 
         /**
          * Automatically organizes steps on flowchart. Fits flowchart to screen.
          */
         refreshChart: function() {
-            if (this.flowchartEnabled) {
-                this.flowchartView.jsPlumbManager.organizeBlocks();
-                this.flowchartView.$el.trigger('autozoom');
+            if (this.flowchartContainerView) {
+                this.flowchartContainerView.refresh();
             }
         },
 
@@ -111,7 +112,7 @@ define(function(require) {
          * @param {StepModel=} stepTo
          */
         addNewStepTransition: function(stepFrom, stepTo) {
-            var transition = new TransitionModel();
+            const transition = new TransitionModel();
             this.openManageTransitionForm(transition, stepFrom, stepTo);
         },
 
@@ -132,7 +133,7 @@ define(function(require) {
                 return;
             }
 
-            var transitionEditView = new TransitionEditFormView({
+            const transitionEditView = new TransitionEditFormView({
                 autoRender: true,
                 model: transition,
                 workflow: this.model,
@@ -156,7 +157,7 @@ define(function(require) {
                 return;
             }
 
-            var stepEditView = new StepEditView({
+            const stepEditView = new StepEditView({
                 model: step,
                 workflow: this.model,
                 workflowContainer: this.workflowManagementView.$el
@@ -182,7 +183,7 @@ define(function(require) {
          * @param {StepModel} step - step to clone
          */
         cloneStep: function(step) {
-            var clonedStep = this.model.cloneStep(step, true);
+            const clonedStep = this.model.cloneStep(step, true);
             this.openManageStepForm(clonedStep);
         },
 
@@ -204,7 +205,7 @@ define(function(require) {
          * @private
          */
         _showModalMessage: function(message, title, okText) {
-            var confirm = new DeleteConfirmation({
+            const confirm = new DeleteConfirmation({
                 title: title || '',
                 content: message,
                 okText: okText || __('OK'),
@@ -221,7 +222,7 @@ define(function(require) {
          * @private
          */
         _removeHandler: function(model, message) {
-            var confirm = new DeleteConfirmation({
+            const confirm = new DeleteConfirmation({
                 content: message
             });
             confirm.on('ok', function() {
@@ -240,9 +241,9 @@ define(function(require) {
          */
         resetWorkflow: function() {
             // Need to manually destroy collection elements to trigger all appropriate events
-            var resetCollection = function(collection) {
+            const resetCollection = function(collection) {
                 if (collection.length) {
-                    for (var i = collection.length - 1; i > -1; i--) {
+                    for (let i = collection.length - 1; i > -1; i--) {
                         collection.at(i).destroy();
                     }
                 }
@@ -278,7 +279,7 @@ define(function(require) {
                 return;
             }
 
-            var formData = helper.getFormData(this.workflowManagementView.$el);
+            const formData = helper.getFormData(this.workflowManagementView.$el);
             formData.steps_display_ordered = formData.hasOwnProperty('steps_display_ordered');
 
             if (!this.model.get('name')) {
@@ -297,12 +298,12 @@ define(function(require) {
 
             mediator.execute('showLoading');
             this.model.save(null, {
-                success: _.bind(function() {
+                success: () => {
                     mediator.execute('hideLoading');
 
-                    var redirectUrl = '';
-                    var modelName = this.model.get('name');
-                    var saveAndClose = this.workflowManagementView.submitActor &&
+                    let redirectUrl = '';
+                    const modelName = this.model.get('name');
+                    const saveAndClose = this.workflowManagementView.submitActor &&
                             !$(this.workflowManagementView.submitActor).is('[data-action="save_and_stay"]');
                     if (saveAndClose) {
                         redirectUrl = routing.generate('oro_workflow_definition_view', {name: modelName});
@@ -312,25 +313,18 @@ define(function(require) {
 
                     mediator.once('page:afterChange', function() {
                         messenger.notificationFlashMessage('success', __('Workflow saved.'));
-                        messenger.notificationFlashMessage(
-                            'warning',
-                            __(
-                                'oro.workflow.translation_rebuild_required',
-                                {path: routing.generate('oro_translation_translation_index')}
-                            )
-                        );
                     });
                     mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
-                }, this),
-                errorHandlerMessage: function(event, response) {
-                    var message = __('Could not save workflow.');
+                },
+                errorHandlerMessage: (event, response) => {
+                    let message = __('Could not save workflow.');
                     if (response.responseJSON && response.responseJSON.error) {
                         message = response.responseJSON.error;
                     }
 
                     return message;
                 },
-                error: function(model, response) {
+                error: (model, response) => {
                     mediator.execute('hideLoading');
                 }
             });
@@ -382,7 +376,7 @@ define(function(require) {
          * @param {StepModel} stepFrom
          */
         cloneTransition: function(transition, stepFrom) {
-            var clonedTransition = this.model.cloneTransition(transition, true);
+            const clonedTransition = this.model.cloneTransition(transition, true);
             this.openManageTransitionForm(clonedTransition, stepFrom);
         },
 
@@ -414,7 +408,7 @@ define(function(require) {
          * Opens "Add step" dialog
          */
         addNewStep: function() {
-            var step = new StepModel();
+            const step = new StepModel();
             this.openManageStepForm(step);
         },
 

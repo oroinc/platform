@@ -3,20 +3,30 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\AddParentEntityIdToQuery;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
     /** @var AddParentEntityIdToQuery */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->processor = new AddParentEntityIdToQuery($this->doctrineHelper);
+        $this->processor = new AddParentEntityIdToQuery(
+            $this->doctrineHelper,
+            new EntityIdHelper()
+        );
     }
 
     public function testProcessWhenQueryDoesNotExist()
@@ -55,6 +65,211 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
+    public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig()
+    {
+        $associationName = 'association';
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id']);
+        $parentConfig->addField('id');
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(Entity\User::class)
+            ->createQueryBuilder('e');
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId(-1);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT e FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertCount(0, $this->context->getQuery()->getParameters());
+    }
+
+    public function testProcessForComputedAssociationWhenQueryForItIsPreparedByAnotherProcessor()
+    {
+        $associationName = 'owner';
+        $parentId = 123;
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id']);
+        $parentConfig->addField('id');
+        $parentConfig->addField($associationName)
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(Entity\User::class)
+            ->createQueryBuilder('e')
+            ->where('e.owner = :parent_entity_id')
+            ->setParameter('parent_entity_id', $parentId);
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT e'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
+            . ' WHERE e.owner = :parent_entity_id',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertEquals(
+            $parentId,
+            $this->context->getQuery()->getParameter('parent_entity_id')->getValue()
+        );
+    }
+
+    public function testProcessForComputedAssociationWhenQueryForItIsNotPreparedByAnotherProcessor()
+    {
+        $associationName = 'owner';
+        $parentId = 123;
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id']);
+        $parentConfig->addField('id');
+        $parentConfig->addField($associationName)
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(Entity\User::class)
+            ->createQueryBuilder('r')
+            ->innerJoin('e.owner', 'e');
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT r'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User r'
+            . ' INNER JOIN e.owner e'
+            . ' WHERE e.id = :parent_entity_id',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertEquals(
+            $parentId,
+            $this->context->getQuery()->getParameter('parent_entity_id')->getValue()
+        );
+    }
+
+    public function testProcessForComputedAssociationAndCompositeParentIdWhenQueryForItIsPreparedByAnotherProcessor()
+    {
+        $associationName = 'owner';
+        $parentId = ['id' => 123, 'title' => 'test'];
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id', 'title']);
+        $parentConfig->addField('id');
+        $parentConfig->addField('title');
+        $parentConfig->addField($associationName)
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+        $parentMetadata->addField(new FieldMetadata('title'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(Entity\User::class)
+            ->createQueryBuilder('e')
+            ->innerJoin('e.owner', 'o')
+            ->where('o.id = :parent_entity_id1 AND o.name = :parent_entity_id2')
+            ->setParameter('parent_entity_id1', $parentId['id'])
+            ->setParameter('parent_entity_id2', $parentId['title']);
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT e'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e'
+            . ' INNER JOIN e.owner o'
+            . ' WHERE o.id = :parent_entity_id1 AND o.name = :parent_entity_id2',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertSame(
+            $parentId['id'],
+            $this->context->getQuery()->getParameter('parent_entity_id1')->getValue()
+        );
+        self::assertSame(
+            $parentId['title'],
+            $this->context->getQuery()->getParameter('parent_entity_id2')->getValue()
+        );
+    }
+
+    public function testProcessForComputedAssociationAndCompositeParentIdWhenQueryForItIsNotPreparedByAnotherProcessor()
+    {
+        $associationName = 'owner';
+        $parentId = ['id' => 123, 'title' => 'test'];
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id', 'title']);
+        $parentConfig->addField('id');
+        $parentConfig->addField('title');
+        $parentConfig->addField($associationName)
+            ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+        $parentMetadata->addField(new FieldMetadata('title'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(Entity\User::class)
+            ->createQueryBuilder('r')
+            ->innerJoin('e.owner', 'e');
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT r'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User r'
+            . ' INNER JOIN e.owner e'
+            . ' WHERE e.id = :parent_entity_id1 AND e.title = :parent_entity_id2',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertSame(
+            $parentId['id'],
+            $this->context->getQuery()->getParameter('parent_entity_id1')->getValue()
+        );
+        self::assertSame(
+            $parentId['title'],
+            $this->context->getQuery()->getParameter('parent_entity_id2')->getValue()
+        );
+    }
+
     public function testProcessForToManyBidirectionalAssociation()
     {
         $associationName = 'products';
@@ -64,16 +279,18 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\Product::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\Product::class, 'e');
 
         $this->context->setIsCollection(true);
         $this->context->setParentClassName(Entity\User::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -99,16 +316,18 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\User::class, 'e');
 
         $this->context->setIsCollection(true);
         $this->context->setParentClassName(Entity\Origin::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -135,16 +354,18 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('products');
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\Product::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\Product::class, 'e');
 
         $this->context->setIsCollection(true);
         $this->context->setParentClassName(Entity\User::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -170,16 +391,18 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('users');
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\User::class, 'e');
 
         $this->context->setIsCollection(true);
         $this->context->setParentClassName(Entity\Origin::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -206,15 +429,17 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\User::class, 'e');
 
         $this->context->setParentClassName(Entity\Product::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -240,15 +465,17 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\User::class, 'e');
 
         $this->context->setParentClassName(Entity\Origin::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -275,15 +502,17 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('owner');
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\User::class, 'e');
 
         $this->context->setParentClassName(Entity\Product::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -309,15 +538,17 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('user');
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\User::class, 'e');
 
         $this->context->setParentClassName(Entity\Origin::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -344,15 +575,17 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\Origin::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\Origin::class, 'e');
 
         $this->context->setParentClassName(Entity\Mailbox::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -378,15 +611,17 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('origin');
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\Origin::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\Origin::class, 'e');
 
         $this->context->setParentClassName(Entity\Mailbox::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -412,15 +647,17 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['renamedId']);
         $parentConfig->addField('renamedId')->setPropertyPath('id');
         $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\User::class, 'e');
 
         $this->context->setParentClassName(Entity\Product::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -447,15 +684,18 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->addField('id');
         $parentConfig->addField('title');
         $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+        $parentMetadata->addField(new FieldMetadata('title'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\CompositeKeyEntity::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\CompositeKeyEntity::class, 'e');
 
         $this->context->setParentClassName(Entity\CompositeKeyEntity::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -487,15 +727,18 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->addField('renamedId')->setPropertyPath('id');
         $parentConfig->addField('renamedTitle')->setPropertyPath('title');
         $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
+        $parentMetadata->addField(new FieldMetadata('renamedTitle'))->setPropertyPath('title');
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\CompositeKeyEntity::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\CompositeKeyEntity::class, 'e');
 
         $this->context->setParentClassName(Entity\CompositeKeyEntity::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -530,15 +773,17 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $ownerFieldConfig->setTargetClass(Entity\Category::class);
         $ownerTargetConfig = $ownerFieldConfig->createAndSetTargetEntity();
         $ownerTargetConfig->addField('category');
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\User::class, 'e');
 
         $this->context->setParentClassName(Entity\Product::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
@@ -569,15 +814,17 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
 
-        $query = $this->doctrineHelper
-            ->getEntityRepositoryForClass(Entity\Category::class)
-            ->createQueryBuilder('e');
+        $query = $this->doctrineHelper->createQueryBuilder(Entity\Category::class, 'e');
 
         $this->context->setParentClassName(Entity\UserProfile::class);
         $this->context->setParentId($parentId);
         $this->context->setAssociationName($associationName);
         $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 

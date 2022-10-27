@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The registry that allows to get the exclusion provider for a specific request type.
@@ -41,10 +41,6 @@ class ExclusionProviderRegistry
 
     /**
      * Returns the exclusion provider that contains exclusion rules for the given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return ExclusionProviderInterface
      *
      * @throws \LogicException if a exclusion provider does not exist for the given request type
      */

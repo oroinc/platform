@@ -1,0 +1,66 @@
+Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+    bu_main_child:
+        name: Main Child BU
+        owner: '@business_unit'
+        organization: '@organization'
+    bu_first:
+        name: First BU
+        organization: '@organization'
+    bu_first_child:
+        name: First Child BU
+        owner: '@bu_first'
+        organization: '@organization'
+
+Oro\Bundle\UserBundle\Entity\User:
+    user_business_unit:
+        firstName: Main BU
+        lastName: user
+        username: user_business_unit
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        enabled: true
+        email: user_business_unit@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+    user_bu_main_child:
+        firstName: Main Child BU
+        lastName: user
+        username: user_bu_main_child
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@bu_main_child'
+        businessUnits: ['@bu_main_child']
+        enabled: true
+        email: user_bu_main_child@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+    user_bu_first:
+        firstName: First BU
+        lastName: user
+        username: user_bu_first
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@bu_first'
+        businessUnits: ['@bu_first']
+        enabled: true
+        email: user_bu_first@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+    user_bu_first_child:
+        firstName: First Child BU
+        lastName: user
+        username: user_bu_first_child
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@bu_first_child'
+        businessUnits: ['@bu_first_child']
+        enabled: true
+        email: user_bu_first_child@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8

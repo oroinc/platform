@@ -15,7 +15,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
     use TwigExtensionTestCaseTrait;
     use EntityTrait;
 
-    const ENTITY_CLASS_NAME = 'entity_class';
+    private const ENTITY_CLASS_NAME = 'entity_class';
 
     /** @var AbstractDynamicFieldsExtension|\PHPUnit\Framework\MockObject\MockObject */
     private $baseExtension;
@@ -26,14 +26,10 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
     /** @var DynamicFieldsExtensionAttributeDecorator */
     private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->baseExtension = $this->getMockBuilder(AbstractDynamicFieldsExtension::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->attributeConfigHelper = $this->getMockBuilder(AttributeConfigHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->baseExtension = $this->createMock(AbstractDynamicFieldsExtension::class);
+        $this->attributeConfigHelper = $this->createMock(AttributeConfigHelper::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_entity_config.config.attributes_config_helper', $this->attributeConfigHelper)
@@ -43,11 +39,6 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
             $this->baseExtension,
             $container
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(AbstractDynamicFieldsExtension::NAME, $this->extension->getName());
     }
 
     public function testGetField()
@@ -70,10 +61,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsDataProvider()
+    public function getFieldsDataProvider(): array
     {
         return [
             'no attributes' => [
@@ -141,16 +129,10 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
 
     /**
      * @dataProvider getFieldsDataProvider
-     *
-     * @param array $fields
-     * @param string $entityClass
-     * @param array $attributeHelperWiths
-     * @param array $attributeHelperReturns
-     * @param array $expectedFields
      */
     public function testGetFields(
         array $fields,
-        $entityClass,
+        ?string $entityClass,
         array $attributeHelperWiths,
         array $attributeHelperReturns,
         array $expectedFields

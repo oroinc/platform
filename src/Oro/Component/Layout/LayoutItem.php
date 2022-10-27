@@ -16,10 +16,6 @@ final class LayoutItem implements LayoutItemInterface
     /** @var string|null */
     private $alias;
 
-    /**
-     * @param RawLayoutBuilderInterface $rawLayoutBuilder
-     * @param ContextInterface          $context
-     */
     public function __construct(
         RawLayoutBuilderInterface $rawLayoutBuilder,
         ContextInterface $context

@@ -14,20 +14,20 @@ use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchEntityFilterTypeTest extends FormIntegrationTestCase
 {
     /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
+    private $entityNameResolver;
 
     /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationHelper;
+    private $localizationHelper;
 
     /** @var SearchEntityFilterType */
-    protected $type;
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);

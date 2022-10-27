@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\ORM\EntityManager;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -11,71 +11,57 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslationUsers;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class LanguageRepositoryTest extends WebTestCase
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var LanguageRepository */
-    protected $repository;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-
         $this->loadFixtures([LoadTranslations::class]);
 
-        $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Language::class);
-        $this->repository = $this->em->getRepository(Language::class);
+        /* @var User $user */
+        $user = self::getContainer()->get('doctrine')->getRepository(User::class)
+            ->findOneBy(['username' => LoadTranslationUsers::TRANSLATOR_USERNAME]);
 
-        /* @var $userRepository UserRepository */
-        $userRepository = $this->getContainer()->get('doctrine')->getManagerForClass(User::class)
-            ->getRepository(User::class);
-
-        /* @var $user User */
-        $user = $userRepository->findOneBy(['username' => LoadTranslationUsers::TRANSLATOR_USERNAME]);
-
-        $token = new UsernamePasswordOrganizationToken($user, false, 'k', $user->getOrganization(), $user->getRoles());
+        $token = new UsernamePasswordOrganizationToken(
+            $user,
+            false,
+            'k',
+            $user->getOrganization(),
+            $user->getUserRoles()
+        );
         $this->client->getContainer()->get('security.token_storage')->setToken($token);
     }
 
-    public function testGetAvailableLanguageCodes()
+    private function getRepository(): LanguageRepository
     {
-        $this->assertEmpty(array_diff(
-            [
-                LoadLanguages::LANGUAGE1,
-                LoadLanguages::LANGUAGE2,
-            ],
-            $this->repository->getAvailableLanguageCodes()
-        ));
+        return self::getContainer()->get('doctrine')->getRepository(Language::class);
     }
 
-    public function testGetEnabledAvailableLanguageCodes()
+    public function testGetAvailableLanguageCodesAsArrayKeys(): void
     {
-        $this->assertEmpty(array_diff(
-            [
-                LoadLanguages::LANGUAGE2,
-            ],
-            $this->repository->getAvailableLanguageCodes(true)
-        ));
+        $defaultAndLoadedLanguageCodes = array_merge(
+            [Configuration::DEFAULT_LANGUAGE],
+            array_keys(LoadLanguages::LANGUAGES)
+        );
+
+        self::assertEqualsCanonicalizing(
+            array_fill_keys($defaultAndLoadedLanguageCodes, true),
+            $this->getRepository()->getAvailableLanguageCodesAsArrayKeys()
+        );
     }
 
     public function testGetAvailableLanguagesByCurrentUser()
     {
-        /* @var $aclHelper AclHelper */
-        $aclHelper = $this->getContainer()->get('oro_security.acl_helper');
+        /* @var AclHelper $aclHelper */
+        $aclHelper = self::getContainer()->get('oro_security.acl_helper');
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 $this->getReference(LoadLanguages::LANGUAGE3)
             ],
-            $this->repository->getAvailableLanguagesByCurrentUser($aclHelper)
+            $this->getRepository()->getAvailableLanguagesByCurrentUser($aclHelper)
         );
     }
 
@@ -98,49 +84,45 @@ class LanguageRepositoryTest extends WebTestCase
             ],
         ];
 
-        $result = $this->repository->getTranslationsForExport(LoadLanguages::LANGUAGE1);
+        $result = $this->getRepository()->getTranslationsForExport(LoadLanguages::LANGUAGE1);
 
         foreach ($expected as $translation) {
-            $this->assertTrue(in_array($translation, $result));
+            self::assertTrue(in_array($translation, $result));
         }
     }
 
     /**
-     * @param Language[] $expected
-     * @param bool $enabled
-     *
      * @dataProvider getLanguagesDataProvider
      */
-    public function testGetLanguages(array $expected, $enabled)
+    public function testGetLanguages(array $expected, bool $enabled)
     {
         $current = array_map(function (Language $lang) {
             return $lang->getCode();
-        }, $this->repository->getLanguages($enabled));
+        }, $this->getRepository()->getLanguages($enabled));
 
-        $this->assertEquals($expected, $current);
+        self::assertEquals($expected, $current);
     }
 
-    /**
-     * @return \Generator
-     */
-    public function getLanguagesDataProvider()
+    public function getLanguagesDataProvider(): array
     {
-        yield 'only enabled' => [
-            'expected' => [
-                'en',
-                LoadLanguages::LANGUAGE2,
-                LoadLanguages::LANGUAGE3,
+        return [
+            'only enabled' => [
+                'expected' => [
+                    'en',
+                    LoadLanguages::LANGUAGE2,
+                    LoadLanguages::LANGUAGE3,
+                ],
+                'enabled' => true,
             ],
-            'enabled' => true,
-        ];
-        yield 'all' => [
-            'expected' => [
-                'en',
-                LoadLanguages::LANGUAGE1,
-                LoadLanguages::LANGUAGE2,
-                LoadLanguages::LANGUAGE3,
-            ],
-            'enabled' => false,
+            'all' => [
+                'expected' => [
+                    'en',
+                    LoadLanguages::LANGUAGE1,
+                    LoadLanguages::LANGUAGE2,
+                    LoadLanguages::LANGUAGE3,
+                ],
+                'enabled' => false,
+            ]
         ];
     }
 }

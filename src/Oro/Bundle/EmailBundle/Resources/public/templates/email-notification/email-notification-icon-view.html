@@ -1,5 +1,5 @@
 <i class="mail-icon<% if (unreadEmailsCount > 0) { %>  has-icon-counter highlight<% } %>">
     <% if (unreadEmailsCount > 0) { %>
-        <span class="item-counter"><%=(unreadEmailsCount > 99 ? '99+' : unreadEmailsCount) %></span>
+        <span class="item-counter"><%-(unreadEmailsCount > 99 ? '99+' : unreadEmailsCount) %></span>
     <% } %>
 </i>

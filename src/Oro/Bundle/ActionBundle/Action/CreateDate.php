@@ -14,10 +14,6 @@ class CreateDate extends AbstractDateAction
      */
     protected $localeSettings;
 
-    /**
-     * @param ContextAccessor $contextAccessor
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(ContextAccessor $contextAccessor, LocaleSettings $localeSettings)
     {
         parent::__construct($contextAccessor);

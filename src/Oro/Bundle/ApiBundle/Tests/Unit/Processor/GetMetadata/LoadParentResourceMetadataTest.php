@@ -19,7 +19,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
     /** @var LoadParentResourceMetadata */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -34,7 +34,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
 
     public function testProcessForAlreadyLoadedMetadata()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->metadataProvider->expects(self::never())
             ->method('getMetadata');
@@ -74,12 +74,10 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         $expectedConfig = new EntityDefinitionConfig();
         $expectedConfig->setParentResourceClass(null);
 
-        $parentMetadata = new EntityMetadata();
-        $parentMetadata->setClassName($parentEntityClass);
+        $parentMetadata = new EntityMetadata($parentEntityClass);
         $parentMetadata->setHasIdentifierGenerator(true);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName($entityClass);
+        $expectedMetadata = new EntityMetadata($entityClass);
         $expectedMetadata->setHasIdentifierGenerator(true);
 
         $this->doctrineHelper->expects(self::once())
@@ -106,14 +104,14 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage The class "Test\Entity" must not be a manageable entity because it is based on another API resource. Parent resource is "Test\ParentEntity".
-     */
-    // @codingStandardsIgnoreEnd
     public function testProcessWhenResourceIsBasedOnAnotherResourceButEntityIsManageable()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'The class "Test\Entity" must not be a manageable entity because it is based on another API resource.'
+            . ' Parent resource is "Test\ParentEntity".'
+        );
+
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\ParentEntity';
         $config = new EntityDefinitionConfig();

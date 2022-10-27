@@ -1,0 +1,183 @@
+/* @theme: admin.oro; */
+
+.oro-modal-image-preview {
+    .modal-open & {
+        overflow: hidden;
+    }
+
+    .slick {
+        &-track {
+            display: flex;
+            align-items: center;
+        }
+
+        &-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            float: none;
+            margin: 0 50px;
+            outline: none;
+
+            img {
+                max-width: 100%;
+            }
+        }
+
+        &-arrow {
+            background-color: $oro-modal-image-preview-toolbar-btn-bg;
+            border-radius: 2px;
+            color: $primary-550;
+            cursor: pointer;
+            display: block;
+            font-size: 22px;
+            margin-top: -10px;
+            padding: 8px 10px 9px;
+            position: absolute;
+            top: 50%;
+            z-index: 1080;
+            border: none;
+            outline: none;
+            transition: $oro-modal-image-preview-transition;
+
+            &:hover {
+                color: $primary-inverse;
+            }
+        }
+
+        &-prev {
+            left: 20px;
+        }
+
+        &-next {
+            right: 20px;
+        }
+    }
+
+    .modal {
+        &-dialog {
+            max-width: 100%;
+            margin: auto;
+            box-shadow: none;
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        &-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            border-radius: 0;
+            z-index: 1;
+            padding: 11px 18px 11px 20px;
+            transition: $oro-modal-image-preview-transition;
+
+            .right-toolbar {
+                display: flex;
+                align-self: center;
+            }
+
+            .btn {
+                width: 50px;
+                height: 32px;
+                font-size: 24px;
+                color: $primary-550;
+                transition: color .2s linear;
+                appearance: none;
+                font-weight: 700;
+                line-height: 1;
+                margin: 0;
+                padding: 0;
+                text-shadow: none;
+                opacity: 1;
+                background-color: transparent;
+                border: 0;
+
+                [class*='fa-'] {
+                    font-size: $oro-modal-image-preview-toolbar-btn-font-suze;
+                }
+
+                &:hover {
+                    color: $primary-inverse;
+                }
+            }
+        }
+
+        &-body {
+            padding: 0;
+            width: 100%;
+
+            .images-list__item {
+                background: $primary-inverse;
+                background-image: $oro-modal-image-preview-blank-image-bg;
+                background-size: $oro-modal-image-preview-blank-image-bg-size;
+                background-position: $oro-modal-image-preview-blank-image-bg-position;
+            }
+        }
+
+        &-content {
+            background: none;
+        }
+    }
+
+    .hide-controls {
+        .modal-header {
+            opacity: 0;
+            transform: translate3d(0, -10px, 0);
+        }
+
+        .slick-prev {
+            opacity: 0;
+            transform: translate3d(-10px, 0, 0);
+        }
+
+        .slick-next {
+            opacity: 0;
+            transform: translate3d(10px, 0, 0);
+        }
+    }
+
+    .lazy-loading {
+        position: relative;
+        min-height: $loader-size;
+
+        &::before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            margin: auto;
+
+            @include loader($color: $primary-inverse);
+        }
+
+        .images-list__item {
+            position: relative;
+        }
+    }
+
+    .wrap-modal-slider {
+        max-width: 100%;
+    }
+
+    .counter {
+        font-size: 16px;
+        color: $primary-550;
+    }
+}
+
+.modal-backdrop {
+    &.image-preview {
+        background: $oro-modal-image-preview-backdrop-bg;
+
+        &.show {
+            opacity: .3;
+        }
+    }
+}

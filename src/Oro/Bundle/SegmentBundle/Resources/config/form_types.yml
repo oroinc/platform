@@ -1,11 +1,6 @@
-parameters:
-    oro_segment.form.type.segment.class:                Oro\Bundle\SegmentBundle\Form\Type\SegmentType
-    oro_segment.form.type.entity_choice.class:          Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType
-    oro_segment.form.handler.segment.class:             Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler
-
 services:
     oro_segment.form.type.segment:
-        class: '%oro_segment.form.type.segment.class%'
+        class: Oro\Bundle\SegmentBundle\Form\Type\SegmentType
         tags:
             - { name: form.type, alias: oro_segment }
 
@@ -21,7 +16,7 @@ services:
         class: 'Oro\Bundle\SegmentBundle\Form\Type\SegmentChoiceType'
         arguments:
             - '@doctrine'
-            - '%oro_segment.segment.entity.class%'
+            - '@oro_security.acl_helper'
         tags:
             - { name: form.type}
 
@@ -33,15 +28,17 @@ services:
             - Oro\Bundle\SegmentBundle\Form\Type\SegmentType
 
     oro_segment.form.handler.segment:
-        class: '%oro_segment.form.handler.segment.class%'
+        class: Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler
         arguments:
-            - '@oro_segment.form.segment'
             - '@request_stack'
             - '@doctrine'
             - '@oro_segment.static_segment_manager'
 
+    Oro\Bundle\SegmentBundle\Form\Handler\SegmentHandler:
+        alias: oro_segment.form.handler.segment
+
     oro_segment.form.type.entity_choice:
-        class: '%oro_segment.form.type.entity_choice.class%'
+        class: Oro\Bundle\SegmentBundle\Form\Type\SegmentEntityChoiceType
         arguments:
             - '@oro_segment.entity_provider'
         tags:

@@ -2,19 +2,23 @@
 
 namespace Oro\Bundle\DataGridBundle\Handler;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
-use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
+use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Combines the basic logic of exports.
+ * Responsible for combining the components of reader, processor and writer of export data.
+ * Processes and creates statistics on the export result.
+ */
 class ExportHandler implements StepExecutionWarningHandlerInterface
 {
     /**
@@ -32,17 +36,11 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
      */
     protected $exportFailed = false;
 
-    /**
-     * @param FileManager $fileManager
-     */
     public function setFileManager(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
@@ -95,7 +93,7 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         } catch (\Exception $exception) {
             $context->addFailureException($exception);
         } finally {
-            @unlink($filePath);
+            $this->fileManager->deleteFile($filePath);
         }
 
         $readsCount = $context->getReadCount() ?: 0;
@@ -129,19 +127,5 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         $this->exportFailed = true;
 
         $this->logger->error(sprintf('[DataGridExportHandle] Error message: %s', $reason), ['element' => $element]);
-    }
-
-    /**
-     * @param DatagridExportIdFetcher $idFetcher
-     * @param array $parameters
-     *
-     * @return array
-     */
-    public function getExportingEntityIds(DatagridExportIdFetcher $idFetcher, array $parameters)
-    {
-        $context  = new Context($parameters);
-        $idFetcher->setImportExportContext($context);
-
-        return $idFetcher->getGridDataIds();
     }
 }

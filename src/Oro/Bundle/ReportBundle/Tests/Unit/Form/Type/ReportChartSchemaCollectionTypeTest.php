@@ -2,49 +2,46 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\FieldChoiceType;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaCollectionType;
 use Oro\Bundle\ReportBundle\Form\Type\ReportChartSchemaType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var ReportChartSchemaCollectionType
-     */
-    protected $type;
+    /** @var ReportChartSchemaCollectionType */
+    private $type;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configProvider;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configProvider = $this
-            ->getMockBuilder('\Oro\Bundle\ChartBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configProvider
-            ->expects($this->once())
-            ->method('getChartConfigs')
-            ->will(
-                $this->returnValue(
+        $chartConfigs = [
+            'line_chart' => [
+                'data_schema' => [
                     [
-                        'line_chart' => [
-                            'data_schema' => [
-                                [
-                                    'label'    => 'label',
-                                    'name'     => 'name',
-                                    'required' => false
-                                ]
-                            ]
-                        ]
+                        'label'    => 'label',
+                        'name'     => 'name',
+                        'required' => false
                     ]
-                )
-            );
+                ]
+            ]
+        ];
+
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->configProvider->expects($this->any())
+            ->method('getChartNames')
+            ->willReturn(array_keys($chartConfigs));
+        $this->configProvider->expects($this->any())
+            ->method('getChartConfig')
+            ->willReturnCallback(function ($name) use ($chartConfigs) {
+                return $chartConfigs[$name];
+            });
 
         $this->type = new ReportChartSchemaCollectionType($this->configProvider);
 
@@ -61,25 +58,15 @@ class ReportChartSchemaCollectionTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $manager = $this
-            ->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this
-            ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $schemaCollectionType = new ReportChartSchemaType($manager);
-        $fieldChoiceType      = new FieldChoiceType($translator);
+        $manager = $this->createMock(QueryDesignerManager::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
         return [
             new PreloadedExtension(
                 [
                     ReportChartSchemaCollectionType::class => $this->type,
-                    ReportChartSchemaType::class => $schemaCollectionType,
-                    FieldChoiceType::class => $fieldChoiceType
+                    ReportChartSchemaType::class => new ReportChartSchemaType($manager),
+                    FieldChoiceType::class => new FieldChoiceType($translator)
                 ],
                 []
             )

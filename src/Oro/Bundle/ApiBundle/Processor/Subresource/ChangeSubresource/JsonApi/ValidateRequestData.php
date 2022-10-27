@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Validates that the request data contains valid JSON.API object
+ * Validates that the request data contains valid JSON:API object
  * that can be used to update a sub-resource.
  */
 class ValidateRequestData implements ProcessorInterface
@@ -22,10 +22,6 @@ class ValidateRequestData implements ProcessorInterface
     /** @var bool */
     private $allowIncludedResources;
 
-    /**
-     * @param bool $requirePrimaryResourceId
-     * @param bool $allowIncludedResources
-     */
     public function __construct(
         bool $requirePrimaryResourceId = false,
         bool $allowIncludedResources = false

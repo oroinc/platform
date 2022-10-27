@@ -1,8 +1,10 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% form_theme form with '@OroForm/Form/fields.html.twig' %}
 {% set formAction = path('oro_entityextend_entity_unique_key', {id: entity_id}) %}
 
 {% block navButtons %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {{ UI.cancelButton(path('oro_entityconfig_view', {id: entity_id})) }}
     {{ UI.saveAndCloseButton({
         'label': 'Save'|trans,
@@ -40,29 +42,35 @@
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
     {% endif %}
-    <div data-content="{{ name }}">
-        <div class="row-oro oro-multiselect-holder unique-keys">
-            <a class="removeRow pull-right" href="javascript: void(0);" type="button" data-related="{{ name }}">
-                <i class="fa-close"></i>
-            </a>
-            {{ form_errors(form) }}
-            {{ form_row(form.name) }}
-            {{ form_row(form.key) }}
+    <div data-content="{{ name }}" class="control-group-container">
+        <div class="row-oro oro-multiselect-holder">
+            <div class="float-holder">
+                {{ form_errors(form) }}
+                {{ form_row(form.name) }}
+                {{ form_row(form.key) }}
+            </div>
+            <button class="removeRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}">
+                <span class="fa-close"></span>
+            </button>
         </div>
     </div>
 {% endmacro %}
 
 {% block unique_collection_widget %}
-    {% spaceless %}
+    {% import _self as configEntityGridUnique %}
+
+    {% apply spaceless %}
         <div class="row-oro">
-            <div class="oro-address-collection collection-fields-list" id="entity_extend_unique_key_collection" data-prototype="{{ _self.unique_collection_prototype(form.keys)|escape }}">
+            <div class="oro-item-collection collection-fields-list" id="entity_extend_unique_key_collection" data-prototype="{{ configEntityGridUnique.unique_collection_prototype(form.keys)|escape }}">
                 {% for field in form.keys.children %}
-                    {{ _self.unique_collection_prototype(field) }}
+                    {{ configEntityGridUnique.unique_collection_prototype(field) }}
                 {% endfor %}
             </div>
-            <a class="btn add-list-item pull-left" href="javascript: void(0);"><i class="fa-plus"></i>{{ 'Add'|trans }}</a>
+            <div class="btn-container">
+                <a class="btn add-list-item pull-left" href="#">{{ 'Add'|trans }}</a>
+            </div>
         </div>
-    {% endspaceless %}
+    {% endapply %}
 {% endblock unique_collection_widget %}
 
 {% block content_data %}

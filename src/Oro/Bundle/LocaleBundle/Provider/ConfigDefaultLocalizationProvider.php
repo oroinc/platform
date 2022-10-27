@@ -13,9 +13,6 @@ class ConfigDefaultLocalizationProvider implements LocalizationProviderInterface
     /** @var LocalizationManager */
     private $localizationManager;
 
-    /**
-     * @param LocalizationManager $localizationManager
-     */
     public function __construct(LocalizationManager $localizationManager)
     {
         $this->localizationManager = $localizationManager;
@@ -27,5 +24,9 @@ class ConfigDefaultLocalizationProvider implements LocalizationProviderInterface
     public function getCurrentLocalization()
     {
         return $this->localizationManager->getDefaultLocalization();
+    }
+
+    public function setCurrentLocalization(?Localization $localization): void
+    {
     }
 }

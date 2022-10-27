@@ -1,14 +1,14 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
-interface MessageProcessorRegistryInterface
+/**
+ * Interface for message processor registry.
+ */
+interface MessageProcessorRegistryInterface extends ServiceProviderInterface
 {
-    /**
-     * @param string $processorName
-     *
-     * @return MessageProcessorInterface
-     */
-    public function get($processorName);
+    public function get(string $id): MessageProcessorInterface;
 }

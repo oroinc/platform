@@ -18,10 +18,6 @@ class EntityRelationGridListener
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param ConfigManager  $configManager
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(ConfigManager $configManager, DoctrineHelper $doctrineHelper)
     {
         $this->configManager  = $configManager;
@@ -103,9 +99,6 @@ class EntityRelationGridListener
         $config->offsetSetByPath('[options][additional_fields]', $targetFieldNames);
     }
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();

@@ -7,13 +7,14 @@ use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
-use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Reader\BatchIdsReaderInterface;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -21,19 +22,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ExportHandler extends AbstractHandler
 {
-    /**
-     * @var MimeTypeGuesser
-     */
-    protected $mimeTypeGuesser;
-
-    /**
-     * @param MimeTypeGuesser $mimeTypeGuesser
-     */
-    public function setMimeTypeGuesser(MimeTypeGuesser $mimeTypeGuesser)
-    {
-        $this->mimeTypeGuesser = $mimeTypeGuesser;
-    }
-
     /**
      * Get export result
      *
@@ -53,33 +41,25 @@ class ExportHandler extends AbstractHandler
         $outputFilePrefix = null,
         array $options = []
     ) {
-        if ($outputFilePrefix === null) {
+        if (null === $outputFilePrefix) {
             $outputFilePrefix = $processorType;
         }
         $fileName = FileManager::generateFileName($outputFilePrefix, $outputFormat);
         $filePath = FileManager::generateTmpFilePath($fileName);
-        $entityName = $this->processorRegistry->getProcessorEntityName(
-            $processorType,
-            $processorAlias
-        );
+        $entityName = $this->processorRegistry->getProcessorEntityName($processorType, $processorAlias);
 
         $configuration = [
-            $processorType =>
-                array_merge(
-                    [
-                        'processorAlias' => $processorAlias,
-                        'entityName' => $entityName,
-                        'filePath' => $filePath
-                    ],
-                    $options
-                )
+            $processorType => array_merge(
+                [
+                    'processorAlias' => $processorAlias,
+                    'entityName' => $entityName,
+                    'filePath' => $filePath
+                ],
+                $options
+            )
         ];
 
-        $jobResult = $this->jobExecutor->executeJob(
-            $processorType,
-            $jobName,
-            $configuration
-        );
+        $jobResult = $this->jobExecutor->executeJob($processorType, $jobName, $configuration);
 
         try {
             $this->fileManager->writeFileToStorage($filePath, $fileName);
@@ -104,9 +84,9 @@ class ExportHandler extends AbstractHandler
         if ($errorsCount > 0) {
             $errors = array_merge($errors, $jobResult->getFailureExceptions());
         }
-        
+
         $errors = array_slice($errors, 0, 100);
-        
+
         if (($writer = $this->writerChain->getWriter($outputFormat)) && $writer instanceof ClosableInterface) {
             $writer->close();
         }
@@ -127,33 +107,31 @@ class ExportHandler extends AbstractHandler
      * @param string $jobName
      * @param string $processorType
      * @param string $processorAlias
-     * @param string $options
+     * @param array $options
      * @return array
      */
     public function getExportingEntityIds($jobName, $processorType, $processorAlias, $options)
     {
-        if (! ($reader = $this->getJobReader($jobName, $processorType)) instanceof BatchIdsReaderInterface) {
+        $reader = $this->getJobReader($jobName, $processorType);
+        if (!$reader instanceof BatchIdsReaderInterface) {
             return [];
         }
 
-        $entityName = $this->processorRegistry->getProcessorEntityName(
-            $processorType,
-            $processorAlias
+        return $reader->getIds(
+            $this->processorRegistry->getProcessorEntityName($processorType, $processorAlias),
+            $options
         );
-        /** @var BatchIdsReaderInterface $reader */
-
-        return $reader->getIds($entityName, $options);
     }
 
     /**
      * @param string $jobName
      * @param string $processorType
      * @param string $outputFormat
-     * @param array  $files
+     * @param array $files
      *
      * @return string
      *
-     * @throws \Oro\Bundle\ImportExportBundle\Exception\RuntimeException
+     * @throws RuntimeException
      */
     public function exportResultFileMerge($jobName, $processorType, $outputFormat, array $files)
     {
@@ -177,7 +155,11 @@ class ExportHandler extends AbstractHandler
 
         try {
             foreach ($files as $file) {
-                $tmpPath = $this->fileManager->writeToTmpLocalStorage($file);
+                try {
+                    $tmpPath = $this->fileManager->writeToTmpLocalStorage($file);
+                } catch (FileNotFound $e) {
+                    continue;
+                }
                 if ($outputFormat === 'csv') {
                     $tmpPath = $this->fileManager->fixNewLines($tmpPath);
                 }
@@ -186,7 +168,7 @@ class ExportHandler extends AbstractHandler
             }
             $this->batchFileManager->mergeFiles($localFiles, $localFilePath);
 
-            $this->fileManager->writeFileToStorage($localFilePath, $fileName, true);
+            $this->fileManager->writeFileToStorage($localFilePath, $fileName);
 
             foreach ($files as $file) {
                 $this->fileManager->deleteFile($file);
@@ -202,7 +184,6 @@ class ExportHandler extends AbstractHandler
 
         return $fileName;
     }
-
 
     /**
      * Handles export action
@@ -243,30 +224,21 @@ class ExportHandler extends AbstractHandler
      */
     public function handleDownloadExportResult($fileName)
     {
-        try {
-            $content = $this->fileManager->getContent($fileName);
-        } catch (FileNotFound $exception) {
+        if (!$this->fileManager->isFileExist($fileName)) {
             throw new NotFoundHttpException();
         }
-        $headers     = [];
-        $contentType = $this->getFileContentType($fileName);
-        if ($contentType !== null) {
-            $headers['Content-Type'] = $contentType;
+
+        $response = new BinaryFileResponse($this->fileManager->getFilePath($fileName));
+        $response->headers->set(
+            'Content-Disposition',
+            $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $fileName)
+        );
+
+        $contentType = $this->fileManager->getMimeType($fileName);
+        if (null !== $contentType) {
+            $response->headers->set('Content-Type', $contentType);
         }
 
-        return new Response($content, 200, $headers);
-    }
-
-    /**
-     * Tries to guess MIME type of the given file
-     *
-     * @param string $fileName
-     * @return string|null
-     */
-    protected function getFileContentType($fileName)
-    {
-        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-
-        return $this->mimeTypeGuesser->guessByFileExtension($extension);
+        return $response;
     }
 }

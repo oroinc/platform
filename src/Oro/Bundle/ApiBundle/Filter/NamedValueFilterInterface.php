@@ -9,8 +9,6 @@ interface NamedValueFilterInterface
 {
     /**
      * Gets the name of the filter value.
-     *
-     * @return string
      */
-    public function getFilterValueName();
+    public function getFilterValueName(): string;
 }

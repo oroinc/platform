@@ -1,0 +1,29 @@
+/* @theme: admin.oro; */
+
+$attachment-offset-global: $content-padding-small * .5 !default;
+$attachment-section-width: $field-width !default;
+
+$attachment-file-offset-top: $attachment-offset-global !default;
+$attachment-file-inner-offset: $attachment-offset-global 0 0 0 !default;
+$attachment-file-uploader-width: $attachment-section-width !default;
+
+$attachment-item-max-width: $attachment-section-width !default;
+$attachment-item-offset-top: $attachment-offset-global !default;
+$attachment-item-in-control-offset: 6px !default;
+
+$attachment-item-note-flex-direction: column !default;
+
+$attachment-item-fa-right: $content-padding-small !default;
+$attachment-thumbnail-fa-font-size: 60px !default;
+$attachment-thumbnail-fa-color: $primary-inverse !default;
+
+$attachment-item-dialog-max-width: 100% !default;
+$attachment-item-icon-size: 16px !default;
+$attachment-item-remove-top: 4px !default;
+
+$attachment-fileitems-sort-order-width: 10% !default;
+$attachment-fileitems-sort-order-input-width: 40% !default;
+$attachment-fileitems-remove-width: 2% !default;
+
+$attachment-item-img-width: 32px !default;
+$attachment-item-img-height: 32px !default;

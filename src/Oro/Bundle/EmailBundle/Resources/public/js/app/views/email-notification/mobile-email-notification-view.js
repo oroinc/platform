@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var MobileEmailNotificationView;
-    var $ = require('jquery');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    MobileEmailNotificationView = BaseView.extend({
+    const MobileEmailNotificationView = BaseView.extend({
         autoRender: true,
 
         /**
@@ -14,32 +13,32 @@ define(function(require) {
         countNewEmail: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function MobileEmailNotificationView() {
-            MobileEmailNotificationView.__super__.constructor.apply(this, arguments);
+        constructor: function MobileEmailNotificationView(options) {
+            MobileEmailNotificationView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
-            MobileEmailNotificationView.__super__.initialize.apply(this, arguments);
+            MobileEmailNotificationView.__super__.initialize.call(this, options);
             this.countNewEmail = parseInt(options.countNewEmail);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
-            var $emailsMenuItem = $('#user-menu .oro-email-user-emails a');
+            const $emailsMenuItem = $('#user-menu .oro-email-user-emails a');
             this.$counter = $('<span class="email-count"/>').appendTo($emailsMenuItem);
             this.setCount(this.countNewEmail);
         },
 
         remove: function() {
             this.$counter.remove();
-            MobileEmailNotificationView.__super__.remove.apply(this);
+            MobileEmailNotificationView.__super__.remove.call(this);
         },
 
         setCount: function(count) {

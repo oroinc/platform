@@ -1,11 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var AbstractConditionContainerView;
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
 
-    AbstractConditionContainerView = BaseView.extend({
+    const AbstractConditionContainerView = BaseView.extend({
         tagName: 'li',
 
         className: 'condition',
@@ -34,7 +33,7 @@ define(function(require) {
         requiredOptions: ['criteria', 'value', 'validation', 'eventBus'],
 
         attributes: function() {
-            var attrs = {};
+            const attrs = {};
             attrs['data-condition-cid'] = this.cid;
             attrs['data-criteria'] = this.criteria;
             return attrs;
@@ -69,7 +68,7 @@ define(function(require) {
         },
 
         getTemplateData: function() {
-            var data = AbstractConditionContainerView.__super__.getTemplateData.call(this);
+            const data = AbstractConditionContainerView.__super__.getTemplateData.call(this);
             _.extend(data, _.pick(this, 'criteria', 'value', 'validation'));
             return data;
         },
@@ -89,7 +88,7 @@ define(function(require) {
         },
 
         closeCondition: function() {
-            var eventBus = this.eventBus;
+            const eventBus = this.eventBus;
             this.dispose();
             eventBus.trigger('condition:closed', this);
         },

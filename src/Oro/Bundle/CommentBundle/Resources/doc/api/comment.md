@@ -26,35 +26,35 @@ The created record is returned in the response.
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"comments",
-      "attributes":{  
-         "message":"<p>test contact</p>"
+{
+   "data": {
+      "type": "comments",
+      "attributes": {
+         "message": "<p>test contact</p>"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "attachment":{  
-            "data":{  
-               "type":"files",
-               "id":"1"
+         "attachment": {
+            "data": {
+               "type": "files",
+               "id": "1"
             }
          },
-         "target":{  
-            "data":{  
-               "type":"emails",
-               "id":"123"
+         "target": {
+            "data": {
+               "type": "emails",
+               "id": "123"
             }
          }
       }
@@ -67,42 +67,44 @@ Example:
 
 Edit a specific comment record.
 
+The updated record is returned in the response.
+
 {@inheritdoc}
 
 {@request:json_api}
 Example:
 
 ```JSON
-{  
-   "data":{  
-      "type":"comments",
-      "id":"11",
-      "attributes":{  
-         "message":"<p>test contact</p>"
+{
+   "data": {
+      "type": "comments",
+      "id": "11",
+      "attributes": {
+         "message": "<p>test contact</p>"
       },
-      "relationships":{  
-         "owner":{  
-            "data":{  
-               "type":"users",
-               "id":"1"
+      "relationships": {
+         "owner": {
+            "data": {
+               "type": "users",
+               "id": "1"
             }
          },
-         "organization":{  
-            "data":{  
-               "type":"organizations",
-               "id":"1"
+         "organization": {
+            "data": {
+               "type": "organizations",
+               "id": "1"
             }
          },
-         "attachment":{  
-            "data":{  
-               "type":"files",
-               "id":"1"
+         "attachment": {
+            "data": {
+               "type": "files",
+               "id": "1"
             }
          },
-         "target":{  
-            "data":{  
-               "type":"emails",
-               "id":"123"
+         "target": {
+            "data": {
+               "type": "emails",
+               "id": "123"
             }
          }
       }
@@ -125,33 +127,35 @@ Delete a collection of comment records.
 
 ## FIELDS
 
-### id
-
-#### update
-
-{@inheritdoc}
-
-**The required field**
-
 ### message
 
 #### create
 
 {@inheritdoc}
 
-**The required field**
+**The required field.**
 
 #### update
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### target
 
 A record that the comment was made on.
+
+#### create
+
+{@inheritdoc}
+
+**The required field.**
+
+#### update
+
+{@inheritdoc}
+
+**This field must not be empty, if it is passed.**
 
 ## SUBRESOURCES
 
@@ -240,15 +244,15 @@ Example:
 
 #### get_subresource
 
-Retrieve a record that the comment was made on.
+Retrieve an entity record that the comment was made on.
 
 #### get_relationship
 
-Retrieve the ID of a record that the comment was made on.
+Retrieve the ID of an entity record that the comment was made on.
 
 #### update_relationship
 
-Replace a record that the comment was made on.
+Replace an entity record that the comment was made on.
 
 {@request:json_api}
 Example:

@@ -2,20 +2,18 @@
 
 namespace Oro\Bundle\ReportBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles report form entity saving
+ */
 class ReportHandler
 {
     use RequestHandlerTrait;
-
-    /**
-     * @var FormInterface
-     */
-    protected $form;
 
     /**
      * @var RequestStack
@@ -27,14 +25,8 @@ class ReportHandler
      */
     protected $manager;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack  $requestStack
-     * @param ObjectManager $manager
-     */
-    public function __construct(FormInterface $form, RequestStack $requestStack, ObjectManager $manager)
+    public function __construct(RequestStack $requestStack, ObjectManager $manager)
     {
-        $this->form    = $form;
         $this->requestStack = $requestStack;
         $this->manager = $manager;
     }
@@ -42,18 +34,19 @@ class ReportHandler
     /**
      * Process form
      *
-     * @param  Report $entity
+     * @param Report $entity
+     * @param FormInterface $form
      * @return bool  True on successful processing, false otherwise
      */
-    public function process(Report $entity)
+    public function process(Report $entity, FormInterface $form)
     {
-        $this->form->setData($entity);
+        $form->setData($entity);
 
         $request = $this->requestStack->getCurrentRequest();
         if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
-            $this->submitPostPutRequest($this->form, $request);
+            $this->submitPostPutRequest($form, $request);
 
-            if ($this->form->isValid()) {
+            if ($form->isValid()) {
                 $this->onSuccess($entity);
                 return true;
             }
@@ -64,8 +57,6 @@ class ReportHandler
 
     /**
      * "Success" form handler
-     *
-     * @param Report $entity
      */
     protected function onSuccess(Report $entity)
     {

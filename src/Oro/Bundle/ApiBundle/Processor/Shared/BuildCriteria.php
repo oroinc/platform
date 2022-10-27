@@ -40,7 +40,7 @@ class BuildCriteria implements ProcessorInterface
 
         /**
          * it is important to iterate by $filters, not by $filterValues,
-         * because the the order of filters is matter,
+         * because the order of filters is matter,
          * e.g. "page size" filter should be processed before "page number" filter
          * @see \Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultPaging::addPageNumberFilter
          */

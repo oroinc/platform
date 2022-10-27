@@ -1,64 +1,86 @@
 parameters:
-    oro_attachment.manager.attachment_manager.class:             Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
-
-    oro_attachment.entity.class:                                 Oro\Bundle\AttachmentBundle\Entity\Attachment
-    oro_attachment.file.entity.class:                            Oro\Bundle\AttachmentBundle\Entity\File
-    oro_attachment.manager.api.class:                            Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
-    oro_attachment.manager.file.api.class:                       Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
-
-    oro_attachment.entity_config_dumper.extension.file.class:    Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
-    oro_attachment.entity_config_dumper.extension.class:         Oro\Bundle\AttachmentBundle\Tools\AttachmentConfigDumperExtension
-    oro_attachment.entity_generator.extension.class:             Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
-    oro_attachment.migration.extension.attachment.class:         Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
-
-    oro_attachment.serializer.file_normalizer.class:             Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
-
-    oro_attachment.placeholder.filter.class:                     Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
-    oro_attachment.attachment_grid_listener:                     Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
-
-    oro_attachment.datagrid.action.dialog.class:                 Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
-
-    oro_attachment.provider.attachment.class:                    Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
-
-    oro_attachment.formatter.image_encoded.class:                Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
-    oro_attachment.formatter.image_link.class:                   Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
-    oro_attachment.formatter.image_src.class:                    Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter
-
-    oro_attachment.attachments_dir:                              attachment
-    oro_attachment.media_cache_dir:                              media/cache
-
-    liip_imagine.meta_data.reader.class:                         Imagine\Image\Metadata\DefaultMetadataReader
-
-    oro_attachment.liip_imagine.unsupported_mime_types:          ['image/svg+xml']
+    oro_attachment.liip_imagine.unsupported_mime_types: ['image/svg+xml', 'image/svg']
 
 services:
+    Liip\ImagineBundle\Imagine\Filter\FilterConfiguration:
+        alias: liip_imagine.filter.configuration
+
     oro_attachment.manager:
-        class: '%oro_attachment.manager.attachment_manager.class%'
+        public: true
+        class: Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
         arguments:
-            - '@router'
-            - '%oro_attachment.files%'
+            - '@oro_attachment.provider.file_url'
+            - '@oro_attachment.provider.file_icon'
+            - '@oro_attachment.tools.mime_type_checker'
             - '@oro_entity_extend.association_manager'
-            - '%kernel.debug%'
-            - '%oro_attachment.debug_images%'
-        calls:
-            - [setFileManager, ['@oro_attachment.file_manager']]
+            - '@doctrine'
+            - '@oro_attachment.tools.webp_configuration'
+
+    Oro\Bundle\AttachmentBundle\Manager\AttachmentManager:
+        alias: oro_attachment.manager
+
+    Oro\Bundle\AttachmentBundle\Manager\FileManager:
+        alias: oro_attachment.file_manager
 
     oro_attachment.file_manager:
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
+        public: true
+        parent: oro_gaufrette.file_manager
         arguments:
-          - '@knp_gaufrette.filesystem_map'
-          - '@oro_attachment.protocol_validator'
-        lazy: true
+            - 'attachments'
+            - '@oro_attachment.protocol_validator'
+            - '@oro_attachment.mapper.client_mime_type_mapper'
+            - '@oro_attachment.tools.external_file_factory'
+
+    oro_attachment.mapper.client_mime_type_mapper:
+        class: Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapper
 
     oro_attachment.protocol_validator:
         class: Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator
-        public: false
+
+    oro_attachment.protocol_validator.gaufrette:
+        class: Oro\Bundle\AttachmentBundle\Validator\GaufretteProtocolValidator
+        decorates: oro_attachment.protocol_validator
+        arguments:
+            - '@.inner'
+            -
+                - "@=container.hasParameter('knp_gaufrette.stream_wrapper.protocol') ? parameter('knp_gaufrette.stream_wrapper.protocol') : ''"
+                - "@=container.hasParameter('oro_gaufrette.stream_wrapper.readonly_protocol') ? parameter('oro_gaufrette.stream_wrapper.readonly_protocol') : ''"
+
+    oro_attachment.mime_type_validator:
+        class: Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeTypeValidator
+        arguments:
+            - '%oro_attachment.upload_file_mime_types%'
+            - '%oro_attachment.upload_image_mime_types%'
+        tags:
+            - { name: validator.constraint_validator }
+
+    oro_attachment.validators.image_validator:
+        class: 'Oro\Bundle\AttachmentBundle\Validator\Constraints\ImageValidator'
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_attachment_image_validator }
+
+    oro_attachment.liip_imagine.cache.resolver.prototype.gaufrette:
+        class: Oro\Bundle\AttachmentBundle\Imagine\Cache\Resolver\GaufretteResolver
+        abstract: true
+        arguments:
+            - ~ # file manager. It is injected by Oro\Bundle\AttachmentBundle\DependencyInjection\Imagine\Factory\GaufretteResolverFactory
+            - '@router.request_context'
+            - ~ # url prefix. It is injected by Oro\Bundle\AttachmentBundle\DependencyInjection\Imagine\Factory\GaufretteResolverFactory
+            - ~ # cache prefix. It is injected by Oro\Bundle\AttachmentBundle\DependencyInjection\Imagine\Factory\GaufretteResolverFactory
+
+    oro_attachment.liip_imagine.binary.mime_type_guesser:
+        class: Liip\ImagineBundle\Binary\SimpleMimeTypeGuesser
+        arguments:
+            - '@mime_types'
 
     oro_attachment.liip_imagine.binary.factory.guess_mime_type:
-        class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContextFactory'
+        class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContentFactory'
         arguments:
-          - '@liip_imagine.binary.mime_type_guesser'
-          - '@liip_imagine.extension_guesser'
+          - '@oro_attachment.liip_imagine.binary.mime_type_guesser'
+          - '@mime_types'
 
     oro_attachment.liip_imagine.binary.filter:
         class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\Basic\BasicImagineBinaryFilter'
@@ -70,15 +92,8 @@ services:
        decorates: oro_attachment.liip_imagine.binary.filter
        decoration_priority: 10
        arguments:
-          - '@oro_attachment.liip_imagine.binary.filter.unsupported_binaries.skip_by_mime_type.inner'
+          - '@.inner'
           - '%oro_attachment.liip_imagine.unsupported_mime_types%'
-
-    oro_attachment.thumbnail_factory:
-        class: Oro\Bundle\AttachmentBundle\Tools\ThumbnailFactory
-        arguments:
-          - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
-          - '@oro_attachment.liip_imagine.binary.filter'
-          - '@liip_imagine.filter.configuration'
 
     oro_attachment.association_helper:
         class: Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper
@@ -87,24 +102,27 @@ services:
             - '@oro_entity_config.config_manager'
 
     oro_attachment.manager.api:
-        class: '%oro_attachment.manager.api.class%'
+        public: true
+        class: Oro\Bundle\AttachmentBundle\Entity\Manager\AttachmentApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_attachment.entity.class%'
+            - 'Oro\Bundle\AttachmentBundle\Entity\Attachment'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_attachment.manager'
             - '@oro_entity.doctrine_helper'
+            - '@oro_attachment.manager.file.api'
 
     oro_attachment.manager.file.api:
-        class: '%oro_attachment.manager.file.api.class%'
+        class: Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
+        public: true
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - '%oro_attachment.file.entity.class%'
+            - 'Oro\Bundle\AttachmentBundle\Entity\File'
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_attachment.file_manager'
-            - '@oro_attachment.manager'
+            - '@router'
 
     oro_attachment.listener.file_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\FileListener
@@ -112,67 +130,102 @@ services:
             - '@oro_attachment.file_manager'
             - '@oro_security.token_accessor'
         tags:
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: prePersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: preUpdate }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postPersist }
-            - { name: doctrine.orm.entity_listener, entity: '%oro_attachment.file.entity.class%', event: postUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: preUpdate }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: postPersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: postUpdate }
+
+    oro_attachment.listener.file_delete_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\FileDeleteListener
+        arguments:
+            - '@oro_attachment.file_manager'
+            - '@logger'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: postRemove }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\AttachmentBundle\Entity\File, event: postUpdate }
+            - { name: doctrine.event_listener, event: postFlush }
+
+    oro_attachment.listener.entity_delete_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
 
     oro_attachment.twig.file_extension:
-        class: Oro\Bundle\AttachmentBundle\Twig\FileExtension
+        class: 'Oro\Bundle\AttachmentBundle\Twig\FileExtension'
         public: false
         arguments:
-            - '@service_container'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 
-    oro_attachment.entity_config_dumper.extension.file:
-        class: '%oro_attachment.entity_config_dumper.extension.file.class%'
+    oro_attachment.listener.multi_file_block_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\MultiFileBlockListener
         arguments:
-            - '@oro_entity_config.config_manager'
-            - '@oro_entity_extend.relation_builder'
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: entity_form.render.before, method: onBeforeFormRender, priority: -260 }
+            - { name: kernel.event_listener, event: entity_view.render.before, method: onBeforeViewRender, priority: -260 }
+            - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: onBeforeValueRender, priority: -260 }
+
+    oro_attachment.entity_config_dumper.extension.file:
+        class: Oro\Bundle\AttachmentBundle\Tools\FileEntityConfigDumperExtension
+        parent: oro_entity_extend.entity_config_dumper.extension.relation
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_attachment.entity_config_dumper.extension:
-        class: '%oro_attachment.entity_config_dumper.extension.class%'
+        class: Oro\Bundle\AttachmentBundle\Tools\AttachmentConfigDumperExtension
         parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_attachment.entity_generator.extension:
-        class: '%oro_attachment.entity_generator.extension.class%'
+        class: Oro\Bundle\AttachmentBundle\Tools\AttachmentEntityGeneratorExtension
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
-
     oro_attachment.migration.extension.attachment:
-        class: '%oro_attachment.migration.extension.attachment.class%'
+        class: Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
         tags:
             - { name: oro_migration.extension, extension_name: attachment }
 
+    oro_attachment.importexport.file_manager.import_files:
+        parent: oro_gaufrette.file_manager
+        public: true
+        arguments:
+            - 'import_files'
+
     oro_attachment.serializer.file_normalizer:
-        class: '%oro_attachment.serializer.file_normalizer.class%'
-        calls:
-            - [setAttachmentManager, ['@oro_attachment.manager']]
-            - [setFileManager, ['@oro_attachment.file_manager']]
-            - [setValidator, ['@oro_attachment.validator.file_config_validator']]
-            - [setLogger, ['@logger']]
+        class: Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
+        arguments:
+            - '@oro_attachment.manager'
+            - '@oro_attachment.importexport.file_manager.import_files'
+            - '@oro_attachment.provider.attachment_entity_config'
         tags:
             - { name: oro_importexport.normalizer}
 
     oro_attachment.placeholder.filter:
-        class: '%oro_attachment.placeholder.filter.class%'
+        class: Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter
+        public: true
         arguments:
             - '@oro_attachment.association_helper'
             - '@oro_entity.doctrine_helper'
 
     oro_attachment.event_listener.attachment_grid_listener:
-        class: '%oro_attachment.attachment_grid_listener%'
+        class: Oro\Bundle\AttachmentBundle\EventListener\AttachmentGridListener
         arguments:
             - [entityId]
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-files-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-files-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-images-grid, method: onBuildAfter }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-images-grid, method: onBuildBefore }
 
     oro_attachment.listener.merge_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\MergeListener
@@ -182,7 +235,7 @@ services:
             - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata }
 
     oro_attachment.datagrid.action.dialog:
-        class: '%oro_attachment.datagrid.action.dialog.class%'
+        class: Oro\Bundle\AttachmentBundle\DataGrid\Action\DialogAction
         shared: false
         tags:
             - { name: oro_datagrid.extension.action.type, type: dialog }
@@ -196,12 +249,17 @@ services:
             - { name: oro_ui.view_action_provider, group: activity, priority: -90 }
             - { name: oro_ui.update_action_provider, group: activity, priority: -90 }
 
+    Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider:
+        alias: oro_attachment.provider.attachment
+
     oro_attachment.provider.attachment:
-        class: '%oro_attachment.provider.attachment.class%'
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
+        public: true
         arguments:
             - '@doctrine.orm.entity_manager'
             - '@oro_attachment.association_helper'
             - '@oro_attachment.manager'
+            - '@oro_attachment.provider.picture_sources'
 
     oro_attachment.exclusion_provider:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentExclusionProvider
@@ -210,15 +268,17 @@ services:
             - { name: oro_entity.exclusion_provider.api }
 
     oro_attachment.formatter.image_encoded:
-        class: '%oro_attachment.formatter.image_encoded.class%'
+        class: Oro\Bundle\AttachmentBundle\Formatter\ImageEncodedFormatter
+        public: false
         arguments:
           - '@oro_attachment.file_manager'
           - '@file_locator'
         tags:
-          - { name: oro_formatter, formatter: image_encoded }
+          - { name: oro_formatter, formatter: image_encoded, data_type: image }
 
     oro_attachment.formatter.image_link:
-        class: '%oro_attachment.formatter.image_link.class%'
+        class: Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter
+        public: false
         arguments:
           - '@oro_attachment.manager'
           - '@translator'
@@ -226,24 +286,515 @@ services:
           - { name: oro_formatter, formatter: image_link }
 
     oro_attachment.formatter.image_src:
-        class: '%oro_attachment.formatter.image_src.class%'
+        class: Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter
+        public: false
         arguments:
           - '@oro_attachment.manager'
         tags:
           - { name: oro_formatter, formatter: image_src }
 
-    oro_attachment.image_resizer:
-        class: 'Oro\Bundle\AttachmentBundle\Resizer\ImageResizer'
+    oro_attachment.manager.public_mediacache:
+        parent: oro_gaufrette.file_manager
+        public: true
+        arguments:
+            - 'public_mediacache'
+            - 'cache'
+        tags:
+            - { name: oro_gaufrette.public_filesystem_manager }
+
+    oro_attachment.manager.protected_mediacache:
+        parent: oro_gaufrette.file_manager
+        public: true
+        arguments:
+            - 'protected_mediacache'
+
+    oro_attachment.media_cache_manager_registry:
+        class: 'Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistry'
+        arguments:
+            - '@oro_attachment.acl.file_access_control_checker'
+            - '@oro_attachment.manager.public_mediacache'
+            - '@oro_attachment.manager.protected_mediacache'
+
+    oro_attachment.event_listener.sets_parent_entity_on_flush:
+        class: 'Oro\Bundle\AttachmentBundle\EventListener\SetsParentEntityOnFlushListener'
+        arguments:
+            - '@property_accessor'
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: postPersist }
+
+    oro_attachment.acl.voter.file:
+        class: 'Oro\Bundle\AttachmentBundle\Acl\Voter\FileVoter'
+        public: false
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@security.authorization_checker'
+            - '@Psr\Container\ContainerInterface'
+        calls:
+            - [setClassName, ['Oro\Bundle\AttachmentBundle\Entity\File']]
+        tags:
+            - { name: security.voter }
+            - { name: container.service_subscriber, id: oro_attachment.acl.file_access_control_checker }
+            - { name: container.service_subscriber, id: oro_attachment.provider.file_applications }
+            - { name: container.service_subscriber, id: oro_action.provider.current_application }
+
+    oro_attachment.acl.file_access_control_checker:
+        class: 'Oro\Bundle\AttachmentBundle\Acl\FileAccessControlChecker'
+        public: false
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+
+    oro_attachment.url_generator:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFilterAwareUrlGenerator
+        arguments:
+            - '@router'
+            - '@oro_attachment.configurator.provider.attachment_hash_provider'
+        calls:
+            - [setLogger, ['@logger']]
+
+    oro_attachment.provider.file_name:
+        class: Oro\Bundle\AttachmentBundle\Provider\FileNameProvider
+        arguments:
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.tools.file_name_extension_helper'
+
+    oro_attachment.provider.file_name.webp_aware:
+        class: Oro\Bundle\AttachmentBundle\Provider\WebpAwareFileNameProvider
+        decorates: oro_attachment.provider.file_name
+        # Should be executed first, so it can set format to webp if format is not already specified.
+        decoration_priority: -100
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.tools.webp_configuration'
+            - '@liip_imagine.filter.configuration'
+
+    oro_attachment.provider.file_url:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
+        arguments:
+            - '@oro_attachment.url_generator'
+            - '@oro_attachment.provider.file_name'
+
+    Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface:
+        alias: 'oro_attachment.provider.file_url'
+
+    oro_attachment.provider.file_url_by_uuid:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider'
+        arguments:
+            - '@doctrine'
+            - '@oro_attachment.provider.file_url'
+
+    Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider:
+        alias: 'oro_attachment.provider.file_url_by_uuid'
+
+    oro_attachment.provider.resized_image_path:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProvider'
+        arguments:
+            - '@oro_attachment.provider.file_url'
+
+    oro_attachment.provider.resized_image_path.remove_base_url:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderDecorator'
+        decorates: oro_attachment.provider.resized_image_path
+        decoration_priority: 300
+        arguments:
+            - '@.inner'
+            - '@=service("router").getContext().getBaseUrl()'
+
+    oro_attachment.provider.resized_image_path.remove_media_cache_prefix:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderDecorator'
+        decorates: oro_attachment.provider.resized_image_path
+        decoration_priority: 200
+        arguments:
+            - '@.inner'
+            - 'media/cache'
+
+    oro_attachment.provider.filter_runtime_config:
+        class: Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigDefaultProvider
+
+    oro_attachment.provider.filter_runtime_config.webp_aware:
+        class: Oro\Bundle\AttachmentBundle\Provider\WebpAwareFilterRuntimeConfigProvider
+        decorates: oro_attachment.provider.filter_runtime_config
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.tools.webp_configuration'
+
+    Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider:
+        alias: oro_attachment.provider.resized_image
+
+    oro_attachment.provider.resized_image:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider'
+        public: true
         arguments:
             - '@oro_attachment.file_manager'
             - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
             - '@oro_attachment.liip_imagine.binary.filter'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.provider.filter_runtime_config'
+            - '@logger'
+
+    oro_attachment.manager.image_resize:
+        class: 'Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager'
+        arguments:
+            - '@oro_attachment.provider.resized_image'
+            - '@oro_attachment.provider.resized_image_path'
+            - '@oro_attachment.media_cache_manager_registry'
+            - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
+
+    oro_attachment.manager.image_resize.webp_aware:
+        class: 'Oro\Bundle\AttachmentBundle\Manager\WebpAwareImageResizeManager'
+        decorates: oro_attachment.manager.image_resize
+        decoration_priority: -100
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.tools.webp_configuration'
+
+    oro_attachment.provider.file_icon:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\FileIconProvider'
+        public: false
+        arguments:
+            - '%oro_attachment.files%'
+
+    oro_attachment.tools.mime_type_checker:
+        class: 'Oro\Bundle\AttachmentBundle\Tools\MimeTypeChecker'
+        arguments:
+            - '@oro_config.manager'
+
+    oro_attachment.provider.file_applications:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider'
+        public: false
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+
+    oro_attachment.filtered_attachment_migration:
+        class: 'Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationService'
+        public: true
+        arguments:
+            - '@knp_gaufrette.filesystem_map'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_layout.loader.image_filter'
+            - 'public_mediacache'
+            - '%kernel.project_dir%/public/media/cache'
+
+    oro_attachment.liip_imagine:
+        parent: liip_imagine
+        decorates: liip_imagine
+        calls:
+            - ['setClassFactory', [!service {class: Oro\Bundle\AttachmentBundle\Imagine\Factory\ClassFactory, arguments: ['%knp_gaufrette.stream_wrapper.protocol%']}]]
+
+    oro_attachment.liip_imagine.filter.loader.watermark_image:
+        class: Liip\ImagineBundle\Imagine\Filter\Loader\WatermarkFilterLoader
+        decorates: liip_imagine.filter.loader.watermark_image
+        arguments:
+            - '@oro_attachment.liip_imagine'
+            - 'gaufrette:/' # One slash instead of two used intentionally due to specifics of WatermarkFilterLoader
+
+    oro_attachment.provider.file_constraints:
+        class: Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider
+        arguments:
+            - '@oro_config.manager'
+            - '@oro_attachment.provider.attachment_entity_config'
+
+    Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider:
+        alias: oro_attachment.provider.file_constraints
+
+    oro_attachment.provider.multiple_files_constraints:
+        class: Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+
+    Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider:
+        alias: oro_attachment.provider.multiple_files_constraints
+
+    oro_attachment.validator.constraints.file:
+        class: Symfony\Component\Validator\Constraints\FileValidator
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfigValidator:
+        arguments:
+            - '@oro_attachment.validator.constraints.file'
+            - '@oro_attachment.provider.file_constraints'
+        tags:
+            - { name: validator.constraint_validator }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromEntityFieldConfigValidator:
+        arguments:
+            - '@oro_attachment.validator.constraints.file'
+            - '@oro_attachment.provider.file_constraints'
+        tags:
+            - { name: validator.constraint_validator }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFromEntityFieldConfigValidator:
+        arguments:
+            - '@oro_attachment.provider.multiple_files_constraints'
+        tags:
+            - { name: validator.constraint_validator }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleImageConstraintFromEntityFieldConfigValidator:
+        arguments:
+            - '@oro_attachment.provider.multiple_files_constraints'
+        tags:
+            - { name: validator.constraint_validator }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileUrlValidator:
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: validator.constraint_validator }
+
+    oro_attachment.provider.file_title:
+        class: Oro\Bundle\AttachmentBundle\Provider\FileTitleProvider
+
+    Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface:
+        alias: oro_attachment.provider.file_title
+
+    oro_attachment.provider.attachment_entity_config:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
         calls:
             - [setLogger, ['@logger']]
 
-    oro_attachment.media_cache_manager:
-        class: 'Oro\Bundle\AttachmentBundle\Manager\MediaCacheManager'
-        parent: 'oro_gaufrette.file_manager'
+    Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface:
+        alias: oro_attachment.provider.attachment_entity_config
+
+    oro_attachment.provider.image_file_names:
+        class: Oro\Bundle\AttachmentBundle\Provider\ImageFileNamesProvider
         arguments:
-            - 'mediacache'
-            - '%oro_attachment.media_cache_dir%'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.provider.resized_image_path'
+
+    oro_attachment.manager.image_file_removal_config:
+        class: Oro\Bundle\AttachmentBundle\Manager\FileRemoval\ImageFileRemovalManagerConfig
+
+    oro_attachment.manager.image_file_removal:
+        class: Oro\Bundle\AttachmentBundle\Manager\FileRemovalManager
+        arguments:
+            - '@oro_attachment.manager.image_file_removal_config'
+            - '@oro_attachment.provider.image_file_names'
+            - '@oro_attachment.media_cache_manager_registry'
+
+    oro_attachment.async.image_file_removal_processor:
+        class: Oro\Bundle\AttachmentBundle\Async\ImageFileRemovalProcessor
+        arguments:
+            - '@oro_attachment.manager.image_file_removal'
+            - '@logger'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_attachment.layout.data_provider.file_applications:
+        class: 'Oro\Bundle\AttachmentBundle\Layout\DataProvider\FileApplicationsDataProvider'
+        arguments:
+            - '@oro_attachment.provider.file_applications'
+            - '@oro_action.provider.current_application'
+            - '@oro_entity_config.provider.attachment'
+        tags:
+            - { name: layout.data_provider, alias: file_applications }
+
+    oro_attachment.configurator.attachment_filter_configuration:
+        class: Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration
+        decorates: liip_imagine.filter.configuration
+        # Any decorators cannot have a higher priority than specified, as this will violate backward compatibility.
+        decoration_priority: -255
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.configurator.provider.attachment_post_processors_provider'
+
+    oro_attachment.configurator.provider.attachment_hash_provider:
+        class: Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentHashProvider
+        arguments:
+            - '@oro_attachment.configurator.provider.attachment_post_processors_provider'
+            - '@oro_attachment.configurator.attachment_filter_configuration'
+            - '@oro_attachment.provider.filter_runtime_config'
+
+    oro_attachment.configurator.provider.attachment_post_processors_provider:
+        class: Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentPostProcessorsProvider
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: oro_featuretogle.feature, feature: post_processing_feature }
+
+    oro_attachment.checker.voter.post_processing_voter:
+        class: 'Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessingVoter'
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: oro_featuretogle.voter, priority: 10 }
+
+    oro_attachment.checker.voter.post_processors_voter:
+        class: 'Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessorsVoter'
+        arguments:
+            - '%liip_imagine.jpegoptim.binary%'
+            - '%liip_imagine.pngquant.binary%'
+        tags:
+            - { name: oro_featuretogle.voter, priority: 10 }
+
+    oro_attachment.importexport.event_listener.file_headers:
+        class: Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileHeadersListener
+        tags:
+            - { name: kernel.event_listener, event: oro.import_export.after_load_entity_rules_and_backend_headers, method: afterLoadEntityRulesAndBackendHeaders }
+
+    oro_attachment.import_export.file_import_strategy_helper:
+        class: Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper
+        arguments:
+            - '@oro_entity.helper.field_helper'
+            - '@oro_importexport.field.database_helper'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_attachment.validator.file_config_validator'
+            - '@oro_attachment.validator.multiple_file_config_validator'
+            - '@translator'
+
+    oro_attachment.import_export.file_manipulator:
+        class: Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator
+        arguments:
+            - '@oro_attachment.file_manager'
+            - '@security.authorization_checker'
+            - '@oro_attachment.import_export.file_import_strategy_helper'
+            - '@translator'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_attachment }
+
+    oro_attachment.import_export.event_listener.file_strategy:
+        class: Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener
+        arguments:
+            - '@oro_attachment.import_export.file_manipulator'
+            - '@oro_entity.helper.field_helper'
+            - '@oro_importexport.field.database_helper'
+            - '@oro_importexport.strategy.import.helper'
+            - '@oro_attachment.import_export.file_import_strategy_helper'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_before, method: onProcessBefore }
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter, priority: 50 }
+
+    oro_attachment.event_listener.file_preloading:
+        parent: oro_entity.event_listener.default_preloading
+        tags:
+            - { name: kernel.event_listener, event: oro_entity.preload_entity.file, method: onPreload }
+
+    Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentEntityConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentFieldConfiguration:
+        tags:
+            - oro_entity_config.validation.entity_config
+
+    oro_attachment.checker.voter.webp_feature_voter:
+        class: Oro\Bundle\AttachmentBundle\Checker\Voter\WebpFeatureVoter
+        arguments:
+            - '%oro_attachment.webp_strategy%'
+        tags:
+            - { name: oro_featuretogle.voter }
+
+    oro_attachment.tools.webp_configuration:
+        class: Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration
+        arguments:
+            - '@oro_config.manager'
+            - '%oro_attachment.webp_strategy%'
+
+    Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration:
+        alias: oro_attachment.tools.webp_configuration
+
+    oro_attachment.twig.webp_strategy:
+        class: Oro\Bundle\AttachmentBundle\Twig\WebpStrategyExtension
+        arguments:
+            - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: twig.extension }
+
+    oro_attachment.imagine.filter_service:
+        class: Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService
+        arguments:
+            - '@liip_imagine.data.manager'
+            - '@liip_imagine.cache.manager'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.provider.resized_image'
+            - '@oro_attachment.tools.file_name_extension_helper'
+
+    Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider:
+        alias: oro_attachment.provider.picture_sources
+
+    oro_attachment.provider.picture_sources:
+        class: Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider
+        arguments:
+            - '@oro_attachment.manager'
+
+    oro_attachment.provider.picture_sources.webp_aware:
+        class: Oro\Bundle\AttachmentBundle\Provider\WebpAwarePictureSourcesProvider
+        decorates: oro_attachment.provider.picture_sources
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.manager'
+            - '%oro_attachment.liip_imagine.unsupported_mime_types%'
+
+    oro_attachment.imagine.provider.url:
+        class: Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProvider
+        arguments:
+            - '@router'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.tools.file_name_extension_helper'
+
+    oro_attachment.imagine.provider.url.webp_aware:
+        class: Oro\Bundle\AttachmentBundle\Imagine\Provider\WebpAwareImagineUrlProvider
+        decorates: oro_attachment.imagine.provider.url
+        # Should be executed first, so it can set format to webp if format is not already specified.
+        decoration_priority: -100
+        arguments:
+            - '@.inner'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.tools.webp_configuration'
+
+    oro_attachment.provider.external_url_provider:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\ExternalUrlProvider'
+        decorates: oro_attachment.provider.file_url
+        decoration_priority: -250
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.url_generator'
+            - '@oro_attachment.provider.file_name'
+
+    oro_attachment.tools.external_file_factory:
+        class: Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory
+        arguments:
+            - !service { class: GuzzleHttp\Client }
+        calls:
+            - [setLogger, ['@logger']]
+
+    oro_attachment.provider.extend_field_form_options.file:
+        class: Oro\Bundle\AttachmentBundle\Provider\ExtendFieldFileFormOptionsProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro_entity_extend.form_options_provider }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\FileFieldCompatibilityValidator:
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+            - '@oro_entity.helper.field_helper'
+        tags:
+            - { name: validator.constraint_validator }
+
+    oro_attachment.event_listener.original_file_names_configuration_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\OriginalFileNamesConfigurationListener
+        arguments:
+            - '@session'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: afterUpdate }
+
+    oro_attachment.provider.file_name.original_file_name:
+        class: Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider
+        decorates: oro_attachment.provider.file_name
+        decoration_priority: -50
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.tools.file_name_extension_helper'
+        tags:
+            - { name: oro_featuretogle.feature, feature: attachment_original_filenames }
+
+    oro_attachment.tools.file_name_extension_helper:
+        class: Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper
+        arguments:
+            - '%oro_attachment.liip_imagine.unsupported_mime_types%'

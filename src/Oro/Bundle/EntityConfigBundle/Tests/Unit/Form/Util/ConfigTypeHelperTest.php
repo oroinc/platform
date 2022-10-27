@@ -2,23 +2,25 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Form\Util;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var ConfigTypeHelper */
-    protected $typeHelper;
+    private $typeHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->typeHelper = new ConfigTypeHelper($this->configManager);
     }
@@ -26,7 +28,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFieldNameProvider
      */
-    public function testGetFieldName($configId, $expected)
+    public function testGetFieldName(ConfigIdInterface $configId, ?string $expected)
     {
         $this->assertSame(
             $expected,
@@ -34,7 +36,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getFieldNameProvider()
+    public function getFieldNameProvider(): array
     {
         return [
             [new EntityConfigId('test', 'Test\Entity'), null],
@@ -45,7 +47,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFieldTypeProvider
      */
-    public function testGetFieldType($configId, $expected)
+    public function testGetFieldType(ConfigIdInterface $configId, ?string $expected)
     {
         $this->assertSame(
             $expected,
@@ -53,7 +55,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getFieldTypeProvider()
+    public function getFieldTypeProvider(): array
     {
         return [
             [new EntityConfigId('test', 'Test\Entity'), null],
@@ -63,18 +65,18 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetImmutableNoConfig()
     {
-        $scope     = 'test_scope';
+        $scope = 'test_scope';
         $className = 'Test\Entity';
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with($scope)
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, null)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $configProvider->expects($this->never())
             ->method('getConfig');
 
@@ -86,32 +88,30 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getImmutableProvider
      */
-    public function testGetImmutable($value, $fieldName = null)
+    public function testGetImmutable(mixed $value, string $fieldName = null)
     {
-        $scope     = 'test_scope';
+        $scope = 'test_scope';
         $className = 'Test\Entity';
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('get')
             ->with('immutable')
-            ->will($this->returnValue($value));
+            ->willReturn($value);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with($scope)
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertSame(
             $value,
@@ -119,7 +119,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getImmutableProvider()
+    public function getImmutableProvider(): array
     {
         return [
             [true, null],
@@ -136,32 +136,34 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isImmutableProvider
      */
-    public function testIsImmutable($value, $expected, $fieldName = null, $constraintName = null)
-    {
-        $scope     = 'test_scope';
+    public function testIsImmutable(
+        mixed $value,
+        bool $expected,
+        string $fieldName = null,
+        string $constraintName = null
+    ) {
+        $scope = 'test_scope';
         $className = 'Test\Entity';
 
-        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $config = $this->createMock(Config::class);
         $config->expects($this->once())
             ->method('get')
             ->with('immutable')
-            ->will($this->returnValue($value));
+            ->willReturn($value);
 
-        $configProvider = $this->getConfigProviderMock();
+        $configProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with($scope)
-            ->will($this->returnValue($configProvider));
+            ->willReturn($configProvider);
         $configProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $configProvider->expects($this->once())
             ->method('getConfig')
             ->with($className, $fieldName)
-            ->will($this->returnValue($config));
+            ->willReturn($config);
 
         $this->assertSame(
             $expected,
@@ -169,7 +171,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function isImmutableProvider()
+    public function isImmutableProvider(): array
     {
         return [
             [true, true, null, null],
@@ -195,15 +197,5 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
             [['val1', 'val2'], true, 'testField', 'val2'],
             [['val1'], false, 'testField', 'val2'],
         ];
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getConfigProviderMock()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 }

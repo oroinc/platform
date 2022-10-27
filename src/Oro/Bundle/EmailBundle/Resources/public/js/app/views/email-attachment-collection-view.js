@@ -1,34 +1,34 @@
 define(function(require) {
     'use strict';
 
-    var EmailAttachmentCollectionView;
-    var $ = require('jquery');
-    var EmailAttachmentView = require('oroemail/js/app/views/email-attachment-view');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const $ = require('jquery');
+    const EmailAttachmentView = require('oroemail/js/app/views/email-attachment-view');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     /**
      * @exports EmailAttachmentCollectionView
      */
-    EmailAttachmentCollectionView = BaseCollectionView.extend({
+    const EmailAttachmentCollectionView = BaseCollectionView.extend({
         itemView: EmailAttachmentView,
 
         listen: {
             'add collection': 'collectionAdd',
-            'remove collection': 'collectionRemove'
+            'remove collection': 'collectionRemove',
+            'visibilityChange': 'onVisibilityChange'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function EmailAttachmentCollectionView() {
-            EmailAttachmentCollectionView.__super__.constructor.apply(this, arguments);
+        constructor: function EmailAttachmentCollectionView(options) {
+            EmailAttachmentCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        initialize: function(options) {
-            BaseCollectionView.__super__.initialize.apply(this, arguments);
+        initialize(options) {
+            BaseCollectionView.__super__.initialize.call(this, options);
             this.itemView = this.itemView.extend({// eslint-disable-line oro/named-constructor
                 inputName: options.inputName,
                 fileIcons: options.fileIcons,
@@ -36,23 +36,25 @@ define(function(require) {
             });
 
             this.listSelector = options.listSelector;
-            $(this.listSelector).css('padding-top', 5); // todo move to class styles
             $(this.listSelector).html('');
 
             this.$el.hide();
-            this.collection.map(this.collectionAdd, this);
+            this.showHideAttachmentRow();
         },
 
-        collectionAdd: function(model) {
-            if (!model.get('id')) {
-                this.getItemView(model).fileSelect();
+        collectionAdd(model) {
+            if (!model.get('id') && !model.get('fileName')) {
+                const itemView = this.getItemView(model);
+                if (typeof itemView !== 'undefined') {
+                    itemView.fileSelect();
+                }
             } else {
                 this.showHideAttachmentRow();
             }
         },
 
-        collectionRemove: function() {
-            var self = this;
+        collectionRemove() {
+            const self = this;
             this.collection.each(function(model) {
                 if (model && !model.get('type') && !model.get('id')) {
                     self.collection.remove(model);
@@ -61,7 +63,7 @@ define(function(require) {
             this.showHideAttachmentRow();
         },
 
-        showHideAttachmentRow: function() {
+        showHideAttachmentRow() {
             if (this.collection.isEmpty()) {
                 this.hide();
             } else {
@@ -69,12 +71,16 @@ define(function(require) {
             }
         },
 
-        show: function() {
+        show() {
             this.$el.show();
         },
 
-        hide: function() {
+        hide() {
             this.$el.hide();
+        },
+
+        onVisibilityChange() {
+            this.$el.trigger('content:changed');
         }
     });
 

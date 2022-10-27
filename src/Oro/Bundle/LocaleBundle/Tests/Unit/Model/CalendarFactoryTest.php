@@ -2,50 +2,51 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
+use Oro\Bundle\LocaleBundle\Model\Calendar;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CalendarFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CalendarFactory
-     */
-    protected $factory;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var CalendarFactory */
+    private $factory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->createMock(ContainerInterface::class);
+
         $this->factory = new CalendarFactory($this->container);
     }
 
     /**
      * @dataProvider getCalendarDataProvider
      */
-    public function testGetCalendar($locale, $language)
+    public function testGetCalendar(?string $locale, ?string $language)
     {
-        $calendar = $this->createMock(
-            'Oro\Bundle\LocaleBundle\Model\Calendar',
-            array('setLocale', 'setLanguage')
-        );
-        $calendar->expects($this->once())->method('setLocale')->with($locale);
-        $calendar->expects($this->once())->method('setLanguage')->with($language);
+        $calendar = $this->createMock(Calendar::class);
+        $calendar->expects($this->once())
+            ->method('setLocale')
+            ->with($locale);
+        $calendar->expects($this->once())
+            ->method('setLanguage')
+            ->with($language);
 
-        $this->container->expects($this->once())->method('get')
+        $this->container->expects($this->once())
+            ->method('get')
             ->with('oro_locale.calendar')
-            ->will($this->returnValue($calendar));
+            ->willReturn($calendar);
 
         $this->assertEquals($calendar, $this->factory->getCalendar($locale, $language));
     }
 
-    public function getCalendarDataProvider()
+    public function getCalendarDataProvider(): array
     {
-        return array(
-            array('en_US', 'ru_RU'),
-            array(null, null),
-        );
+        return [
+            ['en_US', 'ru_RU'],
+            [null, null],
+        ];
     }
 }

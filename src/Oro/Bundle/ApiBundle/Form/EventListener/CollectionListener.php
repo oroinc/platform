@@ -16,9 +16,6 @@ class CollectionListener implements EventSubscriberInterface
     /** @var CollectionEntryFactory */
     protected $entryFactory;
 
-    /**
-     * @param CollectionEntryFactory $entryFactory
-     */
     public function __construct(CollectionEntryFactory $entryFactory)
     {
         $this->entryFactory = $entryFactory;
@@ -37,9 +34,6 @@ class CollectionListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSetData(FormEvent $event)
     {
         $form = $event->getForm();
@@ -65,9 +59,6 @@ class CollectionListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -93,9 +84,6 @@ class CollectionListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onSubmit(FormEvent $event)
     {
         $form = $event->getForm();
@@ -115,8 +103,8 @@ class CollectionListener implements EventSubscriberInterface
 
         // The data mapper only adds, but does not remove items, so do this here
         $toDelete = [];
-        foreach ($data as $name => $child) {
-            if (!$form->has($name)) {
+        foreach ($data as $name => $value) {
+            if (!$form->has($name) || (null === $value && !$form->get($name)->getConfig()->getRequired())) {
                 $toDelete[] = $name;
             }
         }

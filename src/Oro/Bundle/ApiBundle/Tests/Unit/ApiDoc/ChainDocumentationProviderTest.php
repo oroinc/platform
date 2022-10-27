@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\ChainDocumentationProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\DocumentationProviderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Psr\Container\ContainerInterface;
 
 class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -14,16 +17,30 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentationProviderInterface */
     private $provider2;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentationProviderInterface */
+    private $provider3;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
+    private $container;
+
     /** @var ChainDocumentationProvider */
     private $chainProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider1 = $this->createMock(DocumentationProviderInterface::class);
         $this->provider2 = $this->createMock(DocumentationProviderInterface::class);
+        $this->provider3 = $this->createMock(DocumentationProviderInterface::class);
+        $this->container = TestContainerBuilder::create()
+            ->add('provider1', $this->provider1)
+            ->add('provider2', $this->provider2)
+            ->add('provider3', $this->provider3)
+            ->getContainer($this);
 
         $this->chainProvider = new ChainDocumentationProvider(
-            [$this->provider1, $this->provider2]
+            [['provider1', null], ['provider2', null], ['provider3', 'rest']],
+            $this->container,
+            new RequestExpressionMatcher()
         );
     }
 
@@ -37,9 +54,11 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider2->expects(self::once())
             ->method('getDocumentation')
             ->willReturn('provider2 documentation');
+        $this->provider3->expects(self::never())
+            ->method('getDocumentation');
 
         self::assertEquals(
-            'provider1 documentation' . "\n" . 'provider2 documentation',
+            'provider1 documentation' . "\n\n" . 'provider2 documentation',
             $this->chainProvider->getDocumentation($requestType)
         );
     }
@@ -54,6 +73,8 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider2->expects(self::once())
             ->method('getDocumentation')
             ->willReturn('provider2 documentation');
+        $this->provider3->expects(self::never())
+            ->method('getDocumentation');
 
         self::assertEquals(
             'provider2 documentation',

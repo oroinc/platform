@@ -4,24 +4,23 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DataGrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\EntityConfigBundle\Config\Config as EntityConfig;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MergeMassActionTest extends \PHPUnit\Framework\TestCase
 {
-    const MAX_ENTITIES_COUNT = 1;
+    private const MAX_ENTITIES_COUNT = 1;
 
-    /**
-     * @var MergeMassAction $target
-     */
+    /** @var MergeMassAction */
     private $target;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $entityConfig = new EntityConfig(
-            $this->createMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface'),
+            $this->createMock(ConfigIdInterface::class),
             ['max_element_count' => self::MAX_ENTITIES_COUNT]
         );
         $entityConfigProvider->expects($this->any())
@@ -29,16 +28,13 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
             ->with('SomeEntityClass')
             ->willReturn($entityConfig);
 
-        $translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator = $this->createMock(TranslatorInterface::class);
 
         $this->target = new MergeMassAction($entityConfigProvider, $translator);
     }
 
     /**
      * @dataProvider getOptionsDataProvider
-     *
-     * @param array $actualOptions
-     * @param array $expectedOptions
      */
     public function testGetOptions(array $actualOptions, array $expectedOptions)
     {
@@ -46,10 +42,7 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedOptions, $this->target->getOptions()->toArray());
     }
 
-    /**
-     * @return array
-     */
-    public function getOptionsDataProvider()
+    public function getOptionsDataProvider(): array
     {
         return [
             'default_values'  => [
@@ -101,12 +94,11 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Trying to get name of unnamed object
-     */
     public function testMergeMassActionSetOptionShouldThrowExceptionIfClassNameOptionIsEmpty()
     {
-        $this->target->setOptions(ActionConfiguration::create(array()));
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Trying to get name of unnamed object');
+
+        $this->target->setOptions(ActionConfiguration::create([]));
     }
 }

@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\NotificationBundle\Event\Handler;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
+use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -18,8 +19,8 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var EmailNotificationManager */
     protected $manager;
 
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /** @var PropertyAccessor */
     protected $propertyAccessor;
@@ -27,28 +28,27 @@ class EmailNotificationHandler implements EventHandlerInterface
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @param EmailNotificationManager $manager
-     * @param EntityManager $em
-     * @param PropertyAccessor $propertyAccessor
-     * @param EventDispatcherInterface $eventDispatcher
-     */
+    /** @var ChainAdditionalEmailAssociationProvider */
+    private $additionalEmailAssociationProvider;
+
     public function __construct(
         EmailNotificationManager $manager,
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         PropertyAccessor $propertyAccessor,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ChainAdditionalEmailAssociationProvider $additionalEmailAssociationProvider
     ) {
         $this->manager = $manager;
-        $this->em = $em;
+        $this->doctrine = $doctrine;
         $this->propertyAccessor = $propertyAccessor;
         $this->eventDispatcher = $eventDispatcher;
+        $this->additionalEmailAssociationProvider = $additionalEmailAssociationProvider;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle(NotificationEvent $event, $matchedNotifications)
+    public function handle(NotificationEvent $event, array $matchedNotifications)
     {
         // convert notification rules to a list of EmailNotificationInterface
         $notifications = [];
@@ -60,12 +60,6 @@ class EmailNotificationHandler implements EventHandlerInterface
         $this->manager->process($notifications);
     }
 
-    /**
-     * @param NotificationEvent $event
-     * @param EmailNotification $notification
-     *
-     * @return TemplateEmailNotificationInterface
-     */
     protected function getEmailNotificationAdapter(
         NotificationEvent $event,
         EmailNotification $notification
@@ -73,9 +67,10 @@ class EmailNotificationHandler implements EventHandlerInterface
         return new TemplateEmailNotificationAdapter(
             $event->getEntity(),
             $notification,
-            $this->em,
+            $this->doctrine->getManager(),
             $this->propertyAccessor,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->additionalEmailAssociationProvider
         );
     }
 }

@@ -1,14 +1,11 @@
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'orotranslation/js/translator',
-    'oroui/js/messenger'
-], function($, _, Backbone, __, messenger) {
+define(function(require) {
     'use strict';
 
-    var service;
-    var subscriptions = [];
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+
+    let service;
+    let subscriptions = [];
 
     /**
      * Oro.Synchronizer - saves provided sync service internally and
@@ -29,21 +26,8 @@ define([
             throw new Error('Synchronization service does not fit requirements');
         }
         service = serv;
-        var onConnection = function() {
-            messenger.notificationFlashMessage('success', __('sync.connection.established'));
-        };
-        service.on('connection_lost', function(data) {
-            data = data || {};
-            var attempt = data.retries || 0;
-            if (attempt) {
-                data.remain = data.maxretries - data.retries + 1;
-            }
-            messenger.notificationMessage('error',
-                __('sync.connection.lost', data, attempt), {flash: Boolean(attempt)});
-            service.off(null, onConnection).once('connection_established', onConnection);
-        });
         while (subscriptions.length) {
-            service.subscribe.apply(service, subscriptions.shift());
+            service.subscribe(...subscriptions.shift());
         }
         return sync;
     }
@@ -55,7 +39,7 @@ define([
     function subscribeModel(model) {
         if (model.id) {
             // saves bound function in order to have same callback in unsubscribeModel call
-            model['[[SetCallback]]'] = (model['[[SetCallback]]'] || _.bind(model.set, model));
+            model['[[SetCallback]]'] = (model['[[SetCallback]]'] || model.set.bind(model));
             sync.subscribe(_.result(model, 'url'), model['[[SetCallback]]']);
             model.on('remove', unsubscribeModel);
         }
@@ -67,7 +51,7 @@ define([
      */
     function unsubscribeModel(model) {
         if (model.id) {
-            var args = [_.result(model, 'url')];
+            const args = [_.result(model, 'url')];
             if (_.isFunction(model['[[SetCallback]]'])) {
                 args.push(model['[[SetCallback]]']);
             }
@@ -75,7 +59,7 @@ define([
         }
     }
 
-    var events = {
+    const events = {
         add: subscribeModel,
         error: function(collection) {
             _.each(collection.models, unsubscribeModel);
@@ -136,10 +120,10 @@ define([
      * @param {string} channel name of a channel
      * @param {Function} callback
      */
-    sync.subscribe = function() {
-        var args = _.toArray(arguments);
+    sync.subscribe = function(channel, callback) {
+        const args = [channel, callback];
         if (service) {
-            service.subscribe.apply(service, args);
+            service.subscribe(...args);
         } else {
             subscriptions.push(args);
         }
@@ -154,10 +138,10 @@ define([
      * @param {Function?} callback
      */
     sync.unsubscribe = function(channel, callback) {
-        var cleaner;
-        var args = _.toArray(arguments);
+        let cleaner;
+        const args = [channel, callback];
         if (service) {
-            service.unsubscribe.apply(service, args);
+            service.unsubscribe(...args);
         } else {
             cleaner = !callback
                 ? function(args) {

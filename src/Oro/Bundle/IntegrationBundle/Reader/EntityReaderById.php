@@ -43,8 +43,6 @@ class EntityReaderById extends BaseReader
     /**
      * Ensure that filtering applied and query builder wrapped in buffered iterator
      * if data source is query builder or just an entity name
-     *
-     * @param ContextInterface $context
      */
     protected function ensureInitialized(ContextInterface $context)
     {

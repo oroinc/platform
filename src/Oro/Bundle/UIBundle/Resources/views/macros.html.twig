@@ -10,7 +10,6 @@
     <div data-content="{{ name }}">
         <div class="row-oro oro-multiselect-holder">
             <div class="float-holder ">
-                {{ form_errors(form) }}
                 {% if form.children|length  %}
                     {% for child in form %}
                         {{ form_widget(child) }}
@@ -19,27 +18,26 @@
                 {% else %}
                     {{ form_widget(form) }}
                 {% endif %}
+                {{ form_errors(form) }}
                 {{ form_rest(form) }}
             </div>
-            <button class="removeRow btn btn-icon btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            {% if widget.parent.vars.allow_delete is not defined or widget.parent.vars.allow_delete -%}
+                <button class="removeRow btn btn-icon btn-square-light" type="button" data-related="{{ name }}"><span class="fa-close"></span></button>
+            {%- endif %}
         </div>
     </div>
 {% endmacro %}
 
-{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
-    {% set tooltip_parameters = tooltip_parameters|default({}) %}
-    {# deprecated tooltips domain since 1.9:1:11 for tooltips use instead 'messages' translation domain #}
-    {% set tooltip = tooltip_raw|trans(tooltip_parameters, "messages") %}
-    {% if (tooltip == tooltip_raw) %}
-        {% set tooltip = tooltip_raw|trans(tooltip_parameters, "tooltips") %}
-    {% endif %}
-    {% if tooltip is not empty %}
+{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor, tooltip_translatable) %}
+    {%- set tooltip = tooltip_raw -%}
+    {%- if tooltip_translatable is not same as(false) -%}
+        {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({})) %}
+    {%- endif -%}
+    {%- if tooltip is not empty -%}
         {% set details_anchor = details_anchor|default(null) %}
         {% set details_link = details_link|default(null) %}
         {% set details_enabled = details_enabled|default(false) %}
         {% set tooltip_placement = isMobileVersion() ? 'top' : tooltip_placement|default(null) %}
-
-        {# Help link logic #}
         {% if details_enabled or details_anchor or details_link %}
             {% set helpLink = details_link|default(get_help_link()) %}
             {% if details_anchor %}
@@ -50,18 +48,12 @@
                 ~ 'oro.form.tooltip.read_more'|trans ~ '</a></div></div>'
             %}
         {% endif %}
-        {# End help link logic #}
-
-        {% set tooltip = '<div class="oro-popover-content">'
-            ~ tooltip
-            ~ '</div>'
-        %}
-
+        {% set tooltip = '<div class="oro-popover-content">' ~ tooltip ~ '</div>' -%}
         <i class="fa-info-circle tooltip-icon"
            {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
            data-content="{{ tooltip }}"
            data-toggle="popover"></i>
-    {% endif %}
+    {%- endif -%}
 {% endmacro %}
 
 {#
@@ -72,6 +64,8 @@
         additionalData - array with additional data
 #}
 {% macro attibuteRow(title, value, additionalData) %}
+    {% import _self as UIMacro %}
+
     {% set attributeValue %}
         <div class="clearfix-oro">
             {% if value.value is not defined  %}
@@ -88,7 +82,33 @@
             {% endfor %}
         {% endif %}
     {% endset %}
-    {{ _self.renderAttribute(title, attributeValue) }}
+    {{ UIMacro.renderAttribute(title, attributeValue) }}
+{% endmacro %}
+
+{#
+    Render attribute row with custom data block
+    Parameters:
+        title - row title
+        data - row data
+        options - addtional options for attribute
+#}
+{% macro renderAttribute(title, data, options) %}
+    {% set options = {
+        rootClass: null,
+        termClass: null,
+        descriptionClass: null,
+        tooltipHTML: null,
+        dir: null
+    }|merge(options|default({})) %}
+
+    <div class="attribute-item{% if options.rootClass %} {{ options.rootClass }}{% endif %}">
+        <label class="attribute-item__term{% if options.termClass %} {{ options.termClass }}{% endif %}">{% if options.tooltipHTML %}{{ options.tooltipHTML|raw }} {% endif %}{{ title }}</label>
+        <div class="attribute-item__description{% if options.descriptionClass %} {{ options.descriptionClass }}{% endif %}"
+            {% if options.dir %}dir="{{ options.dir }}" {% endif %}
+        >
+            {{ data|raw }}
+        </div>
+    </div>
 {% endmacro %}
 
 {#
@@ -97,8 +117,11 @@
         title - row title
         data - row data
 #}
-{% macro renderAttribute(title, data) %}
-    <div class="control-group attribute-row">
+{% macro renderControlGroup(title, data, options) %}
+    {% set options = {
+        rootClass: 'attribute-row'
+    }|merge(options|default({})) %}
+    <div class="control-group{% if options.rootClass %} {{ options.rootClass }}{% endif %}">
         <label class="control-label">{{ title }}</label>
         <div class="controls">
             {{ data|raw }}
@@ -113,9 +136,44 @@
         data  - property data
         entity - the entitty instance on wich Field ACL should be checked
         fieldName - the name of field on wich Field ACL should be checked
+        options - addtional options for property
 #}
-{% macro renderProperty(title, data, entity = null, fieldName = null) %}
-    {{ _self.renderHtmlProperty(title, data|escape, entity, fieldName) }}
+{% macro renderProperty(title, data, entity = null, fieldName = null, options = {}) %}
+    {% import _self as UIMacro %}
+
+    {{ UIMacro.renderHtmlProperty(title, data|escape, entity, fieldName, options) }}
+{% endmacro %}
+
+{#
+    Render html property block
+    Parameters:
+        title - property title
+        data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
+        options - addtional options for property
+#}
+{% macro renderHtmlProperty(title, data, entity = null, fieldName = null, options = {}) %}
+    {% import _self as UIMacro %}
+
+    {% if entity is defined and fieldName is defined and not is_granted('VIEW', entity, fieldName) %}
+    {% else %}
+        {{ UIMacro.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>', options) }}
+    {% endif %}
+{% endmacro %}
+
+{#
+    Render property block
+    Parameters:
+        title - property title
+        data  - property data
+        entity - the entitty instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
+#}
+{% macro renderPropertyControlGroup(title, data, entity = null, fieldName = null) %}
+    {% import _self as UIMacro %}
+
+    {{ UIMacro.renderHtmlPropertyControlGroup(title, data|escape, entity, fieldName) }}
 {% endmacro %}
 
 {#
@@ -126,10 +184,12 @@
         entity - the entitty instance on wich Field ACL should be checked
         fieldName - the name of field on wich Field ACL should be checked
 #}
-{% macro renderHtmlProperty(title, data, entity = null, fieldName = null) %}
+{% macro renderHtmlPropertyControlGroup(title, data, entity = null, fieldName = null) %}
+    {% import _self as UIMacro %}
+
     {% if entity is defined and fieldName is defined and not is_granted('VIEW', entity, fieldName) %}
     {% else %}
-        {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+        {{ UIMacro.renderControlGroup(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
     {% endif %}
 {% endmacro %}
 
@@ -143,22 +203,51 @@
 #}
 {% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName, moreText = 'Show more', lessText = 'Show less') %}
     {% if is_granted('VIEW', entity, fieldName) %}
-        {% set collapseView = {
-            storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
-            uid: '[' ~ title ~ '][' ~ entity.id ~ ']',
-            animationSpeed: 0,
-            closeClass: 'overflows',
-            checkOverflow: true,
-            open: false
-        } %}
-        <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}">
-            {{ _self.renderAttribute(title,
-                '<div class="control-label" data-collapse-container>' ~
+        {% set collapseId = 'collapse-'|uniqid %}
+        {% set collapseKey = 'collapseBlock[' ~ oro_class_name(entity) ~ '][' ~ title ~ '][' ~ entity.id ~ ']' %}
+        <div class="collapse-block">
+            {% import _self as UIMacro %}
+
+            {{ UIMacro.renderAttribute(title,
+                '<div class="control-label collapse-overflow collapse no-transition" data-toggle="false" data-check-overflow="true"' ~
+                      'id="'~ collapseId ~'" data-state-id="'~ collapseKey ~'" data-collapsed-text="'~ moreText|trans ~ '" data-expanded-text="'~ lessText|trans ~'">' ~
                     data|default('oro.ui.empty'|trans) ~
                 '</div>' ~
-                '<a href="#" class="control-label toggle-more" data-collapse-trigger>' ~ moreText|trans ~ '</a>' ~
-                '<a href="#" class="control-label toggle-less" data-collapse-trigger>' ~ lessText|trans ~ '</a>'
+                '<a href="#" role=button class="control-label collapse-toggle" data-toggle="collapse"' ~
+                   'data-target="#'~ collapseId ~'" aria-expanded="false" aria-controls="'~ collapseId ~'"><span data-text>' ~ moreText|trans ~ '</span></a>'
             ) }}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{#
+    Render collapsible html block
+    Parameters:
+        data  - rendered data
+        entity - the entity instance on wich Field ACL should be checked
+        fieldName - the name of field on wich Field ACL should be checked
+#}
+{% macro renderCollapsibleHtml(data, entity = null, fieldName = null, moreText = 'Show more', lessText = 'Show less') %}
+    {% if data is not empty and (entity is empty or fieldName is empty or is_granted('VIEW', entity, fieldName)) %}
+        <div class="collapse-block">
+            {% set collapseId = 'collapse-'|uniqid %}
+            <div id="{{ collapseId }}" class="control-label collapse-overflow collapse no-transition"
+                 data-collapsed-text="{{ moreText|trans }}"
+                 data-expanded-text="{{ lessText|trans }}"
+                 data-check-overflow="true"
+                 data-toggle="false"
+            {%- if entity is not empty and fieldName is not empty -%}
+                 data-state-id="{{ 'collapseBlock[' ~ oro_class_name(entity) ~ '][' ~ fieldName ~ '][' ~ entity.id|default(0) ~ ']'}}"
+            {%- endif -%}
+            >{{ data|raw }}</div>
+            <a href="#"
+               role="button"
+               class="control-label collapse-toggle"
+               data-toggle="collapse"
+               data-target="{{ '#' ~ collapseId }}"
+               aria-expanded="false"
+               aria-controls="{{ collapseId }}"
+            ><span data-text>{{ moreText|trans }}</span></a>
         </div>
     {% endif %}
 {% endmacro %}
@@ -170,13 +259,15 @@
         data  - property data
 #}
 {% macro renderSwitchableHtmlProperty(title, data) %}
+    {% import _self as UIMacro %}
+
     {% if oro_config_value('oro_form.wysiwyg_enabled') %}
         {% set data = data|oro_html_sanitize %}
     {%  else %}
         {% set data = data|striptags|nl2br %}
     {% endif %}
 
-    {{ _self.renderAttribute(title, '<div class="control-label html-property">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ UIMacro.renderAttribute(title, '<div class="control-label html-property">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -187,10 +278,12 @@
         empty - a value which should be used if data is empty
 #}
 {% macro renderColorProperty(title, data, empty) %}
+    {% import _self as UIMacro %}
+
     {% if data is not none %}
        {% set data = '<i class="color hide-text" title="' ~ data ~ '" style="background-color: ' ~ data ~ ';">' ~ data ~ '</i>' %}
     {% endif %}
-    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default(empty)|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ UIMacro.renderAttribute(title, '<div class="control-label">' ~ data|default(empty)|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -203,6 +296,7 @@
             'title' - button title
             'iCss'  - css class for 'i' tag (icon)
             'label' - button label
+            'role'  - link role HTML attribute
         ]
 #}
 {% macro link(parameters) %}
@@ -210,7 +304,7 @@
     {% set iconHtml = '' %}
     {% if parameters.iCss is defined and parameters.iCss %}
         {% set iconHtml %}
-        <span class="{{ parameters.iCss }}" >
+        <span class="{{ parameters.iCss }}" aria-hidden="true">
             {% if not parameters.noIconText|default(false)%}
                 <span class="sr-only">{{ parameters.label }}</span>
             {% endif %}
@@ -218,7 +312,7 @@
         {% endset %}
     {% else %}
     {% endif %}
-    {% spaceless %}
+    {% apply spaceless %}
     <a href="{{ parameters.path }}"
         {% if (parameters.id is defined) %}
             id="{{ parameters.id }}"
@@ -228,11 +322,21 @@
                 data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
             {% endfor %}
         {% endif %}
-        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-        {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
+        {% set classes = '' %}
+        {% if parameters.class is defined %}
+            {% set classes = classes ~ ' ' ~ parameters.class|trim %}
+        {% endif %}
+        {% if parameters.aCss is defined %}
+            {% set classes = classes ~ ' ' ~ parameters.aCss|trim %}
+        {% endif %}
+        {% if classes|length %}
+            class="{{ classes|split(' ')|array_unique|join(' ') }}"
+        {% endif %}
+        {% if parameters.role is defined %}role="{{ parameters.role }}"{% endif %}
+        {% if parameters.title is defined and parameters.title is not empty %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
         {{- parameters.label|trim }}
     </a>
-    {% endspaceless %}
+    {% endapply %}
 {% endmacro %}
 
 {#
@@ -247,8 +351,10 @@
         ]
 #}
 {% macro button(parameters) %}
+    {% import _self as UIMacro %}
+
     <div class="pull-left btn-group icons-holder">
-        {{ _self.link(parameters|merge({'class': 'btn back icons-holder-text'})) }}
+        {{ UIMacro.link(parameters|merge({'class': 'btn back icons-holder-text', 'role': 'button'})) }}
     </div>
 {% endmacro %}
 
@@ -263,10 +369,14 @@
         ]
 #}
 {% macro dropdownButton(parameters) %}
+    {% import _self as UIMacro %}
+
     {% set togglerId = 'dropdown-'|uniqid %}
     <div class="btn-group">
         <a href="#" role="button" id="{{ togglerId }}" class="btn dropdown-toggle" data-toggle="dropdown"
-           aria-haspopup="true" aria-expanded="false" data-placement="bottom-end">
+           aria-haspopup="true" aria-expanded="false" data-placement="{{ parameters.placement is defined ? parameters.placement : 'bottom-end' }}"
+           data-inherit-parent-width="loosely"
+        >
             {% if parameters.iCss is defined %}
                 <span class="{{ parameters.iCss }}" aria-hidden="true"></span>
             {% endif %}
@@ -275,7 +385,7 @@
         <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}" role="menu" aria-labelledby="{{ togglerId }}">
             {% if parameters.elements is defined and parameters.elements is not empty %}
                 {% for item in parameters.elements %}
-                    {{ _self.dropdownItem(item) }}
+                    {{ UIMacro.dropdownItem(item) }}
                 {% endfor %}
             {% endif %}
             {% if parameters.html is defined and parameters.html is not empty %}
@@ -297,7 +407,8 @@
         ]
 #}
 {% macro dropdownItem(parameters) %}
-    <li>{{ _self.link(parameters) }}</li>
+    {% import _self as UIMacro %}
+    <li>{{ UIMacro.link(parameters) }}</li>
 {% endmacro %}
 
 {#
@@ -310,6 +421,8 @@
         ]
 #}
 {% macro pinnedDropdownButton(parameters) %}
+    {% import _self as UIMacro %}
+
     {% if isDesktopVersion() or parameters.mobileEnabled|default(false) %}
         {% set options = parameters.options|default({}) %}
         {% set options = options|merge({
@@ -318,15 +431,15 @@
             groupKey: parameters.groupKey is defined ? parameters.groupKey : '',
             useMainButtonsClone: true
         }) %}
-        {% spaceless %}
+        {% apply spaceless %}
             <div class="pull-right pinned-dropdown"
-                 {{ _self.renderAttributes(parameters.dataAttributes|default({})|merge({
+                 {{ UIMacro.renderAttributes(parameters.dataAttributes|default({})|merge({
                      'page-component-module': 'oroui/js/app/components/jquery-widget-component',
                      'page-component-options': options
                  })) }}>
                 {{ parameters.html|raw }}
             </div>
-        {% endspaceless %}
+        {% endapply %}
     {% else %}
         {{ parameters.html|raw }}
     {% endif %}
@@ -336,6 +449,7 @@
     Predefined pinnedDropdownButton's settings for save button
 #}
 {% macro dropdownSaveButton(parameters) %}
+    {% import _self as UIMacro %}
     {% set parameters = {
         'groupKey': 'saveButtons',
         'options': {
@@ -344,7 +458,7 @@
             }
         }
     }|merge(parameters|default({})) %}
-    {{ _self.pinnedDropdownButton(parameters) }}
+    {{ UIMacro.pinnedDropdownButton(parameters) }}
 {% endmacro %}
 
 {#
@@ -354,10 +468,12 @@
         'label' - button label | 'Cancel' by default
 #}
 {% macro cancelButton(path, label) %}
+    {% import _self as UIMacro %}
+
     {% if label is empty %}
         {% set label = 'Cancel'|trans %}
     {% endif %}
-    {{ _self.button({'path' : path, 'title' : label, 'label' : label, data: {action: 'cancel'} }) }}
+    {{ UIMacro.button({'path' : path, 'title' : label, 'label' : label, data: {action: 'cancel'} }) }}
 {% endmacro %}
 
 {#
@@ -372,6 +488,8 @@
         ]
 #}
 {% macro editButton(parameters) %}
+    {% import _self as UIMacro %}
+
     {% set iCss = ['fa-pencil-square-o'] %}
     {% set aCss = ['edit-button', 'main-group'] %}
     {% if parameters.iCss is defined %}
@@ -402,7 +520,7 @@
     {# Add URL parameters to button path #}
     {% set parameters = parameters|merge({ 'path' : oro_url_add_query(parameters['path']) }) %}
 
-    {{ _self.button(parameters) }}
+    {{ UIMacro.button(parameters) }}
 {% endmacro %}
 
 {#
@@ -457,6 +575,8 @@
         ]
 #}
 {% macro deleteButton(parameters) %}
+    {% import _self as UIMacro %}
+
     {% set aCss = 'btn icons-holder-text' %}
 
     {% if parameters.disabled is defined and parameters.disabled %}
@@ -470,11 +590,13 @@
     {% set parameters = parameters|merge({'aCss': aCss}) %}
 
     <div class="pull-left btn-group icons-holder">
-        {{ _self.deleteLink(parameters) }}
+        {{ UIMacro.deleteLink(parameters) }}
     </div>
 {% endmacro %}
 
 {% macro deleteLink(parameters) %}
+    {% import _self as UIMacro %}
+
     {% set entityLabel = parameters.entity_label is defined ? parameters.entity_label : 'oro.ui.item'|trans %}
     {% set label = parameters.label is defined ? parameters.label : 'oro.ui.delete'|trans %}
     {% if parameters.title is defined %}
@@ -499,9 +621,8 @@
         'aCss': parameters.aCss,
         'title': title,
         'label': label,
-        'path': 'javascript:void(0);'
+        'path': '#'
     } %}
-
 
     {% if (parameters.dataId is defined) %}
         {% set data = linkParams.data|merge({'id': parameters.dataId}) %}
@@ -517,11 +638,11 @@
             {% set linkParams = linkParams|merge({ 'data': data }) %}
         {% endfor %}
     {% endif %}
-    {{ _self.link(linkParams) }}
+    {{ UIMacro.link(linkParams) }}
 {% endmacro %}
 
 {#
-    A button with javascript handler
+    A link with a Javascript handler
 
     Parameters - array:
         [
@@ -530,78 +651,180 @@
             'iCss' - additional css class for 'i' tag
             'dataId' - data-id parameter
             'dataUrl' - data-url parameter
-            'dataRedirect' - url to redirect after an operation finished
-            'successMessage' - a message which will be shown after an operation finished
+            'dataRedirect' - url to redirect to after the operation is finished
+            'successMessage' - message to display after the operation is finished
             'title' - button title
+            'ariaLabel' - button aria-label
             'label' - button label
-            'labelInIcon' - determine whether the label is include in icon or not. Defaults to true
-            'visible' - determined whether the button is visible or not. Defaults to true,
+            'labelInIcon' - defines whether the label is included in the icon (true by default)
+            'visible' - defines whether the button is visible (true by default)
             'dataAttributes' - additional data attributes
         ]
 #}
 {% macro clientLink(parameters) %}
-    {% spaceless %}
-        <a href="javascript: void(0);" class="{{ parameters.class is defined ? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
-            title="{{ parameters.title is defined ? parameters.title : (parameters.label is defined ? parameters.label : '') }}"
-            {% if (parameters.id is defined) %}
-                id="{{ parameters.id }}"
-            {% endif %}
-            {%- if (parameters.dataId is defined) -%}
-                data-id ="{{ parameters.dataId }}"
-            {%- endif -%}
+    {% import _self as UIMacro %}
+    {% set parameters = parameters|merge({
+        class: parameters.class|default('') ~ (parameters.aCss is defined ? ' ' ~ parameters.aCss : '')
+    })%}
+    {% apply spaceless %}
+        <a href="#"
             {%- if (parameters.dataUrlRaw is defined) -%}
                 data-url="{{ parameters.dataUrlRaw|raw }}"
             {% elseif (parameters.dataUrl is defined) %}
                 data-url="{{ parameters.dataUrl }}"
             {%- endif -%}
-            {%- if (parameters.successMessage is defined) -%}
-                data-success-message="{{ parameters.successMessage }}"
-            {%- endif -%}
-            {%- if parameters.dataRedirect is defined -%}
-                data-redirect="{{ parameters.dataRedirect }}"
-            {%- endif -%}
-            {%- if parameters.role is defined -%}
-                role="{{ parameters.role }}"
-            {%- endif -%}
-            {%- if parameters.ariaSelected is defined -%}
-                aria-selected="{{ parameters.ariaSelected }}"
-            {%- endif -%}
-            {%- if parameters.ariaControls is defined -%}
-                aria-controls="{{ parameters.ariaControls }}"
-            {%- endif -%}
-            {%- if (parameters.visible is defined and not parameters.visible) -%}
-                style="display: none"
-            {%- endif -%}
-            {%- if parameters.widget is defined and parameters.widget|length -%}
-                {% set options = parameters.widget %}
-                {%- if (options.createOnEvent is not defined) -%}
-                    {% set options = options|merge({
-                        'createOnEvent' : options.event|default('click')
-                    }) %}
-                {%- endif -%}
-                {{ _self.renderWidgetAttributes(options) }}
-            {%- endif -%}
-            {%- if parameters.pageComponent is defined -%}
-                {{ _self.renderPageComponentAttributes(parameters.pageComponent) }}
-            {%- endif -%}
-            {%- if parameters.dataAttributes is defined and parameters.dataAttributes|length -%}
-                {{ _self.renderAttributes(parameters.dataAttributes) }}
-            {%- endif -%}>
-            {%- if (parameters.labelInIcon is defined) -%}
-                {%- set labelInIcon = parameters.labelInIcon -%}
-            {%- else -%}
-                {%- set labelInIcon = true -%}
-            {%- endif %}
-            {%- if (parameters.iCss is defined) -%}
-                <span class="{{ parameters.iCss }}" aria-hidden="true">
-                    {%- if (parameters.label is defined and labelInIcon) -%}
-                        <span class="sr-only">{{- parameters.label -}}</span>
-                    {%- endif -%}
-                </span>
-            {%- endif %}
+            {{- UIMacro.clientControlAttrs(parameters) -}}>
+            {{- UIMacro.clientControlIcon(parameters) -}}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </a>
-    {% endspaceless %}
+    {% endapply %}
+{% endmacro %}
+
+{#
+    Attributes for a control with a Javascript handler
+
+    Parameters - array:
+        [
+            'class' - default class
+            'id' - HTML attribute id
+            'dataId' - HTML attribute data-id
+            'successMessage' - message to display after the operation is finished
+            'dataRedirect' - url to redirect to after the operation is finished
+            'role' - HTML attribute role
+            'ariaSelected' - HTML attribute aria-selected
+            'ariaControls' - HTML attribute aria-controls
+            'ariaLabel' - HTML attribute aria-label
+            'visible' - defines whether the label is included in the icon (true by default)
+            'widget' - options to define a widget on the control
+            'pageComponent' - options to define a page-component on the control
+            'dataAttributes' - additional HTML data attributes
+        ]
+#}
+{% macro clientControlAttrs(parameters) %}
+    {% import _self as UIMacro %}
+    {% if (parameters.class is defined) %}
+        class="{{ parameters.class|split(' ')|array_unique|join(' ') }}"
+    {% endif %}
+    {% if (parameters.id is defined) %}
+        id="{{ parameters.id }}"
+    {% endif %}
+    {% if (parameters.title is defined) %}
+        title="{{ parameters.title }}"
+    {% endif %}
+    {% if (parameters.dataId is defined) %}
+        data-id="{{ parameters.dataId }}"
+    {% endif %}
+    {% if (parameters.dataIntention is defined) %}
+        data-intention="{{ parameters.dataIntention }}"
+    {% endif %}
+    {% if (parameters.successMessage is defined) %}
+        data-success-message="{{ parameters.successMessage }}"
+    {% endif %}
+    {% if parameters.dataRedirect is defined %}
+        data-redirect="{{ parameters.dataRedirect }}"
+    {% endif %}
+    {% if parameters.role is defined %}
+        role="{{ parameters.role }}"
+    {% endif %}
+    {% if parameters.dir is defined %}
+        dir="{{ parameters.dir }}"
+    {% endif %}
+    {% if parameters.ariaSelected is defined %}
+        aria-selected="{{ parameters.ariaSelected }}"
+    {% endif %}
+    {% if parameters.ariaControls is defined %}
+        aria-controls="{{ parameters.ariaControls }}"
+    {% endif %}
+    {% if (parameters.ariaLabel is defined) %}
+        aria-label="{{ parameters.ariaLabel }}"
+    {% endif %}
+    {% if (parameters.ariaHaspopup is defined) %}
+        aria-haspopup="{{ parameters.ariaHaspopup ? 'true' : 'false' }}"
+    {% endif %}
+    {% if (parameters.visible is defined and not parameters.visible) %}
+        style="display: none"
+    {% endif %}
+    {% if parameters.widget is defined and parameters.widget|length %}
+        {% set options = parameters.widget %}
+        {%- if (options.createOnEvent is not defined) -%}
+            {% set options = options|merge({
+                'createOnEvent' : options.event|default('click')
+            }) %}
+        {%- endif -%}
+        {{ UIMacro.renderWidgetAttributes(options) }}
+    {% endif %}
+    {%- if parameters.pageComponent is defined -%}
+        {{ UIMacro.renderPageComponentAttributes(parameters.pageComponent) }}
+    {%- endif -%}
+    {%- if parameters.dataAttributes is defined and parameters.dataAttributes|length -%}
+        {{ UIMacro.renderAttributes(parameters.dataAttributes) }}
+    {%- endif -%}
+{% endmacro %}
+
+{#
+    An icon for a link/button control with a Javascript handler
+
+    Parameters - array:
+        [
+            'iCss' - additional css class for 'span' tag
+            'label' - control label
+            'labelInIcon' - defines whether the label is included in the icon (true by default)
+        ]
+#}
+{% macro clientControlIcon(parameters) %}
+    {% import _self as UIMacro %}
+    {% apply spaceless %}
+    {%- set labelInIcon = parameters.labelInIcon is defined ? parameters.labelInIcon : true -%}
+    {%- if (parameters.iCss is defined) -%}
+        <span class="{{ parameters.iCss }}" aria-hidden="true">
+            {%- if (parameters.label is defined and labelInIcon) -%}
+                <span class="sr-only">{{- parameters.label -}}</span>
+            {%- endif -%}
+        </span>
+    {%- endif -%}
+    {% endapply %}
+{% endmacro %}
+
+{#
+    A button with a Javascript handler
+
+    Parameters - array:
+        [
+            'class' - default class
+            'btnCss' - additional css class for 'button' tag
+            'iCss' - additional css class for 'span' tag
+            'ariaLabel' - aria-label text for button
+            'dataId' - data-id parameter
+            'dataRedirect' - url to redirect to after the operation is finished
+            'successMessage' - message to display after the operation is finished
+            'label' - button label
+            'labelInIcon' - defines whether the label is included in the icon (true by default)
+            'visible' - defines whether the button is visible (true by default)
+            'dataAttributes' - additional HTML data attributes
+        ]
+#}
+{% macro clientBtn(parameters) %}
+    {% import _self as UIMacro %}
+    {% set parameters = parameters|merge({
+        class: parameters.class|default('') ~ ' ' ~ parameters.btnCss|default('btn')
+    })%}
+    {% set type = parameters.type is defined ? parameters.type : 'button' %}
+    {% apply spaceless %}
+        <button {{- UIMacro.clientControlAttrs(parameters) -}}
+            type="{{ type }}"
+        {% if (parameters.title is defined) %}
+            title="{{ parameters.title }}"
+        {% endif %}
+        {%- if (parameters.dataUrlRaw is defined) -%}
+            data-url="{{ parameters.dataUrlRaw|raw }}"
+        {% elseif (parameters.dataUrl is defined) %}
+            data-url="{{ parameters.dataUrl }}"
+        {%- endif -%}
+        >
+            {{- UIMacro.clientControlIcon(parameters) -}}
+            {{- parameters.label is defined ? parameters.label : '' -}}
+        </button>
+    {% endapply %}
 {% endmacro %}
 
 {#
@@ -625,6 +848,8 @@
     Parameters: options array for widget
 #}
 {% macro renderWidgetAttributes(options) %}
+    {% import _self as UIMacro %}
+
     {% set pageComponent = {
         module:  "oroui/js/app/components/widget-component",
         options: options
@@ -632,19 +857,7 @@
     {% if options.options.pageComponentName is defined %}
         {% set pageComponent = pageComponent|merge({name: options.options.pageComponentName}) %}
     {% endif %}
-    {{ _self.renderPageComponentAttributes(pageComponent) }}
-{% endmacro %}
-{#
-    @deprecated
-    Please use renderWidgetAttributes() with createOnEvent option specified instead
-#}
-{% macro renderWidgetDataAttributes(options) %}
-    {% if (options.createOnEvent is not defined) %}
-        {% set options = options|merge({
-            'createOnEvent' : options.event|default('click')
-        }) %}
-    {% endif %}
-    {{ _self.renderWidgetAttributes(options) }}
+    {{ UIMacro.renderPageComponentAttributes(pageComponent) }}
 {% endmacro %}
 
 {% macro renderAttributes(options, prefix) %}
@@ -673,11 +886,13 @@
         ]
 #}
 {% macro clientButton(parameters) %}
+    {% import _self as UIMacro %}
+
     {#{% espaceless %}#}
         <div class="pull-left btn-group icons-holder">
-            {{ _self.clientLink(parameters|merge({'class': 'btn icons-holder-text'})) }}
+            {{ UIMacro.clientLink(parameters|merge({class: 'btn icons-holder-text', role: 'button'})) }}
         </div>
-    {#{% endspaceless %}#}
+    {#{% endapply %}#}
 {% endmacro %}
 
 {#
@@ -699,8 +914,10 @@
         ]
 #}
 {% macro ajaxButton(parameters) %}
+    {% import _self as UIMacro %}
+
     <div class="pull-left btn-group icons-holder">
-        {{ _self.ajaxLink(parameters|merge({'class': 'btn icons-holder-text'})) }}
+        {{ UIMacro.ajaxLink(parameters|merge({'class': 'btn icons-holder-text', role: 'button'})) }}
     </div>
 {% endmacro %}
 
@@ -723,6 +940,8 @@
         ]
 #}
 {% macro ajaxLink(parameters) %}
+    {% import _self as UIMacro %}
+
     {% set additionalParameters = {
         'pageComponent': {
             'module': 'oroui/js/app/components/ajax-button'
@@ -733,7 +952,7 @@
         }
     } %}
 
-    {{ _self.clientLink(parameters|merge(additionalParameters)) }}
+    {{ UIMacro.clientLink(parameters|merge(additionalParameters)) }}
 {% endmacro %}
 
 {#
@@ -753,54 +972,44 @@
         ]
 #}
 {% macro dropdownClientItem(parameters) %}
-    <li>{{ _self.clientLink(parameters) }}</li>
+    {% import _self as UIMacro %}
+
+    <li>{{ UIMacro.clientLink(parameters) }}</li>
 {% endmacro %}
 
 {#
     Outputs a button with "Save and Close" label. After save application will show a page configured by parameter with name "action".
     For parameters description see documentation of saveActionButton macros.
-
-    For backward compatibility macros supports input parameter as a label of button.
 #}
-{% macro saveAndCloseButton(parametersOrLabel) %}
+{% macro saveAndCloseButton(parameters = {}) %}
+    {% import _self as UIMacro %}
+
     {% set defaultParameters = {
         'class': 'btn-success',
-        'label': 'Save and Close'|trans
+        'label': 'Save and Close'|trans,
+        'action': 'save_and_close'
     } %}
-
-    {% if parametersOrLabel is iterable %}
-        {% set parameters = parametersOrLabel %}
-    {% else %}
-        {# @deprecated since 1.10, support backward compatibility #}
-        {% set parameters = {
-            'label': parametersOrLabel|default('Save and Close'|trans),
-            'action': 'save_and_close'
-        } %}
-    {% endif %}
 
     {% set parameters = defaultParameters|merge(parameters) %}
 
-    {{ _self.saveActionButton(parameters) }}
+    {{ UIMacro.saveActionButton(parameters) }}
 {% endmacro %}
 
 {#
     Outputs a button with "Save and Stay" label. After save application will show a page configured by parameter with name "action".
     For parameters description see documentation of saveActionButton macros.
-
-    For backward compatibility macros supports input parameter as a label of button.
 #}
-{% macro saveAndStayButton(parametersOrLabel) %}
-    {% if parametersOrLabel is iterable %}
-        {% set parameters = parametersOrLabel %}
-    {% else %}
-        {# @deprecated since 1.10, support backward compatibility #}
-        {% set parameters = {
-            'label': parametersOrLabel|default('Save'|trans),
-            'action': 'save_and_stay'
-        } %}
-    {% endif %}
+{% macro saveAndStayButton(parameters = {}) %}
+    {% import _self as UIMacro %}
 
-    {{ _self.saveActionButton(parameters) }}
+    {% set defaultParameters = {
+        'label': 'Save'|trans,
+        'action': 'save_and_stay'
+    } %}
+
+    {% set parameters = defaultParameters|merge(parameters) %}
+
+    {{ UIMacro.saveActionButton(parameters) }}
 {% endmacro %}
 
 {#
@@ -808,13 +1017,15 @@
     For parameters description see documentation of saveActionButton macros.
 #}
 {% macro saveAndNewButton(parameters) %}
+    {% import _self as UIMacro %}
+
     {% set defaultParameters = {
         'label': 'Save and New'|trans
     } %}
 
     {% set parameters = defaultParameters|merge(parameters) %}
 
-    {{ _self.saveActionButton(parameters) }}
+    {{ UIMacro.saveActionButton(parameters) }}
 {% endmacro %}
 
 {#
@@ -826,24 +1037,25 @@
             'type' - button type, should be "button" or "submit"
             'class' - CSS class
             'label' - label of button
-            'route' - Optional name of route to make a redirect.
+            'route' - Name of route to make a redirect.
             'params' - Optional list of route parameters. In case if value of parameter will be available only
                 after save you can pass property path. For example: ['id': '$id']. '$' at the means property path.
                 So when controller will handle save it will redirect to route using actual id value of entity.
             'action' - Contains data used by controller to make redirect. This value is prepared automatically
-                based on route and route_params so you don't need to use this attribute directly.
+                based on route and route_params so you don't need to use this attribute directly if route parameter
+                was set.
         ]
 #}
 {% macro saveActionButton(parameters) %}
+    {% import _self as UIMacro %}
+
     {% set defaultParameters = {
         'type' : 'submit',
         'class': 'btn-success main-group',
         'label': 'Save'|trans,
     } %}
 
-    {% if parameters.action is defined %}
-        {# @deprecated since 1.10, support backward compatibility #}
-    {% elseif parameters.route is defined %}
+    {% if parameters.route is defined %}
         {# Prepare action parameter based on route #}
         {% set action = {'route': parameters.route} %}
         {% if parameters.params is defined %}
@@ -854,9 +1066,8 @@
 
     {% set parameters = defaultParameters|merge(parameters) %}
 
-    {{ _self.buttonType(parameters) }}
+    {{ UIMacro.buttonType(parameters) }}
 {% endmacro %}
-
 
 {#
     Button macros with custom button type
@@ -889,7 +1100,7 @@
     Separator between buttons
 #}
 {% macro buttonSeparator() %}
-    <div class="pull-left">
+    <div class="pull-left" aria-hidden="true">
         <div class="separator-btn"></div>
     </div>
 {% endmacro %}
@@ -937,21 +1148,28 @@
         isForm - flag what scroll block mut contain the form
         contentAttributes - additional attributes for block content
         useSubBlockDivider - indicates if 'row-fluid-divider' css class should be added to a row when there are more than one subblocks
+        options
+            [
+                'initSectionInstantly' - boolean, if is true -- aditional attribute added to the section element,
+                    in order to ignore delayed initialization
+            ]
 #}
-{% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider, headerLinkContent = '') %}
+{% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider, headerLinkContent = '', options = {}) %}
+    {% import _self as UIMacro %}
+
     {% set cols = subblocks|length %}
-    <div class="responsive-section">
+    <div class="responsive-section"{% if options.initSectionInstantly is defined and options.initSectionInstantly %} data-init-section-instantly{% endif %}>
         <h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
         <div class="section-content">
-            <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ _self.attributes(contentAttributes, ['class']) }}>
+            <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ UIMacro.attributes(contentAttributes, ['class']) }}>
                 {% if isForm is defined and isForm == true %}
                     <fieldset class="form-horizontal">
                 {% else %}
                     <div class="form-horizontal">
                 {% endif %}
                     {% for subblock in subblocks %}
-                        {{ _self.scrollSubblock(subblock.title is defined and subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
+                        {{ UIMacro.scrollSubblock(subblock.title is defined and subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
                     {% endfor %}
                 {% if isForm is defined and isForm == true %}
                     </fieldset>
@@ -988,6 +1206,8 @@
         ]
 #}
 {% macro scrollData(dataTarget, data, entity, form = null) %}
+    {% import _self as UIMacro %}
+
     {% set data = oro_ui_scroll_data_before(dataTarget, data, entity, form) %}
 
     {% if form is defined and form %}
@@ -1016,13 +1236,23 @@
                     <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap" aria-label="{{ 'Close'|trans }}">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    {{ data.formErrors|raw }}
+                    {{ data.formErrors|raw|nl2br }}
                 </div>
             </div>
         {% endif %}
-        <div data-spy="scroll" data-target="#{{ dataTarget }}" data-offset="1" class="scrollspy container-fluid scrollable-container{% if isForm %} form-container{% endif %}">
+        <div data-spy="scroll" data-target="#{{ dataTarget }}" data-offset="1" class="scrollspy scrollable-container{% if isForm %} form-container{% endif %}">
+            <div class="container-fluid">
             {% for scrollBlock in dataBlocks %}
-                {{ _self.scrollBlock("scroll-" ~ loop.index, scrollBlock.title, scrollBlock.subblocks, isForm, scrollBlock.content_attr is defined ? scrollBlock.content_attr : null, scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true, scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null) }}
+                {{ UIMacro.scrollBlock(
+                    "scroll-" ~ loop.index,
+                    scrollBlock.title,
+                    scrollBlock.subblocks,
+                    isForm,
+                    scrollBlock.content_attr is defined ? scrollBlock.content_attr : null,
+                    scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true,
+                    scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null,
+                    scrollBlock.options is defined ? scrollBlock.options : {}
+                ) }}
             {% endfor %}
             {% if data.hiddenData is defined or isForm %}
                 <div class="hide" data-skip-input-widgets data-layout="separate">
@@ -1034,34 +1264,6 @@
                     {% endif %}
                 </div>
             {% endif %}
-        </div>
-    </div>
-{% endmacro %}
-
-{#
-    Create collection field block
-    Parameters:
-        field - form collection field
-        label - label of block
-        buttonCaption - Caption of add entity button
-        tooltipText (optional) - text to render a tooltip for the collection field
-#}
-{% macro collectionField(field, label, buttonCaption, tooltipText = null) %}
-    <div class="control-group">
-        <div class="control-label wrap">
-            {% if tooltipText is not null %}
-                {{ _self.tooltip(tooltipText) }}
-            {% endif %}
-            <label>{{ label }}</label>
-        </div>
-        <div class="controls">
-            <div class="row-oro">
-                <div class="oro-item-collection collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">
-                    {% for emailField in field.children %}
-                        {{ _self.collection_prototype(emailField) }}
-                    {% endfor %}
-                </div>
-                <a class="btn add-list-item" href="javascript: void(0);">{{ buttonCaption }}</a>
             </div>
         </div>
     </div>
@@ -1074,10 +1276,18 @@
         excludes - names of attributes which should not be rendered even if they exist in attr parameter
 #}
 {% macro attributes(attr, excludes) %}
-    {% spaceless %}
+    {% apply spaceless %}
         {% set attr = attr|default({}) %}
-        {% for attrname, attrvalue in attr %}{% if not excludes is defined or not excludes[attrname] is defined %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue is iterable ? attrvalue|json_encode : attrvalue }}" {% endif %}{% endif %}{% endfor %}
-    {% endspaceless %}
+        {% for attrname, attrvalue in attr %}
+            {% if not excludes is defined or not excludes[attrname] is defined %}
+                {% if attrname in ['placeholder', 'title'] and translation_domain is defined %}
+                    {{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}"
+                {% else %}
+                    {{ attrname }}="{{ attrvalue is iterable ? attrvalue|json_encode : attrvalue }}"
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endapply %}
 {% endmacro %}
 
 {#
@@ -1087,7 +1297,9 @@
         renderLabel - need render default label
 #}
 {%- macro entityOwnerLink(entity, renderLabel = true) -%}
-    {% spaceless %}
+    {% import _self as UIMacro %}
+
+    {% apply spaceless %}
         {%- if entity %}
             {% set ownerType = oro_get_owner_type(entity) %}
             {%- if ownerType %}
@@ -1112,7 +1324,7 @@
                                 }}:
                             {% endif %}
                             {% if ownerPath is defined and is_granted('VIEW', owner) %}
-                                {{ _self.renderUrl(ownerPath, ownerName) }}
+                                {{ UIMacro.renderUrl(ownerPath, ownerName) }}
                             {% else %}
                                 {{ ownerName }}
                             {% endif %}
@@ -1121,11 +1333,11 @@
                 {% endif %}
             {% endif -%}
         {% endif -%}
-    {% endspaceless %}
+    {% endapply %}
 {%- endmacro -%}
 
-{%- macro renderUrl(url, text, class, title) -%}
-    {% spaceless %}
+{%- macro renderUrl(url, text, class, title, attributes) -%}
+    {% apply spaceless %}
         {% if text is empty %}
             {% set text = url %}
         {% endif %}
@@ -1137,17 +1349,45 @@
         {% endif %}
         {% if url is not empty %}
             <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}"
-                    {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}>{{ text }}</a>
+            {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}
+            {% for name,value in attributes|default({}) %}
+                {{ name }}="{{ value }}"
+            {% endfor %}
+            >{{ text }}</a>
         {% endif %}
-    {% endspaceless %}
+    {% endapply %}
 {%- endmacro -%}
+
+{%- macro renderUrlWithActions(parameters, entity) -%}
+    {% import _self as UIMacro %}
+
+    {% set url = parameters.url|default %}
+    {%- set actions %}
+        {%- placeholder url_actions with {data: url, entity: entity} -%}
+    {% endset -%}
+    {% set actions = actions|trim %}
+    <span class="inline-actions-element truncate{% if actions is empty %} inline-actions-element_no-actions{% endif %}">
+        <span class="inline-actions-element_wrapper">
+            {{ UIMacro.renderUrl(
+                url,
+                parameters.text|default,
+                parameters.class|default,
+                parameters.title|default,
+                parameters.attributes|default
+            ) }}
+        </span>
+        {% if actions is not empty -%}
+            <span class="inline-actions-element_actions url-actions">{{ actions|raw }}</span>
+        {%- endif %}
+    </span>
+{%- endmacro %}
 
 {%- macro renderPhone(phone, title) -%}
     {% if title is empty %}
         {% set title = phone %}
     {% endif %}
     {% if phone is not empty %}
-        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="phone">{{ title }}</a>
+        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="phone nowrap"><bdo dir="ltr">{{ title }}</bdo></a>
     {% endif %}
 {%- endmacro -%}
 
@@ -1158,13 +1398,15 @@
         entity - related entity record
 #}
 {% macro renderPhoneWithActions(phone, entity) -%}
+    {% import _self as UIMacro %}
+
     {% if phone is not empty %}
         {%- set actions %}
             {%- placeholder phone_actions with {phone: phone, entity: entity} -%}
         {% endset -%}
         {% set actions = actions|trim %}
         <span class="inline-actions-element{% if actions is empty %} inline-actions-element_no-actions{% endif %}">
-            <span class="inline-actions-element_wrapper">{{ _self.renderPhone(phone) }}</span>
+            <span class="inline-actions-element_wrapper">{{ UIMacro.renderPhone(phone) }}</span>
             {% if actions is not empty -%}
                 <span class="inline-actions-element_actions phone-actions">{{ actions|raw }}</span>
             {%- endif %}
@@ -1209,25 +1451,31 @@
 {% endmacro %}
 
 {%- macro entityViewLink(entity, label, route, permission) -%}
+    {% import _self as UIMacro %}
+
     {% if entity %}
-        {% if route and is_granted(permission|default('VIEW'), entity) %}
-            {{ _self.renderUrl(path(route, {'id': entity.id}), label) }}
+        {% if route and is_granted(permission|default('VIEW'), entity) and feature_resource_enabled(route, 'routes') %}
+            {{ UIMacro.renderUrl(path(route, {'id': entity.id}), label) }}
         {% else %}
             {{ label|escape }}
         {% endif %}
+    {% else %}
+        {{ 'oro.ui.empty'|trans }}
     {% endif %}
 {%- endmacro -%}
 
 {%- macro entityViewLinks(entities, labelProperty, route, permission) -%}
+    {% import _self as UIMacro %}
+
     {% set links = [] %}
     {% for entity in entities %}
-        {% set links = links|merge([_self.entityViewLink(entity, attribute(entity, labelProperty), route, permission)]) %}
+        {% set links = links|merge([UIMacro.entityViewLink(entity, attribute(entity, labelProperty), route, permission)]) %}
     {% endfor %}
-    {{ _self.renderList(links) }}
+    {{ UIMacro.renderList(links) }}
 {%- endmacro -%}
 
 {#
-    Renders text that should be rendered instead of not accessable entity field
+    Renders text that should be rendered instead of not accessible entity field
     Parameters:
         labelText - Text that should be rendered
 #}
@@ -1254,7 +1502,7 @@
 {%- endmacro -%}
 
 {%- macro renderJsTree(data, actions) -%}
-    {% embed "OroUIBundle::jstree.html.twig" with {
+    {% embed "@OroUI/jstree.html.twig" with {
         data: data,
         actions: actions
     } %}
@@ -1272,4 +1520,129 @@
     {% if classNames %}
         <span class="{{ classNames }}" aria-hidden="true"></span>
     {% endif %}
+{% endmacro %}
+
+{#
+    Render sortable list for configuration options
+    Parameters:
+        widget - form widget data
+        attr - block attributes
+        options - additional options
+            - collection_class - Main class for sortable list,
+            - add_btn_label - Text label for add item button,
+            - column_label - Main column label,
+            - column_options_label - Options column label
+            - data_page_component_module - Class for data-page-component-module attribute
+            - show_form_when_empty - Show select box when a form is empty
+#}
+{% macro sortable_list_view(widget, attr = {}, options = {}) %}
+    {% set originalAttr = attr %}
+    {% import _self as UIMacro %}
+
+    {% if widget.vars.prototype is defined %}
+        {% set prototype_html = UIMacro.sortable_list_view_collection_prototype(widget, options, attr) %}
+    {% endif %}
+
+    {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection grid-container' }) %}
+    {% set id = widget.vars.id ~ '_collection' %}
+    <div class="{{ options.collection_class|default('') }} drag-n-drop-sorting-view" {% if options.data_page_component_module is defined %} data-page-component-module="{{ options.data_page_component_module|escape }}"{% endif %}>
+        <div class="drag-n-drop-sorting-view__wrapper row-oro" {{ UIMacro.renderPageComponentAttributes({
+            module: 'oroui/js/app/components/view-component',
+            options: {
+                view: 'oroui/js/drag-n-drop-sorting',
+                autoRender: true
+            }
+        }) }}>
+            {% set prototype_name = widget.vars.prototype_name %}
+           <div {{ UIMacro.attributes(attr) }}>
+                <table class="grid grid-main-container table-hover table table-bordered">
+                    <thead>
+                    <tr>
+                        <th class="drag-n-drop-sorting-view__column" scope="col"><span>{{ options.column_label|default('') }}</span></th>
+                        <th class="drag-n-drop-sorting-view__column_options" scope="col"><span>{{ options.column_options_label|default('') }}</span></th>
+                        {% if form.mergeAllowed is defined %}
+                            <th></th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+                    <tbody class="sortable-wrapper" data-last-index="{{ widget.children|length}}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
+                    {% if widget.children|length %}
+                        {% for child in widget.children %}
+                            {% set widgetContainerAttributes = originalAttr|filter((v, k) => k not in  ['id', 'class']) %}
+                            {{ UIMacro.sortable_list_view_collection_prototype(child, options, widgetContainerAttributes) }}
+                        {% endfor %}
+                    {% elseif options.show_form_when_empty is defined and prototype_html is defined %}
+                        {{ prototype_html|replace({(prototype_name): '0'})|raw }}
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <a class="btn add-list-item" data-container=".oro-item-collection tbody" href="#">
+                {{ options.add_btn_label|default('') }}
+            </a>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro sortable_list_view_collection_prototype(widget, options, widgetContainerAttributes) %}
+    {% if 'collection' in widget.vars.block_prefixes %}
+        {% set form = widget.vars.prototype %}
+        {% set name = widget.vars.full_name ~ '[' ~ widget.vars.prototype.vars.name ~ ']' %}
+    {% else %}
+        {% set form = widget %}
+        {% set name = widget.vars.full_name %}
+    {% endif %}
+    {% apply spaceless %}
+        {% import _self as UIMacro %}
+        {% if 'data-validation-optional-group' not in widgetContainerAttributes %}
+            {% set widgetContainerAttributes = widgetContainerAttributes|merge({'data-validation-optional-group': ''}) %}
+        {% endif %}
+        <tr data-content="{{ name }}" {{ UIMacro.attributes(widgetContainerAttributes) }}
+            class="{{ options.collection_class|default('') }}">
+        {{ form_widget(form) }}
+    </tr>
+    {% endapply %}
+{% endmacro %}
+
+{% macro render_birthday(birthday) %}
+    {% if birthday is not empty %}
+        {{ birthday|oro_format_date }}
+        {% set age = birthday|age_string %}
+        {{ age is not empty ? '(' ~ age ~ ')': null }}
+    {% else %}
+        {{ 'N/A'|trans }}
+    {% endif %}
+{% endmacro %}
+
+{% macro badge(label, badgeClass = 'info', iconClass = 'fa-circle') %}
+    <span class="badge badge-pill badge-{{ badgeClass }} status-{{ badgeClass }}">
+        <i class="icon-status-{{ badgeClass }} {{ iconClass }}" aria-hidden="true"></i>{{ label }}
+    </span>
+{% endmacro %}
+
+{%- macro renderWysiwygContentPreview(content) -%}
+    {%- apply spaceless -%}
+        {% if content is not empty %}
+            <div data-page-component-view="oroentityconfig/js/views/wysiwyg-content-preview">{{ content|render_content|oro_html_sanitize }}</div>
+        {% endif %}
+    {%- endapply -%}
+{%- endmacro -%}
+
+{% macro renderCollapsibleWysiwygContentPreview(content, entity = null, fieldName = null, previewMessage = 'oro.ui.simplified_preview.message', moreText = 'oro.ui.collapse.more', lessText = 'oro.ui.collapse.less', noDataMessage = 'oro.ui.empty') %}
+    {%- if entity is empty or fieldName is empty or is_granted('VIEW', entity, fieldName) -%}
+        {%- import _self as UIMacro -%}
+        {%- if content|trim is not empty -%}
+            {%- if previewMessage is not empty -%}
+                <div class="alert alert-info alert--compact" role="alert">
+                    <span class="fa-info alert-icon" aria-hidden="true"></span>
+                    {{ previewMessage|trans }}
+                </div>
+            {%- endif -%}
+            <div class="cms-content">
+                {{- UIMacro.renderCollapsibleHtml(UIMacro.renderWysiwygContentPreview(content), entity, fieldName, moreText, lessText) -}}
+            </div>
+        {%- elseif noDataMessage is not empty -%}
+            <div class="no-data">{{ noDataMessage|trans }}</div>
+        {%- endif %}
+    {%- endif -%}
 {% endmacro %}

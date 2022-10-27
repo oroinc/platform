@@ -5,24 +5,49 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\Options;
+use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockTypeExtensionInterface;
+use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
+use Oro\Component\Layout\Extension\ExtensionInterface;
+use Oro\Component\Layout\LayoutItemInterface;
+use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\LayoutRegistry;
+use Oro\Component\Layout\LayoutUpdateInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutRegistry */
-    protected $registry;
+    private $registry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new LayoutRegistry();
         $this->registry->addExtension(new CoreExtension());
-        $this->extension = $this->createMock('Oro\Component\Layout\Extension\ExtensionInterface');
+        $this->extension = $this->createMock(ExtensionInterface::class);
         $this->registry->addExtension($this->extension);
+    }
+
+    public function testGetTypeNames()
+    {
+        $this->extension->expects($this->once())
+            ->method('getTypeNames')
+            ->willReturn(['type1']);
+
+        $this->assertEquals(
+            ['block', 'container', 'type1'],
+            $this->registry->getTypeNames()
+        );
     }
 
     public function testGetTypeFromCoreExtension()
@@ -35,65 +60,61 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
             ->with(BaseType::NAME);
 
         $type = $this->registry->getType(BaseType::NAME);
-        $this->assertInstanceOf('Oro\Component\Layout\Block\Type\BaseType', $type);
+        $this->assertInstanceOf(BaseType::class, $type);
     }
 
     public function testGetType()
     {
         $name = 'test';
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
 
         $this->extension->expects($this->once())
             ->method('hasType')
             ->with($name)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getType')
             ->with($name)
-            ->will($this->returnValue($type));
+            ->willReturn($type);
 
         $this->assertSame($type, $this->registry->getType($name));
         // check that the loaded block type is cached
         $this->assertSame($type, $this->registry->getType($name));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "NULL" given.
-     */
     public function testGetTypeWithNullName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "NULL" given.');
+
         $this->registry->getType(null);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load a block type "".
-     */
     public function testGetTypeWithEmptyName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not load a block type "".');
+
         $this->registry->getType('');
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "integer" given.
-     */
     public function testGetTypeWithNotStringName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
+
         $this->registry->getType(1);
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load a block type "widget".
-     */
     public function testGetUndefinedType()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Could not load a block type "widget".');
+
         $this->extension->expects($this->once())
             ->method('hasType')
             ->with('widget')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->extension->expects($this->never())
             ->method('getType');
 
@@ -102,17 +123,17 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeExtensions()
     {
-        $name          = 'test';
-        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $name = 'test';
+        $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
             ->with($name)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getTypeExtensions')
             ->with($name)
-            ->will($this->returnValue([$typeExtension]));
+            ->willReturn([$typeExtension]);
 
         $result = $this->registry->getTypeExtensions($name);
         $this->assertCount(1, $result);
@@ -121,14 +142,14 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetContextConfigurators()
     {
-        $configurator = $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface');
+        $configurator = $this->createMock(ContextConfiguratorInterface::class);
 
         $this->extension->expects($this->once())
             ->method('hasContextConfigurators')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getContextConfigurators')
-            ->will($this->returnValue([$configurator]));
+            ->willReturn([$configurator]);
 
         $result = $this->registry->getContextConfigurators();
         $this->assertCount(1, $result);
@@ -137,29 +158,28 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testFindDataProvider()
     {
-        $name         = 'test';
+        $name = 'test';
         $dataProvider = $this->createMock(\stdClass::class);
 
         $this->extension->expects($this->once())
             ->method('hasDataProvider')
             ->with($name)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getDataProvider')
             ->with($name)
-            ->will($this->returnValue($dataProvider));
+            ->willReturn($dataProvider);
 
         $this->assertSame($dataProvider, $this->registry->findDataProvider($name));
         // check that the loaded data provider is cached
         $this->assertSame($dataProvider, $this->registry->findDataProvider($name));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "NULL" given.
-     */
     public function testFindDataProviderWithNullName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "NULL" given.');
+
         $this->registry->findDataProvider(null);
     }
 
@@ -168,12 +188,11 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->registry->findDataProvider(''));
     }
 
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "string", "integer" given.
-     */
     public function testFindDataProviderWithNotStringName()
     {
+        $this->expectException(\Oro\Component\Layout\Exception\UnexpectedTypeException::class);
+        $this->expectExceptionMessage('Expected argument of type "string", "integer" given.');
+
         $this->registry->findDataProvider(1);
     }
 
@@ -182,7 +201,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
         $this->extension->expects($this->once())
             ->method('hasDataProvider')
             ->with('foo')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $this->extension->expects($this->never())
             ->method('getDataProvider');
 
@@ -191,20 +210,19 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigureOptions()
     {
-        $name     = 'test';
-        /** @var OptionsResolver $resolver */
-        $resolver = $this->createMock('Oro\Component\Layout\Block\OptionsResolver\OptionsResolver');
+        $name = 'test';
+        $resolver = $this->createMock(OptionsResolver::class);
 
-        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
             ->with($name)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getTypeExtensions')
             ->with($name)
-            ->will($this->returnValue([$typeExtension]));
+            ->willReturn([$typeExtension]);
         $typeExtension->expects($this->once())
             ->method('configureOptions')
             ->with($this->identicalTo($resolver));
@@ -214,20 +232,20 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildBlock()
     {
-        $name    = 'test';
-        $builder = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
+        $name = 'test';
+        $builder = $this->createMock(BlockBuilderInterface::class);
         $options = new Options(['foo' => 'bar']);
 
-        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
             ->with($name)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getTypeExtensions')
             ->with($name)
-            ->will($this->returnValue([$typeExtension]));
+            ->willReturn([$typeExtension]);
         $typeExtension->expects($this->once())
             ->method('buildBlock')
             ->with($this->identicalTo($builder), $options);
@@ -237,20 +255,20 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildView()
     {
-        $name    = 'test';
-        $view    = new BlockView();
-        $block   = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $name = 'test';
+        $view = new BlockView();
+        $block = $this->createMock(BlockInterface::class);
         $options = new Options(['foo' => 'bar']);
-        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
             ->with($name)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getTypeExtensions')
             ->with($name)
-            ->will($this->returnValue([$typeExtension]));
+            ->willReturn([$typeExtension]);
         $typeExtension->expects($this->once())
             ->method('buildView')
             ->with($this->identicalTo($view), $this->identicalTo($block), $options);
@@ -260,20 +278,20 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testFinishView()
     {
-        $name    = 'test';
-        $view    = new BlockView();
-        $block   = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $name = 'test';
+        $view = new BlockView();
+        $block = $this->createMock(BlockInterface::class);
 
-        $typeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->createMock(BlockTypeExtensionInterface::class);
 
         $this->extension->expects($this->once())
             ->method('hasTypeExtensions')
             ->with($name)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getTypeExtensions')
             ->with($name)
-            ->will($this->returnValue([$typeExtension]));
+            ->willReturn([$typeExtension]);
         $typeExtension->expects($this->once())
             ->method('finishView')
             ->with($this->identicalTo($view), $this->identicalTo($block));
@@ -283,22 +301,23 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testUpdateLayout()
     {
-        $id                = 'test';
-        $layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
-        $item              = $this->createMock('Oro\Component\Layout\LayoutItemInterface');
-        $item->expects($this->once())->method('getContext')
-            ->willReturn($this->createMock('Oro\Component\Layout\ContextInterface'));
+        $id = 'test';
+        $layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
+        $item = $this->createMock(LayoutItemInterface::class);
+        $item->expects($this->once())
+            ->method('getContext')
+            ->willReturn($this->createMock(ContextInterface::class));
 
-        $layoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $layoutUpdate = $this->createMock(LayoutUpdateInterface::class);
 
         $this->extension->expects($this->once())
             ->method('hasLayoutUpdates')
             ->with($item)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getLayoutUpdates')
             ->with($item)
-            ->will($this->returnValue([$layoutUpdate]));
+            ->willReturn([$layoutUpdate]);
         $layoutUpdate->expects($this->once())
             ->method('updateLayout')
             ->with($this->identicalTo($layoutManipulator), $this->identicalTo($item));
@@ -308,16 +327,16 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigureContext()
     {
-        $context = $this->createMock('Oro\Component\Layout\ContextInterface');
+        $context = $this->createMock(ContextInterface::class);
 
-        $contextConfigurator = $this->createMock('Oro\Component\Layout\ContextConfiguratorInterface');
+        $contextConfigurator = $this->createMock(ContextConfiguratorInterface::class);
 
         $this->extension->expects($this->once())
             ->method('hasContextConfigurators')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->extension->expects($this->once())
             ->method('getContextConfigurators')
-            ->will($this->returnValue([$contextConfigurator]));
+            ->willReturn([$contextConfigurator]);
         $contextConfigurator->expects($this->once())
             ->method('configureContext')
             ->with($this->identicalTo($context));

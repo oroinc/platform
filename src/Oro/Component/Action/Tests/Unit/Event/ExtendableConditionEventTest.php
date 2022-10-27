@@ -1,24 +1,17 @@
 <?php
 
-namespace Oro\Component\Action\Tests\Unit\Action;
+namespace Oro\Component\Action\Tests\Unit\Event;
 
 use Oro\Component\Action\Event\ExtendableConditionEvent;
 
 class ExtendableConditionEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var |\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
+    /** @var ExtendableConditionEvent */
+    private $extendableConditionEvent;
 
-    /**
-     * @var ExtendableConditionEvent
-     */
-    protected $extendableConditionEvent;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->extendableConditionEvent = new ExtendableConditionEvent($this->context);
+        $this->extendableConditionEvent = new ExtendableConditionEvent();
     }
 
     public function testAddError()

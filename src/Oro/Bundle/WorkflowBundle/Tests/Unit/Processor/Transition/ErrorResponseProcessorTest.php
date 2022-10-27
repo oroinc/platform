@@ -9,68 +9,86 @@ use Symfony\Component\HttpFoundation\Response;
 class ErrorResponseProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ErrorResponseProcessor */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new ErrorResponseProcessor();
     }
 
     public function testBuildResponseFromDefinedFields()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())
+
+        $context->expects(self::once())
             ->method('hasError')
             ->willReturn(true);
 
-        $context->expects($this->exactly(2))
+        $context->expects(self::exactly(2))
             ->method('get')
-            ->withConsecutive(['responseCode'], ['responseMessage'])
+            ->withConsecutive(
+                ['responseCode'],
+                ['responseMessage']
+            )
             ->willReturnOnConsecutiveCalls(418, 'message');
 
-        $context->expects($this->once())->method('setResult')->willReturnCallback(
-            function (Response $response) {
-                $this->assertEquals(418, $response->getStatusCode());
-                $this->assertAttributeEquals('message', 'statusText', $response);
-            }
-        );
-        $context->expects($this->once())->method('setProcessed')->with(true);
+        $context->expects(self::once())
+            ->method('setResult')
+            ->with(self::callback(static function (Response $response) {
+                self::assertStringContainsString('HTTP/1.0 418 message', (string) $response);
+
+                return true;
+            }));
+
+        $context->expects(self::once())
+            ->method('setProcessed')
+            ->with(true);
 
         $this->processor->process($context);
     }
 
     public function testBuildResponseFromError()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('hasError')
             ->willReturn(true);
 
-        $context->expects($this->exactly(2))
+        $context->expects(self::exactly(2))
             ->method('get')
-            ->withConsecutive(['responseCode'], ['responseMessage'])
+            ->withConsecutive(
+                ['responseCode'],
+                ['responseMessage']
+            )
             ->willReturn(null);
 
-        $context->expects($this->once())->method('getError')->willReturn(new \Exception('error message'));
-        $context->expects($this->once())->method('setResult')->willReturnCallback(
-            function (Response $response) {
-                $this->assertEquals(500, $response->getStatusCode());
-                $this->assertAttributeEquals('error message', 'statusText', $response);
-            }
-        );
-        $context->expects($this->once())->method('setProcessed')->with(true);
+        $context->expects(self::once())
+            ->method('getError')
+            ->willReturn(new \Exception('error message'));
+
+        $context->expects(self::once())
+            ->method('setResult')
+            ->with(self::callback(static function (Response $response) {
+                self::assertStringContainsString('HTTP/1.0 500 error message', (string) $response);
+
+                return true;
+            }));
+
+        $context->expects(self::once())
+            ->method('setProcessed')
+            ->with(true);
 
         $this->processor->process($context);
     }
 
     public function testSkipHasNoErrors()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())->method('hasError')->willReturn(false);
-        $context->expects($this->never())->method('setResult');
+        $context->expects(self::once())
+            ->method('hasError')
+            ->willReturn(false);
+        $context->expects(self::never())
+            ->method('setResult');
 
         $this->processor->process($context);
     }

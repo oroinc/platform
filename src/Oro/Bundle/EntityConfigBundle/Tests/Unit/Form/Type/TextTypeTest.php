@@ -9,9 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType as BaseTextType;
 class TextTypeTest extends AbstractConfigTypeTestCase
 {
     /** @var TextType */
-    protected $type;
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

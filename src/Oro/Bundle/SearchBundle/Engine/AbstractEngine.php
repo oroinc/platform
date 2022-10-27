@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Entity\Query as QueryLog;
 use Oro\Bundle\SearchBundle\Event\BeforeSearchEvent;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Abstract standard search engine
  */
-abstract class AbstractEngine implements EngineInterface
+abstract class AbstractEngine implements ExtendedEngineInterface
 {
     /** @var ManagerRegistry */
     protected $registry;
@@ -23,10 +23,6 @@ abstract class AbstractEngine implements EngineInterface
     /** @var bool */
     protected $logQueries = false;
 
-    /**
-     * @param ManagerRegistry          $registry
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         ManagerRegistry $registry,
         EventDispatcherInterface $eventDispatcher
@@ -59,12 +55,39 @@ abstract class AbstractEngine implements EngineInterface
     abstract protected function doSearch(Query $query);
 
     /**
+     * @param Query $query
+     *
+     * @return array
+     * [
+     *  <EntityFQCN> => <DocumentsCount>
+     * ]
+     */
+    abstract protected function doGetDocumentsCountGroupByEntityFQCN(Query $query): array;
+
+    /**
+     * @param Query $query
+     *
+     * @return array
+     * [
+     *  <EntityFQCN> => <DocumentsCount>
+     * ]
+     */
+    public function getDocumentsCountGroupByEntityFQCN(Query $query): array
+    {
+        $event = new BeforeSearchEvent($query);
+        $this->eventDispatcher->dispatch($event, BeforeSearchEvent::EVENT_NAME);
+        $query = $event->getQuery();
+
+        return $this->doGetDocumentsCountGroupByEntityFQCN($query);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function search(Query $query, array $context = [])
     {
         $event = new BeforeSearchEvent($query);
-        $this->eventDispatcher->dispatch(BeforeSearchEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, BeforeSearchEvent::EVENT_NAME);
         $query = $event->getQuery();
 
         // search must be performed as fast as possible and it might return lots of entities (10M and more)
@@ -96,8 +119,6 @@ abstract class AbstractEngine implements EngineInterface
 
     /**
      * Log query
-     *
-     * @param Result $result
      */
     protected function logQuery(Result $result)
     {

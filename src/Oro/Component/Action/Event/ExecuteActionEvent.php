@@ -3,7 +3,7 @@
 namespace Oro\Component\Action\Event;
 
 use Oro\Component\Action\Action\ActionInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ExecuteActionEvent extends Event
 {

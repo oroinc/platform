@@ -18,11 +18,6 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
     /** @var DateHelper */
     protected $dateHelper;
 
-    /**
-     * @param FilterDateRangeConverter $converter
-     * @param SystemAwareResolver      $resolver
-     * @param DateHelper               $dateHelper
-     */
     public function __construct(
         FilterDateRangeConverter $converter,
         SystemAwareResolver $resolver,

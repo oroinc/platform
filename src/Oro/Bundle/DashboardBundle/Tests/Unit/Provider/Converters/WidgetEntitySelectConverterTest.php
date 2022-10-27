@@ -3,88 +3,68 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject */
-    protected $query;
+    private $query;
 
-    /** @var  WidgetEntitySelectConverter */
-    protected $converter;
+    /** @var WidgetEntitySelectConverter */
+    private $converter;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $entityNameResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityNameResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $entityNameResolver = $this->createMock(EntityNameResolver::class);
         $entityNameResolver->expects($this->any())
             ->method('getName')
-            ->willReturnCallback(
-                function ($object) {
-                    /** @var User $object */
-                    return $object->getFirstName() . ' ' . $object->getLastName();
-                }
-            );
+            ->willReturnCallback(function (User $object) {
+                return $object->getFirstName() . ' ' . $object->getLastName();
+            });
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->query = $this->createMock(AbstractQuery::class);
 
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractClass();
-
-        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $aclHelper = $this->createMock(AclHelper::class);
         $aclHelper->expects($this->any())
             ->method('apply')
-            ->will($this->returnValue($this->query));
+            ->willReturn($this->query);
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $expr = $this->createMock(Expr::class);
         $expr->expects($this->any())
             ->method('in')
-            ->with()
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
+        $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects($this->any())
             ->method('expr')
             ->willReturn($expr);
 
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityManager->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($repository);
-
+        $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->any())
             ->method('createQueryBuilder')
             ->with('e')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($repository);
 
         $this->converter = new WidgetEntitySelectConverter(
             $aclHelper,
             $entityNameResolver,
             $doctrineHelper,
             $entityManager,
-            'Oro\Bundle\UserBundle\Entity\User'
+            User::class
         );
     }
 
@@ -101,13 +81,7 @@ class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
 
         $this->query->expects($this->any())
             ->method('getResult')
-            ->will(
-                $this->returnValue(
-                    [
-                        $user1,
-                    ]
-                )
-            );
+            ->willReturn([$user1]);
 
         $this->assertEquals('Joe Doe', $this->converter->getViewValue([1, 2]));
     }
@@ -124,14 +98,7 @@ class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
 
         $this->query->expects($this->any())
             ->method('getResult')
-            ->will(
-                $this->returnValue(
-                    [
-                        $user1,
-                        $user2
-                    ]
-                )
-            );
+            ->willReturn([$user1, $user2]);
 
         $this->assertEquals('Joe Doe; Joyce Palmer', $this->converter->getViewValue([1, 2]));
     }

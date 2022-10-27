@@ -12,9 +12,6 @@ class BadCredentialsException extends BaseBadCredentialsException
     /** @var string */
     private $messageKey;
 
-    /**
-     * @param string $messageKey
-     */
     public function setMessageKey(string $messageKey)
     {
         $this->messageKey = $messageKey;
@@ -31,20 +28,19 @@ class BadCredentialsException extends BaseBadCredentialsException
     /**
      * {@inheritdoc}
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->getToken(), $this->code, $this->messageKey, $this->file, $this->line]);
+        return [$this->messageKey, parent::__serialize()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($string)
+    public function __unserialize(array $data): void
     {
-        list($token, $this->code, $this->messageKey, $this->file, $this->line) = unserialize($string);
+        $this->setMessageKey($data[0]);
+        parent::__unserialize($data[1]);
 
-        if ($token) {
-            $this->setToken($token);
-        }
+        unset($this->serialized);
     }
 }

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UIBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActionButtonLabelProvider
 {
@@ -20,10 +20,6 @@ class ActionButtonLabelProvider
      */
     protected $labels;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param array               $labels
-     */
     public function __construct(
         TranslatorInterface $translator,
         array $labels

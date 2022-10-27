@@ -1,7 +1,8 @@
-@regression
 @fixture-OroUserBundle:user.yml
 Feature: Change user username to another user username
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
+  As an Administrator
+  I want to be sure that user name is a unique attribute
+  So I start to change user name to other existed user name
 
   Scenario: Customer user email change
     Given I login as "charlie" user

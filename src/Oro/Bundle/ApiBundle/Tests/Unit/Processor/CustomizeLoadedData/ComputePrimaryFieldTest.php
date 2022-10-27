@@ -4,31 +4,22 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ComputePrimaryField;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 
-class ComputePrimaryFieldTest extends \PHPUnit\Framework\TestCase
+class ComputePrimaryFieldTest extends CustomizeLoadedDataProcessorTestCase
 {
-    /** @var CustomizeLoadedDataContext */
-    private $context;
-
     /** @var ComputePrimaryField */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->context = new CustomizeLoadedDataContext();
+        parent::setUp();
+
         $this->processor = new ComputePrimaryField(
             'enabledRole',
             'roles',
             'name',
             'enabled'
         );
-    }
-
-    public function testProcessWhenNoData()
-    {
-        $this->processor->process($this->context);
-        self::assertFalse($this->context->hasResult());
     }
 
     public function testProcessWhenNoConfigForPrimaryField()

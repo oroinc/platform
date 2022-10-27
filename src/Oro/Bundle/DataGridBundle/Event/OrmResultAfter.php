@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Event;
 use Doctrine\ORM\AbstractQuery;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class OrmResultAfter extends Event implements GridEventInterface
 {
@@ -57,9 +57,6 @@ class OrmResultAfter extends Event implements GridEventInterface
         return $this->records;
     }
 
-    /**
-     * @param array $records
-     */
     public function setRecords(array $records)
     {
         $this->records = $records;

@@ -32,9 +32,6 @@ class WidgetOwnerListener
         $this->ownerField    = $ownerField;
     }
 
-    /**
-     * @param OrmResultBefore $event
-     */
     public function onResultBefore(OrmResultBefore $event)
     {
         $widgetOptions = $this->widgetConfigs->getWidgetOptions();

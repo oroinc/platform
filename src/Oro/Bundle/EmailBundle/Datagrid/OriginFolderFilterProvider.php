@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -19,11 +19,6 @@ class OriginFolderFilterProvider
     /** @var MailboxNameHelper */
     private $mailboxNameHelper;
 
-    /**
-     * @param ManagerRegistry        $doctrine
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param MailboxNameHelper      $mailboxNameHelper
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         TokenAccessorInterface $tokenAccessor,

@@ -7,22 +7,15 @@ use Behat\Testwork\ServiceContainer\Exception\ConfigurationLoadingException;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
-use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\PDOException;
-use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\Exception\DriverException;
-use Doctrine\DBAL\Schema\Comparator;
-use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\ServiceContainer\Formatter\StatisticFormatterFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -106,9 +99,6 @@ final class BehatStatisticExtension implements TestworkExtension
         return array_filter($vars);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function loadSuiteConfiguration(ContainerBuilder $container)
     {
         $envConfig = $this->getEnvConfig(self::SUITE_ENV_VAR);
@@ -126,10 +116,6 @@ final class BehatStatisticExtension implements TestworkExtension
         $container->setParameter('suite.configurations', array_merge($suiteConfig, $envConfig));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param array $sets
-     */
     protected function loadSuiteSetConfiguration(ContainerBuilder $container, array $sets)
     {
         $envConfig = $this->getEnvConfig(self::SUITE_SET_ENV_VAR);
@@ -227,7 +213,6 @@ final class BehatStatisticExtension implements TestworkExtension
 
     /**
      * Generators should be added before suite configurations
-     * @param ContainerBuilder $container
      */
     private function addGeneratorsToConfigurationRegistry(ContainerBuilder $container)
     {
@@ -240,7 +225,6 @@ final class BehatStatisticExtension implements TestworkExtension
     }
 
     /**
-     * @param ContainerBuilder $container
      * @throws ConnectionException
      * @throws DriverException
      * @throws PDOException
@@ -252,10 +236,6 @@ final class BehatStatisticExtension implements TestworkExtension
         $connection->ping();
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param \Exception $e
-     */
     private function showAlert(OutputInterface $output, \Exception $e)
     {
         $output->writeln(sprintf(
@@ -265,9 +245,6 @@ final class BehatStatisticExtension implements TestworkExtension
         ));
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function skipStatisticSubscribers(ContainerBuilder $container)
     {
         $container->getDefinition('behat_statistic.listener.feature_statistic_subscriber')

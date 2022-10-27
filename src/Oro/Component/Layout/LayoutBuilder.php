@@ -7,9 +7,14 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ *
+ * Responsible for building {@see Layout}.
  */
 class LayoutBuilder implements LayoutBuilderInterface
 {
+    private const BLOCK_THEMES = '_blockThemes';
+    private const FORM_THEMES = '_formThemes';
+
     /** @var LayoutRegistryInterface */
     protected $registry;
 
@@ -33,15 +38,6 @@ class LayoutBuilder implements LayoutBuilderInterface
      */
     private $blockViewCache;
 
-    /**
-     * @param LayoutRegistryInterface            $registry
-     * @param RawLayoutBuilderInterface          $rawLayoutBuilder
-     * @param DeferredLayoutManipulatorInterface $layoutManipulator
-     * @param BlockFactoryInterface              $blockFactory
-     * @param LayoutRendererRegistryInterface    $rendererRegistry
-     * @param ExpressionProcessor                $expressionProcessor
-     * @param BlockViewCache|null                $blockViewCache
-     */
     public function __construct(
         LayoutRegistryInterface $registry,
         RawLayoutBuilderInterface $rawLayoutBuilder,
@@ -217,20 +213,20 @@ class LayoutBuilder implements LayoutBuilderInterface
             $context->resolve();
         }
 
-        $this->layoutManipulator->applyChanges($context);
-        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
-
         if ($this->blockViewCache) {
             $rootView = $this->blockViewCache->fetch($context);
             if ($rootView === null) {
-                $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+                $rootView = $this->buildLayout($context);
 
                 $this->blockViewCache->save($context, $rootView);
             }
         } else {
-            $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+            $rootView = $this->buildLayout($context);
         }
 
+        $rootBlockId = $rootView->getId();
+        $blockThemes = $rootView->vars[self::BLOCK_THEMES];
+        $formThemes = $rootView->vars[self::FORM_THEMES];
         $rootView = $this->getRootView($rootView, $rootId);
 
         if ($context->getOr('expressions_evaluate')) {
@@ -247,17 +243,25 @@ class LayoutBuilder implements LayoutBuilderInterface
         }
 
         $layout = $this->createLayout($rootView);
-        $rootBlockId = $rawLayout->getRootId();
-        $blockThemes = $rawLayout->getBlockThemes();
 
         foreach ($blockThemes as $blockId => $themes) {
             $layout->setBlockTheme($themes, $blockId !== $rootBlockId ? $blockId : null);
         }
 
-        $formThemes = $rawLayout->getFormThemes();
         $layout->setFormTheme($formThemes);
 
         return $layout;
+    }
+
+    protected function buildLayout(ContextInterface $context): BlockView
+    {
+        $this->layoutManipulator->applyChanges($context);
+        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
+        $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+        $rootView->vars[self::BLOCK_THEMES] = $rawLayout->getBlockThemes();
+        $rootView->vars[self::FORM_THEMES] = $rawLayout->getFormThemes();
+
+        return $rootView;
     }
 
     /**
@@ -292,6 +296,15 @@ class LayoutBuilder implements LayoutBuilderInterface
 
         $this->buildValueBags($blockView);
 
+        /** Removes child blocks in case parent block is hidden */
+        if (!$blockView->isVisible()) {
+            foreach ($blockView->children as $key => $childView) {
+                unset($blockView->children[$key]);
+            }
+
+            return;
+        }
+
         foreach ($blockView->children as $key => $childView) {
             $this->processBlockViewData($childView, $context, $data, $deferred, $encoding);
 
@@ -301,9 +314,6 @@ class LayoutBuilder implements LayoutBuilderInterface
         }
     }
 
-    /**
-     * @param BlockView $view
-     */
     protected function buildValueBags(BlockView $view)
     {
         array_walk_recursive(

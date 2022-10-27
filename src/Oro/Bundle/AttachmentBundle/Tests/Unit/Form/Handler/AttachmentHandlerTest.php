@@ -2,45 +2,37 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Handler;
 
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler;
+use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $form;
 
-    /**
-     * @var Request
-     */
+    /** @var Request */
     private $request;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $om;
 
-    /**
-     * @var Attachment
-     */
+    /** @var Attachment */
     private $attachment;
 
-    /**
-     * @var AttachmentHandler
-     */
+    /** @var AttachmentHandler */
     private $handler;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->form = $this->createMock('Symfony\Component\Form\Test\FormInterface');
+        $this->form = $this->createMock(FormInterface::class);
         $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
-        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->om = $this->createMock(ObjectManager::class);
         $this->attachment = new Attachment();
 
         $this->handler = new AttachmentHandler($requestStack, $this->om);
@@ -55,7 +47,7 @@ class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->om->expects($this->never())
             ->method('persist');
@@ -75,7 +67,7 @@ class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->never())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertFalse($this->handler->process($this->form));
     }
@@ -89,11 +81,11 @@ class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->form->expects($this->once())
             ->method('isValid')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->form->expects($this->once())
             ->method('getData')
-            ->will($this->returnValue($this->attachment));
+            ->willReturn($this->attachment);
 
         $this->om->expects($this->once())
             ->method('persist')

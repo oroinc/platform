@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FormBundle\Form\Type\OroUnstructuredTextType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for dictionary filters.
+ */
 class DictionaryFilterType extends AbstractType
 {
     const NAME = 'oro_type_dictionary_filter';
@@ -24,9 +28,6 @@ class DictionaryFilterType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -101,7 +102,7 @@ class DictionaryFilterType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'field_type' => TextType::class,
+                'field_type' => OroUnstructuredTextType::class,
                 'field_options' => [],
                 'operator_type' => ChoiceType::class,
                 'operator_options' => [],
@@ -113,6 +114,8 @@ class DictionaryFilterType extends AbstractType
                 'operator_choices' => [
                     $this->translator->trans('oro.filter.form.label_type_in') => self::TYPE_IN,
                     $this->translator->trans('oro.filter.form.label_type_not_in') => self::TYPE_NOT_IN,
+                    $this->translator->trans('oro.filter.form.label_type_empty') =>  FilterUtility::TYPE_EMPTY,
+                    $this->translator->trans('oro.filter.form.label_type_not_empty') => FilterUtility::TYPE_NOT_EMPTY,
                 ],
             ]
         )->setRequired(

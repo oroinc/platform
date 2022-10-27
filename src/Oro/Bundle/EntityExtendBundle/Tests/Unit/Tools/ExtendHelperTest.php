@@ -4,6 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ */
 class ExtendHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -195,10 +200,10 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider buildEnumCodeForInvalidEnumNameProvider
-     * @expectedException \InvalidArgumentException
      */
     public function testBuildEnumCodeForInvalidEnumName($enumName)
     {
+        $this->expectException(\InvalidArgumentException::class);
         ExtendHelper::buildEnumCode($enumName);
     }
 
@@ -247,21 +252,19 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $entityClassName must not be empty.
-     */
     public function testGenerateEnumCodeForEmptyClassName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$entityClassName must not be empty.');
+
         ExtendHelper::generateEnumCode('', 'testField');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage $fieldName must not be empty.
-     */
     public function testGenerateEnumCodeForEmptyFieldName()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('$fieldName must not be empty.');
+
         ExtendHelper::generateEnumCode('Test\Entity', '');
     }
 
@@ -309,12 +312,28 @@ class ExtendHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testBuildEnumValueIdWithCustomLocale()
+    {
+        $locale = setlocale(LC_CTYPE, 0);
+        if (false === $locale) {
+            self::markTestSkipped('The locale functionality is not implemented on your platform.');
+        }
+
+        setlocale(LC_CTYPE, 'en_US.UTF-8');
+        try {
+            $result = ExtendHelper::buildEnumValueId('broken_value_nameºss');
+        } finally {
+            setlocale(LC_CTYPE, $locale);
+        }
+        $this->assertEquals('5eff4cfd', $result);
+    }
+
     /**
      * @dataProvider buildEnumValueIdForInvalidEnumValueNameProvider
-     * @expectedException \InvalidArgumentException
      */
     public function testBuildEnumValueIdForInvalidEnumValueName($enumValueName)
     {
+        $this->expectException(\InvalidArgumentException::class);
         ExtendHelper::buildEnumValueId($enumValueName);
     }
 

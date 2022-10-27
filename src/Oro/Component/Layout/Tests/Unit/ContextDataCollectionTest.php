@@ -8,23 +8,22 @@ use Oro\Component\Layout\LayoutContext;
 class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutContext */
-    protected $context;
+    private $context;
 
     /** @var ContextDataCollection */
-    protected $collection;
+    private $collection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->context    = new LayoutContext();
+        $this->context = new LayoutContext();
+
         $this->collection = new ContextDataCollection($this->context);
     }
 
     /**
      * @dataProvider valueDataProvider
-     *
-     * @param $value
      */
-    public function testGetSetHasRemove($value)
+    public function testGetSetHasRemove(mixed $value)
     {
         $this->assertFalse(
             $this->collection->has('test'),
@@ -48,10 +47,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function valueDataProvider()
+    public function valueDataProvider(): array
     {
         return [
             [null],
@@ -65,7 +61,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
 
     public function testSetDefault()
     {
-        $this->context['data']    = 'data';
+        $this->context['data'] = 'data';
 
         $this->collection->setDefault(
             'test',
@@ -137,7 +133,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
 
     public function testSetDefaultCallable()
     {
-        $this->context['data']    = 'data';
+        $this->context['data'] = 'data';
 
         $this->collection->setDefault(
             'test',
@@ -151,11 +147,7 @@ class ContextDataCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param $options
-     * @return mixed
-     */
-    public function getTestDataValue($options)
+    public function getTestDataValue(LayoutContext $options): mixed
     {
         return $options['data'];
     }

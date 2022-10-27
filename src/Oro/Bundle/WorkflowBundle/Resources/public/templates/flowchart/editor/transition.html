@@ -1,8 +1,10 @@
 <% var togglerId = _.uniqueId('dropdown-') %>
-<span class="transition-label"><%- label %></span>
-<span role="button" id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown"
+<div class="transition-label" title="<%- label %>">
+    <%- label %>
+</div>
+<span role="button" id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown" data-placement="bottom-end"
       aria-label="<%- _.__('oro.workflow.flowchart.transition.actions_label') %>" aria-haspopup="true" aria-expanded="false">
-</span>
+    </span>
 <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
     <li class="first">
         <a class="workflow-step-edit" href="#edit-step"><span class="fa-pencil-square-o" aria-hidden="true"></span><%- _.__('Edit') %></a>

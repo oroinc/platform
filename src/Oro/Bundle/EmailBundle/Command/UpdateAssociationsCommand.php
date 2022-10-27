@@ -1,42 +1,56 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command;
 
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailAssociationsTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdateAssociationsCommand extends ContainerAwareCommand
+/**
+ * Updates email associations.
+ */
+class UpdateAssociationsCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:email:update-associations';
+
+    private MessageProducerInterface $producer;
+
+    public function __construct(MessageProducerInterface $producer)
+    {
+        parent::__construct();
+
+        $this->producer = $producer;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this
-            ->setName('oro:email:update-associations')
-            ->setDescription('Update associations to emails');
+        $this->setDescription('Updates email associations.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates email associations.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this
-            ->getProducer()
-            ->send(Topics::UPDATE_ASSOCIATIONS_TO_EMAILS, []);
+        $this->producer->send(UpdateEmailAssociationsTopic::getName(), []);
 
         $output->writeln('<info>Update of associations has been scheduled.</info>');
-    }
 
-    /**
-     * @return MessageProducerInterface
-     */
-    protected function getProducer()
-    {
-        return $this->getContainer()->get('oro_message_queue.client.message_producer');
+        return 0;
     }
 }

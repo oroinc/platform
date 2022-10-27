@@ -3,22 +3,21 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class ActivityListControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures([
-            'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData'
-        ]);
+        $this->loadFixtures([LoadActivityData::class]);
     }
 
     public function testGetList()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_activity_list_api_get_list',
@@ -39,17 +38,17 @@ class ActivityListControllerTest extends WebTestCase
         $activity = $this->getReference('test_activity_1');
         $activityId       = $activity->getId();
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $activityListId = $em->getRepository(ActivityList::ENTITY_NAME)
+        $activityListId = $em->getRepository(ActivityList::class)
             ->createQueryBuilder('list')
             ->select('list.id')
             ->where('list.relatedActivityClass = :relatedActivityClass')
             ->andWhere('list.relatedActivityId = :relatedActivityId')
-            ->setParameter('relatedActivityClass', 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity')
+            ->setParameter('relatedActivityClass', TestActivity::class)
             ->setParameter('relatedActivityId', $activityId)
             ->getQuery()
             ->getSingleScalarResult();
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl(
                 'oro_api_get_activitylist_activity_list_item',
@@ -70,7 +69,7 @@ class ActivityListControllerTest extends WebTestCase
 
     public function testGetActivityListActivityListOption()
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_activitylist_activity_list_option')
         );

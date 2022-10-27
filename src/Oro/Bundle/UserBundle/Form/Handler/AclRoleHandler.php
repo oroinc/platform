@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\Permission\ConfigurablePermissionProvider;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
@@ -20,6 +18,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -85,11 +84,6 @@ class AclRoleHandler
     /** @var AclPrivilegeConfigurableFilter */
     protected $configurableFilter;
 
-    /**
-     * @param FormFactory $formFactory
-     * @param AclCacheInterface $aclCache
-     * @param array $privilegeConfig
-     */
     public function __construct(FormFactory $formFactory, AclCacheInterface $aclCache, array $privilegeConfig)
     {
         $this->formFactory = $formFactory;
@@ -98,33 +92,21 @@ class AclRoleHandler
         $this->configurableName = ConfigurablePermissionProvider::DEFAULT_CONFIGURABLE_NAME;
     }
 
-    /**
-     * @param AclManager $aclManager
-     */
     public function setAclManager(AclManager $aclManager)
     {
         $this->aclManager = $aclManager;
     }
 
-    /**
-     * @param AclPrivilegeRepository $privilegeRepository
-     */
     public function setAclPrivilegeRepository(AclPrivilegeRepository $privilegeRepository)
     {
         $this->privilegeRepository = $privilegeRepository;
     }
 
-    /**
-     * @param ManagerRegistry $registry
-     */
     public function setManagerRegistry(ManagerRegistry $registry)
     {
         $this->managerRegistry = $registry;
     }
 
-    /**
-     * @param Request $request
-     */
     public function setRequest(Request $request)
     {
         $this->request = $request;
@@ -138,9 +120,6 @@ class AclRoleHandler
         $this->configurableName = $configurableName;
     }
 
-    /**
-     * @param AclPrivilegeConfigurableFilter $configurableFilter
-     */
     public function setConfigurableFilter(AclPrivilegeConfigurableFilter $configurableFilter)
     {
         $this->configurableFilter = $configurableFilter;
@@ -316,9 +295,6 @@ class AclRoleHandler
         return $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role), $this->getAclGroup());
     }
 
-    /**
-     * @param AbstractRole $role
-     */
     protected function processPrivileges(AbstractRole $role)
     {
         $decodedPrivileges = json_decode($this->form->get('privileges')->getData(), true);
@@ -346,9 +322,9 @@ class AclRoleHandler
 
         // Clear doctrine query cache to be sure that queries will process hints
         // again with updated security information.
-        $cacheDriver = $this->managerRegistry->getManager()->getConfiguration()->getQueryCacheImpl();
-        if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
-            $cacheDriver->deleteAll();
+        $cacheDriver = $this->managerRegistry->getManager()->getConfiguration()->getQueryCache();
+        if ($cacheDriver instanceof AdapterInterface) {
+            $cacheDriver->clear();
         }
     }
 
@@ -424,7 +400,7 @@ class AclRoleHandler
 
         /** @var $user AbstractUser */
         foreach ($users as $user) {
-            $user->addRole($role);
+            $user->addUserRole($role);
             $manager->persist($user);
         }
     }
@@ -441,7 +417,7 @@ class AclRoleHandler
 
         /** @var $user AbstractUser */
         foreach ($users as $user) {
-            $user->removeRole($role);
+            $user->removeUserRole($role);
             $manager->persist($user);
         }
     }

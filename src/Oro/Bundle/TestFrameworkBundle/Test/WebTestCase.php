@@ -6,25 +6,35 @@ use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
-use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
+use Oro\Bundle\TestFrameworkBundle\Test\Event\DisableListenersForDataFixturesEvent;
+use Oro\Bundle\TestFrameworkBundle\Test\Logger\TestEventsLoggerTrait;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\DbIsolationExtension;
+use PHPUnit\Framework\TestResult;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Finder\Finder;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Yaml\Yaml;
 
@@ -33,74 +43,66 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 abstract class WebTestCase extends BaseWebTestCase
 {
     use DbIsolationExtension;
+    use TestEventsLoggerTrait;
 
-    /** Annotation names */
-    const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
+    /**
+     * Use to isolate database changed between tests.
+     * This adds a transaction that will be performed before a test starts and is rolled back when a test ends.
+     */
+    protected const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
 
     /**
      * Use to avoid transaction rollbacks with Connection::transactional and missing on conflict in Doctrine
      * SQLSTATE[25P02] current transaction is aborted, commands ignored until end of transaction block
      */
-    const NEST_TRANSACTIONS_WITH_SAVEPOINTS = 'nestTransactionsWithSavepoints';
+    protected const NEST_TRANSACTIONS_WITH_SAVEPOINTS = 'nestTransactionsWithSavepoints';
 
     /** Default WSSE credentials */
-    const USER_NAME = 'admin';
-    const USER_PASSWORD = 'admin_api_key';
+    protected const USER_NAME = 'admin';
+    protected const USER_PASSWORD = 'admin_api_key';
 
     /**  Default user name and password */
-    const AUTH_USER = 'admin@example.com';
-    const AUTH_PW = 'admin';
-    const AUTH_ORGANIZATION = 1;
+    protected const AUTH_USER = 'admin@example.com';
+    protected const AUTH_PW = 'admin';
+    protected const AUTH_ORGANIZATION = 1;
 
-    /**
-     * @var bool[]
-     */
+    /** @var string Default application kernel class */
+    protected static $class = 'AppKernel';
+
+    /** @var bool[] */
     private static $dbIsolationPerTest = [];
 
-    /**
-     * @var bool[]
-     */
+    /** @var bool[] */
     private static $nestTransactionsWithSavepoints = [];
 
-    /**
-     * @var Client
-     */
+    /** @var Client */
     private static $clientInstance;
 
-    /**
-     * @var Client
-     */
-    private static $soapClientInstance;
-
-    /**
-     * @var array
-     */
-    protected static $loadedFixtures = [];
+    /** @var array */
+    private static $loadedFixtures = [];
 
     /** @var Client */
     protected $client;
 
-    /** @var Client */
-    protected $soapClient;
-
-    /** @var callable */
-    private static $resetCallback;
-
-    /**
-     * @var ReferenceRepository
-     */
+    /** @var ReferenceRepository */
     private static $referenceRepository;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private static $afterInitClientMethods = [];
 
-    protected function setUp()
+    /** @var array */
+    private static $beforeResetClientMethods = [];
+
+    /** @var bool */
+    private static $initClientAllowed = false;
+
+    protected function setUp(): void
     {
     }
 
@@ -108,23 +110,8 @@ abstract class WebTestCase extends BaseWebTestCase
      * In order to disable kernel shutdown
      * @see \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase::tearDown
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
-    }
-
-    /**
-     * @before
-     * @internal
-     */
-    protected function beforeTest()
-    {
-        if (!self::$resetCallback) {
-            $self = $this;
-            self::$resetCallback = function () use ($self) {
-                $self->client = null;
-                $self->soapClient = null;
-            };
-        }
     }
 
     /**
@@ -133,47 +120,38 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected function afterTest()
     {
+        $this->client = null;
+
         if (self::isDbIsolationPerTest()) {
-            $this->rollbackTransaction();
             self::$loadedFixtures = [];
             self::$referenceRepository = null;
 
+            self::rollbackTransaction();
             self::resetClient();
         }
     }
 
     /**
-     * @beforeClass
      * @internal
+     * @afterClass
      */
-    public static function beforeClass()
+    public static function afterClass()
     {
-        /**
-         * In case we have isolated test we should have clean env before run it,
-         * so we will not have next problem:
-         * - Data provider in phpunit called before tests (even before this method) and can start a client
-         *   for not isolated tests (ex. GetRestJsonApiTest),
-         *   so we will have client without transaction started in our test
-         */
+        self::$loadedFixtures = [];
+        self::$referenceRepository = null;
+
+        self::rollbackTransaction();
         self::resetClient();
     }
 
     /**
-     * @afterClass
-     * @internal
+     * {@inheritDoc}
      */
-    public static function afterClass()
+    public function run(TestResult $result = null): TestResult
     {
-        self::rollbackTransaction();
-        self::$loadedFixtures = [];
-        self::$referenceRepository = null;
+        self::$initClientAllowed = true;
 
-        if (self::$resetCallback) {
-            call_user_func(self::$resetCallback);
-            self::$resetCallback = null;
-        }
-
-        self::resetClient();
+        return parent::run($result);
     }
 
     /**
@@ -184,9 +162,26 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param bool $force If this option - true, will reset client on each initClient call
      *
      * @return Client A Client instance
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function initClient(array $options = [], array $server = [], $force = false)
     {
+        if (!self::$initClientAllowed) {
+            $callstack = '';
+            foreach (debug_backtrace() as $frame) {
+                if (!isset($frame['class'], $frame['function'], $frame['type'])) {
+                    break;
+                }
+                $callstack .= '  ' . $frame['class'] . $frame['type'] . $frame['function'] . "()\n";
+            }
+            throw new \LogicException(
+                'The initClient() must not be called in data providers.'
+                . "\nCall stack:\n"
+                . $callstack
+            );
+        }
+
         if (self::isClassHasAnnotation(get_called_class(), 'dbIsolation')) {
             throw new \RuntimeException(
                 sprintf(
@@ -207,7 +202,17 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         if (!self::$clientInstance) {
-            self::$clientInstance = static::createClient($options, $server);
+            if (self::$kernel) {
+                throw new \RuntimeException(
+                    sprintf(
+                        '%s::initClient not allowed with booted kernel, call %s::resetClient first',
+                        get_called_class(),
+                        get_called_class()
+                    )
+                );
+            }
+
+            self::$clientInstance = self::createClient($options, $server);
 
             if (self::isClassHasAnnotation(get_called_class(), 'dbReindex')) {
                 throw new \RuntimeException(
@@ -241,7 +246,7 @@ abstract class WebTestCase extends BaseWebTestCase
                 $class = new \ReflectionClass($className);
 
                 foreach ($class->getMethods() as $method) {
-                    if (\preg_match('/@afterInitClient\b/', $method->getDocComment()) > 0) {
+                    if (self::isClassHasAnnotation($className, 'afterInitClient', $method->getName())) {
                         \array_unshift(
                             self::$afterInitClientMethods[$className],
                             $method->getName()
@@ -255,21 +260,94 @@ abstract class WebTestCase extends BaseWebTestCase
         return self::$afterInitClientMethods[$className];
     }
 
-    /** {@inheritdoc} */
-    protected static function createKernel(array $options = array())
+    /**
+     * {@inheritdoc}
+     */
+    protected static function createKernel(array $options = [])
     {
-        $options['debug'] = false;
+        if (!array_key_exists('environment', $options)) {
+            if (isset($_ENV['SYMFONY_ENV'])) {
+                $options['environment'] = $_ENV['SYMFONY_ENV'];
+            } elseif (isset($_SERVER['SYMFONY_ENV'])) {
+                $options['environment'] = $_SERVER['SYMFONY_ENV'];
+            }
+        }
+
+        if (!array_key_exists('debug', $options)) {
+            if (isset($_ENV['SYMFONY_DEBUG'])) {
+                $options['debug'] = $_ENV['SYMFONY_DEBUG'];
+            } elseif (isset($_SERVER['SYMFONY_DEBUG'])) {
+                $options['debug'] = $_SERVER['SYMFONY_DEBUG'];
+            }
+        }
 
         return parent::createKernel($options);
+    }
+
+    private static function getBeforeResetClientMethods($className)
+    {
+        if (!isset(self::$beforeResetClientMethods[$className])) {
+            self::$beforeResetClientMethods[$className] = [];
+
+            try {
+                $class = new \ReflectionClass($className);
+
+                /** @var \ReflectionMethod $method */
+                foreach ($class->getMethods() as $method) {
+                    if (self::isClassHasAnnotation($className, 'beforeResetClient', $method->getName())) {
+                        if (!$method->isStatic()) {
+                            throw new \RuntimeException(
+                                sprintf('%s::%s should be static', $className, $method->getName())
+                            );
+                        }
+
+                        \array_unshift(
+                            self::$beforeResetClientMethods[$className],
+                            $method->getName()
+                        );
+                    }
+                }
+            } catch (\ReflectionException $e) {
+            }
+        }
+
+        return self::$beforeResetClientMethods[$className];
+    }
+
+    /**
+     * @afterInitClient
+     */
+    protected function enableSearchListeners()
+    {
+        if ($this->getContainer()->hasParameter('optional_search_listeners')) {
+            $optionalSearchListeners = $this->getContainer()->getParameter('optional_search_listeners');
+            $this->getOptionalListenerManager()->enableListeners($optionalSearchListeners);
+        }
+    }
+
+    /**
+     * @afterInitClient
+     */
+    protected function disableOptionalListeners(): void
+    {
+        $manager = $this->getOptionalListenerManager();
+        $manager->disableListeners($manager->getListeners());
+    }
+
+    protected function getOptionalListenerManager(): OptionalListenerManager
+    {
+        return self::getContainer()->get('oro_platform.optional_listeners.manager');
     }
 
     /**
      * @param string $tokenId
      * @return CsrfToken
      */
-    protected function getCsrfToken($tokenId)
+    protected function getCsrfToken($tokenId): CsrfToken
     {
-        return $this->getContainer()->get('security.csrf.token_manager')->getToken($tokenId);
+        $this->ensureSessionIsAvailable();
+
+        return self::getContainer()->get('security.csrf.token_manager')->getToken($tokenId);
     }
 
     /**
@@ -278,84 +356,47 @@ abstract class WebTestCase extends BaseWebTestCase
     protected function loginUser($login)
     {
         if ('' !== $login) {
-            self::$clientInstance->setServerParameters(static::generateBasicAuthHeader($login, $login));
+            self::$clientInstance->setServerParameters(self::generateBasicAuthHeader($login, $login));
         } else {
             self::$clientInstance->setServerParameters([]);
             self::$clientInstance->getCookieJar()->clear();
         }
     }
 
-    /**
-     * @param string $email
-     */
-    protected function updateUserSecurityToken($email)
+    protected function updateUserSecurityToken(string $email): void
     {
         $user = $this->getUser($email);
-        $token = new UsernamePasswordToken($user, false, 'k', $user->getRoles());
-        $this->getContainer()->get('security.token_storage')->setToken($token);
+        $token = new UsernamePasswordOrganizationToken(
+            $user,
+            false,
+            'main',
+            $user->getOrganization(),
+            $user->getRoles()
+        );
+        self::getContainer()->get('security.token_storage')->setToken($token);
     }
 
-    /**
-     * @param string $email
-     * @param string $userClass
-     * @return object
-     */
-    private function getUser($email, $userClass = User::class)
+    private function getUser(string $email, string $userClass = User::class): AbstractUser
     {
         return $this->getContainer()->get('doctrine')->getRepository($userClass)->findOneBy(['email' => $email]);
     }
 
     /**
-     * Reset client and rollback transaction
+     * Reset client
      */
     protected static function resetClient()
     {
         if (self::$clientInstance) {
-            self::$clientInstance = null;
-        }
-
-        if (self::$soapClientInstance) {
-            self::$soapClientInstance = null;
-        }
-
-        static::ensureKernelShutdown();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected static function getKernelClass()
-    {
-        if (isset($_SERVER['KERNEL_DIR'])) {
-            $dir = $_SERVER['KERNEL_DIR'];
-
-            if (!is_dir($dir)) {
-                $phpUnitDir = static::getPhpUnitXmlDir();
-                if (is_dir("$phpUnitDir/$dir")) {
-                    $dir = "$phpUnitDir/$dir";
-                }
+            $hookMethods = self::getBeforeResetClientMethods(static::class);
+            foreach ($hookMethods as $method) {
+                static::$method();
             }
-        } else {
-            $dir = static::getPhpUnitXmlDir();
         }
 
-        $finder = new Finder();
-        $finder->name('AppKernel.php')->depth(0)->in($dir);
-        $results = iterator_to_array($finder);
-        if (!count($results)) {
-            throw new \RuntimeException(
-                'Either set KERNEL_DIR in your phpunit.xml according to' .
-                ' https://symfony.com/doc/current/book/testing.html#your-first-functional-test' .
-                ' or override the WebTestCase::createKernel() method.'
-            );
-        }
+        self::$clientInstance = null;
 
-        $file = current($results);
-        $class = $file->getBasename('.php');
-
-        require_once $file;
-
-        return $class;
+        self::ensureKernelShutdown();
+        self::$kernel = null;
     }
 
     /**
@@ -370,13 +411,9 @@ abstract class WebTestCase extends BaseWebTestCase
             return $data;
         }
 
-        /** @var AliceFixtureLoader $aliceLoader */
-        $aliceLoader = self::getContainer()->get('oro_test.alice_fixture_loader');
-        $aliceLoader->setReferences(self::$referenceRepository->getReferences());
-
         if (is_string($data)) {
             try {
-                $file = $aliceLoader->locateFile($data);
+                $file = self::getContainer()->get('file_locator')->locate($data);
                 if (is_file($file)) {
                     $data = Yaml::parse(file_get_contents($file));
                 }
@@ -384,12 +421,15 @@ abstract class WebTestCase extends BaseWebTestCase
             }
         }
 
+        $resolver = self::getContainer()->get('oro_test.value_resolver');
+        $resolver->setReferences(new Collection(self::$referenceRepository->getReferences()));
+
         if (is_array($data)) {
-            array_walk_recursive($data, function (&$item) use ($aliceLoader) {
-                $item = $aliceLoader->getProcessor()->process($item, [], null);
+            array_walk_recursive($data, function (&$item) use ($resolver) {
+                $item = $resolver->resolve($item);
             });
         } elseif (is_int($data) || is_string($data)) {
-            $data = $aliceLoader->getProcessor()->process($data, [], null);
+            $data = $resolver->resolve($data);
         } else {
             throw new \InvalidArgumentException(
                 sprintf('Expected argument of type "array or string", "%s" given.', gettype($data))
@@ -432,65 +472,18 @@ abstract class WebTestCase extends BaseWebTestCase
         return self::$nestTransactionsWithSavepoints[$calledClass];
     }
 
-    /**
-     * @param string $className
-     * @param string $annotationName
-     *
-     * @return bool
-     */
-    private static function isClassHasAnnotation($className, $annotationName)
-    {
-        $annotations = \PHPUnit\Util\Test::parseTestMethodAnnotations($className);
-        return isset($annotations['class'][$annotationName]);
-    }
+    private static function isClassHasAnnotation(
+        string $className,
+        string $annotationName,
+        ?string $methodName = null
+    ): bool {
+        $annotations = \PHPUnit\Util\Test::parseTestMethodAnnotations($className, $methodName);
 
-    /**
-     * @param string $wsdl
-     * @param array $options
-     * @param bool $force
-     *
-     * @return SoapClient
-     * @throws \Exception
-     */
-    protected function initSoapClient($wsdl = null, array $options = [], $force = false)
-    {
-        if (!self::$soapClientInstance || $force) {
-            if ($wsdl === null) {
-                $wsdl = "http://localhost/api/soap";
-            }
-
-            $options = array_merge(
-                [
-                    'location' => $wsdl,
-                    'soap_version' => SOAP_1_2
-                ],
-                $options
-            );
-
-            $client = $this->getClientInstance();
-            if ($options['soap_version'] == SOAP_1_2) {
-                $contentType = 'application/soap+xml';
-            } else {
-                $contentType = 'text/xml';
-            }
-            $client->request('GET', $wsdl, [], [], ['CONTENT_TYPE' => $contentType]);
-            $status = $client->getResponse()->getStatusCode();
-            $wsdl = $client->getResponse()->getContent();
-            if ($status >= 400) {
-                throw new \Exception($wsdl, $status);
-            }
-            //save to file
-            $file = tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
-            $fl = fopen($file, 'bw');
-            fwrite($fl, $wsdl);
-            fclose($fl);
-
-            self::$soapClientInstance = new SoapClient($file, $options, $client);
-
-            unlink($file);
+        if ($methodName) {
+            return !empty($annotations['method'][$annotationName]);
         }
 
-        return $this->soapClient = self::$soapClientInstance;
+        return !empty($annotations['class'][$annotationName]);
     }
 
     /**
@@ -505,12 +498,11 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static function runCommand($name, array $params = [], $cleanUp = true, $exceptionOnError = false)
     {
-        /** @var KernelInterface $kernel */
-        $kernel = self::getContainer()->get('kernel');
-
-        $application = new Application($kernel);
+        $application = new Application(self::$kernel ?? self::bootKernel());
         $application->setAutoExit(false);
-        $application->setTerminalDimensions(120, 50);
+
+        putenv('COLUMNS=120');
+        putenv('LINES=50');
 
         $params['--no-ansi'] = true;
 
@@ -544,7 +536,7 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         if ($cleanUp) {
-            $content = preg_replace(['/\s{2,}\n\s{2,}/', '/(\n|\s{2,})+/'], ['', ' '], $content);
+            $content = preg_replace(['/\s{2}\n\s{2}/', '/\n?(\s+)/'], ['', ' '], $content);
         }
 
         return trim($content);
@@ -582,19 +574,30 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $executor = new DataFixturesExecutor($this->getDataFixturesExecutorEntityManager());
-        $this->doLoadFixtures($executor, $loader);
         self::$referenceRepository = $executor->getReferenceRepository();
+        $this->preFixtureLoad();
+        $this->doLoadFixtures($executor, $loader);
         $this->postFixtureLoad();
     }
 
     /**
-     * @param DataFixturesExecutor $executor
-     * @param DataFixturesLoader   $loader
+     * @return string[]
      */
+    protected function getListenersThatShouldBeDisabledDuringDataFixturesLoading()
+    {
+        $event = new DisableListenersForDataFixturesEvent();
+        /** @var EventDispatcherInterface $eventDispatcher */
+        $eventDispatcher = self::getContainer()->get('event_dispatcher');
+        $eventDispatcher->dispatch($event, DisableListenersForDataFixturesEvent::NAME);
+
+        return $event->getListeners();
+    }
+
     private function doLoadFixtures(DataFixturesExecutor $executor, DataFixturesLoader $loader)
     {
+        $container = self::getContainer();
         /** @var TestBufferedMessageProducer|null $messageProducer */
-        $messageProducer = self::getContainer()->get(
+        $messageProducer = $container->get(
             'oro_message_queue.client.buffered_message_producer',
             ContainerInterface::NULL_ON_INVALID_REFERENCE
         );
@@ -602,6 +605,11 @@ abstract class WebTestCase extends BaseWebTestCase
             $messageProducer = null;
         }
 
+        // disable some listeners to speed up loading of fixtures
+        $listenersToDisable = $this->getListenersThatShouldBeDisabledDuringDataFixturesLoading();
+        foreach ($listenersToDisable as $listenerServiceId) {
+            $container->get($listenerServiceId)->setEnabled(false);
+        }
         // prevent sending of messages during loading of fixtures,
         // because fixtures are used to prepare data for tests
         // and it makes no sense to send messages before a test starts
@@ -613,6 +621,9 @@ abstract class WebTestCase extends BaseWebTestCase
         try {
             $executor->execute($loader->getFixtures(), true);
         } finally {
+            foreach ($listenersToDisable as $listenerServiceId) {
+                $container->get($listenerServiceId)->setEnabled(true);
+            }
             if ($restoreSendingOfMessages) {
                 $messageProducer->restoreSendingOfMessages();
             }
@@ -655,6 +666,11 @@ abstract class WebTestCase extends BaseWebTestCase
         return $filteredFixtures;
     }
 
+    protected function isLoadedFixture(string $fixtureClass): bool
+    {
+        return in_array($fixtureClass, self::$loadedFixtures, true);
+    }
+
     /**
      * @param string $name
      *
@@ -695,6 +711,13 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * Callback function to be executed before fixture load.
+     */
+    protected function preFixtureLoad()
+    {
+    }
+
+    /**
      * Callback function to be executed after fixture load.
      */
     protected function postFixtureLoad()
@@ -724,7 +747,7 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @return string
      */
-    protected function getUrl($name, $parameters = [], $absolute = false)
+    protected function getUrl(string $name, array $parameters = [], bool|int $absolute = false)
     {
         $referenceType = $absolute;
         if (is_bool($absolute)) {
@@ -735,20 +758,10 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Get an instance of the dependency injection container.
-     *
-     * @return ContainerInterface
-     */
-    protected static function getContainer()
-    {
-        return static::getClientInstance()->getContainer();
-    }
-
-    /**
      * @return Client
      * @throws \BadMethodCallException
      */
-    public static function getClientInstance()
+    protected static function getClientInstance()
     {
         if (!self::$clientInstance) {
             throw new \BadMethodCallException('Client instance is not initialized.');
@@ -768,7 +781,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $oroDefaultPrefix = $this->getUrl('oro_default');
 
         $replaceOroDefaultPrefixCallback = function (&$value) use ($oroDefaultPrefix, $urlParameterKey) {
-            if (!is_null($value[$urlParameterKey])) {
+            if (is_array($value) && !is_null($value[$urlParameterKey])) {
                 $value[$urlParameterKey] = str_replace(
                     '%oro_default_prefix%',
                     $oroDefaultPrefix,
@@ -781,6 +794,44 @@ abstract class WebTestCase extends BaseWebTestCase
             $data,
             $replaceOroDefaultPrefixCallback
         );
+    }
+
+    /**
+     * Calls a URI with emulation of AJAX request.
+     *
+     * @param string $method        The request method
+     * @param string $uri           The URI to fetch
+     * @param array  $parameters    The Request parameters
+     * @param array  $files         The files
+     * @param array  $server        The server parameters (HTTP headers are referenced with a HTTP_ prefix as PHP does)
+     * @param string $content       The raw body data
+     * @param bool   $changeHistory Whether to update the history or not
+     *                              (only used internally for back(), forward(), and reload())
+     *
+     * @return Crawler
+     */
+    public function ajaxRequest(
+        $method,
+        $uri,
+        array $parameters = [],
+        array $files = [],
+        array $server = [],
+        $content = null,
+        $changeHistory = true
+    ) {
+        $csrfToken = 'nochecks';
+        $cookieJar = $this->client->getCookieJar();
+        $csrfTokenCookie = $cookieJar->get(CsrfRequestManager::CSRF_TOKEN_ID, '/', 'localhost');
+        if ($csrfTokenCookie) {
+            $csrfToken = $csrfTokenCookie->getValue();
+        } else {
+            $cookieJar->set(new Cookie(CsrfRequestManager::CSRF_TOKEN_ID, $csrfToken, null, '/', 'localhost'));
+        }
+        $server['HTTP_X-Requested-With'] = 'XMLHttpRequest';
+        $server['HTTP_Content-type'] = 'application/json';
+        $server['HTTP_' . CsrfRequestManager::CSRF_HEADER] = $csrfToken;
+
+        return $this->client->request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
     }
 
     /**
@@ -809,18 +860,18 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $replaceCallback = function (&$value) use ($randomString) {
-            if (!is_null($value)) {
+            if (is_string($value)) {
                 $value = str_replace('%str%', $randomString, $value);
             }
         };
 
         foreach ($parameters as $key => $value) {
-            array_walk(
+            array_walk_recursive(
                 $parameters[$key]['request'],
                 $replaceCallback,
                 $randomString
             );
-            array_walk(
+            array_walk_recursive(
                 $parameters[$key]['response'],
                 $replaceCallback,
                 $randomString
@@ -902,7 +953,7 @@ abstract class WebTestCase extends BaseWebTestCase
         return [
             'PHP_AUTH_USER' => $userName,
             'PHP_AUTH_PW' => $userPassword,
-            'PHP_AUTH_ORGANIZATION' => $userOrganization
+            'HTTP_PHP_AUTH_ORGANIZATION' => $userOrganization
         ];
     }
 
@@ -943,11 +994,11 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|int $message
+     * @param string $message
      *
      * @return array
      */
-    public static function getJsonResponseContent(Response $response, $statusCode, $message = null)
+    public static function getJsonResponseContent(Response $response, $statusCode, string $message = '')
     {
         self::assertJsonResponseStatusCodeEquals($response, $statusCode, $message);
         return self::jsonToArray($response->getContent());
@@ -958,9 +1009,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    public static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertEmptyResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertEmpty(
@@ -974,9 +1025,9 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    public static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertJsonResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertResponseContentTypeEquals($response, 'application/json', $message);
@@ -987,23 +1038,22 @@ abstract class WebTestCase extends BaseWebTestCase
      *
      * @param Response $response
      * @param int $statusCode
-     * @param string|null $message
+     * @param string $message
      */
-    public static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
+    protected static function assertHtmlResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
     {
         self::assertResponseStatusCodeEquals($response, $statusCode, $message);
         self::assertResponseContentTypeEquals($response, 'text/html; charset=UTF-8', $message);
     }
 
     /**
-     * Assert response status code equals
-     *
-     * @param Response $response
-     * @param int $statusCode
-     * @param string|null $message
+     * Asserts response status code equals to the given status code.
      */
-    public static function assertResponseStatusCodeEquals(Response $response, $statusCode, $message = null)
-    {
+    protected static function assertResponseStatusCodeEquals(
+        Response $response,
+        int $statusCode,
+        string $message = ''
+    ): void {
         try {
             \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
@@ -1037,29 +1087,79 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Assert response content type equals
-     *
-     * @param Response $response
-     * @param string $contentType
-     * @param string|null $message
+     * Asserts response has the given content type.
      */
-    public static function assertResponseContentTypeEquals(Response $response, $contentType, $message = null)
-    {
+    protected static function assertResponseContentTypeEquals(
+        Response $response,
+        string $contentType,
+        string $message = ''
+    ): void {
         $message = $message ? $message . PHP_EOL : '';
         $message .= sprintf('Failed asserting response has header "Content-Type: %s":', $contentType);
         $message .= PHP_EOL . $response->headers;
+        self::assertTrue($response->headers->contains('Content-Type', $contentType), $message);
+    }
 
-        \PHPUnit\Framework\TestCase::assertTrue($response->headers->contains('Content-Type', $contentType), $message);
+    /**
+     * Asserts response contains the given content type.
+     */
+    protected static function assertResponseContentTypeContains(
+        Response $response,
+        string $contentType,
+        string $message = ''
+    ): void {
+        $message = $message ? $message . PHP_EOL : '';
+        $message .= sprintf('Failed asserting response "Content-Type" header contains "%s":', $contentType);
+        $message .= PHP_EOL . $response->headers;
+        self::assertTrue(
+            $response->headers->has('Content-Type'),
+            $message . PHP_EOL . 'The response does not have "Content-Type" header.'
+        );
+        self::assertStringContainsString($contentType, $response->headers->get('Content-Type'), $message);
+    }
+
+    /**
+     * Asserts the given response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $headerName
+     * @param mixed    $expectedValue
+     */
+    protected static function assertResponseHeader(Response $response, string $headerName, string $expectedValue): void
+    {
+        self::assertEquals(
+            $expectedValue,
+            $response->headers->get($headerName),
+            sprintf('"%s" response header', $headerName)
+        );
+    }
+
+    /**
+     * Asserts the given response header equals to the expected value.
+     */
+    protected static function assertResponseHeaderNotExists(Response $response, string $headerName): void
+    {
+        self::assertFalse(
+            $response->headers->has($headerName),
+            sprintf('"%s" header should not exist in the response', $headerName)
+        );
+    }
+
+    /**
+     * Asserts "Allow" response header equals to the expected value.
+     */
+    protected static function assertAllowResponseHeader(
+        Response $response,
+        string $expectedAllowedMethods,
+        string $message = ''
+    ): void {
+        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
     }
 
     /**
      * Assert that intersect of $actual with $expected equals $expected
-     *
-     * @param array $expected
-     * @param array $actual
-     * @param string $message
      */
-    public static function assertArrayIntersectEquals(array $expected, array $actual, $message = null)
+    protected static function assertArrayIntersectEquals(array $expected, array $actual, string $message = '')
     {
         $actualIntersect = self::getRecursiveArrayIntersect($actual, $expected);
         \PHPUnit\Framework\TestCase::assertEquals(
@@ -1077,8 +1177,9 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param array $source
      * @param array $target
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public static function getRecursiveArrayIntersect(array $target, array $source)
+    protected static function getRecursiveArrayIntersect(array $target, array $source)
     {
         $result = [];
 
@@ -1104,15 +1205,12 @@ abstract class WebTestCase extends BaseWebTestCase
             }
         }
 
-
         return $result;
     }
 
     /**
      * Sorts array by key recursively. This method is used to output failures of array response comparison in
      * a more comprehensive way.
-     *
-     * @param array $array
      */
     protected static function sortArrayByKeyRecursively(array &$array)
     {
@@ -1123,28 +1221,6 @@ abstract class WebTestCase extends BaseWebTestCase
                 self::sortArrayByKeyRecursively($value);
             }
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return Client
-     */
-    protected function getClient()
-    {
-        return self::getClientInstance();
-    }
-
-    /**
-     * @return Client
-     */
-    protected function getSoapClient()
-    {
-        if (!self::$soapClientInstance) {
-            throw new \LogicException('Client is not initialized, call "initSoapClient" method first');
-        }
-
-        return self::$soapClientInstance;
     }
 
     /**
@@ -1181,5 +1257,37 @@ abstract class WebTestCase extends BaseWebTestCase
             0 !== strpos($path, '/')
             && 0 !== strpos($path, '@')
             && false === strpos($path, ':');
+    }
+
+    protected function getSession(): ?SessionInterface
+    {
+        $this->ensureSessionIsAvailable();
+
+        return self::getContainer()->get('request_stack')->getSession();
+    }
+
+    protected function ensureSessionIsAvailable(): void
+    {
+        $container = self::getContainer();
+        $requestStack = $container->get('request_stack');
+
+        try {
+            $requestStack->getSession();
+        } catch (SessionNotFoundException $e) {
+            $session = $container->has('session')
+                ? $container->get('session')
+                : $container->get('session.factory')->createSession();
+
+            $masterRequest = new Request();
+            $masterRequest->setSession($session);
+
+            $requestStack->push($masterRequest);
+
+            $session->start();
+            $session->save();
+
+            $cookie = new Cookie($session->getName(), $session->getId());
+            self::getClientInstance()->getCookieJar()->set($cookie);
+        }
     }
 }

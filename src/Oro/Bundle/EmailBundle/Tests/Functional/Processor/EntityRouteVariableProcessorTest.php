@@ -2,89 +2,83 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Processor;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 
 class EntityRouteVariableProcessorTest extends WebTestCase
 {
     /** @var EmailRenderer */
-    protected $emailRenderer;
+    private $emailRenderer;
 
     /** @var Item */
-    protected $entity;
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
-        $this->emailRenderer = $this->getContainer()->get('oro_email.email_renderer');
+        $this->initClient([], self::generateBasicAuthHeader());
+        $this->emailRenderer = self::getContainer()->get('oro_email.email_renderer');
+        $this->loadFixtures([LoadUser::class]);
         $this->entity = $this->createItemEntity();
     }
 
     /**
-     * @param $variable
-     * @param $expected
-     *
      * @dataProvider variablesDataProvider
      */
     public function testVariables($variable, $expected)
     {
-        $data = $this->emailRenderer->renderWithDefaultFilters(
+        $data = $this->emailRenderer->renderTemplate(
             sprintf('{{ %s }}', $variable),
             ['entity' => $this->entity]
         );
 
-        $this->assertEquals(1, preg_match($expected, $data));
+        $this->assertEquals(1, preg_match($expected, $data), 'data: ' . $data);
     }
 
-    /**
-     * @return \Generator
-     */
-    public function variablesDataProvider()
+    public function variablesDataProvider(): array
     {
         $baseUrl = '(http|https)\:\/\/.*\/';
 
-        yield 'index' => [
-            'variable' => 'entity.url.index',
-            'expected' => sprintf('/^%s%s$/i', $baseUrl, 'test\/item\/'),
-        ];
-
-        yield 'view' => [
-            'variable' => 'entity.url.view',
-            'expected' => sprintf('/^%s%s\d+$/i', $baseUrl, 'test\/item\/view\/'),
-        ];
-
-        yield 'create' => [
-            'variable' => 'entity.url.create',
-            'expected' => sprintf('/^%s%s$/i', $baseUrl, 'test\/item\/create'),
-        ];
-
-        yield 'update' => [
-            'variable' => 'entity.url.update',
-            'expected' => sprintf('/^%s%s\d+$/i', $baseUrl, 'test\/item\/update\/'),
+        return [
+            'index'      => [
+                'variable' => 'entity.url.index',
+                'expected' => sprintf('/^%s%s$/i', $baseUrl, 'test\/item\/')
+            ],
+            'view'       => [
+                'variable' => 'entity.url.view',
+                'expected' => sprintf('/^%s%s\d+$/i', $baseUrl, 'test\/item\/view\/')
+            ],
+            'create'     => [
+                'variable' => 'entity.url.create',
+                'expected' => sprintf('/^%s%s$/i', $baseUrl, 'test\/item\/create')
+            ],
+            'update'     => [
+                'variable' => 'entity.url.update',
+                'expected' => sprintf('/^%s%s\d+$/i', $baseUrl, 'test\/item\/update\/')
+            ],
+            'view.child' => [
+                'variable' => 'entity.owner.url.view',
+                'expected' => sprintf('/^%s%s\d+$/i', $baseUrl, 'user\/view\/')
+            ]
         ];
     }
 
-    /**
-     * @return Item
-     */
-    protected function createItemEntity()
+    private function createItemEntity(): Item
     {
         $testEntity = new Item();
-        $this->getManager(Item::class)->persist($testEntity);
-        $this->getManager(Item::class)->flush($testEntity);
+        $testEntity->owner = $this->getReference('user');
+
+        $em = $this->getEntityManager(get_class($testEntity));
+        $em->persist($testEntity);
+        $em->flush();
 
         return $testEntity;
     }
 
-    /**
-     * @param $class
-     *
-     * @return EntityManager|null|object
-     */
-    private function getManager($class)
+    private function getEntityManager(string $entityClass): EntityManagerInterface
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($class);
+        return self::getContainer()->get('doctrine')->getManagerForClass($entityClass);
     }
 }

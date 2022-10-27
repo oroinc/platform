@@ -57,6 +57,7 @@ Failed asserting that exactly all messages were sent.
 +        'message' => 'test message 1'
      )
 +    1 => Array (...)
+ )
 
 TEXT;
 

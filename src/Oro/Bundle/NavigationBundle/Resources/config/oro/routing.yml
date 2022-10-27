@@ -1,49 +1,141 @@
+oro_navigation_js_routing_js:
+    path: "/media/js/%oro_navigation.js_routing_filename_prefix%routes.{_format}"
+    methods: [GET]
+    defaults: { _controller: fos_js_routing.controller:indexAction }
+    requirements:
+        _format: json
+
 oro_navigation_bundle:
     resource:     "@OroNavigationBundle/Controller"
     type:         annotation
 
-oro_navigation_api_pinbar:
-    resource:     "@OroNavigationBundle/Controller/Api/NavigationItemController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest
 
-oro_navigation_api_shortcut:
-    resource:     "@OroNavigationBundle/Controller/Api/ShortcutsController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest
+#
+# OLD REST API ROUTES
+#
 
-oro_navigation_api_pagestate:
-    resource:     "@OroNavigationBundle/Controller/Api/PagestateController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
+oro_api_get_navigationitems:
+    path: '/api/rest/{version}/navigationitems/{type}.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
-
-oro_pinbar_help:
-    path:      /pinbar/help
-    defaults:     { _controller: FrameworkBundle:Template:template, template: "OroNavigationBundle:Pinbar:help.html.twig" }
-
-# deprecated API route
-oro_api_post_pagestate_deprecated:
-    path:            /api/rest/{version}/pagestate.{_format}
-    methods:         [POST]
-    defaults:
-        _controller: Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::postAction
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\NavigationItemController::getAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json|html
-        version:     latest|v1
+        _format: json
+        version: latest|v1
+
+oro_api_post_navigationitems:
+    path: '/api/rest/{version}/navigationitems/{type}.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\NavigationItemController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_put_navigationitems_id:
+    path: '/api/rest/{version}/navigationitems/{type}/ids/{itemId}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\NavigationItemController::putIdAction'
+        _format: json
+        version: latest
+    requirements:
+        itemId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_navigationitems_id:
+    path: '/api/rest/{version}/navigationitems/{type}/ids/{itemId}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\NavigationItemController::deleteIdAction'
+        _format: json
+        version: latest
+    requirements:
+        itemId: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_shortcuts:
+    path: '/api/rest/{version}/shortcuts/{query}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\ShortcutsController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_pagestates:
+    path: '/api/rest/{version}/pagestates.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_get_pagestate:
+    path: '/api/rest/{version}/pagestates/{id}.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::getAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_post_pagestate:
+    path: '/api/rest/{version}/pagestates.{_format}'
+    methods: [POST]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::postAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_put_pagestate:
+    path: '/api/rest/{version}/pagestates/{id}.{_format}'
+    methods: [PUT]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::putAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_delete_pagestate:
+    path: '/api/rest/{version}/pagestates/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1
+
+oro_api_get_pagestate_checkid:
+    path: '/api/rest/{version}/pagestate/checkid.{_format}'
+    methods: [GET]
+    defaults:
+        _controller: 'Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::getCheckidAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1

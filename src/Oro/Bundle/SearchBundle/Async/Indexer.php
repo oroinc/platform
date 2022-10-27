@@ -3,10 +3,15 @@
 namespace Oro\Bundle\SearchBundle\Async;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByIdTopic;
+use Oro\Bundle\SearchBundle\Async\Topic\ReindexTopic;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Transformer\MessageTransformerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * Performs indexation operations for search index.
+ */
 class Indexer implements IndexerInterface
 {
     /**
@@ -24,11 +29,6 @@ class Indexer implements IndexerInterface
      */
     protected $producer;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param DoctrineHelper $doctrineHelper
-     * @param MessageTransformerInterface $transformer
-     */
     public function __construct(
         MessageProducerInterface $producer,
         DoctrineHelper $doctrineHelper,
@@ -87,7 +87,7 @@ class Indexer implements IndexerInterface
             $this->doctrineHelper->getEntityManagerForClass($class);
         }
 
-        $this->producer->send(Topics::REINDEX, $classes);
+        $this->producer->send(ReindexTopic::getName(), $classes);
     }
 
     /**
@@ -105,7 +105,7 @@ class Indexer implements IndexerInterface
 
         $messages = $this->transformer->transform($entities);
         foreach ($messages as $message) {
-            $this->producer->send(Topics::INDEX_ENTITIES, $message);
+            $this->producer->send(IndexEntitiesByIdTopic::getName(), $message);
         }
 
         return true;

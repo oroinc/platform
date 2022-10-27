@@ -2,13 +2,17 @@ oro_form_bundle:
     resource: "@OroFormBundle/Controller"
     type: annotation
 
+#
+# OLD REST API ROUTES
+#
+
 oro_api_autocomplete_search:
-    path:            /api/rest/{version}/autocomplete/search.{_format}
-    methods:         [GET]
+    path: '/api/rest/{version}/autocomplete/search.{_format}'
+    methods: [GET]
     defaults:
-        _controller: OroFormBundle:Api\Rest\Autocomplete:search
-        _format:     json
-        version:     latest
+        _controller: 'Oro\Bundle\FormBundle\Controller\Api\Rest\AutocompleteController::searchAction'
+        _format: json
+        version: latest
     requirements:
-        _format:     json
-        version:     latest|v1
+        _format: json
+        version: latest|v1

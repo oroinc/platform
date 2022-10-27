@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('oroui/js/items-manager/table');
-    var Backbone = require('backbone');
+    const $ = require('oroui/js/items-manager/table');
+    const Backbone = require('backbone');
 
     describe('oroui/js/items-manager/table', function() {
-        var $el;
+        let $el;
 
         beforeEach(function() {
             $el = $('<div>');
@@ -67,7 +67,7 @@ define(function(require) {
         });
 
         it('handles adding model to the collection', function() {
-            var collection = new Backbone.Collection();
+            const collection = new Backbone.Collection();
 
             $el.itemsManagerTable({
                 itemTemplate: '<div></div>',
@@ -80,12 +80,12 @@ define(function(require) {
         });
 
         it('handles removing model from the collection', function() {
-            var collection = new Backbone.Collection([
+            const collection = new Backbone.Collection([
                 {name: 'a'}, {name: 'b'}
             ]);
 
             $el.itemsManagerTable({
-                itemTemplate: '<div data-cid="<%= cid %>"></div>',
+                itemTemplate: '<div data-cid="<%- cid %>"></div>',
                 collection: collection
             });
 
@@ -95,12 +95,12 @@ define(function(require) {
         });
 
         it('handles model changing', function() {
-            var collection = new Backbone.Collection([
+            const collection = new Backbone.Collection([
                 {name: 'a'}
             ]);
 
             $el.itemsManagerTable({
-                itemTemplate: '<div data-cid="<%= cid %>"><%= name %></div>',
+                itemTemplate: '<div data-cid="<%- cid %>"><%= name %></div>',
                 collection: collection
             });
 
@@ -110,7 +110,7 @@ define(function(require) {
         });
 
         it('handles collection reset', function() {
-            var collection = new Backbone.Collection([
+            const collection = new Backbone.Collection([
                 {name: 'a'}, {name: 'b'}, {name: 'c'}
             ]);
 
@@ -125,7 +125,7 @@ define(function(require) {
         });
 
         it('provides render hook', function() {
-            var collection = new Backbone.Collection([
+            const collection = new Backbone.Collection([
                 {name: '<script>alert(\'a\')</script>'}
             ]);
 
@@ -142,12 +142,12 @@ define(function(require) {
         });
 
         it('translates action click event into model event with params: model, data-attributes', function() {
-            var collection = new Backbone.Collection([
+            const collection = new Backbone.Collection([
                 {name: 'a'}
             ]);
 
             $el.itemsManagerTable({
-                itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="foo"></div>',
+                itemTemplate: '<div data-cid="<%- cid %>" data-collection-action="foo"></div>',
                 collection: collection
             });
 
@@ -161,12 +161,12 @@ define(function(require) {
         });
 
         it('does not translate action click event into model event if corresponding handler provided', function() {
-            var collection = new Backbone.Collection([
+            const collection = new Backbone.Collection([
                 {name: 'a'}
             ]);
 
             $el.itemsManagerTable({
-                itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="foo"></div>',
+                itemTemplate: '<div data-cid="<%- cid %>" data-collection-action="foo"></div>',
                 collection: collection,
                 fooHandler: function() {}
             });
@@ -182,12 +182,12 @@ define(function(require) {
 
         it('handles action click event with params: model, ' +
             'data-attributes, if corresponding handler provided', function() {
-            var collection = new Backbone.Collection([
+            const collection = new Backbone.Collection([
                 {name: 'a'}
             ]);
 
-            var options = {
-                itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="bar"></div>',
+            const options = {
+                itemTemplate: '<div data-cid="<%- cid %>" data-collection-action="bar"></div>',
                 collection: collection,
                 barHandler: function() {}
             };

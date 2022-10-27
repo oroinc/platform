@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_12;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -57,11 +57,11 @@ class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
         $data = $this->connection->fetchColumn($sql, $parameters);
         $this->logQuery($logger, $sql, $parameters);
 
-        $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+        $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
         if (array_key_exists($scope, $data)) {
             unset($data[$scope]);
         }
-        $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+        $data = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
 
         $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
         $parameters = [$data, $className];

@@ -1,4 +1,0 @@
-layout:
-    actions:
-        - '@setBlockTheme':
-            themes: 'OroEntityConfigBundle:layouts:blank/page/layout.html.twig'

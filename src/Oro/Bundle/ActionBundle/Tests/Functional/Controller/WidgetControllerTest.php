@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonProviderExtensionStub;
 use Oro\Bundle\ActionBundle\Tests\Functional\Stub\ButtonStub;
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 use Oro\Component\PropertyAccess\PropertyAccessor;
@@ -14,49 +17,49 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class WidgetControllerTest extends WebTestCase
 {
-    const ROOT_NODE_NAME = 'operations';
-
     /** @var int */
     private $entityId;
 
-    /** @var FilesystemCache */
-    protected $cacheProvider;
+    /** @var ConfigurationProvider */
+    private $configProvider;
+
+    /** @var PhpArrayConfigCacheModifier */
+    private $configModifier;
 
     /** @var PropertyAccessor */
-    protected $propertyAccessor;
+    private $propertyAccessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
-        $this->loadFixtures([
-            'Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData',
-            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems',
-        ]);
+        $this->configProvider = $this->getContainer()->get('oro_action.tests.configuration.provider');
+        $this->configModifier = new PhpArrayConfigCacheModifier($this->configProvider);
+
+        $this->loadFixtures([LoadTestEntityData::class, LoadItems::class]);
         $this->entityId = $this->getReference(LoadTestEntityData::TEST_ENTITY_1)->getId();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
-        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
-
-        parent::tearDown();
+        $this->getContainer()->get('oro_action.tests.provider.button.extension')
+            ->setDecoratedExtension(null);
+        $this->configModifier->resetCache();
     }
 
     /**
      * @dataProvider buttonsOperationDataProvider
-     *
-     * @param array $config
-     * @param string $route
-     * @param bool $entityId
-     * @param string $entityClass
-     * @param array $expected
      */
-    public function testButtonsOperation(array $config, $route, $entityId, $entityClass, array $expected)
-    {
-        $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
-        $this->getContainer()->get('oro_action.provider.button')->addExtension(new ButtonProviderExtensionStub());
+    public function testButtonsOperation(
+        array $config,
+        string $route,
+        ?bool $entityId,
+        string $entityClass,
+        array $expected
+    ) {
+        $this->setOperationsConfig($config);
+        $this->getContainer()->get('oro_action.tests.provider.button.extension')
+            ->setDecoratedExtension(new ButtonProviderExtensionStub());
 
         if ($entityId) {
             $entityId = $this->entityId;
@@ -81,7 +84,7 @@ class WidgetControllerTest extends WebTestCase
 
         if ($expected) {
             foreach ($expected as $item) {
-                $this->assertContains($item, $crawler->html());
+                self::assertStringContainsString($item, $crawler->html());
             }
         } else {
             $this->assertEmpty($crawler);
@@ -90,23 +93,16 @@ class WidgetControllerTest extends WebTestCase
 
     /**
      * @dataProvider formOperationDataProvider
-     *
-     * @param string $entity
-     * @param array $inputData
-     * @param array $submittedData
-     * @param array $expectedFormData
-     * @param array $expectedData
-     * @param string $expectedMessage
      */
     public function testFormOperation(
-        $entity,
+        string $entity,
         array $inputData,
         array $submittedData,
         array $expectedFormData,
         array $expectedData,
-        $expectedMessage
+        string $expectedMessage
     ) {
-        $this->cacheProvider->save(self::ROOT_NODE_NAME, $this->getConfigurationForFormOperation());
+        $this->setOperationsConfig($this->getConfigurationForFormOperation());
 
         $entity = $this->getReference($entity);
 
@@ -121,7 +117,7 @@ class WidgetControllerTest extends WebTestCase
                     '_widgetContainer' => 'dialog',
                     'operationName' => 'oro_action_test_operation',
                     'entityId' => $entity->getId(),
-                    'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                    'entityClass' => TestActivity::class,
                 ]
             )
         );
@@ -136,17 +132,14 @@ class WidgetControllerTest extends WebTestCase
 
         $crawler = $this->client->submit($form);
 
-        $this->assertContains($expectedMessage, $crawler->html());
+        self::assertStringContainsString($expectedMessage, $crawler->html());
         $this->assertEntityFields($entity, $expectedData);
     }
 
     /**
-     * @param string $groupName
-     * @param array $actions
-     *
      * @dataProvider buttonsOperationAndGroupsProvider
      */
-    public function testButtonsOperationAndGroups($groupName, array $actions)
+    public function testButtonsOperationAndGroups(string $groupName, array $actions)
     {
         $item = $this->getReference(LoadItems::ITEM1);
 
@@ -156,7 +149,7 @@ class WidgetControllerTest extends WebTestCase
                 'oro_action_widget_buttons',
                 [
                     '_widgetContainer' => 'dialog',
-                    'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\Item',
+                    'entityClass' => Item::class,
                     'entityId' => $item->getId(),
                     'group' => $groupName
                 ]
@@ -176,10 +169,7 @@ class WidgetControllerTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function formOperationDataProvider()
+    public function formOperationDataProvider(): array
     {
         return [
             'valid operation' => [
@@ -214,7 +204,7 @@ class WidgetControllerTest extends WebTestCase
                             ]
                         ]
                     ]
-                ])
+                ], JSON_THROW_ON_ERROR)
             ],
             'operation not allowed' => [
                 'entity' => LoadTestEntityData::TEST_ENTITY_2,
@@ -279,11 +269,7 @@ class WidgetControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param object $entity
-     * @param array $fields
-     */
-    protected function assertEntityFields($entity, array $fields)
+    private function assertEntityFields(object $entity, array $fields): void
     {
         $entity = $this->getEntity($entity->getId());
 
@@ -292,22 +278,13 @@ class WidgetControllerTest extends WebTestCase
         }
     }
 
-    /**
-     * @param int $id
-     * @return object|null
-     */
-    protected function getEntity($id)
+    private function getEntity(int $id): ?TestActivity
     {
-        return $this->getContainer()
-            ->get('doctrine')
-            ->getRepository('Oro\Bundle\TestFrameworkBundle\Entity\TestActivity')
+        return $this->getContainer()->get('doctrine')->getRepository(TestActivity::class)
             ->find($id);
     }
 
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
+    private function getPropertyAccessor(): PropertyAccessor
     {
         if (!$this->propertyAccessor) {
             $this->propertyAccessor = new PropertyAccessor();
@@ -317,11 +294,9 @@ class WidgetControllerTest extends WebTestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function buttonsOperationDataProvider()
+    public function buttonsOperationDataProvider(): array
     {
         $label = 'oro.action.test.label';
 
@@ -343,14 +318,14 @@ class WidgetControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_operation' => [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message']],
                         ],
                     ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => [$label, ButtonStub::LABEL]
             ],
             'existing entity wrong conditions' => [
@@ -358,24 +333,24 @@ class WidgetControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_operation' => [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message wrong']],
                         ],
                     ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => []
             ],
             'existing entity short syntax' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_operation' => ['entities' => ['OroTestFrameworkBundle:TestActivity']]]
+                    ['oro_action_test_operation' => ['entities' => [TestActivity::class]]]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => [$label]
             ],
             'existing entity with root namespace' => [
@@ -383,13 +358,13 @@ class WidgetControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_operation' => [
-                            'entities' => ['\Oro\Bundle\TestFrameworkBundle\Entity\TestActivity']
+                            'entities' => [TestActivity::class]
                         ]
                     ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => [$label]
             ],
             'unknown entity' => [
@@ -397,23 +372,27 @@ class WidgetControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_operation' => [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Enti\UnknownEntity']
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\UnknownEntity']
                         ]
                     ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => []
             ],
             'unknown entity short syntax' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_operation' => ['entities' => ['OroTestFrameworkBundle:UnknownEntity']]]
+                    [
+                        'oro_action_test_operation' => [
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\UnknownEntity']
+                        ]
+                    ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => []
             ],
             'existing route' => [
@@ -423,7 +402,7 @@ class WidgetControllerTest extends WebTestCase
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => [$label]
             ],
             'unknown route' => [
@@ -433,14 +412,14 @@ class WidgetControllerTest extends WebTestCase
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => []
             ],
             'empty context' => [
                 'config' => $config,
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => []
             ],
             'existing route and entity' => [
@@ -448,14 +427,14 @@ class WidgetControllerTest extends WebTestCase
                     $config,
                     ['oro_action_test_operation' =>
                         [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             'routes' => ['oro_action_test_route']
                         ]
                     ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => null,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => [$label]
             ],
             'modal action' => [
@@ -463,7 +442,7 @@ class WidgetControllerTest extends WebTestCase
                     $config,
                     ['oro_action_test_operation' =>
                         [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             'routes' => ['oro_action_test_route'],
                             'frontend_options' => ['show_dialog' => false],
                         ]
@@ -471,7 +450,7 @@ class WidgetControllerTest extends WebTestCase
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => null,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => ['"showDialog":false', '"hasDialog":false'],
             ],
             'non modal action' => [
@@ -479,7 +458,7 @@ class WidgetControllerTest extends WebTestCase
                     $config,
                     ['oro_action_test_operation' =>
                         [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'entities' => [TestActivity::class],
                             'routes' => ['oro_action_test_route'],
                             'frontend_options' => ['show_dialog' => true],
                             'form_options' => [
@@ -492,7 +471,7 @@ class WidgetControllerTest extends WebTestCase
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => null,
-                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'entityClass' => TestActivity::class,
                 'expected' => [
                     'data-options',
                     '"showDialog":true',
@@ -534,17 +513,14 @@ class WidgetControllerTest extends WebTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    protected function getConfigurationForFormOperation()
+    private function getConfigurationForFormOperation(): array
     {
         return [
             'oro_action_test_operation' => [
                 'label' => 'oro.action.test.label',
                 'enabled' => true,
                 'order' => 10,
-                'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                'entities' => [TestActivity::class],
                 'routes' => [],
                 'frontend_options' => ['show_dialog' => true],
                 'attributes' => [
@@ -592,10 +568,7 @@ class WidgetControllerTest extends WebTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function buttonsOperationAndGroupsProvider()
+    public function buttonsOperationAndGroupsProvider(): array
     {
         return [
             'default group' => [
@@ -615,5 +588,12 @@ class WidgetControllerTest extends WebTestCase
                 OperationDefinition::ACTIONS => ['Edit', 'Delete'],
             ],
         ];
+    }
+
+    private function setOperationsConfig(array $operations): void
+    {
+        $config = $this->configProvider->getConfiguration();
+        $config['operations'] = $operations;
+        $this->configModifier->updateCache($config);
     }
 }

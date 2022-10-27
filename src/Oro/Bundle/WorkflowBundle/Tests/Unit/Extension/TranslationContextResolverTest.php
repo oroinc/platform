@@ -5,48 +5,31 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 use Oro\Bundle\WorkflowBundle\Extension\TranslationContextResolver;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplateParametersResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var KeyTemplateParametersResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $resolver;
+    private $resolver;
 
     /** @var TranslationContextResolver */
-    protected $extension;
+    private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->resolver = $this->getMockBuilder(KeyTemplateParametersResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->resolver = $this->createMock(KeyTemplateParametersResolver::class);
 
         $this->extension = new TranslationContextResolver($this->translator, $this->resolver);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function tearDown()
-    {
-        unset($this->translator, $this->resolver, $this->extension);
-    }
-
-    /**
-     * @param string $inputKey
-     * @param string $resolvedId
-     * @param array $resolvedParameters
-     *
      * @dataProvider resolveProvider
      */
-    public function testResolve($inputKey, $resolvedId, $resolvedParameters)
+    public function testResolve(string $inputKey, string $resolvedId, array $resolvedParameters)
     {
         $this->resolver->expects($this->once())
             ->method('resolveTemplateParameters')
@@ -61,10 +44,7 @@ class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('translatedString', $this->extension->resolve($inputKey));
     }
 
-    /**
-     * @return array
-     */
-    public function resolveProvider()
+    public function resolveProvider(): array
     {
         $keyPrefix = WorkflowTemplate::KEY_PREFIX;
         $templatePrefix = str_replace('{{ template }}', '', TranslationContextResolver::TRANSLATION_TEMPLATE);
@@ -108,21 +88,17 @@ class TranslationContextResolverTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $input
-     *
      * @dataProvider resolveUnresolvedKeysProvider
      */
-    public function testResolveUnresolvedKeys($input)
+    public function testResolveUnresolvedKeys(string $input)
     {
-        $this->translator->expects($this->never())->method('trans');
+        $this->translator->expects($this->never())
+            ->method('trans');
 
         $this->assertNull($this->extension->resolve($input));
     }
 
-    /**
-     * @return array
-     */
-    public function resolveUnresolvedKeysProvider()
+    public function resolveUnresolvedKeysProvider(): array
     {
         return [
             'not applicable key' => [

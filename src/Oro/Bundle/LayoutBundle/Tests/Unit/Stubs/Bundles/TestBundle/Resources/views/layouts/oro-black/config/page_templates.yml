@@ -1,0 +1,8 @@
+templates:
+    -
+        label: Two columns page
+        description: Two columns template
+        route_name: oro_two_columns_view
+        key: two-columns
+titles:
+    oro_two_columns_view: Two Columns Page

@@ -16,9 +16,6 @@ class LoadEmailSuggestions implements ProcessorInterface
     /** @var EmailActivitySuggestionApiEntityManager */
     protected $apiEntityManager;
 
-    /**
-     * @param EmailActivitySuggestionApiEntityManager $apiEntityManager
-     */
     public function __construct(EmailActivitySuggestionApiEntityManager $apiEntityManager)
     {
         $this->apiEntityManager = $apiEntityManager;

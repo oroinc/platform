@@ -6,8 +6,11 @@ use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Prepare data for form based on widgetDataItems attribute.
+ */
 class WidgetItemsFormSubscriber implements EventSubscriberInterface
 {
     /** @var WidgetConfigs $manager */
@@ -16,10 +19,6 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param WidgetConfigs       $widgetConfigs
-     * @param TranslatorInterface $translator
-     */
     public function __construct(WidgetConfigs $widgetConfigs, TranslatorInterface $translator)
     {
         $this->widgetConfigs = $widgetConfigs;
@@ -36,9 +35,6 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSet(FormEvent $event)
     {
         $widgetName   = $event->getForm()->getConfig()->getOption('widget_name');
@@ -53,7 +49,7 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
 
             $data[$id] = [
                 'id'    => $id,
-                'label' => $this->translator->trans($item['label']),
+                'label' => isset($item['label']) ? $this->translator->trans((string) $item['label']) : '',
                 'show'  => $oldItem ? $oldItem['show'] : !$originalData,
                 'order' => $oldItem ? $oldItem['order'] : $order,
             ];

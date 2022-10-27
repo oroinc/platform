@@ -4,13 +4,16 @@ namespace Oro\Bundle\UserBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Loads default admin user.
+ */
 class LoadAdminUserData extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
     const DEFAULT_ADMIN_USERNAME = 'admin';
@@ -43,7 +46,6 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
     /**
      * Load default administrator
      *
-     * @param ObjectManager $manager
      * @throws \RuntimeException
      */
     public function load(ObjectManager $manager)
@@ -73,7 +75,7 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
             ->setEnabled(true)
             ->setOwner($businessUnit)
             ->setPlainPassword(md5(uniqid(mt_rand(), true)))
-            ->addRole($adminRole)
+            ->addUserRole($adminRole)
             ->addBusinessUnit($businessUnit)
             ->setOrganization($organization)
             ->addOrganization($organization);

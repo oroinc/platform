@@ -3,40 +3,26 @@
 namespace Oro\Bundle\EmailBundle\Async;
 
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailAssociationsTopic;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that updates email associations for emails.
+ */
 class UpdateEmailAssociationsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var AssociationManager
-     */
-    private $associationManager;
+    private AssociationManager $associationManager;
 
-    /**
-     * @var JobRunner
-     */
-    private $jobRunner;
+    private JobRunner $jobRunner;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param AssociationManager $associationManager
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
-    public function __construct(AssociationManager $associationManager, JobRunner $jobRunner, LoggerInterface $logger)
+    public function __construct(AssociationManager $associationManager, JobRunner $jobRunner)
     {
         $this->associationManager = $associationManager;
         $this->jobRunner = $jobRunner;
-        $this->logger = $logger;
     }
 
     /**
@@ -62,6 +48,6 @@ class UpdateEmailAssociationsMessageProcessor implements MessageProcessorInterfa
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::UPDATE_ASSOCIATIONS_TO_EMAILS];
+        return [UpdateEmailAssociationsTopic::getName()];
     }
 }

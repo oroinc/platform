@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\UIBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-use Twig_Environment;
+use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
+/**
+ * BeforeViewRenderEvent event is triggered before processing entity view (by oro_view_process Twig function)
+ * and allows to modify the data that is passed to the template.
+ */
 class BeforeViewRenderEvent extends Event
 {
-    /** @var \Twig_Environment */
+    /** @var Environment */
     protected $twigEnvironment;
 
     /**
@@ -21,11 +25,11 @@ class BeforeViewRenderEvent extends Event
     protected $entity;
 
     /**
-     * @param \Twig_Environment $twigEnvironment
+     * @param Environment       $twigEnvironment
      * @param array             $data
      * @param object            $entity
      */
-    public function __construct(Twig_Environment $twigEnvironment, array $data, $entity)
+    public function __construct(Environment $twigEnvironment, array $data, $entity)
     {
         $this->entity          = $entity;
         $this->data            = $data;
@@ -57,7 +61,7 @@ class BeforeViewRenderEvent extends Event
     }
 
     /**
-     * @return \Twig_Environment
+     * @return Environment
      */
     public function getTwigEnvironment()
     {

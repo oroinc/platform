@@ -2,256 +2,212 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
-use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerInterface;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
+use Oro\Bundle\ImapBundle\Tests\Unit\Stub\Form\Type\ConfigurationTestType;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChoiceAccountTypeTest extends FormIntegrationTestCase
 {
+    private const OAUTH_ACCOUNT_TYPE = 'oauth1';
+
     /** @var SymmetricCrypterInterface */
-    protected $encryptor;
+    private $encryptor;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configProvider;
+    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $oauthManagerRegistry;
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $userConfigManager;
+    /** @var User */
+    private $user;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encryptor = new DefaultCrypter('someKey');
 
-        $user = $this->getUser();
-
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-
-        $user->expects($this->any())
-            ->method('getOrganization')
-            ->willReturn($organization);
+        $this->user = new User();
+        $this->user->setOrganization(new Organization());
 
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->tokenAccessor->expects($this->any())
+        $this->tokenAccessor->expects(self::any())
             ->method('getUser')
-            ->willReturn($user);
-        $this->tokenAccessor->expects($this->any())
+            ->willReturn($this->user);
+        $this->tokenAccessor->expects(self::any())
             ->method('getOrganization')
-            ->willReturn($organization);
+            ->willReturn($this->user->getOrganization());
 
-        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator->expects($this->any())
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($string) {
                 return $string . '.trans';
             });
 
-        $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->setMethods(['hasConfig', 'getConfig', 'get'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $oauthManager1 = $this->getOAuthManager('oauth1');
+        $oauthManager2 = $this->getOAuthManager('oauth2');
+        $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);
+        $this->oauthManagerRegistry->expects(self::any())
+            ->method('getManagers')
+            ->willReturn([$oauthManager1, $oauthManager2]);
+        $this->oauthManagerRegistry->expects(self::any())
+            ->method('isOauthImapEnabled')
+            ->willReturnCallback(function ($type) {
+                return in_array($type, ['oauth1', 'oauth2']);
+            });
+        $this->oauthManagerRegistry->expects(self::any())
+            ->method('hasManager')
+            ->willReturnCallback(function ($type) {
+                return in_array($type, ['oauth1', 'oauth2']);
+            });
+        $this->oauthManagerRegistry->expects(self::any())
+            ->method('getManager')
+            ->willReturnCallback(function ($type) use ($oauthManager1, $oauthManager2) {
+                if ('oauth1' === $type) {
+                    return $oauthManager1;
+                }
+                if ('oauth2' === $type) {
+                    return $oauthManager2;
+                }
+                throw new \InvalidArgumentException(sprintf('The manager for %s" does not exist.', $type));
+            });
 
         parent::setUp();
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * {@inheritDoc}
      */
-    protected function getUser()
+    protected function getExtensions(): array
     {
-        return $this->getMockBuilder('\StdClass')->setMethods(['getOrganization'])->getMock();
-    }
-
-    protected function getExtensions()
-    {
-        $type = new ChoiceAccountType($this->translator);
-
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
-                        ChoiceAccountType::class => $type,
-                        CheckButtonType::class => new CheckButtonType(),
-                        ConfigurationGmailType::class => new ConfigurationGmailType(
-                            $this->translator,
-                            $this->userConfigManager,
-                            $this->tokenAccessor
-                        ),
-                        ConfigurationType::class => new ConfigurationType(
-                            $this->encryptor,
-                            $this->tokenAccessor,
-                            $this->translator
-                        ),
-                        EmailFolderTreeType::class => new EmailFolderTreeType(),
+                        new ChoiceAccountType($this->translator, $this->oauthManagerRegistry),
+                        new CheckButtonType(),
+                        new ConfigurationTestType($this->tokenAccessor),
+                        new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator),
+                        new EmailFolderTreeType()
                     ],
                     [
-                        FormType::class => [new TooltipFormExtension($this->configProvider, $this->translator)],
+                        FormType::class => [new TooltipFormExtensionStub($this)]
                     ]
                 ),
             ]
         );
     }
 
-    protected function tearDown()
-    {
-        parent::tearDown();
-        unset($this->encryptor);
-    }
-
-    /**
-     * @param array      $formData
-     * @param array|bool $expectedViewData
-     * @param array      $expectedModelData
-     *
-     * @dataProvider setDataProvider
-     */
-    public function testBindValidData($formData, $expectedViewData, $expectedModelData)
+    public function testBindValidDataShouldHaveOnlyAccountTypeField()
     {
         $form = $this->factory->create(ChoiceAccountType::class);
-        if ($expectedViewData) {
-            $form->submit($formData);
-            foreach ($expectedViewData as $name => $value) {
-                $this->assertEquals($value, $form->get($name)->getData());
-            }
 
-            $entity = $form->getData();
-            foreach ($expectedModelData as $name => $value) {
-                if ($name === 'userEmailOrigin') {
-                    $userEmailOrigin = $this->readAttribute($entity, $name);
+        $form->submit([
+            'accountType'     => '',
+            'userEmailOrigin' => [
+                'user'                 => 'test',
+                'imapHost'             => '',
+                'imapPort'             => '',
+                'imapEncryption'       => '',
+                'accessTokenExpiresAt' => '',
+                'accountType'          => ''
+            ],
+        ]);
 
-                    if ($userEmailOrigin) {
-                        $password = $this->encryptor->decryptData($userEmailOrigin->getPassword());
-                        $userEmailOrigin->setPassword($password);
-                    }
+        self::assertEquals('', $form->get('accountType')->getData());
 
-                    $this->assertAttributeEquals($userEmailOrigin, $name, $entity);
-                } else {
-                    $this->assertAttributeEquals($value, $name, $entity);
-                }
-            }
-        } else {
-            $form->submit($formData);
-            $this->assertNull($form->getData());
-        }
+        /** @var AccountTypeModel $entity */
+        $entity = $form->getData();
+
+        self::assertNull($entity->getUserEmailOrigin());
+        self::assertSame('', $entity->getAccountType());
     }
 
-    /**
-     * @return array
-     */
-    public function setDataProvider()
+    public function testBindValidDataShouldHaveCustomAccountTypeAndConnectionTypeFields()
     {
-        $accessTokenExpiresAt = new \DateTime();
+        $now = new \DateTime();
+        $form = $this->factory->create(ChoiceAccountType::class);
 
-        return [
-            'should have only accountType field' => [
-                [
-                    'accountType' => '',
-                    'userEmailOrigin' => [
-                        'user' => 'test',
-                        'imapHost' => '',
-                        'imapPort' => '',
-                        'imapEncryption' => '',
-                        'accessTokenExpiresAt' => '',
-                    ],
-                ],
-                [
-                    'accountType' => ''
-                ],
-                [
-                    'accountType' => '',
-                    'userEmailOrigin' => null
-                ],
+        $form->submit([
+            'accountType'     => self::OAUTH_ACCOUNT_TYPE,
+            'userEmailOrigin' => [
+                'user'                 => 'test',
+                'imapHost'             => '',
+                'imapPort'             => '',
+                'imapEncryption'       => '',
+                'accessTokenExpiresAt' => $now,
+                'accessToken'          => 'token',
+                'googleAuthCode'       => 'googleAuthCode',
+                'accountType'          => self::OAUTH_ACCOUNT_TYPE
             ],
-            'should have accountType field and ConnectionGmailType' => [
-                [
-                    'accountType' => 'gmail',
-                    'userEmailOrigin' => [
-                        'user' => 'test',
-                        'imapHost' => '',
-                        'imapPort' => '',
-                        'imapEncryption' => '',
-                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                        'accessToken' => 'token',
-                        'googleAuthCode' => 'googleAuthCode'
-                    ],
-                ],
-                [
-                    'accountType' => 'gmail',
-                    'userEmailOrigin' => $this->getUserEmailOrigin([
-                        'user' => 'test',
-                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                        'googleAuthCode' => 'googleAuthCode',
-                        'accessToken' => 'token',
-                    ])
-                ],
-                [
-                    'accountType' => 'gmail',
-                    'userEmailOrigin' => $this->getUserEmailOrigin([
-                        'user' => 'test',
-                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                        'googleAuthCode' => 'googleAuthCode',
-                        'accessToken' => 'token'
-                    ])
-                ],
-            ],
-            'should have accountType field and ConnectionType' => [
-                [
-                    'accountType' => 'other',
-                    'userEmailOrigin' => [
-                        'user' => 'test',
-                        'imapHost' => '',
-                        'imapPort' => '',
-                        'imapEncryption' => '',
-                        'accessTokenExpiresAt' => $accessTokenExpiresAt,
-                        'accessToken' => '',
-                        'googleAuthCode' => 'googleAuthCode',
-                        'password' => '111'
-                    ],
-                ],
-                [
-                    'accountType' => 'other',
-                ],
-                [
-                    'accountType' => 'other',
-                    'userEmailOrigin' => $this->getUserEmailOrigin([
-                        'user' => 'test',
-                        'accessTokenExpiresAt' => null,
-                        'googleAuthCode' => null,
-                        'password' => '111'
-                    ])
-                ],
-            ]
-        ];
+        ]);
+
+        self::assertEquals(
+            self::OAUTH_ACCOUNT_TYPE,
+            $form->get('accountType')->getData()
+        );
+        self::assertEquals($this->getUserEmailOrigin([
+            'user'                 => 'test',
+            'accessTokenExpiresAt' => $now,
+            'accessToken'          => 'token',
+            'accountType'          => self::OAUTH_ACCOUNT_TYPE
+        ]), $form->get('userEmailOrigin')->getData());
+
+        /** @var AccountTypeModel $model */
+        $model = $form->getData();
+
+        self::assertInstanceOf(UserEmailOrigin::class, $model->getUserEmailOrigin());
+        self::assertSame(self::OAUTH_ACCOUNT_TYPE, $model->getAccountType());
     }
 
-    /**
-     *  Return UserEmailOrigin entity created with data of $data variable
-     */
-    protected function getUserEmailOrigin($data)
+    public function testBindValidDataShouldHaveOtherAccountTypeAndConnectionTypeFields()
+    {
+        $formData = [
+            'accountType'     => 'other',
+            'userEmailOrigin' => [
+                'user'                 => 'test',
+                'imapHost'             => '',
+                'imapPort'             => '',
+                'imapEncryption'       => '',
+                'accessTokenExpiresAt' => new \DateTime(),
+                'accessToken'          => '',
+                'password'             => '111',
+                'accountType'          => self::OAUTH_ACCOUNT_TYPE
+            ],
+        ];
+        $form = $this->factory->create(ChoiceAccountType::class);
+        $form->submit($formData);
+
+        self::assertEquals('other', $form->get('accountType')->getData());
+
+        /** @var AccountTypeModel $entity */
+        $entity = $form->getData();
+
+        self::assertInstanceOf(UserEmailOrigin::class, $entity->getUserEmailOrigin());
+        self::assertSame('other', $entity->getAccountType());
+    }
+
+    private function getUserEmailOrigin(array $data): UserEmailOrigin
     {
         $userEmailOrigin = new UserEmailOrigin();
         $userEmailOrigin->setUser($data['user']);
@@ -266,11 +222,28 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         if (isset($data['refreshToken'])) {
             $userEmailOrigin->setRefreshToken($data['refreshToken']);
         }
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-        $userEmailOrigin->setOrganization($organization);
-
-        $userEmailOrigin->setOwner($this->getUser());
+        if (isset($data['accountType'])) {
+            $userEmailOrigin->setAccountType($data['accountType']);
+        }
+        $userEmailOrigin->setOrganization($this->user->getOrganization());
+        $userEmailOrigin->setOwner($this->user);
 
         return $userEmailOrigin;
+    }
+
+    private function getOAuthManager(string $type): OAuthManagerInterface
+    {
+        $oauthManager = $this->createMock(OAuthManagerInterface::class);
+        $oauthManager->expects(self::any())
+            ->method('getType')
+            ->willReturn($type);
+        $oauthManager->expects(self::any())
+            ->method('isOAuthEnabled')
+            ->willReturn(true);
+        $oauthManager->expects(self::any())
+            ->method('getConnectionFormTypeClass')
+            ->willReturn(ConfigurationTestType::class);
+
+        return $oauthManager;
     }
 }

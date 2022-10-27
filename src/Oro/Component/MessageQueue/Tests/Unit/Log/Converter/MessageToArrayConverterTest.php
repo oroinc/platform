@@ -10,7 +10,7 @@ class MessageToArrayConverterTest extends \PHPUnit\Framework\TestCase
     /** @var MessageToArrayConverter */
     private $converter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->converter = new MessageToArrayConverter();
     }

@@ -39,9 +39,6 @@ class EntityTriggerManager
         $this->entityClass    = $entityClass;
     }
 
-    /**
-     * @param DatabaseDriverInterface $driver
-     */
     public function addDriver(DatabaseDriverInterface $driver)
     {
         $this->drivers[$driver->getName()] = $driver;

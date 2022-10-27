@@ -12,8 +12,6 @@ use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
  */
 class WebSocketSendProcessor implements SendProcessorInterface
 {
-    const NAME = 'web_socket';
-
     /**
      * @var array
      */
@@ -34,11 +32,6 @@ class WebSocketSendProcessor implements SendProcessorInterface
      */
     protected $messageParamsProvider;
 
-    /**
-     * @param WebsocketClientInterface $websocketClient
-     * @param ConnectionChecker $connectionChecker
-     * @param MessageParamsProvider $messageParamsProvider
-     */
     public function __construct(
         WebsocketClientInterface $websocketClient,
         ConnectionChecker $connectionChecker,
@@ -117,14 +110,6 @@ class WebSocketSendProcessor implements SendProcessorInterface
         }
 
         return $this->websocketClient->publish(sprintf('oro/reminder_remind/%s', $recipientId), $messageData);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
     }
 
     /**

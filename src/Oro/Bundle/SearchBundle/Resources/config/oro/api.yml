@@ -1,0 +1,83 @@
+api:
+    entity_aliases:
+        Oro\Bundle\SearchBundle\Api\Model\SearchEntity:
+            alias:        searchentity
+            plural_alias: searchentities
+        Oro\Bundle\SearchBundle\Api\Model\SearchItem:
+            alias:        search
+            plural_alias: search
+
+    entities:
+        Oro\Bundle\SearchBundle\Api\Model\SearchEntity:
+            documentation_resource: '@OroSearchBundle/Resources/doc/api/search_entity.md'
+            disable_meta_properties: true
+            disable_fieldset: true
+            identifier_field_names: [id]
+            fields:
+                id:
+                    data_type: string
+                entityType:
+                    data_type: string
+                entityName:
+                    data_type: string
+                searchable:
+                    data_type: bool
+            filters:
+                fields:
+                    searchable:
+                        data_type: boolean
+                        operators: [ '=' ]
+                        property_path: _
+            actions:
+                get_list:
+                    page_size: -1 # disable paging
+                    disable_sorting: true
+                get: false
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+
+        Oro\Bundle\SearchBundle\Api\Model\SearchItem:
+            documentation_resource: '@OroSearchBundle/Resources/doc/api/search.md'
+            identifier_field_names: [id]
+            disable_meta_properties: true
+            fields:
+                id:
+                    data_type: integer
+                entityName:
+                    data_type: string
+                entity:
+                    data_type: nestedAssociation
+                    fields:
+                        __class__:
+                            property_path: entityClass
+                        id:
+                            property_path: entityId
+                entityClass:
+                    data_type: string
+                entityId:
+                    data_type: string
+                entityUrl:
+                    data_type: string
+            filters:
+                fields:
+                    searchText:
+                        data_type: string
+                        operators: [ '=' ]
+                        property_path: _
+                    entities:
+                        data_type: string
+                        allow_array: true
+                        operators: [ '=' ]
+                        property_path: _
+            actions:
+                get_list:
+                    disable_sorting: true
+                get: false
+                create: false
+                update: false
+                delete: false
+                delete_list: false
+                get_subresource: false
+                get_relationship: false

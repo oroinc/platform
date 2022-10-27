@@ -1,0 +1,3 @@
+Extend\Entity\TestApiE3:
+    entity:
+        name: 'Test Entity'

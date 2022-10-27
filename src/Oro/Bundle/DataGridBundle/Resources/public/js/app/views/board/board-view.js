@@ -18,26 +18,25 @@ define(function(require) {
      * @param {BoardDataCollection} options.boardCollection - collection for board view
      * @param {PageableCollection} options.serverCollection - base collection with data
      */
-    var BoardView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var mediator = require('oroui/js/mediator');
-    var BaseView = require('oroui/js/app/views/base/view');
-    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
-    var scrollHelper = require('oroui/js/tools/scroll-helper');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
+    const scrollHelper = require('oroui/js/tools/scroll-helper');
 
-    BoardView = BaseView.extend({
+    const BoardView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'board',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        template: require('tpl!../../../../templates/board/board-view.html'),
+        template: require('tpl-loader!../../../../templates/board/board-view.html'),
 
         /**
          * Shared between shild views timeout to detect early status change
@@ -45,14 +44,14 @@ define(function(require) {
         earlyChangeTimeout: 2000,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function BoardView() {
-            BoardView.__super__.constructor.apply(this, arguments);
+        constructor: function BoardView(options) {
+            BoardView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.readonly = options.readonly;
@@ -69,7 +68,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             clearInterval(this.setTrackScrollInterval);
@@ -77,20 +76,20 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _ensureElement: function() {
-            BoardView.__super__._ensureElement.apply(this, arguments);
+            BoardView.__super__._ensureElement.call(this);
             if (this.className) {
                 this.$el.addClass(_.result(this, 'className'));
             }
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
-            var board = this;
+            const board = this;
             BoardView.__super__.render.call(this);
             this.updateNoDataBlock();
             this.subview('header', new BaseCollectionView({
@@ -111,8 +110,8 @@ define(function(require) {
                 itemView: function(columnViewOptions) {
                     columnViewOptions.readonly = board.readonly;
                     columnViewOptions.boardCollection = board.boardCollection;
-                    var boardColumnIds = columnViewOptions.model.get('ids');
-                    var columnView = new board.columnView(_.extend(columnViewOptions, {
+                    const boardColumnIds = columnViewOptions.model.get('ids');
+                    const columnView = new board.columnView(_.extend(columnViewOptions, {
                         cardView: function(options) {
                             options.readonly = board.readonly;
                             options.actions = $.extend(true, {}, board.cardActions);
@@ -123,7 +122,7 @@ define(function(require) {
                             };
                             options.datagrid = board.boardPlugin.main.grid;
                             options.earlyTransitionStatusChangeTimeout = board.earlyChangeTimeout;
-                            var card = new board.cardView(options);
+                            const card = new board.cardView(options);
                             board.listenTo(card, 'navigate', function retriggerNavigate(model, options) {
                                 board.trigger('navigate', model,
                                     columnViewOptions.model.get('columnDefinition'), options);
@@ -146,10 +145,10 @@ define(function(require) {
             // link server request handlers
             this.listenTo(this.serverCollection, 'request', function(model, xhr) {
                 this._beforeRequest();
-                var self = this;
-                var always = xhr.always;
-                xhr.always = function() {
-                    always.apply(this, arguments);
+                const self = this;
+                const always = xhr.always;
+                xhr.always = function(...args) {
+                    always.apply(this, args);
                     if (!self.disposed) {
                         self._afterRequest(this);
                     }
@@ -157,32 +156,35 @@ define(function(require) {
             });
 
             // setup scroll tracking logic
-            this.setTrackScrollInterval = setInterval(_.bind(this.trackScroll, this), 300);
+            this.setTrackScrollInterval = setInterval(this.trackScroll.bind(this), 300);
             this.listenTo(this.serverCollection, 'change reset add remove',
-                _.debounce(_.bind(this.trackScroll, this), 0));
+                _.debounce(this.trackScroll.bind(this), 0));
         },
 
         /**
          * Updates no-data block
          */
         updateNoDataBlock: function() {
-            var noDataVisible = this.serverCollection.models.length <= 0;
+            let messageHTML;
+            const grid = this.boardPlugin.main.grid;
+            const noDataVisible = this.serverCollection.models.length <= 0;
             if (noDataVisible) {
-                var placeholders = {
-                    entityHint: (
-                        this.boardPlugin.main.grid.entityHint ||
-                        __(this.boardPlugin.main.grid.noDataTranslations.entityHint)).toLowerCase()
+                const placeholders = {
+                    entityHint: (grid.entityHint || __(grid.noDataTranslations.entityHint)).toLowerCase()
                 };
 
-                var hints = [];
-
-                hints.push(__(this.boardPlugin.main.grid.noDataTranslations.noEntities));
-                if (!_.isEmpty(this.serverCollection.state.filters)) {
-                    hints.push(__(this.boardPlugin.main.grid.noDataTranslations.noResults, placeholders));
+                if (_.isEmpty(this.serverCollection.state.filters)) {
+                    messageHTML = grid.noDataTemplate({
+                        text: __(grid.noDataTranslations.noEntities, placeholders)
+                    });
+                } else {
+                    messageHTML = grid.noSearchResultsTemplate({
+                        title: __(grid.noDataTranslations.noResultsTitle),
+                        text: __(grid.noDataTranslations.noResults, placeholders)
+                    });
                 }
-                this.$('.no-data').html(this.boardPlugin.main.grid.noDataTemplate({
-                    hints: hints
-                }));
+
+                this.$('.no-data').html(messageHTML);
             }
             this.$el.toggleClass('no-data-visible', noDataVisible);
         },
@@ -191,7 +193,7 @@ define(function(require) {
          * Starts intensive scroll settings tracking, usefull during d'n'd when there is no enough events
          */
         startIntensiveScrollTracking: function() {
-            this.dragTrackScrollInterval = setInterval(_.bind(this.trackScroll, this), 0);
+            this.dragTrackScrollInterval = setInterval(this.trackScroll.bind(this), 0);
         },
 
         /**
@@ -207,8 +209,8 @@ define(function(require) {
          * @return {string}
          */
         getCssHeightCalcExpression: function() {
-            var documentHeight = scrollHelper.documentHeight();
-            var availableHeight = mediator.execute('layout:getAvailableHeight', this.$('.board-body'));
+            const documentHeight = scrollHelper.documentHeight();
+            const availableHeight = mediator.execute('layout:getAvailableHeight', this.$('.board-body'));
             return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
         },
 
@@ -216,8 +218,8 @@ define(function(require) {
          * Scroll support handler
          */
         trackScroll: function() {
-            var bodyEl = this.$('.board-body')[0];
-            var hasScroll = scrollHelper.hasScroll(bodyEl, 'top');
+            const bodyEl = this.$('.board-body')[0];
+            const hasScroll = scrollHelper.hasScroll(bodyEl, 'top');
 
             if (hasScroll !== this.lastHasScroll) {
                 this.subview('header').$el.css({
@@ -258,7 +260,7 @@ define(function(require) {
          * Handler which persist DOM state to server
          */
         onItemMove: function(data) {
-            var options = {
+            const options = {
                 position: data.position,
                 column: data.column,
                 relativePosition: {}
@@ -272,16 +274,16 @@ define(function(require) {
                 }
             }
             // do not break $.sortable working cycle, let it finish everything it need
-            _.defer(_.bind(function() {
+            _.defer(() => {
                 this.trigger('update', data.model, options);
-            }, this));
+            });
         },
 
         /**
          * Callback keeps header up to date with scrollable body
          */
         onBoardBodyScroll: function() {
-            var el = this.$('.board-body')[0];
+            const el = this.$('.board-body')[0];
             this.subview('header').$el.css({
                 'margin-left': -1 * el.scrollLeft
             });

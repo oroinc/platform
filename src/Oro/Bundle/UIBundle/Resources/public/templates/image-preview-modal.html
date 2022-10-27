@@ -1,0 +1,38 @@
+<div class="modal-dialog hide-controls" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div class="counter">
+                <span class="counter-current"><%- counterCurrent %></span>
+                /
+                <span class="counter-all"><%- counterAll %></span>
+            </div>
+            <div class="right-toolbar">
+                <button type="button" class="btn btn-icon print" aria-label="<%- _.__('Print') %>">
+                    <span aria-hidden="true" class="fa-print"></span>
+                </button>
+                <a class="btn btn-icon download" href="#" download aria-label="<%- _.__('Download') %>">
+                    <span aria-hidden="true" class="fa-download"></span>
+                </a>
+                <button type="button" class="btn btn-icon close" data-dismiss="modal" aria-label="<%- _.__('Close') %>">
+                    <span aria-hidden="true" class="fa-close"></span>
+                </button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="wrap-modal-slider">
+                <div class="images-list">
+                    <% _.each(images, function(image) { %>
+                        <div class="lazy-loading">
+                            <picture>
+                                <% _.each(image.sources, function(source) { %>
+                                    <source srcset="<%- source.srcset %>" type="<%- source.type %>">
+                                <% }) %>
+                                <img src="<%- image.src %>" class="images-list__item" loading="lazy">
+                            </picture>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

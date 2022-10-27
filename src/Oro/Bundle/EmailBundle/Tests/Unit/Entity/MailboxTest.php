@@ -3,27 +3,26 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class MailboxTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $user;
+    private $user;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $origin;
+    private $origin;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\user')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->user = $this->createMock(User::class);
+        $this->origin = $this->createMock(UserEmailOrigin::class);
 
-        $this->origin = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->origin->expects($this->any())->method('getUser')->willReturn($this->user);
+        $this->origin->expects($this->any())
+            ->method('getUser')
+            ->willReturn($this->user);
     }
 
     /**
@@ -42,7 +41,12 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             $mailbox->setOrigin(null);
             $this->assertEmpty($mailbox->getImapAccountType());
         } else {
-            $this->origin->expects($this->any())->method('getAccessToken')->willReturn($accessToken);
+            $this->origin->expects($this->any())
+                ->method('getAccountType')
+                ->willReturn($accountType);
+            $this->origin->expects($this->any())
+                ->method('getAccessToken')
+                ->willReturn($accessToken);
             $this->assertEquals($accountType, $mailbox->getImapAccountType()->getAccountType());
         }
     }

@@ -3,23 +3,24 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
 {
     /**
      * @dataProvider invalidFiltersStructureProvider
      */
-    public function testInvalidFiltersStructure($expectedExceptionMessage, $filters)
+    public function testInvalidFiltersStructure(string $expectedExceptionMessage, array $filters)
     {
-        $en         = 'Acme\Entity\TestEntity';
+        $en = 'Acme\Entity\TestEntity';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
             ],
             'filters' => $filters,
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => [
                     'column1' => 'string',
@@ -27,28 +28,24 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
 
         try {
             $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);
             $builder->getConfiguration()->toArray();
             $this->fail('Expected "Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException" exception.');
         } catch (InvalidFiltersException $ex) {
-            if (false === strpos($ex->getMessage(), $expectedExceptionMessage)) {
-                $this->fail(
-                    sprintf(
-                        'Expected exception message "%s", but given "%s".',
-                        $expectedExceptionMessage,
-                        $ex->getMessage()
-                    )
-                );
+            if (!str_contains($ex->getMessage(), $expectedExceptionMessage)) {
+                $this->fail(sprintf(
+                    'Expected exception message "%s", but given "%s".',
+                    $expectedExceptionMessage,
+                    $ex->getMessage()
+                ));
             }
         }
     }
 
-    public function invalidFiltersStructureProvider()
+    public function invalidFiltersStructureProvider(): array
     {
         return [
             [
@@ -63,7 +60,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '1',
                                 'type'  => 1,
@@ -73,7 +70,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '2',
                                 'type'  => 1,
@@ -89,7 +86,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '1',
                                 'type'  => 1,
@@ -104,7 +101,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '1',
                                 'type'  => 1,
@@ -120,7 +117,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
                     [
                         'columnName' => 'column1',
                         'criterion'  => [
-                            'filter' => "string",
+                            'filter' => 'string',
                             'data'   => [
                                 'value' => '1',
                                 'type'  => 1,

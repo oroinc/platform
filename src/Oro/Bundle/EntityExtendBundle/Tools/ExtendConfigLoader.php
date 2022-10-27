@@ -8,25 +8,23 @@ use Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader;
 
+/**
+ * Adds extended entity specifics to the loader that loads entity configs from annotations to a database.
+ */
 class ExtendConfigLoader extends ConfigLoader
 {
-    /** @var int */
-    private $snapshotSuffixOffset;
+    private int $snapshotSuffixOffset;
 
-    /**
-     * @param ConfigManager    $configManager
-     * @param EntityManagerBag $entityManagerBag
-     */
     public function __construct(ConfigManager $configManager, EntityManagerBag $entityManagerBag)
     {
         parent::__construct($configManager, $entityManagerBag);
-        $this->snapshotSuffixOffset = -strlen(ExtendHelper::ENUM_SNAPSHOT_SUFFIX);
+        $this->snapshotSuffixOffset = -\strlen(ExtendHelper::ENUM_SNAPSHOT_SUFFIX);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function hasEntityConfigs(ClassMetadata $metadata)
+    protected function hasEntityConfigs(ClassMetadata $metadata): bool
     {
         return parent::hasEntityConfigs($metadata) && !ExtendHelper::isCustomEntity($metadata->getName());
     }
@@ -34,7 +32,7 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function hasFieldConfigs(ClassMetadata $metadata, $fieldName)
+    protected function hasFieldConfigs(ClassMetadata $metadata, string $fieldName): bool
     {
         if ($this->isExtendField($metadata->name, $fieldName)) {
             return false;
@@ -54,24 +52,24 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function hasAssociationConfigs(ClassMetadata $metadata, $associationName)
+    protected function hasAssociationConfigs(ClassMetadata $metadata, string $associationName): bool
     {
         if ($this->isExtendField($metadata->name, $associationName)) {
             return false;
         }
 
         // check for default field of oneToMany or manyToMany relation
-        if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
-            $guessedName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
+        if (str_starts_with($associationName, ExtendConfigDumper::DEFAULT_PREFIX)) {
+            $guessedName = substr($associationName, \strlen(ExtendConfigDumper::DEFAULT_PREFIX));
             if (!empty($guessedName) && $this->isExtendField($metadata->name, $guessedName)) {
                 return false;
             }
         }
         // check for inverse side field of oneToMany relation
         $targetClass = $metadata->getAssociationTargetClass($associationName);
-        $prefix      = strtolower(ExtendHelper::getShortClassName($targetClass)) . '_';
-        if (strpos($associationName, $prefix) === 0) {
-            $guessedName = substr($associationName, strlen($prefix));
+        $prefix = strtolower(ExtendHelper::getShortClassName($targetClass)) . '_';
+        if (str_starts_with($associationName, $prefix)) {
+            $guessedName = substr($associationName, \strlen($prefix));
             if (!empty($guessedName) && $this->isExtendField($targetClass, $guessedName)) {
                 return false;
             }
@@ -80,15 +78,7 @@ class ExtendConfigLoader extends ConfigLoader
         return parent::hasAssociationConfigs($metadata, $associationName);
     }
 
-    /**
-     * Determines whether a field is extend or not
-     *
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    protected function isExtendField($className, $fieldName)
+    protected function isExtendField(string $className, string $fieldName): bool
     {
         if ($this->configManager->hasConfig($className, $fieldName)) {
             return $this->configManager
@@ -100,13 +90,7 @@ class ExtendConfigLoader extends ConfigLoader
         return false;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    protected function isMultiEnumField($className, $fieldName)
+    protected function isMultiEnumField(string $className, string $fieldName): bool
     {
         if ($this->configManager->hasConfig($className, $fieldName)) {
             /** @var FieldConfigId $fieldId */
@@ -122,7 +106,7 @@ class ExtendConfigLoader extends ConfigLoader
     /**
      * {@inheritdoc}
      */
-    protected function loadEntityConfigs(ClassMetadata $metadata, $force)
+    protected function loadEntityConfigs(ClassMetadata $metadata, bool $force): void
     {
         parent::loadEntityConfigs($metadata, $force);
 

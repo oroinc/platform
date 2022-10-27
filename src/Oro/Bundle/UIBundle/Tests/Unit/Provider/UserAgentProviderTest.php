@@ -9,48 +9,37 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class UserAgentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var UserAgentProvider
-     */
-    protected $userAgentProvider;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    /**
-     * @var RequestStack|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $requestStack;
+    /** @var UserAgentProvider */
+    private $userAgentProvider;
 
-    /**
-     * @inheritDoc
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->requestStack = $this->createMock('Symfony\Component\HttpFoundation\RequestStack');
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->userAgentProvider = new UserAgentProvider($this->requestStack);
     }
 
     /**
      * @dataProvider getUserAgentDataProvider
-     * @param bool $isRequest
-     * @param string $userAgentName
      */
-    public function testGetUserAgent($isRequest, $userAgentName)
+    public function testGetUserAgent(bool $isRequest, ?string $userAgentName): void
     {
         $request = null;
         if ($isRequest) {
-            /** @var HeaderBag|\PHPUnit\Framework\MockObject\MockObject $request */
-            $headers = $this->createMock('\Symfony\Component\HttpFoundation\HeaderBag');
-            /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
-            $request = $this->createMock('Symfony\Component\HttpFoundation\Request');
+            $headers = $this->createMock(HeaderBag::class);
+            $request = $this->createMock(Request::class);
             $request->headers = $headers;
-            $headers->expects($this->once())
+            $headers->expects(self::once())
                 ->method('get')
                 ->with('User-Agent')
                 ->willReturn($userAgentName);
         }
 
-        $this->requestStack->expects($this->once())
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::once())
+            ->method('getMainRequest')
             ->willReturn($request);
 
         $userAgent = $this->userAgentProvider->getUserAgent();
@@ -58,13 +47,10 @@ class UserAgentProviderTest extends \PHPUnit\Framework\TestCase
             $userAgentName = UserAgentProvider::UNKNOWN_USER_AGENT;
         }
 
-        $this->assertEquals($userAgentName, $userAgent->getUserAgent());
+        self::assertEquals($userAgentName, $userAgent->getUserAgent());
     }
 
-    /**
-     * @return array
-     */
-    public function getUserAgentDataProvider()
+    public function getUserAgentDataProvider(): array
     {
         return [
             [
@@ -82,17 +68,17 @@ class UserAgentProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetUserAgentCache()
+    public function testGetUserAgentCache(): void
     {
-        $this->requestStack->expects($this->exactly(2))
-            ->method('getMasterRequest')
+        $this->requestStack->expects(self::exactly(2))
+            ->method('getMainRequest')
             ->willReturn(null);
 
         $userAgent = $this->userAgentProvider->getUserAgent();
 
         $userAgentName = UserAgentProvider::UNKNOWN_USER_AGENT;
 
-        $this->assertEquals($userAgentName, $userAgent->getUserAgent());
-        $this->assertSame($userAgent, $this->userAgentProvider->getUserAgent());
+        self::assertEquals($userAgentName, $userAgent->getUserAgent());
+        self::assertSame($userAgent, $this->userAgentProvider->getUserAgent());
     }
 }

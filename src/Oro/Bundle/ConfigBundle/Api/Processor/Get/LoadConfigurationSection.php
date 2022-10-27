@@ -14,12 +14,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class LoadConfigurationSection implements ProcessorInterface
 {
-    /** @var ConfigurationRepository */
-    protected $configRepository;
+    private ConfigurationRepository $configRepository;
 
-    /**
-     * @param ConfigurationRepository $configRepository
-     */
     public function __construct(ConfigurationRepository $configRepository)
     {
         $this->configRepository = $configRepository;

@@ -4,8 +4,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -33,8 +33,8 @@ class LoadEmailSuggestionData extends AbstractFixture implements DependentFixtur
      */
     public function load(ObjectManager $manager)
     {
-        $this->em           = $manager;
-        $this->organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $this->em = $manager;
+        $this->organization = $manager->getRepository(Organization::class)->getFirst();
 
         $this->email = new Email();
         $this->email->setEmail('test1@example.com');
@@ -49,7 +49,6 @@ class LoadEmailSuggestionData extends AbstractFixture implements DependentFixtur
 
         $this->em->flush();
     }
-
 
     /**
      * @param string $firstName

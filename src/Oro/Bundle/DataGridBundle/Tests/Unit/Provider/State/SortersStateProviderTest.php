@@ -6,14 +6,20 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\State\SortersStateProvider;
-use Oro\Bundle\UserBundle\Entity\AbstractUser;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SortersStateProviderTest extends AbstractStateProviderTest
 {
+    use EntityTrait;
+
     /** @var SortersStateProvider */
     private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -26,10 +32,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenParameters(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -42,32 +44,22 @@ class SortersStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @param array $state
-     * @param array $minifiedState
-     */
     private function mockParametersState(array $state, array $minifiedState): void
     {
-        $this->datagridParametersHelper
-            ->expects(self::once())
+        $this->datagridParametersHelper->expects(self::once())
             ->method('getFromParameters')
             ->with($this->datagridParameters, AbstractSorterExtension::SORTERS_ROOT_PARAM)
             ->willReturn($state);
 
-        $this->datagridParametersHelper
-            ->expects(self::exactly(1 - (int)$state))
+        $this->datagridParametersHelper->expects(self::exactly(1 - (int)$state))
             ->method('getFromMinifiedParameters')
             ->with($this->datagridParameters, AbstractSorterExtension::MINIFIED_SORTERS_PARAM)
             ->willReturn($minifiedState);
     }
 
-    /**
-     * @param array $sortersColumns
-     */
     private function mockSortersColumns(array $sortersColumns): void
     {
-        $this->datagridConfiguration
-            ->expects(self::once())
+        $this->datagridConfiguration->expects(self::once())
             ->method('offsetGetByPath')
             ->with(SorterConfiguration::COLUMNS_PATH)
             ->willReturn($sortersColumns);
@@ -75,10 +67,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenMinifiedParameters(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -91,9 +79,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
         self::assertEquals($expectedState, $actualState);
     }
 
-    /**
-     * @return array
-     */
     public function stateDataProvider(): array
     {
         return [
@@ -153,10 +138,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenCurrentGridView(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -167,24 +148,18 @@ class SortersStateProviderTest extends AbstractStateProviderTest
         $this->mockGridName($gridName = 'sample-datagrid');
         $this->mockCurrentGridViewId($viewId = 'sample-view');
 
-        $this->gridViewManager
-            ->expects(self::once())
+        $this->gridViewManager->expects(self::once())
             ->method('getView')
             ->with($viewId, 1, $gridName)
-            ->willReturn($gridView = $this->mockGridView('getSortersData', $state));
+            ->willReturn($this->mockGridView('getSortersData', $state));
 
         $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
 
         self::assertEquals($expectedState, $actualState);
     }
 
-
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultGridView(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -196,16 +171,16 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
         $this->assertNoCurrentGridView();
 
-        $this->tokenAccessor
-            ->expects(self::once())
-            ->method('getUser')
-            ->willReturn($user = $this->createMock(AbstractUser::class));
+        $user = $this->getEntity(User::class, ['id' => 42]);
 
-        $this->gridViewManager
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->gridViewManager->expects(self::once())
             ->method('getDefaultView')
             ->with($user, $gridName)
-            ->willReturn($gridView = $this->mockGridView('getSortersData', $state));
+            ->willReturn($this->mockGridView('getSortersData', $state));
 
         $actualState = $this->provider->getState($this->datagridConfiguration, $this->datagridParameters);
 
@@ -214,10 +189,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenGridViewsDisabled(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -225,8 +196,7 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
         $this->assertGridViewsDisabled();
 
-        $this->datagridConfiguration
-            ->expects(self::any())
+        $this->datagridConfiguration->expects(self::any())
             ->method('offsetGetByPath')
             ->willReturnMap([
                 [SorterConfiguration::COLUMNS_PATH, [], $sortersColumns],
@@ -241,10 +211,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateWhenDefaultSortersState(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -252,8 +218,7 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
         $this->assertNoCurrentNoDefaultGridView();
 
-        $this->datagridConfiguration
-            ->expects(self::any())
+        $this->datagridConfiguration->expects(self::any())
             ->method('offsetGetByPath')
             ->willReturnMap([
                 [SorterConfiguration::COLUMNS_PATH, [], $sortersColumns],
@@ -272,8 +237,7 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
         $this->assertNoCurrentNoDefaultGridView();
 
-        $this->datagridConfiguration
-            ->expects(self::any())
+        $this->datagridConfiguration->expects(self::any())
             ->method('offsetGetByPath')
             ->willReturnMap([
                 [SorterConfiguration::COLUMNS_PATH, [], ['sampleColumn1' => []]],
@@ -287,10 +251,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateFromParameters(array $state, array $sortersColumns, array $expectedState): void
     {
@@ -305,10 +265,6 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $state
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetStateFromParametersWhenDefaultSortersState(
         array $state,
@@ -317,8 +273,7 @@ class SortersStateProviderTest extends AbstractStateProviderTest
     ): void {
         $this->mockParametersState([], []);
 
-        $this->datagridConfiguration
-            ->expects(self::any())
+        $this->datagridConfiguration->expects(self::any())
             ->method('offsetGetByPath')
             ->willReturnMap([
                 [SorterConfiguration::COLUMNS_PATH, [], $sortersColumns],
@@ -333,15 +288,10 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     /**
      * @dataProvider stateDataProvider
-     *
-     * @param array $defaultSorters
-     * @param array $sortersColumns
-     * @param array $expectedState
      */
     public function testGetDefaultState(array $defaultSorters, array $sortersColumns, array $expectedState): void
     {
-        $this->datagridConfiguration
-            ->expects(self::any())
+        $this->datagridConfiguration->expects(self::any())
             ->method('offsetGetByPath')
             ->willReturnMap([
                 [SorterConfiguration::COLUMNS_PATH, [], $sortersColumns],
@@ -356,8 +306,7 @@ class SortersStateProviderTest extends AbstractStateProviderTest
 
     public function testGetDefaultStateWhenDefaultSortingDisabled(): void
     {
-        $this->datagridConfiguration
-            ->expects(self::any())
+        $this->datagridConfiguration->expects(self::any())
             ->method('offsetGetByPath')
             ->willReturnMap([
                 [SorterConfiguration::COLUMNS_PATH, [], []],

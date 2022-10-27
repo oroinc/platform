@@ -14,9 +14,6 @@ class Select2ArrayToStringTransformerDecorator implements DataTransformerInterfa
      */
     private $transformer;
 
-    /**
-     * @param DataTransformerInterface $transformer
-     */
     public function __construct(DataTransformerInterface $transformer)
     {
         $this->transformer = $transformer;

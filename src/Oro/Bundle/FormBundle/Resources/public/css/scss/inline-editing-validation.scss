@@ -12,13 +12,19 @@
 
         > span {
             position: absolute;
+            /* stylelint-disable declaration-no-important */
             top: auto !important;
             left: auto !important;
+            /* stylelint-enable declaration-no-important */
             margin-top: 0;
             text-align: left;
         }
 
-        &:after {
+        .validation-failed__icon {
+            overflow: hidden;
+        }
+
+        &::after {
             border-width: 6px 4px 0;
             margin-top: 0;
         }
@@ -36,7 +42,7 @@
                 }
             }
 
-            &:after {
+            &::after {
                 border-width: 0 4px 6px;
                 top: auto;
                 bottom: 100%;
@@ -51,7 +57,7 @@
             left: 100%;
             margin-left: 6px;
 
-            &:after {
+            &::after {
                 border-width: 4px 6px 4px 0;
                 border-color: transparent $error-message-balloon-background;
                 top: -16px;
@@ -67,6 +73,7 @@
             right: 100%;
             margin-right: 6px;
 
+            /* stylelint-disable no-descending-specificity */
             > span {
                 margin-left: -280px;
 
@@ -74,8 +81,9 @@
                     right: 0;
                 }
             }
+            /* stylelint-enable no-descending-specificity */
 
-            &:after {
+            &::after {
                 border-width: 4px 0 4px 6px;
                 border-color: transparent $error-message-balloon-background;
                 top: -16px;

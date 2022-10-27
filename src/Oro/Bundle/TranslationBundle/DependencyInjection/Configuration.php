@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\DependencyInjection;
 
@@ -8,17 +9,10 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const DEFAULT_ADAPTER = 'crowdin';
-    const DEFAULT_CROWDIN_API_URL = 'https://api.crowdin.com/api';
-    const DEFAULT_PROXY_API_URL = 'http://translations.orocrm.com/api';
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('oro_translation')
+        $treeBuilder = new TreeBuilder('oro_translation');
+        $rootNode = $treeBuilder->getRootNode()
             ->children()
                 ->arrayNode('js_translation')
                     ->addDefaultsIfNotSet()
@@ -34,49 +28,60 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
-                ->arrayNode('api')
+                ->arrayNode('translation_service')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->arrayNode('crowdin')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('endpoint')
-                                    ->defaultValue(self::DEFAULT_CROWDIN_API_URL)
-                                ->end()
-                            ->end()
-                        ->end()
-                        ->arrayNode('oro_service')
-                            ->addDefaultsIfNotSet()
-                            ->children()
-                                ->scalarNode('endpoint')->defaultValue(self::DEFAULT_PROXY_API_URL)->end()
-                                ->scalarNode('key')->defaultValue('')->end()
-                            ->end()
-                        ->end()
+                        ->scalarNode('apikey')->defaultValue('')->end()
                     ->end()
                 ->end()
-                ->scalarNode('default_api_adapter')->defaultValue(self::DEFAULT_ADAPTER)->end()
+                ->arrayNode('package_names')
+                    ->prototype('scalar')->end()
+                ->end()
                 ->scalarNode('debug_translator')->defaultFalse()->end()
                 ->arrayNode('locales')
                     ->beforeNormalization()
                         ->ifString()
-                        ->then(function ($v) {
-                            return preg_split('/\s*,\s*/', $v);
-                        })
+                        ->then(fn ($v) => \preg_split('/\s*,\s*/', $v))
                     ->end()
                     ->requiresAtLeastOneElement()
                     ->prototype('scalar')->end()
                 ->end()
                 ->booleanNode('default_required')->defaultTrue()->end()
-                ->scalarNode('manager_registry')->defaultValue('doctrine')->end()
-                ->scalarNode('templating')->defaultValue("OroTranslationBundle::default.html.twig")->end()
+                ->scalarNode('templating')->defaultValue('@OroTranslation/default.html.twig')->end()
+                ->arrayNode('translatable_dictionaries')
+                    ->info(
+                        'The configuration of Gedmo translatable entities'
+                        . ' that should by synchronized with the translator component.'
+                        . ' All translation messages for these entities should be in the "entities" domain.'
+                    )
+                    ->example([
+                        'Acme\Bundle\AppBundle\Entity\Country' => [
+                            'name' => [
+                                'translation_key_prefix' => 'acme_country.',
+                                'key_field_name' => 'iso2Code'
+                            ]
+                        ]
+                    ])
+                    ->useAttributeAsKey('entity class')
+                    ->prototype('array')
+                        ->useAttributeAsKey('translatable field name')
+                        ->prototype('array')
+                            ->children()
+                                ->scalarNode('translation_key_prefix')
+                                    ->info('The prefix for the translation message key.')
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('key_field_name')
+                                    ->info('The field name where the key is stored.')
+                                    ->cannotBeEmpty()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
-        SettingsBuilder::append(
-            $rootNode,
-            [
-                'installed_translation_meta' => ['type' => 'array']
-            ]
-        );
+        SettingsBuilder::append($rootNode, ['installed_translation_meta' => ['type' => 'array']]);
 
         return $treeBuilder;
     }

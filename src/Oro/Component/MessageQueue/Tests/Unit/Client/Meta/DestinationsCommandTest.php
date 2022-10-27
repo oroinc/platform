@@ -6,36 +6,26 @@ use Oro\Component\MessageQueue\Client\Meta\DestinationMeta;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Client\Meta\DestinationsCommand;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Container;
 
 class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DestinationsCommand */
-    private $command;
+    private DestinationsCommand $command;
 
-    /** @var Container */
-    private $container;
+    private DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = $this->createMock(DestinationMetaRegistry::class);
 
-        $this->command = new DestinationsCommand();
-
-        $this->container = new Container();
-        $this->container->set('oro_message_queue.client.meta.destination_meta_registry', $this->registry);
-        $this->command->setContainer($this->container);
+        $this->command = new DestinationsCommand($this->registry);
     }
 
-    public function testShouldHaveCommandName()
+    public function testShouldHaveCommandName(): void
     {
-        $this->assertEquals('oro:message-queue:destinations', $this->command->getName());
+        self::assertEquals('oro:message-queue:destinations', $this->command->getName());
     }
 
-    public function testShouldShowMessageFoundZeroDestinationsIfAnythingInRegistry()
+    public function testShouldShowMessageFoundZeroDestinationsIfAnythingInRegistry(): void
     {
         $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
@@ -43,40 +33,42 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
 
         $output = $this->executeCommand();
 
-        $this->assertContains('Found 0 destinations', $output);
+        static::assertStringContainsString('Found 0 destinations', $output);
     }
 
-    public function testShouldShowMessageFoundTwoDestinations()
+    public function testShouldShowMessageFoundTwoDestinations(): void
     {
         $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
             ->willReturn([
-                new DestinationMeta('aClientName', 'aDestinationName'),
-                new DestinationMeta('anotherClientName', 'anotherDestinationName')
-            ]);
+                             new DestinationMeta('aClientName', 'aDestinationName'),
+                             new DestinationMeta('anotherClientName', 'anotherDestinationName'),
+                         ]);
 
         $output = $this->executeCommand();
 
-        $this->assertContains('Found 2 destinations', $output);
+        static::assertStringContainsString('Found 2 destinations', $output);
     }
 
-    public function testShouldShowInfoAboutDestinations()
+    public function testShouldShowInfoAboutDestinations(): void
     {
         $this->registry->expects(self::once())
             ->method('getDestinationsMeta')
-            ->willReturn([
-                new DestinationMeta('aFooClientName', 'aFooDestinationName', ['fooSubscriber']),
-                new DestinationMeta('aBarClientName', 'aBarDestinationName', ['barSubscriber']),
-            ]);
+            ->willReturn(
+                [
+                    new DestinationMeta('aFooClientName', 'aFooDestinationName', ['fooSubscriber']),
+                    new DestinationMeta('aBarClientName', 'aBarDestinationName', ['barSubscriber']),
+                ]
+            );
 
         $output = $this->executeCommand();
 
-        $this->assertContains('aFooClientName', $output);
-        $this->assertContains('aFooDestinationName', $output);
-        $this->assertContains('fooSubscriber', $output);
-        $this->assertContains('aBarClientName', $output);
-        $this->assertContains('aBarDestinationName', $output);
-        $this->assertContains('barSubscriber', $output);
+        static::assertStringContainsString('aFooClientName', $output);
+        static::assertStringContainsString('aFooDestinationName', $output);
+        static::assertStringContainsString('fooSubscriber', $output);
+        static::assertStringContainsString('aBarClientName', $output);
+        static::assertStringContainsString('aBarDestinationName', $output);
+        static::assertStringContainsString('barSubscriber', $output);
     }
 
     /**
@@ -84,7 +76,7 @@ class DestinationsCommandTest extends \PHPUnit\Framework\TestCase
      *
      * @return string
      */
-    protected function executeCommand(array $arguments = [])
+    private function executeCommand(array $arguments = []): string
     {
         $tester = new CommandTester($this->command);
         $tester->execute($arguments);

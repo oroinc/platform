@@ -2,54 +2,53 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\ExportPreGetIds;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Specifies and rules how to read data from a source
+ * Prepares the list of entities for export.
+ * Responsible for creating a list for each batch during export
+ */
 class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterface
 {
-    /** @var ManagerRegistry */
-    protected $registry;
+    protected ManagerRegistry $registry;
+    protected OwnershipMetadataProviderInterface $ownershipMetadata;
+    protected ?EventDispatcherInterface $dispatcher = null;
+    protected ?AclHelper $aclHelper = null;
+    protected ExportQueryProvider $exportQueryProvider;
 
-    /** @var OwnershipMetadataProviderInterface */
-    protected $ownershipMetadata;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    /** @var AclHelper */
-    protected $aclHelper;
-
-    /**
-     * @param ContextRegistry                    $contextRegistry
-     * @param ManagerRegistry                    $registry
-     * @param OwnershipMetadataProviderInterface $ownershipMetadata
-     */
     public function __construct(
         ContextRegistry $contextRegistry,
         ManagerRegistry $registry,
-        OwnershipMetadataProviderInterface $ownershipMetadata
+        OwnershipMetadataProviderInterface $ownershipMetadata,
+        ExportQueryProvider $exportQueryProvider
     ) {
         parent::__construct($contextRegistry);
 
         $this->ownershipMetadata = $ownershipMetadata;
         $this->registry = $registry;
+        $this->exportQueryProvider = $exportQueryProvider;
     }
 
     /**
-     * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
     protected function initializeFromContext(ContextInterface $context)
@@ -71,17 +70,11 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         }
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     */
     public function setSourceQueryBuilder(QueryBuilder $queryBuilder)
     {
         $this->setSourceIterator($this->createSourceIterator($queryBuilder));
     }
 
-    /**
-     * @param Query $query
-     */
     public function setSourceQuery(Query $query)
     {
         $this->setSourceIterator($this->createSourceIterator($query));
@@ -97,7 +90,6 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         $qb = $this->createSourceEntityQueryBuilder($entityName, $organization, $ids);
         $this->setSourceQuery($this->applyAcl($qb));
     }
-
 
     /**
      * @param $entityName
@@ -118,8 +110,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
 
         $metadata = $entityManager->getClassMetadata($entityName);
         foreach (array_keys($metadata->getAssociationMappings()) as $fieldName) {
-            // can't join with *-to-many relations because they affects query pagination
-            if ($metadata->isAssociationWithSingleJoinColumn($fieldName)) {
+            if ($this->exportQueryProvider->isAssociationExportable($metadata, $fieldName)) {
                 $alias = '_' . $fieldName;
                 $qb->addSelect($alias);
                 $qb->leftJoin('o.' . $fieldName, $alias);
@@ -172,12 +163,14 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
             ));
         }
 
-        $identifierName = $metadata->getSingleIdentifierFieldName();
-        $queryBuilder = $entityManager
-            ->getRepository($entityName)
-            ->createQueryBuilder('o ', 'o.' . $identifierName);
-        $queryBuilder->select(sprintf('partial o.{%s}', $identifierName));
-        $queryBuilder->orderBy('o.' . $identifierName, 'ASC');
+        $queryBuilder = $this->createQueryBuilderByEntityNameAndIdentifier(
+            $entityManager,
+            $entityName,
+            $options
+        );
+
+        $event = new ExportPreGetIds($queryBuilder, $options);
+        $this->dispatcher->dispatch($event, Events::BEFORE_EXPORT_GET_IDS);
 
         $organization = isset($options['organization']) ? $options['organization'] : null;
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
@@ -188,16 +181,34 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
     }
 
     /**
-     * @param EventDispatcherInterface $dispatcher
+     * @param ObjectManager|EntityManager $entityManager
+     * @param string $entityName
+     * @param array $options
+     *
+     * @return QueryBuilder
      */
+    protected function createQueryBuilderByEntityNameAndIdentifier(
+        ObjectManager $entityManager,
+        string $entityName,
+        array $options = []
+    ): QueryBuilder {
+        /** @var ClassMetadata $metadata */
+        $metadata = $entityManager->getClassMetadata($entityName);
+        $identifierName = $metadata->getSingleIdentifierFieldName();
+        $queryBuilder = $entityManager
+            ->getRepository($entityName)
+            ->createQueryBuilder('o ', 'o.' . $identifierName);
+        $queryBuilder->select(sprintf('partial o.{%s}', $identifierName));
+        $queryBuilder->orderBy('o.' . $identifierName, 'ASC');
+
+        return $queryBuilder;
+    }
+
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param AclHelper $aclHelper
-     */
     public function setAclHelper(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
@@ -235,7 +246,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
                 }
 
                 $event = new AfterEntityPageLoadedEvent($rows);
-                $this->dispatcher->dispatch(Events::AFTER_ENTITY_PAGE_LOADED, $event);
+                $this->dispatcher->dispatch($event, Events::AFTER_ENTITY_PAGE_LOADED);
 
                 return $event->getRows();
             });

@@ -2,22 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 
 class ProcessControllerTest extends WebTestCase
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->entityManager = $this->client->getContainer()->get('doctrine')
-            ->getManagerForClass('OroWorkflowBundle:ProcessDefinition');
     }
 
     public function testActivateDeactivate()
@@ -27,8 +19,8 @@ class ProcessControllerTest extends WebTestCase
         $this->assertTrue($definition->isEnabled());
 
         // deactivate process
-        $this->client->request(
-            'GET',
+        $this->client->jsonRequest(
+            'POST',
             $this->getUrl(
                 'oro_api_process_deactivate',
                 ['processDefinition' => $definitionName]
@@ -42,8 +34,8 @@ class ProcessControllerTest extends WebTestCase
         $this->assertFalse($definition->isEnabled());
 
         // activate process
-        $this->client->request(
-            'GET',
+        $this->client->jsonRequest(
+            'POST',
             $this->getUrl(
                 'oro_api_process_activate',
                 ['processDefinition' => $definitionName]
@@ -57,28 +49,13 @@ class ProcessControllerTest extends WebTestCase
         $this->assertTrue($definition->isEnabled());
     }
 
-    /**
-     * Refresh entity
-     *
-     * @param ProcessDefinition $definition
-     *
-     * @return ProcessDefinition
-     */
-    protected function refreshEntity(ProcessDefinition $definition)
+    private function refreshEntity(ProcessDefinition $definition): ProcessDefinition
     {
-        $definition = $this->client
-            ->getContainer()
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroWorkflowBundle:ProcessDefinition')
+        return self::getContainer()->get('doctrine')->getRepository(ProcessDefinition::class)
             ->findOneBy(['name' => $definition->getName()]);
-
-        return $definition;
     }
 
-    /**
-     * @param array $result
-     */
-    protected function assertResult($result)
+    private function assertResult(array $result): void
     {
         $this->assertArrayHasKey('successful', $result);
         $this->assertArrayHasKey('message', $result);
@@ -86,17 +63,18 @@ class ProcessControllerTest extends WebTestCase
         $this->assertNotEmpty($result['message']);
     }
 
-    protected function createNewEnabledProcessDefinition()
+    private function createNewEnabledProcessDefinition(): ProcessDefinition
     {
         $testEntity = new ProcessDefinition();
         $testEntity
-            ->setName('test_' . uniqid())
-            ->setLabel('Test ' . uniqid())
+            ->setName('test_name')
+            ->setLabel('Test Label')
             ->setEnabled(true)
             ->setRelatedEntity('My/Test/Entity');
 
-        $this->entityManager->persist($testEntity);
-        $this->entityManager->flush($testEntity);
+        $em = $this->client->getContainer()->get('doctrine')->getManagerForClass(ProcessDefinition::class);
+        $em->persist($testEntity);
+        $em->flush($testEntity);
 
         return $testEntity;
     }

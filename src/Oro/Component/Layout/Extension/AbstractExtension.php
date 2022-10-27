@@ -10,6 +10,10 @@ use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
+/**
+ * The base class for extensions which provide block types, block type extensions and layout updates.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 abstract class AbstractExtension implements ExtensionInterface
 {
     /**
@@ -64,6 +68,18 @@ abstract class AbstractExtension implements ExtensionInterface
      * @var object[]
      */
     private $dataProviders;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypeNames(): array
+    {
+        if (null === $this->types) {
+            $this->initTypes();
+        }
+
+        return array_keys($this->types);
+    }
 
     /**
      * {@inheritdoc}
@@ -317,8 +333,6 @@ abstract class AbstractExtension implements ExtensionInterface
 
     /**
      * Initializes layout updates.
-     *
-     * @param ContextInterface $context
      *
      * @throws Exception\UnexpectedTypeException if any registered layout update is not
      *                                           an instance of LayoutUpdateInterface

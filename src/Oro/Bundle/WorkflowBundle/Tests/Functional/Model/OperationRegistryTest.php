@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Model;
 
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\Criteria\OperationFindCriteria;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
@@ -14,29 +15,31 @@ use Symfony\Component\Yaml\Yaml;
 
 class OperationRegistryTest extends WebTestCase
 {
-    const ROOT_NODE_NAME = 'operations';
+    /** @var ConfigurationProvider */
+    private $configProvider;
 
-    /** @var FilesystemCache */
-    private $cacheProvider;
+    /** @var PhpArrayConfigCacheModifier */
+    private $configModifier;
 
     /** @var OperationRegistry */
     private $operationRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadWorkflowDefinitions::class]);
         $this->setUpTokenStorage();
 
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
-        $this->cacheProvider->save(self::ROOT_NODE_NAME, $this->getOperationsConfig());
+        $this->configProvider = $this->getContainer()->get('oro_action.tests.configuration.provider');
+        $this->configModifier = new PhpArrayConfigCacheModifier($this->configProvider);
+        $this->setOperationsConfig($this->getOperationsConfig());
 
         $this->operationRegistry = $this->getContainer()->get('oro_action.operation_registry');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
-        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
+        $this->configModifier->resetCache();
     }
 
     public function testFindWithDisablingFromWorkflows()
@@ -57,7 +60,7 @@ class OperationRegistryTest extends WebTestCase
         $this->assertEquals('oro_test_operation_not_disabled', $operation->getName());
     }
 
-    protected function setUpTokenStorage()
+    private function setUpTokenStorage()
     {
         $token = new UsernamePasswordToken(new User(), self::AUTH_PW, 'user');
 
@@ -67,10 +70,17 @@ class OperationRegistryTest extends WebTestCase
     /**
      * @return array
      */
-    protected function getOperationsConfig()
+    private function getOperationsConfig()
     {
         $config = Yaml::parse(file_get_contents(__DIR__ . '/../DataFixtures/config/oro/actions.yml')) ?: [];
 
-        return isset($config['operations']) ? $config['operations'] : [];
+        return $config['operations'] ?? [];
+    }
+
+    private function setOperationsConfig(array $operations)
+    {
+        $config = $this->configProvider->getConfiguration();
+        $config['operations'] = $operations;
+        $this->configModifier->updateCache($config);
     }
 }

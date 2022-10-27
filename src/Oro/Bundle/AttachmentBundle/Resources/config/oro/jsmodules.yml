@@ -1,0 +1,4 @@
+dynamic-imports:
+    commons:
+        - oroattachment/js/app/components/multi-file-control-component
+        - oroattachment/js/app/views/attachment-view

@@ -1,40 +1,59 @@
 <?php
+declare(strict_types=1);
+
 namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-class CreateQueuesCommand extends Command implements ContainerAwareInterface
+/**
+ * Creates required message queues.
+ */
+class CreateQueuesCommand extends Command
 {
-    use ContainerAwareTrait;
+    /** @var string */
+    protected static $defaultName = 'oro:message-queue:create-queues';
 
-    /**
-     * {@inheritdoc}
-     */
+    private DriverInterface $clientDriver;
+    private DestinationMetaRegistry $destinationMetaRegistry;
+
+    public function __construct(DriverInterface $clientDriver, DestinationMetaRegistry $destinationMetaRegistry)
+    {
+        $this->clientDriver = $clientDriver;
+        $this->destinationMetaRegistry = $destinationMetaRegistry;
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:message-queue:create-queues')
-            ->setDescription('Creates all required queues');
+            ->setDescription('Creates required message queues.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command creates required message queues.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        /** @var DriverInterface $driver */
-        $driver = $this->container->get('oro_message_queue.client.driver');
-        /** @var DestinationMetaRegistry $destinationMetaRegistry */
-        $destinationMetaRegistry = $this->container->get('oro_message_queue.client.meta.destination_meta_registry');
-        foreach ($destinationMetaRegistry->getDestinationsMeta() as $meta) {
-            $output->writeln(sprintf('Creating queue: <comment>%s</comment>', $meta->getTransportName()));
+        foreach ($this->destinationMetaRegistry->getDestinationsMeta() as $meta) {
+            $output->writeln(sprintf('Creating queue: <comment>%s</comment>', $meta->getTransportQueueName()));
 
-            $driver->createQueue($meta->getTransportName());
+            $this->clientDriver->createQueue($meta->getTransportQueueName());
         }
+
+        return 0;
     }
 }

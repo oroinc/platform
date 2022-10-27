@@ -1,6 +1,7 @@
 oro_translation_jstranslation:
-    path:      /media/js/translation/{_locale}.json
-    defaults:  { _controller:  oro_translation.controller:indexAction }
+    path: '/media/js/translation/{_locale}.json'
+    defaults:
+        _controller: 'Oro\Bundle\TranslationBundle\Controller\JsTranslationController:indexAction'
     options:
         expose: true
 
@@ -14,12 +15,29 @@ oro_translation_language:
     type:         annotation
     prefix:       /language
 
-oro_translation_bundle_api:
-    resource:     "@OroTranslationBundle/Resources/config/oro/routing_api.yml"
-    type:         rest
-    prefix:       api/rest/{version}
-    requirements:
-        version:  latest|v1
-        _format:  json
+
+#
+# OLD REST API ROUTES
+#
+
+oro_api_get_translations:
+    path: '/api/rest/{version}/translations.{_format}'
+    methods: [GET]
     defaults:
-        version:  latest
+        _controller: 'Oro\Bundle\TranslationBundle\Controller\Api\Rest\TranslationController::cgetAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1
+
+oro_api_patch_translation:
+    path: '/api/rest/{version}/translations/{locale}/{domain}/{key}/patch.{_format}'
+    methods: [PATCH]
+    defaults:
+        _controller: 'Oro\Bundle\TranslationBundle\Controller\Api\Rest\TranslationController::patchAction'
+        _format: json
+        version: latest
+    requirements:
+        _format: json
+        version: latest|v1

@@ -1,15 +1,13 @@
 define(function(require) {
     'use strict';
 
-    var FlowchartEditorStepView;
-    var _ = require('underscore');
-    var FlowchartViewerStepView = require('../viewer/step-view');
+    const FlowchartViewerStepView = require('../viewer/step-view');
 
-    FlowchartEditorStepView = FlowchartViewerStepView.extend({
-        template: require('tpl!oroworkflow/templates/flowchart/editor/step.html'),
+    const FlowchartEditorStepView = FlowchartViewerStepView.extend({
+        template: require('tpl-loader!oroworkflow/templates/flowchart/editor/step.html'),
 
         className: function() {
-            var classNames = [FlowchartEditorStepView.__super__.className.call(this)];
+            const classNames = [FlowchartEditorStepView.__super__.className.call(this)];
             if (!this.model.get('_is_start')) {
                 classNames.push('dropdown');
             }
@@ -25,24 +23,28 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function FlowchartEditorStepView() {
-            FlowchartEditorStepView.__super__.constructor.apply(this, arguments);
+        constructor: function FlowchartEditorStepView(options) {
+            FlowchartEditorStepView.__super__.constructor.call(this, options);
         },
 
         connect: function() {
-            var instance = this.areaView.jsPlumbInstance;
+            const instance = this.areaView.jsPlumbInstance;
             // add element as source to jsPlumb
             if (this.model.get('draggable') !== false) {
                 instance.draggable(this.$el, {
-                    stop: _.bind(function(e) {
+                    start: function(obj) {
+                        instance.eventBus.trigger('step:drag-start', obj, this.model);
+                    }.bind(this),
+                    stop: function(obj) {
                         // update model position when dragging stops
-                        this.model.set({position: e.pos});
-                    }, this)
+                        this.model.set({position: obj.pos});
+                        instance.eventBus.trigger('step:drag-stop', obj, this.model);
+                    }.bind(this)
                 });
             }
-            FlowchartEditorStepView.__super__.connect.apply(this, arguments);
+            FlowchartEditorStepView.__super__.connect.call(this);
         },
 
         triggerEditStep: function(e) {

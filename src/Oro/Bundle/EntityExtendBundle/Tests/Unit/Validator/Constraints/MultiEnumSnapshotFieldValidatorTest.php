@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
-use Doctrine\Common\EventManager;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
@@ -15,25 +15,15 @@ use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\NewEntitiesHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit\Framework\TestCase
+class MultiEnumSnapshotFieldValidatorTest extends ConstraintValidatorTestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
+    private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var MultiEnumSnapshotFieldValidator */
-    protected $validator;
-
-    protected function setUp()
+    protected function createValidator()
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $extendConfigProvider = new ConfigProviderMock(
-            $configManager,
-            'extend'
-        );
-
+        $extendConfigProvider = new ConfigProviderMock($this->createMock(ConfigManager::class), 'extend');
         $extendConfigProvider->addFieldConfig(
             self::ENTITY_CLASS,
             'field' . ExtendHelper::ENUM_SNAPSHOT_SUFFIX,
@@ -62,69 +52,87 @@ class MultiEnumSnapshotFieldValidatorTest extends \PHPUnit\Framework\TestCase
             'enum'
         );
 
-        /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-
-        $this->validator = new MultiEnumSnapshotFieldValidator(
-            new FieldNameValidationHelper($extendConfigProvider, $eventDispatcher, new NewEntitiesHelper())
+        return new MultiEnumSnapshotFieldValidator(
+            new FieldNameValidationHelper(
+                $extendConfigProvider,
+                $this->createMock(EventDispatcherInterface::class),
+                new NewEntitiesHelper(),
+                (new InflectorFactory())->build()
+            )
         );
     }
 
     /**
      * @dataProvider validateProvider
-     *
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param string $expectedValidationMessageType
      */
-    public function testValidate($fieldName, $fieldType, $expectedValidationMessageType)
-    {
+    public function testValidate(
+        string $fieldName,
+        string $fieldType,
+        ?string $expectedValidationMessageType,
+        ?string $violationFieldName = null
+    ) {
         $entity = new EntityConfigModel(self::ENTITY_CLASS);
-        $field  = new FieldConfigModel($fieldName, $fieldType);
+        $field = new FieldConfigModel($fieldName, $fieldType);
         $entity->addField($field);
-
-        $context = $this->createMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
-        $this->validator->initialize($context);
 
         $constraint = new MultiEnumSnapshotField();
 
-        if ($expectedValidationMessageType) {
-            $message   = PropertyAccess::createPropertyAccessor()
-                ->getValue($constraint, $expectedValidationMessageType);
-            $violation = $this->createMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
-            $context->expects($this->once())
-                ->method('buildViolation')
-                ->with($message)
-                ->willReturn($violation);
-            $violation->expects($this->once())
-                ->method('atPath')
-                ->with('fieldName')
-                ->willReturnSelf();
-            $violation->expects($this->once())
-                ->method('addViolation');
-        } else {
-            $context->expects($this->never())
-                ->method('buildViolation');
-        }
-
         $this->validator->validate($field, $constraint);
+
+        if (null === $expectedValidationMessageType) {
+            $this->assertNoViolation();
+        } else {
+            $message = PropertyAccess::createPropertyAccessor()
+                ->getValue($constraint, $expectedValidationMessageType);
+            $this->buildViolation($message)
+                ->setParameters(['{{ value }}' => $fieldName, '{{ field }}' => $violationFieldName ?? $fieldName])
+                ->atPath('property.path.fieldName')
+                ->assertRaised();
+        }
     }
 
-    /**
-     * @return array
-     */
-    public function validateProvider()
+    public function validateProvider(): array
     {
         return [
             ['anotherField' . ExtendHelper::ENUM_SNAPSHOT_SUFFIX, 'int', null],
             ['enumField' . ExtendHelper::ENUM_SNAPSHOT_SUFFIX, 'int', null],
-            ['multiEnumField' . ExtendHelper::ENUM_SNAPSHOT_SUFFIX, 'int', 'duplicateSnapshotMessage'],
-            ['multi_enum_field_' . strtolower(ExtendHelper::ENUM_SNAPSHOT_SUFFIX), 'int', 'duplicateSnapshotMessage'],
-            ['field', 'multiEnum', 'duplicateFieldMessage'],
-            ['fieLD', 'multiEnum', 'duplicateFieldMessage'],
-            ['deletedField', 'multiEnum', 'duplicateFieldMessage'],
+            [
+                'multiEnumField' . ExtendHelper::ENUM_SNAPSHOT_SUFFIX,
+                'int',
+                'duplicateSnapshotMessage',
+                'multiEnumField'
+            ],
+            [
+                'multi_enum_field_' . strtolower(ExtendHelper::ENUM_SNAPSHOT_SUFFIX),
+                'int',
+                'duplicateSnapshotMessage',
+                'multiEnumField'
+            ],
+            [
+                'field',
+                'multiEnum',
+                'duplicateFieldMessage',
+                'field' . ExtendHelper::ENUM_SNAPSHOT_SUFFIX
+            ],
+            [
+                'fieLD',
+                'multiEnum',
+                'duplicateFieldMessage',
+                'field' . ExtendHelper::ENUM_SNAPSHOT_SUFFIX
+            ],
+            [
+                'deletedField',
+                'multiEnum',
+                'duplicateFieldMessage',
+                'deletedField' . ExtendHelper::ENUM_SNAPSHOT_SUFFIX
+            ],
             ['deleted_field', 'multiEnum', null],
-            ['toBeDeletedField', 'multiEnum', 'duplicateFieldMessage'],
+            [
+                'toBeDeletedField',
+                'multiEnum',
+                'duplicateFieldMessage',
+                'toBeDeletedField' . ExtendHelper::ENUM_SNAPSHOT_SUFFIX
+            ],
             ['to_be_deleted_field', 'multiEnum', null],
         ];
     }

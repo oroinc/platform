@@ -1,3 +1,4 @@
+/* stylelint-disable */
 /* Layout helpers
 ----------------------------------*/
 .select-filter-widget .ui-helper-reset,
@@ -230,18 +231,9 @@
 
 /* Component containers
 ----------------------------------*/
-.ui-datepicker .ui-widget {
-    font-family: 'Helvetica Neue',Helvetica,sans-serif;
-}
-.ui-datepicker .ui-widget input,
-.ui-datepicker .ui-widget select,
-.ui-datepicker .ui-widget textarea,
-.ui-datepicker .ui-widget button {
-    font-family: 'Helvetica Neue',Helvetica,sans-serif;
-}
 .ui-widget-content,
 .ui-datepicker.ui-widget-content{
-    background: #ffffff url(../images/ui-bg_flat_75_ffffff_40x100.png) 50% 50% repeat-x;
+    background: #ffffff url('~bundles/oroui/images/ui-bg_flat_75_ffffff_40x100.png') 50% 50% repeat-x;
     color: #222222;
     overflow: visible;
 }
@@ -249,7 +241,7 @@
     color: #222222;
 }
 .ui-datepicker .ui-widget-header {
-    background: #cccccc url(../images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x;
+    background: #cccccc url('~bundles/oroui/images/ui-bg_highlight-soft_75_cccccc_1x100.png') 50% 50% repeat-x;
     color: #222222;
     font-weight: bold;
 }
@@ -262,7 +254,7 @@
 .ui-datepicker .ui-state-default,
 .ui-datepicker.ui-widget-content .ui-state-default,
 .ui-datepicker .ui-widget-header .ui-state-default {
-    background: #e6e6e6 url(../images/ui-bg_glass_75_e6e6e6_1x400.png) 50% 50% repeat-x;
+    background: #e6e6e6 url('~bundles/oroui/images/ui-bg_glass_75_e6e6e6_1x400.png') 50% 50% repeat-x;
     font-weight: normal;
     color: #555555;
     text-align: center;
@@ -279,7 +271,7 @@
 .ui-datepicker .ui-state-focus,
 .ui-datepicker.ui-widget-content .ui-state-focus,
 .ui-datepicker .ui-widget-header .ui-state-focus {
-    background: #dadada url(../images/ui-bg_glass_75_dadada_1x400.png) 50% 50% repeat-x;
+    background: #dadada url('~bundles/oroui/images/ui-bg_glass_75_dadada_1x400.png') 50% 50% repeat-x;
     font-weight: normal;
     color: #212121;
 }
@@ -293,7 +285,7 @@
 .ui-datepicker .ui-state-active,
 .ui-datepicker .ui-widget-content .ui-state-active,
 .ui-datepicker .ui-widget-header .ui-state-active {
-    background: #ffffff url(../images/ui-bg_glass_65_ffffff_1x400.png) 50% 50% repeat-x;
+    background: #ffffff url('~bundles/oroui/images/ui-bg_glass_65_ffffff_1x400.png') 50% 50% repeat-x;
     font-weight: normal;
     color: #212121;
 }
@@ -312,27 +304,27 @@
 }
 .ui-datepicker .ui-icon,
 .ui-datepicker.ui-widget-content .ui-icon {
-    background-image: url(../images/ui-icons_222222_256x240.png);
+    background-image: url('~bundles/oroui/images/ui-icons_222222_256x240.png');
 }
 .ui-datepicker .ui-widget-header .ui-icon {
-    background-image: url(../images/ui-icons_222222_256x240.png);
+    background-image: url('~bundles/oroui/images/ui-icons_222222_256x240.png');
 }
 .ui-datepicker .ui-state-default .ui-icon {
-    background-image: url(../images/ui-icons_888888_256x240.png);
+    background-image: url('~bundles/oroui/images/ui-icons_888888_256x240.png');
 }
 .ui-datepicker .ui-state-hover .ui-icon,
 .ui-datepicker .ui-state-focus .ui-icon {
-    background-image: url(../images/ui-icons_454545_256x240.png);
+    background-image: url('~bundles/oroui/images/ui-icons_454545_256x240.png');
 }
 .ui-datepicker .ui-state-active .ui-icon {
-    background-image: url(../images/ui-icons_454545_256x240.png);
+    background-image: url('~bundles/oroui/images/ui-icons_454545_256x240.png');
 }
 .ui-datepicker .ui-state-highlight .ui-icon {
-    background-image: url(../images/ui-icons_2e83ff_256x240.png);
+    background-image: url('~bundles/oroui/images/ui-icons_2e83ff_256x240.png');
 }
 .ui-datepicker .ui-state-error .ui-icon,
 .ui-datepicker .ui-state-error-text .ui-icon {
-    background-image: url(../images/ui-icons_cd0a0a_256x240.png);
+    background-image: url('~bundles/oroui/images/ui-icons_cd0a0a_256x240.png');
 }
 
 /* positioning */

@@ -16,13 +16,11 @@ class EmailActivityUpdatesTest extends \PHPUnit\Framework\TestCase
 
         $emailAddressWithoutOwner = new EmailAddress();
 
-        $emailOwnerProvider = $this->createEmailOwnersProviderMock();
-        $emailOwnerProvider
-            ->expects($this->once())
+        $emailOwnerProvider = $this->createMock(EmailOwnersProvider::class);
+        $emailOwnerProvider->expects($this->once())
             ->method('hasEmailsByOwnerEntity')
             ->with($this->identicalTo($emailOwner))
-            ->will($this->returnValue(true))
-        ;
+            ->willReturn(true);
 
         $emailActivityUpdates = new EmailActivityUpdates($emailOwnerProvider);
         $emailActivityUpdates->processUpdatedEmailAddresses([
@@ -46,19 +44,17 @@ class EmailActivityUpdatesTest extends \PHPUnit\Framework\TestCase
         $emailOwner2 = new TestEmailOwner(12345);
         $emailAddress2->setOwner($emailOwner2);
 
-        $emailOwnerProvider = $this->createEmailOwnersProviderMock();
-        $emailOwnerProvider
-            ->expects($this->at(0))
+        $emailOwnerProvider = $this->createMock(EmailOwnersProvider::class);
+        $emailOwnerProvider->expects($this->exactly(2))
             ->method('hasEmailsByOwnerEntity')
-            ->with($this->identicalTo($emailOwner1))
-            ->will($this->returnValue(true))
-        ;
-        $emailOwnerProvider
-            ->expects($this->at(1))
-            ->method('hasEmailsByOwnerEntity')
-            ->with($this->identicalTo($emailOwner2))
-            ->will($this->returnValue(false))
-        ;
+            ->withConsecutive(
+                [$this->identicalTo($emailOwner1)],
+                [$this->identicalTo($emailOwner2)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                true,
+                false
+            );
 
         $emailActivityUpdates = new EmailActivityUpdates($emailOwnerProvider);
         $emailActivityUpdates->processUpdatedEmailAddresses([
@@ -70,13 +66,5 @@ class EmailActivityUpdatesTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(1, $result);
         $this->assertSame($emailOwner1, $result[0]);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EmailOwnersProvider
-     */
-    private function createEmailOwnersProviderMock()
-    {
-        return $this->createMock(EmailOwnersProvider::class);
     }
 }

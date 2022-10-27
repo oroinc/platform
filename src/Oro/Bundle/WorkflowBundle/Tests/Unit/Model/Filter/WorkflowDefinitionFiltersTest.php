@@ -11,82 +11,81 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class WorkflowDefinitionFiltersTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
 
-    /** @var WorkflowDefinitionFilters */
-    protected $filters;
+    private WorkflowDefinitionFilters $filters;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->requestStack = $this->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->filters = new WorkflowDefinitionFilters($this->requestStack);
-
         $this->filters->addFilter(new SystemDefinitionFilter());
         $this->filters->addFilter(new DefaultDefinitionFilter());
     }
 
-    public function testGetFilters()
+    public function testGetFilters(): void
     {
-        $this->requestStack->expects($this->exactly(2))->method('getMasterRequest')->willReturn(null);
+        $this->requestStack->expects(self::exactly(2))
+            ->method('getMainRequest')
+            ->willReturn(null);
 
-        $this->assertEquals(
+        self::assertEquals(
             new ArrayCollection([new SystemDefinitionFilter()]),
             $this->filters->getFilters()
         );
     }
 
-    public function testGetFiltersWithRequest()
+    public function testGetFiltersWithRequest(): void
     {
-        $this->requestStack->expects($this->exactly(2))->method('getMasterRequest')->willReturn(new Request());
+        $this->requestStack->expects(self::exactly(2))
+            ->method('getMainRequest')
+            ->willReturn(new Request());
 
-        $this->assertEquals(
+        self::assertEquals(
             new ArrayCollection([new SystemDefinitionFilter(), new DefaultDefinitionFilter()]),
             $this->filters->getFilters()
         );
     }
 
-    public function testGetFiltersWithSystemType()
+    public function testGetFiltersWithSystemType(): void
     {
         $this->filters->setType(WorkflowDefinitionFilters::TYPE_SYSTEM);
 
-        $this->requestStack->expects($this->never())->method('getMasterRequest');
+        $this->requestStack->expects(self::never())
+            ->method('getMainRequest');
 
-        $this->assertEquals(
+        self::assertEquals(
             new ArrayCollection([new SystemDefinitionFilter()]),
             $this->filters->getFilters()
         );
     }
 
-    public function testGetFiltersWithDisabled()
+    public function testGetFiltersWithDisabled(): void
     {
         $this->filters->setEnabled(false);
 
-        $this->requestStack->expects($this->never())->method('getMasterRequest');
+        $this->requestStack->expects(self::never())
+            ->method('getMainRequest');
 
-        $this->assertEquals(
+        self::assertEquals(
             new ArrayCollection(),
             $this->filters->getFilters()
         );
     }
 
-    public function testSetEnabled()
+    public function testSetEnabled(): void
     {
         $this->filters->setEnabled(true);
-        $this->assertTrue($this->filters->isEnabled());
+        self::assertTrue($this->filters->isEnabled());
         $this->filters->setEnabled(false);
-        $this->assertFalse($this->filters->isEnabled());
+        self::assertFalse($this->filters->isEnabled());
     }
 
-    public function testSetType()
+    public function testSetType(): void
     {
-        $this->assertEquals(WorkflowDefinitionFilters::TYPE_DEFAULT, $this->filters->getType());
+        self::assertEquals(WorkflowDefinitionFilters::TYPE_DEFAULT, $this->filters->getType());
         $this->filters->setType(WorkflowDefinitionFilters::TYPE_SYSTEM);
-        $this->assertEquals(WorkflowDefinitionFilters::TYPE_SYSTEM, $this->filters->getType());
+        self::assertEquals(WorkflowDefinitionFilters::TYPE_SYSTEM, $this->filters->getType());
     }
 }

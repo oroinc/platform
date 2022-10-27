@@ -10,51 +10,47 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    const TEST_TYPE = 'test_format_type';
-    const TEST_FORMAT = 'MMM, d y t';
+    private const TEST_TYPE = 'test_format_type';
+    private const TEST_FORMAT = 'MMM, d y t';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $localeSettings;
+    private $localeSettings;
 
     /** @var LocaleExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->localeSettings =$this->getMockBuilder(LocaleSettings::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localeSettings =$this->createMock(LocaleSettings::class);
 
         $container = self::getContainerBuilder()
-            ->add('oro_locale.settings', $this->localeSettings)
+            ->add(LocaleSettings::class, $this->localeSettings)
             ->getContainer($this);
 
         $this->extension = new LocaleExtension($container);
     }
 
-    protected function tearDown()
-    {
-        unset($this->localeSettings);
-        unset($this->extension);
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale', $this->extension->getName());
-    }
-
-    public function testGetTimeZoneOffset()
+    public function testGetTimeZoneOffset(): void
     {
         $timezoneString = 'UTC';
         $timezoneOffset = '+00:00';
 
-        $this->localeSettings->expects($this->once())
+        $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
-            ->will($this->returnValue($timezoneString));
+            ->willReturn($timezoneString);
 
-        $this->assertEquals(
+        self::assertEquals(
             $timezoneOffset,
             self::callTwigFunction($this->extension, 'oro_timezone_offset', [])
         );
+    }
+
+    public function testIsRtlMode(): void
+    {
+        $this->localeSettings->expects(self::any())
+            ->method('isRtlMode')
+            ->willReturn(true);
+
+        self::assertTrue(self::callTwigFunction($this->extension, 'oro_is_rtl_mode', []));
     }
 }

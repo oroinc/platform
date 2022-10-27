@@ -4,34 +4,36 @@ namespace Oro\Bundle\SidebarBundle\Twig;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
-use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
+use Oro\Bundle\SidebarBundle\Configuration\WidgetDefinitionProvider;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Asset\Packages as AssetHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class SidebarExtension extends \Twig_Extension implements FeatureToggleableInterface
+/**
+ * Provides a Twig function to retrieve sidebar widgets information:
+ *   - oro_sidebar_get_available_widgets
+ */
+class SidebarExtension extends AbstractExtension implements FeatureToggleableInterface, ServiceSubscriberInterface
 {
     use FeatureCheckerHolderTrait;
-
-    const NAME = 'oro_sidebar';
 
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
     /**
-     * @return WidgetDefinitionRegistry
+     * @return WidgetDefinitionProvider
      */
-    protected function getWidgetDefinitionRegistry()
+    protected function getWidgetDefinitionProvider()
     {
-        return $this->container->get('oro_sidebar.widget_definition.registry');
+        return $this->container->get('oro_sidebar.widget_definition_provider');
     }
 
     /**
@@ -39,7 +41,7 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
      */
     protected function getTranslator()
     {
-        return $this->container->get('translator');
+        return $this->container->get(TranslatorInterface::class);
     }
 
     /**
@@ -47,7 +49,7 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
      */
     protected function getAssetHelper()
     {
-        return $this->container->get('assets.packages');
+        return $this->container->get(AssetHelper::class);
     }
 
     /**
@@ -56,19 +58,19 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_sidebar_get_available_widgets', [$this, 'getWidgetDefinitions']),
+            new TwigFunction('oro_sidebar_get_available_widgets', [$this, 'getWidgetDefinitions']),
         ];
     }
 
     /**
-     * Get available widgets for placement.
+     * Gets available widgets for the given placement.
      *
      * @param string $placement
      * @return array
      */
     public function getWidgetDefinitions($placement)
     {
-        $definitions = $this->getWidgetDefinitionRegistry()
+        $definitions = $this->getWidgetDefinitionProvider()
             ->getWidgetDefinitionsByPlacement($placement);
         $translator = $this->getTranslator();
         $assetHelper = $this->getAssetHelper();
@@ -79,7 +81,7 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
                 continue;
             }
 
-            $definition['title'] = $translator->trans($definition['title']);
+            $definition['title'] = isset($definition['title']) ? $translator->trans((string) $definition['title']) : '';
             if (!empty($definition['icon'])) {
                 $definition['icon'] = $assetHelper->getUrl($definition['icon']);
             }
@@ -94,8 +96,12 @@ class SidebarExtension extends \Twig_Extension implements FeatureToggleableInter
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return self::NAME;
+        return [
+            'oro_sidebar.widget_definition_provider' => WidgetDefinitionProvider::class,
+            TranslatorInterface::class,
+            AssetHelper::class,
+        ];
     }
 }

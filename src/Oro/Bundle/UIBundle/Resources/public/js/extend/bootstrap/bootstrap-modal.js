@@ -1,23 +1,31 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
+    const $ = require('jquery');
+    const _ = require('underscore');
+    require('bootstrap-modal');
 
-    var NAME = 'modal';
-    var EVENT_KEY = '.bs.modal';
-    var Event = {
+    const NAME = 'modal';
+    const EVENT_KEY = '.bs.modal';
+    const Event = {
         FOCUSIN: 'focusin' + EVENT_KEY
     };
 
-    require('bootstrap-modal');
+    const Modal = $.fn[NAME].Constructor;
+    const original = _.pick(Modal.prototype, 'dispose');
+
+    Modal.prototype.dispose = function() {
+        this._removeBackdrop();
+        original.dispose.call(this);
+    };
 
     /**
      * fix endless loop
      * Based on https://github.com/Khan/bootstrap/commit/378ab557e24b861579d2ec4ce6f04b9ea995ab74
      * Updated to support two modals on page
      */
-    $.fn[NAME].Constructor.prototype._enforceFocus = function() {
-        var that = this;
+    Modal.prototype._enforceFocus = function() {
+        const that = this;
 
         $(document).off(Event.FOCUSIN) // Guard against infinite focus loop
             .on(Event.FOCUSIN, function safeSetFocus(event) {

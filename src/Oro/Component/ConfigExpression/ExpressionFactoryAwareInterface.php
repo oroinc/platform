@@ -9,8 +9,6 @@ interface ExpressionFactoryAwareInterface
 {
     /**
      * Sets the expression factory.
-     *
-     * @param ExpressionFactoryInterface $expressionFactory
      */
     public function setExpressionFactory(ExpressionFactoryInterface $expressionFactory);
 }

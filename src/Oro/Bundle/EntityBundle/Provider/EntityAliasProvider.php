@@ -2,20 +2,22 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
+/**
+ * Provides aliases for entities.
+ */
 class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassProviderInterface
 {
     /** @var EntityAliasConfigBag */
     protected $config;
+    private Inflector $inflector;
 
-    /**
-     * @param EntityAliasConfigBag $config
-     */
-    public function __construct(EntityAliasConfigBag $config)
+    public function __construct(EntityAliasConfigBag $config, Inflector $inflector)
     {
         $this->config = $config;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -46,7 +48,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
 
         return new EntityAlias(
             strtolower($name),
-            strtolower(Inflector::pluralize($name))
+            strtolower($this->inflector->pluralize($name))
         );
     }
 
@@ -79,7 +81,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
      */
     protected function isOroEntity($entityClass)
     {
-        return $this->startsWith($entityClass, 'Oro');
+        return str_starts_with($entityClass, 'Oro');
     }
 
     /**
@@ -108,9 +110,9 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
         $partCount = count($parts);
         if ($partCount > 3) {
             $bundlePart = $parts[$partCount - 3];
-            if ($this->endsWith($bundlePart, 'Bundle')) {
-                $bundleName = substr($bundlePart, 0, strlen($bundlePart) - 6);
-                if (!$this->startsWith($parts[$partCount - 1], $bundleName)) {
+            if (str_ends_with($bundlePart, 'Bundle')) {
+                $bundleName = substr($bundlePart, 0, -6);
+                if (!str_starts_with($parts[$partCount - 1], $bundleName)) {
                     $name = $bundleName . $parts[$partCount - 1];
                 }
             }
@@ -136,31 +138,5 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
         return false === $lastDelimiter
             ? $className
             : substr($className, $lastDelimiter + 1);
-    }
-
-    /**
-     * Determines whether the beginning of $haystack matches $needle.
-     *
-     * @param string $haystack The string to check
-     * @param string $needle   The string to compare
-     *
-     * @return bool
-     */
-    protected function startsWith($haystack, $needle)
-    {
-        return strpos($haystack, $needle) === 0;
-    }
-
-    /**
-     * Determines whether the ending of $haystack matches $needle.
-     *
-     * @param string $haystack The string to check
-     * @param string $needle   The string to compare
-     *
-     * @return bool
-     */
-    protected function endsWith($haystack, $needle)
-    {
-        return substr($haystack, -strlen($needle)) === $needle;
     }
 }

@@ -1,0 +1,16 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\EmbeddedFormBundle\Controller\EmbedFormController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_entity_config.provider.ownership, key: Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider }
+
+    Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

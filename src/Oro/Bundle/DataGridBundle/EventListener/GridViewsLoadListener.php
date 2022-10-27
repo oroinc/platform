@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
@@ -10,9 +10,13 @@ use Oro\Bundle\DataGridBundle\Event\GridViewsLoadEvent;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\Configuration;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Listener for modification Grid Views on Grid Views Load
+ */
 class GridViewsLoadListener
 {
     /** @var ManagerRegistry */
@@ -38,15 +42,6 @@ class GridViewsLoadListener
      */
     protected $appearanceTypeManager;
 
-    /**
-     * @param ManagerRegistry               $registry
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param AclHelper                     $aclHelper
-     * @param TranslatorInterface           $translator
-     * @param GridViewManager               $gridViewManager
-     * @param AppearanceTypeManager         $appearanceTypeManager
-     */
     public function __construct(
         ManagerRegistry $registry,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -65,50 +60,14 @@ class GridViewsLoadListener
         $this->appearanceTypeManager = $appearanceTypeManager;
     }
 
-    /**
-     * @param GridViewsLoadEvent $event
-     */
     public function onViewsLoad(GridViewsLoadEvent $event)
     {
-        $gridName = $event->getGridName();
-        $views = [];
         $currentUser = $this->tokenAccessor->getUser();
-        if (null === $currentUser) {
+        if (null === $currentUser || !$currentUser->getId()) {
             return;
         }
 
-        $defaultGridView = $this->gridViewManager->getDefaultView($currentUser, $gridName);
-        $gridViews = $event->getGridViews();
-
-        foreach ($gridViews['system'] as $systemView) {
-            if ($defaultGridView) {
-                if ($systemView->getName() == $defaultGridView->getName()) {
-                    $systemView->setDefault(true);
-                } else {
-                    $systemView->setDefault(false);
-                }
-            }
-            $views[] = $systemView->getMetadata();
-        }
-        foreach ($gridViews['user'] as $gridView) {
-            $view = $gridView->createView();
-            $view->setEditable($this->authorizationChecker->isGranted('EDIT', $gridView));
-            $view->setDeletable($this->authorizationChecker->isGranted('DELETE', $gridView));
-            if ($defaultGridView) {
-                $view->setDefault($defaultGridView->getName() === $gridView->getName());
-            }
-            if ($gridView->getOwner() && $gridView->getOwner()->getId() !== $currentUser->getId()) {
-                $view->setSharedBy($gridView->getOwner()->getUsername());
-            }
-            $views[] = $view->getMetadata();
-        }
-
-        foreach ($views as &$view) {
-            if (!$view['icon']) {
-                $view['icon'] = $this->getViewIcon($view['appearanceType']);
-            }
-        }
-
+        $views = $this->getGridViews($currentUser, $event);
         $event->setGridViews($views);
     }
 
@@ -133,5 +92,49 @@ class GridViewsLoadListener
     protected function getGridViewRepository()
     {
         return $this->registry->getRepository('OroDataGridBundle:GridView');
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function getGridViews(AbstractUser $user, GridViewsLoadEvent $event): array
+    {
+        $gridName = $event->getGridName();
+
+        $defaultGridView = $this->gridViewManager->getDefaultView($user, $gridName);
+        $gridViews = $event->getGridViews();
+
+        $views = [];
+        foreach ($gridViews['system'] as $systemView) {
+            if ($defaultGridView) {
+                if ($systemView->getName() == $defaultGridView->getName()) {
+                    $systemView->setDefault(true);
+                } else {
+                    $systemView->setDefault(false);
+                }
+            }
+            $views[] = $systemView->getMetadata();
+        }
+
+        foreach ($gridViews['user'] as $gridView) {
+            $view = $gridView->createView();
+            $view->setEditable($this->authorizationChecker->isGranted('EDIT', $gridView));
+            $view->setDeletable($this->authorizationChecker->isGranted('DELETE', $gridView));
+            if ($defaultGridView) {
+                $view->setDefault($defaultGridView->getName() === $gridView->getName());
+            }
+            if ($gridView->getOwner() && $gridView->getOwner()->getId() !== $user->getId()) {
+                $view->setSharedBy($gridView->getOwner()->getUsername());
+            }
+            $views[] = $view->getMetadata();
+        }
+
+        foreach ($views as &$view) {
+            if (!$view['icon']) {
+                $view['icon'] = $this->getViewIcon($view['appearanceType']);
+            }
+        }
+
+        return $views;
     }
 }

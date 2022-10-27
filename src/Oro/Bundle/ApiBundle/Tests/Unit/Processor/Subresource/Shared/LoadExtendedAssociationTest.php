@@ -2,15 +2,20 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadExtendedAssociation;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySerializer */
@@ -19,7 +24,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
     /** @var LoadExtendedAssociation */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +33,8 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor = new LoadExtendedAssociation(
             $this->entitySerializer,
             $this->doctrineHelper,
-            new EntityIdHelper()
+            new EntityIdHelper(),
+            $this->configProvider
         );
     }
 
@@ -70,12 +76,11 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertCount(0, $this->context->getSkippedGroups());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsupported type of extended association: invalidType.
-     */
     public function testProcessForInvalidTypeOfExtendedAssociation()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported type of extended association: invalidType.');
+
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:invalidType');
@@ -90,7 +95,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -100,8 +105,14 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
             ['id' => $parentId, $associationName => ['id' => 1]]
         ];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
+
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -120,7 +131,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
             ['id' => 1],
             $this->context->getResult()
         );
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForEmptyResultOfManyToOneExtendedAssociation()
@@ -128,7 +139,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -138,8 +149,14 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
             ['id' => $parentId, $associationName => null]
         ];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
+
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -155,7 +172,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForEmptyResultOfManyToManyExtendedAssociation()
@@ -163,7 +180,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToMany:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -173,8 +190,14 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
             ['id' => $parentId, $associationName => []]
         ];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
+
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -190,7 +213,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertSame([], $this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForEmptyResultOfMultipleManyToOneExtendedAssociation()
@@ -198,7 +221,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:multipleManyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -208,8 +231,14 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
             ['id' => $parentId, $associationName => []]
         ];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
+
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -225,7 +254,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertSame([], $this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForManyToOneExtendedAssociationWhenParentEntityWasNotFound()
@@ -233,7 +262,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -241,8 +270,14 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
 
         $loadedData = [];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
+
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -258,7 +293,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertNull($this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForManyToManyExtendedAssociationWhenParentEntityWasNotFound()
@@ -266,7 +301,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToMany:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -274,8 +309,14 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
 
         $loadedData = [];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
+
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -291,7 +332,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertSame([], $this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
     public function testProcessForMultipleManyToOneExtendedAssociationWhenParentEntityWasNotFound()
@@ -299,7 +340,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:multipleManyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -307,8 +348,14 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
 
         $loadedData = [];
 
-        $expectedQueryBuilder = $this->doctrineHelper->getEntityRepositoryForClass($parentClassName)
-            ->createQueryBuilder('e')
+        $parentConfigContainer = new Config();
+        $parentConfigContainer->setDefinition($parentConfig);
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($parentConfigContainer);
+
+        $expectedQueryBuilder = $this->doctrineHelper
+            ->createQueryBuilder($parentClassName, 'e')
             ->andWhere('e.id = :id')
             ->setParameter('id', $parentId);
         $this->entitySerializer->expects(self::once())
@@ -324,6 +371,6 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
 
         self::assertSame([], $this->context->getResult());
-        self::assertEquals(['normalize_data'], $this->context->getSkippedGroups());
+        self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 }

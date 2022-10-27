@@ -13,7 +13,6 @@ return array(
                     ),
                 ),
             ),
-            'relations' => array(),
         ),
     ),
     'aliases' => array(

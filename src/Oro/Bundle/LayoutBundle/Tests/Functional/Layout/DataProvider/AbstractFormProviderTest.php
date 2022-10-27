@@ -12,22 +12,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class AbstractFormProviderTest extends WebTestCase
 {
     /** @var FormFactoryInterface */
-    protected $formFactory;
+    private $formFactory;
 
     /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    private $router;
 
     /** @var FormProviderStub */
-    protected $formProvider;
+    private $formProvider;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
-        $this->router = $this->getMockBuilder(UrlGeneratorInterface::class)->getMock();
+        $this->router = $this->createMock(UrlGeneratorInterface::class);
 
         $this->formFactory = $this->getContainer()->get('form.factory');
         $this->formProvider = new FormProviderStub($this->formFactory, $this->router);
@@ -35,28 +32,20 @@ class AbstractFormProviderTest extends WebTestCase
 
     /**
      * @dataProvider formDataProvider
-     *
-     * @param string $routeName
-     * @param mixed  $data
-     * @param array  $options
-     * @param array  $cacheKeyOptions
-     * @param array  $expectedData
-     * @param string $expectedCacheKey
      */
     public function testGetFormAndFormView(
-        $routeName,
-        $data,
+        string $routeName,
+        mixed $data,
         array $options,
         array $cacheKeyOptions,
         array $expectedData,
-        $expectedCacheKey
+        string $expectedCacheKey
     ) {
         $formAction = 'form_action';
 
         $options = array_merge($options, ['action' => $formAction]);
 
-        $this->router
-            ->expects($this->exactly(4))
+        $this->router->expects($this->exactly(4))
             ->method('generate')
             ->with($routeName)
             ->willReturn($formAction);
@@ -85,11 +74,9 @@ class AbstractFormProviderTest extends WebTestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function formDataProvider()
+    public function formDataProvider(): array
     {
         return [
             'form' => [
@@ -217,24 +204,12 @@ class AbstractFormProviderTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param mixed  $data
-     * @param array  $options
-     *
-     * @return FormInterface
-     */
-    private function getForm($data = null, array $options = [])
+    private function getForm(mixed $data = null, array $options = []): FormInterface
     {
         return $this->formFactory->create(LayoutFormStub::class, $data, $options);
     }
 
-    /**
-     * @param string $type
-     * @param array  $options
-     *
-     * @return string
-     */
-    private function getCacheKey($type, array $options)
+    private function getCacheKey(string $type, array $options): string
     {
         return sprintf('%s:%s', $type, md5(serialize($options)));
     }

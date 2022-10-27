@@ -13,9 +13,6 @@ class PreCloseEventArgs extends EventArgs
     /** @var EntityManager */
     private $em;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;

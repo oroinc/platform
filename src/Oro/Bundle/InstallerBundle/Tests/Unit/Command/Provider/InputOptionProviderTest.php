@@ -11,32 +11,23 @@ use Symfony\Component\Console\Question\Question;
 
 class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const OPTION_NAME = 'option-name';
-    const MESSAGE = 'Question message';
+    private const OPTION_NAME = 'option-name';
+    private const MESSAGE = 'Question message';
 
-    /**
-     * @var QuestionHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var QuestionHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $questionHelper;
 
-    /**
-     * @var InputInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $input;
 
-    /**
-     * @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $output;
 
-    /**
-     * @var InputOptionProvider
-     */
+    /** @var InputOptionProvider */
     private $inputOptionProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        parent::setUp();
         $this->questionHelper = $this->createMock(QuestionHelper::class);
         $this->input = $this->createMock(InputInterface::class);
         $this->output = $this->createMock(OutputInterface::class);
@@ -47,8 +38,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetWhenOptionHasValue()
     {
         $defaultOptionValue = 'default option value';
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn($defaultOptionValue);
@@ -61,8 +51,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetWhenOptionHasValueAndConfirmationTypeOfQuestion(string $optionValue, bool $convertedValue)
     {
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn($optionValue);
@@ -78,10 +67,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function confirmationQuestionDataProvider()
+    public function confirmationQuestionDataProvider(): array
     {
         return [
             'n equals false as it starts from n' => [
@@ -113,13 +99,11 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWhenOptionHasNoValueAndNotInteractive()
     {
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('isInteractive')
             ->willReturn(false);
 
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn(null);
@@ -133,19 +117,16 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWhenOptionHasNoValueAndInteractiveAndNoInputFromUser()
     {
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('isInteractive')
             ->willReturn(true);
 
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn(null);
 
-        $this->questionHelper
-            ->expects($this->any())
+        $this->questionHelper->expects($this->any())
             ->method('ask')
             ->with($this->input, $this->output, $this->isInstanceOf(Question::class))
             ->willReturn(null);
@@ -159,20 +140,17 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWhenOptionHasNoValueAndInteractiveAndUserInputsAnswer()
     {
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('isInteractive')
             ->willReturn(true);
 
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn(null);
 
         $userAnswer = 'user answer';
-        $this->questionHelper
-            ->expects($this->any())
+        $this->questionHelper->expects($this->any())
             ->method('ask')
             ->with($this->input, $this->output, $this->isInstanceOf(Question::class))
             ->willReturn($userAnswer);

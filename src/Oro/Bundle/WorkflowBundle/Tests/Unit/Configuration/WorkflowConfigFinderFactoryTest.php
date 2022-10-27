@@ -14,9 +14,8 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowConfigFinderBuilder */
     private $workflowConfigFinderBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        /** @var ConfigFinderFactory|\PHPUnit\Framework\MockObject\MockObject $finderFactory */
         $this->finderFactory = $this->createMock(ConfigFinderFactory::class);
 
         $this->workflowConfigFinderBuilder = new WorkflowConfigFinderBuilder($this->finderFactory);
@@ -49,16 +48,22 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
         $finder1 = $this->createMock(Finder::class);
         $finder2 = $this->createMock(Finder::class);
 
-        $this->finderFactory->expects($this->exactly(2))->method('create')
-            ->withConsecutive(['subDir1', 'fileName1'], ['subDir2', 'fileName2'])
+        $this->finderFactory->expects($this->exactly(2))
+            ->method('create')
+            ->withConsecutive(
+                ['subDir1', 'appSubDir1', 'fileName1'],
+                ['subDir2', 'appSubDir2', 'fileName2']
+            )
             ->willReturnOnConsecutiveCalls($finder1, $finder2);
 
         $this->workflowConfigFinderBuilder->setSubDirectory('subDir1');
         $this->workflowConfigFinderBuilder->setFileName('fileName1');
+        $this->workflowConfigFinderBuilder->setAppSubDirectory('appSubDir1');
         $this->assertSame($finder1, $this->workflowConfigFinderBuilder->create());
 
         $this->workflowConfigFinderBuilder->setSubDirectory('subDir2');
         $this->workflowConfigFinderBuilder->setFileName('fileName2');
+        $this->workflowConfigFinderBuilder->setAppSubDirectory('appSubDir2');
 
         $this->assertSame($finder2, $this->workflowConfigFinderBuilder->create());
     }

@@ -16,16 +16,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class AddFileContentFormListener implements ProcessorInterface
 {
-    const CONTENT_FIELD_NAME            = 'content';
-    const ORIGINAL_FILE_NAME_FIELD_NAME = 'originalFilename';
-    const MIME_TYPE_FIELD_NAME          = 'mimeType';
+    private const CONTENT_FIELD_NAME = 'content';
+    private const ORIGINAL_FILE_NAME_FIELD_NAME = 'originalFilename';
+    private const MIME_TYPE_FIELD_NAME = 'mimeType';
 
-    /** @var FileManager */
-    protected $fileManager;
+    private FileManager $fileManager;
 
-    /**
-     * @param FileManager $fileManager
-     */
     public function __construct(FileManager $fileManager)
     {
         $this->fileManager = $fileManager;
@@ -47,9 +43,6 @@ class AddFileContentFormListener implements ProcessorInterface
         $formBuilder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPreSubmit(FormEvent $event)
     {
         $data = $event->getData();

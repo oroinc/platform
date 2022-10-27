@@ -7,19 +7,15 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 class AttributeHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AttributeHandler
-     */
-    protected $handler;
+    /** @var AttributeHandler */
+    private $handler;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->handler = new AttributeHandler();
     }
 
     /**
-     * @param array $expected
-     * @param array $input
      * @dataProvider handleDataProvider
      */
     public function testHandle(array $expected, array $input)
@@ -27,65 +23,65 @@ class AttributeHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->handler->handle($input));
     }
 
-    public function handleDataProvider()
+    public function handleDataProvider(): array
     {
-        return array(
-            'simple configuration' => array(
-                'expected' => array(
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(
-                        array(
+        return [
+            'simple configuration' => [
+                'expected' => [
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [
+                        [
                             'name' => 'test_attribute',
                             'property_path' => 'entity.test_attribute',
-                        )
-                    )
-                ),
-                'input' => array(
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(
-                        array(
+                        ]
+                    ]
+                ],
+                'input' => [
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [
+                        [
                             'name' => 'test_attribute',
                             'property_path' => 'entity.test_attribute',
-                        )
-                    )
-                ),
-            ),
-            'full configuration' => array(
-                'expected' => array(
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(
-                        array(
+                        ]
+                    ]
+                ],
+            ],
+            'full configuration' => [
+                'expected' => [
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [
+                        [
                             'name' => 'test_attribute',
                             'label' => 'Test Attribute', //should be kept as filtering disposed to another class
                             'type' => 'entity',
-                            'entity_acl' => array(
+                            'entity_acl' => [
                                 'delete' => false,
-                            ),
+                            ],
                             'property_path' => 'entity.test_attribute',
-                        )
-                    ),
-                ),
-                'input' => array(
-                    WorkflowConfiguration::NODE_ATTRIBUTES => array(
-                        array(
+                        ]
+                    ],
+                ],
+                'input' => [
+                    WorkflowConfiguration::NODE_ATTRIBUTES => [
+                        [
                             'name' => 'test_attribute',
                             'label' => 'Test Attribute',
                             'type' => 'entity',
-                            'entity_acl' => array(
+                            'entity_acl' => [
                                 'delete' => false,
-                            ),
+                            ],
                             'property_path' => 'entity.test_attribute'
-                        )
-                    ),
-                ),
-            ),
-        );
+                        ]
+                    ],
+                ],
+            ],
+        ];
     }
 
     public function testHandleEmptyConfiguration()
     {
-        $configuration = array(
-            WorkflowConfiguration::NODE_ATTRIBUTES => array(
-                array('property_path' => 'entity.property')
-            ),
-        );
+        $configuration = [
+            WorkflowConfiguration::NODE_ATTRIBUTES => [
+                ['property_path' => 'entity.property']
+            ],
+        ];
 
         $result = $this->handler->handle($configuration);
 

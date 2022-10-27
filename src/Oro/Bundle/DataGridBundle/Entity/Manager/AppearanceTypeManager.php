@@ -13,9 +13,6 @@ class AppearanceTypeManager
     /** @var  array */
     protected $appearanceTypes;
 
-    /**
-     * @param EntityManager $em
-     */
     public function __construct(EntityManager $em)
     {
         $this->em = $em;

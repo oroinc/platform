@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Factory;
 
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 interface QueryFactoryInterface

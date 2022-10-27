@@ -24,13 +24,12 @@ define([
 ) {
     'use strict';
 
-    var AddressBookView;
     /**
      * @export  oroaddress/js/address-book
      * @class   oroaddress.AddressBook
      * @extends Backbone.View
      */
-    AddressBookView = BaseView.extend({
+    const AddressBookView = BaseView.extend({
         isEmpty: false,
 
         options: {
@@ -42,8 +41,11 @@ define([
             addressCreateUrl: null,
             addressUpdateUrl: null,
             addressDeleteUrl: null,
+            addressesContainerHtml: '<div class="map-address-list"></div>',
+            noDataContainerHtml: '<div class="no-data"></div>',
             mapView: Googlemaps,
             addressMapOptions: {},
+            addressTagName: 'div',
             allowToRemovePrimary: false,
             confirmRemove: true,
             confirmRemoveComponent: deleteConfirmation,
@@ -55,14 +57,14 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function AddressBookView() {
-            AddressBookView.__super__.constructor.apply(this, arguments);
+        constructor: function AddressBookView(options) {
+            AddressBookView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -98,7 +100,7 @@ define([
                 el: this.$mapContainerFrame
             });
 
-            var activeAddress = this.getCollection().find({active: true});
+            const activeAddress = this.getCollection().find({active: true});
             if (activeAddress) {
                 this.activateAddress(activeAddress);
             }
@@ -117,21 +119,21 @@ define([
         },
 
         _initMainContainers: function() {
-            this.$noDataContainer = $('<div class="no-data"><span>' + this.noDataMessage + '</span></div>');
-            this.$addressesContainer = $('<div class="map-address-list"/>');
+            this.$noDataContainer = $(this.options.noDataContainerHtml).text(this.noDataMessage);
+            this.$addressesContainer = $(this.options.addressesContainerHtml);
 
-            if (!this.$el.find('.map-address-list').length) {
+            if (!$.contains(this.$el[0], this.$addressesContainer[0])) {
                 this.$el.append(this.$addressesContainer);
             }
 
-            if (!this.$el.find('.no-data').length) {
+            if (!$.contains(this.$el[0], this.$noDataContainer[0])) {
                 this.$el.append(this.$noDataContainer);
             }
         },
 
-        _getUrl: function(optionsKey) {
+        _getUrl: function(optionsKey, ...rest) {
             if (_.isFunction(this.options[optionsKey])) {
-                return this.options[optionsKey].apply(this, Array.prototype.slice.call(arguments, 1));
+                return this.options[optionsKey].apply(this, rest);
             }
             return this.options[optionsKey];
         },
@@ -142,7 +144,7 @@ define([
 
         onAddressRemove: function() {
             if (!this.getCollection().where({active: true}).length) {
-                var primaryAddress = this.getCollection().where({primary: true});
+                const primaryAddress = this.getCollection().where({primary: true});
                 if (primaryAddress.length) {
                     primaryAddress[0].set('active', true);
                 } else if (this.getCollection().length) {
@@ -193,7 +195,7 @@ define([
 
         _activatePreviousAddress: function() {
             if (this.activeAddress !== undefined) {
-                var previouslyActive = this.getCollection().where({id: this.activeAddress.get('id')});
+                const previouslyActive = this.getCollection().where({id: this.activeAddress.get('id')});
                 if (previouslyActive.length) {
                     previouslyActive[0].set('active', true);
                 }
@@ -202,16 +204,18 @@ define([
 
         addAddress: function(address) {
             if (!this.$el.find('#address-book-' + address.id).length) {
-                var addressView = new AddressView({
+                const addressView = new AddressView({
                     model: address,
                     map: this.options.addressMapOptions,
                     template: this.options.template,
                     allowToRemovePrimary: this.options.allowToRemovePrimary,
                     confirmRemove: this.options.confirmRemove,
                     confirmRemoveComponent: this.options.confirmRemoveComponent,
-                    addressDeleteUrl: this._getUrl('addressDeleteUrl', address)
+                    addressDeleteUrl: this._getUrl('addressDeleteUrl', address),
+                    tagName: this.options.addressTagName,
+                    isAddressHtmlFormatted: this.options.isAddressHtmlFormatted
                 });
-                addressView.on('edit', _.bind(this.editAddress, this));
+                addressView.on('edit', this.editAddress.bind(this));
                 this.$addressesContainer.append(addressView.render().$el);
             }
         },
@@ -236,25 +240,22 @@ define([
                         resizable: false,
                         width: 585,
                         autoResize: true,
-                        close: _.bind(function() {
+                        close: () => {
                             delete this.addressEditDialog;
-                        }, this)
+                        }
                     }
                 });
                 this.addressEditDialog.render();
-                mediator.on(
-                    'page:request',
-                    _.bind(function() {
-                        if (this.addressEditDialog) {
-                            this.addressEditDialog.remove();
-                        }
-                    }, this)
-                );
-                this.addressEditDialog.on('formSave', _.bind(function() {
+                mediator.on('page:request', () => {
+                    if (this.addressEditDialog) {
+                        this.addressEditDialog.remove();
+                    }
+                });
+                this.addressEditDialog.on('formSave', () => {
                     this.addressEditDialog.remove();
                     messenger.notificationFlashMessage('success', __('Address saved'));
                     this.reloadAddresses();
-                }, this));
+                });
             }
         },
 

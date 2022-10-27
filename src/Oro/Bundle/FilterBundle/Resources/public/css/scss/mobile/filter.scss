@@ -1,14 +1,12 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
+
 .filter-box {
     background-color: $mobile-filter-box-background-color;
     border-bottom-width: $mobile-filter-box-border-bottom-width;
 
-    &.ui-dialog {
-        padding: $mobile-filter-box-ui-dialog-inner-offset;
-    }
-
-    & > .dropdown {
+    > .dropdown {
         margin-left: $mobile-filter-box-dropdown-offset-left;
         margin-right: $mobile-filter-box-dropdown-offset-right;
 
@@ -16,7 +14,7 @@
     }
 
     .dropdown {
-        & > .dropdown-toggle {
+        > .dropdown-toggle {
             text-align: $mobile-filter-box-dropdown-toggle-text-align;
             width: $mobile-filter-box-dropdown-toggle-width;
             background-color: $mobile-filter-box-dropdown-toggle-background-color;
@@ -34,7 +32,7 @@
                 display: $mobile-filter-box-reset-all-filter-display;
                 position: $mobile-filter-box-reset-all-filter-position;
                 top: $mobile-filter-box-reset-all-filter-top;
-                #{$end}: $mobile-filter-box-reset-all-filter-end;
+                right: $mobile-filter-box-reset-all-filter-end;
 
                 @include fa-icon($mobile-filter-box-reset-all-filter-icon, before, true) {
                     font-size: $mobile-filter-box-reset-all-icon-font-size;
@@ -52,13 +50,13 @@
             }
         }
 
-        & > .dropdown-menu {
+        > .dropdown-menu {
             padding: $mobile-filter-box-dropdown-menu-inner-offset;
             margin: $mobile-filter-box-dropdown-menu-offset;
             max-width: $mobile-filter-box-dropdown-menu-max-width;
             width: $mobile-filter-box-dropdown-menu-width;
 
-            &:before {
+            &::before {
                 border-bottom: $mobile-filter-box-dropdown-menu-before-border-bottom;
                 border-left: $mobile-filter-box-dropdown-menu-before-border-left;
                 border-right: $mobile-filter-box-dropdown-menu-before-border-right;
@@ -70,7 +68,7 @@
                 top: $mobile-filter-box-dropdown-menu-before-top;
             }
 
-            &:after {
+            &::after {
                 border-bottom: $mobile-filter-box-dropdown-menu-after-border-bottom;
                 border-left: $mobile-filter-box-dropdown-menu-after-border-left;
                 border-right: $mobile-filter-box-dropdown-menu-after-border-right;
@@ -91,35 +89,55 @@
 
     .filter-criteria {
         width: 100%;
+        margin-left: $mobile-filter-box-criteria-offset-left;
+
+        &.empty-type {
+            .choice-filter {
+                display: flex;
+                padding-bottom: 0;
+
+                .btn-group.btn-block {
+                    width: $mobile-filter-box-criteria-empty-width;
+                }
+
+                .filter-update {
+                    margin: 0 0 0 $mobile-filter-offset-y;
+                    position: static;
+                }
+            }
+
+            .btn-group {
+                + .value-field-frame {
+                    margin-top: 0;
+                }
+            }
+        }
 
         .btn-group {
             display: block;
-            float: none;
+            float: left;
 
             > .btn {
                 width: $mobile-filter-box-width;
                 height: $mobile-filter-box-height;
                 font-size: $mobile-filter-box-font-size;
-                line-height: $mobile-filter-box-line-height;
                 text-transform: $mobile-filter-box-text-transform;
-                text-align: $mobile-filter-box-text-text-align;
             }
-            & + .value-field-frame {
+
+            + .value-field-frame {
                 margin-left: 0;
-                margin-top: 8px;
             }
         }
 
         .choice-filter,
         .value-field-frame,
         .product-price-filter {
+            @include clearfix();
+
             display: $mobile-filter-box-product-price-filter-display;
         }
 
         .choice-filter {
-            padding-bottom: $mobile-choice-filter-inner-offset-bottom;
-            position: relative;
-
             .value-field-frame {
                 position: static;
                 display: flex;
@@ -132,20 +150,30 @@
             }
 
             .select2-container {
+                // stylelint-disable-next-line declaration-no-important
                 width: 100% !important;
                 margin-left: -2px;
-            }
 
-            .filter-update {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
+                input[type='text'] {
+                    padding: $mobile-filter-box-choice-filter-inner-offset;
+                }
             }
 
             &.number-range-filter {
+                .filter-update {
+                    display: $mobile-filter-update-display;
+                    width: $mobile-filter-update-width;
+                    margin: $mobile-filter-update-offset;
+                }
+
+                .btn-block {
+                    margin-bottom: 0;
+                }
+
                 .filter-start,
                 .filter-end {
+                    margin-top: $mobile-filter-offset-y;
+                    margin-bottom: 0;
                     display: block;
                     width: 100%;
 
@@ -155,15 +183,16 @@
                 }
 
                 .btn-group.btn-block {
+                    // stylelint-disable-next-line declaration-no-important
                     float: none !important;
                 }
 
                 .filter-value {
-                    padding-bottom: $mobile-choice-filter-value-inner-offset-bottom;
                     position: relative;
                 }
 
                 .filter-trigger-wrapper {
+                    margin-bottom: 0;
                     position: absolute;
                     bottom: 0;
                     left: 0;
@@ -177,62 +206,66 @@
                 .filter-separator {
                     margin: 0 6px;
                 }
-            }
 
-            &.dictionary-filter {
-                .btn-group.btn-block {
-                    float: none;
+                &.product-price-filter-criteria {
+                    .product-price-unit-filter-separator {
+                        margin-left: $content-padding-medium;
+                    }
+
+                    .filter-separator,
+                    .product-price-unit-filter-separator {
+                        height: 40px;
+                        line-height: 40px;
+                        align-self: center;
+                    }
+
+                    .filter-value {
+                        flex-direction: row;
+                        margin-top: $mobile-filter-offset-y;
+                        padding-bottom: $mobile-choice-filter-inner-offset-bottom;
+                    }
+
+                    .filter-start,
+                    .filter-end {
+                        margin-top: 0;
+                        width: 50%;
+                    }
                 }
-
-                .select2-container {
-                    margin-left: 0;
-                }
             }
-        }
-
-        .filter-update {
-            display: $mobile-filter-update-display;
-            width: $mobile-filter-update-width;
-            max-width: $mobile-filter-update-max-width;
-            margin: $mobile-filter-update-offset;
-            height: $mobile-filter-update-height;
-            border-radius: $mobile-filter-update-border-radius;
-            font-size: $mobile-filter-update-font-size;
         }
 
         .filter-value {
             display: flex;
             width: 100%;
         }
+
+        .oro-action {
+            margin-top: $mobile-filter-offset-y;
+        }
     }
 
-    .filter-select-oro-wrapper {
-        width: auto;
-
-        .selector {
-            width: 100% !important;
-
-            span {
-                width: 100% !important;
-            }
+    .filter-select-oro {
+        &-wrapper {
+            margin-bottom: $mobile-filter-offset-y;
         }
     }
 
     .filter-item {
+        // stylelint-disable-next-line declaration-no-important
         display: $mobile-filter-item-display !important;
         margin: $mobile-filter-item-offset;
 
         > .btn {
             height: 32px;
             line-height: 32px;
-            text-align: #{$start};
+            text-align: left;
         }
 
         &.open-filter {
-            &:before,
-            &:after {
-                #{$start}: 0;
-                #{$end}: 0;
+            &::before,
+            &::after {
+                left: 0;
+                right: 0;
                 width: 0;
                 margin: auto;
             }
@@ -240,17 +273,19 @@
 
         .filter-criteria-selector {
             display: block;
-            padding-#{$end}: $mobile-filter-criteria-selector-inner-end-offset;
+            padding-right: $mobile-filter-criteria-selector-inner-end-offset;
             text-overflow: ellipsis;
             overflow: hidden;
 
             .filter-criteria-hint {
-                padding-#{$end}: $mobile-filter-criteria-selector-hint-inner-end-offset;
+                padding-right: $mobile-filter-criteria-selector-hint-inner-end-offset;
+                display: inline;
             }
         }
 
-        &.choice-tree-filter {
+        .choice-tree-filter {
             max-width: initial;
+
             .select2-container {
                 margin: 0;
             }
@@ -258,12 +293,7 @@
 
         .reset-filter {
             position: absolute;
-            #{$end}: $mobile-reset-filter-end;
-
-            [class^="fa-"],
-            [class*=" fa-"] {
-                margin-top: 4px;
-            }
+            right: $mobile-reset-filter-end;
         }
     }
 
@@ -274,16 +304,44 @@
     }
 
     &.ui-dialog {
+        padding: $mobile-filter-box-ui-dialog-inner-offset;
+
         .ui-dialog-content {
-            padding: $mobile-filter-box-ui-dialog-content-inner-offset;
+            @include safe-area-offset(padding, $mobile-filter-box-ui-dialog-content-inner-offset);
+
             height: $mobile-filter-box-ui-dialog-content-height;
+            position: $mobile-filter-box-ui-dialog-content-position;
+
+            .filter-criteria {
+                z-index: $mobile-filter-box-ui-dialog-content-z-index;
+
+                .btn-group.show {
+                    &::before {
+                        content: '';
+                        width: $mobile-filter-box-ui-dialog-content-filter-criteria-before-width;
+                        height: $mobile-filter-box-ui-dialog-content-filter-criteria-before-height;
+                        position: $mobile-filter-box-ui-dialog-content-filter-criteria-before-position;
+                        top: $mobile-filter-box-ui-dialog-content-filter-criteria-before-top;
+                        left: $mobile-filter-box-ui-dialog-content-filter-criteria-before-left;
+                        z-index: $mobile-filter-box-ui-dialog-content-z-index;
+                    }
+                }
+
+                // Fullscreen dropdown menu
+                .dropdown-menu {
+                    width: $mobile-filter-box-ui-dialog-content-filter-criteria-width;
+                    height: $mobile-filter-box-ui-dialog-content-filter-criteria-height;
+                    top: $mobile-filter-box-ui-dialog-content-filter-criteria-top;
+                    transform: $mobile-filter-box-ui-dialog-content-filter-criteria-transform;
+                }
+            }
         }
 
         .ui-dialog-buttonpane {
             position: $mobile-filter-box-ui-dialog-buttonpane-position;
             bottom: $mobile-filter-box-ui-dialog-buttonpane-bottom;
-            #{$start}: $mobile-filter-box-ui-dialog-buttonpane-left;
-            #{$end}: $mobile-filter-box-ui-dialog-buttonpane-right;
+            left: $mobile-filter-box-ui-dialog-buttonpane-left;
+            right: $mobile-filter-box-ui-dialog-buttonpane-right;
         }
 
         .reset-filter-button,
@@ -293,15 +351,96 @@
     }
 }
 
+.filter-start-date,
+.filter-end-date {
+    .datetime-visual-element {
+        margin-bottom: $mobile-filter-offset-y;
+    }
+
+    .timepicker-input {
+        margin: 0 0 $mobile-filter-offset-y 0;
+    }
+
+    &:last-child {
+        .datepicker-input,
+        .timepicker-input {
+            margin-bottom: 0;
+        }
+    }
+}
+
 .ui-multiselect-menu {
     &.select-filter-widget {
+        // stylelint-disable-next-line declaration-no-important
         min-width: 100% !important;
         max-width: 100%;
+
         .ui-multiselect-checkboxes {
             &.fixed-li {
                 li > label {
                     text-overflow: ellipsis;
                     overflow: hidden;
+                }
+            }
+        }
+    }
+}
+
+@media only screen
+    and (max-width: $small-landscape-devices-media-breakpoint)
+    and (min-width: #{$small-devices-media-breakpoint + 1}) {
+    .filter-box {
+        .filter-criteria {
+            .btn-group {
+                + .value-field-frame {
+                    margin-top: $mobile-filter-offset-y;
+                }
+            }
+
+            .choice-filter {
+                input[type='text'] {
+                    margin-left: 0;
+                }
+
+                .select2-container {
+                    margin-left: 0;
+                }
+
+                .btn-group.btn-block {
+                    float: none;
+                }
+            }
+        }
+    }
+}
+
+@media only screen and (max-width: $small-devices-media-breakpoint) {
+    .filter-box {
+        .filter-criteria {
+            .choice-filter {
+                padding-bottom: $mobile-choice-filter-inner-offset-bottom;
+                position: relative;
+
+                .filter-update {
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                }
+            }
+
+            .filter-update {
+                margin: $mobile-filter-update-offset;
+
+                &:not(.filter-update-empty) {
+                    display: $mobile-filter-update-display;
+                    width: $mobile-filter-update-width;
+                }
+            }
+
+            .oro-action {
+                .filter-update {
+                    margin-top: 0;
                 }
             }
         }

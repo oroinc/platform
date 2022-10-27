@@ -1,5 +1,9 @@
 datagrids:
     items-grid:
+        options:
+            noDataMessages:
+                emptyGrid: translation.trans1
+                emptyFilteredGrid: translation.trans2
         source:
             type: orm
             query:
@@ -7,7 +11,7 @@ datagrids:
                     - item.id
                     - item.stringValue
                 from:
-                    - { table: '%oro_test.entity.item.class%', alias: item }
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\Item, alias: item }
         columns:
             id:
                 label: id
@@ -23,7 +27,7 @@ datagrids:
                 select:
                     - itemValue.id
                 from:
-                    - { table: '%oro_test.entity.item_value.class%', alias: itemValue }
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\ItemValue, alias: itemValue }
         columns:
             id:
                 label: id
@@ -44,12 +48,27 @@ datagrids:
             default:
                 id: ASC
 
+    test-entity-name-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - item.name
+                from:
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership, alias: item }
+        columns:
+            name:
+                label: name
+        sorters:
+            default:
+                name: ASC
+
     test-search-grid:
         source:
             type: search
             query:
                 select:
-                    - text.stringValue
+                    - text.stringValue as stringValue
                     - integer.id as id
                 from:
                     - oro_test_item
@@ -63,6 +82,11 @@ datagrids:
                     type: integer
             default:
                 id: ASC
+        filters:
+            columns:
+                stringValue:
+                    type: string
+                    data_name: text.stringValue
 
     items-grid-with-export-page-size:
         source:
@@ -72,7 +96,7 @@ datagrids:
                     - item.id
                     - item.stringValue
                 from:
-                    - { table: '%oro_test.entity.item.class%', alias: item }
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\Item, alias: item }
         columns:
             id:
                 label: id

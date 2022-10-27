@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Link;
+namespace Oro\Bundle\ReportBundle\Tests\Unit\Extension\Link;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -9,16 +9,12 @@ use Oro\Bundle\ReportBundle\Extension\Link\DateGroupingActionRemoverExtension;
 
 class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $config;
+    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
+    private $config;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->config = $this->getMockBuilder(DatagridConfiguration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->config = $this->createMock(DatagridConfiguration::class);
     }
 
     public function testIsApplicableFalse()
@@ -50,7 +46,6 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($extension->isApplicable($this->config));
     }
 
-
     public function testIsApplicableTrue()
     {
         $this->config->expects($this->once())
@@ -70,28 +65,19 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param        [] $inputRows
-     * @param        [] $expectedRows
      * @dataProvider visitResultProvider
      */
     public function testVisitResult($inputRows, $expectedRows)
     {
-        /** @var ResultsObject|\PHPUnit\Framework\MockObject\MockObject $result * */
-        $result = $this->getMockBuilder(ResultsObject::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $result = $this->createMock(ResultsObject::class);
         $result->expects($this->once())
             ->method('getData')
             ->willReturn($inputRows);
         $result->expects($this->once())
             ->method('setData')
-            ->will(
-                $this->returnCallback(
-                    function ($newRows) use ($expectedRows) {
-                        $this->assertSame($expectedRows, $newRows);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($newRows) use ($expectedRows) {
+                $this->assertSame($expectedRows, $newRows);
+            });
 
         $extension = new DateGroupingActionRemoverExtension('');
         $extension->setParameters(new ParameterBag());
@@ -99,10 +85,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->visitResult($this->config, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function visitResultProvider()
+    public function visitResultProvider(): array
     {
         return [
             [

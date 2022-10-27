@@ -20,10 +20,6 @@ class MergeListener
     /** @var TaggableHelper */
     protected $taggableHelper;
 
-    /**
-     * @param TagManager     $tagManager
-     * @param TaggableHelper $helper
-     */
     public function __construct(TagManager $tagManager, TaggableHelper $helper)
     {
         $this->tagManager     = $tagManager;
@@ -32,8 +28,6 @@ class MergeListener
 
     /**
      * Add merge metadata for tags
-     *
-     * @param EntityMetadataEvent $event
      */
     public function onBuildMetadata(EntityMetadataEvent $event)
     {
@@ -57,8 +51,6 @@ class MergeListener
 
     /**
      * Load tags
-     *
-     * @param EntityDataEvent $event
      */
     public function onCreateEntityData(EntityDataEvent $event)
     {
@@ -76,8 +68,6 @@ class MergeListener
 
     /**
      * Save tags
-     *
-     * @param EntityDataEvent $event
      */
     public function afterMergeEntity(EntityDataEvent $event)
     {

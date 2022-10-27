@@ -1,144 +1,56 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMessageProcessorRegistryPass;
-use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\InvalidTopicSubscriber;
-use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\OnlyTopicNameTopicSubscriber;
-use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\ProcessorNameTopicSubscriber;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 class BuildMessageProcessorRegistryPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithoutAnyArguments()
+    private BuildMessageProcessorRegistryPass $compiler;
+
+    private ContainerBuilder $container;
+
+    private Definition $registryDefinition;
+
+    protected function setUp(): void
     {
-        new BuildMessageProcessorRegistryPass();
+        $this->compiler = new BuildMessageProcessorRegistryPass();
+
+        $this->container = new ContainerBuilder();
+        $this->registryDefinition = $this->container->register('oro_message_queue.client.message_processor_registry')
+            ->addArgument([]);
     }
 
-    public function testShouldBuildRouteRegistry()
+    public function testWhenRegistryIsNotDefined(): void
     {
         $container = new ContainerBuilder();
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'topic',
-            'processorName' => 'processor-name',
-        ]);
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id', $this->getMockClass(MessageProcessorInterface::class))
+            ->addTag('oro_message_queue.client.message_processor', []);
 
-        $processorRegistry = new Definition('ProcessorRegistry', [[]]);
-        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
-
-        $pass = new BuildMessageProcessorRegistryPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'processor-name' => 'processor-id',
-        ];
-
-        $this->assertEquals($expectedValue, $processorRegistry->getArgument(0));
+        $this->compiler->process($container);
     }
 
-    public function testShouldThrowExceptionIfTopicNameIsNotSet()
+    public function testProcess(): void
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage(
-            'Topic name is not set but it is required. service: "processor",'.
-            ' tag: "oro_message_queue.client.message'
+        $this->container->register('processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'topic']
+            );
+
+        $this->compiler->process($this->container);
+
+        self::assertEquals(
+            [
+                new Reference('processor_id'),
+                new Reference('oro_message_queue.client.noop_message_processor'),
+            ],
+            $this->registryDefinition->getArgument(0)
         );
-
-        $container = new ContainerBuilder();
-
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor', $processor);
-
-        $processorRegistry = new Definition('ProcessorRegistry', [[]]);
-        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
-
-        $pass = new BuildMessageProcessorRegistryPass();
-        $pass->process($container);
-    }
-
-    public function testShouldSetServiceIdAdProcessorIdIfIsNotSetInTag()
-    {
-        $container = new ContainerBuilder();
-
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'topic',
-        ]);
-        $container->setDefinition('processor-id', $processor);
-
-        $processorRegistry = new Definition('ProcessorRegistry', [[]]);
-        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
-
-        $pass = new BuildMessageProcessorRegistryPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'processor-id' => 'processor-id',
-        ];
-
-        $this->assertEquals($expectedValue, $processorRegistry->getArgument(0));
-    }
-
-    public function testShouldBuildRouteFromSubscriberIfOnlyTopicNameSpecified()
-    {
-        $container = new ContainerBuilder();
-
-        $processor = new Definition(OnlyTopicNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-id', $processor);
-
-        $processorRegistry = new Definition('ProcessorRegistry', [[]]);
-        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
-
-        $pass = new BuildMessageProcessorRegistryPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'processor-id' => 'processor-id',
-        ];
-
-        $this->assertEquals($expectedValue, $processorRegistry->getArgument(0));
-    }
-
-    public function testShouldBuildRouteFromSubscriberIfProcessorNameSpecified()
-    {
-        $container = new ContainerBuilder();
-
-        $processor = new Definition(ProcessorNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-id', $processor);
-
-        $processorRegistry = new Definition('ProcessorRegistry', [[]]);
-        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
-
-        $pass = new BuildMessageProcessorRegistryPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'subscriber-processor-name' => 'processor-id',
-        ];
-
-        $this->assertEquals($expectedValue, $processorRegistry->getArgument(0));
-    }
-
-    public function testShouldThrowExceptionWhenTopicSubscriberConfigurationIsInvalid()
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Topic subscriber configuration is invalid. "[12345]"');
-        $container = new ContainerBuilder();
-
-        $processor = new Definition(InvalidTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-id', $processor);
-
-        $processorRegistry = new Definition('ProcessorRegistry', [[]]);
-        $container->setDefinition('oro_message_queue.client.message_processor_registry', $processorRegistry);
-
-        $pass = new BuildMessageProcessorRegistryPass();
-        $pass->process($container);
     }
 }

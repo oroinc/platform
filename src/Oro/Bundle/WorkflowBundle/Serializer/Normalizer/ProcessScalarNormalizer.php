@@ -7,7 +7,7 @@ class ProcessScalarNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, string $format = null, array $context = [])
     {
         return $object;
     }
@@ -15,7 +15,7 @@ class ProcessScalarNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         return $data;
     }
@@ -31,7 +31,7 @@ class ProcessScalarNormalizer extends AbstractProcessNormalizer
     /**
      * {@inheritDoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return is_scalar($data) || $data === null;
     }

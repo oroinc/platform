@@ -16,10 +16,6 @@ class EntityNameProvider implements EntityNameProviderInterface
     /** @var ServiceLink */
     protected $dqlNameFormatterLink;
 
-    /**
-     * @param ServiceLink $nameFormatterLink
-     * @param ServiceLink $dqlNameFormatterLink
-     */
     public function __construct(ServiceLink $nameFormatterLink, ServiceLink $dqlNameFormatterLink)
     {
         $this->nameFormatterLink    = $nameFormatterLink;

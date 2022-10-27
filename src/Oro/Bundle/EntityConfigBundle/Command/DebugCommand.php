@@ -1,95 +1,136 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Yaml\Yaml;
 
 /**
+ * Displays entity configuration.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class DebugCommand extends ContainerAwareCommand
+class DebugCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @var string */
+    protected static $defaultName = 'oro:entity-config:debug';
+
+    private ManagerRegistry $registry;
+    private ConfigManager $configManager;
+
+    public function __construct(ManagerRegistry $registry, ConfigManager $configManager)
+    {
+        parent::__construct();
+
+        $this->registry = $registry;
+        $this->configManager = $configManager;
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setName('oro:entity-config:debug')
-            ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name')
-            ->addArgument('field', InputArgument::OPTIONAL, 'The field name')
-            ->addOption(
-                'cache',
-                null,
-                InputOption::VALUE_NONE,
-                'Show configuration values from a cache. By default values are loaded from a database'
-            )
-            ->addOption(
-                'scope',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The attribute scope'
-            )
-            ->addOption(
-                'attr',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The attribute name'
-            )
-            ->addOption(
-                'val',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The attribute value'
-            )
-            ->addOption(
-                'list',
-                'l',
-                InputOption::VALUE_NONE,
-                'Show the list of configurable entities or fields'
-            )
-            ->addOption(
-                'set',
-                null,
-                InputOption::VALUE_NONE,
-                'Sets an attribute value of configurable entities or fields'
-            )
-            ->addOption(
-                'remove',
-                null,
-                InputOption::VALUE_NONE,
-                'Removes an attribute/scope from configurable entities or fields'
-            )
+            ->addArgument('entity', InputArgument::OPTIONAL, 'Entity class name')
+            ->addArgument('field', InputArgument::OPTIONAL, 'Field name')
+            ->addOption('cache', null, InputOption::VALUE_NONE, 'Load configuration from cache (instead of database)')
+            ->addOption('scope', null, InputOption::VALUE_REQUIRED, 'Attribute scope')
+            ->addOption('attr', null, InputOption::VALUE_REQUIRED, 'Attribute name')
+            ->addOption('val', null, InputOption::VALUE_REQUIRED, 'Attribute value')
+            ->addOption('list', 'l', InputOption::VALUE_NONE, 'List the configurable entities or fields')
+            ->addOption('set', null, InputOption::VALUE_NONE, 'Set an attribute value')
+            ->addOption('remove', null, InputOption::VALUE_NONE, 'Remove an attribute/scope')
             ->addOption(
                 'ref-non-configurable',
                 null,
                 InputOption::VALUE_NONE,
-                'Show all fields that are references to non configurable entities'
+                'Show fields that are references to non-configurable entities'
             )
-            ->setDescription('Displays entity configuration.');
+            ->setDescription('Displays entity configuration.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays entity configuration.
+
+  <info>php %command.full_name%</info>
+
+The entity class name and field name can be provided as arguments
+to see only the related configuration:
+
+  <info>php %command.full_name% <entity-class></info>
+  <info>php %command.full_name% <entity-class> <field-name></info>
+
+The <info>--list</info> option can be used to see a list of the configurable entities,
+or a list of fields of a specific entity:
+
+  <info>php %command.full_name% --list</info>
+  <info>php %command.full_name% --list <entity-class></info>
+
+The <info>--ref-non-configurable</info> option can be used to show the fields that are
+references to non-configurable entities:
+
+  <info>php %command.full_name% --ref-non-configurable <entity-class></info>
+
+The <info>--cache</info> option can be used to load the entity configuration from cache
+(instead of from the database):
+
+  <info>php %command.full_name% --cache --scope=<attribute-scope></info>
+
+The <info>--scope</info> and <info>--attr</info> options can be used to load or apply the changes
+to the specified attribute scope and attribute:
+
+  <info>php %command.full_name% --scope=<attribute-scope></info>
+  <info>php %command.full_name% --attr=<attribute-name></info>
+
+The <info>--set</info> and <info>--val</info> options can be used to update an attribute value:
+
+  <info>php %command.full_name% --attr=<attribute-name> --set --val=<value></info>
+
+The <info>--remove</info> option can be used to remove an attribute scope or an attribute:
+
+  <info>php %command.full_name% --remove --scope=<attribute-scope></info>
+  <info>php %command.full_name% --remove --attr=<attribute-name></info>
+
+HELP
+            )
+            ->addUsage('<entity-class>')
+            ->addUsage('<entity-class> <field-name>')
+            ->addUsage('--list')
+            ->addUsage('--list <entity-class>')
+            ->addUsage('--ref-non-configurable <entity-class>')
+            ->addUsage('--cache --scope=<scope>')
+            ->addUsage('--scope=<attribute-scope>')
+            ->addUsage('--attr=<attribute-name>')
+            ->addUsage('--set --attr=<attribute-name> --val=<value>')
+            ->addUsage('--remove --scope=<attribute-scope>')
+            ->addUsage('--remove --attr=<attribute-name>')
+        ;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
         $entity         = $input->getArgument('entity');
         $field          = $input->getArgument('field');
         $scope          = $input->getOption('scope');
@@ -118,26 +159,26 @@ class DebugCommand extends ContainerAwareCommand
             }
             if ($isList) {
                 if (empty($entity)) {
-                    $this->dumpEntityListFromCache($output, $scope);
+                    $this->dumpEntityListFromCache($io, $scope);
                 } else {
-                    $this->dumpFieldListFromCache($output, $entity, $scope);
+                    $this->dumpFieldListFromCache($io, $entity, $scope);
                 }
             } elseif (!empty($entity)) {
                 if (empty($field)) {
-                    $this->dumpEntityConfigFromCache($output, $entity, $scope, $attrName);
+                    $this->dumpEntityConfigFromCache($io, $entity, $scope, $attrName);
                 } else {
-                    $this->dumpFieldConfigFromCache($output, $entity, $field, $scope, $attrName);
+                    $this->dumpFieldConfigFromCache($io, $entity, $field, $scope, $attrName);
                 }
             }
         } else {
             if ($isList) {
                 if (empty($entity)) {
-                    $this->dumpEntityList($output);
+                    $this->dumpEntityList($io);
                 } else {
-                    $this->dumpFieldList($output, $entity);
+                    $this->dumpFieldList($io, $entity);
                 }
             } elseif ($isRefNonConfig) {
-                $this->dumpNonConfigRef($output, $entity);
+                $this->dumpNonConfigRef($io, $entity);
             } elseif (!empty($entity)) {
                 if ($isSet && empty($scope) && empty($attrName) && $attrVal === null) {
                     throw new \RuntimeException(
@@ -151,34 +192,33 @@ class DebugCommand extends ContainerAwareCommand
                 }
                 if ($isSet) {
                     if (empty($field)) {
-                        $this->setEntityConfigValue($output, $entity, $scope, $attrName, $attrVal);
+                        $this->setEntityConfigValue($io, $entity, $scope, $attrName, $attrVal);
                     } else {
-                        $this->setFieldConfigValue($output, $entity, $field, $scope, $attrName, $attrVal);
+                        $this->setFieldConfigValue($io, $entity, $field, $scope, $attrName, $attrVal);
                     }
                 } elseif ($isRemove) {
                     if (empty($field)) {
-                        $this->removeEntityConfigScopeOrAttribute($output, $entity, $scope, $attrName);
+                        $this->removeEntityConfigScopeOrAttribute($io, $entity, $scope, $attrName);
                     } else {
-                        $this->removeFieldConfigScopeOrAttribute($output, $entity, $field, $scope, $attrName);
+                        $this->removeFieldConfigScopeOrAttribute($io, $entity, $field, $scope, $attrName);
                     }
                 } else {
                     if (empty($field)) {
-                        $this->dumpEntityConfig($output, $entity, $scope, $attrName);
+                        $this->dumpEntityConfig($io, $entity, $scope, $attrName);
                     } else {
-                        $this->dumpFieldConfig($output, $entity, $field, $scope, $attrName);
+                        $this->dumpFieldConfig($io, $entity, $field, $scope, $attrName);
                     }
                 }
             }
         }
+
+        return 0;
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    protected function dumpEntityList(OutputInterface $output)
+    protected function dumpEntityList(OutputInterface $output): void
     {
         /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
         $rows = $em->getConnection()->fetchAll(
             'SELECT class_name, mode FROM oro_entity_config ORDER BY class_name'
@@ -188,19 +228,12 @@ class DebugCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $scope
-     */
-    protected function dumpEntityListFromCache(OutputInterface $output, $scope)
+    protected function dumpEntityListFromCache(OutputInterface $output, string $scope): void
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getContainer()->get('oro_entity_config.config_manager');
-
         /** @var EntityConfigId[] $ids */
-        $ids = $cm->getIds($scope, null, true);
+        $ids = $this->configManager->getIds($scope, null, true);
         /** @var EntityConfigId[] $notHiddenIds */
-        $notHiddenIds = $cm->getIds($scope, null);
+        $notHiddenIds = $this->configManager->getIds($scope, null);
 
         foreach ($ids as $id) {
             $hidden = true;
@@ -220,14 +253,10 @@ class DebugCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     */
-    protected function dumpFieldList(OutputInterface $output, $className)
+    protected function dumpFieldList(OutputInterface $output, string $className): void
     {
         /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
         $rows = $em->getConnection()->fetchAll(
             'SELECT fc.field_name, fc.type, fc.mode FROM oro_entity_config ec'
@@ -242,20 +271,12 @@ class DebugCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $scope
-     */
-    protected function dumpFieldListFromCache(OutputInterface $output, $className, $scope)
+    protected function dumpFieldListFromCache(OutputInterface $output, string $className, string $scope): void
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getContainer()->get('oro_entity_config.config_manager');
-
         /** @var FieldConfigId[] $ids */
-        $ids = $cm->getIds($scope, $className, true);
+        $ids = $this->configManager->getIds($scope, $className, true);
         /** @var FieldConfigId[] $notHiddenIds */
-        $notHiddenIds = $cm->getIds($scope, $className);
+        $notHiddenIds = $this->configManager->getIds($scope, $className);
 
         foreach ($ids as $id) {
             $hidden = true;
@@ -278,14 +299,10 @@ class DebugCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string|null     $className
-     */
-    protected function dumpNonConfigRef(OutputInterface $output, $className = null)
+    protected function dumpNonConfigRef(OutputInterface $output, ?string $className = null): void
     {
         /** @var EntityManager $em */
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
         if (empty($className)) {
             $rows       = $em->getConnection()->fetchAll(
@@ -346,16 +363,17 @@ class DebugCommand extends ContainerAwareCommand
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string|null     $scope
-     * @param string|null     $attrName
-     */
-    protected function dumpEntityConfig(OutputInterface $output, $className, $scope = null, $attrName = null)
-    {
+    protected function dumpEntityConfig(
+        SymfonyStyle $output,
+        string $className,
+        ?string $scope = null,
+        ?string $attrName = null
+    ): void {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT * FROM oro_entity_config WHERE class_name = ?',
@@ -365,21 +383,19 @@ class DebugCommand extends ContainerAwareCommand
         foreach ($rows as $row) {
             $output->writeln(sprintf('Class: %s', $row['class_name']));
             $output->writeln(sprintf('Mode:  %s', $row['mode']));
-            $output->writeln('Values:');
+            $output->title('Values:');
             $this->dumpData($output, $connection->convertToPHPValue($row['data'], 'array'), $scope, $attrName);
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $scope
-     * @param string|null     $attrName
-     */
-    protected function dumpEntityConfigFromCache(OutputInterface $output, $className, $scope, $attrName = null)
-    {
+    protected function dumpEntityConfigFromCache(
+        SymfonyStyle $output,
+        string $className,
+        string $scope,
+        ?string $attrName = null
+    ): void {
         /** @var ConfigProvider $cp */
-        $cp = $this->getContainer()->get('oro_entity_config.config_manager')->getProvider($scope);
+        $cp = $this->configManager->getProvider($scope);
 
         if (!$cp->hasConfig($className)) {
             $output->writeln('The configuration was not found.');
@@ -388,21 +404,22 @@ class DebugCommand extends ContainerAwareCommand
         $config = $cp->getConfig($className);
 
         $output->writeln(sprintf('Class: %s', $config->getId()->getClassName()));
-        $output->writeln('Values:');
+        $output->title('Values:');
         $this->dumpConfig($output, $config, $attrName);
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $fieldName
-     * @param string|null     $scope
-     * @param string|null     $attrName
-     */
-    protected function dumpFieldConfig(OutputInterface $output, $className, $fieldName, $scope = null, $attrName = null)
-    {
+    protected function dumpFieldConfig(
+        SymfonyStyle $output,
+        string $className,
+        string $fieldName,
+        ?string $scope = null,
+        ?string $attrName = null
+    ): void {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT ec.class_name, fc.* FROM oro_entity_config ec'
@@ -416,27 +433,20 @@ class DebugCommand extends ContainerAwareCommand
             $output->writeln(sprintf('Field: %s', $row['field_name']));
             $output->writeln(sprintf('Type:  %s', $row['type']));
             $output->writeln(sprintf('Mode:  %s', $row['mode']));
-            $output->writeln('Values:');
+            $output->title('Values:');
             $this->dumpData($output, $connection->convertToPHPValue($row['data'], 'array'), $scope, $attrName);
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $fieldName
-     * @param string          $scope
-     * @param string|null     $attrName
-     */
     protected function dumpFieldConfigFromCache(
-        OutputInterface $output,
-        $className,
-        $fieldName,
-        $scope,
-        $attrName = null
-    ) {
+        SymfonyStyle $output,
+        string $className,
+        string $fieldName,
+        string $scope,
+        ?string $attrName = null
+    ): void {
         /** @var ConfigProvider $cp */
-        $cp = $this->getContainer()->get('oro_entity_config.config_manager')->getProvider($scope);
+        $cp = $this->configManager->getProvider($scope);
 
         if (!$cp->hasConfig($className, $fieldName)) {
             $output->writeln('The configuration was not found.');
@@ -447,18 +457,16 @@ class DebugCommand extends ContainerAwareCommand
         $output->writeln(sprintf('Class: %s', $config->getId()->getClassName()));
         $output->writeln(sprintf('Field: %s', $config->getId()->getFieldName()));
         $output->writeln(sprintf('Type:  %s', $config->getId()->getFieldType()));
-        $output->writeln('Values:');
+        $output->title('Values:');
         $this->dumpConfig($output, $config, $attrName);
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param array           $data
-     * @param string|null     $scope
-     * @param string|null     $attrName
-     */
-    protected function dumpData(OutputInterface $output, array $data, $scope = null, $attrName = null)
-    {
+    protected function dumpData(
+        OutputInterface $output,
+        array $data,
+        ?string $scope = null,
+        ?string $attrName = null
+    ): void {
         $res = $data;
         if (!empty($scope)) {
             if (isset($data[$scope])) {
@@ -473,12 +481,7 @@ class DebugCommand extends ContainerAwareCommand
         $output->writeln($this->convertArrayToString($res));
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param ConfigInterface $config
-     * @param string|null     $attrName
-     */
-    protected function dumpConfig(OutputInterface $output, ConfigInterface $config, $attrName = null)
+    protected function dumpConfig(OutputInterface $output, ConfigInterface $config, ?string $attrName = null): void
     {
         $data = $config->all();
         $res  = [$config->getId()->getScope() => $data];
@@ -488,20 +491,17 @@ class DebugCommand extends ContainerAwareCommand
         $output->writeln($this->convertArrayToString($res));
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $scope
-     * @param string|null     $attrName
-     */
     protected function removeEntityConfigScopeOrAttribute(
         OutputInterface $output,
-        $className,
-        $scope,
-        $attrName = null
-    ) {
+        string $className,
+        string $scope,
+        ?string $attrName = null
+    ): void {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT * FROM oro_entity_config WHERE class_name = ?',
@@ -520,7 +520,7 @@ class DebugCommand extends ContainerAwareCommand
                 unset($data[$scope][$attrName]);
             }
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -530,22 +530,18 @@ class DebugCommand extends ContainerAwareCommand
         $this->clearConfigCache();
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $fieldName
-     * @param string          $scope
-     * @param string|null     $attrName
-     */
     protected function removeFieldConfigScopeOrAttribute(
         OutputInterface $output,
-        $className,
-        $fieldName,
-        $scope,
-        $attrName = null
-    ) {
+        string $className,
+        string $fieldName,
+        string $scope,
+        ?string $attrName = null
+    ): void {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT fc.* FROM oro_entity_config ec'
@@ -566,7 +562,7 @@ class DebugCommand extends ContainerAwareCommand
                 unset($data[$scope][$attrName]);
             }
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -577,21 +573,20 @@ class DebugCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $scope
-     * @param string          $attrName
-     * @param mixed           $attrVal
+     * @param mixed $attrVal
      */
     protected function setEntityConfigValue(
         OutputInterface $output,
-        $className,
-        $scope,
-        $attrName,
+        string $className,
+        string $scope,
+        string $attrName,
         $attrVal
-    ) {
+    ): void {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT * FROM oro_entity_config WHERE class_name = ?',
@@ -606,7 +601,7 @@ class DebugCommand extends ContainerAwareCommand
             $data                    = $connection->convertToPHPValue($row['data'], 'array');
             $data[$scope][$attrName] = $this->getTypedVal($attrVal);
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -617,23 +612,21 @@ class DebugCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $fieldName
-     * @param string          $scope
-     * @param string          $attrName
-     * @param mixed           $attrVal
+     * @param mixed $attrVal
      */
     protected function setFieldConfigValue(
         OutputInterface $output,
-        $className,
-        $fieldName,
-        $scope,
-        $attrName,
+        string $className,
+        string $fieldName,
+        string $scope,
+        string $attrName,
         $attrVal
-    ) {
+    ): void {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManagerForClass(EntityConfigModel::class);
+
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine.orm.entity_manager')->getConnection();
+        $connection = $em->getConnection();
 
         $rows = $connection->fetchAll(
             'SELECT fc.* FROM oro_entity_config ec'
@@ -650,7 +643,7 @@ class DebugCommand extends ContainerAwareCommand
             $data                    = $connection->convertToPHPValue($row['data'], 'array');
             $data[$scope][$attrName] = $this->getTypedVal($attrVal);
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -690,9 +683,7 @@ class DebugCommand extends ContainerAwareCommand
 
     protected function clearConfigCache()
     {
-        /** @var ConfigManager $cm */
-        $cm = $this->getContainer()->get('oro_entity_config.config_manager');
-        $cm->clearCache();
+        $this->configManager->clearCache();
     }
 
     /**
@@ -704,21 +695,22 @@ class DebugCommand extends ContainerAwareCommand
      */
     protected function convertArrayToString(array $array)
     {
-        $replace = [
-            false => 'false',
-            true  => 'true',
-            null  => 'NULL',
-        ];
+        $array = $this->sortDataByKeys($array);
 
-        array_walk_recursive(
-            $array,
-            function (&$item) use ($replace) {
-                if (is_bool($item) || is_null($item)) {
-                    $item = $replace[$item];
-                }
+        return Yaml::dump($array, 5, 4, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE | Yaml::DUMP_OBJECT);
+    }
+
+    private function sortDataByKeys(array $array): array
+    {
+        if (ArrayUtil::isAssoc($array)) {
+            ksort($array);
+        }
+        foreach ($array as &$val) {
+            if (is_array($val) && ArrayUtil::isAssoc($val)) {
+                ksort($val);
             }
-        );
+        }
 
-        return print_r($array, true);
+        return $array;
     }
 }

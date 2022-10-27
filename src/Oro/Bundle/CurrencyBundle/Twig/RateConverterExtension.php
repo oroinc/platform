@@ -2,7 +2,16 @@
 
 namespace Oro\Bundle\CurrencyBundle\Twig;
 
-class RateConverterExtension extends \Twig_Extension
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
+
+/**
+ * Provides a Twig function to retrieve base currency value:
+ *   - oro_multicurrency_rate_converter
+ *
+ * This function is not available in the community edition.
+ */
+class RateConverterExtension extends AbstractExtension
 {
     /**
      * {@inheritdoc}
@@ -10,7 +19,7 @@ class RateConverterExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_multicurrency_rate_converter', [$this, 'convert']),
+            new TwigFunction('oro_multicurrency_rate_converter', [$this, 'convert']),
         ];
     }
 
@@ -25,13 +34,5 @@ class RateConverterExtension extends \Twig_Extension
     public function convert()
     {
         return '';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'oro_multicurrency';
     }
 }

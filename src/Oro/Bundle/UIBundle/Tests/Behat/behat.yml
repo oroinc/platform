@@ -3,9 +3,11 @@ oro_behat_extension:
     OroUIBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroUIBundle::DragAndDropContext
-        - OroFormBundle::FormContext
-        - OroDataGridBundle::GridContext
+        - Oro\Bundle\UIBundle\Tests\Behat\Context\DragAndDropContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
       paths:
         - '@OroUIBundle/Tests/Behat/Features'
 
@@ -35,7 +37,6 @@ oro_behat_extension:
 
     Link:
       selector: 'a'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Entity Status:
       selector: '.badge'
@@ -43,27 +44,21 @@ oro_behat_extension:
 
     Breadcrumb Container:
       selector: 'ul.breadcrumb'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Page Title:
       selector: '.page-title'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Entity Edit Button:
       selector: 'a.edit-button'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Entity Delete Button:
       selector: 'a.edit-remove'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     Flash Message:
-      selector: '#flash-messages div.alert'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+      selector: '#flash-messages div.alert, .ui-dialog-messages .alert'
 
     Flash Message Close Button:
       selector: '#flash-messages div.alert .notification-flash__close'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     ControlGroup:
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\ControlGroup
@@ -74,44 +69,44 @@ oro_behat_extension:
 
     UiDialog Title:
       selector: 'span.ui-dialog-title'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiDialog Content:
       selector: 'div.ui-dialog-content'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiDialog okButton:
       selector: 'div.ui-dialog-buttonpane button[type=submit]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiDialog cancelButton:
       selector: 'div.ui-dialog-buttonpane button[type=reset]'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiDialog Disabled okButton:
+      selector: 'div.ui-dialog-buttonpane button.disabled[type=submit]'
+
+    UiDialog ActionPanel:
+      selector: 'div[role="dialog"] .ui-dialog-buttonpane'
 
     UiWindow:
       selector: 'div.modal'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow Title:
       selector: 'div.modal-header h3, div.modal-dialog__body h2.page-title'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow Content:
       selector: 'div.modal-body, div.modal-dialog__body'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow okButton:
       selector: 'div.modal-footer .ok, div.buttons-equal button.ok'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
 
     UiWindow cancelButton:
       selector: 'div.modal-footer .cancel, div.buttons-equal button.cancel'
-      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Element
+
+    UiWindow ActionPanel:
+      selector: 'div.modal .modal-footer'
 
     ContextSelector:
       selector:
         type: xpath
-        locator: '//div[contains(@class, "ui-dialog")]/div[contains(@class, "widget-content")]/div[contains(@class, "btn-group")]'
+        locator: '//div[contains(@class, "ui-dialog")]/div[contains(@class, "widget-content")]/div[contains(@class, "dropdown")]'
       class: Oro\Bundle\UIBundle\Tests\Behat\Element\ContextSelector
 
     Application Settings Form:
@@ -124,5 +119,14 @@ oro_behat_extension:
     Alert Error Message:
       selector: '.alert-error .message'
 
+    Alert Error Flash Message:
+      selector: '.alert .notification-flash__text'
+
     TypeaheadSuggestionsDropdown:
       selector: '.typeahead.dropdown-menu'
+
+    Tooltip:
+      selector: '.tooltip'
+
+    TooltipInner:
+      selector: '.tooltip-inner'

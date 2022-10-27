@@ -2,21 +2,21 @@
 
 namespace Oro\Component\Routing\Loader;
 
+use Oro\Component\Routing\Resolver\EnhancedRouteCollection;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-use Oro\Component\Routing\Resolver\SortableRouteCollection;
 use Symfony\Component\Config\Loader\Loader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
+/**
+ * Abstract class used by all loaders which should work with EnhancedRouteCollection.
+ */
 abstract class AbstractLoader extends Loader
 {
     /** @var RouteOptionsResolverInterface */
     protected $routeOptionsResolver;
 
-    /**
-     * @param RouteOptionsResolverInterface $routeOptionsResolver
-     */
     public function __construct(RouteOptionsResolverInterface $routeOptionsResolver)
     {
         $this->routeOptionsResolver = $routeOptionsResolver;
@@ -30,7 +30,7 @@ abstract class AbstractLoader extends Loader
      */
     public function load($resource, $type = null)
     {
-        $routes = new SortableRouteCollection();
+        $routes = new EnhancedRouteCollection();
         $this->loadRoutes($routes);
 
         $routeCollectionAccessor = new RouteCollectionAccessor($routes);
@@ -39,19 +39,30 @@ abstract class AbstractLoader extends Loader
             $this->routeOptionsResolver->resolve($route, $routeCollectionAccessor);
         }
 
-        $routes->sortByPriority();
-
         return $routes;
     }
 
-    /**
-     * @param RouteCollection $routes
-     */
     protected function loadRoutes(RouteCollection $routes)
     {
         $resources = $this->getResources();
         foreach ($resources as $resource) {
-            $routes->addCollection($this->resolve($resource)->load($resource));
+            $resourceRoutesCollection = $this->import($resource);
+
+            $this->updateRoutesPriority($resourceRoutesCollection);
+            $routes->addCollection($resourceRoutesCollection);
+        }
+    }
+
+    protected function updateRoutesPriority(RouteCollection $resourceRoutesCollection): void
+    {
+        foreach ($resourceRoutesCollection->all() as $name => $route) {
+            if ($route->getOption('priority')) {
+                // Remove route with the same name first because just replacing
+                // would not place the new route at the end of the array.
+                $resourceRoutesCollection->remove($name);
+
+                $resourceRoutesCollection->add($name, $route, $route->getOption('priority'));
+            }
         }
     }
 

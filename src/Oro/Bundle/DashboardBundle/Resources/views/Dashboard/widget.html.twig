@@ -20,7 +20,7 @@
             {% if config.show_on_widget and config.value is not null%}
                 {% if config.value is iterable %}
                     {% for key,value in config.value %}
-                <div class="widget-config-data"><stong>{{ key|trans }}</stong>: {{ value }}</div>
+                <div class="widget-config-data"><strong>{{ key|trans }}</strong>: {{ value }}</div>
                     {% endfor %}
                 {% else %}
                     {% if config.options is defined and config.options.label is defined %}
@@ -39,7 +39,12 @@
                     {% if value is null %}
                         {% set value = config.value %}
                     {% endif %}
-                    <div class="widget-config-data"><stong>{{ label|trans }}</stong>: {{ value }}</div>
+                    {% if value is same as(true) %}
+                        {% set value = value
+                            ? 'oro.dashboard.widget.option_value.boolean.true'|trans
+                            : 'oro.dashboard.widget.option_value.boolean.false'|trans %}
+                    {% endif %}
+                    <div class="widget-config-data"><strong>{{ label|trans }}</strong>: {{ value }}</div>
                 {% endif %}
             {% endif %}
         {% endfor %}
@@ -49,12 +54,12 @@
             {% if actions is defined %}
                 {% for action in actions -%}
                     {% if action.type is not defined or action.type == "button" %}
-                        {% set cssType = "btn btn-mini " ~ action.class|default('btn-primary') %}
+                        {% set cssType = "btn btn-sm " ~ action.class|default('btn-primary') %}
                     {% else %}
                         {% set cssType = "dashboard-link" %}
                     {% endif %}
                     <a class="dashboard-btn  {{ cssType }}{% if not action.url is defined or not action.url %} no-hash{% endif %}"
-                        href="{{ action.url|default('javascript:void(0);') }}"
+                        href="{{ action.url|default('#') }}"
                         {% if action.data is defined %}
                             {% for dataItemName,dataItemValue in action.data %}
                             data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"

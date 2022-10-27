@@ -24,11 +24,6 @@ class InitializeEntityMapper implements ProcessorInterface
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param EntityInstantiator             $entityInstantiator
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityInstantiator $entityInstantiator,
@@ -51,10 +46,7 @@ class InitializeEntityMapper implements ProcessorInterface
             return;
         }
 
-        $entityClass = $this->doctrineHelper->getManageableEntityClass(
-            $context->getClassName(),
-            $context->getConfig()
-        );
+        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
         if (!$entityClass) {
             // the entity mapper is required only for manageable entities
             // or resources based on manageable entities

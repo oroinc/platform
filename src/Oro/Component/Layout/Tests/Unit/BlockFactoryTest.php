@@ -3,49 +3,56 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
+use Oro\Component\Layout\Exception\InvalidArgumentException;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\LayoutRegistry;
+use Oro\Component\Layout\LayoutUpdateInterface;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class BlockFactoryTest extends LayoutTestCase
 {
     /** @var LayoutContext */
-    protected $context;
+    private $context;
 
     /** @var RawLayoutBuilder */
-    protected $rawLayoutBuilder;
+    private $rawLayoutBuilder;
 
     /** @var DeferredLayoutManipulator */
-    protected $layoutManipulator;
+    private $layoutManipulator;
 
     /** @var LayoutRegistry */
-    protected $registry;
+    private $registry;
 
     /** @var ExpressionLanguage */
-    protected $expressionLanguage;
+    private $expressionLanguage;
 
     /** @var BlockFactory */
-    protected $blockFactory;
+    private $blockFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->registry = new LayoutRegistry();
         $this->registry->addExtension(new CoreExtension());
@@ -55,41 +62,39 @@ class BlockFactoryTest extends LayoutTestCase
                     'root'                         => new Type\RootType(),
                     'header'                       => new Type\HeaderType(),
                     'logo'                         => new Type\LogoType(),
+                    'logo_with_required_title'     => new Type\LogoWithRequiredTitleType(),
                     'test_self_building_container' => new Type\TestSelfBuildingContainerType()
                 ]
             )
         );
 
-        $this->context            = new LayoutContext();
-        $this->rawLayoutBuilder   = new RawLayoutBuilder();
-        $this->layoutManipulator  = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
+        $this->context = new LayoutContext();
+        $this->rawLayoutBuilder = new RawLayoutBuilder();
+        $this->layoutManipulator = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
         $this->expressionLanguage = new ExpressionLanguage();
-        $expressionProcessor      = new ExpressionProcessor(
+        $expressionProcessor = new ExpressionProcessor(
             $this->expressionLanguage,
             new ExpressionEncoderRegistry([])
         );
-        $this->blockFactory       = new BlockFactory(
+        $this->blockFactory = new BlockFactory(
             $this->registry,
             $this->layoutManipulator,
             $expressionProcessor
         );
     }
 
-    /**
-     * @param string|null $rootId
-     *
-     * @return BlockView
-     */
-    protected function getLayoutView($rootId = null)
+    private function getLayoutView(): BlockView
     {
         $this->layoutManipulator->applyChanges($this->context, true);
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
-        return $this->blockFactory->createBlockView($rawLayout, $this->context, $rootId);
+        return $this->blockFactory->createBlockView($rawLayout, $this->context);
     }
 
     public function testSimpleLayout()
     {
+        $this->context->resolve();
+
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
@@ -117,6 +122,8 @@ class BlockFactoryTest extends LayoutTestCase
 
     public function testCoreVariablesForRootItemOnly()
     {
+        $this->context->resolve();
+
         $this->layoutManipulator
             ->add('rootId', null, 'root');
 
@@ -136,7 +143,7 @@ class BlockFactoryTest extends LayoutTestCase
                         'root',
                         '_rootId'
                     ],
-                    'cache_key'            => '_rootId_root'
+                    'cache_key'            => '_rootId_root_ad7b81dea42cf2ef7525c274471e3ce6'
                 ],
                 'children' => []
             ],
@@ -147,6 +154,8 @@ class BlockFactoryTest extends LayoutTestCase
 
     public function testCoreVariables()
     {
+        $this->context->resolve();
+
         $this->layoutManipulator
             ->add('rootId', null, 'root')
             ->add('headerId', 'rootId', 'header')
@@ -168,7 +177,7 @@ class BlockFactoryTest extends LayoutTestCase
                         'root',
                         '_rootId'
                     ],
-                    'cache_key'            => '_rootId_root'
+                    'cache_key'            => '_rootId_root_ad7b81dea42cf2ef7525c274471e3ce6'
                 ],
                 'children' => [
                     [ // header
@@ -184,7 +193,7 @@ class BlockFactoryTest extends LayoutTestCase
                                 'header',
                                 '_headerId'
                             ],
-                            'cache_key'            => '_headerId_header'
+                            'cache_key'            => '_headerId_header_ad7b81dea42cf2ef7525c274471e3ce6'
                         ],
                         'children' => [
                             [ // logo
@@ -199,7 +208,7 @@ class BlockFactoryTest extends LayoutTestCase
                                         'logo',
                                         '_logoId'
                                     ],
-                                    'cache_key'            => '_logoId_logo',
+                                    'cache_key'            => '_logoId_logo_ad7b81dea42cf2ef7525c274471e3ce6',
                                     'title'                => 'test'
                                 ]
                             ]
@@ -212,14 +221,16 @@ class BlockFactoryTest extends LayoutTestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The "header" item cannot be added as a child to "logo" item (block type: logo) because only container blocks can have children.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddChildToNotContainer()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
+            'The "header" item cannot be added as a child to "logo" item (block type: logo)'
+            . ' because only container blocks can have children.'
+        );
+
+        $this->context->resolve();
+
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('logo', 'root', 'logo')
@@ -233,78 +244,56 @@ class BlockFactoryTest extends LayoutTestCase
      */
     public function testExtensions()
     {
-        $testBlockType = $this->createMock('Oro\Component\Layout\Block\Type\AbstractType');
+        $testBlockType = $this->createMock(AbstractType::class);
         $testBlockType->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
         $testBlockType->expects($this->any())
             ->method('getParent')
-            ->will($this->returnValue(BaseType::NAME));
+            ->willReturn(BaseType::NAME);
 
-        $headerLayoutUpdate = $this->createMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $headerLayoutUpdate = $this->createMock(LayoutUpdateInterface::class);
         $headerLayoutUpdate->expects($this->once())
             ->method('updateLayout')
-            ->will(
-                $this->returnCallback(
-                    function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
-                        $layoutManipulator->add('test', 'header', 'test');
-                    }
-                )
-            );
+            ->willReturnCallback(function (LayoutManipulatorInterface $layoutManipulator) {
+                $layoutManipulator->add('test', 'header', 'test');
+            });
 
-        $headerBlockTypeExtension = $this->createMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $headerBlockTypeExtension = $this->createMock(BlockTypeExtensionInterface::class);
         $headerBlockTypeExtension->expects($this->any())
             ->method('getExtendedType')
-            ->will($this->returnValue('header'));
+            ->willReturn('header');
         $headerBlockTypeExtension->expects($this->once())
             ->method('configureOptions')
-            ->will(
-                $this->returnCallback(
-                    function (OptionsResolver $resolver) {
-                        $resolver->setDefaults(
-                            [
-                                'test_option_1' => '',
-                                'test_option_2' => ['background'=> 'red']
-                            ]
-                        );
-                    }
-                )
-            );
+            ->willReturnCallback(function (OptionsResolver $resolver) {
+                $resolver->setDefaults([
+                    'test_option_1' => '',
+                    'test_option_2' => ['background' => 'red']
+                ]);
+            });
         $headerBlockTypeExtension->expects($this->once())
             ->method('buildBlock')
-            ->will(
-                $this->returnCallback(
-                    function (BlockBuilderInterface $builder, Options $options) {
-                        if ($options['test_option_1'] === 'move_logo_to_root') {
-                            $builder->getLayoutManipulator()->move('logo', 'root');
-                        }
-                    }
-                )
-            );
+            ->willReturnCallback(function (BlockBuilderInterface $builder, Options $options) {
+                if ($options['test_option_1'] === 'move_logo_to_root') {
+                    $builder->getLayoutManipulator()->move('logo', 'root');
+                }
+            });
         $headerBlockTypeExtension->expects($this->once())
             ->method('buildView')
-            ->will(
-                $this->returnCallback(
-                    function (BlockView $view, BlockInterface $block, Options $options) {
-                        $view->vars['attr']['block_id'] = $block->getId();
-                        if ($options['test_option_1'] === 'move_logo_to_root') {
-                            $view->vars['attr']['logo_moved'] = true;
-                        }
-                        $view->vars['attr']['background'] = $options['test_option_2']['background'];
-                    }
-                )
-            );
+            ->willReturnCallback(function (BlockView $view, BlockInterface $block, Options $options) {
+                $view->vars['attr']['block_id'] = $block->getId();
+                if ($options['test_option_1'] === 'move_logo_to_root') {
+                    $view->vars['attr']['logo_moved'] = true;
+                }
+                $view->vars['attr']['background'] = $options['test_option_2']['background'];
+            });
         $headerBlockTypeExtension->expects($this->once())
             ->method('finishView')
-            ->will(
-                $this->returnCallback(
-                    function (BlockView $view, BlockInterface $block) {
-                        if (isset($view['test'])) {
-                            $view['test']->vars['processed_by_header_extension'] = true;
-                        }
-                    }
-                )
-            );
+            ->willReturnCallback(function (BlockView $view) {
+                if (isset($view['test'])) {
+                    $view['test']->vars['processed_by_header_extension'] = true;
+                }
+            });
 
         $this->registry->addExtension(
             new AbstractExtensionStub(
@@ -317,6 +306,8 @@ class BlockFactoryTest extends LayoutTestCase
                 []
             )
         );
+
+        $this->context->resolve();
 
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -358,14 +349,14 @@ class BlockFactoryTest extends LayoutTestCase
 
     /**
      * @dataProvider expressionsProvider
-     *
-     * @param bool $deferred
      */
-    public function testProcessingExpressionsInBuildView($deferred)
+    public function testProcessingExpressionsInBuildView(bool $deferred)
     {
-        $this->context->set('expressions_evaluate', true);
-        $this->context->set('expressions_evaluate_deferred', $deferred);
-        $this->context->set('title', 'test title');
+        $this->context = new LayoutContext(
+            ['expressions_evaluate' => true, 'expressions_evaluate_deferred' => $deferred, 'title' => 'test title'],
+            ['expressions_evaluate', 'expressions_evaluate_deferred', 'title']
+        );
+        $this->context->resolve();
 
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -394,10 +385,7 @@ class BlockFactoryTest extends LayoutTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function expressionsProvider()
+    public function expressionsProvider(): array
     {
         return [
             ['deferred' => false],
@@ -405,13 +393,14 @@ class BlockFactoryTest extends LayoutTestCase
         ];
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testBuildViewShouldFailWhenUsingNonProcessedExpressions()
     {
-        $this->context->set('expressions_evaluate', false);
-        $this->context->set('title', 'test title');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->context = new LayoutContext(
+            ['expressions_evaluate' => false, 'title' => 'test title'],
+            ['expressions_evaluate', 'title']
+        );
+        $this->context->resolve();
 
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -423,14 +412,14 @@ class BlockFactoryTest extends LayoutTestCase
         $this->getLayoutView();
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testBuildViewShouldFailWhenUsingDataInExpressionsInDeferredMode()
     {
-        $this->context->set('expressions_evaluate', true);
-        $this->context->set('expressions_evaluate_deferred', true);
-        $this->context->data()->set('title', 'test title');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->context = new LayoutContext(
+            ['expressions_evaluate' => true, 'expressions_evaluate_deferred' => true, 'title' => 'test title'],
+            ['expressions_evaluate', 'expressions_evaluate_deferred', 'title']
+        );
+        $this->context->resolve();
 
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -448,7 +437,8 @@ class BlockFactoryTest extends LayoutTestCase
         $valueBag->add('one');
         $valueBag->add('two');
 
-        $this->context->set('expressions_evaluate', true);
+        $this->context = new LayoutContext(['expressions_evaluate' => true], ['expressions_evaluate']);
+        $this->context->resolve();
 
         $this->layoutManipulator
             ->add('root', null, 'root')
@@ -473,5 +463,20 @@ class BlockFactoryTest extends LayoutTestCase
             ],
             $view
         );
+    }
+
+    public function testExceptionDuringResolveBlockOptions()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
+            'Cannot resolve options for the block "logo". Reason: The required option "title" is missing.'
+        );
+
+        $this->context->resolve();
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo_with_required_title');
+        $this->getLayoutView();
     }
 }

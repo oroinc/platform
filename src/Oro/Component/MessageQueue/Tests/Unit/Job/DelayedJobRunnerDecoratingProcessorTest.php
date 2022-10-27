@@ -10,57 +10,42 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var JobRunner
-     */
-    private $jobRunner;
+    private MessageProcessorInterface|\PHPUnit\Framework\MockObject\MockObject $processor;
 
-    /**
-     * @var MessageProcessorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $processor;
+    private DelayedJobRunnerDecoratingProcessor $decoratorProcessor;
 
-    /**
-     * @var DelayedJobRunnerDecoratingProcessor
-     */
-    private $decoratorProcessor;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->jobRunner = new JobRunner();
+        $jobRunner = new JobRunner();
         $this->processor = $this->createMock(MessageProcessorInterface::class);
 
-        $this->decoratorProcessor = new DelayedJobRunnerDecoratingProcessor($this->jobRunner, $this->processor);
+        $this->decoratorProcessor = new DelayedJobRunnerDecoratingProcessor($jobRunner, $this->processor);
     }
 
     /**
      * @dataProvider resultDataProvider
-     * @param bool|string|null $processorResult
-     * @param string $expected
      */
-    public function testProcess($processorResult, $expected)
+    public function testProcess(string|bool|null $processorResult, string $expected): void
     {
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
 
-        $message->expects($this->any())
+        $message->expects(self::any())
             ->method('getBody')
-            ->willReturn(json_encode(['id' => 1, 'jobId' => 123]));
+            ->willReturn(['id' => 1, 'jobId' => 123]);
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('process')
-            ->with($this->isInstanceOf(MessageInterface::class))
+            ->with(self::isInstanceOf(MessageInterface::class))
             ->willReturn($processorResult);
 
-        $this->assertEquals($expected, $this->decoratorProcessor->process($message, $session));
+        self::assertEquals($expected, $this->decoratorProcessor->process($message, $session));
     }
 
     /**
      * @return array
      */
-    public function resultDataProvider()
+    public function resultDataProvider(): array
     {
         return [
             'ACK' => [MessageProcessorInterface::ACK, MessageProcessorInterface::ACK],
@@ -71,41 +56,35 @@ class DelayedJobRunnerDecoratingProcessorTest extends \PHPUnit\Framework\TestCas
         ];
     }
 
-    public function testProcessRequeue()
+    public function testProcessRequeue(): void
     {
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
 
-        $message->expects($this->any())
+        $message->expects(self::any())
             ->method('getBody')
-            ->willReturn(json_encode(['jobId' => 123]));
+            ->willReturn(['jobId' => 123]);
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('process')
-            ->with($this->isInstanceOf(MessageInterface::class))
+            ->with(self::isInstanceOf(MessageInterface::class))
             ->willReturn(MessageProcessorInterface::REQUEUE);
 
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('REQUEUE requested');
-        $this->decoratorProcessor->process($message, $session);
+        self::assertEquals(MessageProcessorInterface::REQUEUE, $this->decoratorProcessor->process($message, $session));
     }
 
-    public function testProcessWithoutJobId()
+    public function testProcessWithoutJobId(): void
     {
-        /** @var MessageInterface|\PHPUnit\Framework\MockObject\MockObject $message */
         $message = $this->createMock(MessageInterface::class);
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
 
-        $message->expects($this->any())
+        $message->expects(self::any())
             ->method('getBody')
-            ->willReturn(json_encode(['id' => 1]));
+            ->willReturn(['id' => 1]);
 
-        $this->processor->expects($this->never())
+        $this->processor->expects(self::never())
             ->method('process');
 
-        $this->assertEquals(MessageProcessorInterface::REJECT, $this->decoratorProcessor->process($message, $session));
+        self::assertEquals(MessageProcessorInterface::REJECT, $this->decoratorProcessor->process($message, $session));
     }
 }

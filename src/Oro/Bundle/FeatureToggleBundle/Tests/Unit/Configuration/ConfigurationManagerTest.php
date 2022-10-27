@@ -5,51 +5,53 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configurationProvider;
+    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurationProvider;
 
-    /**
-     * @var ConfigurationManager
-     */
-    protected $configurationManager;
+    /** @var ConfigurationManager */
+    private $configurationManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configurationProvider = $this->getMockBuilder(ConfigurationProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
+
         $this->configurationManager = new ConfigurationManager($this->configurationProvider);
-    }
-
-    public function testGetDefault()
-    {
-        $feature = 'feature';
-        $node = 'node';
-        $default = 'default';
-
-        $this->configurationProvider->expects($this->once())
-            ->method('getFeaturesConfiguration')
-            ->willReturn([]);
-
-        $this->assertEquals($default, $this->configurationManager->get($feature, $node, $default));
     }
 
     public function testGet()
     {
-        $feature = 'feature';
-        $node = 'node';
-        $default = 'default';
         $value = 'value';
 
         $this->configurationProvider->expects($this->once())
             ->method('getFeaturesConfiguration')
             ->willReturn(['feature' => ['node' => $value]]);
 
-        $this->assertEquals($value, $this->configurationManager->get($feature, $node, $default));
+        $this->assertSame($value, $this->configurationManager->get('feature', 'node', 'default'));
+    }
+
+    public function testGetDefault()
+    {
+        $default = 'default';
+
+        $this->configurationProvider->expects($this->once())
+            ->method('getFeaturesConfiguration')
+            ->willReturn([]);
+
+        $this->assertSame($default, $this->configurationManager->get('feature', 'node', $default));
+    }
+
+    public function testGetDefaultWhenFeatureValueIsNull()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getFeaturesConfiguration')
+            ->willReturn(['feature' => ['node' => null]]);
+
+        $this->assertNull($this->configurationManager->get('feature', 'node', 'default'));
     }
 
     public function testGetFeaturesByResource()
@@ -60,9 +62,18 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->configurationProvider->expects($this->once())
             ->method('getResourcesConfiguration')
-            ->willReturn([$resourceType => [$resource =>$features ]]);
+            ->willReturn([$resourceType => [$resource => $features]]);
 
         $this->assertEquals($features, $this->configurationManager->getFeaturesByResource($resourceType, $resource));
+    }
+
+    public function testGetFeaturesByResourceWhenTheyDoesNotSet()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getResourcesConfiguration')
+            ->willReturn([]);
+
+        $this->assertSame([], $this->configurationManager->getFeaturesByResource('testType', 'testResource'));
     }
 
     public function testGetFeatureDependencies()
@@ -77,6 +88,15 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dependsOn, $this->configurationManager->getFeatureDependencies($feature));
     }
 
+    public function testGetFeatureDependenciesWhenTheyDoesNotSet()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getDependenciesConfiguration')
+            ->willReturn([]);
+
+        $this->assertSame([], $this->configurationManager->getFeatureDependencies('feature'));
+    }
+
     public function testGetFeatureDependents()
     {
         $feature = 'feature1';
@@ -89,40 +109,37 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($dependents, $this->configurationManager->getFeatureDependents($feature));
     }
 
+    public function testGetFeatureDependentsWhenTheyDoesNotSet()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getDependentsConfiguration')
+            ->willReturn([]);
+
+        $this->assertSame([], $this->configurationManager->getFeatureDependents('feature'));
+    }
+
     public function testGetFeatureByToggle()
     {
-        $feature = 'feature1';
-        $toggle = 'oro_bundle.toggle_key';
-
         $this->configurationProvider->expects($this->once())
-            ->method('getFeaturesConfiguration')
-            ->willReturn([$feature => ['toggle' => $toggle]]);
+            ->method('getTogglesConfiguration')
+            ->willReturn(['toggle1' => 'feature1']);
 
-        $this->assertSame($feature, $this->configurationManager->getFeatureByToggle($toggle));
+        $this->assertEquals('feature1', $this->configurationManager->getFeatureByToggle('toggle1'));
     }
 
-    public function testGetFeatureByWrongToggle()
+    public function testGetFeatureByToggleWhenItDoesNotSet()
     {
         $this->configurationProvider->expects($this->once())
-            ->method('getFeaturesConfiguration')
-            ->willReturn(['feature1' => ['toggle' => 'oro_bundle.toggle_key']]);
+            ->method('getTogglesConfiguration')
+            ->willReturn(['toggle1' => 'feature1']);
 
-        $this->assertNull($this->configurationManager->getFeatureByToggle('wrong_toggle_key'));
-    }
-
-    public function testGetFeatureByToggleWhenNotIsset()
-    {
-        $this->configurationProvider->expects($this->once())
-            ->method('getFeaturesConfiguration')
-            ->willReturn(['feature1' => ['not_toggle' => 'oro_bundle.toggle_key']]);
-
-        $this->assertNull($this->configurationManager->getFeatureByToggle('oro_bundle.toggle_key'));
+        $this->assertNull($this->configurationManager->getFeatureByToggle('toggle2'));
     }
 
     /**
      * @dataProvider getResourcesByTypeProvider
      */
-    public function testGetResourcesByType($resourceType, array $configuration, array $expectedResources)
+    public function testGetResourcesByType(string $resourceType, array $configuration, array $expectedResources)
     {
         $this->configurationProvider->expects($this->once())
             ->method('getResourcesConfiguration')
@@ -131,35 +148,23 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResources, $this->configurationManager->getResourcesByType($resourceType));
     }
 
-    public function getResourcesByTypeProvider()
+    public function getResourcesByTypeProvider(): array
     {
         return [
             'non existing resource' => [
                 'nonExisting',
                 [
-                    'resource1' => [
-                        'feature1_1',
-                        'feature1_2',
-                    ],
+                    'resource1' => ['feature1_1', 'feature1_2']
                 ],
-                [],
+                []
             ],
-            'existing resource' => [
+            'existing resource'     => [
                 'resource1',
                 [
-                    'resource1' => [
-                        'feature1_1',
-                        'feature1_2',
-                    ],
-                    'resource2' => [
-                        'feature2_1',
-                        'feature2_2',
-                    ],
+                    'resource1' => ['feature1_1', 'feature1_2'],
+                    'resource2' => ['feature2_1', 'feature2_2'],
                 ],
-                [
-                    'feature1_1',
-                    'feature1_2',
-                ],
+                ['feature1_1', 'feature1_2']
             ],
         ];
     }

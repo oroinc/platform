@@ -4,14 +4,15 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Condition;
 
 use Oro\Bundle\ActionBundle\Condition\CollectionElementValueExists;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CollectionElementValueExists */
-    protected $condition;
+    private $condition;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->condition = new CollectionElementValueExists();
         $this->condition->setContextAccessor(new ContextAccessor());
@@ -19,12 +20,8 @@ class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider initializeExceptionDataProvider
-     *
-     * @param array $options
-     * @param string $exceptionName
-     * @param string $exceptionMessage
      */
-    public function testInitializeException(array $options, $exceptionName, $exceptionMessage)
+    public function testInitializeException(array $options, string $exceptionName, string $exceptionMessage)
     {
         $this->expectException($exceptionName);
         $this->expectExceptionMessage($exceptionMessage);
@@ -32,20 +29,17 @@ class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize($options);
     }
 
-    /**
-     * @return array
-     */
-    public function initializeExceptionDataProvider()
+    public function initializeExceptionDataProvider(): array
     {
         return [
             [
                 'options' => [],
-                'exceptionName' => 'Oro\Component\ConfigExpression\Exception\InvalidArgumentException',
+                'exceptionName' => InvalidArgumentException::class,
                 'exceptionMessage' => 'Options must have 2 or more elements, but 0 given.'
             ],
             [
                 'options' => ['string', 'string'],
-                'exceptionName' => 'Oro\Component\ConfigExpression\Exception\InvalidArgumentException',
+                'exceptionName' => InvalidArgumentException::class,
                 'exceptionMessage' => 'Option with index 0 must be property path.'
             ]
         ];
@@ -53,21 +47,14 @@ class CollectionElementValueExistsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider evaluateDataProvider
-     *
-     * @param array $options
-     * @param array $context
-     * @param bool $expectedResult
      */
-    public function testEvaluate(array $options, array $context, $expectedResult)
+    public function testEvaluate(array $options, array $context, bool $expectedResult)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    /**
-     * @return array
-     */
-    public function evaluateDataProvider()
+    public function evaluateDataProvider(): array
     {
         $options = [new PropertyPath('foo.words'), new PropertyPath('data.name'), new PropertyPath('bar')];
 

@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailActivityEntityControllerTest extends WebTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
         $this->loadFixtures(
@@ -22,7 +22,7 @@ class EmailActivityEntityControllerTest extends WebTestCase
             'oro_api_get_activity_relations',
             ['activity' => 'emails', 'id' => $this->getReference('email_1')->getId()]
         );
-        $this->client->request('GET', $url);
+        $this->client->jsonRequest('GET', $url);
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(3, $entities);
     }
@@ -33,10 +33,9 @@ class EmailActivityEntityControllerTest extends WebTestCase
             'oro_api_get_activity_relations',
             ['activity' => 'emails', 'id' => $this->getReference('email_1')->getId()]
         );
-        $this->client->request(
+        $this->client->jsonRequest(
             'GET',
             $url . '?page=2&limit=2',
-            [],
             [],
             ['HTTP_X-Include' => 'totalCount']
         );
@@ -60,7 +59,7 @@ class EmailActivityEntityControllerTest extends WebTestCase
                 'entityId' => $this->getReference('user_1')->getId()
             ]
         );
-        $this->client->request('DELETE', $url);
+        $this->client->jsonRequest('DELETE', $url);
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
 
         // check that the relation was deleted
@@ -68,7 +67,7 @@ class EmailActivityEntityControllerTest extends WebTestCase
             'oro_api_get_activity_relations',
             ['activity' => 'emails', 'id' => $this->getReference('email_1')->getId()]
         );
-        $this->client->request('GET', $url);
+        $this->client->jsonRequest('GET', $url);
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(2, $entities);
     }
@@ -82,7 +81,7 @@ class EmailActivityEntityControllerTest extends WebTestCase
             'oro_api_post_activity_relation',
             ['activity' => 'emails', 'id' => $this->getReference('email_1')->getId()]
         );
-        $this->client->request(
+        $this->client->jsonRequest(
             'POST',
             $url,
             [
@@ -98,7 +97,7 @@ class EmailActivityEntityControllerTest extends WebTestCase
             'oro_api_get_activity_relations',
             ['activity' => 'emails', 'id' => $this->getReference('email_1')->getId()]
         );
-        $this->client->request('GET', $url);
+        $this->client->jsonRequest('GET', $url);
         $entities = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(3, $entities);
     }
@@ -118,11 +117,11 @@ class EmailActivityEntityControllerTest extends WebTestCase
             'importance' => 'low',
             'body'       => 'Test body',
             'bodyType'   => 'text',
-            'receivedAt' => '2015-06-19 12:17:51'
+            'receivedAt' => '2015-06-19T12:17:51Z'
         ];
 
         // Create new email
-        $this->client->request('POST', $this->getUrl('oro_api_post_email'), $email);
+        $this->client->jsonRequest('POST', $this->getUrl('oro_api_post_email'), $email);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
         $this->assertArrayHasKey('id', $response);
         $emailId = $response['id'];
@@ -132,7 +131,7 @@ class EmailActivityEntityControllerTest extends WebTestCase
 
         $this->assertNotEmpty($user->getAuthStatus()->getId());
 
-        $this->client->request('POST', $this->getUrl('oro_api_post_activity_relation', [
+        $this->client->jsonRequest('POST', $this->getUrl('oro_api_post_activity_relation', [
             'activity' => 'emails',
             'id'       => $emailId
         ]), [
@@ -149,8 +148,8 @@ class EmailActivityEntityControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
 
         // Check that user has activity list target(email) on view page
-        $this->client->request('GET', $this->getUrl('oro_user_view', ['id' => $user->getId()]));
+        $this->client->jsonRequest('GET', $this->getUrl('oro_user_view', ['id' => $user->getId()]));
         $content = $this->client->getResponse()->getContent();
-        $this->assertContains($email['subject'], $content);
+        self::assertStringContainsString($email['subject'], $content);
     }
 }

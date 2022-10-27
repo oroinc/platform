@@ -11,9 +11,9 @@ use Oro\Component\Layout\BlockView;
 class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TaggableDatagridExtension */
-    protected $extension;
+    private $extension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->extension = new TaggableDatagridExtension();
     }
@@ -25,8 +25,6 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $expectedOptions
      */
     public function testConfigureOptions(array $options, array $expectedOptions)
     {
@@ -36,10 +34,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedOptions, $actual);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             [
@@ -56,8 +51,7 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
     public function testBuildView()
     {
         $view = new BlockView();
-        /** @var BlockInterface $block */
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
+        $block = $this->createMock(BlockInterface::class);
         $this->extension->buildView($view, $block, new Options(['enable_tagging' => true]));
         $this->assertTrue($view->vars['enable_tagging']);
     }
@@ -66,9 +60,8 @@ class TaggableDatagridExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $view = new BlockView();
         $view->vars['block_prefixes'] = [];
-        /** @var BlockInterface $block */
-        $block = $this->createMock('Oro\Component\Layout\BlockInterface');
-        $this->extension->finishView($view, $block, new Options(['enable_tagging' => true]));
+        $block = $this->createMock(BlockInterface::class);
+        $this->extension->finishView($view, $block);
         $this->assertEquals('taggable_datagrid', $view->vars['block_prefixes'][0]);
     }
 }

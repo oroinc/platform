@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\SegmentBundle\Controller\SegmentController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_segment.entity_provider, key: Oro\Bundle\EntityBundle\Provider\EntityProvider }
+            - { name: container.service_subscriber, id: oro_segment.static_segment_manager, key: Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager }

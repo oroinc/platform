@@ -8,6 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
  * ORO Migration that creates base Email database structure
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class OroEmailBundle implements Migration
 {
@@ -80,8 +81,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate table oro_email_address
-     *
-     * @param Schema $schema
      */
     public static function oroEmailAddressTable(Schema $schema)
     {
@@ -99,8 +98,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate table oro_email_attachment
-     *
-     * @param Schema $schema
      */
     public static function oroEmailAttachmentTable(Schema $schema)
     {
@@ -117,8 +114,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate table oro_email_attachment_content
-     *
-     * @param Schema $schema
      */
     public static function oroEmailAttachmentContentTable(Schema $schema)
     {
@@ -135,8 +130,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate table oro_email_body
-     *
-     * @param Schema $schema
      */
     public static function oroEmailBodyTable(Schema $schema)
     {
@@ -156,8 +149,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate table oro_email_folder
-     *
-     * @param Schema $schema
      */
     public static function oroEmailFolderTable(Schema $schema)
     {
@@ -176,8 +167,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate table oro_email_origin
-     *
-     * @param Schema $schema
      */
     public static function oroEmailOriginTable(Schema $schema)
     {
@@ -196,8 +185,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate table oro_email_recipient
-     *
-     * @param Schema $schema
      */
     public static function oroEmailRecipientTable(Schema $schema)
     {
@@ -216,8 +203,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate table oro_email_template
-     *
-     * @param Schema $schema
      */
     public static function oroEmailTemplateTable(Schema $schema)
     {
@@ -242,8 +227,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate table oro_email_template_translation
-     *
-     * @param Schema $schema
      */
     public static function oroEmailTemplateTranslationTable(Schema $schema)
     {
@@ -289,8 +272,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_email_attachment
-     *
-     * @param Schema $schema
      */
     public static function oroEmailAttachmentForeignKeys(Schema $schema)
     {
@@ -307,8 +288,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_email_attachment_content
-     *
-     * @param Schema $schema
      */
     public static function oroEmailAttachmentContentForeignKeys(Schema $schema)
     {
@@ -325,8 +304,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_email_body
-     *
-     * @param Schema $schema
      */
     public static function oroEmailBodyForeignKeys(Schema $schema)
     {
@@ -343,8 +320,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_email_folder
-     *
-     * @param Schema $schema
      */
     public static function oroEmailFolderForeignKeys(Schema $schema)
     {
@@ -361,8 +336,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_email_recipient
-     *
-     * @param Schema $schema
      */
     public static function oroEmailRecipientForeignKeys(Schema $schema)
     {
@@ -385,8 +358,6 @@ class OroEmailBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_email_template_translation
-     *
-     * @param Schema $schema
      */
     public static function oroEmailTemplateTranslationForeignKeys(Schema $schema)
     {

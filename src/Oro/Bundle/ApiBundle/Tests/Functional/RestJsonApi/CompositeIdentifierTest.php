@@ -7,34 +7,21 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class CompositeIdentifierTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/composite_identifier.yml'
         ]);
     }
 
-    /**
-     * @param string $key1
-     * @param int    $key2
-     *
-     * @return string
-     */
-    private function getEntityId($key1, $key2)
+    private function getEntityId(string $key1, int $key2): string
     {
-        return http_build_query(
-            ['renamedKey1' => $key1, 'key2' => $key2],
-            '',
-            ';'
-        );
+        return http_build_query(['renamedKey1' => $key1, 'key2' => $key2], '', ';');
     }
 
     public function testGetList()
@@ -315,6 +302,42 @@ class CompositeIdentifierTest extends RestJsonApiTestCase
         $response = $this->cget(
             ['entity' => $entityType],
             ['filter[name]' => 'Item+3']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'          => $entityType,
+                        'id'            => $this->getEntityId('item 3', 3),
+                        'attributes'    => [
+                            'name' => 'Item 3'
+                        ],
+                        'relationships' => [
+                            'parent'   => [
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                            ],
+                            'children' => [
+                                'data' => [
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListFilterByAssociationWithCompositeIdentifier()
+    {
+        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[parent]' => $this->getEntityId('item 1', 1)]
         );
 
         $this->assertResponseContains(

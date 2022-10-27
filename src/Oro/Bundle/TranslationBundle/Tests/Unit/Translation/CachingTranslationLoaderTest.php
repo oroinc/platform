@@ -2,38 +2,44 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
-use Doctrine\Common\Cache\ArrayCache;
+use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Oro\Bundle\TranslationBundle\Translation\CachingTranslationLoader;
-use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
+use Symfony\Component\Config\Resource\ResourceInterface;
+use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
 class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $innerLoader;
+    /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $innerLoader;
+
+    /** @var MemoryCache|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
     /** @var CachingTranslationLoader */
-    protected $cachingLoader;
+    private $cachingLoader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->innerLoader = $this->createMock('Symfony\Component\Translation\Loader\LoaderInterface');
+        $this->innerLoader = $this->createMock(LoaderInterface::class);
+        $this->cache = $this->createMock(MemoryCache::class);
 
-        $this->cachingLoader = new CachingTranslationLoader(
-            $this->innerLoader,
-            new ArrayCache()
-        );
+        $this->cachingLoader = new CachingTranslationLoader($this->innerLoader, $this->cache);
     }
 
     public function testLoadForStringResourceType()
     {
-        $locale   = 'fr';
-        $domain   = 'test';
+        $locale = 'fr';
+        $domain = 'test';
         $resource = 'test_resource';
 
         $catalogue = new MessageCatalogue($locale);
 
-        $this->innerLoader->expects($this->once())
+        $this->cache->expects(self::exactly(2))
+            ->method('get')
+            ->with(sprintf('%s_%s_%s', $locale, $domain, $resource))
+            ->willReturnOnConsecutiveCalls(null, $catalogue);
+        $this->innerLoader->expects(self::once())
             ->method('load')
             ->with($resource, $locale, $domain)
             ->willReturn($catalogue);
@@ -51,19 +57,23 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadForSupportedObjectResourceType()
     {
-        $locale        = 'fr';
-        $domain        = 'test';
-        $metadataCache = $this
-            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $resource      = new OrmTranslationResource($locale, $metadataCache);
+        $locale = 'fr';
+        $domain = 'test';
+        $resourceFile = 'test_file.yml';
+        $resource = $this->createMock(ResourceInterface::class);
+        $resource->expects($this->atLeastOnce())
+            ->method('__toString')
+            ->willReturn($resourceFile);
 
         $catalogue = new MessageCatalogue($locale);
 
+        $this->cache->expects(self::exactly(2))
+            ->method('get')
+            ->with(sprintf('%s_%s_%s', $locale, $domain, $resourceFile))
+            ->willReturnOnConsecutiveCalls(null, $catalogue);
         $this->innerLoader->expects($this->once())
             ->method('load')
-            ->with((string)$resource, $locale, $domain)
+            ->with($resourceFile, $locale, $domain)
             ->willReturn($catalogue);
 
         $this->assertSame(
@@ -79,8 +89,8 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadForUnsupportedResourceType()
     {
-        $locale   = 'fr';
-        $domain   = 'test';
+        $locale = 'fr';
+        $domain = 'test';
         $resource = new \stdClass();
 
         $catalogue = new MessageCatalogue($locale);
@@ -103,8 +113,8 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadForEmptyStringResourceType()
     {
-        $locale   = 'fr';
-        $domain   = 'test';
+        $locale = 'fr';
+        $domain = 'test';
         $resource = '';
 
         $catalogue = new MessageCatalogue($locale);

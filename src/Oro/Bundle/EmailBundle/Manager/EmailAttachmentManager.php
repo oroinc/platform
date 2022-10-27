@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Manager;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -18,39 +18,35 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
+/**
+ * Provides methods to manage email attachments.
+ */
 class EmailAttachmentManager
 {
     /** @var FileManager */
-    protected $fileManager;
+    private $fileManager;
 
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /** @var RouterInterface */
-    protected $router;
+    private $router;
 
     /** @var ConfigFileValidator */
-    protected $configFileValidator;
+    private $configFileValidator;
 
     /** @var AttachmentAssociationHelper */
-    protected $attachmentAssociationHelper;
+    private $attachmentAssociationHelper;
 
-    /**
-     * @param FileManager                 $fileManager
-     * @param EntityManager               $em
-     * @param RouterInterface             $router
-     * @param ConfigFileValidator         $configFileValidator
-     * @param AttachmentAssociationHelper $attachmentAssociationHelper
-     */
     public function __construct(
         FileManager $fileManager,
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         RouterInterface $router,
         ConfigFileValidator $configFileValidator,
         AttachmentAssociationHelper $attachmentAssociationHelper
     ) {
         $this->fileManager = $fileManager;
-        $this->em = $em;
+        $this->doctrine = $doctrine;
         $this->router = $router;
         $this->configFileValidator = $configFileValidator;
         $this->attachmentAssociationHelper = $attachmentAssociationHelper;
@@ -113,7 +109,7 @@ class EmailAttachmentManager
         $targetEntityClass = ClassUtils::getClass($target);
         if ($this->attachmentAssociationHelper->isAttachmentAssociationEnabled($targetEntityClass)) {
             $targetAssociationName = ExtendHelper::buildAssociationName($targetEntityClass);
-            $attached = $this->em->getRepository('OroAttachmentBundle:Attachment')->findOneBy(
+            $attached = $this->doctrine->getRepository(Attachment::class)->findOneBy(
                 [
                     $targetAssociationName => $target,
                     'file'                 => $attachment->getFile()
@@ -132,7 +128,7 @@ class EmailAttachmentManager
      * @param EmailAttachment $entity
      * @param int             $width
      * @param int             $height
-     * @param bool|string     $referenceType
+     * @param int             $referenceType
      *
      * @return string
      */
@@ -140,7 +136,7 @@ class EmailAttachmentManager
         EmailAttachment $entity,
         $width = AttachmentManager::DEFAULT_IMAGE_WIDTH,
         $height = AttachmentManager::DEFAULT_IMAGE_HEIGHT,
-        $referenceType = RouterInterface::ABSOLUTE_PATH
+        int $referenceType = RouterInterface::ABSOLUTE_PATH
     ) {
         return $this->router->generate(
             'oro_resize_email_attachment',
@@ -158,7 +154,7 @@ class EmailAttachmentManager
      *
      * @return ComponentFile
      */
-    protected function saveEmailAttachmentToTemporaryFile(EmailAttachment $emailAttachment)
+    private function saveEmailAttachmentToTemporaryFile(EmailAttachment $emailAttachment)
     {
         $content = ContentDecoder::decode(
             $emailAttachment->getContent()->getContent(),
@@ -178,7 +174,7 @@ class EmailAttachmentManager
      * @param EmailAttachment $emailAttachment
      * @param object          $entity
      */
-    protected function linkAttachmentToEntity(EmailAttachment $emailAttachment, $entity)
+    private function linkAttachmentToEntity(EmailAttachment $emailAttachment, $entity)
     {
         $attachment = new Attachment();
         if (!$attachment->supportTarget(ClassUtils::getClass($entity))) {
@@ -187,7 +183,9 @@ class EmailAttachmentManager
 
         $attachment->setFile($emailAttachment->getFile());
         $attachment->setTarget($entity);
-        $this->em->persist($attachment);
-        $this->em->flush();
+
+        $em = $this->doctrine->getManagerForClass(Attachment::class);
+        $em->persist($attachment);
+        $em->flush();
     }
 }

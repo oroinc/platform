@@ -9,18 +9,15 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 class OptionsResolverTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextAccessor;
+    private $contextAccessor;
 
     /** @var OptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    protected $optionsAssembler;
+    private $optionsAssembler;
 
     /** @var OptionsResolver */
-    protected $optionsResolver;
+    private $optionsResolver;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
         $this->optionsAssembler = $this->createMock(OptionsAssembler::class);
         $this->contextAccessor = $this->createMock(ContextAccessor::class);
@@ -30,9 +27,6 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resolveOptionsDataProvider
-     *
-     * @param array $options
-     * @param array $expected
      */
     public function testResolveOptions(array $options, array $expected)
     {
@@ -49,10 +43,7 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->optionsResolver->resolveOptions($data, $options));
     }
 
-    /**
-     * @return array
-     */
-    public function resolveOptionsDataProvider()
+    public function resolveOptionsDataProvider(): array
     {
         return [
             'empty' => [

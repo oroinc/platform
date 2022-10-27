@@ -12,9 +12,6 @@ class TransitionOptionsResolveProcessor implements ProcessorInterface
     /** @var TransitionOptionsResolver */
     private $transitionOptionsResolver;
 
-    /**
-     * @param TransitionOptionsResolver $transitionOptionsResolver
-     */
     public function __construct(TransitionOptionsResolver $transitionOptionsResolver)
     {
         $this->transitionOptionsResolver = $transitionOptionsResolver;

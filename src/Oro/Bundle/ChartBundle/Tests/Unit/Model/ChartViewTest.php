@@ -3,54 +3,50 @@
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ChartBundle\Model\ChartView;
+use Oro\Bundle\ChartBundle\Model\Data\DataInterface;
+use Twig\Environment;
 
 class ChartViewTest extends \PHPUnit\Framework\TestCase
 {
-    const TEMPLATE = 'template.twig.html';
+    private const TEMPLATE = 'template.twig.html';
+    private const TEST_VARS = ['foo' => 'bar'];
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $twig;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $twig;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $data;
+    /** @var DataInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $data;
 
-    protected $testVars = array('foo' => 'bar');
+    /** @var ChartView */
+    private $chartView;
 
-    /**
-     * @var ChartView
-     */
-    protected $chartView;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->twig = $this->createMock('Twig_Environment');
-        $this->data = $this->createMock('Oro\Bundle\ChartBundle\Model\Data\DataInterface');
+        $this->twig = $this->createMock(Environment::class);
+        $this->data = $this->createMock(DataInterface::class);
         $this->chartView = new ChartView(
             $this->twig,
             self::TEMPLATE,
             $this->data,
-            $this->testVars
+            self::TEST_VARS
         );
     }
 
     public function testRender()
     {
-        $expectedArrayData = array('bar' => 'baz');
-        $expectedContext = array_merge($this->testVars, array('data' => $expectedArrayData));
+        $rawData = ['bar' => 'baz <HELLO>', 'test' => 'string', 'value' => 10.0];
+        $expectedArrayData = ['bar' => htmlentities('baz <HELLO>'), 'test' => 'string', 'value' => 10.0];
+        $expectedContext = array_merge(self::TEST_VARS, ['data' => $expectedArrayData]);
         $expectedRenderResult = 'Rendered template';
 
         $this->data->expects($this->once())
             ->method('toArray')
-            ->will($this->returnValue($expectedArrayData));
+            ->willReturn($rawData);
 
         $this->twig->expects($this->once())
             ->method('render')
             ->with(self::TEMPLATE, $expectedContext)
-            ->will($this->returnValue($expectedRenderResult));
+            ->willReturn($expectedRenderResult);
 
         $this->assertEquals($expectedRenderResult, $this->chartView->render());
     }

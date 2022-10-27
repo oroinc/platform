@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ImapEmailTest extends \PHPUnit\Framework\TestCase
 {

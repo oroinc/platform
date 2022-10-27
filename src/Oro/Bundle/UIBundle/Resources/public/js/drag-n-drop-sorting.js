@@ -1,18 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var DraggableSortingView;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var BaseView = require('oroui/js/app/views/base/view');
-    require('jquery-ui');
+    const $ = require('jquery');
+    const BaseView = require('oroui/js/app/views/base/view');
+    require('jquery-ui/widgets/sortable');
 
-    DraggableSortingView = BaseView.extend({
+    const DraggableSortingView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function DraggableSortingView() {
-            DraggableSortingView.__super__.constructor.apply(this, arguments);
+        constructor: function DraggableSortingView(options) {
+            DraggableSortingView.__super__.constructor.call(this, options);
         },
 
         render: function() {
@@ -22,7 +20,7 @@ define(function(require) {
         },
 
         reindexValues: function() {
-            var index = 1;
+            let index = 1;
             this.$('[name$="[_position]"]').each(function() {
                 $(this).val(index++);
             });
@@ -33,7 +31,8 @@ define(function(require) {
                 tolerance: 'pointer',
                 delay: 100,
                 containment: 'parent',
-                stop: _.bind(this.reindexValues, this)
+                handle: '[data-name="sortable-handle"]',
+                stop: this.reindexValues.bind(this)
             });
         }
     });

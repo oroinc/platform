@@ -1,0 +1,8 @@
+services:
+    oro_datagrid.tests.datagrid_orm_query_collector:
+        class: Oro\Bundle\DataGridBundle\Tests\Functional\Environment\DatagridQueryCollector
+        public: true
+        decorates: oro_datagrid.orm.query_executor
+        decoration_priority: -255
+        arguments:
+            - '@.inner'

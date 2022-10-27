@@ -3,64 +3,40 @@
 namespace Oro\Bundle\ActionBundle\Helper;
 
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * Helper responsible for generating urls for needed for action.
+ */
 class ApplicationsUrlHelper
 {
-    /** @var RouteProviderInterface */
-    private $routeProvider;
+    private RouteProviderInterface $routeProvider;
 
-    /** @var RouterInterface */
-    private $router;
+    private UrlGeneratorInterface $urlGenerator;
 
-    /**
-     * @param RouteProviderInterface $routeProvider
-     * @param RouterInterface $router
-     */
-    public function __construct(RouteProviderInterface $routeProvider, RouterInterface $router)
+    public function __construct(RouteProviderInterface $routeProvider, UrlGeneratorInterface $urlGenerator)
     {
         $this->routeProvider = $routeProvider;
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
     }
 
-    /**
-     * @param array $parameters
-     *
-     * @return string
-     */
-    public function getExecutionUrl(array $parameters = [])
+    public function getExecutionUrl(array $parameters = []): string
     {
         return $this->generateUrl($this->routeProvider->getExecutionRoute(), $parameters);
     }
 
-    /**
-     * @param array $parameters
-     *
-     * @return string
-     */
-    public function getDialogUrl(array $parameters = [])
+    public function getDialogUrl(array $parameters = []): string
     {
         return $this->generateUrl($this->routeProvider->getFormDialogRoute(), $parameters);
     }
 
-    /**
-     * @param array $parameters
-     *
-     * @return string
-     */
-    public function getPageUrl(array $parameters = [])
+    public function getPageUrl(array $parameters = []): string
     {
         return $this->generateUrl($this->routeProvider->getFormPageRoute(), $parameters);
     }
 
-    /**
-     * @param string $routeName
-     * @param array $parameters
-     *
-     * @return string
-     */
-    private function generateUrl($routeName, array $parameters = [])
+    private function generateUrl(string $routeName, array $parameters = []): string
     {
-        return $this->router->generate($routeName, $parameters);
+        return $this->urlGenerator->generate($routeName, $parameters);
     }
 }

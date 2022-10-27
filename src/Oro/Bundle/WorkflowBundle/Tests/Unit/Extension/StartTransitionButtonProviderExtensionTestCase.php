@@ -10,27 +10,25 @@ use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTransitionButtonProviderExtensionTestCase
 {
-    const ENTITY_CLASS = 'entity1';
-    const ROUTE_NAME = 'route1';
-    const DATAGRID = 'datagrid1';
+    private const ENTITY_CLASS = 'entity1';
+    private const ROUTE_NAME = 'route1';
+    private const DATAGRID = 'datagrid1';
 
     /**
      * @dataProvider findDataProvider
-     *
-     * @param bool $expected
-     * @param string|null $entityClass
-     * @param string|null $routeName
-     * @param string|null $datagrid
      */
-    public function testFind($expected, $entityClass = null, $routeName = null, $datagrid = null)
-    {
+    public function testFind(
+        bool $expected,
+        string $entityClass = null,
+        string $routeName = '',
+        string $datagrid = null
+    ) {
         $this->applicationProvider->expects($this->atLeastOnce())
             ->method('getCurrentApplication')
             ->willReturn($expected ? $this->getApplication() : null);
@@ -70,11 +68,14 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
                 ->setOriginalUrl('example.com')
                 ->setDatagridName($datagrid);
 
-            $this->destinationPageResolver->expects($this->once())->method('getOriginalUrl')->willReturn('example.com');
+            $this->originalUrlProvider->expects($this->once())
+                ->method('getOriginalUrl')
+                ->willReturn('example.com');
 
             $buttons = [new StartTransitionButton($transition, $workflow, $buttonContext)];
         } else {
-            $this->destinationPageResolver->expects($this->never())->method('getOriginalUrl');
+            $this->originalUrlProvider->expects($this->never())
+                ->method('getOriginalUrl');
         }
 
         $this->assertEquals(
@@ -85,10 +86,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
         );
     }
 
-    /**
-     * @return array
-     */
-    public function findDataProvider()
+    public function findDataProvider(): array
     {
         return [
             'entity' => [
@@ -103,7 +101,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
             'datagrid' => [
                 'expected' => true,
                 'entityClass' => null,
-                'routeName' => null,
+                'routeName' => '',
                 'datagrid' => self::DATAGRID,
             ],
             'not matched' => [
@@ -171,7 +169,8 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
 
     public function testFindWithGroupAtContext()
     {
-        $this->workflowRegistry->expects($this->never())->method('getActiveWorkflows');
+        $this->workflowRegistry->expects($this->never())
+            ->method('getActiveWorkflows');
         $this->assertEquals(
             [],
             $this->extension->find((new ButtonSearchContext())->setGroup('test_group'))
@@ -180,19 +179,13 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
 
     /**
      * @dataProvider isAvailableDataProvider
-     *
-     * @param ButtonInterface $button
-     * @param bool $expected
      */
-    public function testIsAvailable(ButtonInterface $button, $expected)
+    public function testIsAvailable(ButtonInterface $button, bool $expected)
     {
         $this->assertEquals($expected, $this->extension->isAvailable($button, new ButtonSearchContext()));
     }
 
-    /**
-     * @return array
-     */
-    public function isAvailableDataProvider()
+    public function isAvailableDataProvider(): array
     {
         return [
             'available' => [
@@ -224,58 +217,55 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
     {
         // for start transition
         $this->assertTrue($this->extension->supports($this->createTransitionButton()));
-        // for notstart transition
+        // for not start transition
         $this->assertFalse($this->extension->supports($this->createTransitionButton(false, false)));
 
-        /** @var ButtonInterface|\PHPUnit\Framework\MockObject\MockObject $notTransitionButton */
         $notTransitionButton = $this->createMock(ButtonInterface::class);
         // for not supported button
         $this->assertFalse($this->extension->supports($notTransitionButton));
     }
 
-    /**
-     * @param TransitionManager|\PHPUnit\Framework\MockObject\MockObject $transitionManager
-     * @param array $configuration
-     * @param array $exclusiveRecordGroups
-     *
-     * @return Workflow|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function getWorkflow(
         TransitionManager $transitionManager,
         array $configuration = [],
         array $exclusiveRecordGroups = []
-    ) {
-        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
+    ): Workflow {
         $workflow = $this->getMockBuilder(Workflow::class)
-            ->setMethods(['getTransitionManager', 'getVariables'])
+            ->onlyMethods(['getTransitionManager', 'getVariables'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject $definition */
         $definition = $this->createMock(WorkflowDefinition::class);
-        $definition->expects($this->any())->method('getRelatedEntity')->willReturn(self::ENTITY_CLASS);
-        $definition->expects($this->any())->method('getConfiguration')->willReturn($configuration);
-        $definition->expects($this->any())->method('getExclusiveRecordGroups')->willReturn($exclusiveRecordGroups);
+        $definition->expects($this->any())
+            ->method('getRelatedEntity')
+            ->willReturn(self::ENTITY_CLASS);
+        $definition->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn($configuration);
+        $definition->expects($this->any())
+            ->method('getExclusiveRecordGroups')
+            ->willReturn($exclusiveRecordGroups);
 
         $workflow->setDefinition($definition);
-        $workflow->expects($this->any())->method('getTransitionManager')->willReturn($transitionManager);
-        $workflow->expects($this->any())->method('getVariables')->willReturn(new ArrayCollection());
+        $workflow->expects($this->any())
+            ->method('getTransitionManager')
+            ->willReturn($transitionManager);
+        $workflow->expects($this->any())
+            ->method('getVariables')
+            ->willReturn(new ArrayCollection());
 
         return $workflow;
     }
 
-    /**
-     * @param bool $isAvailable
-     * @param bool $isStart
-     *
-     * @return StartTransitionButton
-     */
-    private function createTransitionButton($isAvailable = false, $isStart = true)
+    private function createTransitionButton(bool $isAvailable = false, bool $isStart = true): StartTransitionButton
     {
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->any())->method('isAvailable')->willReturn($isAvailable);
-        $transition->expects($this->any())->method('isStart')->willReturn($isStart);
+        $transition->expects($this->any())
+            ->method('isAvailable')
+            ->willReturn($isAvailable);
+        $transition->expects($this->any())
+            ->method('isStart')
+            ->willReturn($isStart);
         $transitionManager = $this->createMock(TransitionManager::class);
 
         $workflow = $this->getWorkflow($transitionManager);

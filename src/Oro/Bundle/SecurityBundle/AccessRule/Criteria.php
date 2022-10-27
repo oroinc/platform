@@ -31,13 +31,6 @@ class Criteria
     /** @var array [option name => option value, ...] */
     private $options = [];
 
-    /**
-     * @param string $type
-     * @param string $entityClass
-     * @param string $alias
-     * @param string $permission
-     * @param bool   $isRoot
-     */
     public function __construct(
         string $type,
         string $entityClass,
@@ -54,8 +47,6 @@ class Criteria
 
     /**
      * Gets the type of a processed query.
-     *
-     * @return string
      */
     public function getType(): string
     {
@@ -64,8 +55,6 @@ class Criteria
 
     /**
      * Gets name of a permission for which this criteria is created.
-     *
-     * @return string
      */
     public function getPermission(): string
     {
@@ -74,8 +63,6 @@ class Criteria
 
     /**
      * Gets the class name of an entity for which this criteria is created.
-     *
-     * @return string
      */
     public function getEntityClass(): string
     {
@@ -84,8 +71,6 @@ class Criteria
 
     /**
      * Gets an alias of an entity in a query for which this criteria is created.
-     *
-     * @return string
      */
     public function getAlias(): string
     {
@@ -94,8 +79,6 @@ class Criteria
 
     /**
      * Indicates whether this criteria is related to the root entity in a query.
-     *
-     * @return bool
      */
     public function isRoot(): bool
     {
@@ -104,8 +87,6 @@ class Criteria
 
     /**
      * Gets an expression that is built by this criteria object.
-     *
-     * @return ExpressionInterface|null
      */
     public function getExpression(): ?ExpressionInterface
     {
@@ -113,11 +94,15 @@ class Criteria
     }
 
     /**
+     * Sets an expression.
+     */
+    public function setExpression(ExpressionInterface $expression): void
+    {
+        $this->expression = $expression;
+    }
+
+    /**
      * Appends an expression that should be concatenated with existing expressions by logical AND operator.
-     *
-     * @param ExpressionInterface $expression
-     *
-     * @return Criteria
      */
     public function andExpression(ExpressionInterface $expression): Criteria
     {
@@ -137,10 +122,6 @@ class Criteria
 
     /**
      * Appends an expression that should be concatenated with existing expressions by logical OR operator.
-     *
-     * @param ExpressionInterface $expression
-     *
-     * @return Criteria
      */
     public function orExpression(ExpressionInterface $expression): Criteria
     {
@@ -160,10 +141,6 @@ class Criteria
 
     /**
      * Indicates whether this criteria has the given additional option.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
     public function hasOption(string $key): bool
     {
@@ -200,8 +177,6 @@ class Criteria
 
     /**
      * Removes an additional option.
-     *
-     * @param string $key
      */
     public function removeOption(string $key): void
     {

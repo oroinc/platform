@@ -1,0 +1,14 @@
+entity_config:
+    draft:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#draft
+        entity:
+            items:
+                draftable:
+                    options:
+                        indexed: true
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#draft
+        field:
+            items:
+                draftable:
+                    options:
+                        value_type: boolean

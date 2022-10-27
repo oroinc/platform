@@ -6,6 +6,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Represents an entity restriction used in workflows.
+ *
  * @ORM\Table(
  *      name="oro_workflow_restriction",
  *      uniqueConstraints={
@@ -40,7 +42,7 @@ class WorkflowRestriction
     /**
      * @var string
      *
-     * @ORM\Column(name="field", type="string", length=255, nullable=false)
+     * @ORM\Column(name="field", type="string", length=150, nullable=false)
      */
     protected $field;
 
@@ -69,10 +71,10 @@ class WorkflowRestriction
     /**
      * @var string
      *
-     * @ORM\Column(name="mode", type="string", length=255)
+     * @ORM\Column(name="mode", type="string", length=8)
      */
     protected $mode;
-    
+
     /**
      * @var array
      *
@@ -176,7 +178,7 @@ class WorkflowRestriction
     public function setAttribute($attribute)
     {
         $this->attribute = $attribute;
-        
+
         return $this;
     }
 
@@ -216,7 +218,7 @@ class WorkflowRestriction
     public function setMode($mode)
     {
         $this->mode = $mode;
-        
+
         return $this;
     }
 
@@ -236,7 +238,7 @@ class WorkflowRestriction
     public function setValues(array $values)
     {
         $this->values = $values;
-        
+
         return $this;
     }
 
@@ -276,7 +278,6 @@ class WorkflowRestriction
      * @param WorkflowRestriction $restriction
      *
      * @return WorkflowEntityAcl
-     *
      */
     public function import(WorkflowRestriction $restriction)
     {
@@ -292,7 +293,7 @@ class WorkflowRestriction
                 $this->getDefinition()->getStepByName($restriction->getStep()->getName())
             );
         }
-        
+
         return $this;
     }
 }

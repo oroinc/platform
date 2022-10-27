@@ -67,9 +67,16 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="field_decimal", type="decimal", precision=10, scale=6, nullable=true)
+     * @ORM\Column(name="field_decimal", type="decimal", precision=20, scale=8, nullable=true)
      */
     public $fieldDecimal;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="field_decimal_default", type="decimal", nullable=true)
+     */
+    public $fieldDecimalDefault;
 
     /**
      * @var float
@@ -133,6 +140,27 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
      * @ORM\Column(name="field_percent", type="percent", nullable=true)
      */
     public $fieldPercent;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="field_percent_100", type="percent", nullable=true)
+     */
+    public $fieldPercent100;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="field_percent_round", type="percent", nullable=true)
+     */
+    public $fieldPercentRound;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="field_percent_100_round", type="percent", nullable=true)
+     */
+    public $fieldPercent100Round;
 
     /**
      * @var string

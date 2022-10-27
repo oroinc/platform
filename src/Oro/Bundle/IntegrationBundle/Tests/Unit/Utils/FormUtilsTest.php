@@ -13,25 +13,20 @@ use Oro\Bundle\IntegrationBundle\Utils\FormUtils;
 class FormUtilsTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TypesRegistry */
-    protected $typesRegistry;
+    private $typesRegistry;
 
     /** @var FormUtils */
-    protected $utils;
+    private $utils;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->typesRegistry = new TypesRegistry();
-        $this->utils         = new FormUtils($this->typesRegistry);
-    }
-
-    public function tearDown()
-    {
-        unset($this->utils, $this->typesRegistry);
+        $this->utils = new FormUtils($this->typesRegistry);
     }
 
     public function testHasTwoWaySyncConnectors()
     {
-        $testType                  = 'type2';
+        $testType = 'type2';
         $testTypeThatHasConnectors = 'type1';
 
         $this->typesRegistry->addChannelType($testType, new TestIntegrationType());
@@ -46,7 +41,7 @@ class FormUtilsTest extends \PHPUnit\Framework\TestCase
     public function testWasSyncedAtLeastOnce()
     {
         $channel = new Channel();
-        $status  = new Status();
+        $status = new Status();
         $status->setChannel($channel)
             ->setCode(Status::STATUS_COMPLETED);
 

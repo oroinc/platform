@@ -25,11 +25,6 @@ class EntityDataFactory
      */
     protected $eventDispatcher;
 
-    /**
-     * @param MetadataRegistry $metadataRegistry
-     * @param DoctrineHelper $doctrineHelper
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         MetadataRegistry $metadataRegistry,
         DoctrineHelper $doctrineHelper,
@@ -52,8 +47,8 @@ class EntityDataFactory
         $data = new EntityData($entityMetadata, $entities);
 
         $this->eventDispatcher->dispatch(
-            MergeEvents::CREATE_ENTITY_DATA,
-            new EntityDataEvent($data)
+            new EntityDataEvent($data),
+            MergeEvents::CREATE_ENTITY_DATA
         );
 
         return $data;

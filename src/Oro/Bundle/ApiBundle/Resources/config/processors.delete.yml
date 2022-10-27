@@ -1,7 +1,6 @@
 services:
     oro_api.delete.processor:
         class: Oro\Bundle\ApiBundle\Processor\DeleteProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - delete
@@ -37,8 +36,8 @@ services:
     # data_security_check
     #
 
-    oro_api.delete.entity_object_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
+    oro_api.delete.validate_entity_object_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectAccess
         arguments:
             - '@security.authorization_checker'
             - DELETE
@@ -49,11 +48,11 @@ services:
     # delete_data
     #
 
-    oro_api.delete.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByDeleteHandler
+    oro_api.delete.delete_entity_by_delete_handler:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteEntityByDeleteHandler
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@service_container'
+            - '@oro_entity.delete_handler_registry'
         tags:
             - { name: oro.api.processor, action: delete, group: delete_data, priority: -10 }
 

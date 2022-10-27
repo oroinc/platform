@@ -3,30 +3,30 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
 use Oro\Bundle\IntegrationBundle\Provider\SOAPTransport;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class SoapTransportTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SOAPTransport|\PHPUnit\Framework\MockObject\MockObject */
-    protected $transport;
+    private $transport;
 
     /** @var Transport|\PHPUnit\Framework\MockObject\MockObject */
-    protected $transportEntity;
+    private $transportEntity;
 
     /** @var ParameterBag */
-    protected $settings;
+    private $settings;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $soapClientMock;
+    /** @var \SoapClient|\PHPUnit\Framework\MockObject\MockObject */
+    private $soapClient;
 
-    /**
-     * Setup test entity
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transport = $this->getMockForAbstractClass(
-            'Oro\Bundle\IntegrationBundle\Provider\SOAPTransport',
+            SOAPTransport::class,
             [],
             '',
             true,
@@ -35,37 +35,27 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
             ['getSoapClient', 'getSleepBetweenAttempt']
         );
 
-        $this->soapClientMock = $this->getMockBuilder('\SoapClient')
+        $this->soapClient = $this->getMockBuilder(\SoapClient::class)
             ->disableOriginalConstructor()
-            ->setMethods(['__soapCall', '__getLastResponseHeaders'])
+            ->onlyMethods(['__soapCall', '__getLastResponseHeaders'])
             ->getMock();
 
-        $this->settings        = new ParameterBag();
-        $this->transportEntity = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Transport');
-        $this->transportEntity->expects($this->any())->method('getSettingsBag')
-            ->will($this->returnValue($this->settings));
+        $this->settings = new ParameterBag();
+        $this->transportEntity = $this->createMock(Transport::class);
+        $this->transportEntity->expects($this->any())
+            ->method('getSettingsBag')
+            ->willReturn($this->settings);
 
         $this->transport->expects($this->any())
             ->method('getSleepBetweenAttempt')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
     }
 
-    /**
-     * Tear down setup objects
-     */
-    protected function tearDown()
-    {
-        unset($this->transport, $this->transportEntity, $this->soapClientMock, $this->settings);
-    }
-
-    /**
-     * Test init method
-     */
     public function testInit()
     {
         $this->transport->expects($this->once())
             ->method('getSoapClient')
-            ->will($this->returnValue($this->soapClientMock));
+            ->willReturn($this->soapClient);
 
         $this->settings->set('wsdl_url', 'http://localhost.not.exists/?wsdl');
 
@@ -81,43 +71,35 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->transport->getLastResponse());
     }
 
-    /**
-     * Test init method errors
-     *
-     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException
-     */
     public function testInitErrors()
     {
+        $this->expectException(InvalidConfigurationException::class);
         $this->transport->init($this->transportEntity);
     }
 
     /**
      * @dataProvider exceptionProvider
-     *
-     * @expectedException \Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException
      */
-    public function testMultipleAttemptException($header, $attempt, $code)
+    public function testMultipleAttemptException(string $header, int $attempt, int $code)
     {
-        $this->soapClientMock->expects($this->any())
+        $this->expectException(SoapConnectionException::class);
+        $this->soapClient->expects($this->any())
             ->method('__getLastResponseHeaders')
-            ->will($this->returnValue($header));
-        $this->soapClientMock->expects($this->exactly($attempt))
+            ->willReturn($header);
+        $this->soapClient->expects($this->exactly($attempt))
             ->method('__soapCall')
-            ->will($this->throwException(new \Exception('error', $code)));
+            ->willThrowException(new \Exception('error', $code));
 
         $this->transport->expects($this->once())
             ->method('getSoapClient')
-            ->will($this->returnValue($this->soapClientMock));
+            ->willReturn($this->soapClient);
 
         $this->settings->set('wsdl_url', 'http://localhost.not.exists/?wsdl');
         $this->transport->init($this->transportEntity);
         $this->transport->call('test');
     }
 
-    /**
-     * @return array
-     */
-    public function exceptionProvider()
+    public function exceptionProvider(): array
     {
         return [
             'Attempts'              => [
@@ -135,36 +117,32 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
 
     public function testMultipleAttempt()
     {
-        $this->soapClientMock->expects($this->at(0))
-            ->method('__getLastResponseHeaders')
-            ->will($this->returnValue("HTTP/1.1 502 Bad gateway\n\r"));
-        $this->soapClientMock->expects($this->at(0))
+        $this->soapClient->expects($this->exactly(4))
             ->method('__soapCall')
-            ->will($this->throwException(new \Exception('error', 502)));
-
-        $this->soapClientMock->expects($this->at(1))
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function () {
+                    throw new \Exception('error', 502);
+                }),
+                new ReturnCallback(function () {
+                    throw new \Exception('error', 503);
+                }),
+                new ReturnCallback(function () {
+                    throw new \Exception('error', 504);
+                }),
+                new ReturnCallback(function () {
+                })
+            );
+        $this->soapClient->expects($this->exactly(3))
             ->method('__getLastResponseHeaders')
-            ->will($this->returnValue("HTTP/1.1 503 Service unavailable Explained\n\r"));
-        $this->soapClientMock->expects($this->at(1))
-            ->method('__soapCall')
-            ->will($this->throwException(new \Exception('error', 503)));
-
-        $this->soapClientMock->expects($this->at(2))
-            ->method('__getLastResponseHeaders')
-            ->will($this->returnValue("HTTP/1.1 504 Gateway timeout Explained\n\r"));
-        $this->soapClientMock->expects($this->at(2))
-            ->method('__soapCall')
-            ->will($this->throwException(new \Exception('error', 504)));
-
-        $this->soapClientMock->expects($this->at(4))
-            ->method('__getLastResponseHeaders')
-            ->will($this->returnValue("HTTP/1.1 200 OK\n\r"));
-        $this->soapClientMock->expects($this->at(4))
-            ->method('__soapCall');
+            ->willReturnOnConsecutiveCalls(
+                "HTTP/1.1 502 Bad gateway\n\r",
+                "HTTP/1.1 503 Service unavailable Explained\n\r",
+                "HTTP/1.1 504 Gateway timeout Explained\n\r"
+            );
 
         $this->transport->expects($this->once())
             ->method('getSoapClient')
-            ->will($this->returnValue($this->soapClientMock));
+            ->willReturn($this->soapClient);
 
         $this->settings->set('wsdl_url', 'http://localhost.not.exists/?wsdl');
         $this->transport->init($this->transportEntity);

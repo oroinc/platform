@@ -18,8 +18,6 @@ class AddImpersonationTable implements Migration
 
     /**
      * Create oro_user_impersonation table
-     *
-     * @param Schema $schema
      */
     public static function createOroUserImpersonationTable(Schema $schema)
     {

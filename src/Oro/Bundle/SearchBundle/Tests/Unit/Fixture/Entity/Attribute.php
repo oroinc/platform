@@ -3,21 +3,14 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity;
 
 class Attribute
 {
-    /**
-     * @var string $code
-     */
+    /** @var string */
     protected $code;
 
-    /**
-     * @var string $backendType
-     */
+    /** @var string */
     protected $backendType;
 
     protected $searchable;
 
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         $this->searchable   = true;

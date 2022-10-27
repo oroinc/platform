@@ -17,9 +17,6 @@ class LayoutContextHolder
         return $this->context;
     }
 
-    /**
-     * @param ContextInterface $context
-     */
     public function setContext(ContextInterface $context)
     {
         $this->context = $context;

@@ -18,9 +18,6 @@ class OroEmailBundle implements Migration
         $this->updateSyncStart($schema, $queries);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroEmailFolderTable(Schema $schema)
     {
         $table = $schema->getTable('oro_email_folder');
@@ -29,11 +26,6 @@ class OroEmailBundle implements Migration
         }
     }
 
-
-    /**
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     */
     protected function updateSyncStart(Schema $schema, QueryBag $queries)
     {
         if ($schema->hasTable('oro_email_folder')) {

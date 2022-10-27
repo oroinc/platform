@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Filter;
 
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -10,20 +9,19 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by incoming and outgoing email messages.
+ */
 class ChoiceMessageTypeFilter extends ChoiceFilter
 {
     /** @var EmailOwnerProviderStorage */
     protected $emailOwnerProviderStorage;
 
-    /**
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility $util
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
@@ -42,16 +40,17 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
         if (!$data) {
             return false;
         }
-        $bothValuesSelected = in_array(FolderType::INBOX, $data['value'], true) &&
-                              in_array(FolderType::SENT, $data['value'], true);
 
-        $noValueSelected = !in_array(FolderType::INBOX, $data['value'], true) &&
-                           !in_array(FolderType::SENT, $data['value'], true);
+        $inboxSelected = in_array(FolderType::INBOX, $data['value'], true);
+        $sentSelected = in_array(FolderType::SENT, $data['value'], true);
 
-        if ($bothValuesSelected) {
+        if ($inboxSelected && $sentSelected) {
             $data['value'] = [];
+
             return parent::apply($ds, $data);
-        } elseif ($noValueSelected) {
+        }
+
+        if (!$inboxSelected && !$sentSelected) {
             return parent::apply($ds, $data);
         }
 
@@ -59,7 +58,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
             return false;
         }
 
-        if (in_array(FolderType::INBOX, $data['value'], true)) {
+        if ($inboxSelected) {
             $this->applyInboxFilter($ds);
         } else {
             $this->applySentFilter($ds);
@@ -68,9 +67,6 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
         return true;
     }
 
-    /**
-     * @param OrmFilterDatasourceAdapter $ds
-     */
     protected function applyInboxFilter(OrmFilterDatasourceAdapter $ds)
     {
         $qb = $ds->getQueryBuilder();
@@ -108,7 +104,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
                 )
             );
 
-        list($dql, $replacements) = $this->createDQLWithReplacedAliases($ds, $subQb);
+        [$dql, $replacements] = $this->createDqlWithReplacedAliases($ds, $subQb);
 
         $replacedFieldExpr = QueryBuilderUtil::getField($replacements['eu'], 'id');
         $oldExpr = sprintf('%1$s = %1$s', $replacedFieldExpr);
@@ -120,9 +116,6 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
             ->andWhere($qb->expr()->exists($dql));
     }
 
-    /**
-     * @param OrmFilterDatasourceAdapter $ds
-     */
     protected function applySentFilter(OrmFilterDatasourceAdapter $ds)
     {
         $qb = $ds->getQueryBuilder();
@@ -146,16 +139,16 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
                     )
                 )
             );
-        list($dql, $replacements) = $this->createDQLWithReplacedAliases($ds, $subQb);
+        [$dql, $replacements] = $this->createDqlWithReplacedAliases($ds, $subQb);
 
         $replacedFieldExpr = sprintf('%s.%s', $replacements['eu'], 'id');
         $oldExpr = sprintf('%1$s = %1$s', $replacedFieldExpr);
         $newExpr = sprintf('%s = eu.id', $replacedFieldExpr);
         $dql = strtr($dql, [$oldExpr => $newExpr]);
         $qb
-        ->setParameter('outgoing_types', FolderType::outgoingTypes())
-        ->setParameter('incoming_types', FolderType::incomingTypes())
-        ->andWhere($qb->expr()->exists($dql));
+            ->setParameter('outgoing_types', FolderType::outgoingTypes())
+            ->setParameter('incoming_types', FolderType::incomingTypes())
+            ->andWhere($qb->expr()->exists($dql));
     }
 
     /**
@@ -166,7 +159,7 @@ class ChoiceMessageTypeFilter extends ChoiceFilter
         return $this->emailOwnerProviderStorage->getEmailOwnerFieldName(
             ArrayUtil::find(
                 function (EmailOwnerProviderInterface $provider) {
-                    return $provider->getEmailOwnerClass() === 'Oro\Bundle\UserBundle\Entity\User';
+                    return $provider->getEmailOwnerClass() === User::class;
                 },
                 $this->emailOwnerProviderStorage->getProviders()
             )

@@ -8,9 +8,6 @@ use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class MergeModesListener
 {
-    /**
-     * @param EntityMetadataEvent $event
-     */
     public function onCreateMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();

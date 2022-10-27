@@ -7,31 +7,63 @@ use Oro\Bundle\AttachmentBundle\Guesser\MimeTypeExtensionGuesser;
 class MimeTypeExtensionGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MimeTypeExtensionGuesser */
-    protected $guesser;
+    private $guesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->guesser = new MimeTypeExtensionGuesser();
     }
 
-    /**
-     * @dataProvider guessDataProvider
-     */
-    public function testGuess($mimeType, $expectedExtension)
+    public function testIsGuesserSupported(): void
     {
-        $this->assertEquals($expectedExtension, $this->guesser->guess($mimeType));
+        $this->assertTrue($this->guesser->isGuesserSupported());
     }
 
-    public function guessDataProvider()
+    public function testGuessMimeType(): void
+    {
+        $this->assertNull($this->guesser->guessMimeType(realpath(__DIR__ . '/../Fixtures/testFile/test.msg')));
+    }
+
+    /**
+     * @dataProvider extensionDataProvider
+     */
+    public function testGetExtensions(string $mimeType, array $expectedExtensions): void
+    {
+        $this->assertEquals($expectedExtensions, $this->guesser->getExtensions($mimeType));
+    }
+
+    public function extensionDataProvider(): array
     {
         return [
             [
                 'application/vnd.ms-outlook',
-                'msg',
+                ['msg'],
             ],
             [
                 'nonExisting',
-                null,
+                [],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider mimeTypeDataProvider
+     */
+    public function testGetMimeTypes(string $extension, array $expectedMimeTypes): void
+    {
+        $this->assertEquals($expectedMimeTypes, $this->guesser->getMimeTypes($extension));
+    }
+
+    public function mimeTypeDataProvider(): array
+    {
+        return [
+            [
+                'msg',
+                ['application/vnd.ms-outlook'],
+            ],
+            [
+                'nonExisting',
+                [],
             ],
         ];
     }

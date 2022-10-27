@@ -7,18 +7,19 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
+/**
+ * Creates a response that contains the transition form.
+ */
 class DefaultFormTemplateResponseProcessor implements ProcessorInterface
 {
-    const DEFAULT_TRANSITION_TEMPLATE = 'OroWorkflowBundle:Widget:widget/transitionForm.html.twig';
+    const DEFAULT_TRANSITION_TEMPLATE = '@OroWorkflow/Widget/widget/transitionForm.html.twig';
 
-    /** @var \Twig_Environment */
+    /** @var Environment */
     private $twig;
 
-    /**
-     * @param \Twig_Environment $twig
-     */
-    public function __construct(\Twig_Environment $twig)
+    public function __construct(Environment $twig)
     {
         $this->twig = $twig;
     }

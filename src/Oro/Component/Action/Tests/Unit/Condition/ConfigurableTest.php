@@ -2,32 +2,31 @@
 
 namespace Oro\Component\Action\Tests\Unit\Condition;
 
+use Doctrine\Common\Collections\Collection;
 use Oro\Component\Action\Condition\Configurable;
+use Oro\Component\ConfigExpression\Condition\AbstractCondition;
+use Oro\Component\ConfigExpression\ExpressionAssembler;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 class ConfigurableTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $assembler;
+    /** @var ExpressionAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    private $assembler;
 
-    /**
-     * @var Configurable
-     */
-    protected $condition;
+    /** @var Configurable */
+    private $condition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->assembler = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->assembler = $this->createMock(ExpressionAssembler::class);
+
         $this->condition = new Configurable($this->assembler);
     }
 
     public function testInitialize()
     {
         $this->assertInstanceOf(
-            'Oro\Component\ConfigExpression\Condition\AbstractCondition',
+            AbstractCondition::class,
             $this->condition->initialize([])
         );
     }
@@ -36,9 +35,8 @@ class ConfigurableTest extends \PHPUnit\Framework\TestCase
     {
         $options = [];
         $context = new \stdClass();
-        $errors = $this->getMockForAbstractClass('Doctrine\Common\Collections\Collection');
-        $realCondition = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionInterface')
-            ->getMockForAbstractClass();
+        $errors = $this->getMockForAbstractClass(Collection::class);
+        $realCondition = $this->createMock(ExpressionInterface::class);
         $realCondition->expects($this->exactly(2))
             ->method('evaluate')
             ->with($context, $errors)

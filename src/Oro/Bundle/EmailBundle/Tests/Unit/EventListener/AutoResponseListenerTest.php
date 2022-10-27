@@ -3,36 +3,35 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponsesTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $autoResponseManager;
+    /** @var AutoResponseManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $autoResponseManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $producer;
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $producer;
 
     /** @var AutoResponseListener */
-    protected $listener;
+    private $listener;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->autoResponseManager = $this->getMockBuilder(AutoResponseManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->autoResponseManager = $this->createMock(AutoResponseManager::class);
         $this->producer = $this->createMock(MessageProducerInterface::class);
 
         $container = TestContainerBuilder::create()
             ->add('oro_email.autoresponserule_manager', $this->autoResponseManager)
-            ->add('oro_message_queue.client.message_producer', $this->producer)
+            ->add(MessageProducerInterface::class, $this->producer)
             ->getContainer($this);
 
         $this->listener = new AutoResponseListener($container);
@@ -42,27 +41,27 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->autoResponseManager->expects($this->exactly(2))
             ->method('hasAutoResponses')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->producer->expects($this->once())
             ->method('send')
-            ->with(Topics::SEND_AUTO_RESPONSES, ['ids' => [123, 12345]]);
+            ->with(SendAutoResponsesTopic::getName(), ['ids' => [123, 12345]]);
 
         $email1 = new Email();
-        $this->writePropertyValue($email1, 'id', 123);
+        ReflectionUtil::setId($email1, 123);
 
         $emailBody1 = new EmailBody();
         $emailBody1->setEmail($email1);
 
         $email2 = new Email();
-        $this->writePropertyValue($email2, 'id', 12345);
+        ReflectionUtil::setId($email2, 12345);
 
         $emailBody2 = new EmailBody();
         $emailBody2->setEmail($email2);
 
-        $this->writePropertyValue($this->listener, 'emailBodies', [$emailBody1, $emailBody2]);
+        ReflectionUtil::setPropertyValue($this->listener, 'emailBodies', [$emailBody1, $emailBody2]);
 
-        $this->listener->postFlush($this->createPostFlushEventArgsMock());
+        $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
     }
 
     public function testShouldNotPublishEmailIdsIfThereIsNotEmailBodies()
@@ -73,37 +72,34 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
         $this->producer->expects($this->never())
             ->method('send');
 
-        $this->listener->postFlush($this->createPostFlushEventArgsMock());
+        $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
     }
 
     public function testShouldFilterOutEmailsWhichHasNoAutoResponse()
     {
-        $this->autoResponseManager->expects($this->at(0))
-            ->method('hasAutoResponses')
-            ->will($this->returnValue(false));
-        $this->autoResponseManager->expects($this->at(1))
-            ->method('hasAutoResponses')
-            ->will($this->returnValue(true));
-
-        $this->producer->expects($this->once())
-            ->method('send')
-            ->with(Topics::SEND_AUTO_RESPONSES, ['ids' => [12345]]);
-
         $email1 = new Email();
-        $this->writePropertyValue($email1, 'id', 123);
+        ReflectionUtil::setId($email1, 123);
 
         $emailBody1 = new EmailBody();
         $emailBody1->setEmail($email1);
 
         $email2 = new Email();
-        $this->writePropertyValue($email2, 'id', 12345);
+        ReflectionUtil::setId($email2, 12345);
 
         $emailBody2 = new EmailBody();
         $emailBody2->setEmail($email2);
 
-        $this->writePropertyValue($this->listener, 'emailBodies', [$emailBody1, $emailBody2]);
+        ReflectionUtil::setPropertyValue($this->listener, 'emailBodies', [$emailBody1, $emailBody2]);
 
-        $this->listener->postFlush($this->createPostFlushEventArgsMock());
+        $this->autoResponseManager->expects($this->exactly(2))
+            ->method('hasAutoResponses')
+            ->willReturnOnConsecutiveCalls(false, true);
+
+        $this->producer->expects($this->once())
+            ->method('send')
+            ->with(SendAutoResponsesTopic::getName(), ['ids' => [12345]]);
+
+        $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
     }
 
     public function testShouldNotPublishEmailIdsIfEmailFeatureIsTurnedOff()
@@ -115,10 +111,7 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->with($this->anything());
 
-        $featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->setMethods(['isFeatureEnabled'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $featureChecker = $this->createMock(FeatureChecker::class);
         $featureChecker->expects($this->once())
             ->method('isFeatureEnabled')
             ->with($this->anything())
@@ -126,27 +119,6 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->setFeatureChecker($featureChecker);
         $this->listener->addFeature('email');
 
-        $this->listener->postFlush($this->createPostFlushEventArgsMock());
-    }
-
-    /**
-     * @param object $object
-     * @param string $property
-     * @param mixed  $value
-     */
-    private function writePropertyValue($object, $property, $value)
-    {
-        $refProperty = new \ReflectionProperty(get_class($object), $property);
-        $refProperty->setAccessible(true);
-        $refProperty->setValue($object, $value);
-        $refProperty->setAccessible(false);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|PostFlushEventArgs
-     */
-    private function createPostFlushEventArgsMock()
-    {
-        return $this->createMock(PostFlushEventArgs::class);
+        $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
     }
 }

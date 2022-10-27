@@ -5,23 +5,18 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowEntityAcl
-     */
-    protected $entityAcl;
+    /** @var WorkflowEntityAcl */
+    private $entityAcl;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityAcl = new WorkflowEntityAcl();
-    }
-
-    protected function tearDown()
-    {
-        unset($this->entityAcl);
     }
 
     public function testGetId()
@@ -29,8 +24,8 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entityAcl->getId());
 
         $value = 42;
-        $this->setEntityId($value);
-        $this->assertEquals($value, $this->entityAcl->getId());
+        ReflectionUtil::setId($this->entityAcl, $value);
+        $this->assertSame($value, $this->entityAcl->getId());
     }
 
     /**
@@ -45,16 +40,16 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($value, $accessor->getValue($this->entityAcl, $property));
     }
 
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        return array(
-            array('attribute', 'test'),
-            array('step', new WorkflowStep()),
-            array('definition', new WorkflowDefinition()),
-            array('entityClass', new \DateTime()),
-            array('updatable', false),
-            array('deletable', false),
-        );
+        return [
+            ['attribute', 'test'],
+            ['step', new WorkflowStep()],
+            ['definition', new WorkflowDefinition()],
+            ['entityClass', new \DateTime()],
+            ['updatable', false],
+            ['deletable', false],
+        ];
     }
 
     public function testImport()
@@ -83,23 +78,12 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->entityAcl->getAttributeStepKey(), $newEntityAcl->getAttributeStepKey());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
-     * @expectedExceptionMessage Workflow entity ACL with ID 1 doesn't have workflow step
-     */
     public function testGetAttributeStepKeyNoStepException()
     {
-        $this->setEntityId(1);
-        $this->entityAcl->getAttributeStepKey();
-    }
+        $this->expectException(WorkflowException::class);
+        $this->expectExceptionMessage("Workflow entity ACL with ID 1 doesn't have workflow step");
 
-    /**
-     * @param int $value
-     */
-    protected function setEntityId($value)
-    {
-        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl', 'id');
-        $idReflection->setAccessible(true);
-        $idReflection->setValue($this->entityAcl, $value);
+        ReflectionUtil::setId($this->entityAcl, 1);
+        $this->entityAcl->getAttributeStepKey();
     }
 }

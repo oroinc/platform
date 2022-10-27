@@ -33,7 +33,7 @@ class ObjectIdAccessor
 
         if ($domainObject instanceof DomainObjectInterface) {
             return $domainObject->getObjectIdentifier();
-        } elseif (method_exists($domainObject, 'getId')) {
+        } elseif ($domainObject && method_exists($domainObject, 'getId')) {
             return $domainObject->getId();
         } elseif ($this->doctrineHelper->isManageableEntity($domainObject)) {
             $id = $this->doctrineHelper->getSingleEntityIdentifier($domainObject, false);

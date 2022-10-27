@@ -1,17 +1,15 @@
 <?php
 
-namespace Oro\Tests\Unit\Component\Layout\Block\Type;
+namespace Oro\Component\Layout\Tests\Unit\Block\Type;
 
 use Oro\Component\Layout\Block\Type\Options;
 
 class OptionsTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Options
-     */
-    protected $options;
+    /** @var Options */
+    private $options;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->options = new Options(['value' => 'test']);
     }
@@ -20,7 +18,7 @@ class OptionsTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertEquals('test', $this->options->get('value'));
 
-        $this->expectException('OutOfBoundsException');
+        $this->expectException(\OutOfBoundsException::class);
         $this->assertFalse($this->options->get('nameNotExist'));
     }
 

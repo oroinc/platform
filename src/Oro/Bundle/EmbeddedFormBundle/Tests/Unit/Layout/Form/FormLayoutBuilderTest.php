@@ -8,46 +8,49 @@ use Oro\Bundle\EmbeddedFormBundle\Layout\Form\FormLayoutBuilder;
 use Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Form\Type\Stub\CompoundFormTypeStub;
 use Oro\Component\Layout\Block\Type\Options;
 use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\LayoutManipulatorInterface;
+use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
 
 class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    const ROOT_ID = 'rootId';
-    const FORM_NAME = 'testForm';
-    const FIELD_PREFIX = 'testForm_';
-    const GROUP_PREFIX = 'testForm:group_';
+    private const ROOT_ID = 'rootId';
+    private const FORM_NAME = 'testForm';
+    private const FIELD_PREFIX = 'testForm_';
+    private const GROUP_PREFIX = 'testForm:group_';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $layoutManipulator;
+    /** @var LayoutManipulatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $layoutManipulator;
 
     /** @var BlockBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $blockBuilder;
+    private $blockBuilder;
 
     /** @var FormLayoutBuilder */
-    protected $builder;
+    private $builder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->layoutManipulator = $this->createMock('Oro\Component\Layout\LayoutManipulatorInterface');
-        $this->blockBuilder      = $this->createMock('Oro\Component\Layout\BlockBuilderInterface');
+        $this->layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);
+        $this->blockBuilder = $this->createMock(BlockBuilderInterface::class);
         $this->blockBuilder->expects($this->any())
             ->method('getId')
-            ->will($this->returnValue(self::ROOT_ID));
+            ->willReturn(self::ROOT_ID);
         $this->blockBuilder->expects($this->any())
             ->method('getLayoutManipulator')
-            ->will($this->returnValue($this->layoutManipulator));
+            ->willReturn($this->layoutManipulator);
 
         $this->builder = new FormLayoutBuilder();
     }
 
     public function testEmptyForm()
     {
-        $options      = $this->getOptions();
-        $form         = $this->getForm();
+        $options = $this->getOptions();
+        $form = $this->getForm();
         $formAccessor = new FormAccessor($form);
 
         $this->layoutManipulator->expects($this->never())
@@ -59,32 +62,29 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testFlatForm()
     {
-        $options      = $this->getOptions();
-        $form         = $this->getForm();
+        $options = $this->getOptions();
+        $form = $this->getForm();
         $formAccessor = new FormAccessor($form);
         $form->add($this->getForm(false, TextType::class, 'field1'));
         $form->add($this->getForm(false, TextareaType::class, 'field2'));
 
-        $this->layoutManipulator->expects($this->at(0))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field1',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
-            )
-            ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(1))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field2',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
-            )
-            ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->exactly(2))
-            ->method('add');
+            ->method('add')
+            ->withConsecutive(
+                [
+                    self::FIELD_PREFIX . 'field1',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ],
+                [
+                    self::FIELD_PREFIX . 'field2',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
+                ]
+            )
+            ->willReturnSelf();
 
         $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
@@ -98,43 +98,37 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testCompoundChildForm()
     {
-        $options      = $this->getOptions();
-        $form         = $this->getForm();
+        $options = $this->getOptions();
+        $form = $this->getForm();
         $formAccessor = new FormAccessor($form);
-        $childForm    = $this->getForm(true, CompoundFormTypeStub::class, 'field1');
+        $childForm = $this->getForm(true, CompoundFormTypeStub::class, 'field1');
         $childForm->add($this->getForm(false, TextareaType::class, 'field11'));
         $form->add($childForm);
         $form->add($this->getForm(false, TextType::class, 'field2'));
 
-        $this->layoutManipulator->expects($this->at(0))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field1',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
-            )
-            ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(1))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field1:field11',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1.field11']
-            )
-            ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(2))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field2',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
-            )
-            ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->exactly(3))
-            ->method('add');
+            ->method('add')
+            ->withConsecutive(
+                [
+                    self::FIELD_PREFIX . 'field1',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ],
+                [
+                    self::FIELD_PREFIX . 'field1:field11',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1.field11']
+                ],
+                [
+                    self::FIELD_PREFIX . 'field2',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
+                ]
+            )
+            ->willReturnSelf();
 
         $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
@@ -149,34 +143,31 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testCompoundChildFormWhichMarkedAsSimpleForm()
     {
-        $options      = $this->getOptions();
-        $form         = $this->getForm();
+        $options = $this->getOptions();
+        $form = $this->getForm();
         $formAccessor = new FormAccessor($form);
-        $childForm    = $this->getForm(true, CompoundFormTypeStub::class, 'field1');
+        $childForm = $this->getForm(true, CompoundFormTypeStub::class, 'field1');
         $childForm->add($this->getForm(false, TextType::class, 'field11'));
         $form->add($childForm);
         $form->add($this->getForm(false, TextareaType::class, 'field2'));
 
-        $this->layoutManipulator->expects($this->at(0))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field1',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
-            )
-            ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(1))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field2',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
-            )
-            ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->exactly(2))
-            ->method('add');
+            ->method('add')
+            ->withConsecutive(
+                [
+                    self::FIELD_PREFIX . 'field1',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ],
+                [
+                    self::FIELD_PREFIX . 'field2',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
+                ]
+            )
+            ->willReturnSelf();
 
         $this->builder->addSimpleFormTypes([CompoundFormTypeStub::class]);
         $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
@@ -191,34 +182,31 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testPreferredFields()
     {
-        $options                     = $this->getOptions();
+        $options = $this->getOptions();
         $options['preferred_fields'] = ['field2'];
 
-        $form         = $this->getForm();
+        $form = $this->getForm();
         $formAccessor = new FormAccessor($form);
         $form->add($this->getForm(false, TextType::class, 'field1'));
         $form->add($this->getForm(false, TextareaType::class, 'field2'));
 
-        $this->layoutManipulator->expects($this->at(0))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field2',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
-            )
-            ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(1))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field1',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
-            )
-            ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->exactly(2))
-            ->method('add');
+            ->method('add')
+            ->withConsecutive(
+                [
+                    self::FIELD_PREFIX . 'field2',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
+                ],
+                [
+                    self::FIELD_PREFIX . 'field1',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ]
+            )
+            ->willReturnSelf();
 
         $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
@@ -232,45 +220,39 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testPreferredCompoundFields()
     {
-        $options                     = $this->getOptions();
+        $options = $this->getOptions();
         $options['preferred_fields'] = ['field2.field21'];
 
-        $form         = $this->getForm();
+        $form = $this->getForm();
         $formAccessor = new FormAccessor($form);
         $form->add($this->getForm(false, TextType::class, 'field1'));
         $childForm = $this->getForm(true, CompoundFormTypeStub::class, 'field2');
         $childForm->add($this->getForm(false, TextType::class, 'field21'));
         $form->add($childForm);
 
-        $this->layoutManipulator->expects($this->at(0))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field2:field21',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
-            )
-            ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(1))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field1',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
-            )
-            ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->at(2))
-            ->method('add')
-            ->with(
-                self::FIELD_PREFIX . 'field2',
-                self::ROOT_ID,
-                EmbedFormFieldType::NAME,
-                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
-            )
-            ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->exactly(3))
-            ->method('add');
+            ->method('add')
+            ->withConsecutive(
+                [
+                    self::FIELD_PREFIX . 'field2:field21',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
+                ],
+                [
+                    self::FIELD_PREFIX . 'field1',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ],
+                [
+                    self::FIELD_PREFIX . 'field2',
+                    self::ROOT_ID,
+                    EmbedFormFieldType::NAME,
+                    ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
+                ]
+            )
+            ->willReturnSelf();
 
         $this->builder->build($formAccessor, $this->blockBuilder, new Options($options));
         $this->assertSame(
@@ -283,35 +265,30 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param bool   $compound
-     * @param string $innerType
-     * @param string $name
-     *
-     * @return FormInterface
-     */
-    protected function getForm($compound = true, $innerType = TextType::class, $name = 'some_form')
-    {
-        $formConfig = $this->createMock('Symfony\Component\Form\FormConfigInterface');
-        $form       = new Form($formConfig);
+    private function getForm(
+        bool $compound = true,
+        string $innerType = TextType::class,
+        string $name = 'some_form'
+    ): FormInterface {
+        $formConfig = $this->createMock(FormConfigInterface::class);
         $resolvedType = new ResolvedFormType(new $innerType());
         $formConfig->expects($this->any())
             ->method('getCompound')
-            ->will($this->returnValue($compound));
+            ->willReturn($compound);
+        $formConfig->expects($this->any())
+            ->method('getDataMapper')
+            ->willReturn($this->createMock(DataMapperInterface::class));
         $formConfig->expects($this->any())
             ->method('getType')
-            ->will($this->returnValue($resolvedType));
+            ->willReturn($resolvedType);
         $formConfig->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
-        return $form;
+        return new Form($formConfig);
     }
 
-    /**
-     * @return array
-     */
-    protected function getOptions()
+    private function getOptions(): array
     {
         return [
             'form'              => null,

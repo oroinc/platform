@@ -3,28 +3,31 @@
 namespace Oro\Bundle\TagBundle\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration as InlineEditingConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditingConfigurator;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Enables grid inline editing feature to provide tags inline editing.
+ * Adds tag column and filter for entities with enabled tag functionality.
+ */
 class TagsExtension extends AbstractTagsExtension
 {
     const TAGS_ROOT_PARAM = '_tags';
-    const DISABLED_PARAM  = '_disabled';
+    const DISABLED_PARAM = '_disabled';
 
     const COLUMN_NAME = 'tags';
 
     /** @var TaggableHelper */
     protected $taggableHelper;
-
-    /** @var EntityRoutingHelper */
-    protected $entityRoutingHelper;
 
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
@@ -32,28 +35,23 @@ class TagsExtension extends AbstractTagsExtension
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param TagManager                    $tagManager
-     * @param EntityClassResolver           $entityClassResolver
-     * @param TaggableHelper                $helper
-     * @param EntityRoutingHelper           $entityRoutingHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenStorageInterface         $tokenStorage
-     */
+    /** @var InlineEditingConfigurator */
+    private $inlineEditingConfigurator;
+
     public function __construct(
         TagManager $tagManager,
         EntityClassResolver $entityClassResolver,
         TaggableHelper $helper,
-        EntityRoutingHelper $entityRoutingHelper,
         AuthorizationCheckerInterface $authorizationChecker,
-        TokenStorageInterface $tokenStorage
+        TokenStorageInterface $tokenStorage,
+        InlineEditingConfigurator $inlineEditingConfigurator
     ) {
         parent::__construct($tagManager, $entityClassResolver);
 
         $this->taggableHelper = $helper;
-        $this->entityRoutingHelper = $entityRoutingHelper;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenStorage = $tokenStorage;
+        $this->inlineEditingConfigurator = $inlineEditingConfigurator;
     }
 
     /**
@@ -82,13 +80,11 @@ class TagsExtension extends AbstractTagsExtension
     /**
      * @return bool
      */
-    protected function isDisabled()
+    protected function isDisabled(): bool
     {
         $tagParameters = $this->getParameters()->get(self::TAGS_ROOT_PARAM);
 
-        return
-            $tagParameters &&
-            !empty($tagParameters[self::DISABLED_PARAM]);
+        return !empty($tagParameters[self::DISABLED_PARAM]);
     }
 
     /**
@@ -96,7 +92,7 @@ class TagsExtension extends AbstractTagsExtension
      *
      * @return bool
      */
-    protected function isGridRootEntityTaggable(DatagridConfiguration $configuration)
+    protected function isGridRootEntityTaggable(DatagridConfiguration $configuration): bool
     {
         $className = $this->getEntity($configuration);
 
@@ -109,7 +105,7 @@ class TagsExtension extends AbstractTagsExtension
     public function processConfigs(DatagridConfiguration $config)
     {
         $columns = $config->offsetGetByPath('[columns]', []);
-        $column  = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
+        $column = [self::COLUMN_NAME => $this->getColumnDefinition($config)];
         $config->offsetSetByPath('[columns]', array_merge($columns, $column));
 
         // do not add tag filter if $filters are empty(case when they are disabled).
@@ -117,6 +113,18 @@ class TagsExtension extends AbstractTagsExtension
         if (!empty($filters)) {
             $filters[self::FILTER_COLUMN_NAME] = $this->getColumnFilterDefinition($config);
             $config->offsetSetByPath(self::GRID_FILTERS_PATH, $filters);
+        }
+
+        $this->enableInlineEditing($config);
+    }
+
+    public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
+    {
+        if ($this->inlineEditingConfigurator->isInlineEditingSupported($config)) {
+            $data->offsetSet(
+                InlineEditingConfiguration::BASE_CONFIG_KEY,
+                $config->offsetGetOr(InlineEditingConfiguration::BASE_CONFIG_KEY, [])
+            );
         }
     }
 
@@ -129,49 +137,19 @@ class TagsExtension extends AbstractTagsExtension
      */
     protected function getColumnDefinition(DatagridConfiguration $config)
     {
-        $className        = $this->getEntity($config);
-        $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
-
-        $permissions = [
-            'oro_tag_create' => $this->authorizationChecker->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY)
-        ];
+        $className = $this->getEntity($config);
 
         return [
-            'label'          => 'oro.tag.tags_label',
-            'type'           => 'callback',
-            'frontend_type'  => 'tags',
-            'callable'       => function (ResultRecordInterface $record) {
+            'label' => 'oro.tag.tags_label',
+            'type' => 'callback',
+            'frontend_type' => 'tags',
+            'callable' => function (ResultRecordInterface $record) {
                 return $record->getValue(self::COLUMN_NAME);
             },
-            'editable'       => false,
-            'translatable'   => true,
-            'renderable'     => $this->taggableHelper->isEnableGridColumn($className),
-            'inline_editing' => [
-                'enable'                    => $this->authorizationChecker->isGranted(
-                    TagManager::ACL_RESOURCE_ASSIGN_ID_KEY
-                ),
-                'editor'                    => [
-                    'view'         => 'orotag/js/app/views/editor/tags-editor-view',
-                    'view_options' => [
-                        'permissions' => $permissions
-                    ]
-                ],
-                'save_api_accessor'         => [
-                    'route'                       => 'oro_api_post_taggable',
-                    'http_method'                 => 'POST',
-                    'default_route_parameters'    => [
-                        'entity' => $urlSafeClassName
-                    ],
-                    'route_parameters_rename_map' => [
-                        'id' => 'entityId'
-                    ]
-                ],
-                'autocomplete_api_accessor' => [
-                    'class'               => 'oroui/js/tools/search-api-accessor',
-                    'search_handler_name' => 'tags',
-                    'label_field_name'    => 'name'
-                ]
-            ]
+            'editable' => false,
+            'translatable' => true,
+            'notMarkAsBlank' => true,
+            'renderable' => $this->taggableHelper->isEnableGridColumn($className)
         ];
     }
 
@@ -187,6 +165,7 @@ class TagsExtension extends AbstractTagsExtension
         $className = $this->getEntity($config);
         $dataName = sprintf('%s.%s', $config->getOrmQuery()->getRootAlias(), 'id');
         $enabled = $this->taggableHelper->isEnableGridFilter($className);
+
         return [
             'type' => 'tag',
             'data_name' => $dataName,
@@ -205,13 +184,24 @@ class TagsExtension extends AbstractTagsExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rows    = $result->getData();
+        $rows = $result->getData();
         $idField = 'id';
-        $tags    = $this->getTagsForEntityClass(
+        $tags = $this->getTagsForEntityClass(
             $this->getEntity($config),
             $this->extractEntityIds($rows, $idField)
         );
 
         $this->addTagsToData($rows, $tags, $idField, self::COLUMN_NAME);
+    }
+
+    private function enableInlineEditing(DatagridConfiguration $config): void
+    {
+        if ($this->inlineEditingConfigurator->isInlineEditingSupported($config)
+            && !$config->offsetGetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH)
+        ) {
+            $config->offsetSetByPath(InlineEditingConfiguration::ENABLED_CONFIG_PATH, true);
+            $this->inlineEditingConfigurator->configureInlineEditingForGrid($config);
+            $this->inlineEditingConfigurator->configureInlineEditingForColumn($config, self::COLUMN_NAME);
+        }
     }
 }

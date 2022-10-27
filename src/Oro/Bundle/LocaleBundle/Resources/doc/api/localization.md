@@ -44,7 +44,7 @@ Retrieve the service records that store the localization titles localized data.
 
 #### get_relationship
 
-Retrieve the ID's of service records that store the localization titles localized data.
+Retrieve the IDs of service records that store the localization titles localized data.
 
 # Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue
 
@@ -52,19 +52,19 @@ Retrieve the ID's of service records that store the localization titles localize
 
 ### get
 
-Retrieve a specific LocalizedFallbackValue record.
+Retrieve a specific localized fallback value record.
 
 {@inheritdoc}
 
 ### get_list
 
-Retrieve a collection of LocalizedFallbackValue records.
+Retrieve a collection of localized fallback value records.
 
 {@inheritdoc}
 
 ### create
 
-Create a new LocalizedFallbackValue record.
+Create a new localized fallback value record.
 
 The created record is returned in the response.
 
@@ -85,8 +85,8 @@ Example:
     "relationships": {
       "localization": {
         "data": {
-        "type":"localizations",
-        "id":"1"
+          "type": "localizations",
+          "id": "1"
         }
       }
     }
@@ -97,7 +97,7 @@ Example:
 
 ### update
 
-Edit a specific LocalizedFallbackValue record.
+Edit a specific localized fallback value record.
 
 The updated record is returned in the response.
 
@@ -119,8 +119,8 @@ Example:
     "relationships": {
       "localization": {
         "data": {
-        "type":"localizations",
-        "id":"1"
+          "type": "localizations",
+          "id": "1"
         }
       }
     }
@@ -137,15 +137,15 @@ Example:
 
 #### get_subresource
 
-Retrieve a record of localization assigned to a specific localizedfallbackvalues record.
+Retrieve a record of localization assigned to a specific localized fallback value record.
 
 #### get_relationship
 
-Retrieve ID of localization record assigned to a specific localizedfallbackvalues record.
+Retrieve ID of localization record assigned to a specific localized fallback value record.
 
 #### update_relationship
 
-Replace localization assigned to a specific localizedfallbackvalues record
+Replace localization assigned to a specific localized fallback value record.
 
 {@request:json_api}
 Example:

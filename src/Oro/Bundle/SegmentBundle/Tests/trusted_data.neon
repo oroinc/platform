@@ -1,0 +1,30 @@
+# Configuration for https://github.com/oroinc/phpstan-rules/
+trusted_data:
+    variables:
+        Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager:
+            getQueryBuilderForSegment:
+                identifier: true
+            getSelectSql:
+                identifier: true
+            executeInsertFromSelect:
+                dbQuery: true
+            executeInsertValues:
+                selectSql: true
+        Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager:
+            getFilterSubQuery:
+                tableAlias: true
+            applyOrderByPart:
+                part: true
+    safe_methods:
+        Oro\Bundle\SegmentBundle\Filter\SegmentFilter:
+            getDataFieldName: true
+        Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager:
+            getFromTableAlias: true
+        Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager:
+            getIdentifierFieldName: true
+            getFilterSubQuery: true
+        Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository:
+            getEntityReferenceField: true
+        Oro\Bundle\SegmentBundle\Provider\SegmentSnapshotDeltaProvider:
+            getIdentifierFieldName: true
+            getSegmentIdentifierFieldName: true

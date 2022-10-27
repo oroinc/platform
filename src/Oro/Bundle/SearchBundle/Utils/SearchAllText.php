@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Utils;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchAllText
 {

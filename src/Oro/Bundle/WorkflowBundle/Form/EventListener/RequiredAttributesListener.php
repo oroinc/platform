@@ -25,9 +25,6 @@ class RequiredAttributesListener implements EventSubscriberInterface
      */
     protected $attributeNames;
 
-    /**
-     * @param array $attributeNames
-     */
     public function initialize(array $attributeNames)
     {
         $this->attributeNames = $attributeNames;
@@ -35,8 +32,6 @@ class RequiredAttributesListener implements EventSubscriberInterface
 
     /**
      * Extract only required attributes for form and create new WorkflowData based on them
-     *
-     * @param FormEvent $event
      */
     public function onPreSetData(FormEvent $event)
     {
@@ -52,8 +47,6 @@ class RequiredAttributesListener implements EventSubscriberInterface
 
     /**
      * Copy submitted data to existing workflow data
-     *
-     * @param FormEvent $event
      */
     public function onSubmit(FormEvent $event)
     {

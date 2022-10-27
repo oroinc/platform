@@ -10,9 +10,6 @@ class SerializationHelper
     /** @var DataTransformerInterface */
     private $dataTransformer;
 
-    /**
-     * @param DataTransformerInterface $dataTransformer
-     */
     public function __construct(DataTransformerInterface $dataTransformer)
     {
         $this->dataTransformer = $dataTransformer;
@@ -21,24 +18,15 @@ class SerializationHelper
     /**
      * Prepares the given value for serialization.
      *
-     * @param string           $entityClass
-     * @param string           $fieldName
      * @param mixed            $fieldValue
      * @param array            $context
      * @param FieldConfig|null $fieldConfig
      *
      * @return mixed
      */
-    public function transformValue(
-        $entityClass,
-        $fieldName,
-        $fieldValue,
-        array $context,
-        FieldConfig $fieldConfig = null
-    ) {
+    public function transformValue($fieldValue, array $context, FieldConfig $fieldConfig = null)
+    {
         return $this->dataTransformer->transform(
-            $entityClass,
-            $fieldName,
             $fieldValue,
             null !== $fieldConfig ? $fieldConfig->toArray(true) : [],
             $context
@@ -46,35 +34,66 @@ class SerializationHelper
     }
 
     /**
-     * Passes a serialized data through the specified "post serialization" handler.
-     *
-     * @param array    $item
-     * @param callable $handler
-     * @param array    $context
-     *
-     * @return array
+     * Passes a serialized items through "post serialization" handler for a single item
+     * if the given config has this handler.
      */
-    public function postSerialize(array $item, $handler, array $context)
+    public function postSerializeItem(?array $item, EntityConfig $config, array $context): ?array
     {
-        // @deprecated since 1.9. New signature of 'post_serialize' callback is
-        // function (array $item, array $context) : array
-        // Old signature was function (array &$item) : void
-        // The following implementation supports both new and old signature of the callback
-        // Remove this implementation when a support of old signature will not be required
-        if ($handler instanceof \Closure) {
-            $handleResult = $handler($item, $context);
-            if (null !== $handleResult) {
-                $item = $handleResult;
-            }
-        } else {
-            $item = call_user_func($handler, $item, $context);
+        if (!$item) {
+            return $item;
         }
 
-        /* New implementation, uncomment it when a support of old signature will not be required
-        $item = call_user_func($handler, $item, $context);
-        */
+        $handler = $config->getPostSerializeHandler();
+        if (null !== $handler) {
+            $item = $handler($item, $context);
+        }
 
         return $item;
+    }
+
+    /**
+     * Passes a serialized items through "post serialization" handler for a list of items
+     * if the given config has this handler.
+     */
+    public function postSerializeCollection(array $items, EntityConfig $config, array $context): array
+    {
+        if (!$items) {
+            return $items;
+        }
+
+        $collectionHandler = $config->getPostSerializeCollectionHandler();
+        if (null !== $collectionHandler) {
+            $items = $collectionHandler($items, $context);
+        }
+
+        return $items;
+    }
+
+    /**
+     * Passes a serialized items through "post serialization" handlers
+     * for a single item and for a list of items if the given config has these handlers.
+     */
+    public function processPostSerializeItems(array $items, EntityConfig $config, array $context): array
+    {
+        if (empty($items)) {
+            return $items;
+        }
+
+        $handler = $config->getPostSerializeHandler();
+        if (null !== $handler) {
+            foreach ($items as $key => $item) {
+                if (\is_array($item) && !empty($item)) {
+                    $item = $handler($item, $context);
+                }
+                $items[$key] = $item;
+            }
+        }
+        $collectionHandler = $config->getPostSerializeCollectionHandler();
+        if (null !== $collectionHandler) {
+            $items = $collectionHandler($items, $context);
+        }
+
+        return $items;
     }
 
     /**
@@ -84,36 +103,35 @@ class SerializationHelper
      * and returns the changed data.
      *
      * @param array        $serializedData
-     * @param string       $entityClass
      * @param EntityConfig $entityConfig
      * @param array        $context
      * @param array        $fields [field name => [property, ...], ...]
      *
      * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function handleFieldsReferencedToChildFields(
         array $serializedData,
-        $entityClass,
         EntityConfig $entityConfig,
         array $context,
         array $fields
-    ) {
+    ): array {
         foreach ($fields as $fieldName => $propertyPath) {
             $value = null;
             $firstField = $this->getFieldName($entityConfig, $propertyPath[0]);
-            if (array_key_exists($firstField, $serializedData)) {
+            if (\array_key_exists($firstField, $serializedData)) {
                 $currentData = $serializedData[$firstField];
                 $currentConfig = $this->getTargetEntityConfig($entityConfig, $firstField);
-                if (null !== $currentConfig && is_array($currentData)) {
-                    $lastIndex = count($propertyPath) - 1;
+                if (null !== $currentConfig && \is_array($currentData)) {
+                    $lastIndex = \count($propertyPath) - 1;
                     $index = 1;
                     while ($index < $lastIndex) {
                         $currentField = $this->getFieldName($currentConfig, $propertyPath[$index]);
-                        if (!array_key_exists($currentField, $currentData)) {
+                        if (!\array_key_exists($currentField, $currentData)) {
                             break;
                         }
                         $currentData = $currentData[$currentField];
-                        if (!is_array($currentData)) {
+                        if (!\is_array($currentData)) {
                             break;
                         }
                         $currentConfig = $this->getTargetEntityConfig($currentConfig, $currentField);
@@ -124,13 +142,11 @@ class SerializationHelper
                     }
                     if ($index === $lastIndex) {
                         $currentField = $this->getFieldName($currentConfig, $propertyPath[$lastIndex]);
-                        if (array_key_exists($currentField, $currentData)) {
+                        if (\array_key_exists($currentField, $currentData)) {
                             $value = $currentData[$currentField];
                             $currentConfig = $this->getTargetEntityConfig($currentConfig, $currentField);
                             if (null === $currentConfig) {
                                 $value = $this->transformValue(
-                                    $entityClass,
-                                    $fieldName,
                                     $value,
                                     $context,
                                     $entityConfig->getField($fieldName)
@@ -148,13 +164,8 @@ class SerializationHelper
 
     /**
      * Attempts to get the configuration of a target entity of the specified field.
-     *
-     * @param EntityConfig $entityConfig
-     * @param string       $fieldName
-     *
-     * @return EntityConfig|null
      */
-    private function getTargetEntityConfig(EntityConfig $entityConfig, $fieldName)
+    private function getTargetEntityConfig(EntityConfig $entityConfig, string $fieldName): ?EntityConfig
     {
         $fieldConfig = $entityConfig->getField($fieldName);
         if (null === $fieldConfig) {
@@ -166,13 +177,8 @@ class SerializationHelper
 
     /**
      * Gets the field name for the given entity property taking into account renaming.
-     *
-     * @param EntityConfig $entityConfig
-     * @param string       $property
-     *
-     * @return string
      */
-    private function getFieldName(EntityConfig $entityConfig, $property)
+    private function getFieldName(EntityConfig $entityConfig, string $property): string
     {
         $renamedFields = $entityConfig->get(ConfigUtil::RENAMED_FIELDS);
         if (null !== $renamedFields && isset($renamedFields[$property])) {

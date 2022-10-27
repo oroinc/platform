@@ -3,16 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Request;
 
 /**
- * The interface for classes that can resolve different kind of predefined identifiers of Data API resources.
+ * The interface for classes that can resolve different kind of predefined identifiers of API resources.
  */
 interface EntityIdResolverInterface
 {
     /**
-     * Gets the description of a predefined identifier of Data API resource that can be resolved by this resolver.
+     * Gets the description of a predefined identifier of API resource that can be resolved by this resolver.
      * This description is used in auto-generated documentation, including API sandbox.
      * The Markdown markup language can be used in the description.
-     *
-     * @return string
      */
     public function getDescription(): string;
 

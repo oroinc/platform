@@ -1,0 +1,18 @@
+aliases:
+    routing$: fosjsrouting/js/router
+app-modules:
+    - oronavigation/js/app/modules/navigation-module
+configs:
+    oronavigation/js/routes-loader: {}
+dynamic-imports:
+    commons:
+        - oronavigation/js/app/components/favorite-component
+        - oronavigation/js/app/components/pin-component
+        - oronavigation/js/app/views/history-view
+        - oronavigation/js/app/views/most-viewed-view
+        - oronavigation/js/app/views/navigation-menu-view
+        - oronavigation/js/app/views/page-state-view
+        - oronavigation/js/app/views/shortcuts-view
+        - routing
+    jstree:
+        - oronavigation/js/app/views/tree-manage-view

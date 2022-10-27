@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event allow to change aliases config before the usage in context search

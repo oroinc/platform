@@ -16,11 +16,6 @@ class DataFixturesLoader extends Loader
     /** @var AliceFixtureLoader */
     private $aliceFixtureLoader;
 
-    /**
-     * @param FixtureFactoryInterface            $factory
-     * @param FixtureIdentifierResolverInterface $identifierResolver
-     * @param ContainerInterface                 $container
-     */
     public function __construct(
         FixtureFactoryInterface $factory,
         FixtureIdentifierResolverInterface $identifierResolver,

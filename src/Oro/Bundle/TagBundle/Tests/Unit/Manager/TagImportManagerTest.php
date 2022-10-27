@@ -4,32 +4,30 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\TagBundle\Entity\Tag;
+use Oro\Bundle\TagBundle\Entity\TagManager;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Manager\TagImportManager;
 
 class TagImportManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TagImportManager */
-    protected $tagImportManager;
+    private $tagImportManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $tagStorage = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $tagStorage = $this->createMock(TagManager::class);
         $tagStorage->expects($this->any())
             ->method('loadOrCreateTags')
-            ->will($this->returnCallback(function (array $tagNames) {
+            ->willReturnCallback(function (array $tagNames) {
                 return array_map(
                     function ($tagName) {
                         return new Tag($tagName);
                     },
                     $tagNames
                 );
-            }));
+            });
 
-        $taggableHelper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $taggableHelper = $this->createMock(TaggableHelper::class);
 
         $this->tagImportManager = new TagImportManager($tagStorage, $taggableHelper);
     }
@@ -42,7 +40,7 @@ class TagImportManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->tagImportManager->normalizeTags($tags));
     }
 
-    public function normalizeTagsProvider()
+    public function normalizeTagsProvider(): array
     {
         return [
             'null' => [
@@ -73,7 +71,7 @@ class TagImportManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->tagImportManager->denormalizeTags($data));
     }
 
-    public function denormalizeTagsProvider()
+    public function denormalizeTagsProvider(): array
     {
         return [
             'data without "tags" field' => [

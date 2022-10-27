@@ -5,6 +5,7 @@ namespace Oro\Component\TestUtils\ORM\Mocks;
 /**
  * This class is a clone of namespace Doctrine\Tests\Mocks\StatementMock that is excluded from doctrine
  * package since v2.4.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class StatementMock implements \IteratorAggregate, \Doctrine\DBAL\Driver\Statement
 {
@@ -24,12 +25,14 @@ class StatementMock implements \IteratorAggregate, \Doctrine\DBAL\Driver\Stateme
     {
     }
 
-    public function execute($params = null)
+    public function execute($params = null): bool
     {
+        return true;
     }
 
-    public function rowCount()
+    public function rowCount(): int
     {
+        return 1;
     }
 
     public function closeCursor()
@@ -56,7 +59,7 @@ class StatementMock implements \IteratorAggregate, \Doctrine\DBAL\Driver\Stateme
     {
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Extension\MassAction;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
@@ -14,21 +13,24 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactory;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadTestEntitiesData;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * @dbIsolationPerTest
+ */
 class IterableResultFactoryTest extends WebTestCase
 {
     use RolePermissionExtension;
 
-    const GRID_NAME = 'test-entity-grid';
+    private const GRID_NAME = 'test-entity-grid';
+    private const GRID_ONLY_NAME = 'test-entity-name-grid';
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->initClient([], static::generateBasicAuthHeader(LoadUserData::SIMPLE_USER, 'simple_password'));
+        $this->initClient([], self::generateBasicAuthHeader(LoadUserData::SIMPLE_USER, 'simple_password'));
         $this->loadFixtures([LoadTestEntitiesData::class]);
     }
 
@@ -110,6 +112,35 @@ class IterableResultFactoryTest extends WebTestCase
         ], $iterableResult);
     }
 
+    public function testCreateIterableResultWhenDataIdentifierNotInSelect(): void
+    {
+        $datagrid = $this->getDatagridManager()->getDatagrid(self::GRID_ONLY_NAME);
+
+        $selectedItems = SelectedItems::createFromParameters([
+            'values' => [],
+            'inset' => true
+        ]);
+
+        $iterableResult = $this->getFactory()->createIterableResult(
+            $datagrid->getAcceptedDatasource(),
+            ActionConfiguration::create(['data_identifier' => 'item.id']),
+            $datagrid->getConfig(),
+            $selectedItems
+        );
+
+        $ids = array_map(
+            fn (string $name) => $this->getReference($name)->getId(),
+            [
+                LoadTestEntitiesData::FIRST_SIMPLE_USER_ENTITY,
+                LoadTestEntitiesData::SECOND_SIMPLE_USER_ENTITY,
+                LoadTestEntitiesData::THIRD_SIMPLE_USER_ENTITY,
+                LoadTestEntitiesData::FIRST_NOT_SIMPLE_USER_ENTITY,
+            ]
+        );
+
+        $this->assertIterableResult($ids, 'id', $iterableResult);
+    }
+
     public function testCreateIterableResultWithObjectIdentifier()
     {
         /** @var TestEntity $secondTestEntity */
@@ -182,47 +213,39 @@ class IterableResultFactoryTest extends WebTestCase
         ], $iterableResult);
     }
 
-    /**
-     * @param array $expectedNames
-     * @param IterableResultInterface $iterableResult
-     */
-    private function assertNames(array $expectedNames, IterableResultInterface $iterableResult)
+    private function assertNames(array $expectedNames, IterableResultInterface $iterableResult): void
     {
-        $names = array_map(function (ResultRecord $record) {
-            return $record->getValue('name');
-        }, iterator_to_array($iterableResult));
-
-        static::assertEquals($expectedNames, $names);
+        $this->assertIterableResult($expectedNames, 'name', $iterableResult);
     }
 
-    private function makeUserViewOnlyOwnEntities()
+    private function assertIterableResult(
+        array $expected,
+        string $column,
+        IterableResultInterface $iterableResult
+    ): void {
+        $values = array_map(
+            static fn (ResultRecord $record) => $record->getValue($column),
+            iterator_to_array($iterableResult)
+        );
+
+        self::assertEquals($expected, $values);
+    }
+
+    private function makeUserViewOnlyOwnEntities(): void
     {
-        /** @var ObjectManager $entityManager */
-        $entityManager = $this->client->getContainer()->get('doctrine')->getManagerForClass('OroUserBundle:User');
-
-        /** @var User $user */
+        /** @var User $simpleUser */
         $simpleUser = $this->getReference(LoadUserData::SIMPLE_USER);
-        $organization = $entityManager->getRepository('OroOrganizationBundle:Organization')
-            ->find(self::AUTH_ORGANIZATION);
 
-        $token = new UsernamePasswordOrganizationToken($simpleUser, $simpleUser->getUsername(), 'main', $organization);
-        $this->client->getContainer()->get('security.token_storage')->setToken($token);
-
+        $this->updateUserSecurityToken($simpleUser->getEmail());
         $this->updateRolePermission('ROLE_USER', TestEntity::class, AccessLevel::BASIC_LEVEL);
     }
 
-    /**
-     * @return IterableResultFactory
-     */
-    private function getFactory()
+    private function getFactory(): IterableResultFactory
     {
         return $this->client->getContainer()->get('oro_datagrid.extension.mass_action.iterable_result_factory.alias');
     }
 
-    /**
-     * @return Manager
-     */
-    private function getDatagridManager()
+    private function getDatagridManager(): Manager
     {
         return $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
     }

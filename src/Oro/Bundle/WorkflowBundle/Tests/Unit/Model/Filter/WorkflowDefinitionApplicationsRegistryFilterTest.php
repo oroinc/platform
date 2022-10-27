@@ -15,7 +15,7 @@ class WorkflowDefinitionApplicationsRegistryFilterTest extends \PHPUnit\Framewor
     /** @var WorkflowDefinitionApplicationsRegistryFilter */
     private $filter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->currentApplicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
 
@@ -24,12 +24,8 @@ class WorkflowDefinitionApplicationsRegistryFilterTest extends \PHPUnit\Framewor
 
     /**
      * @dataProvider filterDataProvider
-     *
-     * @param ArrayCollection $definitions
-     * @param string $currentApplication
-     * @param array $expected
      */
-    public function testFilter(ArrayCollection $definitions, $currentApplication, array $expected)
+    public function testFilter(ArrayCollection $definitions, ?string $currentApplication, array $expected)
     {
         $this->currentApplicationProvider->expects($this->once())
             ->method('getCurrentApplication')
@@ -38,10 +34,7 @@ class WorkflowDefinitionApplicationsRegistryFilterTest extends \PHPUnit\Framewor
         $this->assertEquals($expected, $this->filter->filter($definitions)->toArray());
     }
 
-    /**
-     * @return array
-     */
-    public function filterDataProvider()
+    public function filterDataProvider(): array
     {
         $wd1 = (new WorkflowDefinition)->setName('wd1')->setApplications(['default']);
         $wd2 = (new WorkflowDefinition)->setName('wd2')->setApplications(['default', 'commerce']);

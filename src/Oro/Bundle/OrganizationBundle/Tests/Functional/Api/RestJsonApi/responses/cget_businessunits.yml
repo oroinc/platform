@@ -1,0 +1,67 @@
+data:
+    -
+        type: businessunits
+        id: '<toString(@business_unit->id)>'
+        attributes:
+            extend_description: null
+            name: Main
+            phone: null
+            website: null
+            email: null
+            fax: null
+            createdAt: '@business_unit->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@business_unit->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            users:
+                data:
+                    -
+                        type: users
+                        id: '<toString(@user->id)>'
+            owner:
+                data: null
+    -
+        type: businessunits
+        id: '<toString(@business_unit_1->id)>'
+        attributes:
+            extend_description: null
+            name: business_unit_1
+            phone: null
+            website: null
+            email: null
+            fax: null
+            createdAt: '@business_unit_1->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@business_unit_1->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            users:
+                data: []
+            owner:
+                data: null
+    -
+        type: businessunits
+        id: '<toString(@business_unit_2->id)>'
+        attributes:
+            extend_description: null
+            name: business_unit_2
+            phone: null
+            website: null
+            email: null
+            fax: null
+            createdAt: '@business_unit_2->createdAt->format("Y-m-d\TH:i:s\Z")'
+            updatedAt: '@business_unit_2->updatedAt->format("Y-m-d\TH:i:s\Z")'
+        relationships:
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            users:
+                data: []
+            owner:
+                data: null

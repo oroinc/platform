@@ -3,246 +3,163 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
-use Oro\Bundle\MessageQueueBundle\Tests\Unit\Mocks\FooTransportFactory;
-use Oro\Component\MessageQueue\DependencyInjection\DbalTransportFactory;
-use Oro\Component\MessageQueue\DependencyInjection\DefaultTransportFactory;
-use Oro\Component\MessageQueue\DependencyInjection\NullTransportFactory;
-use Oro\Component\Testing\ClassExtensionTrait;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
+use Oro\Component\MessageQueue\Client\NoopMessageProcessor;
+use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
- */
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    use ClassExtensionTrait;
+    use TempDirExtension;
 
-    public function testShouldImplementConfigurationInterface()
+    public function testGetConfigTreeBuilder(): void
     {
-        $this->assertClassImplements(ConfigurationInterface::class, Configuration::class);
+        $factories = [];
+        $configuration = new Configuration($factories, 'prod');
+
+        $treeBuilder = $configuration->getConfigTreeBuilder();
+        self::assertInstanceOf(TreeBuilder::class, $treeBuilder);
     }
 
-    public function testCouldBeConstructedWithFactoriesAsFirstArgument()
+    public function testProcessConfiguration(): void
     {
-        new Configuration([]);
-    }
+        $factories = [
+            'dbal' => new DbalTransportFactory(),
+        ];
 
-    public function testThrowIfTransportNotConfigured()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The child node "transport" at path "oro_message_queue" must be configured.');
-        $configuration = new Configuration([]);
-
+        $configuration = new Configuration($factories, 'prod');
         $processor = new Processor();
-        $processor->processConfiguration($configuration, [[]]);
-    }
-
-    public function testShouldInjectFooTransportFactoryConfig()
-    {
-        $configuration = new Configuration([new FooTransportFactory()]);
-
-        $processor = new Processor();
-        $processor->processConfiguration($configuration, [[
-            'transport' => [
-                'foo' => [
-                    'foo_param' => 'aParam'
-                ],
-            ]
-        ]]);
-    }
-
-    public function testThrowExceptionIfFooTransportConfigInvalid()
-    {
-        $configuration = new Configuration([new FooTransportFactory()]);
-
-        $processor = new Processor();
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage(
-            'The path "oro_message_queue.transport.foo.foo_param" cannot contain an empty value, but got null.'
-        );
-
-        $processor->processConfiguration($configuration, [[
-            'transport' => [
-                'foo' => [
-                    'foo_param' => null
-                ],
-            ]
-        ]]);
-    }
-
-    public function testShouldAllowConfigureDefaultTransport()
-    {
-        $configuration = new Configuration([new DefaultTransportFactory()]);
-
-        $processor = new Processor();
-        $processor->processConfiguration($configuration, [[
-            'transport' => [
-                'default' => ['alias' => 'foo'],
-            ]
-        ]]);
-    }
-
-    public function testShouldAllowConfigureNullTransport()
-    {
-        $configuration = new Configuration([new NullTransportFactory()]);
-
-        $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, [[
-            'transport' => [
-                'null' => true,
-            ]
-        ]]);
-
-        $this->assertEquals([
-            'transport' => [
-                'null' => [],
-            ],
+        $pidFileDir = $this->getTempDir('oro-message-queue');
+        $expected = [
             'persistent_services' => [],
             'persistent_processors' => [],
             'security_agnostic_topics' => [],
-            'security_agnostic_processors' => []
-        ], $config);
-    }
-
-    public function testShouldAllowConfigureSeveralTransportsSameTime()
-    {
-        $configuration = new Configuration([
-            new NullTransportFactory(),
-            new DefaultTransportFactory(),
-            new FooTransportFactory(),
-        ]);
-
-        $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, [[
-            'transport' => [
-                'default' => 'foo',
-                'null' => true,
-                'foo' => ['foo_param' => 'aParam'],
-            ]
-        ]]);
-
-        $this->assertEquals([
-            'transport' => [
-                'default' => ['alias' => 'foo'],
-                'null' => [],
-                'foo' => ['foo_param' => 'aParam'],
+            'security_agnostic_processors' => [],
+            'time_before_stale' => [
+                'jobs' => [],
             ],
-            'persistent_services' => [],
-            'persistent_processors' => [],
-            'security_agnostic_topics' => [],
-            'security_agnostic_processors' => []
-        ], $config);
-    }
-
-    public function testShouldAllowConfigureDBALTransport()
-    {
-        $configuration = new Configuration([
-            new DefaultTransportFactory(),
-            new DbalTransportFactory()
-        ]);
-
-        $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, [[
+            'consumer' => [
+                'heartbeat_update_period' => 15,
+            ],
             'transport' => [
-                'default' => 'dbal',
-                'dbal' => true,
-            ]
-        ]]);
-
-        $pidDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'oro-message-queue';
-
-        $this->assertEquals([
-            'transport' => [
-                'default' => [
-                    'alias' => 'dbal',
-                ],
                 'dbal' => [
-                    'connection' => 'default',
+                    'connection' => 'message_queue',
                     'table' => 'oro_message_queue',
-                    'pid_file_dir' => $pidDir,
+                    'pid_file_dir' => $pidFileDir,
+                    'consumer_process_pattern' => ':consume',
                     'polling_interval' => 1000,
-                    'consumer_process_pattern' => ':consume'
-                ]
-            ],
-            'persistent_services' => [],
-            'persistent_processors' => [],
-            'security_agnostic_topics' => [],
-            'security_agnostic_processors' => []
-        ], $config);
-    }
-
-    public function testShouldSetDefaultConfigurationForClient()
-    {
-        $configuration = new Configuration([new DefaultTransportFactory()]);
-
-        $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, [[
-            'transport' => [
-                'default' => ['alias' => 'foo'],
-            ],
-            'client' => null,
-        ]]);
-
-        $this->assertEquals([
-            'transport' => [
-                'default' => ['alias' => 'foo'],
+                ],
             ],
             'client' => [
-                'prefix' => 'oro',
-                'router_processor' => 'oro_message_queue.client.route_message_processor',
-                'router_destination' => 'default',
-                'default_destination' => 'default',
                 'traceable_producer' => false,
-                'redelivered_delay_time' => 10,
-                'default_topic' => 'default'
+                'prefix' => 'oro',
+                'default_destination' => 'default',
+                'default_topic' => 'default',
+                'redelivery' => [
+                    'enabled' => true,
+                    'delay_time' => 10,
+                ],
+                'noop_status' => NoopMessageProcessor::REQUEUE,
             ],
-            'persistent_services' => [],
-            'persistent_processors' => [],
-            'security_agnostic_topics' => [],
-            'security_agnostic_processors' => []
-        ], $config);
+        ];
+
+        self::assertEquals(
+            $expected,
+            $processor->processConfiguration($configuration, [
+                'oro_message_queue' => [
+                    'persistent_services' => [],
+                    'persistent_processors' => [],
+                    'security_agnostic_topics' => [],
+                    'security_agnostic_processors' => [],
+                    'time_before_stale' => [],
+                    'consumer' => [],
+                    'transport' => [
+                        'dbal' => [
+                            'pid_file_dir' => $pidFileDir,
+                        ],
+                    ],
+                    'client' => [],
+                ],
+            ])
+        );
     }
 
-    public function testThrowExceptionIfRouterDestinationIsEmpty()
+    /**
+     * @dataProvider processConfigurationDataProvider
+     *
+     * @param string $environment
+     * @param string $expectedNoopStatus
+     */
+    public function testProcessConfigurationUsesDefaultNoopStatus(string $environment, string $expectedNoopStatus): void
     {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage(
-            'The path "oro_message_queue.client.router_destination" cannot contain an empty value, but got "".'
-        );
-
-        $configuration = new Configuration([new DefaultTransportFactory()]);
-
+        $configuration = new Configuration([], $environment);
         $processor = new Processor();
-        $processor->processConfiguration($configuration, [[
-            'transport' => [
-                'default' => ['alias' => 'foo'],
-            ],
-            'client' => [
-                'router_destination' => '',
-            ],
-        ]]);
+
+        $processedConfig = $processor->processConfiguration($configuration, []);
+        self::assertEquals($expectedNoopStatus, $processedConfig['client']['noop_status']);
     }
 
-    public function testShouldThrowExceptionIfDefaultDestinationIsEmpty()
+    public function processConfigurationDataProvider(): array
     {
-        $this->expectException(InvalidConfigurationException::class);
+        return [
+            'env is prod' => [
+                'environment' => 'prod',
+                'expectedNoopStatus' => NoopMessageProcessor::REQUEUE,
+            ],
+            'env is dev' => [
+                'environment' => 'dev',
+                'expectedNoopStatus' => NoopMessageProcessor::THROW_EXCEPTION,
+            ],
+            'env is test' => [
+                'environment' => 'test',
+                'expectedNoopStatus' => NoopMessageProcessor::THROW_EXCEPTION,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider processConfigurationWithAllowedNoopStatusDataProvider
+     *
+     * @param string $noopStatus
+     */
+    public function testProcessConfigurationWithAllowedNoopStatus(string $noopStatus): void
+    {
+        $configuration = new Configuration([], 'prod');
+        $processor = new Processor();
+
+        $processedConfig = $processor->processConfiguration($configuration, [
+            'oro_message_queue' => [
+                'client' => ['noop_status' => $noopStatus],
+            ],
+        ]);
+
+        self::assertEquals($noopStatus, $processedConfig['client']['noop_status']);
+    }
+
+    public function processConfigurationWithAllowedNoopStatusDataProvider(): array
+    {
+        return [
+            [NoopMessageProcessor::ACK],
+            [NoopMessageProcessor::REJECT],
+            [NoopMessageProcessor::REQUEUE],
+            [NoopMessageProcessor::THROW_EXCEPTION],
+        ];
+    }
+
+    public function testProcessConfigurationThrowsExceptionWhenInvalidNoopStatus(): void
+    {
+        $configuration = new Configuration([], 'prod');
+        $processor = new Processor();
+
         $this->expectExceptionMessage(
-            'The path "oro_message_queue.client.default_destination" cannot contain an empty value, but got "".'
+            'The value "invalid_status" is not allowed for path "oro_message_queue.client.noop_status"'
         );
 
-        $configuration = new Configuration([new DefaultTransportFactory()]);
-
-        $processor = new Processor();
-        $processor->processConfiguration($configuration, [[
-            'transport' => [
-                'default' => ['alias' => 'foo'],
+        $processor->processConfiguration($configuration, [
+            'oro_message_queue' => [
+                'client' => ['noop_status' => 'invalid_status'],
             ],
-            'client' => [
-                'default_destination' => '',
-            ],
-        ]]);
+        ]);
     }
 }

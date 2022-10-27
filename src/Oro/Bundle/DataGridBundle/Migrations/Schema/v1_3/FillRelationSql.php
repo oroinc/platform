@@ -3,9 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Migrations\Schema\v1_3;
 
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
-use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
-use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Psr\Log\LoggerInterface;
 
 class FillRelationSql extends ParametrizedMigrationQuery
@@ -46,7 +44,7 @@ class FillRelationSql extends ParametrizedMigrationQuery
         $types  = [];
         $this->logQuery($logger, $query, $params, $types);
         if (!$dryRun) {
-            $this->connection->executeUpdate($query, $params, $types);
+            $this->connection->executeStatement($query, $params, $types);
         }
     }
 }

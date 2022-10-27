@@ -14,16 +14,13 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityOverrideTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadEnumsData::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/entities_with_override_class.yml'
@@ -187,6 +184,7 @@ class EntityOverrideTest extends RestJsonApiTestCase
                     'relationships' => [
                         'activityTargets' => [
                             'data' => [
+                                ['type' => 'testapioverrideclasstargets', 'id' => '<toString(@target_1->id)>'],
                                 ['type' => 'testapioverrideclassowners', 'id' => '<toString(@owner_1->id)>']
                             ]
                         ]
@@ -622,7 +620,8 @@ class EntityOverrideTest extends RestJsonApiTestCase
                         'relationships' => [
                             'owners' => [
                                 'data' => [
-                                    ['type' => 'testapioverrideclassowners', 'id' => '<toString(@owner_1->id)>']
+                                    ['type' => 'testapioverrideclassowners', 'id' => '<toString(@owner_1->id)>'],
+                                    ['type' => 'testapioverrideclassowners', 'id' => '<toString(@owner_2->id)>']
                                 ]
                             ]
                         ]
@@ -955,6 +954,21 @@ class EntityOverrideTest extends RestJsonApiTestCase
             ['entity' => 'testapioverrideclassowners'],
             ['filter' => ['id' => (string)$entityIdToDelete]]
         );
+
+        self::assertNull($this->getEntityManager()->find(TestOverrideClassOwner::class, $entityIdToDelete));
+    }
+
+    public function testDeleteListWithTotalAndDeletedCountsOfOverriddenEntities()
+    {
+        $entityIdToDelete = $this->getReference('owner_1')->id;
+        $response = $this->cdelete(
+            ['entity' => 'testapioverrideclassowners'],
+            ['filter' => ['id' => (string)$entityIdToDelete]],
+            ['HTTP_X-Include' => 'totalCount;deletedCount']
+        );
+
+        self::assertEquals(1, $response->headers->get('X-Include-Total-Count'), 'totalCount');
+        self::assertEquals(1, $response->headers->get('X-Include-Deleted-Count'), 'deletedCount');
 
         self::assertNull($this->getEntityManager()->find(TestOverrideClassOwner::class, $entityIdToDelete));
     }

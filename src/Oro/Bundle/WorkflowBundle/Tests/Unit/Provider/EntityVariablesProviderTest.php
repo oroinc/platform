@@ -8,53 +8,37 @@ use Oro\Bundle\WorkflowBundle\Provider\EntityVariablesProvider;
 class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntityVariablesProvider */
-    protected $provider;
+    private $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new EntityVariablesProvider();
     }
 
-    /**
-     * @dataProvider entityProvider
-     *
-     * @param string|null $entity
-     */
-    public function testGetVariableDefinitions($entity)
+    public function testGetVariableDefinitions()
     {
-        $this->assertEquals([], $this->provider->getVariableDefinitions($entity));
+        $this->assertSame([], $this->provider->getVariableDefinitions());
     }
 
-    /**
-     * @dataProvider entityProvider
-     *
-     * @param string|null $entity
-     */
-    public function testGetVariableGetters($entity)
+    public function testGetVariableGetters()
     {
         $this->assertEquals(
             [
                 WorkflowTransitionRecord::class => [
-                    'id' => 'getId',
-                    'workflowItem' => 'getWorkflowItem',
+                    'id'             => 'getId',
+                    'workflowItem'   => 'getWorkflowItem',
                     'transitionName' => 'getTransitionName',
-                    'stepFrom' => 'getStepFrom',
-                    'stepTo' => 'getStepTo',
+                    'stepFrom'       => 'getStepFrom',
+                    'stepTo'         => 'getStepTo',
                     'transitionDate' => 'getTransitionDate'
                 ]
             ],
-            $this->provider->getVariableGetters($entity)
+            $this->provider->getVariableGetters()
         );
     }
 
-    /**
-     * @return array
-     */
-    public function entityProvider()
+    public function testGetVariableProcessors()
     {
-        return [
-            [null],
-            [new \stdClass()]
-        ];
+        self::assertSame([], $this->provider->getVariableProcessors(WorkflowTransitionRecord::class));
     }
 }

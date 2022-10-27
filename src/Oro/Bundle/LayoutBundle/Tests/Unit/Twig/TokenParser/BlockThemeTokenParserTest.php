@@ -4,100 +4,130 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\TokenParser;
 
 use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
+use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use Twig\Environment;
+use Twig\Node\Expression\ArrayExpression;
+use Twig\Node\Expression\ConstantExpression;
+use Twig\Node\Expression\NameExpression;
+use Twig\Parser;
+use Twig\Source;
 
 class BlockThemeTokenParserTest extends \PHPUnit\Framework\TestCase
 {
+    use TwigExtensionTestCaseTrait;
+
     /**
      * @dataProvider getTestsForLayoutTheme
      */
-    public function testCompile($source, $expected)
+    public function testCompile(Source $source, BlockThemeNode $expected)
     {
-        $env = new \Twig_Environment(
-            new \Twig_Loader_String(),
+        $env = new Environment(
+            $this->getLoader(),
             ['cache' => false, 'autoescape' => false, 'optimizations' => 0]
         );
         $env->addTokenParser(new BlockThemeTokenParser());
         $stream = $env->tokenize($source);
-        $parser = new \Twig_Parser($env);
+        $parser = new Parser($env);
 
         $this->assertEquals($expected, $parser->parse($stream)->getNode('body')->getNode(0));
     }
 
     public function getTestsForLayoutTheme()
     {
+        $sourceBlockThemeNodeTpl1 = new Source('{% block_theme layout "tpl1" %}', 'index');
+        $blockThemeNodeTpl1 = new BlockThemeNode(
+            new NameExpression('layout', 1),
+            new ArrayExpression(
+                [
+                    new ConstantExpression(0, 1),
+                    new ConstantExpression('tpl1', 1),
+                ],
+                1
+            ),
+            1,
+            'block_theme'
+        );
+        $blockThemeNodeTpl1->setSourceContext($sourceBlockThemeNodeTpl1);
+
+        $sourceBlockThemeNodeTpl1Tpl2 = new Source('{% block_theme layout "tpl1" "tpl2" %}', 'index');
+        $blockThemeNodeTpl1Tpl2 = new BlockThemeNode(
+            new NameExpression('layout', 1),
+            new ArrayExpression(
+                [
+                    new ConstantExpression(0, 1),
+                    new ConstantExpression('tpl1', 1),
+                    new ConstantExpression(1, 1),
+                    new ConstantExpression('tpl2', 1),
+                ],
+                1
+            ),
+            1,
+            'block_theme'
+        );
+
+        $blockThemeNodeTpl1Tpl2->setSourceContext($sourceBlockThemeNodeTpl1Tpl2);
+
+        $sourceBlockThemeNodeWithTpl1 = new Source('{% block_theme layout with "tpl1" %}', 'index');
+        $blockThemeNodeWithTpl1 = new BlockThemeNode(
+            new NameExpression('layout', 1),
+            new ConstantExpression('tpl1', 1),
+            1,
+            'block_theme'
+        );
+        $blockThemeNodeWithTpl1->setSourceContext($sourceBlockThemeNodeWithTpl1);
+
+        $sourceBlockThemeNodeWithTpl1Array = new Source('{% block_theme layout with ["tpl1"] %}', 'index');
+        $blockThemeNodeWithTpl1Array = new BlockThemeNode(
+            new NameExpression('layout', 1),
+            new ArrayExpression(
+                [
+                    new ConstantExpression(0, 1),
+                    new ConstantExpression('tpl1', 1),
+                ],
+                1
+            ),
+            1,
+            'block_theme'
+        );
+        $blockThemeNodeWithTpl1Array->setSourceContext($sourceBlockThemeNodeWithTpl1Array);
+
+        $sourceBlockThemeNodeWithTpl1Tpl2Array = new Source('{% block_theme layout with ["tpl1", "tpl2"] %}', 'index');
+        $blockThemeNodeWithTpl1Tpl2Array = new BlockThemeNode(
+            new NameExpression('layout', 1),
+            new ArrayExpression(
+                [
+                    new ConstantExpression(0, 1),
+                    new ConstantExpression('tpl1', 1),
+                    new ConstantExpression(1, 1),
+                    new ConstantExpression('tpl2', 1),
+                ],
+                1
+            ),
+            1,
+            'block_theme'
+        );
+        $blockThemeNodeWithTpl1Tpl2Array->setSourceContext($sourceBlockThemeNodeWithTpl1Tpl2Array);
+
         return [
             [
-                '{% block_theme layout "tpl1" %}',
-                new BlockThemeNode(
-                    new \Twig_Node_Expression_Name('layout', 1),
-                    new \Twig_Node_Expression_Array(
-                        [
-                            new \Twig_Node_Expression_Constant(0, 1),
-                            new \Twig_Node_Expression_Constant('tpl1', 1),
-                        ],
-                        1
-                    ),
-                    1,
-                    'block_theme'
-                ),
+                $sourceBlockThemeNodeTpl1,
+                $blockThemeNodeTpl1,
             ],
             [
-                '{% block_theme layout "tpl1" "tpl2" %}',
-                new BlockThemeNode(
-                    new \Twig_Node_Expression_Name('layout', 1),
-                    new \Twig_Node_Expression_Array(
-                        [
-                            new \Twig_Node_Expression_Constant(0, 1),
-                            new \Twig_Node_Expression_Constant('tpl1', 1),
-                            new \Twig_Node_Expression_Constant(1, 1),
-                            new \Twig_Node_Expression_Constant('tpl2', 1),
-                        ],
-                        1
-                    ),
-                    1,
-                    'block_theme'
-                ),
+                $sourceBlockThemeNodeTpl1Tpl2,
+                $blockThemeNodeTpl1Tpl2,
             ],
             [
-                '{% block_theme layout with "tpl1" %}',
-                new BlockThemeNode(
-                    new \Twig_Node_Expression_Name('layout', 1),
-                    new \Twig_Node_Expression_Constant('tpl1', 1),
-                    1,
-                    'block_theme'
-                ),
+                $sourceBlockThemeNodeWithTpl1,
+                $blockThemeNodeWithTpl1
             ],
             [
-                '{% block_theme layout with ["tpl1"] %}',
-                new BlockThemeNode(
-                    new \Twig_Node_Expression_Name('layout', 1),
-                    new \Twig_Node_Expression_Array(
-                        [
-                            new \Twig_Node_Expression_Constant(0, 1),
-                            new \Twig_Node_Expression_Constant('tpl1', 1),
-                        ],
-                        1
-                    ),
-                    1,
-                    'block_theme'
-                ),
+                $sourceBlockThemeNodeWithTpl1Array,
+                $blockThemeNodeWithTpl1Array
             ],
             [
-                '{% block_theme layout with ["tpl1", "tpl2"] %}',
-                new BlockThemeNode(
-                    new \Twig_Node_Expression_Name('layout', 1),
-                    new \Twig_Node_Expression_Array(
-                        [
-                            new \Twig_Node_Expression_Constant(0, 1),
-                            new \Twig_Node_Expression_Constant('tpl1', 1),
-                            new \Twig_Node_Expression_Constant(1, 1),
-                            new \Twig_Node_Expression_Constant('tpl2', 1),
-                        ],
-                        1
-                    ),
-                    1,
-                    'block_theme'
-                ),
+                $sourceBlockThemeNodeWithTpl1Tpl2Array,
+                $blockThemeNodeWithTpl1Tpl2Array
             ],
         ];
     }

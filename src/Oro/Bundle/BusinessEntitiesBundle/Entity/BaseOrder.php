@@ -8,10 +8,11 @@ use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * Class BaseOrder
+ * Represents a generic sales order.
  *
  * @package Oro\Bundle\BusinessEntitiesBundle\Entity
  * @ORM\MappedSuperclass
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class BaseOrder
 {

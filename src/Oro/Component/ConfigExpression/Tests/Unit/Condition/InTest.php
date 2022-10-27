@@ -10,7 +10,7 @@ class InTest extends \PHPUnit\Framework\TestCase
 {
     protected $condition;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->condition = new Condition\In();
         $this->condition->setContextAccessor(new ContextAccessor());

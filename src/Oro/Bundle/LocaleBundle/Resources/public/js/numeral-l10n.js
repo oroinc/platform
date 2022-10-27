@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var numeral = require('numeral');
-    var localeSettings = require('./locale-settings');
-    var currencySettings = localeSettings.getNumberFormats('currency');
+    const numeral = require('numeral');
+    const localeSettings = require('./locale-settings');
+    const currencySettings = localeSettings.getNumberFormats('currency');
 
     numeral.locales[localeSettings.getLocale().toLowerCase()] = {
         delimiters: {
@@ -17,7 +17,7 @@ define(function(require) {
             trillion: 't'
         },
         ordinal: function(number) {
-            var b = number % 10;
+            const b = number % 10;
             return (~~(number % 100 / 10) === 1) ? 'th'
                 : (b === 1) ? 'st'
                     : (b === 2) ? 'nd'

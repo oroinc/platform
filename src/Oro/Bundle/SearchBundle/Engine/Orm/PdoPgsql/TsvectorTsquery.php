@@ -11,8 +11,6 @@ class TsvectorTsquery extends FunctionNode
 {
     /**
      * Parse parameters
-     *
-     * @param \Doctrine\ORM\Query\Parser $parser
      */
     public function parse(\Doctrine\ORM\Query\Parser $parser)
     {

@@ -4,6 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Translation\KeyTemplate;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationKeyTemplateInterface;
 
+/**
+ * Workflow label key template.
+ */
 class WorkflowTemplate implements TranslationKeyTemplateInterface
 {
     const NAME = 'workflow';
@@ -20,7 +23,7 @@ class WorkflowTemplate implements TranslationKeyTemplateInterface
     /**
      * @return string
      */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return self::KEY_PREFIX . '.{{ workflow_name }}';
     }

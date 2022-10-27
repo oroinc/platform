@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Dbal\Extension;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Dbal\DbalCliProcessManager;
@@ -10,33 +10,32 @@ use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessage
 use Oro\Component\MessageQueue\Test\DbalSchemaExtensionTrait;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
+use Oro\Component\Testing\TempDirExtension;
 use Psr\Log\NullLogger;
 
 class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
 {
     use DbalSchemaExtensionTrait;
+    use TempDirExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
 
         $this->ensureTableExists('message_queue');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dropTable('message_queue');
     }
-
 
     public function testShouldRedeliverOrphanMessages()
     {
         $connection = $this->createConnection();
         $dbal = $connection->getDBALConnection();
 
-        $pidDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'oro-message-queue';
-        @unlink($pidDir);
-        @mkdir($pidDir);
+        $pidDir = $this->getTempDir('message-queue');
         file_put_contents($pidDir.'/consumer-id.pid', '123456');
 
         $dbal->insert('message_queue', [
@@ -44,15 +43,13 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
             'redelivered' => false,
             'queue' => 'queue',
             'priority' => 1,
-        ], ['redelivered' => Type::BOOLEAN]);
+        ], ['redelivered' => Types::BOOLEAN]);
         $id = (int) $dbal->lastInsertId('message_queue_id_seq');
 
         $consumer = $this->createMessageConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $consumer->expects($this->once())
             ->method('getConsumerId')
-            ->will($this->returnValue('any-other-consumer-id'))
-        ;
+            ->willReturn('any-other-consumer-id');
 
         //guard
         $this->assertGreaterThan(0, $id);
@@ -82,7 +79,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
      */
     private function createConnection()
     {
-        $dbal = $this->getContainer()->get('doctrine.dbal.default_connection');
+        $dbal = $this->getContainer()->get('doctrine.dbal.message_queue_connection');
 
         return new DbalConnection($dbal, 'message_queue');
     }

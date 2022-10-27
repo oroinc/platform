@@ -1,0 +1,6 @@
+CN:
+    format: '%postal_code%\n%COUNTRY%\n%REGION%%city%\n%street%'
+    latin_format: '%street%, %city%\n%REGION%, %COUNTRY% %postal_code%'
+    require: [city, postal_code]
+    has_disputed: true
+    format_charset: GB2312

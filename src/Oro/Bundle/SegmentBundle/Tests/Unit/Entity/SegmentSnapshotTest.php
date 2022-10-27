@@ -7,21 +7,16 @@ use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 
 class SegmentSnapshotTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SegmentSnapshot */
-    protected $entity;
-
     /** @var Segment */
-    protected $segment;
+    private $segment;
 
-    protected function setUp()
+    /** @var SegmentSnapshot */
+    private $entity;
+
+    protected function setUp(): void
     {
         $this->segment = new Segment();
-        $this->entity  = new SegmentSnapshot($this->segment);
-    }
-
-    protected function tearDown()
-    {
-        unset($this->segment, $this->entity);
+        $this->entity = new SegmentSnapshot($this->segment);
     }
 
     public function testSettersAndGetters()
@@ -32,9 +27,9 @@ class SegmentSnapshotTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getIntegerEntityId());
         $this->assertNotNull($this->entity->getSegment());
 
-        $testEntityId        = 12;
+        $testEntityId = 12;
         $testIntegerEntityId = 13;
-        $testCreatedAt       = new \DateTime('now - 1 day', new \DateTimeZone('UTC'));
+        $testCreatedAt = new \DateTime('now - 1 day', new \DateTimeZone('UTC'));
         $this->entity->setEntityId($testEntityId);
         $this->entity->setIntegerEntityId($testIntegerEntityId);
         $this->entity->setCreatedAt($testCreatedAt);
@@ -45,6 +40,6 @@ class SegmentSnapshotTest extends \PHPUnit\Framework\TestCase
 
         $this->entity->prePersist();
         $this->assertNotSame($testCreatedAt, $this->entity->getCreatedAt());
-        $this->assertInstanceOf('\DateTime', $this->entity->getCreatedAt());
+        $this->assertInstanceOf(\DateTime::class, $this->entity->getCreatedAt());
     }
 }

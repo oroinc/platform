@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\Layout\Exception\InvalidArgumentException;
+
 /**
  * The data accessor that falls back to the layout context if a data provider
  * is not registered in the layout registry.
@@ -10,28 +12,16 @@ namespace Oro\Component\Layout;
  */
 class DataAccessor implements DataAccessorInterface
 {
-    /** @var LayoutRegistryInterface */
-    private $registry;
+    private LayoutRegistryInterface $registry;
+    private ContextInterface $context;
+    private array $dataProviders = [];
 
-    /** @var ContextInterface */
-    private $context;
-
-    /** @var array */
-    private $dataProviders = [];
-
-    /**
-     * @param LayoutRegistryInterface $registry
-     * @param ContextInterface        $context
-     */
     public function __construct(LayoutRegistryInterface $registry, ContextInterface $context)
     {
         $this->registry = $registry;
-        $this->context  = $context;
+        $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get($name)
     {
         return $this->offsetGet($name);
@@ -40,70 +30,57 @@ class DataAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($name)
+    public function offsetGet($name): mixed
     {
         $dataProvider = $this->getDataProvider($name);
-
-        if (is_object($dataProvider)) {
-            return new DataProviderDecorator($dataProvider, ['get', 'has', 'is']);
-        } elseif ($dataProvider !== false) {
+        if (null !== $dataProvider) {
+            return $dataProvider;
+        }
+        if ($this->context->data()->has($name)) {
             return $this->context->data()->get($name);
         }
 
-        throw new Exception\InvalidArgumentException(
-            sprintf('Could not load the data provider "%s".', $name)
-        );
+        throw new InvalidArgumentException(sprintf('Could not load the data provider "%s".', $name));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($name)
+    public function offsetExists($name): bool
     {
-        return $this->getDataProvider($name) !== false;
+        return
+            null !== $this->getDataProvider($name)
+            || $this->context->data()->has($name);
     }
 
     /**
-     * Implements \ArrayAccess
-     *
-     * @param mixed $name
-     * @param mixed $value
+     * {@inheritdoc}
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         throw new \BadMethodCallException('Not supported');
     }
 
     /**
-     * Implements \ArrayAccess
-     *
-     * @param mixed $name
+     * {@inheritdoc}
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         throw new \BadMethodCallException('Not supported');
     }
 
-    /**
-     * @param string $name The name of the data provider
-     *
-     * @return mixed The returned values:
-     *               data provider object if the data provider is loaded
-     *               mixed if data should be loaded from the layout context
-     *               false if the requested data cannot be loaded
-     */
-    protected function getDataProvider($name)
+    private function getDataProvider(string $name): ?object
     {
-        if (!isset($this->dataProviders[$name])) {
-            $dataProvider = $this->registry->findDataProvider($name);
-
-            if ($dataProvider === null) {
-                $dataProvider = $this->context->data()->has($name) ? true : false;
-            }
-
-            $this->dataProviders[$name] = $dataProvider;
+        if (\array_key_exists($name, $this->dataProviders)) {
+            return $this->dataProviders[$name];
         }
 
-        return $this->dataProviders[$name];
+        $dataProvider = $this->registry->findDataProvider($name);
+        if (null !== $dataProvider) {
+            $dataProvider = new DataProviderDecorator($dataProvider);
+        }
+        $this->dataProviders[$name] = $dataProvider;
+
+        return $dataProvider;
     }
 }

@@ -8,9 +8,10 @@ use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
 class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var WidgetItemsLoadDataListener */
     private $widgetItemsLoadDataListener;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->widgetItemsLoadDataListener = new WidgetItemsLoadDataListener();
     }
@@ -53,7 +54,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterItemsProvider
      */
-    public function testFilterItems($items, $config, $expectedItems)
+    public function testFilterItems(array $items, array $config, array $expectedItems)
     {
         $widgetConfig = [
             'configuration' => [
@@ -67,7 +68,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(array_keys($expectedItems), array_keys($event->getItems()));
     }
 
-    public function filterItemsProvider()
+    public function filterItemsProvider(): array
     {
         return [
             $this->getDataInOrder(),
@@ -77,10 +78,10 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getDataInOrder()
+    private function getDataInOrder(): array
     {
         return [
-            $items = [
+            'items' => [
                 'revenue' => [
                     'label' => 'Revenue',
                 ],
@@ -88,7 +89,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
                     'label' => 'Orders number',
                 ],
             ],
-            $config = [
+            'config' => [
                 'items' => [
                     [
                         'id'    => 'revenue',
@@ -104,7 +105,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            $expectedItems = [
+            'expectedItems' => [
                 'revenue' => [
                     'label' => 'Revenue',
                 ],
@@ -115,10 +116,10 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getUnsortedData()
+    private function getUnsortedData(): array
     {
         return [
-            $items = [
+            'items' => [
                 'revenue' => [
                     'label' => 'Revenue',
                 ],
@@ -126,7 +127,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
                     'label' => 'Orders number',
                 ],
             ],
-            $config = [
+            'config' => [
                 'items' => [
                     [
                         'id'    => 'revenue',
@@ -142,7 +143,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            $expectedItems = [
+            'expectedItems' => [
                 'orders_number' => [
                     'label' => 'Orders number',
                 ],
@@ -153,10 +154,10 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getUnfilteredData()
+    private function getUnfilteredData(): array
     {
         return [
-            $items = [
+            'items' => [
                 'revenue' => [
                     'label' => 'Revenue',
                 ],
@@ -164,7 +165,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
                     'label' => 'Orders number',
                 ],
             ],
-            $config = [
+            'config' => [
                 'items' => [
                     [
                         'id'    => 'revenue',
@@ -180,7 +181,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            $expectedItems = [
+            'expectedItems' => [
                 'orders_number' => [
                     'label' => 'Orders number',
                 ],
@@ -188,10 +189,10 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getMixedData()
+    private function getMixedData(): array
     {
         return [
-            $items = [
+            'items' => [
                 'revenue' => [
                     'label' => 'Revenue',
                 ],
@@ -202,7 +203,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
                     'label' => 'Another',
                 ],
             ],
-            $config = [
+            'config' => [
                 'items' => [
                     [
                         'id'    => 'revenue',
@@ -224,7 +225,7 @@ class WidgetItemsLoadDataListenerTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ],
-            $expectedItems = [
+            'expectedItems' => [
                 'another' => [
                     'label' => 'Another',
                 ],

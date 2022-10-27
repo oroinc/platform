@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Provider\Filter;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -11,9 +11,12 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Provides business unit tree.
+ */
 class ChoiceTreeBusinessUnitProvider
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var AclHelper */
@@ -25,14 +28,8 @@ class ChoiceTreeBusinessUnitProvider
     /** @var ChainOwnerTreeProvider */
     protected $treeProvider;
 
-    /**
-     * @param Registry                $registry
-     * @param TokenAccessorInterface  $tokenAccessor
-     * @param AclHelper               $aclHelper
-     * @param ChainOwnerTreeProvider  $treeProvider
-     */
     public function __construct(
-        Registry $registry,
+        ManagerRegistry $registry,
         TokenAccessorInterface $tokenAccessor,
         AclHelper $aclHelper,
         ChainOwnerTreeProvider $treeProvider
@@ -88,9 +85,6 @@ class ChoiceTreeBusinessUnitProvider
         return $businessUnit->getName();
     }
 
-    /**
-     * @param QueryBuilder $qb
-     */
     protected function addBusinessUnitName(QueryBuilder $qb)
     {
         $qb->addSelect('businessUnit.name');

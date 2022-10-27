@@ -2,19 +2,26 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides a set of utility methods for email notification grids.
+ */
 class EmailNotificationGridHelper
 {
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
-    /**
-     * @param EntityManager  $em
-     */
-    public function __construct(EntityManager $em)
+    /** @var array */
+    private $events;
+
+    public function __construct(ManagerRegistry $doctrine, array $events)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
+        $this->events = $events;
     }
 
     /**
@@ -22,10 +29,7 @@ class EmailNotificationGridHelper
      */
     public function getRecipientUsersChoices()
     {
-        return $this->getEntityChoices(
-            'OroUserBundle:User',
-            'e.id, e.firstName, e.lastName'
-        );
+        return $this->getEntityChoices(User::class, 'e.id, e.firstName, e.lastName');
     }
 
     /**
@@ -33,7 +37,15 @@ class EmailNotificationGridHelper
      */
     public function getRecipientGroupsChoices()
     {
-        return $this->getEntityChoices('OroUserBundle:Group', 'e.id, e.name', 'name');
+        return $this->getEntityChoices(Group::class, 'e.id, e.name', 'name');
+    }
+
+    /**
+     * @return array
+     */
+    public function getEventNameChoices()
+    {
+        return $this->events;
     }
 
     /**
@@ -43,24 +55,22 @@ class EmailNotificationGridHelper
      *
      * @return array
      */
-    protected function getEntityChoices($entity, $select, $mainField = null)
+    private function getEntityChoices($entity, $select, $mainField = null)
     {
         $options = [];
-        $entities = $this->em
+        $entities = $this->getEntityManager($entity)
             ->createQueryBuilder()
             ->from($entity, 'e')
             ->select($select)
             ->getQuery()
             ->getArrayResult();
-
         foreach ($entities as $entityItem) {
-            if (is_null($mainField)) {
-                $id = $entityItem['id'];
+            $id = $entityItem['id'];
+            if (null === $mainField) {
                 unset($entityItem['id']);
-
                 $options[implode(' ', $entityItem)] = $id;
             } else {
-                $options[$entityItem[$mainField]] = $entityItem['id'];
+                $options[$entityItem[$mainField]] = $id;
             }
         }
 
@@ -68,12 +78,12 @@ class EmailNotificationGridHelper
     }
 
     /**
-     * @return array
+     * @param string $entityClass
+     *
+     * @return EntityManagerInterface
      */
-    public function getEventNameChoices()
+    private function getEntityManager($entityClass)
     {
-        return $this->em
-            ->getRepository('OroNotificationBundle:Event')
-            ->getEventNamesChoices();
+        return $this->doctrine->getManagerForClass($entityClass);
     }
 }

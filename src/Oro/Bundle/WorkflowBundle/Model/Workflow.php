@@ -20,6 +20,8 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 
 /**
+ * A model that stores all the necessary workflow management functionality.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Workflow
@@ -79,15 +81,6 @@ class Workflow
      */
     protected $variables;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param AclManager $aclManager
-     * @param RestrictionManager $restrictionManager
-     * @param StepManager|null $stepManager
-     * @param BaseAttributeManager|null $attributeManager
-     * @param TransitionManager|null $transitionManager
-     * @param VariableManager|null $variableManager
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AclManager $aclManager,
@@ -172,17 +165,18 @@ class Workflow
      * @param object $entity
      * @param array $data
      * @param string|Transition $startTransition
+     * @param Collection|null $errors
      *
      * @return WorkflowItem
      */
-    public function start($entity, array $data = [], $startTransition = null)
+    public function start($entity, array $data = [], $startTransition = null, Collection $errors = null)
     {
         if (null === $startTransition) {
             $startTransition = TransitionManager::DEFAULT_START_TRANSITION_NAME;
         }
 
         $workflowItem = $this->createWorkflowItem($entity, $data);
-        $this->transit($workflowItem, $startTransition);
+        $this->transit($workflowItem, $startTransition, $errors);
 
         // transition started without related entity, workflow item must be created for specified entity
         if (!$this->doctrineHelper->getSingleEntityIdentifier($entity)) {
@@ -247,7 +241,7 @@ class Workflow
      * @return bool
      * @throws InvalidTransitionException
      */
-    protected function checkTransitionValid(Transition $transition, WorkflowItem $workflowItem, $fireExceptions)
+    public function checkTransitionValid(Transition $transition, WorkflowItem $workflowItem, $fireExceptions)
     {
         // get current step
         $currentStep = null;
@@ -288,18 +282,43 @@ class Workflow
      *
      * @param WorkflowItem $workflowItem
      * @param string|Transition $transition
+     * @param Collection|null $errors
      *
      * @throws ForbiddenTransitionException
      * @throws InvalidTransitionException
+     * @throws WorkflowException
      */
-    public function transit(WorkflowItem $workflowItem, $transition)
+    public function transit(WorkflowItem $workflowItem, $transition, Collection $errors = null)
     {
         $transition = $this->transitionManager->extractTransition($transition);
 
         $this->checkTransitionValid($transition, $workflowItem, true);
 
         $transitionRecord = $this->createTransitionRecord($workflowItem, $transition);
-        $transition->transit($workflowItem);
+        $transition->transit($workflowItem, $errors);
+        $workflowItem->addTransitionRecord($transitionRecord);
+
+        $this->aclManager->updateAclIdentities($workflowItem);
+        $this->restrictionManager->updateEntityRestrictions($workflowItem);
+    }
+
+    /**
+     * Transits a workflow item without checking for preconditions and conditions.
+     *
+     * @param WorkflowItem $workflowItem
+     * @param string|Transition $transition
+     *
+     * @throws InvalidTransitionException
+     * @throws WorkflowException
+     */
+    public function transitUnconditionally(WorkflowItem $workflowItem, $transition)
+    {
+        $transition = $this->transitionManager->extractTransition($transition);
+
+        $this->checkTransitionValid($transition, $workflowItem, true);
+
+        $transitionRecord = $this->createTransitionRecord($workflowItem, $transition);
+        $transition->transitUnconditionally($workflowItem);
         $workflowItem->addTransitionRecord($transitionRecord);
 
         $this->aclManager->updateAclIdentities($workflowItem);
@@ -352,16 +371,27 @@ class Workflow
             unset($data[$entityAttributeName]);
         }
 
-        $workflowItem->getData()
+        $workflowData = $workflowItem
+            ->getData()
             ->set($entityAttributeName, $entity)
             ->setFieldsMapping($this->getAttributesMapping())
             ->add($data);
         $workflowItem->setDefinition($this->getDefinition());
 
-        // populate WorkflowData with variables
+        // Populates WorkflowData with attributes default values.
+        foreach ($this->getAttributeManager()->getAttributes() as $attribute) {
+            if ($attribute->getDefault() !== null) {
+                $attributeValue = $workflowData->get($attribute->getName());
+                if ($attributeValue === null) {
+                    $workflowData->set($attribute->getName(), $attribute->getDefault());
+                }
+            }
+        }
+
+        // Populates WorkflowData with variables.
         if ($variables = $this->getVariables()) {
             foreach ($variables as $name => $variable) {
-                $workflowItem->getData()->set($name, $variable->getValue());
+                $workflowData->set($name, $variable->getValue());
             }
         }
 

@@ -16,7 +16,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadata;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -28,7 +28,6 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
      */
     protected function getAttributeType()
     {
-        /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper */
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->any())
             ->method('getEntityMetadata')
@@ -36,11 +35,6 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
             ->willReturn($this->metadata);
 
         return new ManyToManyAttributeType($this->entityNameResolver, $doctrineHelper);
-    }
-
-    public function testGetType()
-    {
-        $this->assertEquals('manyToMany', $this->getAttributeType()->getType());
     }
 
     /**
@@ -77,12 +71,11 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value must be an array or Traversable, [string] given
-     */
     public function testGetSearchableException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Value must be an array or Traversable, [string] given');
+
         $this->getAttributeType()->getSearchableValue($this->attribute, '', $this->localization);
     }
 
@@ -115,12 +108,11 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value must be an array or Traversable, [string] given
-     */
     public function testGetFilterableValueException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Value must be an array or Traversable, [string] given');
+
         $this->getAttributeType()->getFilterableValue($this->attribute, '', $this->localization);
     }
 
@@ -223,12 +215,11 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         );
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetSortableValueNoDoctrineMetadata()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->attribute->fromArray('extend', []);
 
         $this->metadata->expects($this->once())
@@ -245,21 +236,19 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
             ->getSortableValue($this->attribute, new ArrayCollection([$value]), $this->localization);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetSortableValueException()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetSortableValueExceptionByExtendedScope()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->attribute->fromArray('extend', ['target_entity' => \stdClass::class]);
 
         $this->metadata->expects($this->never())->method($this->anything());
@@ -267,12 +256,11 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         $this->getAttributeType()->getSortableValue($this->attribute, null, $this->localization);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Not supported
-     */
     public function testGetSortableValueExceptionByDoctrineMetadata()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Not supported');
+
         $this->attribute->fromArray('extend', []);
 
         $this->metadata->expects($this->once())

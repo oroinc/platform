@@ -9,9 +9,6 @@ class SimpleGeneratorStub implements TagGeneratorInterface
     /** @var string */
     protected $suffix;
 
-    /**
-     * @param $suffix
-     */
     public function __construct($suffix)
     {
         $this->suffix = $suffix;
@@ -22,7 +19,7 @@ class SimpleGeneratorStub implements TagGeneratorInterface
      */
     public function supports($data)
     {
-        return is_string($data) && strpos($data, 'test') !== false;
+        return \is_string($data) && str_contains($data, 'test');
     }
 
     /**
@@ -30,9 +27,9 @@ class SimpleGeneratorStub implements TagGeneratorInterface
      */
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
-        $tags = [$data . $this->suffix];
+        $tags = [$data . '_' . $this->suffix];
         if ($includeCollectionTag) {
-            $tags[] = $data . $this->suffix . self::COLLECTION_SUFFIX;
+            $tags[] = $data . '_' . $this->suffix . self::COLLECTION_SUFFIX;
         }
 
         return $tags;

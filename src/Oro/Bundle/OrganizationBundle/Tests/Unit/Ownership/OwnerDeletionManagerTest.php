@@ -1,78 +1,76 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Tests\Ownership;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership;
 
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentCheckerInterface;
 use Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity\TestEntity;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity\TestOwnerEntity;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use Psr\Container\ContainerInterface;
 
 class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $checkerContainer;
+
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipProvider;
+
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadata;
+
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
     /** @var OwnerDeletionManager */
-    protected $ownerDeletionManager;
+    private $ownerDeletionManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $defaultChecker;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $ownershipProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $ownershipMetadata;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->defaultChecker    =
-            $this->createMock('Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentCheckerInterface');
-        $this->ownershipProvider =
-            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $this->ownershipMetadata =
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
-                ->disableOriginalConstructor()
-                ->getMock();
-        $this->em                =
-            $this->getMockBuilder('\Doctrine\ORM\EntityManager')
-                ->disableOriginalConstructor()
-                ->getMock();
+        $this->checkerContainer = $this->createMock(ContainerInterface::class);
+        $this->ownershipProvider = $this->createMock(ConfigProvider::class);
+        $this->ownershipMetadata = $this->createMock(OwnershipMetadataProviderInterface::class);
+        $this->em = $this->createMock(EntityManager::class);
 
         $this->ownershipMetadata->expects($this->any())
             ->method('getUserClass')
-            ->will(
-                $this->returnValue('Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity\TestOwnerEntity')
-            );
+            ->willReturn(TestOwnerEntity::class);
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityManagerForClass')
+            ->willReturn($this->em);
 
         $this->ownerDeletionManager = new OwnerDeletionManager(
-            $this->defaultChecker,
+            $this->checkerContainer,
             $this->ownershipProvider,
             $this->ownershipMetadata,
-            $this->em,
+            $doctrineHelper,
             new ObjectIdAccessor($doctrineHelper)
         );
     }
 
+    private function getEntityConfig(string $entityClassName, array $values): Config
+    {
+        $entityConfigId = new EntityConfigId('entity', $entityClassName);
+        $entityConfig = new Config($entityConfigId);
+        $entityConfig->setValues($values);
+
+        return $entityConfig;
+    }
+
     public function testIsOwner()
     {
-        $this->assertEquals(
-            true,
-            $this->ownerDeletionManager->isOwner(new TestOwnerEntity())
-        );
-        $this->assertEquals(
-            false,
-            $this->ownerDeletionManager->isOwner(new TestEntity())
-        );
+        $this->assertTrue($this->ownerDeletionManager->isOwner(new TestOwnerEntity()));
+        $this->assertFalse($this->ownerDeletionManager->isOwner(new TestEntity()));
     }
 
     public function testHasAssignmentsForNotOwnerEntity()
@@ -82,123 +80,113 @@ class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
         $this->ownershipProvider->expects($this->never())
             ->method('getConfigs');
 
-        $result = $this->ownerDeletionManager->hasAssignments($owner);
-        $this->assertEquals(false, $result);
+        $this->assertFalse($this->ownerDeletionManager->hasAssignments($owner));
     }
 
     public function testHasAssignmentsForNonOwnerTypeEntity()
     {
         $owner = new TestOwnerEntity();
 
-        $entity          = new TestEntity();
+        $entity = new TestEntity();
         $entityClassName = get_class($entity);
         $entityOwnerType = 'NONE';
 
         $entityConfig = $this->getEntityConfig(
             $entityClassName,
-            [
-                'owner_type' => $entityOwnerType,
-            ]
+            ['owner_type' => $entityOwnerType]
         );
 
         $this->ownershipProvider->expects($this->once())
             ->method('getConfigs')
             ->with(null, true)
-            ->will($this->returnValue([$entityConfig]));
-
+            ->willReturn([$entityConfig]);
         $this->ownershipMetadata->expects($this->never())
             ->method('getMetadata');
 
-        $result = $this->ownerDeletionManager->hasAssignments($owner);
-        $this->assertEquals(false, $result);
+        $this->assertFalse($this->ownerDeletionManager->hasAssignments($owner));
     }
 
     public function testHasAssignmentsWithDefaultChecker()
     {
-        $owner   = new TestOwnerEntity();
+        $owner = new TestOwnerEntity();
         $ownerId = 123;
         $owner->setId($ownerId);
 
-        $entity          = new TestEntity();
+        $entity = new TestEntity();
         $entityClassName = get_class($entity);
         $entityOwnerType = 'USER';
 
-        $entityConfig            = $this->getEntityConfig(
+        $entityConfig = $this->getEntityConfig(
             $entityClassName,
-            [
-                'owner_type' => $entityOwnerType,
-            ]
+            ['owner_type' => $entityOwnerType]
         );
         $entityOwnershipMetadata = new OwnershipMetadata($entityOwnerType, 'owner', 'owner_id');
 
         $this->ownershipProvider->expects($this->once())
             ->method('getConfigs')
             ->with(null, true)
-            ->will($this->returnValue([$entityConfig]));
-
+            ->willReturn([$entityConfig]);
         $this->ownershipMetadata->expects($this->once())
             ->method('getMetadata')
             ->with($entityClassName)
-            ->will($this->returnValue($entityOwnershipMetadata));
+            ->willReturn($entityOwnershipMetadata);
 
-        $this->defaultChecker->expects($this->once())
+        $defaultChecker = $this->createMock(OwnerAssignmentCheckerInterface::class);
+        $defaultChecker->expects($this->once())
             ->method('hasAssignments')
             ->with($ownerId, $entityClassName, 'owner', $this->identicalTo($this->em))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
+        $this->checkerContainer->expects($this->once())
+            ->method('has')
+            ->with($entityClassName)
+            ->willReturn(false);
+        $this->checkerContainer->expects($this->once())
+            ->method('get')
+            ->with('default')
+            ->willReturn($defaultChecker);
 
-        $result = $this->ownerDeletionManager->hasAssignments($owner);
-        $this->assertEquals(true, $result);
+        $this->assertTrue($this->ownerDeletionManager->hasAssignments($owner));
     }
 
     public function testHasAssignmentsWithCustomChecker()
     {
-        $owner   = new TestOwnerEntity();
+        $owner = new TestOwnerEntity();
         $ownerId = 123;
         $owner->setId($ownerId);
 
-        $entity          = new TestEntity();
+        $entity = new TestEntity();
         $entityClassName = get_class($entity);
         $entityOwnerType = 'USER';
 
-        $entityConfig            = $this->getEntityConfig(
+        $entityConfig = $this->getEntityConfig(
             $entityClassName,
-            [
-                'owner_type' => $entityOwnerType,
-            ]
+            ['owner_type' => $entityOwnerType]
         );
         $entityOwnershipMetadata = new OwnershipMetadata($entityOwnerType, 'owner', 'owner_id');
 
         $this->ownershipProvider->expects($this->once())
             ->method('getConfigs')
             ->with(null, true)
-            ->will($this->returnValue([$entityConfig]));
-
+            ->willReturn([$entityConfig]);
         $this->ownershipMetadata->expects($this->once())
             ->method('getMetadata')
             ->with($entityClassName)
-            ->will($this->returnValue($entityOwnershipMetadata));
+            ->willReturn($entityOwnershipMetadata);
 
-        $customChecker =
-            $this->createMock('Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentCheckerInterface');
+        $customChecker = $this->createMock(OwnerAssignmentCheckerInterface::class);
         $customChecker->expects($this->once())
             ->method('hasAssignments')
             ->with($ownerId, $entityClassName, 'owner', $this->identicalTo($this->em))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
+        $this->checkerContainer->expects($this->once())
+            ->method('has')
+            ->with($entityClassName)
+            ->willReturn(true);
+        $this->checkerContainer->expects($this->once())
+            ->method('get')
+            ->with($entityClassName)
+            ->willReturn($customChecker);
 
-        $this->defaultChecker->expects($this->never())
-            ->method('hasAssignments');
-
-        $this->ownerDeletionManager->registerAssignmentChecker($entityClassName, $customChecker);
-        $result = $this->ownerDeletionManager->hasAssignments($owner);
-        $this->assertEquals(true, $result);
-    }
-
-    protected function getEntityConfig($entityClassName, $values)
-    {
-        $entityConfigId = new EntityConfigId('entity', $entityClassName);
-        $entityConfig   = new Config($entityConfigId);
-        $entityConfig->setValues($values);
-
-        return $entityConfig;
+        $this->assertTrue($this->ownerDeletionManager->hasAssignments($owner));
     }
 }

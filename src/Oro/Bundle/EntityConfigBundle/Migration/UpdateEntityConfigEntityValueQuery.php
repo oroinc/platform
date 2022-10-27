@@ -3,12 +3,19 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
 
-class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAwareInterface
+/**
+ * Set specific row value in oro_entity_config_index_value table.
+ */
+class UpdateEntityConfigEntityValueQuery implements
+    MigrationQuery,
+    ConnectionAwareInterface,
+    ConfigurationHandlerAwareInterface
 {
     /**
      * @var string
@@ -40,6 +47,8 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
      */
     protected $replaceValue;
 
+    protected ConfigurationHandler $configurationHandler;
+
     /**
      * @param string $entityName
      * @param string $scope
@@ -64,6 +73,11 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $this->connection = $connection;
     }
 
+    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
+    {
+        $this->configurationHandler = $configurationHandler;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -84,9 +98,6 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $this->updateEntityConfig($logger);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     protected function updateEntityConfigIndexValue(LoggerInterface $logger)
     {
         $sql =
@@ -114,9 +125,6 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $logger->debug($sql);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     protected function updateEntityConfig(LoggerInterface $logger)
     {
         $sql = 'SELECT data FROM oro_entity_config WHERE class_name = ? LIMIT 1';
@@ -124,11 +132,23 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $data = $this->connection->fetchColumn($sql, $parameters);
         $this->logQuery($logger, $sql, $parameters);
 
-        $data = $data ? $this->connection->convertToPHPValue($data, Type::TARRAY) : [];
+        $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
 
         if ($this->isDoUpdate($data)) {
+            if (!isset($data[$this->scope])) {
+                $data[$this->scope] = [];
+            }
+
             $data[$this->scope][$this->code] = $this->value;
-            $data = $this->connection->convertToDatabaseValue($data, Type::TARRAY);
+
+            $data[$this->scope] = $this->configurationHandler->process(
+                ConfigurationHandler::CONFIG_ENTITY_TYPE,
+                $this->scope,
+                $data[$this->scope],
+                $this->entityName
+            );
+
+            $data = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
 
             $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';
             $parameters = [$data, $this->entityName];

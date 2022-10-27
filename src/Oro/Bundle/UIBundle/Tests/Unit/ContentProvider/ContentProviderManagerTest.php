@@ -2,152 +2,153 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\ContentProvider;
 
+use Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface;
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class ContentProviderManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContentProviderManager
-     */
-    protected $manager;
+    /** @var ContentProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $provider1;
 
-    protected function setUp()
+    /** @var ContentProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $provider2;
+
+    /** @var ContentProviderManager */
+    private $manager;
+
+    protected function setUp(): void
     {
-        $this->manager = new ContentProviderManager();
+        $this->provider1 = $this->createMock(ContentProviderInterface::class);
+        $this->provider2 = $this->createMock(ContentProviderInterface::class);
+
+        $container = TestContainerBuilder::create()
+            ->add('provider1', $this->provider1)
+            ->add('provider2', $this->provider2)
+            ->getContainer($this);
+
+        $this->manager = new ContentProviderManager(
+            ['provider1', 'provider2'],
+            $container,
+            ['provider1']
+        );
     }
 
-    public function testProviderAddGet()
+    public function testGetContentProviderNames()
     {
-        $this->assertCount(0, $this->manager->getContentProviders());
-        $this->assertFalse($this->manager->hasContentProvider('test1'));
-
-        $testContentProviderOne = $this->getMockBuilder('Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface')
-            ->setMethods(array('setEnabled', 'isEnabled', 'getName'))
-            ->getMockForAbstractClass();
-        $testContentProviderOne->expects($this->once())
-            ->method('setEnabled')
-            ->with(true);
-        $testContentProviderOne->expects($this->atLeastOnce())
-            ->method('isEnabled')
-            ->will($this->returnValue(true));
-        $testContentProviderOne->expects($this->atLeastOnce())
-            ->method('getName')
-            ->will($this->returnValue('test1'));
-
-        $testContentProviderTwo = $this->getMockBuilder('Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface')
-            ->setMethods(array('setEnabled', 'isEnabled', 'getName'))
-            ->getMockForAbstractClass();
-        $testContentProviderTwo->expects($this->once())
-            ->method('setEnabled')
-            ->with(false);
-        $testContentProviderTwo->expects($this->atLeastOnce())
-            ->method('isEnabled')
-            ->will($this->returnValue(false));
-        $testContentProviderTwo->expects($this->atLeastOnce())
-            ->method('getName')
-            ->will($this->returnValue('test2'));
-
-        $this->manager->addContentProvider($testContentProviderOne, true);
-        $this->manager->addContentProvider($testContentProviderTwo, false);
-
-        $this->assertCount(2, $this->manager->getContentProviders());
-        $this->assertTrue($this->manager->hasContentProvider('test1'));
-        $this->assertTrue($this->manager->hasContentProvider('test2'));
-        $this->assertFalse($this->manager->hasContentProvider('test3'));
-
-        $enabledProcessors = $this->manager->getEnabledContentProviders();
-        $this->assertCount(1, $enabledProcessors);
-        $this->assertEquals($testContentProviderOne, $enabledProcessors->first());
-
-        $processorsByKey = $this->manager->getContentProvidersByKeys(array('test2'));
-        $this->assertCount(1, $processorsByKey);
-        $this->assertEquals($testContentProviderTwo, $processorsByKey->first());
+        $this->assertEquals(
+            ['provider1', 'provider2'],
+            $this->manager->getContentProviderNames()
+        );
     }
 
-    public function testDisableProcessor()
+    public function testDisableContentProvider()
     {
-        $testContentProviderOne = $this->getMockBuilder('Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface')
-            ->setMethods(array('setEnabled', 'isEnabled', 'getName'))
-            ->getMockForAbstractClass();
-        $testContentProviderOne->expects($this->exactly(2))
-            ->method('setEnabled');
-        $testContentProviderOne->expects($this->at(0))
-            ->method('setEnabled')
-            ->with(true);
-        $testContentProviderOne->expects($this->at(2))
-            ->method('setEnabled')
-            ->with(false);
-        $testContentProviderOne->expects($this->atLeastOnce())
-            ->method('getName')
-            ->will($this->returnValue('test1'));
+        $this->manager->disableContentProvider('provider1');
 
-        $this->manager->addContentProvider($testContentProviderOne, true);
-        $this->manager->disableContentProvider('test1');
+        $this->provider1->expects($this->never())
+            ->method('getContent');
+        $this->provider2->expects($this->never())
+            ->method('getContent');
+
+        $this->assertEquals(
+            [],
+            $this->manager->getContent()
+        );
     }
 
-    public function testEnableProcessor()
+    public function testDisableContentProviderForAlreadyDisabledProvider()
     {
-        $testContentProviderOne = $this->getMockBuilder('Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface')
-            ->setMethods(array('setEnabled', 'isEnabled', 'getName'))
-            ->getMockForAbstractClass();
-        $testContentProviderOne->expects($this->exactly(2))
-            ->method('setEnabled');
-        $testContentProviderOne->expects($this->at(0))
-            ->method('setEnabled')
-            ->with(false);
-        $testContentProviderOne->expects($this->at(2))
-            ->method('setEnabled')
-            ->with(true);
-        $testContentProviderOne->expects($this->atLeastOnce())
-            ->method('getName')
-            ->will($this->returnValue('test1'));
+        $this->manager->disableContentProvider('provider2');
 
-        $this->manager->addContentProvider($testContentProviderOne, false);
-        $this->manager->enableContentProvider('test1');
-    }
-
-    public function testGetContentEnabled()
-    {
-        $testContentProviderOne = $this->getMockBuilder('Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface')
-            ->setMethods(array('setEnabled', 'isEnabled', 'getName', 'getContent'))
-            ->getMockForAbstractClass();
-        $testContentProviderOne->expects($this->once())
-            ->method('setEnabled')
-            ->with(true);
-        $testContentProviderOne->expects($this->atLeastOnce())
-            ->method('isEnabled')
-            ->will($this->returnValue(true));
-        $testContentProviderOne->expects($this->atLeastOnce())
-            ->method('getName')
-            ->will($this->returnValue('test1'));
-        $testContentProviderOne->expects($this->atLeastOnce())
+        $this->provider1->expects($this->once())
             ->method('getContent')
-            ->will($this->returnValue('test1_content'));
+            ->willReturn('content1');
+        $this->provider2->expects($this->never())
+            ->method('getContent');
 
-        $expected = array('test1' => 'test1_content');
-        $this->manager->addContentProvider($testContentProviderOne, true);
-        $this->assertEquals($expected, $this->manager->getContent());
+        $this->assertEquals(
+            ['provider1' => 'content1'],
+            $this->manager->getContent()
+        );
     }
 
-    public function testGetContentKeys()
+    public function testEnableContentProvider()
     {
-        $testContentProviderOne = $this->getMockBuilder('Oro\Bundle\UIBundle\ContentProvider\ContentProviderInterface')
-            ->setMethods(array('setEnabled', 'isEnabled', 'getName', 'getContent'))
-            ->getMockForAbstractClass();
-        $testContentProviderOne->expects($this->once())
-            ->method('setEnabled')
-            ->with(true);
-        $testContentProviderOne->expects($this->never())
-            ->method('isEnabled');
-        $testContentProviderOne->expects($this->atLeastOnce())
-            ->method('getName')
-            ->will($this->returnValue('test1'));
-        $testContentProviderOne->expects($this->atLeastOnce())
-            ->method('getContent')
-            ->will($this->returnValue('test1_content'));
+        $this->manager->enableContentProvider('provider2');
 
-        $expected = array('test1' => 'test1_content');
-        $this->manager->addContentProvider($testContentProviderOne, true);
-        $this->assertEquals($expected, $this->manager->getContent(array('test1')));
+        $this->provider1->expects($this->once())
+            ->method('getContent')
+            ->willReturn('content1');
+        $this->provider2->expects($this->once())
+            ->method('getContent')
+            ->willReturn('content2');
+
+        $this->assertEquals(
+            ['provider1' => 'content1', 'provider2' => 'content2'],
+            $this->manager->getContent()
+        );
+    }
+
+    public function testEnableContentProviderForAlreadyEnabledProvider()
+    {
+        $this->manager->enableContentProvider('provider1');
+
+        $this->provider1->expects($this->once())
+            ->method('getContent')
+            ->willReturn('content1');
+        $this->provider2->expects($this->never())
+            ->method('getContent');
+
+        $this->assertEquals(
+            ['provider1' => 'content1'],
+            $this->manager->getContent()
+        );
+    }
+
+    public function testReset()
+    {
+        $this->manager->enableContentProvider('provider2');
+        $this->manager->reset();
+
+        $this->provider1->expects($this->once())
+            ->method('getContent')
+            ->willReturn('content1');
+        $this->provider2->expects($this->never())
+            ->method('getContent');
+
+        $this->assertEquals(
+            ['provider1' => 'content1'],
+            $this->manager->getContent()
+        );
+    }
+
+    public function testGetContentForSpecificName()
+    {
+        $this->provider1->expects($this->once())
+            ->method('getContent')
+            ->willReturn('content1');
+        $this->provider2->expects($this->never())
+            ->method('getContent');
+
+        $this->assertEquals(
+            ['provider1' => 'content1'],
+            $this->manager->getContent(['provider1'])
+        );
+    }
+
+    public function testGetContentForSpecificNamesIncludingNameOfDisabledProvider()
+    {
+        $this->provider1->expects($this->once())
+            ->method('getContent')
+            ->willReturn('content1');
+        $this->provider2->expects($this->once())
+            ->method('getContent')
+            ->willReturn('content2');
+
+        $this->assertEquals(
+            ['provider1' => 'content1', 'provider2' => 'content2'],
+            $this->manager->getContent(['provider1', 'provider2'])
+        );
     }
 }

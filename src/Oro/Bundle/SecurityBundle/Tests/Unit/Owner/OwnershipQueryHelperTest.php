@@ -12,35 +12,33 @@ use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OwnershipQueryHelperTest extends OrmTestCase
 {
     /** @var EntityManager */
-    protected $em;
+    private $em;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
-    protected $ownershipMetadataProvider;
+    private $ownershipMetadataProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassResolver */
-    protected $entityClassResolver;
+    private $entityClassResolver;
 
     /** @var OwnershipQueryHelper */
-    protected $ownershipQueryHelper;
+    private $ownershipQueryHelper;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $reader = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity'
+        ]);
 
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
@@ -48,7 +46,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
         $this->entityClassResolver->expects(self::any())
             ->method('getEntityClass')
             ->willReturnCallback(function ($entityName) {
-                return 0 === strpos($entityName, 'Test:')
+                return str_starts_with($entityName, 'Test:')
                     ? 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity' . substr($entityName, 5)
                     : $entityName;
             });
@@ -65,7 +63,7 @@ class OwnershipQueryHelperTest extends OrmTestCase
      *
      * @return \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataInterface
      */
-    protected function getOwnershipMetadata($organizationFieldName = null, $ownerFieldName = null)
+    private function getOwnershipMetadata($organizationFieldName = null, $ownerFieldName = null)
     {
         $metadata = $this->createMock(OwnershipMetadataInterface::class);
         $metadata->expects(self::any())

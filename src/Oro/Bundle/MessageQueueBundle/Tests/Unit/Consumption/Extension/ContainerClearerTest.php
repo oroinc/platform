@@ -9,13 +9,13 @@ use Symfony\Component\DependencyInjection\Container;
 
 class ContainerClearerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Container */
+    /** @var Container|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
     /** @var ContainerClearer */
     private $clearer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->container = $this->createMock(Container::class);
 
@@ -24,17 +24,42 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetPersistentServices()
     {
-        self::assertAttributeSame([], 'persistentServices', $this->clearer);
+        $service1 = new \stdClass();
+        $serviceId1 = 'foo_service';
+        $service2 = new \stdClass();
+        $serviceId2 = 'bar_service';
+        $this->container->expects(static::exactly(4))
+            ->method('initialized')
+            ->withConsecutive(
+                [$serviceId1],
+                [$serviceId2],
+                [$serviceId1],
+                [$serviceId2]
+            )
+            ->willReturnOnConsecutiveCalls(
+                true,
+                true,
+                false,
+                false
+            );
+        $this->container->expects(static::exactly(2))
+            ->method('get')
+            ->willReturnMap([
+                [$serviceId1, Container::EXCEPTION_ON_INVALID_REFERENCE, $service1],
+                [$serviceId2, Container::EXCEPTION_ON_INVALID_REFERENCE, $service2],
+            ]);
 
-        $this->clearer->setPersistentServices(['foo_service']);
-        self::assertAttributeEquals(['foo_service'], 'persistentServices', $this->clearer);
+        // expectations
+        $this->container->expects(static::exactly(2))
+            ->method('set')
+            ->withConsecutive(
+                [$serviceId1, $service1],
+                [$serviceId2, $service2]
+            );
 
-        $this->clearer->setPersistentServices(['bar_service']);
-        self::assertAttributeEquals(
-            ['foo_service', 'bar_service'],
-            'persistentServices',
-            $this->clearer
-        );
+        $this->clearer->setPersistentServices([$serviceId1]);
+        $this->clearer->setPersistentServices([$serviceId2]);
+        $this->clearer->clear($this->createMock(LoggerInterface::class));
     }
 
     public function testClearShouldWriteToLogAppropriateMessage()
@@ -82,10 +107,13 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
 
         $fooService = new \stdClass();
 
-        $this->container->expects(self::once())
+        $this->container->expects(self::exactly(2))
             ->method('initialized')
             ->with('foo_service')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(
+                true,
+                false
+            );
         $this->container->expects(self::once())
             ->method('get')
             ->with('foo_service')
@@ -95,6 +123,34 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $this->container->expects(self::once())
             ->method('set')
             ->with('foo_service', self::identicalTo($fooService));
+
+        $this->clearer->setPersistentServices(['foo_service']);
+        $this->clearer->clear($logger);
+    }
+
+    public function testClearShouldNotRestorePersistentServiceIfItWasInitializedButPresentInContainer()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $fooService = new \stdClass();
+
+        $this->container->expects(self::exactly(2))
+            ->method('initialized')
+            ->with('foo_service')
+            ->willReturn(true);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('foo_service')
+            ->willReturn($fooService);
+        $this->container->expects(self::once())
+            ->method('reset');
+        $this->container->expects(self::never())
+            ->method('set')
+            ->with('foo_service', self::identicalTo($fooService));
+
+        $logger->expects(self::once())
+            ->method('notice')
+            ->with('Next persistent services were already initialized during restoring: foo_service');
 
         $this->clearer->setPersistentServices(['foo_service']);
         $this->clearer->clear($logger);

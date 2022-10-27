@@ -19,17 +19,11 @@ class ColumnConfigListener
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /**
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(EntityClassResolver $entityClassResolver)
     {
         $this->entityClassResolver = $entityClassResolver;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();

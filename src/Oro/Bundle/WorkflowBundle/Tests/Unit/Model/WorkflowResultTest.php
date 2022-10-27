@@ -2,27 +2,24 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 
 class WorkflowResultTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowResult
-     */
-    protected $result;
+    /** @var WorkflowResult */
+    private $result;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->result = new WorkflowResult();
     }
 
     public function testConstructor()
     {
-        $this->assertEquals(array(), $this->result->getValues());
-        $values = array(
+        $this->assertEquals([], $this->result->getValues());
+        $values = [
             'foo' => 'bar'
-        );
+        ];
         $this->result = new WorkflowResult($values);
         $this->assertEquals($values, $this->result->getValues());
     }
@@ -39,13 +36,6 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->result->remove('foo');
         $this->assertFalse($this->result->has('foo'));
         $this->assertNull($this->result->get('foo'));
-    }
-
-    protected function createAttribute($name)
-    {
-        $attribute = new Attribute();
-        $attribute->setName($name);
-        return $attribute;
     }
 
     public function testIssetGetSetUnset()
@@ -80,19 +70,19 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
 
     public function testCount()
     {
-        $this->assertEquals(0, count($this->result));
+        $this->assertCount(0, $this->result);
 
         $this->result->set('foo', 'bar');
-        $this->assertEquals(1, count($this->result));
+        $this->assertCount(1, $this->result);
 
         $this->result->set('baz', 'qux');
-        $this->assertEquals(2, count($this->result));
+        $this->assertCount(2, $this->result);
 
         $this->result->remove('foo');
-        $this->assertEquals(1, count($this->result));
+        $this->assertCount(1, $this->result);
 
         $this->result->remove('baz');
-        $this->assertEquals(0, count($this->result));
+        $this->assertCount(0, $this->result);
     }
 
     public function testIsEmpty()
@@ -108,12 +98,12 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->result->set('foo', 'bar');
         $this->result->set('baz', 'qux');
 
-        $data = array();
+        $data = [];
         foreach ($this->result as $key => $value) {
             $data[$key] = $value;
         }
 
-        $this->assertEquals(array('foo' => 'bar', 'baz' => 'qux'), $data);
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $data);
     }
 
     public function testGetValuesAll()
@@ -124,12 +114,12 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->result->set('quux', 'quux_value');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'foo_value',
                 'bar' => 'bar_value',
                 'baz' => null,
                 'quux' => 'quux_value',
-            ),
+            ],
             $this->result->getValues()
         );
     }
@@ -142,13 +132,13 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->result->set('quux', 'quux_value');
 
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'foo_value',
                 'baz' => null,
                 'qux' => null,
                 'quux' => 'quux_value',
-            ),
-            $this->result->getValues(array('foo', 'baz', 'qux', 'quux'))
+            ],
+            $this->result->getValues(['foo', 'baz', 'qux', 'quux'])
         );
     }
 
@@ -157,25 +147,25 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
         $this->result->set('foo', 'foo_value');
         $this->result->set('bar', 'bar_value');
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'foo_value',
                 'bar' => 'bar_value'
-            ),
+            ],
             $this->result->getValues()
         );
 
         $this->result->add(
-            array(
+            [
                 'bar' => 'new_bar_value',
                 'baz' => 'baz_value',
-            )
+            ]
         );
         $this->assertEquals(
-            array(
+            [
                 'foo' => 'foo_value',
                 'bar' => 'new_bar_value',
                 'baz' => 'baz_value',
-            ),
+            ],
             $this->result->getValues()
         );
     }

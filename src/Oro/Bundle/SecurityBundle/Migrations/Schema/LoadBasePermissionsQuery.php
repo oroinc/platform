@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Migrations\Schema;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Psr\Log\LoggerInterface;
 
@@ -26,11 +26,11 @@ class LoadBasePermissionsQuery extends ParametrizedSqlMigrationQuery
             'VALUES (:name, :label, :is_apply_to_all, :group_names, :description)';
 
         $types = [
-            'name' => Type::STRING,
-            'label' => Type::STRING,
-            'is_apply_to_all' => Type::BOOLEAN,
-            'group_names' => Type::TARRAY,
-            'description' => Type::STRING
+            'name' => Types::STRING,
+            'label' => Types::STRING,
+            'is_apply_to_all' => Types::BOOLEAN,
+            'group_names' => Types::ARRAY,
+            'description' => Types::STRING
         ];
 
         $permissions = array_diff($this->permissions, $this->getExistingPermissions($logger));

@@ -1,0 +1,30 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\EntityConfigBundle\Controller\AuditController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\EntityConfigBundle\Controller\ConfigController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_entity.entity_field_provider }
+
+    Oro\Bundle\EntityConfigBundle\Controller\AttributeController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\EntityConfigBundle\Controller\AttributeFamilyController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_entity_config.provider.extend }
+            - { name: container.service_subscriber, id: oro_entity_config.provider.attribute }

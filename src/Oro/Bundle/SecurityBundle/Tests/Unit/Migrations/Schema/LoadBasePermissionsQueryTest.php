@@ -12,15 +12,12 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|Connection */
     protected $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')->disableOriginalConstructor()->getMock();
-        $this->connection->expects($this->any())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
-    }
-
-    protected function tearDown()
-    {
-        unset($this->connection);
+        $this->connection = $this->createMock(Connection::class);
+        $this->connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn(new MySqlPlatform());
     }
 
     public function testExecute()
@@ -32,11 +29,7 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
         $query->execute(new ArrayLogger());
     }
 
-    /**
-     * @param array $permissions
-     * @param int $countCalls
-     */
-    protected function assertConnectionCalled(array $permissions, $countCalls)
+    protected function assertConnectionCalled(array $permissions, int $countCalls)
     {
         $permissions = array_map(
             function ($permission) {
@@ -58,13 +51,13 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
             ->willReturn([['name' => 'ASSIGN']]);
 
         $this->connection->expects($this->exactly($countCalls))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->willReturnCallback(
                 function ($query, array $params = [], array $types = []) use (&$data) {
                     $index = array_search($params, $data, true);
 
-                    $this->assertTrue($index !== false);
-                    $this->assertContains('INSERT INTO oro_security_permission', $query);
+                    self::assertNotFalse($index);
+                    self::assertStringContainsString('INSERT INTO oro_security_permission', $query);
 
                     unset($data[$index]);
                 }

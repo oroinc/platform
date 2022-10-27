@@ -11,8 +11,6 @@ interface ReminderSenderInterface
 {
     /**
      * Push reminder for sending
-     *
-     * @param Reminder $reminder
      */
     public function push(Reminder $reminder);
 

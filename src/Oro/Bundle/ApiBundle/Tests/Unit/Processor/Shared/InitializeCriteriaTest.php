@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Doctrine\Common\Collections\Criteria as CommonCriteria;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria;
@@ -17,7 +18,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
     /** @var InitializeCriteria */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +57,10 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
-        self::assertNull($this->context->getCriteria());
+        self::assertInstanceOf(
+            CommonCriteria::class,
+            $this->context->getCriteria()
+        );
     }
 
     public function testProcessForManageableEntity()
@@ -105,6 +109,9 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        self::assertNull($this->context->getCriteria());
+        self::assertInstanceOf(
+            CommonCriteria::class,
+            $this->context->getCriteria()
+        );
     }
 }

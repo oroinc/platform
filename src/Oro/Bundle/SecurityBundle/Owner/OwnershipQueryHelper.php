@@ -8,6 +8,9 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * A helper class that can be used to add ownership related fields to a query builder.
+ */
 class OwnershipQueryHelper
 {
     /** @var OwnershipMetadataProviderInterface */
@@ -16,10 +19,6 @@ class OwnershipQueryHelper
     /** @var EntityClassResolver */
     private $entityClassResolver;
 
-    /**
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param EntityClassResolver                $entityClassResolver
-     */
     public function __construct(
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         EntityClassResolver $entityClassResolver
@@ -50,7 +49,7 @@ class OwnershipQueryHelper
 
         $queryAliases = $this->collectEntityAliases($qb, $filter);
         foreach ($queryAliases as $entityAlias => $data) {
-            list($entityClass, $idFieldAlias) = $data;
+            [$entityClass, $idFieldAlias] = $data;
             $metadata = $this->ownershipMetadataProvider->getMetadata($entityClass);
             if (!$metadata->hasOwner()) {
                 continue;
@@ -93,7 +92,7 @@ class OwnershipQueryHelper
         foreach ($selects as $select) {
             $parts = $select->getParts();
             foreach ($parts as $part) {
-                if (false !== strpos($part, $fieldExpr)) {
+                if (str_contains($part, $fieldExpr)) {
                     return;
                 }
             }
@@ -196,14 +195,14 @@ class OwnershipQueryHelper
 
             $expr = trim(substr($selectExpr, $beginExprPos + 1, $endExprPos - $beginExprPos - 1));
 
-            if (strlen($expr) === $idFieldExprLength) {
+            if (\strlen($expr) === $idFieldExprLength) {
                 $result = $idFieldName;
                 break;
             }
-            if (0 === strpos($expr, $idFieldExpr)) {
+            if (str_starts_with($expr, $idFieldExpr)) {
                 $asExpr = strtolower(trim(substr($expr, $idFieldExprLength)));
-                if (0 === strpos($asExpr, 'as ')) {
-                    $result = trim(substr($expr, strpos(strtolower($expr), ' as ') + 4));
+                if (str_starts_with($asExpr, 'as ')) {
+                    $result = trim(substr($expr, stripos($expr, ' as ') + 4));
                     break;
                 }
             }

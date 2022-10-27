@@ -1,0 +1,26 @@
+data:
+    type: comments
+    id: '<toString(@comment1->id)>'
+    attributes:
+        message: 'Comment 1'
+        createdAt: '@comment1->createdAt->format("Y-m-d\TH:i:s\Z")'
+        updatedAt: '@comment1->updatedAt->format("Y-m-d\TH:i:s\Z")'
+    relationships:
+        updatedBy:
+            data:
+                type: users
+                id: '<toString(@user1->id)>'
+        owner:
+            data:
+                type: users
+                id: '<toString(@user->id)>'
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@organization->id)>'
+        attachment:
+            data: null
+        target:
+            data:
+                type: notes
+                id: '<toString(@note1->id)>'

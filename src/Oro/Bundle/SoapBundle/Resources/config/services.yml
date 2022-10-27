@@ -1,22 +1,9 @@
-parameters:
-    oro_soap.handler.delete.class:                Oro\Bundle\SoapBundle\Handler\DeleteHandler
-    oro_soap.handler.include_delegate.class:      Oro\Bundle\SoapBundle\Handler\DelegateIncludeHandler
-    oro_soap.handler.include_total_header.class:  Oro\Bundle\SoapBundle\Handler\TotalHeaderHandler
-
-    oro_soap.provider.metadata.chain.class:       Oro\Bundle\SoapBundle\Provider\ChainMetadataProvider
-    oro_soap.provider.metadata.entity.class:      Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider
-
-    oro_soap.locale_listener.class:               Oro\Bundle\SoapBundle\EventListener\LocaleListener
-
 services:
-    oro_soap.handler.delete.abstract:
-        abstract: true
-        calls:
-            - [setOwnerDeletionManager, ['@oro_organization.owner_deletion_manager']]
-
     oro_soap.handler.delete:
-        class: '%oro_soap.handler.delete.class%'
-        parent: oro_soap.handler.delete.abstract
+        class: Oro\Bundle\SoapBundle\Handler\DeleteHandler
+        public: true
+        arguments:
+            - '@oro_entity.delete_handler_registry'
 
     oro_soap.manager.entity_manager.abstract:
         abstract: true
@@ -27,25 +14,27 @@ services:
             - [setEntitySerializer, ['@oro_soap.entity_serializer']]
 
     oro_soap.handler.include_delegate:
-        class: '%oro_soap.handler.include_delegate.class%'
+        class: Oro\Bundle\SoapBundle\Handler\DelegateIncludeHandler
         arguments:
             - '@service_container'
 
     oro_soap.handler.include:
         alias: oro_soap.handler.include_delegate
+        public: true
 
     oro_soap.handler.include_total_header:
-        class: '%oro_soap.handler.include_total_header.class%'
+        class: Oro\Bundle\SoapBundle\Handler\TotalHeaderHandler
+        public: true
         arguments:
             - '@oro_batch.orm.query_builder.count_query_optimizer'
         tags:
             - { name: oro_soap.include_handler, alias: totalCount }
 
     oro_soap.provider.metadata.chain:
-        class: '%oro_soap.provider.metadata.chain.class%'
+        class: Oro\Bundle\SoapBundle\Provider\ChainMetadataProvider
 
     oro_soap.provider.metadata.entity:
-        class: '%oro_soap.provider.metadata.entity.class%'
+        class: Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider
         arguments:
             - '@oro_entity_config.config_manager'
             - '@translator'
@@ -54,6 +43,7 @@ services:
 
     oro_soap.provider.metadata:
         alias: oro_soap.provider.metadata.chain
+        public: true
 
     oro_soap.entity_serializer:
         class: Oro\Component\EntitySerializer\EntitySerializer
@@ -67,27 +57,24 @@ services:
             - '@oro_soap.entity_serializer.config_converter'
             - '@oro_soap.entity_serializer.data_normalizer'
         calls:
-            - [setFieldsFilter, ['@oro_security.serializer.filter_chain']]
+            - [setFieldFilter, ['@oro_security.entity_serializer.field_filter']]
 
     oro_soap.entity_serializer.doctrine_helper:
         class: Oro\Component\EntitySerializer\DoctrineHelper
-        public: false
         arguments:
             - '@doctrine'
 
     oro_soap.entity_serializer.serialization_helper:
         class: Oro\Component\EntitySerializer\SerializationHelper
-        public: false
         arguments:
             - '@oro_soap.entity_serializer.data_transformer'
 
     oro_soap.entity_serializer.entity_accessor:
         class: Oro\Component\EntitySerializer\EntityDataAccessor
-        public: false
+        public: true
 
     oro_soap.entity_serializer.field_accessor:
         class: Oro\Component\EntitySerializer\FieldAccessor
-        public: false
         arguments:
             - '@oro_soap.entity_serializer.doctrine_helper'
             - '@oro_soap.entity_serializer.entity_accessor'
@@ -95,65 +82,63 @@ services:
 
     oro_soap.entity_serializer.field_filter:
         class: Oro\Bundle\EntityExtendBundle\Serializer\ExtendEntityFieldFilter
-        public: false
         arguments:
             - '@oro_entity_config.config_manager'
 
     oro_soap.entity_serializer.value_transformer:
-        class: Oro\Component\EntitySerializer\ValueTransformer
-        public: false
-
-    oro_soap.entity_serializer.data_transformer:
-        class: Oro\Component\EntitySerializer\EntityDataTransformer
-        public: false
+        class: Oro\Component\EntitySerializer\DataTransformer
         arguments:
             - '@service_container'
+
+    oro_soap.entity_serializer.data_transformer:
+        class: Oro\Bundle\SoapBundle\Serializer\DataTransformer
+        arguments:
             - '@oro_soap.entity_serializer.value_transformer'
 
     oro_soap.entity_serializer.query_resolver:
         class: Oro\Bundle\SoapBundle\Serializer\AclProtectedQueryResolver
-        public: false
         arguments:
             - '@oro_entity.query_hint_resolver'
             - '@oro_security.acl_helper'
 
     oro_soap.entity_serializer.query_factory:
         class: Oro\Component\EntitySerializer\QueryFactory
-        public: false
         arguments:
             - '@oro_soap.entity_serializer.doctrine_helper'
             - '@oro_soap.entity_serializer.query_resolver'
 
     oro_soap.entity_serializer.config_normalizer:
         class: Oro\Component\EntitySerializer\ConfigNormalizer
-        public: false
 
     oro_soap.entity_serializer.config_converter:
         class: Oro\Component\EntitySerializer\ConfigConverter
-        public: false
 
     oro_soap.entity_serializer.data_normalizer:
         class: Oro\Component\EntitySerializer\DataNormalizer
-        public: false
 
-    # event listeners
     oro_soap.locale_listener:
-        class: '%oro_soap.locale_listener.class%'
+        class: Oro\Bundle\SoapBundle\EventListener\LocaleListener
         arguments:
-            - '@service_container'
+            - '@stof_doctrine_extensions.listener.translatable'
         tags:
             - { name: kernel.event_subscriber }
 
+    oro_soap.listener.api_sub_request:
+        class: Oro\Bundle\SoapBundle\EventListener\ApiSubRequestListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
     oro_soap.client.factory:
-        class: 'Oro\Bundle\SoapBundle\Client\Factory\NativeSoapClientFactory'
-        public: false
+        class: Oro\Bundle\SoapBundle\Client\Factory\NativeSoapClientFactory
 
     oro_soap.client:
-        class: 'Oro\Bundle\SoapBundle\Client\SoapClient'
-        public: false
+        class: Oro\Bundle\SoapBundle\Client\SoapClient
         arguments:
             - '@oro_soap.client.factory'
 
     oro_soap.client.factory.settings:
-        class: 'Oro\Bundle\SoapBundle\Client\Settings\Factory\SoapClientSettingsFactory'
-        public: false
+        class: Oro\Bundle\SoapBundle\Client\Settings\Factory\SoapClientSettingsFactory
+
+    oro_soap.request.param_fetcher:
+        alias: fos_rest.request.param_fetcher
+        public: true

@@ -4,6 +4,7 @@
 "Save and New": "Save and New"
 "Update": "Update"
 "Accept": "Accept"
+"Apply": "Apply"
 "Decline": "Decline"
 "Cancel": "Cancel"
 "Close": "Close"
@@ -31,6 +32,7 @@ oro.age: "{0} newborn|]0,Inf[age %count%"
 "Get help": "Get help"
 "Communications": "Communications"
 "Additional Information": "Additional Information"
+"Ok, got it": "Ok, got it"
 
 oro:
     auth:
@@ -38,8 +40,7 @@ oro:
             logo: OroPlatform
             main: OroPlatform
             text: The Rapid Application Development Platform for Web Applications
-        copy: © 2018 Oro, Inc. All Rights Reserved
-
+    copyright: © {{year}} Oro, Inc. All Rights Reserved
     ui:
         actions:          "%entityName% Actions"
         actions.activity: More actions
@@ -53,6 +54,7 @@ oro:
         delete_confirm_cascade: Are you sure you want to delete this %entity_label% with other entities related to it?
         delete_entity:  Delete %entityName%
         delete_message: "%entity_label% deleted"
+        disabled_js:    "JavaScript is disabled in your browser which limits the functionality of the website. Please enable it to view page content and work with all website features"
         edit:           Edit
         edit_entity:    Edit %entityName%
         view:           View
@@ -129,15 +131,72 @@ oro:
         filter:
             by: Filter By
         jstree:
+            quick_search: 'Quick Search'
             move:
                 success.label: '%nodes% was successfully moved'
                 source.label: 'Selected items'
                 target.label: 'Move to'
                 confirm_slug_change.title: 'Create 301 Redirect from old to new URLs'
         navbar:
-          toggler_label: 'Maximize/minimize menu'
-          scroll_up_label: 'Scroll menu up'
-          scroll_down_label: 'Scroll menu down'
+            toggler_label: 'Maximize/minimize menu'
+        loading: 'Loading...'
+        page_loading: 'Page loading...'
+        button:
+            copy_to_clipboard.label: 'Copy to Clipboard'
+            skip_to_content: 'Skip to Main Content'
+        collapse:
+            more: 'View More'
+            less: 'View Less'
+        breadcrumb.aria_label: Breadcrumbs
+        dropdown_option_aria_label: "More Actions"
+        simplified_preview:
+            message: Current content view is simplified, please check the edit page to see the actual result.
+
+    htmlpurifier:
+        formatted_error: '- {{ message }} (near {{ place }}...)'
+        formatted_error_line: 'Line #{{ line }}: {{ message }}'
+        messages:
+            'HTMLPurifier': 'HTML Purifier'
+            'LanguageFactoryTest: Pizza': 'Pizza'
+            'LanguageTest: List': '$1'
+            'LanguageTest: Hash': '$1.Keys; $1.Values'
+            'Item separator': ', '
+            'Item separator last': ' and '
+            'ErrorCollector: No errors': 'No errors detected. However, because error reporting is still incomplete, there may have been errors that the error collector was not notified of; please inspect the output HTML carefully.'
+            'ErrorCollector: At line': ' at line $line'
+            'ErrorCollector: Incidental errors': 'Incidental errors'
+            'Lexer: Unclosed comment': 'Unclosed comment'
+            'Lexer: Unescaped lt': 'Unescaped less-than sign (&lt;) should be &amp;lt;'
+            'Lexer: Missing gt': 'Missing greater-than sign (&gt;), previous less-than sign (&lt;) should be escaped'
+            'Lexer: Missing attribute key': 'Attribute declaration has no key'
+            'Lexer: Missing end quote': 'Attribute declaration has no end quote'
+            'Lexer: Extracted body': 'Document metadata tags should be removed'
+            'Strategy_RemoveForeignElements: Tag transform': '&lt;$1&gt; element should be transformed into "$CurrentToken.Serialized"'
+            'Strategy_RemoveForeignElements: Missing required attribute': '"$CurrentToken.Compact" element missing required attribute $1'
+            'Strategy_RemoveForeignElements: Foreign element to text': 'Unrecognized "$CurrentToken.Serialized" tag should be converted to text'
+            'Strategy_RemoveForeignElements: Foreign element removed': 'Unrecognized "$CurrentToken.Serialized" tag should be removed'
+            'Strategy_RemoveForeignElements: Comment removed': 'Comment containing "$CurrentToken.Data" should be removed'
+            'Strategy_RemoveForeignElements: Foreign meta element removed': 'Unrecognized "$CurrentToken.Serialized" meta tag and all descendants should be removed'
+            'Strategy_RemoveForeignElements: Token removed to end': 'Tags and text starting from $1 element should be removed to end'
+            'Strategy_RemoveForeignElements: Trailing hyphen in comment removed': 'Trailing hyphen(s) in comment should be removed'
+            'Strategy_RemoveForeignElements: Hyphens in comment collapsed': 'Double hyphens in comments are not allowed, and should be collapsed into single hyphens'
+            'Strategy_MakeWellFormed: Unnecessary end tag removed': 'Unnecessary "$CurrentToken.Serialized" tag should be removed'
+            'Strategy_MakeWellFormed: Unnecessary end tag to text': 'Unnecessary "$CurrentToken.Serialized" tag should be converted to text'
+            'Strategy_MakeWellFormed: Tag auto closed': '$1.Compact started on line $1.Line should be auto-closed by "$CurrentToken.Compact"'
+            'Strategy_MakeWellFormed: Tag carryover': '$1.Compact started on line $1.Line should be auto-continued into "$CurrentToken.Compact"'
+            'Strategy_MakeWellFormed: Stray end tag removed': 'Stray "$CurrentToken.Serialized" tag should be removed'
+            'Strategy_MakeWellFormed: Stray end tag to text': 'Stray "$CurrentToken.Serialized" tag should be converted to text'
+            'Strategy_MakeWellFormed: Tag closed by element end': '$1.Compact tag started on line $1.Line should be closed by end of "$CurrentToken.Serialized"'
+            'Strategy_MakeWellFormed: Tag closed by document end': '$1.Compact tag started on line $1.Line should be closed by end of document'
+            'Strategy_FixNesting: Node removed': '"$CurrentToken.Compact" node should be removed'
+            'Strategy_FixNesting: Node excluded': '"$CurrentToken.Compact" node should be removed due to descendant exclusion by ancestor element'
+            'Strategy_FixNesting: Node reorganized': 'Contents of "$CurrentToken.Compact" node should be reorganized to enforce its content model'
+            'Strategy_FixNesting: Node contents removed': 'Contents of "$CurrentToken.Compact" node should be removed'
+            'AttrValidator: Attributes transformed': 'Attributes on "$CurrentToken.Compact" should be transformed from $1.Keys to $2.Keys'
+            'AttrValidator: Attribute removed': '"$CurrentAttr.Name" attribute on "$CurrentToken.Compact" should be removed'
+
 'Click to go back': 'Click to go back'
 'Show more': 'Show more'
 'Show less': 'Show less'
+'Remove row': 'Remove row'
+'Add row': 'Add row'

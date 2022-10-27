@@ -7,39 +7,28 @@ use Knp\Menu\MenuFactory;
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
-use Symfony\Component\Routing\Router;
 
 class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BreadcrumbManager */
-    protected $manager;
-
     /** @var Matcher|\PHPUnit\Framework\MockObject\MockObject */
-    protected $matcher;
-
-    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    private $matcher;
 
     /** @var BuilderChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $provider;
+    private $provider;
 
     /** @var MenuFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $factory;
+    private $factory;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    /** @var BreadcrumbManager */
+    private $manager;
+
+    protected function setUp(): void
     {
         $this->matcher = $this->createMock(Matcher::class);
-        $this->router = $this->createMock(Router::class);
         $this->provider = $this->createMock(BuilderChainProvider::class);
+        $this->factory = $this->createMock(MenuFactory::class);
 
-        $this->factory = $this->getMockBuilder(MenuFactory::class)
-            ->setMethods(['getRouteInfo', 'processRoute'])
-            ->getMock();
-
-        $this->manager = new BreadcrumbManager($this->provider, $this->matcher, $this->router);
+        $this->manager = new BreadcrumbManager($this->provider, $this->matcher);
     }
 
     public function testGetBreadcrumbs()
@@ -51,17 +40,13 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->provider->expects($this->once())
             ->method('get')
-            ->with(
-                'test',
-                ['check_access_not_logged_in' => true]
-            )
-            ->will($this->returnValue($item));
+            ->with('test', ['check_access_not_logged_in' => true])
+            ->willReturn($item);
 
         $this->matcher->expects($this->any())
             ->method('isCurrent')
             ->with($subItem)
-            ->will($this->returnValue(true));
-
+            ->willReturn(true);
 
         $breadcrumbs = $this->manager->getBreadcrumbs('test', false);
         $this->assertEquals('sub_item_test', $breadcrumbs[0]['label']);
@@ -73,7 +58,8 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->provider->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($item));
+            ->willReturn($item);
+
         $this->assertNull($this->manager->getBreadcrumbs('nullable'));
     }
 
@@ -89,10 +75,9 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $item1->setExtra('routes', []);
         $item2->addChild($item);
 
-
         $this->provider->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($item1));
+            ->willReturn($item1);
 
         $this->assertEquals(
             [
@@ -131,10 +116,9 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $item1->setExtra('routes', []);
         $item2->addChild($item);
 
-
         $this->provider->expects($this->once())
             ->method('get')
-            ->will($this->returnValue($item1));
+            ->willReturn($item1);
 
         $this->assertEquals(
             ['test', 'sub_item', 'test1'],
@@ -149,12 +133,12 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $item->addChild($subItem);
         $this->provider->expects($this->any())
             ->method('get')
-            ->will($this->returnValue($item));
+            ->willReturn($item);
 
         $resultMenu = $this->manager->getMenu('test', ['subItem']);
         $this->assertEquals($subItem, $resultMenu);
 
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
         $this->manager->getMenu('test', ['bad_item']);
     }
 
@@ -180,14 +164,10 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
                     $this->equalTo($subItem)
                 )
             )
-            ->will(
-                $this->returnCallback(
-                    function ($param) use (&$params) {
-                        /** @var MenuItem $param */
-                        return $params[$param->getLabel()];
-                    }
-                )
-            );
+            ->willReturnCallback(function ($param) use (&$params) {
+                /** @var MenuItem $param */
+                return $params[$param->getLabel()];
+            });
 
         $this->assertEquals($subItem, $this->manager->getCurrentMenuItem([$item, $goodItem]));
     }

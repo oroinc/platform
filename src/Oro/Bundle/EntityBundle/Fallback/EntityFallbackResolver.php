@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Fallback;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -17,10 +17,12 @@ use Oro\Bundle\EntityBundle\Fallback\Provider\SystemConfigFallbackProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
+ * Resolver for entity field`s fallback values
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityFallbackResolver
@@ -42,57 +44,39 @@ class EntityFallbackResolver
         self::TYPE_ARRAY,
     ];
 
-    /**
-     * @var EntityFallbackProviderInterface[]
-     */
-    protected $fallbackProviders = [];
+    /** @var ContainerInterface */
+    protected $fallbackProviders;
 
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @var SystemConfigurationFormProvider
-     */
+    /** @var SystemConfigurationFormProvider */
     protected $sysConfigFormProvider;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var ConfigBag
-     */
+    /** @var ConfigBag */
     protected $configBag;
 
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessor */
     protected $accessor;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * EntityFallbackResolver constructor.
-     *
-     * @param ConfigProvider $entityConfigProvider
-     * @param SystemConfigurationFormProvider $formProvider
-     * @param ConfigManager $configManager
-     * @param ConfigBag $configBag
-     * @param DoctrineHelper $doctrineHelper
-     */
+    /** @var EntityFallbackProviderInterface[] [provider key => provider, ...] */
+    private array $loadedFallbackProviders = [];
+
     public function __construct(
+        ContainerInterface $fallbackProviders,
         ConfigProvider $entityConfigProvider,
         SystemConfigurationFormProvider $formProvider,
         ConfigManager $configManager,
         ConfigBag $configBag,
         DoctrineHelper $doctrineHelper
     ) {
+        $this->fallbackProviders = $fallbackProviders;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->sysConfigFormProvider = $formProvider;
         $this->accessor = PropertyAccess::createPropertyAccessor();
@@ -102,7 +86,7 @@ class EntityFallbackResolver
     }
 
     /**
-     * @param object $object
+     * @param object|string $object
      * @param string $objectFieldName
      * @return string
      * @throws FallbackFieldConfigurationMissingException
@@ -127,7 +111,7 @@ class EntityFallbackResolver
     }
 
     /**
-     * @param object $object
+     * @param object|string $object
      * @param string $objectFieldName
      * @return array
      */
@@ -161,6 +145,26 @@ class EntityFallbackResolver
     public function isFallbackSupported($object, $objectFieldName, $fallbackId)
     {
         return $this->getFallbackProvider($fallbackId)->isFallbackSupported($object, $objectFieldName);
+    }
+
+    /**
+     * @param string $fallbackId
+     * @param object|string $object
+     * @param string $objectFieldName
+     * @return bool
+     */
+    public function isFallbackConfigured(string $fallbackId, $object, string $objectFieldName): bool
+    {
+        try {
+            $fallbackList = $this->getFallbackConfig(
+                $object,
+                $objectFieldName,
+                EntityFieldFallbackValue::FALLBACK_LIST
+            );
+        } catch (FallbackFieldConfigurationMissingException $e) {
+            return false;
+        }
+        return array_key_exists($fallbackId, $fallbackList);
     }
 
     /**
@@ -314,30 +318,25 @@ class EntityFallbackResolver
     }
 
     /**
-     * @param EntityFallbackProviderInterface $provider
-     * @param string $providerId
-     * @return $this
-     */
-    public function addFallbackProvider(EntityFallbackProviderInterface $provider, $providerId)
-    {
-        $this->fallbackProviders[$providerId] = $provider;
-
-        return $this;
-    }
-
-    /**
      * @param string $key
      *
      * @return EntityFallbackProviderInterface
      * @throws FallbackProviderNotFoundException
      */
-    public function getFallbackProvider($key)
+    public function getFallbackProvider(string $key)
     {
-        if (!array_key_exists($key, $this->fallbackProviders)) {
+        if (isset($this->loadedFallbackProviders[$key])) {
+            return $this->loadedFallbackProviders[$key];
+        }
+
+        if (!$this->fallbackProviders->has($key)) {
             throw new FallbackProviderNotFoundException($key);
         }
 
-        return $this->fallbackProviders[$key];
+        $provider = $this->fallbackProviders->get($key);
+        $this->loadedFallbackProviders[$key] = $provider;
+
+        return $provider;
     }
 
     /**
@@ -477,7 +476,7 @@ class EntityFallbackResolver
         $qb->select('1')
             ->innerJoin(QueryBuilderUtil::getField('e', $objectFieldName), 'fallbackValue')
             ->where($qb->expr()->eq('fallbackValue.scalarValue', ':value'))
-            ->setParameter('value', $value, Type::STRING)
+            ->setParameter('value', $value, Types::STRING)
             ->setMaxResults(1);
 
         return (bool)$qb->getQuery()->getResult();

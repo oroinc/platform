@@ -7,7 +7,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
 
 class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -32,7 +32,7 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdResolverRegistry */
     private $registry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->resolver1 = $this->createMock(EntityIdResolverInterface::class);
         $this->resolver2 = $this->createMock(EntityIdResolverInterface::class);

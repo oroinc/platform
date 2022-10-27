@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\Loader;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -11,6 +12,9 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedAssociationMetadataH
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataHelper */
@@ -22,7 +26,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
     /** @var NestedAssociationMetadataHelper */
     private $nestedAssociationMetadataHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->metadataHelper = $this->createMock(MetadataHelper::class);
         $this->objectMetadataFactory = $this->createMock(ObjectMetadataFactory::class);
@@ -35,7 +39,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testAddNestedAssociation()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -52,7 +56,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         $targetClass = 'Test\TargetClass';
         $field->setTargetClass($targetClass);
 
-        $targetEntityMetadata = new EntityMetadata();
+        $targetEntityMetadata = new EntityMetadata('Test\Entity');
 
         $this->metadataHelper->expects(self::once())
             ->method('setPropertyPath')
@@ -89,7 +93,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testAddNestedAssociationWhenDataTypeIsNotSetForIdField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -105,7 +109,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         $targetClass = 'Test\TargetClass';
         $field->setTargetClass($targetClass);
 
-        $targetEntityMetadata = new EntityMetadata();
+        $targetEntityMetadata = new EntityMetadata('Test\Entity');
 
         $this->metadataHelper->expects(self::once())
             ->method('setPropertyPath')
@@ -139,15 +143,15 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($targetEntityMetadata->isInheritedType());
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "__class__" field should be configured for the nested association. Parent Field: Test\Class::testField.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddNestedAssociationWhenClassFieldDoesNotExist()
     {
-        $entityMetadata = new EntityMetadata();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "__class__" field should be configured for the nested association.'
+            . ' Parent Field: Test\Class::testField.'
+        );
+
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -164,15 +168,14 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage A property path should be configured for the "__class__" field. Parent Field: Test\Class::testField.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddNestedAssociationWhenClassFieldDoesNotHavePropertyPath()
     {
-        $entityMetadata = new EntityMetadata();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'A property path should be configured for the "__class__" field. Parent Field: Test\Class::testField.'
+        );
+
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -190,15 +193,14 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "__class__" field should not be an association. Parent Field: Test\Class::testField.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddNestedAssociationWhenClassFieldIsAssociation()
     {
-        $entityMetadata = new EntityMetadata();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "__class__" field should not be an association. Parent Field: Test\Class::testField.'
+        );
+
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -218,15 +220,14 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "id" field should be configured for the nested association. Parent Field: Test\Class::testField.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddNestedAssociationWhenIdFieldDoesNotExist()
     {
-        $entityMetadata = new EntityMetadata();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "id" field should be configured for the nested association. Parent Field: Test\Class::testField.'
+        );
+
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -245,15 +246,14 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage A property path should be configured for the "id" field. Parent Field: Test\Class::testField.
-     */
-    // @codingStandardsIgnoreEnd
     public function testAddNestedAssociationWhenIdFieldDoesNotHavePropertyPath()
     {
-        $entityMetadata = new EntityMetadata();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'A property path should be configured for the "id" field. Parent Field: Test\Class::testField.'
+        );
+
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -273,13 +273,14 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ApiBundle\Exception\RuntimeException
-     * @expectedExceptionMessage The "id" field should not be an association. Parent Field: Test\Class::testField.
-     */
     public function testAddNestedAssociationWhenIdFieldIsAssociation()
     {
-        $entityMetadata = new EntityMetadata();
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The "id" field should not be an association. Parent Field: Test\Class::testField.'
+        );
+
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();

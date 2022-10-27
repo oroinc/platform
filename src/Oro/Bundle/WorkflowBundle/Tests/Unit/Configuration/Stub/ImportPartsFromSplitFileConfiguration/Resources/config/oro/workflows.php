@@ -37,7 +37,8 @@
             'first_attribute' => [
                 'type' => 'object',
                 'property_path' => null,
-                'options' => ['class' => 'DateTime']
+                'options' => ['class' => 'DateTime'],
+                'default' => null,
             ]
         ],
         'is_system' => false,
@@ -94,7 +95,8 @@
             'first_attribute' => [
                 'type' => 'object',
                 'property_path' => null,
-                'options' => ['class' => 'DateTime']
+                'options' => ['class' => 'DateTime'],
+                'default' => null,
             ]
         ],
         'is_system' => false,

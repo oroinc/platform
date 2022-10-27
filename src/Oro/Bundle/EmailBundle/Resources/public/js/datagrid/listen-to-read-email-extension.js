@@ -1,20 +1,19 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var UnreadEmailsStateHolder = require('oroemail/js/app/unread-emails-state-holder');
+    const UnreadEmailsStateHolder = require('oroemail/js/app/unread-emails-state-holder');
     return {
         init: function(deferred, options) {
-            options.gridPromise.done(_.bind(function(grid) {
-                UnreadEmailsStateHolder.getModel().on('change:ids', _.bind(this._changeHandler, this, grid.collection));
+            options.gridPromise.done(grid => {
+                UnreadEmailsStateHolder.getModel().on('change:ids', this._changeHandler.bind(this, grid.collection));
                 deferred.resolve();
-            }, this)).fail(function() {
+            }).fail(function() {
                 deferred.reject();
             });
         },
         _changeHandler: function(collection, model, ids) {
             collection.each(function(model) {
-                var rowClassName = ids.indexOf(Number(model.get('id'))) === -1 ? 'email-row-is-readed' : '';
+                const rowClassName = ids.indexOf(Number(model.get('id'))) === -1 ? 'email-row-is-read' : '';
                 model.set('row_class_name', rowClassName);
             });
         }

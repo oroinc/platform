@@ -69,9 +69,6 @@ class WorkflowTransitionTriggersAssembler
         );
     }
 
-    /**
-     * @param TransitionTriggerAssemblerInterface $assembler
-     */
     public function registerAssembler(TransitionTriggerAssemblerInterface $assembler)
     {
         $this->assemblers[] = $assembler;

@@ -1,12 +1,50 @@
 /* @theme: default; */
 
-//more styles in FrontendBundle/default/grid.scss
-
 .select {
-    max-width: 100%;
+    background: $select-bg;
+
+    @include base-ui-element(
+        $use-base-style-for-select,
+        $select-padding,
+        $select-font-size,
+        $select-font-family,
+        $select-line-height,
+        $select-border,
+        $select-border-radius,
+        $select-background-color,
+        $select-color,
+        $select-disable-platform-style
+    );
 
     @include placeholder {
-        color: get-color('additional', 'middle');
+        color: $select-placeholder-color;
+    }
+
+    @include element-state('hover') {
+        text-decoration: none;
+        border-color: $select-border-color-hover-state;
+    }
+
+    @include element-state('focus') {
+        border-color: $select-border-color-focus-state;
+        box-shadow: $select-box-shadow-focus-state;
+    }
+
+    &.focus-visible {
+        border-color: $select-border-color-focus-state;
+    }
+
+    @include element-state('error') {
+        border-color: $select-border-color-error-state;
+    }
+
+    @include element-state('error') {
+        box-shadow: $select-box-shadow-error-state;
+    }
+
+    @include element-state('disabled') {
+        background-color: $select-disabled-background-color;
+        pointer-events: none;
     }
 
     &--size-m {
@@ -18,16 +56,13 @@
         height: $select-height--s;
         padding: $select-padding--s;
     }
+}
 
-    @include element-state('hover') {
-        box-shadow: $select-box-shadow-hover-state;
+@-moz-document url-prefix('') {
+    .select {
+        height: $select-firefox-height;
+        line-height: $select-firefox-line-height;
+        padding-top: $select-firefox-inner-offset-top;
+        padding-bottom: $select-firefox-inner-offset-bottom;
     }
-
-    @include element-state('focus') {
-        box-shadow: $select-box-shadow-focus-state;
-    }
-
-    @include element-state('error') {
-        box-shadow: $select-box-shadow-error-state;
-    };
 }

@@ -2,32 +2,37 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\BlockFactoryInterface;
+use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\DeferredLayoutManipulatorInterface;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
+use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutFactory;
+use Oro\Component\Layout\LayoutRegistryInterface;
+use Oro\Component\Layout\LayoutRendererRegistryInterface;
+use Oro\Component\Layout\RawLayoutBuilderInterface;
 
 class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $rendererRegistry;
+    private $rendererRegistry;
 
     /** @var ExpressionProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $expressionProcessor;
+    private $expressionProcessor;
 
     /** @var LayoutFactory */
-    protected $layoutFactory;
+    private $layoutFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry            = $this->createMock('Oro\Component\Layout\LayoutRegistryInterface');
-        $this->rendererRegistry    = $this->createMock('Oro\Component\Layout\LayoutRendererRegistryInterface');
-        $this->expressionProcessor = $this
-            ->getMockBuilder('Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->layoutFactory       = new LayoutFactory(
+        $this->registry = $this->createMock(LayoutRegistryInterface::class);
+        $this->rendererRegistry = $this->createMock(LayoutRendererRegistryInterface::class);
+        $this->expressionProcessor = $this->createMock(ExpressionProcessor::class);
+
+        $this->layoutFactory = new LayoutFactory(
             $this->registry,
             $this->rendererRegistry,
             $this->expressionProcessor
@@ -47,12 +52,12 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
     public function testGetType()
     {
         $name = 'test';
-        $type = $this->createMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->createMock(BlockTypeInterface::class);
 
         $this->registry->expects($this->once())
             ->method('getType')
             ->with($name)
-            ->will($this->returnValue($type));
+            ->willReturn($type);
 
         $this->assertSame($type, $this->layoutFactory->getType($name));
     }
@@ -60,27 +65,27 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateRawLayoutBuilder()
     {
         $this->assertInstanceOf(
-            'Oro\Component\Layout\RawLayoutBuilderInterface',
+            RawLayoutBuilderInterface::class,
             $this->layoutFactory->createRawLayoutBuilder()
         );
     }
 
     public function testCreateLayoutManipulator()
     {
-        $rawLayoutBuilder = $this->createMock('Oro\Component\Layout\RawLayoutBuilderInterface');
+        $rawLayoutBuilder = $this->createMock(RawLayoutBuilderInterface::class);
 
         $this->assertInstanceOf(
-            'Oro\Component\Layout\DeferredLayoutManipulatorInterface',
+            DeferredLayoutManipulatorInterface::class,
             $this->layoutFactory->createLayoutManipulator($rawLayoutBuilder)
         );
     }
 
     public function testCreateBlockFactory()
     {
-        $layoutManipulator = $this->createMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
+        $layoutManipulator = $this->createMock(DeferredLayoutManipulatorInterface::class);
 
         $this->assertInstanceOf(
-            'Oro\Component\Layout\BlockFactoryInterface',
+            BlockFactoryInterface::class,
             $this->layoutFactory->createBlockFactory($layoutManipulator)
         );
     }
@@ -88,7 +93,7 @@ class LayoutFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateLayoutBuilder()
     {
         $this->assertInstanceOf(
-            'Oro\Component\Layout\LayoutBuilderInterface',
+            LayoutBuilderInterface::class,
             $this->layoutFactory->createLayoutBuilder()
         );
     }

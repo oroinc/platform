@@ -2,7 +2,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
     first_user_workflow_definition:
         name: 'first_user_workflow_definition'
         label: 'oro.workflow.first_user_workflow_definition.label'
-        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        relatedEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
         active: true
         entityAttributeName: 'entity'
         configuration:
@@ -22,7 +22,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition:
     second_user_workflow_definition:
         name: 'second_user_workflow_definition'
         label: 'oro.workflow.second_user_workflow_definition.label'
-        relatedEntity: 'Oro\Bundle\UserBundle\Entity\User'
+        relatedEntity: 'Oro\\Bundle\\UserBundle\\Entity\\User'
         active: true
         entityAttributeName: 'entity'
         configuration:

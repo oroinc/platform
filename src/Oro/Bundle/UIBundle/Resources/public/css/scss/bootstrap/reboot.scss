@@ -1,9 +1,71 @@
 /* @theme: admin.oro; */
 
-@import "bowerassets/bootstrap/scss/reboot";
+@import '~@oroinc/bootstrap/scss/reboot';
+
+body {
+    text-align: left;
+}
+
+a {
+    &:focus {
+        outline: $input-focus-border-color auto 1px;
+    }
+}
 
 // Bad practices, should be removed in future
 ul,
 ol {
     padding: 0;
+}
+
+input {
+    &::-ms-clear {
+        display: none;
+    }
+
+    &[type='date'] {
+        min-height: 32px;
+
+        &::-webkit-inner-spin-button {
+            display: none;
+        }
+
+        // Fix height Shadow DOM elements
+        &::-webkit-date-and-time-value,
+        &::-webkit-datetime-edit {
+            line-height: 1;
+        }
+    }
+
+    &[type='time'] {
+        // Fix height Shadow DOM elements
+        &::-webkit-date-and-time-value,
+        &::-webkit-datetime-edit {
+            line-height: 1;
+        }
+    }
+
+    &[type='number'] {
+        // fix FireFox platform styles
+        box-shadow: none;
+    }
+}
+
+select {
+    /* Hide expand button of select in IE11
+     * Remove when stop supporting IE11
+     */
+    &::-ms-expand {
+        display: none;
+    }
+}
+
+[type='search'] {
+    appearance: textfield;
+    outline-offset: -2px;
+}
+
+button {
+    // default padding from Chrome
+    padding: 1px 6px;
 }

@@ -13,10 +13,21 @@
     </div>
 
     {% if form.use_parent_scope_value is defined %}
-        <div class="control-subgroup parent-scope-checkbox">
-            <div class="oro-clearfix">
-                {{ form_row(form.use_parent_scope_value, { 'attr': {'data-role': 'changeUseDefault'} }) }}
+        {% if 'hidden' in form.use_parent_scope_value.vars.block_prefixes %}
+            {{ form_row(form.use_parent_scope_value, { 'attr': {'data-role': 'changeUseDefault'} }) }}
+        {% else %}
+            <div class="control-subgroup parent-scope-checkbox">
+                <div class="parent-scope-checkbox__wrapper">
+                    {{ form_row(form.use_parent_scope_value, { 'attr': {'data-role': 'changeUseDefault'} }) }}
+                </div>
             </div>
+        {% endif %}
+    {% endif %}
+
+    {% if form.vars.value_hint is defined and form.vars.value_hint is not empty %}
+        {% import '@OroUI/macros.html.twig' as UI %}
+        <div class="control-subgroup value-hint-container">
+            {{ UI.tooltip(form.vars.value_hint, [], null, false, null, null, form.vars.translatable_value_hint) }}
         </div>
     {% endif %}
 {% endblock %}

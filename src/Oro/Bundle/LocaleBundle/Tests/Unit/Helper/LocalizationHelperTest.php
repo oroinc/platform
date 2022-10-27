@@ -15,26 +15,18 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
     use FallbackTrait;
 
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationManager;
+    private $localizationManager;
 
     /** @var LocalizationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $currentLocalizationProvider;
+    private $currentLocalizationProvider;
 
     /** @var LocalizationHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->localizationManager = $this->getMockBuilder(LocalizationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->currentLocalizationProvider = $this->getMockBuilder(LocalizationProviderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localizationManager = $this->createMock(LocalizationManager::class);
+        $this->currentLocalizationProvider = $this->createMock(LocalizationProviderInterface::class);
 
         $this->helper = new LocalizationHelper($this->localizationManager, $this->currentLocalizationProvider);
     }
@@ -73,12 +65,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $value = new LocalizedFallbackValue();
         $value->setString('0');
         $value->setLocalization(new Localization());
-        $values = new ArrayCollection(
-            [
-                $defaultValue,
-                $value
-            ]
-        );
+        $values = new ArrayCollection([$defaultValue, $value]);
 
         $this->assertEquals($defaultValue, $this->helper->getFirstNonEmptyLocalizedValue($values));
     }
@@ -90,12 +77,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $value = new LocalizedFallbackValue();
         $value->setText('0');
         $value->setLocalization(new Localization());
-        $values = new ArrayCollection(
-            [
-                $defaultValue,
-                $value
-            ]
-        );
+        $values = new ArrayCollection([$defaultValue, $value]);
 
         $this->assertEquals($defaultValue, $this->helper->getFirstNonEmptyLocalizedValue($values));
     }
@@ -105,11 +87,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $value = new LocalizedFallbackValue();
         $value->setString('0');
         $value->setLocalization(new Localization());
-        $values = new ArrayCollection(
-            [
-                $value
-            ]
-        );
+        $values = new ArrayCollection([$value]);
 
         $this->assertEquals($value, $this->helper->getFirstNonEmptyLocalizedValue($values));
     }
@@ -119,11 +97,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $value = new LocalizedFallbackValue();
         $value->setText('0');
         $value->setLocalization(new Localization());
-        $values = new ArrayCollection(
-            [
-                $value
-            ]
-        );
+        $values = new ArrayCollection([$value]);
 
         $this->assertEquals($value, $this->helper->getFirstNonEmptyLocalizedValue($values));
     }
@@ -133,11 +107,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
         $value = new LocalizedFallbackValue();
         $value->setText('');
         $value->setLocalization(new Localization());
-        $values = new ArrayCollection(
-            [
-                $value
-            ]
-        );
+        $values = new ArrayCollection([$value]);
 
         $this->assertNull($this->helper->getFirstNonEmptyLocalizedValue($values));
     }

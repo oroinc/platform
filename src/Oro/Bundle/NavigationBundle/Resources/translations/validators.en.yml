@@ -1,0 +1,6 @@
+oro:
+    navigation:
+        validator:
+            unique_pinbar_tab_url.error: 'This pin already exists'
+            menu_update:
+                not_dangerous_protocol.message: '"{{ protocol }}" pseudo-protocol is not allowed in menu URIs.'

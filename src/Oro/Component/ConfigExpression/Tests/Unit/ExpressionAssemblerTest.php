@@ -2,9 +2,9 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
-use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 use Oro\Component\ConfigExpression\ExpressionAssembler;
-use Oro\Component\ConfigExpression\Func;
+use Oro\Component\ConfigExpression\ExpressionFactoryInterface;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ExpressionStub;
 
 class ExpressionAssemblerTest extends \PHPUnit\Framework\TestCase
@@ -14,32 +14,22 @@ class ExpressionAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     public function testAssemble($configuration, $expected)
     {
-        $factory = $this->createMock('Oro\Component\ConfigExpression\ExpressionFactoryInterface');
+        $factory = $this->createMock(ExpressionFactoryInterface::class);
         $factory->expects($this->any())
             ->method('create')
-            ->will(
-                $this->returnCallback(
-                    function ($type, $options) {
-                        $expr = new ExpressionStub($type);
+            ->willReturnCallback(function ($type, $options) {
+                $expr = new ExpressionStub($type);
 
-                        return $expr->initialize($options);
-                    }
-                )
-            );
+                return $expr->initialize($options);
+            });
 
-        $configurationPass =
-            $this->getMockBuilder('Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface')
-                ->getMockForAbstractClass();
+        $configurationPass = $this->createMock(ConfigurationPassInterface::class);
 
         $configurationPass->expects($this->any())
             ->method('passConfiguration')
-            ->will(
-                $this->returnCallback(
-                    function ($options) {
-                        return ['passed' => $options];
-                    }
-                )
-            );
+            ->willReturnCallback(function ($options) {
+                return ['passed' => $options];
+            });
 
         $assembler = new ExpressionAssembler($factory);
         $assembler->addConfigurationPass($configurationPass);
@@ -48,7 +38,7 @@ class ExpressionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function configurationDataProvider()
+    public function configurationDataProvider(): array
     {
         return [
             [

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
 use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
@@ -18,18 +18,22 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Contains methods handling email recipients.
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ */
 class EmailRecipientsHelper
 {
     const ORGANIZATION_PROPERTY = 'organization';
-    const EMAIL_IDS_SEPARATOR   = ';';
+    const EMAIL_IDS_SEPARATOR = ';';
 
     /** @var AclHelper */
     protected $aclHelper;
@@ -46,29 +50,18 @@ class EmailRecipientsHelper
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var PropertyAccessor*/
+    /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
     /** @var EmailOwnerProvider */
     protected $emailOwnerProvider;
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var EmailAddressHelper */
     protected $addressHelper;
 
-    /**
-     * @param AclHelper $aclHelper
-     * @param DQLNameFormatter $dqlNameFormatter
-     * @param NameFormatter $nameFormatter
-     * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
-     * @param EmailOwnerProvider $emailOwnerProvider
-     * @param Registry $registry
-     * @param EmailAddressHelper $addressHelper
-     * @param Indexer $search
-     */
     public function __construct(
         AclHelper $aclHelper,
         DQLNameFormatter $dqlNameFormatter,
@@ -76,9 +69,10 @@ class EmailRecipientsHelper
         ConfigManager $configManager,
         TranslatorInterface $translator,
         EmailOwnerProvider $emailOwnerProvider,
-        Registry $registry,
+        ManagerRegistry $registry,
         EmailAddressHelper $addressHelper,
-        Indexer $search
+        Indexer $search,
+        PropertyAccessorInterface $propertyAccessor
     ) {
         $this->aclHelper = $aclHelper;
         $this->dqlNameFormatter = $dqlNameFormatter;
@@ -89,6 +83,7 @@ class EmailRecipientsHelper
         $this->registry = $registry;
         $this->addressHelper = $addressHelper;
         $this->search = $search;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -104,19 +99,11 @@ class EmailRecipientsHelper
             return null;
         }
 
-        $organizationName = null;
-        if ($this->getPropertyAccessor()->isReadable($object, static::ORGANIZATION_PROPERTY)) {
-            $organization = $this->getPropertyAccessor()->getValue($object, static::ORGANIZATION_PROPERTY);
-            if ($organization) {
-                $organizationName = $organization->getName();
-            }
-        }
-
         return new RecipientEntity(
             $objectMetadata->name,
             reset($identifiers),
             $this->createRecipientEntityLabel($this->nameFormatter->format($object), $objectMetadata->name),
-            $organizationName
+            $this->getOrganizationName($object)
         );
     }
 
@@ -152,14 +139,14 @@ class EmailRecipientsHelper
     public function createRecipientData(Recipient $recipient)
     {
         $data = ['key' => $recipient->getId()];
-        if ($recipientEntity = $recipient->getEntity()) {
+        if ($recipient->getEntity()) {
             $data = array_merge(
                 $data,
                 [
-                    'contextText'  => $recipient->getEntity()->getLabel(),
+                    'contextText' => $recipient->getEntity()->getLabel(),
                     'contextValue' => [
                         'entityClass' => $recipient->getEntity()->getClass(),
-                        'entityId'    => $recipient->getEntity()->getId(),
+                        'entityId' => $recipient->getEntity()->getId(),
                     ],
                     'organization' => $recipient->getEntity()->getOrganization(),
                 ]
@@ -167,9 +154,9 @@ class EmailRecipientsHelper
         }
 
         return [
-            'id'    => self::prepareFormRecipientIds($recipient->getId()),
-            'text'  => $recipient->getName(),
-            'data'  => json_encode($data),
+            'id' => self::prepareFormRecipientIds($recipient->getId()),
+            'text' => $recipient->getName(),
+            'data' => json_encode($data),
         ];
     }
 
@@ -253,12 +240,12 @@ class EmailRecipientsHelper
     {
         if (!$organization ||
             !$object ||
-            !$this->getPropertyAccessor()->isReadable($object, static::ORGANIZATION_PROPERTY)
+            !$this->propertyAccessor->isReadable($object, static::ORGANIZATION_PROPERTY)
         ) {
             return true;
         }
 
-        $objectOrganization = $this->getPropertyAccessor()->getValue($object, static::ORGANIZATION_PROPERTY);
+        $objectOrganization = $this->propertyAccessor->getValue($object, static::ORGANIZATION_PROPERTY);
         if (!$organization) {
             return true;
         }
@@ -314,6 +301,71 @@ class EmailRecipientsHelper
     }
 
     /**
+     * Prepares base64 encoded emails to be used as ids in recipients form for select2 component.
+     *
+     * @param array|string $ids
+     *
+     * @return string;
+     */
+    public static function prepareFormRecipientIds($ids)
+    {
+        if (is_string($ids)) {
+            return base64_encode($ids);
+        }
+
+        $ids = array_map("base64_encode", $ids);
+
+        return implode(self::EMAIL_IDS_SEPARATOR, $ids);
+    }
+
+    /**
+     * Extracts base64 encoded selected email values, that are used as ids in recipients form for select2 component.
+     *
+     * @param array|string $value
+     *
+     * @return array;
+     */
+    public static function extractFormRecipientIds($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        /*
+         * str_getcsv is used to cover the case if emails are pasted directly with ";" separator
+         * and it protects from ";" used  in full email address. (example: "Recipient Name; Name2" <myemail@domain.com>)
+         */
+        $idsEncoded = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
+        $idsDecoded = array_map(function ($idEncoded) {
+            return base64_decode($idEncoded, true) ?: $idEncoded;
+        }, $idsEncoded);
+
+        return $idsDecoded;
+    }
+
+    /**
+     * @param array $emails
+     * @param object $object
+     *
+     * @return Recipient[]
+     */
+    public function createRecipientsFromEmails(array $emails, $object)
+    {
+        $objectClass = ClassUtils::getClass($object);
+        $em = $this->registry->getManagerForClass($objectClass);
+        $objectMetadata = $em->getClassMetadata($objectClass);
+
+        $recipientEntity = $this->createRecipientEntity($object, $objectMetadata);
+
+        $recipients = [];
+        foreach ($emails as $email => $name) {
+            $recipient = new Recipient($email, $name, $recipientEntity);
+            $recipients[$recipient->getIdentifier()] = $recipient;
+        }
+
+        return $recipients;
+    }
+
+    /**
      * @param QueryBuilder $qb
      * @param EmailRecipientsProviderArgs $args
      *
@@ -348,6 +400,7 @@ class EmailRecipientsHelper
 
     /**
      * @param string $className
+     *
      * @return null|string
      */
     protected function getClassLabel($className)
@@ -356,60 +409,21 @@ class EmailRecipientsHelper
             return null;
         }
         $entityConfig = new EntityConfigId('entity', $className);
-        $label        = $this->configManager->getConfig($entityConfig)->get('label');
+        $label = (string) $this->configManager->getConfig($entityConfig)->get('label');
 
         return $this->translator->trans($label);
     }
 
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
+    protected function getOrganizationName(object $object): ?string
     {
-        if (!$this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $organizationName = null;
+        if ($this->propertyAccessor->isReadable($object, static::ORGANIZATION_PROPERTY)) {
+            $organization = $this->propertyAccessor->getValue($object, static::ORGANIZATION_PROPERTY);
+            if ($organization instanceof OrganizationInterface) {
+                $organizationName = $organization->getName();
+            }
         }
 
-        return $this->propertyAccessor;
-    }
-
-    /**
-     * Prepares base64 encoded emails to be used as ids in recipients form for select2 component.
-     *
-     * @param  array|string $ids
-     * @return string;
-     */
-    public static function prepareFormRecipientIds($ids)
-    {
-        if (is_string($ids)) {
-            return base64_encode($ids);
-        }
-
-        $ids = array_map("base64_encode", $ids);
-
-        return implode(self::EMAIL_IDS_SEPARATOR, $ids);
-    }
-
-    /**
-     * Extracts base64 encoded selected email values, that are used as ids in recipients form for select2 component.
-     *
-     * @param  array|string $value
-     * @return array;
-     */
-    public static function extractFormRecipientIds($value)
-    {
-        if (is_array($value)) {
-            return $value;
-        }
-        /*
-         * str_getcsv is used to cover the case if emails are pasted directly with ";" separator
-         * and it protects from ";" used  in full email address. (example: "Recipient Name; Name2" <myemail@domain.com>)
-         */
-        $idsEncoded = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
-        $idsDecoded = array_map(function ($idEncoded) {
-            return base64_decode($idEncoded, true) ? : $idEncoded;
-        }, $idsEncoded);
-
-        return $idsDecoded;
+        return $organizationName;
     }
 }

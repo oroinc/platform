@@ -1,0 +1,35 @@
+dependencies:
+  - Oro\Bundle\AddressBundle\Tests\Functional\DataFixtures\LoadCountriesAndRegions
+  - Oro\Bundle\AddressBundle\Tests\Functional\DataFixtures\LoadAddressTypes
+
+Oro\Bundle\AddressBundle\Entity\Address:
+    address1:
+        label: 'Address 1'
+        street: 'Street 1'
+        street2: 'Street 2'
+        city: 'Los Angeles'
+        postalCode: '90001'
+        country: '@country_usa'
+        region: '@region_usa_california'
+        organization: 'Acme'
+        namePrefix: 'Mr.'
+        nameSuffix: 'M.D.'
+        firstName: 'John'
+        middleName: 'Edgar'
+        lastName: 'Doo'
+    address2:
+        label: 'Address 2'
+        street: 'Street 2'
+        city: 'Los Angeles'
+        postalCode: '90002'
+        country: '@country_usa'
+        region: '@region_usa_california'
+        firstName: 'John'
+        lastName: 'Smith'
+    address3:
+        label: 'Address 3'
+        city: 'Tel Aviv'
+        country: '@country_israel'
+        region: '@region_israel_telaviv'
+        firstName: 'John'
+        lastName: 'Smith'

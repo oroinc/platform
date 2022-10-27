@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\SwitchFormExtension;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentConfigAccessor;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentMetadataAccessor;
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Switches to Data API form extension.
+ * Switches to API form extension.
  */
 class InitializeApiFormExtension extends SwitchFormExtension implements ProcessorInterface
 {
@@ -20,7 +19,7 @@ class InitializeApiFormExtension extends SwitchFormExtension implements Processo
      */
     public function process(ContextInterface $context)
     {
-        /** @var SubresourceContext|FormContext $context */
+        /** @var ChangeRelationshipContext $context */
 
         if ($this->isApiFormExtensionActivated($context)) {
             // the API form extension is already activated

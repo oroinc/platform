@@ -18,50 +18,34 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
+
+    /** @var BusinessUnitManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $businessUnitManager;
+
     /** @var OrganizationExtension */
     private $extension;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityOwnerAccessor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $businessUnitManager;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityOwnerAccessor = $this->getMockBuilder(EntityOwnerAccessor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->businessUnitManager = $this->getMockBuilder(BusinessUnitManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->businessUnitManager = $this->createMock(BusinessUnitManager::class);
 
-        $this->entityOwnerAccessor->expects($this->any())
+        $entityOwnerAccessor = $this->createMock(EntityOwnerAccessor::class);
+        $entityOwnerAccessor->expects($this->any())
             ->method('getOwner')
-            ->willReturnCallback(
-                function ($entity) {
-                    return $entity->getOwner();
-                }
-            );
+            ->willReturnCallback(function ($entity) {
+                return $entity->getOwner();
+            });
 
         $container = self::getContainerBuilder()
-            ->add('oro_security.owner.entity_owner_accessor', $this->entityOwnerAccessor)
-            ->add('oro_entity_config.config_manager', $this->configManager)
+            ->add(ConfigManager::class, $this->configManager)
+            ->add('oro_security.owner.entity_owner_accessor', $entityOwnerAccessor)
             ->add('oro_organization.business_unit_manager', $this->businessUnitManager)
             ->getContainer($this);
 
         $this->extension = new OrganizationExtension($container);
-    }
-
-    public function testName()
-    {
-        $this->assertEquals('oro_owner_type', $this->extension->getName());
     }
 
     public function testGetOwnerType()
@@ -143,9 +127,7 @@ class OrganizationExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetBusinessUnitCount()
     {
-        $repo = $this->getMockBuilder(BusinessUnitRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(BusinessUnitRepository::class);
         $repo->expects($this->once())
             ->method('getBusinessUnitsCount')
             ->willReturn(2);

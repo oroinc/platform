@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\TranslationBundle\Controller\JsTranslationController:
+        arguments:
+            - '@oro_translation.js_generator'
+
+    Oro\Bundle\TranslationBundle\Controller\TranslationController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\TranslationBundle\Controller\LanguageController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

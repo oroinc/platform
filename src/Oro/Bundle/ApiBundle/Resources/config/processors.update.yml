@@ -1,7 +1,6 @@
 services:
     oro_api.update.processor:
         class: Oro\Bundle\ApiBundle\Processor\UpdateProcessor
-        public: false
         arguments:
             - '@oro_api.processor_bag'
             - update
@@ -32,22 +31,15 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
-    oro_api.update.normalize_entity_id:
-        class: Oro\Bundle\ApiBundle\Processor\Update\NormalizeEntityId
-        arguments:
-            - '@oro_api.entity_id_transformer_registry'
-        tags:
-            - { name: oro.api.processor, action: update, group: normalize_input, priority: -110 }
-
     #
     # security_check
     #
 
-    oro_api.update.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+    oro_api.update.validate_entity_type_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@security.authorization_checker'
+            - '@oro_api.doctrine_helper'
             - '@oro_security.acl.group_provider.chain'
             - EDIT
         tags:
@@ -61,8 +53,8 @@ services:
     # data_security_check
     #
 
-    oro_api.update.entity_object_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
+    oro_api.update.validate_entity_object_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectAccess
         arguments:
             - '@security.authorization_checker'
             - EDIT
@@ -81,6 +73,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Update\SaveEntity
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.save_data_handler'
         tags:
             - { name: oro.api.processor, action: update, group: save_data, priority: -10 }
 

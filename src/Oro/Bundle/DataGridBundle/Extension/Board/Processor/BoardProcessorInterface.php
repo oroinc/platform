@@ -5,6 +5,9 @@ namespace Oro\Bundle\DataGridBundle\Extension\Board\Processor;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 
+/**
+ * Represents a datagrid processor for "board" mode.
+ */
 interface BoardProcessorInterface
 {
     /**
@@ -22,7 +25,6 @@ interface BoardProcessorInterface
      * @param DatasourceInterface $datasource
      * @param array $boardData
      * @param DatagridConfiguration $datagridConfig
-     * @return
      */
     public function processDatasource(
         DatasourceInterface $datasource,
@@ -36,18 +38,10 @@ interface BoardProcessorInterface
      * @param DatasourceInterface $datasource
      * @param array $boardData
      * @param DatagridConfiguration $datagridConfig
-     * @return
      */
     public function processPaginationDatasource(
         DatasourceInterface $datasource,
         $boardData,
         DatagridConfiguration $datagridConfig
     );
-
-    /**
-     * Get processor name
-     *
-     * @return string
-     */
-    public function getName();
 }

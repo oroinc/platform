@@ -8,9 +8,9 @@ namespace Oro\Component\ChainProcessor;
 interface ToArrayInterface
 {
     /**
-     * Gets an array representation of an object.
+     * Gets a native PHP array representation of the object.
      *
-     * @return array
+     * @return array [key => value, ...]
      */
-    public function toArray();
+    public function toArray(): array;
 }

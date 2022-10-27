@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Acl\Extension;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
@@ -13,12 +15,15 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
+/**
+ * The ACL extension that works with workflows.
+ */
 class WorkflowAclExtension extends AbstractWorkflowAclExtension
 {
-    const NAME = 'workflow';
+    public const NAME = 'workflow';
 
-    const PERMISSION_VIEW    = 'VIEW_WORKFLOW';
-    const PERMISSION_PERFORM = 'PERFORM_TRANSITIONS';
+    private const PERMISSION_VIEW    = 'VIEW_WORKFLOW';
+    private const PERMISSION_PERFORM = 'PERFORM_TRANSITIONS';
 
     /** @var WorkflowAclMetadataProvider */
     protected $workflowMetadataProvider;
@@ -26,15 +31,6 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     /** @var WorkflowTransitionAclExtension */
     protected $transitionAclExtension;
 
-    /**
-     * @param ObjectIdAccessor                           $objectIdAccessor
-     * @param OwnershipMetadataProviderInterface         $metadataProvider
-     * @param EntityOwnerAccessor                        $entityOwnerAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param WorkflowManager                            $workflowManager
-     * @param WorkflowAclMetadataProvider                $workflowMetadataProvider
-     * @param WorkflowTransitionAclExtension             $transitionAclExtension
-     */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         OwnershipMetadataProviderInterface $metadataProvider,
@@ -75,6 +71,8 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
                 MaskBuilder::MASK_PERFORM_TRANSITIONS_SYSTEM,
             ],
         ];
+
+        $this->maskBuilder = new MaskBuilder();
     }
 
     /**
@@ -90,7 +88,7 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
      */
     public function supports($type, $id)
     {
-        return $id === $this->getExtensionKey();
+        return $this->getExtensionKey() === $id;
     }
 
     /**
@@ -134,7 +132,7 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
      */
     public function getObjectIdentity($val)
     {
-        if (is_string($val)) {
+        if (\is_string($val)) {
             $type = $id = $group = null;
             $this->parseDescriptor($val, $type, $id, $group);
             if ($this->getExtensionKey() !== $id) {
@@ -142,7 +140,8 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
             }
 
             return new ObjectIdentity($id, ObjectIdentityHelper::buildType($type, $group));
-        } elseif ($val instanceof AclAnnotation) {
+        }
+        if ($val instanceof AclAnnotation) {
             throw new \InvalidArgumentException('Workflow ACL Extension does not support ACL annotations.');
         }
 
@@ -155,22 +154,6 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     public function getMaskPattern($mask)
     {
         return MaskBuilder::getPatternFor($mask);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMaskBuilder($permission)
-    {
-        return new MaskBuilder();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAllMaskBuilders()
-    {
-        return [new MaskBuilder()];
     }
 
     /**
@@ -190,10 +173,28 @@ class WorkflowAclExtension extends AbstractWorkflowAclExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getMaskBuilderConst($constName)
+    protected function getValidMasks($object)
     {
-        return MaskBuilder::getConst($constName);
+        if ($object instanceof ObjectIdentity && $object->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+            $maxAccessLevel = $this->metadataProvider->getMaxAccessLevel(
+                AccessLevel::SYSTEM_LEVEL,
+                ObjectIdentityFactory::ROOT_IDENTITY_TYPE
+            );
+
+            return $maxAccessLevel === AccessLevel::SYSTEM_LEVEL
+                ? $this->getMaskForGroup('SYSTEM')
+                    | $this->getMaskForGroup('GLOBAL')
+                    | $this->getMaskForGroup('DEEP')
+                    | $this->getMaskForGroup('LOCAL')
+                    | $this->getMaskForGroup('BASIC')
+                : $this->getMaskForGroup('GLOBAL')
+                    | $this->getMaskForGroup('DEEP')
+                    | $this->getMaskForGroup('LOCAL')
+                    | $this->getMaskForGroup('BASIC');
+        }
+
+        return parent::getValidMasks($object);
     }
 }

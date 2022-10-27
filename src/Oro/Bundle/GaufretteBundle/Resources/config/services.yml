@@ -1,3 +1,6 @@
+parameters:
+    knp_gaufrette.filesystem_map.class: Oro\Bundle\GaufretteBundle\FilesystemMap
+
 services:
     oro_gaufrette.file_manager:
         class: Oro\Bundle\GaufretteBundle\FileManager
@@ -5,3 +8,10 @@ services:
         calls:
             - [setFilesystemMap, ['@knp_gaufrette.filesystem_map']]
             - [setProtocol, ["@=container.hasParameter('knp_gaufrette.stream_wrapper.protocol') ? parameter('knp_gaufrette.stream_wrapper.protocol') : ''"]]
+            - [setReadonlyProtocol, ["@=container.hasParameter('oro_gaufrette.stream_wrapper.readonly_protocol') ? parameter('oro_gaufrette.stream_wrapper.readonly_protocol') : ''"]]
+
+    oro_gaufrette.listener.route_collection:
+        class: Oro\Bundle\GaufretteBundle\EventListener\RouteCollectionListener
+        tags:
+            - { name: kernel.event_listener, event: oro_distribution.route_collection.expose, method: onCollectionAutoload, priority: -255 }
+            - { name: kernel.event_listener, event: oro_distribution.route_collection.autoload, method: onCollectionAutoload, priority: -255 }

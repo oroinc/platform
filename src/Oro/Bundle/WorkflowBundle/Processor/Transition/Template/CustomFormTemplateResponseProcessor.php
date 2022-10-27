@@ -8,22 +8,22 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
+/**
+ * Creates a response that contains a custom transition form (or default, if no custom template was provided).
+ */
 class CustomFormTemplateResponseProcessor implements ProcessorInterface
 {
-    const DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE = 'OroWorkflowBundle:Widget:widget/transitionCustomForm.html.twig';
+    const DEFAULT_TRANSITION_CUSTOM_FORM_TEMPLATE = '@OroWorkflow/Widget/widget/transitionCustomForm.html.twig';
 
-    /** @var \Twig_Environment */
+    /** @var Environment */
     private $twig;
 
     /** @var FormTemplateDataProviderRegistry */
     private $templateDataProviderRegistry;
 
-    /**
-     * @param \Twig_Environment $twig
-     * @param FormTemplateDataProviderRegistry $templateDataProviderRegistry
-     */
-    public function __construct(\Twig_Environment $twig, FormTemplateDataProviderRegistry $templateDataProviderRegistry)
+    public function __construct(Environment $twig, FormTemplateDataProviderRegistry $templateDataProviderRegistry)
     {
         $this->twig = $twig;
         $this->templateDataProviderRegistry = $templateDataProviderRegistry;
@@ -76,10 +76,6 @@ class CustomFormTemplateResponseProcessor implements ProcessorInterface
         );
     }
 
-    /**
-     * @param TransitionContext $context
-     * @return bool
-     */
     public function isApplicable(TransitionContext $context): bool
     {
         if ($context->isSaved()) {

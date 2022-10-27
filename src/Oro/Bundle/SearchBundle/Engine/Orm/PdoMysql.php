@@ -29,9 +29,6 @@ class PdoMysql extends BaseDriver
 
     /**
      * Init additional doctrine functions
-     *
-     * @param EntityManagerInterface $em
-     * @param ClassMetadata $class
      */
     public function initRepo(EntityManagerInterface $em, ClassMetadata $class)
     {
@@ -73,7 +70,7 @@ class PdoMysql extends BaseDriver
         $condition = $searchCondition['condition'];
 
         $words = array_filter(
-            explode(' ', $this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue)),
+            explode(Query::DELIMITER, $this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue)),
             'strlen'
         );
 
@@ -161,32 +158,6 @@ class PdoMysql extends BaseDriver
     }
 
     /**
-     * @deprecated
-     * Get array of words retrieved from $value string
-     *
-     * @param  string $value
-     * @param  string $searchCondition
-     *
-     * @return array
-     */
-    protected function getWords($value, $searchCondition)
-    {
-        $results = array_filter(explode(' ', $value), 'strlen');
-        $results = array_map(
-            function ($word) use ($searchCondition) {
-                if ($searchCondition === Query::OPERATOR_CONTAINS && filter_var($word, FILTER_VALIDATE_EMAIL)) {
-                    $word = sprintf('"%s"', $word);
-                }
-
-                return $word;
-            },
-            $results
-        );
-
-        return $results;
-    }
-
-    /**
      * Get words that have length less than $this->fullTextMinWordLength
      *
      * @param  array $words
@@ -270,7 +241,7 @@ class PdoMysql extends BaseDriver
 
         if ($setOrderBy) {
             $qb->addSelect(
-                sprintf('MATCH_AGAINST(%s.value, :value%s) * search.weight as rankField%s', $joinAlias, $index, $index)
+                "MATCH_AGAINST($joinAlias.value, :value$index 'IN BOOLEAN MODE') * search.weight as rankField$index"
             )
                 ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
         }
@@ -437,7 +408,7 @@ class PdoMysql extends BaseDriver
      */
     protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
     {
-        if ($this->em->getConnection()->isTransactionActive()) {
+        if ($this->entityManager->getConnection()->isTransactionActive()) {
             return sprintf('DELETE FROM %s', $tableName);
         }
 

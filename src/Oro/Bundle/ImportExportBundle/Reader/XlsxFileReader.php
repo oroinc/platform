@@ -2,160 +2,98 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
-use Liuggio\ExcelBundle\Factory as ExcelFactory;
+use Box\Spout\Common\Type;
+use Box\Spout\Reader\Common\Creator\ReaderFactory;
+use Box\Spout\Reader\ReaderInterface;
+use Box\Spout\Reader\XLSX\RowIterator;
+use Box\Spout\Reader\XLSX\Sheet;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 
+/**
+ * Corresponds for reading xlsx file line by line using context passed
+ */
 class XlsxFileReader extends AbstractFileReader
 {
-    /**
-     * @var bool
-     */
-    protected $firstLineIsHeader = true;
+    /** @var ReaderInterface */
+    private $fileReader;
+
+    /** @var RowIterator */
+    private $rowIterator;
 
     /**
-     * @var ExcelFactory
+     * {@inheritdoc}
      */
-    protected $phpExcel;
-
-    /**
-     * @var \PHPExcel
-     */
-    protected $excelObj;
-
-    /**
-     * @var boolean
-     */
-    protected $rewound = false;
-
-    /**
-     * @var \PHPExcel_Worksheet_RowIterator
-     */
-    protected $rowIterator;
-
-    /**
-     * @param ContextRegistry $contextRegistry
-     * @param ExcelFactory $phpExcel
-     */
-    public function __construct(ContextRegistry $contextRegistry, ExcelFactory $phpExcel)
+    public function read($context = null): ?array
     {
-        $this->phpExcel = $phpExcel;
-        parent::__construct($contextRegistry);
+        if (!$context instanceof ContextInterface) {
+            $context = $this->getContext();
+        }
+
+        $data = $this->readRow($context);
+        if (!array_filter($data)) {
+            if ($this->isEof()) {
+                $this->rowIterator->rewind();
+                $this->header = null;
+                return null;
+            } else {
+                return [];
+            }
+        }
+
+        return $this->normalizeRow($data);
+    }
+
+    private function readRow(ContextInterface $context): array
+    {
+        if ($this->isEof()) {
+            return [];
+        }
+
+        $context->incrementReadOffset();
+        $data = $this->rowIterator->current();
+        $this->rowIterator->next();
+        $context->incrementReadCount();
+        return $data->toArray();
+    }
+
+    private function isEof(): bool
+    {
+        if (!$this->rowIterator->valid()) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function read($context = null)
+    public function initializeByContext(ContextInterface $context): void
     {
-        if (! $this->rowIterator instanceof \PHPExcel_Worksheet_RowIterator) {
-            $this->initRowIterator();
-        }
+        parent::initializeByContext($context);
 
-        if (! $context instanceof ContextInterface) {
-            $context = $this->getContext();
-        }
+        $this->fileReader = ReaderFactory::createFromType(Type::XLSX);
+        $this->fileReader->open($this->fileInfo->getPathname());
 
-        if (!$this->rewound) {
-            $this->rowIterator->resetStart();
-            $this->rewound = true;
-        }
-        if ($data = $this->readLine($context)) {
-            if ($this->firstLineIsHeader) {
-                if ($context->getReadCount() === 1) {
-                    $this->header || $this->header = $data;
-                    $data = $this->readLine($context);
-                }
-            }
+        $sheetIterator = $this->fileReader->getSheetIterator();
+        $sheetIterator->rewind();
 
-            if ($data && count($this->header) !== count($data)) {
-                throw new InvalidItemException(
-                    sprintf(
-                        'Expecting to get %d columns, actually got %d',
-                        count($this->header),
-                        count($data)
-                    ),
-                    $data
-                );
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param ContextInterface $context
-     * @return array|null
-     */
-    public function readLine(ContextInterface $context)
-    {
-        $data = null;
-        if ($this->rowIterator->valid()) {
-            foreach ($this->rowIterator->current()->getCellIterator() as $cell) {
-                $data[] = $cell->getValue();
-            }
-            $context->incrementReadOffset();
-            $context->incrementReadCount();
-            $this->rowIterator->next();
-        } else {
-            $this->header = null;
-        }
-
-        return $data;
-    }
-
-    /**
-     * @return \PHPExcel
-     */
-    public function getFile()
-    {
-        if ($this->excelObj) {
-            return $this->excelObj;
-        }
-
-        \PHPExcel_Settings::setCacheStorageMethod(
-            \PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp,
-            ['memoryCacheSize' => '512M']
-        );
-
-        $fileName = $this->fileInfo->getPathname();
-
-        return $this->excelObj = $this->phpExcel->createPHPExcelObject($fileName);
-    }
-
-    /**
-     * @param null|string $filePath
-     */
-    protected function initRowIterator($filePath = null)
-    {
-        if (! $filePath) {
-            $filePath = $this->fileInfo->getPathname();
-        }
-
-        $this->header = null;
-        $excelObj = $this->phpExcel->createPHPExcelObject($filePath);
-        $sheet = $excelObj->getActiveSheet();
+        /** @var Sheet $sheet */
+        $sheet = $sheetIterator->current();
         $this->rowIterator = $sheet->getRowIterator();
+        $this->rowIterator->rewind();
+
+        if ($this->firstLineIsHeader && !$this->header) {
+            $this->header = $this->readRow($context);
+        }
     }
 
-    /**
-     * @param ContextInterface $context
-     * @throws InvalidConfigurationException
-     */
-    protected function initializeFromContext(ContextInterface $context)
+    public function close()
     {
-        parent::initializeFromContext($context);
-
-        if ($context->hasOption('firstLineIsHeader')) {
-            $this->firstLineIsHeader = (bool)$context->getOption('firstLineIsHeader');
+        $this->rowIterator = null;
+        if ($this->fileReader) {
+            $this->fileReader->close();
         }
-
-        if ($context->hasOption('header')) {
-            $this->header = $context->getOption('header');
-        }
-
-        $this->initRowIterator($context->getOption('filePath'));
+        parent::close();
     }
 }

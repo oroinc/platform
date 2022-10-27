@@ -13,9 +13,6 @@ class AliasedEntityExclusionProvider extends AbstractExclusionProvider
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
-    /**
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(EntityAliasResolver $entityAliasResolver)
     {
         $this->entityAliasResolver = $entityAliasResolver;

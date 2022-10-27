@@ -1,6 +1,0 @@
-{% set originalValue = record.getValue('englishValue') %}
-{% if originalValue is null %}
-    <span class="no-english-translation">{{ 'N/A'|trans }}</span>
-{% else %}
-    {{ originalValue }}
-{% endif %}

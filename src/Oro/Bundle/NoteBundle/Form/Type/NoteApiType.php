@@ -10,14 +10,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for Note entity REST API.
+ */
 class NoteApiType extends NoteType
 {
     /** @var  ConfigManager $configManager */
     protected $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -49,7 +49,7 @@ class NoteApiType extends NoteType
     {
         $resolver->setDefaults(
             [
-                'data_class'         => Note::ENTITY_NAME,
+                'data_class'         => Note::class,
                 'csrf_token_id'      => 'note',
                 'csrf_protection'    => false
             ]

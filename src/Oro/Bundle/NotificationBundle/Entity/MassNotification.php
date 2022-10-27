@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\NotificationBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * MassNotification
+ * Mass Notification entity.
  *
  * @ORM\Table("oro_notification_mass_notif")
  * @ORM\Entity()
  * @Config(
+ *      routeName="oro_notification_massnotification_index",
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
@@ -64,14 +64,14 @@ class MassNotification
     protected $body;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
      */
     protected $scheduledAt;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      *
      * @ORM\Column(type="datetime")
      */
@@ -91,7 +91,7 @@ class MassNotification
     {
         return $this->id;
     }
-    
+
     /**
      * @return string
      */
@@ -110,7 +110,7 @@ class MassNotification
 
         return $this;
     }
-    
+
     /**
      * @return string
      */
@@ -169,18 +169,18 @@ class MassNotification
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
-    public function getScheduledAt()
+    public function getScheduledAt(): ?\DateTimeInterface
     {
         return $this->scheduledAt;
     }
 
     /**
-     * @param \DateTime $scheduledAt
+     * @param \DateTimeInterface $scheduledAt
      * @return MassNotification
      */
-    public function setScheduledAt($scheduledAt)
+    public function setScheduledAt(\DateTimeInterface $scheduledAt): self
     {
         $this->scheduledAt = $scheduledAt;
 
@@ -188,18 +188,18 @@ class MassNotification
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
-    public function getProcessedAt()
+    public function getProcessedAt(): ?\DateTimeInterface
     {
         return $this->processedAt;
     }
 
     /**
-     * @param \DateTime $processedAt
+     * @param \DateTimeInterface $processedAt
      * @return MassNotification
      */
-    public function setProcessedAt($processedAt)
+    public function setProcessedAt(\DateTimeInterface $processedAt): self
     {
         $this->processedAt = $processedAt;
 

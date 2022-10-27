@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 class ContextNormalizer
 {
@@ -12,10 +12,6 @@ class ContextNormalizer
     /** @var ManagerRegistry */
     protected $registry;
 
-    /**
-     * @param ScopeManager    $scopeManager
-     * @param ManagerRegistry $registry
-     */
     public function __construct(ScopeManager $scopeManager, ManagerRegistry $registry)
     {
         $this->scopeManager = $scopeManager;

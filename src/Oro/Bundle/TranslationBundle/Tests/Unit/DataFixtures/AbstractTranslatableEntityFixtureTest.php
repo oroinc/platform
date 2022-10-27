@@ -2,65 +2,77 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DataFixtures;
 
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\DataFixtures\AbstractTranslatableEntityFixture;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AbstractTranslatableEntityFixtureTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|AbstractTranslatableEntityFixture
-     */
-    protected $fixture;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    protected function setUp()
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $objectManager;
+
+    protected function setUp(): void
     {
-        $this->fixture =
-            $this->getMockBuilder('Oro\Bundle\TranslationBundle\DataFixtures\AbstractTranslatableEntityFixture')
-                ->setMethods(array('loadEntities'))
-                ->getMockForAbstractClass();
+        $this->container = $this->getMockBuilder(ContainerInterface::class)
+            ->onlyMethods(['get'])
+            ->getMockForAbstractClass();
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->objectManager = $this->createMock(ObjectManager::class);
     }
 
-    protected function tearDown()
+    public function testSetContainerSetsContainerForLaterUse()
     {
-        unset($this->fixture);
-    }
+        $fixture = $this->getMockForAbstractClass(AbstractTranslatableEntityFixture::class);
+        $fixture->setContainer($this->container);
 
-    public function testSetContainer()
-    {
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $this->fixture->setContainer($container);
-
-        $this->assertAttributeEquals($container, 'container', $this->fixture);
-    }
-
-    public function testLoad()
-    {
-        $translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('get'))
-            ->getMockForAbstractClass();
-        $container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
-            ->with('translator')
-            ->will($this->returnValue($translator));
+            ->with('translator');
 
-        $objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
+        $fixture->load($this->objectManager);
+    }
+
+    public function testLoadSetsTranslatorFromContainer()
+    {
+        $this->container->expects(self::once())
+            ->method('get')->with('translator')
+            ->willReturn($this->translator);
+
+        $fixture = new class() extends AbstractTranslatableEntityFixture {
+            public function xgetTranslator(): TranslatorInterface
+            {
+                return $this->translator;
+            }
+
+            protected function loadEntities(ObjectManager $manager)
+            {
+            }
+        };
+        $fixture->setContainer($this->container);
+
+        $fixture->load($this->objectManager);
+
+        self::assertSame($this->translator, $fixture->xgetTranslator());
+    }
+
+    public function testLoadPassesManagerToLoadEntities()
+    {
+        $fixture = $this->getMockBuilder(AbstractTranslatableEntityFixture::class)
+            ->onlyMethods(['loadEntities'])
             ->getMockForAbstractClass();
+        $fixture->setContainer($this->container);
 
-        $this->fixture->expects($this->once())
+        $fixture->expects(self::once())
             ->method('loadEntities')
-            ->with($objectManager);
+            ->with(self::identicalTo($this->objectManager));
 
-        $this->fixture->setContainer($container);
-        $this->fixture->load($objectManager);
-
-        $this->assertAttributeEquals($translator, 'translator', $this->fixture);
+        $fixture->load($this->objectManager);
     }
 }

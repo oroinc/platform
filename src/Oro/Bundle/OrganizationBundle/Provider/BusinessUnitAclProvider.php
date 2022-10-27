@@ -4,11 +4,14 @@ namespace Oro\Bundle\OrganizationBundle\Provider;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * Provides IDs of business units from which the current user is granted to access to a specific entity type.
+ */
 class BusinessUnitAclProvider
 {
     /** @var AuthorizationCheckerInterface */
@@ -17,7 +20,7 @@ class BusinessUnitAclProvider
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /** @var AclVoter */
+    /** @var AclVoterInterface */
     protected $aclVoter;
 
     /** @var OwnerTreeProvider */
@@ -29,16 +32,10 @@ class BusinessUnitAclProvider
     /** @var string */
     protected $accessLevel;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param AclVoter                      $aclVoter
-     * @param OwnerTreeProvider             $treeProvider
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
-        AclVoter $aclVoter,
+        AclVoterInterface $aclVoter,
         OwnerTreeProvider $treeProvider
     ) {
         $this->authorizationChecker = $authorizationChecker;
@@ -70,17 +67,17 @@ class BusinessUnitAclProvider
             $ids = $this->treeProvider->getTree()->getAllBusinessUnitIds();
         } elseif (AccessLevel::GLOBAL_LEVEL === $this->accessLevel) {
             $ids = $this->treeProvider->getTree()->getOrganizationBusinessUnitIds(
-                $this->getOrganizationContextId()
+                $this->getOrganizationId()
             );
         } elseif (AccessLevel::DEEP_LEVEL === $this->accessLevel) {
             $ids = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
                 $currentUser->getId(),
-                $this->getOrganizationContextId()
+                $this->getOrganizationId()
             );
         } elseif (AccessLevel::LOCAL_LEVEL === $this->accessLevel) {
             $ids = $this->treeProvider->getTree()->getUserBusinessUnitIds(
                 $currentUser->getId(),
-                $this->getOrganizationContextId()
+                $this->getOrganizationId()
             );
         }
 
@@ -115,7 +112,7 @@ class BusinessUnitAclProvider
     /**
      * @return int
      */
-    protected function getOrganizationContextId()
+    protected function getOrganizationId()
     {
         return $this->tokenAccessor->getOrganization()->getId();
     }

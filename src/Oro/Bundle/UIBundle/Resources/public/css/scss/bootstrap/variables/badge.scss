@@ -2,25 +2,41 @@
 
 $badge-theme-success: (
     'background': $success-ultra-light,
-    'color': $success-light
+    'color': $success-darken,
+    'icon-color': $success-light
 ) !default;
 
 $badge-theme-danger: (
     'background': $danger-lighten,
-    'color': $danger-darken
+    'color': $danger-ultra-dark,
+    'icon-color': $danger-darken
 ) !default;
 
 $badge-theme-warning: (
     'background': $warning-light,
-    'color': $warning-darken
+    'color': $warning-darken,
+    'icon-color': $warning-dark
+) !default;
+
+$badge-theme-info: (
+    'background': $info-lighten,
+    'color': $info-ultra-dark,
+    'icon-color': $info-dark
+) !default;
+
+$badge-theme-primary: (
+    'background': $primary-860,
+    'color': $primary-400,
+    'icon-color': $primary-600
 ) !default;
 
 $badge-theme-keys: () !default;
 $badge-theme-keys: map-merge(
     (
         'enabled': $badge-theme-success,
-        'disabled': $badge-theme-danger,
+        'disabled': $badge-theme-primary,
         'tentatively': $badge-theme-warning,
+        'info': $badge-theme-info,
         'warning': $badge-theme-warning
     ),
     $badge-theme-keys

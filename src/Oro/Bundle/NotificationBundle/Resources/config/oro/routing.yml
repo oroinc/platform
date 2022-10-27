@@ -4,13 +4,18 @@ oro_notification:
     prefix:       /notification
 
 
-oro_notification_api_emailnotification:
-    resource:     "@OroNotificationBundle/Controller/Api/Rest/EmailNotificationController.php"
-    type:         rest
-    prefix:       api/rest/{version}/
-    requirements:
-        version:  latest|v1
-        _format:  json
-    defaults:
-        version:  latest
+#
+# OLD REST API ROUTES
+#
 
+oro_api_delete_emailnotication:
+    path: '/api/rest/{version}/emailnotications/{id}.{_format}'
+    methods: [DELETE]
+    defaults:
+        _controller: 'Oro\Bundle\NotificationBundle\Controller\Api\Rest\EmailNotificationController::deleteAction'
+        _format: json
+        version: latest
+    requirements:
+        id: \d+
+        _format: json
+        version: latest|v1

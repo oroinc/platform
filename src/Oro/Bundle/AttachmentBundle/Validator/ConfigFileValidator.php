@@ -2,102 +2,98 @@
 
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager as Configuration;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\Validator\Constraints\File as FileConstraint;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
+use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
+use Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileMimeType;
+use Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileUrl;
+use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileFieldCompatibility;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
+use Symfony\Component\Validator\Constraints\File as SymfonyFileConstraint;
+use Symfony\Component\Validator\Constraints\Sequentially;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+/**
+ * The validator that can be used to check that a file is allowed to be uploaded.
+ */
 class ConfigFileValidator
 {
-    /** @var ValidatorInterface */
-    protected $validator;
+    private ValidatorInterface $validator;
 
-    /** @var Configuration */
-    protected $config;
+    private FileConstraintsProvider $fileConstraintsProvider;
 
-    /** @var ConfigProvider */
-    protected $attachmentConfigProvider;
-
-    /**
-     * @param ValidatorInterface $validator
-     * @param ConfigManager      $configManager
-     * @param Configuration      $config
-     */
-    public function __construct(ValidatorInterface $validator, ConfigManager $configManager, Configuration $config)
+    public function __construct(ValidatorInterface $validator, FileConstraintsProvider $fileConstraintsProvider)
     {
-        $this->validator                = $validator;
-        $this->attachmentConfigProvider = $configManager->getProvider('attachment');
-        $this->config                   = $config;
+        $this->validator = $validator;
+        $this->fileConstraintsProvider = $fileConstraintsProvider;
     }
 
     /**
-     * @param ComponentFile $file      A file object to be validated
-     * @param string        $dataClass Parent entity class name
-     * @param string        $fieldName Field name where new file/image field was added
+     * @param \SplFileInfo $file A file object to be validated
+     * @param string $dataClass The FQCN of a parent entity
+     * @param string $fieldName The name of file/image field
      *
-     * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+     * @return ConstraintViolationListInterface
      */
-    public function validate($file, $dataClass, $fieldName = '')
+    public function validate($file, $dataClass, $fieldName = ''): ConstraintViolationListInterface
     {
-        /** @var Config $entityAttachmentConfig */
-        if ($fieldName === '') {
-            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass);
-            $mimeTypes              = $this->getMimeArray($entityAttachmentConfig->get('mimetypes'));
-            if (!$mimeTypes) {
-                $mimeTypes = array_merge(
-                    $this->getMimeArray($this->config->get('oro_attachment.upload_file_mime_types')),
-                    $this->getMimeArray($this->config->get('oro_attachment.upload_image_mime_types'))
-                );
-            }
+        if ($file === null) {
+            return new ConstraintViolationList();
+        }
+
+        $constraints = [];
+
+        if ($fieldName) {
+            $constraints[] = new FileFieldCompatibility(['entityClass' => $dataClass, 'fieldName' => $fieldName]);
+        }
+
+        if ($file instanceof SymfonyFile) {
+            $constraints[] = new SymfonyFileConstraint(
+                [
+                    'maxSize' => $this->getMaxFileSize($dataClass, $fieldName),
+                    'mimeTypes' => $this->getMimeTypes($dataClass, $fieldName),
+                    'mimeTypesMessage' => 'oro.attachment.mimetypes.invalid_mime_type',
+                ]
+            );
+        } elseif ($file instanceof ExternalFile) {
+            $constraints[] = $this->createExternalFileUrlConstraint();
+            $constraints[] = new ExternalFileMimeType(['mimeTypes' => $this->getMimeTypes($dataClass, $fieldName)]);
         } else {
-            $entityAttachmentConfig = $this->attachmentConfigProvider->getConfig($dataClass, $fieldName);
-            $mimeTypes = $this->getMimeArray($entityAttachmentConfig->get('mimetypes'));
-            if (!$mimeTypes) {
-                /** @var FieldConfigId $fieldConfigId */
-                $fieldConfigId = $entityAttachmentConfig->getId();
-                if ($fieldConfigId->getFieldType() === 'file') {
-                    $configValue = 'upload_file_mime_types';
-                } else {
-                    $configValue = 'upload_image_mime_types';
-                }
-                $mimeTypes = $this->getMimeArray($this->config->get('oro_attachment.' . $configValue));
-            }
+            throw new \InvalidArgumentException(
+                sprintf('Argument of type "%s" is not supported', get_debug_type($file))
+            );
         }
 
-        $fileSize = $entityAttachmentConfig->get('maxsize') * 1024 * 1024;
+        return $this->validator->validate($file, [new Sequentially(['constraints' => $constraints])]);
+    }
 
-        foreach ($mimeTypes as $id => $value) {
-            $mimeTypes[$id] = trim($value);
-        }
+    private function getMaxFileSize(string $dataClass, string $fieldName = ''): int
+    {
+        return $fieldName === ''
+            ? $this->fileConstraintsProvider->getMaxSizeForEntity($dataClass)
+            : $this->fileConstraintsProvider->getMaxSizeForEntityField($dataClass, $fieldName);
+    }
 
-        return $this->validator->validate(
-            $file,
+    private function getMimeTypes(string $dataClass, string $fieldName = ''): array
+    {
+        return $fieldName === ''
+            ? $this->fileConstraintsProvider->getAllowedMimeTypesForEntity($dataClass)
+            : $this->fileConstraintsProvider->getAllowedMimeTypesForEntityField($dataClass, $fieldName);
+    }
+
+    public function validateExternalFileUrl(string $url): ConstraintViolationListInterface
+    {
+        return $this->validator->validate($url, $this->createExternalFileUrlConstraint());
+    }
+
+    private function createExternalFileUrlConstraint(): ExternalFileUrl
+    {
+        return new ExternalFileUrl(
             [
-                new FileConstraint(
-                    [
-                        'maxSize'   => $fileSize,
-                        'mimeTypes' => $mimeTypes
-                    ]
-                )
+                'allowedUrlsRegExp' => $this->fileConstraintsProvider->getExternalFileAllowedUrlsRegExp(),
+                'emptyRegExpMessage' => 'oro.attachment.external_file.empty_regexp',
             ]
         );
-    }
-
-    /**
-     * @param string $mimeString
-     * @return array
-     */
-    protected function getMimeArray($mimeString)
-    {
-        $mimeTypes = explode("\n", $mimeString);
-        if (count($mimeTypes) === 1 && $mimeTypes[0] === '') {
-            return [];
-        }
-
-        return $mimeTypes;
     }
 }

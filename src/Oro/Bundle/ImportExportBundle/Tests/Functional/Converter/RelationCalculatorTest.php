@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Converter;
 
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ImportExportBundle\Converter\RelationCalculator;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class RelationCalculatorTest extends WebTestCase
 {
-    /**
-     * @var RelationCalculator
-     */
-    protected $relationCalculator;
+    /** @var RelationCalculator */
+    private $relationCalculator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
         $this->relationCalculator = $this->getContainer()->get('oro_importexport.data_converter.relation_calculator');
@@ -21,14 +21,15 @@ class RelationCalculatorTest extends WebTestCase
 
     public function testGetMaxRelatedEntities()
     {
-        $entityName = 'Oro\Bundle\UserBundle\Entity\User';
         $maxGroups = 0;
         $maxRoles = 0;
         $maxBusinessUnits = 0;
 
         // calculate expected data
+        /** @var EntityRepository $repo */
+        $repo = $this->getContainer()->get('doctrine')->getRepository(User::class);
         /** @var User[] $users */
-        $users = $this->getContainer()->get('doctrine')->getRepository($entityName)->findAll();
+        $users = $repo->findAll();
         foreach ($users as $user) {
             $groupsCount = count($user->getGroups());
             if ($groupsCount > $maxGroups) {
@@ -45,20 +46,19 @@ class RelationCalculatorTest extends WebTestCase
         }
 
         // assert test data
-        $this->assertEquals($maxGroups, $this->relationCalculator->getMaxRelatedEntities($entityName, 'groups'));
-        $this->assertEquals($maxRoles, $this->relationCalculator->getMaxRelatedEntities($entityName, 'roles'));
+        $this->assertEquals($maxGroups, $this->relationCalculator->getMaxRelatedEntities(User::class, 'groups'));
+        $this->assertEquals($maxRoles, $this->relationCalculator->getMaxRelatedEntities(User::class, 'userRoles'));
         $this->assertEquals(
             $maxBusinessUnits,
-            $this->relationCalculator->getMaxRelatedEntities($entityName, 'businessUnits')
+            $this->relationCalculator->getMaxRelatedEntities(User::class, 'businessUnits')
         );
     }
 
-    /**
-     * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Oro\Bundle\UserBundle\Entity\User:username is not multiple relation field
-     */
     public function testGetMaxRelatedEntitiesException()
     {
-        $this->relationCalculator->getMaxRelatedEntities('Oro\Bundle\UserBundle\Entity\User', 'username');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Oro\Bundle\UserBundle\Entity\User:username is not multiple relation field');
+
+        $this->relationCalculator->getMaxRelatedEntities(User::class, 'username');
     }
 }

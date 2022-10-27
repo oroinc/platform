@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\EventListener;
 
 use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
@@ -8,12 +9,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class UpdateSchemaListenerTest extends WebTestCase
 {
-    public function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $filePath = $this->getContainer()->getParameter('oro_message_queue.consumption.interrupt_filepath');
 
@@ -38,12 +39,12 @@ class UpdateSchemaListenerTest extends WebTestCase
 
         $this->assertTrue($isListenerExist);
     }
-    
+
     public function testMustCreateFileIfNotExistOnUpdateSchemaEvent()
     {
         $filePath = $this->getContainer()->getParameter('oro_message_queue.consumption.interrupt_filepath');
 
-        $this->assertFileNotExists($filePath);
+        $this->assertFileDoesNotExist($filePath);
 
         $this->removeListenersForEventExceptTested();
 
@@ -58,11 +59,12 @@ class UpdateSchemaListenerTest extends WebTestCase
         $directory = dirname($filePath);
 
         @mkdir($directory, 0777, true);
-        touch($filePath, time() - 1);
+        touch($filePath);
 
         $this->assertFileExists($filePath);
 
         $timestamp = filemtime($filePath);
+        sleep(1);
 
         $this->removeListenersForEventExceptTested();
 
@@ -70,13 +72,13 @@ class UpdateSchemaListenerTest extends WebTestCase
 
         clearstatcache(true, $filePath);
 
-        $this->assertNotEquals($timestamp, filemtime($filePath));
+        $this->assertGreaterThan($timestamp, filemtime($filePath));
     }
 
     /**
      * Remove all listeners except UpdateSchemaListener for UpdateSchemaEvent
      */
-    protected function removeListenersForEventExceptTested()
+    private function removeListenersForEventExceptTested()
     {
         $dispatcher = $this->getEventDispatcher();
 
@@ -90,18 +92,18 @@ class UpdateSchemaListenerTest extends WebTestCase
     /**
      * Dispatch UpdateSchemaEvent
      */
-    protected function dispatchUpdateSchemaEvent()
+    private function dispatchUpdateSchemaEvent()
     {
         $dispatcher = $this->getEventDispatcher();
 
         $event = $this->createMock(UpdateSchemaEvent::class);
-        $dispatcher->dispatch(UpdateSchemaEvent::NAME, $event);
+        $dispatcher->dispatch($event, UpdateSchemaEvent::NAME);
     }
 
     /**
      * @return EventDispatcherInterface
      */
-    protected function getEventDispatcher()
+    private function getEventDispatcher()
     {
         return $this->getContainer()->get('event_dispatcher');
     }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Form\DataTransformer;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\DataTransformer\AddressSameTransformer;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
 {
@@ -16,10 +17,10 @@ class AddressSameTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * {@inheritdoc}
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->transformer = new AddressSameTransformer(
-            $this->getPropertyAccessor(),
+            PropertyAccess::createPropertyAccessor(),
             ['billing_address', 'shipping_address']
         );
     }

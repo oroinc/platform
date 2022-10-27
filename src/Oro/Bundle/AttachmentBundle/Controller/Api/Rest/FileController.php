@@ -2,11 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
@@ -18,22 +13,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * @RouteResource("file")
- * @NamePrefix("oro_api_")
+ * Provides REST API actions for File entity.
  */
-class FileController extends RestGetController implements ClassResourceInterface
+class FileController extends RestGetController
 {
     /**
      * Get file.
      *
      * @param Request $request
-     * @param string $key
+     * @param int $id
      * @param string $_format
      *
-     * @Get(
-     *      "/files/{key}",
-     *      requirements={"_format"="json|binary"}
-     * )
      * @ApiDoc(
      *      description="Get file",
      *      resource=true
@@ -41,16 +31,13 @@ class FileController extends RestGetController implements ClassResourceInterface
      *
      * @return Response
      */
-    public function getAction(Request $request, $key, $_format)
+    public function getAction(Request $request, $id, $_format)
     {
-        // @todo: For now I do not known why, but _format does not set automatically.
-        // @todo: It seems that it is a bug in FOS Rest Bundle
-        // @todo: https://magecore.atlassian.net/browse/BAP-8352
         if ($_format) {
             $request->setRequestFormat($_format);
         }
 
-        return $this->handleGetRequest($key);
+        return $this->handleGetRequest($id);
     }
 
     /**
@@ -66,12 +53,11 @@ class FileController extends RestGetController implements ClassResourceInterface
     /**
      * {@inheritdoc}
      *
-     * @todo: It seems that we need to implement a view handler for FOS Rest Bundle
-     * @todo: https://magecore.atlassian.net/browse/BAP-8351
+     * Implement a view handler for FOS Rest Bundle in BAP-8351.
      */
-    protected function buildResponse($data, $action, $contextValues = [], $status = Codes::HTTP_OK)
+    protected function buildResponse($data, $action, $contextValues = [], $status = Response::HTTP_OK)
     {
-        if ($status === Codes::HTTP_OK) {
+        if ($status === Response::HTTP_OK) {
             $format = $this->get('request_stack')->getCurrentRequest()->getRequestFormat();
             if ($format === 'binary') {
                 if ($action !== self::ACTION_READ) {

@@ -2,59 +2,63 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Model\Recipient;
+use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\RecentEmailRecipientsProvider;
+use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    protected $tokenAccessor;
-    protected $aclHelper;
-    protected $relatedEmailsProvider;
-    protected $registry;
-    protected $emailOwnerProvider;
-    protected $emailRecipientsHelper;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
+
+    /** @var RelatedEmailsProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $relatedEmailsProvider;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailOwnerProvider;
+
+    /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailRecipientsHelper;
+
+    /** @var RecentEmailRecipientsProvider */
     private $emailRecipientsProvider;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->aclHelper = $this->createMock(AclHelper::class);
+        $this->relatedEmailsProvider = $this->createMock(RelatedEmailsProvider::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->emailOwnerProvider = $this->createMock(EmailOwnerProvider::class);
+        $this->emailRecipientsHelper = $this->createMock(EmailRecipientsHelper::class);
 
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->relatedEmailsProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->registry->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManager')
-            ->will($this->returnValue($em));
-
-        $this->emailOwnerProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->emailRecipientsHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturn($this->createMock(EntityManager::class));
 
         $this->emailRecipientsProvider = new RecentEmailRecipientsProvider(
             $this->tokenAccessor,
             $this->relatedEmailsProvider,
             $this->aclHelper,
-            $this->registry,
+            $this->doctrine,
             $this->emailOwnerProvider,
             $this->emailRecipientsHelper
         );
@@ -69,7 +73,7 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $args = new EmailRecipientsProviderArgs(null, '', 100);
 
@@ -89,56 +93,48 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $this->relatedEmailsProvider->expects($this->once())
             ->method('getEmails')
             ->with($user)
-            ->will($this->returnValue($senderEmails));
+            ->willReturn($senderEmails);
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('setMaxResults')
             ->with($args->getLimit())
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
-        $emailRecipientRepository = $this
-            ->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailRecipientRepository = $this->createMock(EmailRecipientRepository::class);
         $emailRecipientRepository->expects($this->once())
             ->method('getEmailsUsedInLast30DaysQb')
             ->with(array_keys($senderEmails), [], $args->getQuery())
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue($resultEmails));
+            ->willReturn($resultEmails);
 
         $this->aclHelper->expects($this->once())
             ->method('apply')
             ->with($qb)
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
-        $this->registry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getRepository')
-            ->with('OroEmailBundle:EmailRecipient')
-            ->will($this->returnValue($emailRecipientRepository));
+            ->with(EmailRecipient::class)
+            ->willReturn($emailRecipientRepository);
 
         $this->emailRecipientsHelper->expects($this->any())
             ->method('isObjectAllowed')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertEquals($expectedResult, $this->emailRecipientsProvider->getRecipients($args));
     }
 
-    public function emailProvider()
+    public function emailProvider(): array
     {
         return [
             [

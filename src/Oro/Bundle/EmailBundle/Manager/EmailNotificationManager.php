@@ -2,49 +2,40 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class EmailNotificationManager
- * @package Oro\Bundle\EmailBundle\Manager
+ * Provides information about new emails.
  */
 class EmailNotificationManager
 {
-    /** @var HtmlTagHelper */
-    protected $htmlTagHelper;
+    private ManagerRegistry $doctrine;
+    private HtmlTagHelper $htmlTagHelper;
+    private UrlGeneratorInterface $urlGenerator;
+    private ConfigManager $configManager;
+    private AclHelper $aclHelper;
 
-    /** @var Router */
-    protected $router;
-
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var EntityManager */
-    protected $em;
-
-    /**
-     * @param EntityManager $entityManager
-     * @param HtmlTagHelper $htmlTagHelper
-     * @param Router $router
-     * @param ConfigManager $configManager
-     */
     public function __construct(
-        EntityManager $entityManager,
+        ManagerRegistry $doctrine,
         HtmlTagHelper $htmlTagHelper,
-        Router $router,
-        ConfigManager $configManager
+        UrlGeneratorInterface $urlGenerator,
+        ConfigManager $configManager,
+        AclHelper $aclHelper
     ) {
-        $this->em = $entityManager;
+        $this->doctrine = $doctrine;
         $this->htmlTagHelper = $htmlTagHelper;
-        $this->router = $router;
+        $this->urlGenerator = $urlGenerator;
         $this->configManager = $configManager;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -57,15 +48,11 @@ class EmailNotificationManager
      */
     public function getEmails(User $user, Organization $organization, $maxEmailsDisplay, $folderId)
     {
-        $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails(
-            $user,
-            $organization,
-            $maxEmailsDisplay,
-            $folderId
-        );
+        $emails = $this->doctrine->getRepository(Email::class)
+            ->getNewEmails($user, $organization, $maxEmailsDisplay, $folderId, $this->aclHelper);
 
         $emailsData = [];
-        /** @var $email Email */
+        /** @var Email $email */
         foreach ($emails as $emailUser) {
             $email = $emailUser->getEmail();
             $bodyContent = '';
@@ -76,9 +63,9 @@ class EmailNotificationManager
 
             $emailId = $email->getId();
             $emailsData[] = [
-                'replyRoute' => $this->router->generate('oro_email_email_reply', ['id' => $emailId]),
-                'replyAllRoute' => $this->router->generate('oro_email_email_reply_all', ['id' => $emailId]),
-                'forwardRoute' => $this->router->generate('oro_email_email_forward', ['id' => $emailId]),
+                'replyRoute' => $this->urlGenerator->generate('oro_email_email_reply', ['id' => $emailId]),
+                'replyAllRoute' => $this->urlGenerator->generate('oro_email_email_reply_all', ['id' => $emailId]),
+                'forwardRoute' => $this->urlGenerator->generate('oro_email_email_forward', ['id' => $emailId]),
                 'id' => $emailId,
                 'seen' => $emailUser->isSeen(),
                 'subject' => $this->htmlTagHelper->purify($email->getSubject()),
@@ -102,31 +89,26 @@ class EmailNotificationManager
      */
     public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization, $folderId);
+        return $this->doctrine->getRepository(Email::class)
+            ->getCountNewEmails($user, $organization, $folderId, $this->aclHelper);
     }
 
-    /**
-     * @param Email $email
-     *
-     * @return bool|string
-     */
-    protected function getFromNameLink(Email $email)
+    private function getFromNameLink(Email $email): ?string
     {
-        $path = false;
-        if ($email->getFromEmailAddress() && $email->getFromEmailAddress()->getOwner()) {
-            $className = $email->getFromEmailAddress()->getOwner()->getClass();
-            $routeName = $this->configManager->getEntityMetadata($className)->getRoute('view', false);
-            $path = null;
-            try {
-                $path = $this->router->generate(
-                    $routeName,
-                    ['id' => $email->getFromEmailAddress()->getOwner()->getId()]
-                );
-            } catch (RouteNotFoundException $e) {
-                return false;
-            }
+        if (!$email->getFromEmailAddress()) {
+            return null;
         }
 
-        return $path;
+        $owner = $email->getFromEmailAddress()->getOwner();
+        if (null === $owner) {
+            return null;
+        }
+
+        $routeName = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))->getRoute('view', false);
+        try {
+            return $this->urlGenerator->generate($routeName, ['id' => $owner->getId()]);
+        } catch (RouteNotFoundException $e) {
+            return null;
+        }
     }
 }

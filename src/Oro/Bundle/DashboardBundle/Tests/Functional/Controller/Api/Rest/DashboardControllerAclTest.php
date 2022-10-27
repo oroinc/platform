@@ -8,15 +8,13 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class DashboardControllerAclTest extends WebTestCase
 {
-    /**
-     * @var Manager
-     */
-    protected $dashboardManager;
+    /** @var Manager */
+    private $dashboardManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData']);
+        $this->loadFixtures([LoadUserData::class]);
 
         $this->dashboardManager = $this->getContainer()->get('oro_dashboard.manager');
     }
@@ -27,7 +25,7 @@ class DashboardControllerAclTest extends WebTestCase
 
         $this->assertNotNull($dashboard);
 
-        $this->client->request(
+        $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_dashboard',
@@ -35,7 +33,6 @@ class DashboardControllerAclTest extends WebTestCase
                     'id' => $dashboard->getId()
                 ]
             ),
-            [],
             [],
             $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );

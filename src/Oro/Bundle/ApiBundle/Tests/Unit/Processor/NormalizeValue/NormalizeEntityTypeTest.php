@@ -15,11 +15,16 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
     /** @var NormalizeEntityType */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entityAliasResolverRegistry = $this->createMock(EntityAliasResolverRegistry::class);
 
         $this->processor = new NormalizeEntityType($this->entityAliasResolverRegistry);
+    }
+
+    private function getArrayRequirement(string $requirement): string
+    {
+        return sprintf('%1$s(,%1$s)*', $requirement);
     }
 
     public function testProcess()
@@ -39,7 +44,7 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        self::assertEquals(NormalizeEntityType::REQUIREMENT, $context->getRequirement());
+        self::assertEquals('[a-zA-Z][\w\\\\]+', $context->getRequirement());
         self::assertEquals('alias', $context->getResult());
     }
 
@@ -57,17 +62,15 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityAliasResolver);
         $entityAliasResolver->expects(self::exactly(2))
             ->method('getPluralAlias')
-            ->willReturnMap(
-                [
-                    ['Test\Class1', 'alias1'],
-                    ['Test\Class2', 'alias2']
-                ]
-            );
+            ->willReturnMap([
+                ['Test\Class1', 'alias1'],
+                ['Test\Class2', 'alias2']
+            ]);
 
         $this->processor->process($context);
 
         self::assertEquals(
-            $this->getArrayRequirement(NormalizeEntityType::REQUIREMENT),
+            $this->getArrayRequirement('[a-zA-Z][\w\\\\]+'),
             $context->getRequirement()
         );
         self::assertEquals(['alias1', 'alias2'], $context->getResult());
@@ -108,10 +111,5 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
 
         self::assertEquals('test', $context->getRequirement());
-    }
-
-    protected function getArrayRequirement($requirement)
-    {
-        return sprintf('%1$s(,%1$s)*', $requirement);
     }
 }

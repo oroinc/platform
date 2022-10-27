@@ -8,62 +8,57 @@ use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 class EntitySecurityMetadataTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EntitySecurityMetadata */
-    protected $entity;
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->entity = new EntitySecurityMetadata(
             'SomeType',
             \stdClass::class,
             'SomeGroup',
             'SomeLabel',
-            array(), //permissions
+            [], //permissions
             'SomeDescription',
             'SomeCategory',
             [
-                'first' => new FieldSecurityMetadata('first', 'First Label'),
+                'first'  => new FieldSecurityMetadata('first', 'First Label'),
                 'second' => new FieldSecurityMetadata('second', 'Second Label', ['VIEW'], 'Second Description')
             ]
         );
     }
 
-    protected function tearDown()
-    {
-        unset($this->entity);
-    }
-
     public function testGetters()
     {
-        static::assertEquals('SomeType', $this->entity->getSecurityType());
-        static::assertEquals(\stdClass::class, $this->entity->getClassName());
-        static::assertEquals('SomeGroup', $this->entity->getGroup());
-        static::assertEquals('SomeLabel', $this->entity->getLabel());
-        static::assertEquals('SomeDescription', $this->entity->getDescription());
-        static::assertEquals('SomeCategory', $this->entity->getCategory());
+        self::assertEquals('SomeType', $this->entity->getSecurityType());
+        self::assertEquals(\stdClass::class, $this->entity->getClassName());
+        self::assertEquals('SomeGroup', $this->entity->getGroup());
+        self::assertEquals('SomeLabel', $this->entity->getLabel());
+        self::assertEquals('SomeDescription', $this->entity->getDescription());
+        self::assertEquals('SomeCategory', $this->entity->getCategory());
         $fields = $this->entity->getFields();
-        static::assertCount(2, $fields);
-        static::assertEquals(new FieldSecurityMetadata('first', 'First Label'), $fields['first']);
-        $secondFieldConfig =  $fields['second'];
-        static::assertEquals('second', $secondFieldConfig->getFieldName());
-        static::assertEquals('Second Label', $secondFieldConfig->getLabel());
-        static::assertEquals(['VIEW'], $secondFieldConfig->getPermissions());
+        self::assertCount(2, $fields);
+        self::assertEquals(new FieldSecurityMetadata('first', 'First Label'), $fields['first']);
+        $secondFieldConfig = $fields['second'];
+        self::assertEquals('second', $secondFieldConfig->getFieldName());
+        self::assertEquals('Second Label', $secondFieldConfig->getLabel());
+        self::assertEquals(['VIEW'], $secondFieldConfig->getPermissions());
     }
 
     public function testSerialize()
     {
-        $data        = serialize($this->entity);
+        $data = serialize($this->entity);
         $emptyEntity = unserialize($data);
 
-        static::assertEquals('SomeType', $emptyEntity->getSecurityType());
-        static::assertEquals(\stdClass::class, $emptyEntity->getClassName());
-        static::assertEquals('SomeGroup', $emptyEntity->getGroup());
-        static::assertEquals('SomeLabel', $emptyEntity->getLabel());
-        static::assertEquals('SomeDescription', $emptyEntity->getDescription());
-        static::assertEquals('SomeCategory', $emptyEntity->getCategory());
+        self::assertEquals('SomeType', $emptyEntity->getSecurityType());
+        self::assertEquals(\stdClass::class, $emptyEntity->getClassName());
+        self::assertEquals('SomeGroup', $emptyEntity->getGroup());
+        self::assertEquals('SomeLabel', $emptyEntity->getLabel());
+        self::assertEquals('SomeDescription', $emptyEntity->getDescription());
+        self::assertEquals('SomeCategory', $emptyEntity->getCategory());
         $fields = $emptyEntity->getFields();
-        static::assertCount(2, $fields);
-        static::assertEquals(new FieldSecurityMetadata('first', 'First Label'), $fields['first']);
-        static::assertEquals(
+        self::assertCount(2, $fields);
+        self::assertEquals(new FieldSecurityMetadata('first', 'First Label'), $fields['first']);
+        self::assertEquals(
             new FieldSecurityMetadata('second', 'Second Label', ['VIEW'], 'Second Description'),
             $fields['second']
         );

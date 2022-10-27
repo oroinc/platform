@@ -1,20 +1,23 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsByIdsTopic;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Transport\Null\NullMessage;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->initClient();
     }
@@ -33,31 +36,32 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         $this->createEmailAttachmentWithContent('aaa');
 
         $allAttachments = $this->getEntityManager()->getRepository(EmailAttachment::class)->findAll();
-        $this->assertEquals(3, count($allAttachments));
+        $this->assertCount(3, $allAttachments);
 
-        $message = new NullMessage();
-        $message->setBody(json_encode(['size' => null, 'all' => true]));
+        $message = new Message();
+        $message->setBody(['size' => null, 'all' => true]);
         $message->setMessageId('SomeId');
 
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments');
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(PurgeEmailAttachmentsMessageProcessor::ACK, $result);
-        $this->assertMessageSent(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, [
-            'ids' => [
-                $allAttachments[0]->getId(),
-                $allAttachments[1]->getId(),
-                $allAttachments[2]->getId(),
-            ]
-        ], true);
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        $this->assertMessageSent(
+            PurgeEmailAttachmentsByIdsTopic::getName(),
+            [
+                'ids' => [
+                    $allAttachments[0]->getId(),
+                    $allAttachments[1]->getId(),
+                    $allAttachments[2]->getId(),
+                ]
+            ],
+            true,
+            true
+        );
     }
 
-    /**
-     * @param string $content
-     * @return EmailAttachment
-     */
-    private function createEmailAttachmentWithContent($content)
+    private function createEmailAttachmentWithContent(string $content): EmailAttachment
     {
         $attachmentContent = new EmailAttachmentContent();
         $attachmentContent->setContent($content);
@@ -74,19 +78,8 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         return $attachment;
     }
 
-    /**
-     * @return \Doctrine\ORM\EntityManager
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(EmailAttachment::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
     }
 }

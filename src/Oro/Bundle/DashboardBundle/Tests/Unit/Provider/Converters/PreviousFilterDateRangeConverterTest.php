@@ -2,67 +2,43 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
-use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter;
+use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PreviousFilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formatter;
+
+    /** @var Compiler|\PHPUnit\Framework\MockObject\MockObject */
+    private $dateCompiler;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
+
     /** @var PreviousFilterDateRangeConverter */
-    protected $converter;
+    private $converter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dateCompiler;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $formatter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dateHelper;
-
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->converter = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $settings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $settings->expects($this->any())
-            ->method('getTimeZone')
-            ->willReturn('UTC');
-        $doctrine  = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dateHelper    = new DateHelper($settings, $doctrine, $aclHelper);
+        $this->formatter = $this->createMock(DateTimeFormatterInterface::class);
+        $this->dateCompiler = $this->createMock(Compiler::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->converter = new PreviousFilterDateRangeConverter(
             $this->formatter,
-            $this->converter,
-            $this->translator,
-            $this->dateHelper
+            $this->dateCompiler,
+            $this->translator
         );
     }
 
     public function testGetConvertedValueBetween()
     {
         $start = new \DateTime('2014-01-01', new \DateTimeZone('UTC'));
-        $end   = new \DateTime('2014-12-31', new \DateTimeZone('UTC'));
+        $end = new \DateTime('2014-12-31', new \DateTimeZone('UTC'));
 
         $result = $this->converter->getConvertedValue(
             [],

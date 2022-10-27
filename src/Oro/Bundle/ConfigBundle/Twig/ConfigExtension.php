@@ -3,34 +3,23 @@
 namespace Oro\Bundle\ConfigBundle\Twig;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class ConfigExtension extends \Twig_Extension
+/**
+ * Provides a Twig function to retrieve values of configuration settings:
+ *   - oro_config_value
+ */
+class ConfigExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    protected $container;
+    private ContainerInterface $container;
+    private ?ConfigManager $configManager = null;
 
-    /** @var ConfigManager|null */
-    private $configManager;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    protected function getConfigManager()
-    {
-        if (null === $this->configManager) {
-            $this->configManager = $this->container->get('oro_config.user');
-        }
-
-        return $this->configManager;
     }
 
     /**
@@ -39,7 +28,7 @@ class ConfigExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('oro_config_value', [$this, 'getConfigValue'])
+            new TwigFunction('oro_config_value', [$this, 'getConfigValue']),
         ];
     }
 
@@ -56,8 +45,19 @@ class ConfigExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return 'config_extension';
+        return [
+            'oro_config.user' => ConfigManager::class
+        ];
+    }
+
+    private function getConfigManager(): ConfigManager
+    {
+        if (!$this->configManager) {
+            $this->configManager = $this->container->get('oro_config.user');
+        }
+
+        return $this->configManager;
     }
 }

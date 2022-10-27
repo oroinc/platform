@@ -3,74 +3,61 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\LinkType;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LinkTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LinkType
-     */
-    protected $type;
+    /** @var LinkType */
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->type = new LinkType();
     }
 
     public function testGetParent()
     {
-        $this->assertInternalType('string', $this->type->getParent());
+        self::assertIsString($this->type->getParent());
     }
 
     public function testConfigureOptions()
     {
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
-
-        $resolver
-            ->expects($this->once())
+        $resolver = $this->createMock(OptionsResolver::class);
+        $resolver->expects(self::once())
             ->method('setRequired')
-            ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->once())
+            ->with(self::isType('array'))
+            ->willReturnSelf();
+        $resolver->expects(self::once())
             ->method('setDefined')
-            ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->once())
+            ->with(self::isType('array'))
+            ->willReturnSelf();
+        $resolver->expects(self::once())
             ->method('setDefaults')
-            ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->exactly(3))
+            ->with(self::isType('array'))
+            ->willReturnSelf();
+        $resolver->expects(self::exactly(3))
             ->method('setAllowedTypes')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $this->type->configureOptions($resolver);
     }
 
     /**
-     * @param array $options
-     * @param array $expected
      * @dataProvider optionsProvider
      */
     public function testFinishView(array $options, array $expected)
     {
-        $formView = $this->createMock('Symfony\Component\Form\FormView');
-        $form     = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formView = $this->createMock(FormView::class);
+        $form = $this->createMock(Form::class);
 
         $this->type->finishView($formView, $form, $options);
-        $this->assertEquals($expected, $formView->vars);
+
+        self::assertEquals($expected, $formView->vars);
     }
 
-    /**
-     * @return array
-     */
-    public function optionsProvider()
+    public function optionsProvider(): array
     {
         return [
             [
@@ -78,9 +65,7 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
                     'route'           => 'route',
                     'acl'             => 'acl',
                     'title'           => 'title',
-                    'routeParameters' => [],
-                    'isPath'          => false,
-                    'class'           => ''
+                    'routeParameters' => []
                 ],
                 [
                     'value'           => null,
@@ -88,9 +73,7 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
                     'route'           => 'route',
                     'acl'             => 'acl',
                     'title'           => 'title',
-                    'routeParameters' => [],
-                    'isPath'          => false,
-                    'class'           => ''
+                    'routeParameters' => []
                 ]
             ]
         ];

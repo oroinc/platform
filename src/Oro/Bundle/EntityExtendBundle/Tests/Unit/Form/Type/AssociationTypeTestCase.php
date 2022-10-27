@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
 abstract class AssociationTypeTestCase extends AbstractConfigTypeTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $groupingConfigProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->groupingConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->groupingConfigProvider = $this->createMock(ConfigProvider::class);
 
         parent::setUp();
     }

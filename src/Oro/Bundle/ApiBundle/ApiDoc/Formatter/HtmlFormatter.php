@@ -8,10 +8,12 @@ use Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGenerator;
 use Oro\Bundle\ApiBundle\ApiDoc\SecurityContextInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * Base HTML formatter that can be used for all types of REST API views.
+ *
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class HtmlFormatter extends AbstractFormatter
 {
@@ -21,8 +23,8 @@ class HtmlFormatter extends AbstractFormatter
     /** @var FileLocatorInterface */
     protected $fileLocator;
 
-    /** @var EngineInterface */
-    protected $engine;
+    /** @var Environment */
+    protected $twig;
 
     /** @var string */
     protected $apiName;
@@ -69,28 +71,19 @@ class HtmlFormatter extends AbstractFormatter
     /** @var DocumentationProviderInterface|null */
     protected $documentationProvider;
 
-    /**
-     * @param SecurityContextInterface $securityContext
-     */
     public function setSecurityContext(SecurityContextInterface $securityContext)
     {
         $this->securityContext = $securityContext;
     }
 
-    /**
-     * @param FileLocatorInterface $fileLocator
-     */
     public function setFileLocator(FileLocatorInterface $fileLocator)
     {
         $this->fileLocator = $fileLocator;
     }
 
-    /**
-     * @param EngineInterface $engine
-     */
-    public function setTemplatingEngine(EngineInterface $engine)
+    public function setTwig(Environment $twig)
     {
-        $this->engine = $engine;
+        $this->twig = $twig;
     }
 
     /**
@@ -117,9 +110,6 @@ class HtmlFormatter extends AbstractFormatter
         $this->enableSandbox = $enableSandbox;
     }
 
-    /**
-     * @param array $formats
-     */
     public function setRequestFormats(array $formats)
     {
         $this->requestFormats = $formats;
@@ -149,9 +139,6 @@ class HtmlFormatter extends AbstractFormatter
         $this->acceptType = $acceptType;
     }
 
-    /**
-     * @param array $bodyFormats
-     */
     public function setBodyFormats(array $bodyFormats)
     {
         $this->bodyFormats = $bodyFormats;
@@ -197,17 +184,11 @@ class HtmlFormatter extends AbstractFormatter
         $this->rootRoute = $rootRoute;
     }
 
-    /**
-     * @param array $views
-     */
     public function setViews(array $views)
     {
         $this->views = $views;
     }
 
-    /**
-     * @param DocumentationProviderInterface $documentationProvider
-     */
     public function setDocumentationProvider(DocumentationProviderInterface $documentationProvider)
     {
         $this->documentationProvider = $documentationProvider;
@@ -218,7 +199,7 @@ class HtmlFormatter extends AbstractFormatter
      */
     protected function renderOne(array $data)
     {
-        return $this->engine->render('NelmioApiDocBundle::resource.html.twig', array_merge(
+        return $this->twig->render('@NelmioApiDoc/resource.html.twig', array_merge(
             [
                 'data'           => $data,
                 'displayContent' => true,
@@ -232,7 +213,7 @@ class HtmlFormatter extends AbstractFormatter
      */
     protected function render(array $collection)
     {
-        return $this->engine->render('NelmioApiDocBundle::resources.html.twig', array_merge(
+        return $this->twig->render('@NelmioApiDoc/resources.html.twig', array_merge(
             [
                 'resources' => $collection,
             ],
@@ -246,30 +227,34 @@ class HtmlFormatter extends AbstractFormatter
     protected function getGlobalVars()
     {
         return [
-            'apiName'               => $this->apiName,
-            'authentication'        => $this->authentication,
-            'endpoint'              => $this->endpoint,
-            'enableSandbox'         => $this->enableSandbox,
-            'requestFormatMethod'   => $this->requestFormatMethod,
-            'acceptType'            => $this->acceptType,
-            'bodyFormats'           => $this->bodyFormats,
-            'defaultBodyFormat'     => $this->defaultBodyFormat,
-            'requestFormats'        => $this->requestFormats,
-            'defaultRequestFormat'  => $this->defaultRequestFormat,
-            'date'                  => date(DATE_RFC822),
-            'css'                   => $this->getCss(),
-            'js'                    => $this->getJs(),
-            'motdTemplate'          => $this->motdTemplate,
-            'defaultSectionsOpened' => $this->defaultSectionsOpened,
-            'rootRoute'             => $this->rootRoute ?? RestDocUrlGenerator::ROUTE,
-            'views'                 => $this->getViews(),
-            'defaultView'           => $this->getDefaultView(),
-            'hasSecurityToken'      => $this->securityContext->hasSecurityToken(),
-            'userName'              => $this->securityContext->getUserName(),
-            'apiKey'                => $this->securityContext->getApiKey(),
-            'apiKeyGenerationHint'  => $this->securityContext->getApiKeyGenerationHint(),
-            'loginRoute'            => $this->securityContext->getLoginRoute(),
-            'logoutRoute'           => $this->securityContext->getLogoutRoute()
+            'apiName'                 => $this->apiName,
+            'authentication'          => $this->authentication,
+            'endpoint'                => $this->endpoint,
+            'enableSandbox'           => $this->enableSandbox,
+            'requestFormatMethod'     => $this->requestFormatMethod,
+            'acceptType'              => $this->acceptType,
+            'bodyFormats'             => $this->bodyFormats,
+            'defaultBodyFormat'       => $this->defaultBodyFormat,
+            'requestFormats'          => $this->requestFormats,
+            'defaultRequestFormat'    => $this->defaultRequestFormat,
+            'date'                    => date(DATE_RFC822),
+            'css'                     => $this->getCss(),
+            'js'                      => $this->getJs(),
+            'motdTemplate'            => $this->motdTemplate,
+            'defaultSectionsOpened'   => $this->defaultSectionsOpened,
+            'rootRoute'               => $this->rootRoute ?? RestDocUrlGenerator::ROUTE,
+            'views'                   => $this->getViews(),
+            'defaultView'             => $this->getDefaultView(),
+            'hasSecurityToken'        => $this->securityContext->hasSecurityToken(),
+            'organizations'           => $this->securityContext->getOrganizations(),
+            'organization'            => $this->securityContext->getOrganization(),
+            'userName'                => $this->securityContext->getUserName(),
+            'apiKey'                  => $this->securityContext->getApiKey(),
+            'apiKeyGenerationHint'    => $this->securityContext->getApiKeyGenerationHint(),
+            'csrfCookieName'          => $this->securityContext->getCsrfCookieName(),
+            'switchOrganizationRoute' => $this->securityContext->getSwitchOrganizationRoute(),
+            'loginRoute'              => $this->securityContext->getLoginRoute(),
+            'logoutRoute'             => $this->securityContext->getLogoutRoute()
         ];
     }
 

@@ -3,28 +3,24 @@
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ChartBundle\Form\Type\ChartSettingsType;
+use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class ChartSettingsTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var ChartSettingsType
-     */
-    protected $type;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configProvider;
+    /** @var ChartSettingsType */
+    private $type;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->configProvider = $this
-            ->getMockBuilder('\Oro\Bundle\ChartBundle\Model\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configProvider = $this->createMock(ConfigProvider::class);
 
         $this->type = new ChartSettingsType($this->configProvider);
 
@@ -47,13 +43,9 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array  $options
-     * @param string $exception
-     * @param string $message
-     *
      * @dataProvider invalidOptionsProvider
      */
-    public function testRequireOptionsIncorrectType(array $options, $exception, $message)
+    public function testRequireOptionsIncorrectType(array $options, string $exception, string $message)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
@@ -61,37 +53,33 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
         $this->factory->create(ChartSettingsType::class, null, $options);
     }
 
-    public function invalidOptionsProvider()
+    public function invalidOptionsProvider(): array
     {
         return [
             'name'         => [
                 'options'   => ['chart_name' => 11],
-                'exception' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
+                'exception' => InvalidOptionsException::class,
                 'message'   => 'The option "chart_name" with value 11 is expected to be of type "string", '
-                    . 'but is of type "integer".'
+                    . 'but is of type "int".'
             ],
             'chart_config' => [
                 'options'   => ['chart_name' => 'test', 'chart_config' => 11],
-                'exception' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
+                'exception' => InvalidOptionsException::class,
                 'message'   => 'The option "chart_config" with value 11 is expected to be of type "array", '
-                    . 'but is of type "integer".'
+                    . 'but is of type "int".'
             ],
             'empty'        => [
                 'options'   => [],
-                'exception' => 'Symfony\Component\OptionsResolver\Exception\MissingOptionsException',
+                'exception' => MissingOptionsException::class,
                 'message'   => 'The required option "chart_name" is missing.'
             ]
         ];
     }
 
     /**
-     * @param array   $fieldsData
-     * @param string  $chartName
-     * @param boolean $useParentOptions
-     *
      * @dataProvider fieldDataProvider
      */
-    public function testFieldAdded(array $fieldsData, $chartName, $useParentOptions)
+    public function testFieldAdded(array $fieldsData, string $chartName, bool $useParentOptions)
     {
         $chartOptions = array_merge(
             ['chart_name' => $chartName],
@@ -103,11 +91,10 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
             $formOptions['chart_config'] = $chartOptions;
         }
 
-        $this->configProvider
-            ->expects($this->any())
+        $this->configProvider->expects($this->any())
             ->method('getChartConfig')
             ->with($chartName)
-            ->will($this->returnValue($chartOptions));
+            ->willReturn($chartOptions);
 
         $form = $this->factory->create(ChartSettingsType::class, null, $formOptions);
 
@@ -118,7 +105,7 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
         }
     }
 
-    public function fieldDataProvider()
+    public function fieldDataProvider(): array
     {
         return [
             'name'    => [
@@ -140,12 +127,7 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return array
-     */
-    protected function getFieldData($fieldName)
+    private function getFieldData(string $fieldName): array
     {
         return [
             'name'    => $fieldName . 'Name',

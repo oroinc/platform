@@ -4,6 +4,7 @@ oro:
 
         entity_label:         Note
         entity_plural_label:  Notes
+        entity_grid_all_view_label: All %entity_plural_label%
         entity_description:   Additional information that a user can leave about an entity record.
 
         id.label:             Id

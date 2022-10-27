@@ -7,6 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Assembles dedicated embedded form's layout manager with no block view cache applied.
+ */
 class LayoutManagerPass implements CompilerPassInterface
 {
     const LAYOUT_FACTORY_BUILDER_SERVICE_ID = 'oro_layout.layout_factory_builder';
@@ -26,7 +29,7 @@ class LayoutManagerPass implements CompilerPassInterface
         $embeddedFormLayoutFactoryBuilderDef
             ->setClass($layoutFactoryBuilderDef->getClass())
             ->setArguments($layoutFactoryBuilderDef->getArguments())
-            ->replaceArgument(1, null)
+            ->replaceArgument(3, null)
             ->setMethodCalls($layoutFactoryBuilderDef->getMethodCalls())
         ;
 

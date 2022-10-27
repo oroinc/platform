@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Event;
 
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class SmtpSettingsSaved extends Event
 {
@@ -12,9 +12,6 @@ class SmtpSettingsSaved extends Event
     /** @var SmtpSettings */
     protected $smtpSettings;
 
-    /**
-     * @param SmtpSettings $smtpSettings
-     */
     public function __construct(SmtpSettings $smtpSettings)
     {
         $this->smtpSettings = $smtpSettings;

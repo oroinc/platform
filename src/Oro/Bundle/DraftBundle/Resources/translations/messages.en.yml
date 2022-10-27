@@ -1,0 +1,35 @@
+oro:
+    draft:
+        label: Draft
+        draftproject:
+            entity_label: Project
+            entity_plural_label: Projects
+            entity_grid_all_view_label: All %entity_plural_label%
+            id.label: ID
+            organization.label: Organization
+            owner.label: Owner
+            title.label: Title
+        operations:
+            create:
+                label: Create draft
+                success: Draft has been saved
+                confirmation:
+                    body_title: "Only the changes from the following fields will be transferred to a draft:"
+            update:
+                label: Edit draft
+                save_as_draft.label: Save as draft
+                save_as_new_draft.label: Save as new draft
+            publish:
+                label: Publish draft
+                success: Draft has been published
+            duplicate:
+                label: Duplicate
+            delete:
+                label: Delete draft
+        permission:
+            create.label: Create Drafts
+            view_all.label: View All Drafts
+            edit_all.label: Edit All Drafts
+            delete_own.label: Delete Own Drafts
+            delete_all.label: Delete All Drafts
+            publish.label: Publish Drafts

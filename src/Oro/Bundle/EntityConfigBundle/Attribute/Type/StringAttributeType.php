@@ -5,20 +5,15 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
+/**
+ * Provides metadata about string attribute type.
+ */
 class StringAttributeType implements AttributeTypeInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
-        return 'string';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isSearchable(FieldConfigModel $attribute = null)
+    public function isSearchable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -26,7 +21,7 @@ class StringAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isFilterable(FieldConfigModel $attribute = null)
+    public function isFilterable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -34,7 +29,7 @@ class StringAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return true;
     }

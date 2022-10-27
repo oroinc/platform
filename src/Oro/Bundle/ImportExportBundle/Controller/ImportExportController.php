@@ -3,7 +3,11 @@
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
+use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
+use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
+use Oro\Bundle\ImportExportBundle\Exception\ImportExportExpiredException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Form\Model\ExportData;
@@ -13,40 +17,46 @@ use Oro\Bundle\ImportExportBundle\Form\Type\ExportType;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Handler\HttpImportHandler;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Controller for import/export actions
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ *
+ * Responsible for the import and export
  */
-class ImportExportController extends Controller
+class ImportExportController extends AbstractController
 {
     /**
      * Take uploaded file and move it to temp dir
      *
      * @Route("/import", name="oro_importexport_import_form")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport:importForm.html.twig")
+     * @Template("@OroImportExport/ImportExport/importForm.html.twig")
      *
      * @param Request $request
      *
-     * @return array
+     * @return array|Response
      */
     public function importFormAction(Request $request)
     {
@@ -58,20 +68,14 @@ class ImportExportController extends Controller
 
         if ($this->handleRequest($request, $importForm)) {
             /** @var ImportData $data */
-            $data           = $importForm->getData();
-            $file           = $data->getFile();
-            $processorAlias = $data->getProcessorAlias();
-            if ($file->getClientOriginalExtension() === 'csv') {
-                $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
-            }
-            $fileName = $this->getFileManager()->saveImportingFile($file);
+            [$originalFileName, $processorAlias, $fileName] = $this->getImportData($importForm);
 
             return $this->forward(
-                'OroImportExportBundle:ImportExport:importProcess',
+                __CLASS__ . '::importProcessAction',
                 [
                     'processorAlias' => $processorAlias,
                     'fileName' => $fileName,
-                    'originFileName' => $file->getClientOriginalName()
+                    'originFileName' => $originalFileName
                 ],
                 $request->query->all()
             );
@@ -89,7 +93,7 @@ class ImportExportController extends Controller
     /**
      * @Route("/import_validate_export", name="oro_importexport_import_validate_export_template_form")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport/widget:importValidateExportTemplate.html.twig")
+     * @Template("@OroImportExport/ImportExport/widget/importValidateExportTemplate.html.twig")
      *
      * @param Request $request
      *
@@ -107,9 +111,7 @@ class ImportExportController extends Controller
 
         $entityName = $request->get('entity');
 
-        $configurationsByAlias = $this
-            ->get('oro_importexport.twig_extension.get_import_export_configuration')
-            ->getConfiguration($configAlias);
+        $configurationsByAlias = $this->getImportConfigurations($configAlias);
 
         $configsWithForm = [];
 
@@ -128,16 +130,10 @@ class ImportExportController extends Controller
         if ($entityName && null !== $importForm) {
             if ($this->handleRequest($request, $importForm)) {
                 /** @var ImportData $data */
-                $data           = $importForm->getData();
-                $file           = $data->getFile();
-                $processorAlias = $data->getProcessorAlias();
-                if ($file->getClientOriginalExtension() === 'csv') {
-                    $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
-                }
-                $fileName = $this->getFileManager()->saveImportingFile($file);
+                [$originalFileName, $processorAlias, $fileName] = $this->getImportData($importForm);
 
-                $importForward = 'OroImportExportBundle:ImportExport:importProcess';
-                $validateForward = 'OroImportExportBundle:ImportExport:importValidate';
+                $importForward = ImportExportController::class . '::importProcessAction';
+                $validateForward = ImportExportController::class . '::importValidateAction';
 
                 $forward = $isValidate ? $validateForward : $importForward;
 
@@ -146,7 +142,7 @@ class ImportExportController extends Controller
                     [
                         'processorAlias' => $processorAlias,
                         'fileName' => $fileName,
-                        'originFileName' => $file->getClientOriginalName()
+                        'originFileName' => $originalFileName
                     ],
                     $request->query->all()
                 );
@@ -161,12 +157,26 @@ class ImportExportController extends Controller
         ];
     }
 
+    private function getImportConfigurations(string $configAlias): array
+    {
+        $configurationsByAlias = $this
+            ->get(GetImportExportConfigurationExtension::class)
+            ->getConfiguration($configAlias);
+
+        return array_filter(
+            $configurationsByAlias,
+            function (ImportExportConfigurationInterface $configuration) {
+                return $configuration->getImportProcessorAlias();
+            }
+        );
+    }
+
     /**
      * Take uploaded file and move it to temp dir
      *
      * @Route("/import-validate", name="oro_importexport_import_validation_form")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport:importValidationForm.html.twig")
+     * @Template("@OroImportExport/ImportExport/importValidationForm.html.twig")
      *
      * @param Request $request
      *
@@ -182,14 +192,14 @@ class ImportExportController extends Controller
 
         if ($this->handleRequest($request, $importForm)) {
             /** @var ImportData $data */
-            $data           = $importForm->getData();
-            $file           = $data->getFile();
+            $data = $importForm->getData();
+            $file = $data->getFile();
             $processorAlias = $data->getProcessorAlias();
 
             $fileName = $this->getFileManager()->saveImportingFile($file);
 
             return $this->forward(
-                'OroImportExportBundle:ImportExport:importValidate',
+                ImportExportController::class . '::importValidateAction',
                 [
                     'processorAlias' => $processorAlias,
                     'fileName' => $fileName,
@@ -219,9 +229,11 @@ class ImportExportController extends Controller
 
     /**
      * Validate import data
+     * Called by importValidateExportTemplateFormAction with forward
      *
-     * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
+     * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate", methods={"POST"})
      * @AclAncestor("oro_importexport_import")
+     * @CsrfProtection()
      *
      * @param Request $request
      * @param string $processorAlias
@@ -234,8 +246,8 @@ class ImportExportController extends Controller
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
 
-        $this->getMessageProducer()->send(
-            Topics::PRE_HTTP_IMPORT,
+        $this->get(MessageProducerInterface::class)->send(
+            PreImportTopic::getName(),
             [
                 'fileName' => $fileName,
                 'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
@@ -249,13 +261,19 @@ class ImportExportController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'message' => $this->get('translator')->trans('oro.importexport.import.validate.success.message'),
+            'message' => $this
+                ->get(TranslatorInterface::class)
+                ->trans('oro.importexport.import.validate.success.message'),
         ]);
     }
 
     /**
-     * @Route("/import/process/{processorAlias}", name="oro_importexport_import_process")
+     * Execute import process
+     * Called by importValidateExportTemplateFormAction with forward
+     *
+     * @Route("/import/process/{processorAlias}", name="oro_importexport_import_process", methods={"POST"})
      * @AclAncestor("oro_importexport_export")
+     * @CsrfProtection()
      *
      * @param string $processorAlias
      * @param Request $request
@@ -268,8 +286,8 @@ class ImportExportController extends Controller
         $fileName = $request->get('fileName', null);
         $originFileName = $request->get('originFileName', null);
 
-        $this->getMessageProducer()->send(
-            Topics::PRE_HTTP_IMPORT,
+        $this->get(MessageProducerInterface::class)->send(
+            PreImportTopic::getName(),
             [
                 'fileName' => $fileName,
                 'process' => ProcessorRegistry::TYPE_IMPORT,
@@ -283,13 +301,14 @@ class ImportExportController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'message' => $this->get('translator')->trans('oro.importexport.import.success.message'),
+            'message' => $this->get(TranslatorInterface::class)->trans('oro.importexport.import.success.message'),
         ]);
     }
 
     /**
-     * @Route("/export/instant/{processorAlias}", name="oro_importexport_export_instant")
+     * @Route("/export/instant/{processorAlias}", name="oro_importexport_export_instant", methods={"POST"})
      * @AclAncestor("oro_importexport_export")
+     * @CsrfProtection()
      *
      * @param string $processorAlias
      * @param Request $request
@@ -302,13 +321,13 @@ class ImportExportController extends Controller
         $options = $this->getOptionsFromRequest($request);
         $token = $this->getSecurityToken()->getToken();
 
-        $this->getMessageProducer()->send(Topics::PRE_EXPORT, [
+        $this->get(MessageProducerInterface::class)->send(PreExportTopic::getName(), [
             'jobName' => $jobName,
             'processorAlias' => $processorAlias,
             'outputFilePrefix' => $filePrefix,
             'options' => $options,
             'userId' => $this->getUser()->getId(),
-            'organizationId' => $token->getOrganizationContext()->getId(),
+            'organizationId' => $token->getOrganization()->getId(),
         ]);
 
         return new JsonResponse(['success' => true]);
@@ -317,7 +336,7 @@ class ImportExportController extends Controller
     /**
      * @Route("/export/config", name="oro_importexport_export_config")
      * @AclAncestor("oro_importexport_export")
-     * @Template("OroImportExportBundle:ImportExport:configurableExport.html.twig")
+     * @Template("@OroImportExport/ImportExport/configurableExport.html.twig")
      *
      * @param Request $request
      *
@@ -337,7 +356,7 @@ class ImportExportController extends Controller
             $data = $exportForm->getData();
 
             return $this->forward(
-                'OroImportExportBundle:ImportExport:instantExport',
+                ImportExportController::class . '::instantExportAction',
                 [
                     'processorAlias' => $data->getProcessorAlias(),
                     'request' => $request
@@ -356,7 +375,7 @@ class ImportExportController extends Controller
     /**
      * @Route("/export/template/config", name="oro_importexport_export_template_config")
      * @AclAncestor("oro_importexport_export")
-     * @Template("OroImportExportBundle:ImportExport:configurableTemplateExport.html.twig")
+     * @Template("@OroImportExport/ImportExport/configurableTemplateExport.html.twig")
      *
      * @param Request $request
      * @return array|Response
@@ -371,7 +390,7 @@ class ImportExportController extends Controller
             $data = $exportForm->getData();
 
             $exportTemplateResponse = $this->forward(
-                'OroImportExportBundle:ImportExport:templateExport',
+                ImportExportController::class . '::templateExport',
                 ['processorAlias' => $data->getProcessorAlias()]
             );
 
@@ -397,92 +416,70 @@ class ImportExportController extends Controller
     public function templateExportAction($processorAlias, Request $request)
     {
         $jobName = $request->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
-        $result  = $this->getExportHandler()->getExportResult(
+        $result = $this->getExportHandler()->getExportResult(
             $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
             'csv',
-            null,
+            'import_template',
             $this->getOptionsFromRequest($request)
         );
 
-        return $this->redirectToRoute('oro_importexport_export_download', ['fileName' => $result['file']]);
+        return $this->getExportHandler()->handleDownloadExportResult($result['file']);
     }
 
     /**
-     * @Route("/export/download/{fileName}", name="oro_importexport_export_download")
+     * @Route("/export/download/{jobId}", name="oro_importexport_export_download", requirements={"jobId"="\d+"})
+     * @ParamConverter("result", options={"mapping": {"jobId": "jobId"}})
      *
-     * @param string $fileName
+     * @param ImportExportResult $result
      *
      * @return Response
      */
-    public function downloadExportResultAction($fileName)
+    public function downloadExportResultAction(ImportExportResult $result)
     {
-        if (!$this->isGranted('oro_importexport_import')
-            && !$this->isGranted('oro_importexport_export')
-        ) {
+        if (!$this->isGranted('VIEW', $result)) {
             throw new AccessDeniedException('Insufficient permission');
         }
 
-        return $this->getExportHandler()->handleDownloadExportResult($fileName);
+        if ($result->isExpired()) {
+            throw new ImportExportExpiredException();
+        }
+
+        return $this->getExportHandler()->handleDownloadExportResult($result->getFilename());
     }
 
     /**
-     * @Route("/import_export/error/{jobCode}.log", name="oro_importexport_error_log")
+     * @Route(
+     *     "/import_export/job-error-log/{jobId}.log",
+     *     name="oro_importexport_job_error_log",
+     *     requirements={"jobId"="\d+"}
+     * )
+     * @ParamConverter("result", options={"mapping": {"jobId": "jobId"}})
      *
-     * @param string $jobCode
+     * @param ImportExportResult $result
      * @return Response
-     * @throws AccessDeniedException
      */
-    public function errorLogAction($jobCode)
+    public function importExportJobErrorLogAction(ImportExportResult $result)
     {
-        if (!$this->isGranted('oro_importexport_import')
-            && !$this->isGranted('oro_importexport_export')
-        ) {
+        if (!$this->isGranted('VIEW', $result)) {
             throw new AccessDeniedException('Insufficient permission');
         }
 
-        $jobExecutor = $this->getJobExecutor();
-        $errors      = array_merge(
-            $jobExecutor->getJobFailureExceptions($jobCode),
-            $jobExecutor->getJobErrors($jobCode)
-        );
-        $content     = implode("\r\n", $errors);
-
-        return new Response($content, 200, ['Content-Type' => 'text/x-log']);
-    }
-
-    /**
-     * @Route("/import_export/job-error-log/{jobId}.log", name="oro_importexport_job_error_log")
-     *
-     * @param $jobId
-     * @return Response
-     */
-    public function importExportJobErrorLogAction($jobId)
-    {
-        if (!$this->isGranted('oro_importexport_import')
-            && !$this->isGranted('oro_importexport_export')
-        ) {
-            throw new AccessDeniedException('Insufficient permission');
+        if ($result->isExpired()) {
+            throw new ImportExportExpiredException();
         }
 
-        $job = $this->getDoctrine()->getManagerForClass(Job::class)->getRepository(Job::class)->find($jobId);
+        $jobRepository = $this->getDoctrine()->getManagerForClass(Job::class)->getRepository(Job::class);
+        $job = $jobRepository->find($result->getJobId());
 
         if (!$job) {
-            throw new NotFoundHttpException(sprintf('Job %s not found', $jobId));
+            throw new NotFoundHttpException(sprintf('Job %s not found', $result->getJobId()));
         }
 
-        $content = $this->getImportExportResultSummarizer()->getErrorLog($job);
+        $content = $this->get(ImportExportResultSummarizer::class)->getErrorLog($job);
 
         return new Response($content, 200, ['Content-Type' => 'text/x-log']);
-    }
-
-    /**
-     * @return HttpImportHandler
-     */
-    protected function getImportHandler()
-    {
-        return $this->get('oro_importexport.handler.import.http');
     }
 
     /**
@@ -490,7 +487,7 @@ class ImportExportController extends Controller
      */
     protected function getFileManager()
     {
-        return $this->get('oro_importexport.file.file_manager');
+        return $this->get(FileManager::class);
     }
 
     /**
@@ -498,23 +495,7 @@ class ImportExportController extends Controller
      */
     protected function getExportHandler()
     {
-        return $this->get('oro_importexport.handler.export');
-    }
-
-    /**
-     * @return ImportExportResultSummarizer
-     */
-    protected function getImportExportResultSummarizer()
-    {
-        return $this->get('oro_importexport.async.import_export_result_summarizer');
-    }
-
-    /**
-     * @return JobExecutor
-     */
-    protected function getJobExecutor()
-    {
-        return $this->get('oro_importexport.job_executor');
+        return $this->get(ExportHandler::class);
     }
 
     /**
@@ -534,19 +515,11 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @return MessageProducerInterface
-     */
-    protected function getMessageProducer()
-    {
-        return $this->get('oro_message_queue.client.message_producer');
-    }
-
-    /**
      * @return CsvFileHandler
      */
     protected function getCsvFileHandler()
     {
-        return $this->get('oro_importexport.handler.csv.file');
+        return $this->get(CsvFileHandler::class);
     }
 
     /**
@@ -558,7 +531,7 @@ class ImportExportController extends Controller
     }
 
     /**
-     * @param Request       $request
+     * @param Request $request
      * @param FormInterface $form
      *
      * @return bool
@@ -573,5 +546,42 @@ class ImportExportController extends Controller
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                MessageProducerInterface::class,
+                CsvFileHandler::class,
+                FileManager::class,
+                GetImportExportConfigurationExtension::class,
+                ExportHandler::class,
+                ImportExportResultSummarizer::class,
+            ]
+        );
+    }
+
+    private function getImportData(FormInterface $importForm): array
+    {
+        $data = $importForm->getData();
+        $file = $data->getFile();
+        $originalFileName = $file->getClientOriginalName();
+        $processorAlias = $data->getProcessorAlias();
+
+        if ($file->getClientOriginalExtension() === 'csv') {
+            $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
+            $fileName = $this->getFileManager()->saveImportingFile($file);
+            @unlink($file->getRealPath());
+        } else {
+            $fileName = $this->getFileManager()->saveImportingFile($file);
+        }
+
+        return [$originalFileName, $processorAlias, $fileName];
     }
 }

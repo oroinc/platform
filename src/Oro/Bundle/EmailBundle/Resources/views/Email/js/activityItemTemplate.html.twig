@@ -1,6 +1,6 @@
-{% extends 'OroActivityListBundle:ActivityList/js:activityItemTemplate.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI%}
-{% import 'OroActivityBundle::macros.html.twig' as AC %}
+{% extends '@OroActivityList/ActivityList/js/activityItemTemplate.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI%}
+{% import '@OroActivity/macros.html.twig' as AC %}
 
 {% set entityClass = 'Oro\\Bundle\\EmailBundle\\Entity\\Email' %}
 {% set entityName = oro_entity_config_value(entityClass, 'label')|trans %}
@@ -20,6 +20,9 @@
 {% endblock %}
 
 {% block activityActions %}
+    {% import '@OroActivity/macros.html.twig' as AC %}
+    {% import '@OroUI/macros.html.twig' as UI %}
+
     {% set action %}
         {% if is_granted('oro_email_email_user_edit') %}
             {{ AC.activity_context_link() }}
@@ -31,11 +34,12 @@
         {% if is_granted('oro_email_email_create') %}
             <a href="#" title="{{ 'oro.email.reply'|trans }}"
                class="dropdown-item"
-               data-url="<%= routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
-               {{ UI.renderWidgetDataAttributes({
+               data-url="<%- routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
+               {{ UI.renderWidgetAttributes({
                 'type': 'dialog',
                 'multiple': true,
                 'refresh-widget-alias': 'activity-list-widget',
+                'createOnEvent' : 'click',
                 'options': {
                     'alias': 'reply-dialog',
                     'dialogOptions': {
@@ -44,11 +48,12 @@
                         'allowMinimize': true,
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000
+                        'width': 1000,
+                        'minWidth': 'expanded'
                     }
                 }
-            }) }}><span class="fa-reply hide-text" aria-hidden="true">{{ 'oro.email.reply'|trans|raw }}</span>
-                {{ 'oro.email.reply'|trans|raw }}
+            }) }}><span class="fa-reply hide-text" aria-hidden="true">{{ 'oro.email.reply'|trans }}</span>
+                {{ 'oro.email.reply'|trans }}
             </a>
         {% endif %}
     {% endset %}
@@ -58,11 +63,12 @@
         {% if is_granted('oro_email_email_create') %}
             <a href="#" title="{{ 'oro.email.forward'|trans }}"
                class="dropdown-item"
-               data-url="<%= routing.generate('oro_email_email_forward', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
-               {{ UI.renderWidgetDataAttributes({
+               data-url="<%- routing.generate('oro_email_email_forward', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
+               {{ UI.renderWidgetAttributes({
                 'type': 'dialog',
                 'multiple': true,
                 'refresh-widget-alias': 'activity-list-widget',
+                'createOnEvent' : 'click',
                 'options': {
                     'alias': 'forward-dialog',
                     'dialogOptions': {
@@ -71,11 +77,12 @@
                         'allowMinimize': true,
                         'dblclick': 'maximize',
                         'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000
+                        'width': 1000,
+                        'minWidth': 'expanded'
                     }
                 }
-            }) }}><span class="fa-mail-forward hide-text" aria-hidden="true">{{ 'oro.email.forward'|trans|raw }}</span>
-                {{ 'oro.email.forward'|trans|raw }}
+            }) }}><span class="fa-mail-forward hide-text" aria-hidden="true">{{ 'oro.email.forward'|trans }}</span>
+                {{ 'oro.email.forward'|trans }}
             </a>
         {% endif %}
     {% endset %}

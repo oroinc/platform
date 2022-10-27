@@ -7,45 +7,29 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 
-class LocalizationExtension extends \Twig_Extension
+/**
+ * Provides Twig filters to format language and locale codes, and to retrieve the value in the specified localization
+ * from a localized value holder:
+ *   - oro_language_code_title
+ *   - oro_locale_code_title
+ *   - oro_formatting_code_title
+ *   - localized_value
+ */
+class LocalizationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const NAME = 'oro_locale_localization';
+    private ContainerInterface $container;
+    private ?LanguageCodeFormatter $languageCodeFormatter = null;
+    private ?FormattingCodeFormatter $formattingCodeFormatter = null;
+    private ?LocalizationHelper $localizationHelper = null;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-    }
-
-    /**
-     * @return LanguageCodeFormatter
-     */
-    protected function getLanguageCodeFormatter()
-    {
-        return $this->container->get('oro_locale.formatter.language_code');
-    }
-
-    /**
-     * @return FormattingCodeFormatter
-     */
-    protected function getFormattingCodeFormatter()
-    {
-        return $this->container->get('oro_locale.formatter.formatting_code');
-    }
-
-    /**
-     * @return LocalizationHelper
-     */
-    protected function getLocalizationHelper()
-    {
-        return $this->container->get('oro_locale.helper.localization');
     }
 
     /**
@@ -54,26 +38,10 @@ class LocalizationExtension extends \Twig_Extension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter(
-                'oro_language_code_title',
-                [$this, 'getLanguageTitleByCode'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFilter(
-                'oro_locale_code_title',
-                [$this, 'formatLocale'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFilter(
-                'oro_formatting_code_title',
-                [$this, 'getFormattingTitleByCode'],
-                ['is_safe' => ['html']]
-            ),
-            new \Twig_SimpleFilter(
-                'localized_value',
-                [$this, 'getLocalizedValue'],
-                ['is_safe' => ['html']]
-            ),
+            new TwigFilter('oro_language_code_title', [$this, 'getLanguageTitleByCode']),
+            new TwigFilter('oro_locale_code_title', [$this, 'formatLocale']),
+            new TwigFilter('oro_formatting_code_title', [$this, 'getFormattingTitleByCode']),
+            new TwigFilter('localized_value', [$this, 'getLocalizedValue'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -107,13 +75,7 @@ class LocalizationExtension extends \Twig_Extension
         return $this->getFormattingCodeFormatter()->format($code);
     }
 
-    /**
-     * @param Collection        $values
-     * @param Localization|null $localization
-     *
-     * @return string
-     */
-    public function getLocalizedValue(Collection $values, Localization $localization = null)
+    public function getLocalizedValue(Collection $values, Localization $localization = null): string
     {
         return (string)$this->getLocalizationHelper()->getLocalizedValue($values, $localization);
     }
@@ -121,8 +83,39 @@ class LocalizationExtension extends \Twig_Extension
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public static function getSubscribedServices()
     {
-        return static::NAME;
+        return [
+            'oro_locale.formatter.language_code' => LanguageCodeFormatter::class,
+            'oro_locale.formatter.formatting_code' => FormattingCodeFormatter::class,
+            'oro_locale.helper.localization' => LocalizationHelper::class,
+        ];
+    }
+
+    private function getLanguageCodeFormatter(): LanguageCodeFormatter
+    {
+        if (null === $this->languageCodeFormatter) {
+            $this->languageCodeFormatter = $this->container->get('oro_locale.formatter.language_code');
+        }
+
+        return $this->languageCodeFormatter;
+    }
+
+    private function getFormattingCodeFormatter(): FormattingCodeFormatter
+    {
+        if (null === $this->formattingCodeFormatter) {
+            $this->formattingCodeFormatter = $this->container->get('oro_locale.formatter.formatting_code');
+        }
+
+        return $this->formattingCodeFormatter;
+    }
+
+    private function getLocalizationHelper(): LocalizationHelper
+    {
+        if (null === $this->localizationHelper) {
+            $this->localizationHelper = $this->container->get('oro_locale.helper.localization');
+        }
+
+        return $this->localizationHelper;
     }
 }

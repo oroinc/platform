@@ -45,7 +45,7 @@ Feature: Multi grid context with custom entity
     And I click "Add Context"
     Then I should see "Test Record"
     When I select "Account" context
-    Then I should see "no records found"
+    Then I should see "There are no accounts"
     When I select "Test Entity" context
     Then I should see "Test Record"
     And close ui dialog
@@ -62,7 +62,7 @@ Feature: Multi grid context with custom entity
     And I click "Add Context"
     Then I should see "Test Record"
     When I select "Account" context
-    Then I should see "no records found"
+    Then I should see "There are no accounts"
     When I select "Test Entity" context
     Then I should see "Test Record"
     And close ui dialog

@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
+    const _ = require('underscore');
 
     /**
      * @export  oroworkflow/js/tools/workflow-helper
@@ -23,13 +23,13 @@ define(function(require) {
         },
 
         getFormData: function($form) {
-            var data = $form.serializeArray();
-            var result = {};
-            for (var i = 0; i < data.length; i++) {
-                var field = data[i];
-                var name = field.name;
+            const data = $form.serializeArray();
+            const result = {};
+            for (let i = 0; i < data.length; i++) {
+                const field = data[i];
+                let name = field.name;
 
-                var fieldNameParts = name.match(/\[(\w+)\]$/);
+                let fieldNameParts = name.match(/\[(\w+)\]$/);
                 if (fieldNameParts) {
                     name = fieldNameParts[1];
                     result[name] = field.value;
@@ -53,8 +53,8 @@ define(function(require) {
         },
 
         deepClone: function(obj) {
-            var result = _.clone(obj);
-            for (var k in obj) {
+            const result = _.clone(obj);
+            for (const k in obj) {
                 if (obj.hasOwnProperty(k) && _.isObject(obj[k])) {
                     obj[k] = this.deepClone(obj[k]);
                 }

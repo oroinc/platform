@@ -86,9 +86,6 @@ class TestOverrideClassOwner extends ExtendTestOverrideClassOwner implements Tes
         return $this->target;
     }
 
-    /**
-     * @param TestOverrideClassTarget|null $target
-     */
     public function setTarget(TestOverrideClassTarget $target = null)
     {
         $this->target = $target;
@@ -102,9 +99,6 @@ class TestOverrideClassOwner extends ExtendTestOverrideClassOwner implements Tes
         return $this->targets;
     }
 
-    /**
-     * @param TestOverrideClassTarget $target
-     */
     public function addTarget(TestOverrideClassTarget $target)
     {
         if (!$this->targets->contains($target)) {
@@ -113,9 +107,6 @@ class TestOverrideClassOwner extends ExtendTestOverrideClassOwner implements Tes
         }
     }
 
-    /**
-     * @param TestOverrideClassTarget $target
-     */
     public function removeTarget(TestOverrideClassTarget $target)
     {
         if ($this->targets->contains($target)) {
@@ -132,9 +123,6 @@ class TestOverrideClassOwner extends ExtendTestOverrideClassOwner implements Tes
         return $this->anotherTarget;
     }
 
-    /**
-     * @param TestOverrideClassTargetA|null $target
-     */
     public function setAnotherTarget(TestOverrideClassTargetA $target = null)
     {
         $this->anotherTarget = $target;
@@ -148,9 +136,6 @@ class TestOverrideClassOwner extends ExtendTestOverrideClassOwner implements Tes
         return $this->anotherTargets;
     }
 
-    /**
-     * @param TestOverrideClassTargetA $target
-     */
     public function addAnotherTarget(TestOverrideClassTargetA $target)
     {
         if (!$this->anotherTargets->contains($target)) {
@@ -159,9 +144,6 @@ class TestOverrideClassOwner extends ExtendTestOverrideClassOwner implements Tes
         }
     }
 
-    /**
-     * @param TestOverrideClassTargetA $target
-     */
     public function removeAnotherTarget(TestOverrideClassTargetA $target)
     {
         if ($this->anotherTargets->contains($target)) {

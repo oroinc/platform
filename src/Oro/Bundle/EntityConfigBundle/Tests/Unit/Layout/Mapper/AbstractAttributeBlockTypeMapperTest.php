@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Layout\Mapper;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\Layout\Mapper\AttributeBlockTypeMapperStub;
@@ -17,12 +17,9 @@ class AbstractAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder(ManagerRegistry::class)->getMock();
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
         $this->mapper = new AttributeBlockTypeMapperStub($this->registry);
     }
@@ -48,7 +45,7 @@ class AbstractAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
         $attribute->setEntity($entity);
         $attribute->setFieldName('metadata_attribute');
 
-        $metadata = $this->getMockBuilder(ClassMetadata::class)->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())
             ->method('getAssociationNames')
             ->willReturn(['metadata_attribute']);
@@ -58,14 +55,13 @@ class AbstractAttributeBlockTypeMapperTest extends \PHPUnit\Framework\TestCase
             ->with('metadata_attribute')
             ->willReturn(\stdClass::class);
 
-        $objectManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $objectManager = $this->createMock(EntityManager::class);
         $objectManager->expects($this->once())
             ->method('getClassMetadata')
             ->with('EntityClass')
             ->willReturn($metadata);
 
-        $this->registry
-            ->expects($this->once())
+        $this->registry->expects($this->once())
             ->method('getManagerForClass')
             ->with('EntityClass')
             ->willReturn($objectManager);

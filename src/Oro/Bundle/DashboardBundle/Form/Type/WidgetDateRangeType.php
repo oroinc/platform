@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetDateRangeType extends AbstractType
 {
@@ -21,9 +21,6 @@ class WidgetDateRangeType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -135,7 +132,6 @@ class WidgetDateRangeType extends AbstractType
      * @param Options $options
      *
      * @return array
-     *
      */
     protected function getOperatorChoices(Options $options)
     {

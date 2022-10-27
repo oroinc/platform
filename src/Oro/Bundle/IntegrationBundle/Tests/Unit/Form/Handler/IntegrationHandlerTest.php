@@ -7,99 +7,122 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent;
 use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler as IntegrationHandler;
+use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_NAME = 'form_name';
-    const FORM_DATA = ['field' => 'data'];
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface */
-    protected $form;
+    private const FORM_NAME = 'form_name';
+    private const FORM_DATA = ['field' => 'data'];
 
     /** @var Request */
-    protected $request;
+    private $request;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    protected $em;
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    protected $eventDispatcher;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
+
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
+
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formFactory;
 
     /** @var IntegrationHandler */
-    protected $handler;
+    private $handler;
 
     /** @var Integration */
-    protected $entity;
+    private $entity;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->request         = new Request();
+        $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
-        $this->form            = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()->getMock();
-        $this->em              = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->entity  = new Integration();
-        $this->handler = new IntegrationHandler($requestStack, $this->form, $this->em, $this->eventDispatcher);
+        $this->form = $this->createMock(Form::class);
+        $this->em = $this->createMock(EntityManager::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->entity = new Integration();
+        $this->handler = new IntegrationHandler(
+            $requestStack,
+            $this->form,
+            $this->em,
+            $this->eventDispatcher,
+            $this->formFactory
+        );
     }
 
-    public function testProcessUnsupportedRequest()
+    public function testProcessUnsupportedRequest(): void
     {
-        $this->form->expects($this->once())->method('setData')
+        $this->form->expects($this->once())
+            ->method('setData')
             ->with($this->entity);
 
-        $this->form->expects($this->never())->method('submit');
+        $this->form->expects($this->never())
+            ->method('submit');
 
         $this->assertFalse($this->handler->process($this->entity));
     }
 
     /**
      * @dataProvider supportedMethods
-     *
-     * @param string $method
      */
-    public function testProcessSupportedRequest($method)
+    public function testProcessSupportedRequest(string $method): void
     {
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod($method);
 
-        $this->form->expects($this->any())->method('getName')->willReturn(self::FORM_NAME);
-        $this->form->expects($this->once()) ->method('setData')
+        $this->form->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
+        $this->form->expects($this->once())
+            ->method('setData')
             ->with($this->entity);
-        $this->form->expects($this->once()) ->method('submit')
+        $this->form->expects($this->once())
+            ->method('submit')
             ->with(self::FORM_DATA);
 
         $this->assertFalse($this->handler->process($this->entity));
     }
 
-    /**
-     * @return array
-     */
-    public function supportedMethods()
+    public function supportedMethods(): array
     {
         return [['POST', 'PUT']];
     }
 
-    public function testProcessValidData()
+    public function testProcessValidData(): void
     {
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod('POST');
 
-        $this->form->expects($this->any())->method('getName')->willReturn(self::FORM_NAME);
-        $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($this->once()) ->method('submit') ->with(self::FORM_DATA);
-        $this->form->expects($this->once()) ->method('isValid')
-            ->will($this->returnValue(true));
+        $this->form->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
+        $this->form->expects($this->once())
+            ->method('setData')
+            ->with($this->entity);
+        $this->form->expects($this->once())
+            ->method('submit')
+            ->with(self::FORM_DATA);
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
 
-        $this->em->expects($this->once()) ->method('persist') ->with($this->entity);
-        $this->em->expects($this->once())->method('flush');
+        $this->em->expects($this->once())
+            ->method('persist')
+            ->with($this->entity);
+        $this->em->expects($this->once())
+            ->method('flush');
 
         $this->assertTrue($this->handler->process($this->entity));
     }
@@ -109,127 +132,193 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
      *
      * @param Integration      $entity
      * @param null|User        $newOwner
-     * @param Integration|null $oldIntegration
+     * @param Integration|null $existingIntegration
      * @param bool             $expectOwnerSetEvent
      * @param bool             $expectIntegrationUpdateEvent
      */
     public function testEventDispatching(
         $entity,
         $newOwner,
-        $oldIntegration,
+        $existingIntegration,
         $expectOwnerSetEvent,
         $expectIntegrationUpdateEvent
-    ) {
+    ): void {
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod('POST');
 
-        $this->form->expects($this->any())->method('getName')->willReturn(self::FORM_NAME);
-        $this->form->expects($this->once())->method('setData')->with($entity)
-            ->will(
-                $this->returnCallback(
-                    function ($entity) use ($newOwner) {
-                        $entity->setDefaultUserOwner($newOwner);
-                    }
-                )
-            );
-        $this->form->expects($this->once()) ->method('submit') ->with(self::FORM_DATA);
-        $this->form->expects($this->once()) ->method('isValid')
-            ->will($this->returnValue(true));
+        $this->form->expects($this->any())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
+        $this->form->expects($this->once())
+            ->method('setData')
+            ->with($entity)
+            ->willReturnCallback(function ($entity) use ($newOwner) {
+                $entity->setDefaultUserOwner($newOwner);
+            });
+        $this->form->expects($this->once())
+            ->method('submit')
+            ->with(self::FORM_DATA);
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
 
-        $this->em->expects($this->once()) ->method('persist') ->with($entity);
-        $this->em->expects($this->once())->method('flush');
+        $this->em->expects($this->once())
+            ->method('persist')
+            ->with($entity);
+        $this->em->expects($this->once())
+            ->method('flush');
 
         if ($entity->getId()) {
             $this->em->expects($this->once())
                 ->method('find')
                 ->with('OroIntegrationBundle:Channel', $entity->getId())
-                ->will($this->returnValue($oldIntegration));
+                ->willReturn($existingIntegration);
         }
 
-        $dispatchCallIndex = 0;
+        $events = [];
         if ($expectOwnerSetEvent) {
-            $this->eventDispatcher->expects($this->at($dispatchCallIndex++))
-                ->method('dispatch')
-                ->with(
-                    $this->equalTo(DefaultOwnerSetEvent::NAME),
-                    $this->isInstanceOf('Oro\Bundle\IntegrationBundle\Event\DefaultOwnerSetEvent')
-                );
+            $events[] = [
+                $this->isInstanceOf(DefaultOwnerSetEvent::class),
+                DefaultOwnerSetEvent::NAME
+            ];
         }
         if ($expectIntegrationUpdateEvent) {
-            $this->eventDispatcher->expects($this->at($dispatchCallIndex++))
+            $events[] = [
+                $this->callback(function ($event) use ($entity, $existingIntegration) {
+                    $this->assertInstanceOf(IntegrationUpdateEvent::class, $event);
+                    $this->assertSame($entity, $event->getIntegration());
+                    $this->assertEquals($existingIntegration, $event->getOldState());
+
+                    return true;
+                }),
+                IntegrationUpdateEvent::NAME
+            ];
+        }
+        if ($events) {
+            $this->eventDispatcher->expects($this->exactly(count($events)))
                 ->method('dispatch')
-                ->with(
-                    $this->equalTo(IntegrationUpdateEvent::NAME),
-                    $this->callback(
-                        function ($event) use ($entity, $oldIntegration) {
-                            $this->assertInstanceOf(
-                                'Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent',
-                                $event
-                            );
-
-                            $this->assertSame($entity, $event->getIntegration());
-                            $this->assertEquals($oldIntegration, $event->getOldState());
-
-                            return true;
-                        }
-                    )
-                );
-        } elseif (!$expectOwnerSetEvent) {
-            $this->eventDispatcher->expects($this->never())->method('dispatch');
+                ->withConsecutive(...$events);
+        } else {
+            $this->eventDispatcher->expects($this->never())
+                ->method('dispatch');
         }
 
         $this->assertTrue($this->handler->process($entity));
     }
 
-    /**
-     * @return array
-     */
-    public function eventDataProvider()
+    public function eventDataProvider(): array
     {
         $newIntegration = new Integration();
-        $newOwner   = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
+        $newOwner = $this->createMock(User::class);
 
-        $idProperty = new \ReflectionProperty('Oro\Bundle\IntegrationBundle\Entity\Channel', 'id');
-        $idProperty->setAccessible(true);
+        $existingIntegration = new Integration();
+        ReflectionUtil::setId($existingIntegration, 100);
 
-        $oldIntegration = new Integration();
-        $idProperty->setValue($oldIntegration, 100);
-
-        $someOwner           = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-        $oldIntegrationWithOwner = clone $oldIntegration;
-        $oldIntegrationWithOwner->setDefaultUserOwner($someOwner);
+        $someOwner = $this->createMock(User::class);
+        $existingIntegrationWithOwner = clone $existingIntegration;
+        $existingIntegrationWithOwner->setDefaultUserOwner($someOwner);
 
         $integration = new Integration();
-        $idProperty->setValue($integration, 200);
+        ReflectionUtil::setId($integration, 200);
+
         return [
-            'new entity, should not dispatch'                                             => [
+            'new entity, should not dispatch'                     => [
                 $newIntegration,
                 $newOwner,
                 $integration,
                 false,
                 false
             ],
-            'integration is not new, but owner existed before'                            => [
-                $oldIntegrationWithOwner,
+            'integration is not new, but owner existed before'    => [
+                $existingIntegrationWithOwner,
                 $newOwner,
                 $integration,
                 false,
                 true
             ],
-            'old integration without owner, should dispatch'                              => [
-                $oldIntegration,
+            'existing integration without owner, should dispatch' => [
+                $existingIntegration,
                 $newOwner,
                 $integration,
                 true,
-                false
+                true
             ],
-            'should not dispatch if integration not found' => [
-                $oldIntegrationWithOwner,
+            'should not dispatch if integration not found'        => [
+                $existingIntegrationWithOwner,
                 $newOwner,
                 null,
                 false,
                 false
             ]
         ];
+    }
+
+    public function testGetForm(): void
+    {
+        self::assertSame($this->form, $this->handler->getForm());
+    }
+
+    public function testUpdateForm(): void
+    {
+        $this->request->initialize([], [
+            self::FORM_NAME                   => self::FORM_DATA,
+            IntegrationHandler::UPDATE_MARKER => true,
+        ]);
+        $this->request->setMethod('POST');
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamed')
+            ->with(self::FORM_NAME, ChannelType::class, $this->entity)
+            ->willReturn($this->form);
+
+        $this->form->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
+
+        $this->form->expects(self::once())
+            ->method('submit')
+            ->with(self::FORM_DATA);
+
+        $this->em->expects(self::never())
+            ->method('persist');
+
+        $this->em->expects(self::never())
+            ->method('flush');
+
+        $this->handler->process($this->entity);
+    }
+
+    public function testUpdateFormOnTransportTypeChanged(): void
+    {
+        $this->request->initialize([], [
+            self::FORM_NAME                   => self::FORM_DATA,
+            IntegrationHandler::UPDATE_MARKER => sprintf(
+                '%s[%s]',
+                self::FORM_NAME,
+                IntegrationHandler::TRANSPORT_TYPE_FIELD_NAME
+            ),
+        ]);
+        $this->request->setMethod('POST');
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamed')
+            ->with(self::FORM_NAME, ChannelType::class, $this->entity)
+            ->willReturn($this->form);
+
+        $this->form->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
+
+        $this->form->expects(self::exactly(2))
+            ->method('submit')
+            ->with(self::FORM_DATA);
+
+        $this->em->expects(self::never())
+            ->method('persist');
+
+        $this->em->expects(self::never())
+            ->method('flush');
+
+        $this->handler->process($this->entity);
     }
 }

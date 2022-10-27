@@ -13,30 +13,20 @@ abstract class AbstractDatagridTestCase extends WebTestCase
      *      'gridParameters' => array of params needed to pass to grid request, required param 'gridName'
      *      'gridFilters'    => array of filters
      *   ]
-     *
-     * @return array
      */
-    abstract public function gridProvider();
+    abstract public function gridProvider(): array;
 
-    /**
-     * @var bool
-     */
-    protected $isRealGridRequest = true;
+    protected bool $isRealGridRequest = true;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->initClient(
-            [],
-            array_merge($this->generateBasicAuthHeader(), ['HTTP_X-CSRF-Header' => 1])
-        );
+        $this->initClient([], $this->generateBasicAuthHeader());
     }
 
     /**
      * @dataProvider gridProvider
-     *
-     * @param array $requestData
      */
-    public function testGrid($requestData)
+    public function testGrid(array $requestData)
     {
         $response = $this->client->requestGrid(
             $requestData['gridParameters'],

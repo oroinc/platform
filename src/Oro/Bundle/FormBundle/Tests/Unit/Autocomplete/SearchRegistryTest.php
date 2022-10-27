@@ -4,51 +4,40 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class SearchRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $searchHandler;
+    /** @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $searchHandler;
 
-    /**
-     * @var SearchRegistry
-     */
-    protected $searchRegistry;
+    /** @var SearchRegistry */
+    private $searchRegistry;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->searchHandler = $this->createMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
-        $this->searchRegistry = new SearchRegistry();
-    }
+        $this->searchHandler = $this->createMock(SearchHandlerInterface::class);
 
-    public function testAddSearchHandler()
-    {
-        $this->searchRegistry->addSearchHandler('test', $this->searchHandler);
-        $this->assertAttributeSame(
-            array('test' => $this->searchHandler),
-            'searchHandlers',
-            $this->searchRegistry
-        );
+        $container = TestContainerBuilder::create()
+            ->add('test', $this->searchHandler)
+            ->getContainer($this);
+
+        $this->searchRegistry = new SearchRegistry($container);
     }
 
     public function testGetAndHasSearchHandler()
     {
-        $this->searchRegistry->addSearchHandler('test', $this->searchHandler);
-
         $this->assertTrue($this->searchRegistry->hasSearchHandler('test'));
         $this->assertFalse($this->searchRegistry->hasSearchHandler('testNotExists'));
 
         $this->assertSame($this->searchHandler, $this->searchRegistry->getSearchHandler('test'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Search handler "test" is not registered
-     */
     public function testGetSearchHandlerFails()
     {
-        $this->searchRegistry->getSearchHandler('test');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Search handler "testNotExists" is not registered.');
+
+        $this->searchRegistry->getSearchHandler('testNotExists');
     }
 }

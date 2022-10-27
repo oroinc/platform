@@ -23,7 +23,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "field_acl_supported" = "true"
+ *              "field_acl_supported"=true
  *          }
  *      }
  * )
@@ -78,81 +78,51 @@ class TestSecurityPerson implements TestFrameworkEntityInterface
         $this->orders = new ArrayCollection();
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     */
     public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
     public function setName(string $name): void
     {
         $this->name = $name;
     }
 
-    /**
-     * @return null|TestSecurityDepartment
-     */
     public function getDepartment(): ?TestSecurityDepartment
     {
         return $this->department;
     }
 
-    /**
-     * @param null|TestSecurityDepartment $department
-     */
     public function setDepartment(?TestSecurityDepartment $department): void
     {
         $this->department = $department;
     }
 
-    /**
-     * @return User
-     */
     public function getOwner(): User
     {
         return $this->owner;
     }
 
-    /**
-     * @param User $owner
-     */
     public function setOwner(User $owner): void
     {
         $this->owner = $owner;
     }
 
-    /**
-     * @return Organization
-     */
     public function getOrganization(): Organization
     {
         return $this->organization;
     }
 
-    /**
-     * @param Organization $organization
-     */
     public function setOrganization(Organization $organization): void
     {
         $this->organization = $organization;

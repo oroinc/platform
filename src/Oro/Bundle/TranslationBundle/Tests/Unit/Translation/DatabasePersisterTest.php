@@ -2,30 +2,24 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Language;
+use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
+use Oro\Component\Testing\ReflectionUtil;
 
 class DatabasePersisterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DatabasePersister */
-    protected $persister;
-
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
-
-    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationManager;
-
-    /** @var array */
-    protected $testData = [
+    private const TEST_LOCALE = 'en';
+    private const TEST_DATA = [
         'messages'   => [
             'key_1' => 'value_1',
             'key_2' => 'value_2',
@@ -37,78 +31,219 @@ class DatabasePersisterTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var string */
-    protected $testLocale = 'en';
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    protected function setUp()
+    /** @var TranslationRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationRepository;
+
+    /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationKeyRepository;
+
+    /** @var TranslationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationManager;
+
+    /** @var FileBasedLanguageHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileBasedLanguageHelper;
+
+    /** @var Language */
+    private $language;
+
+    /** @var DatabasePersister */
+    private $persister;
+
+    protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder(Registry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->translationRepository = $this->createMock(TranslationRepository::class);
+        $this->translationKeyRepository = $this->createMock(TranslationKeyRepository::class);
+        $this->translationManager = $this->createMock(TranslationManager::class);
+        $this->fileBasedLanguageHelper = $this->createMock(FileBasedLanguageHelper::class);
 
-        $this->em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->language = new Language();
+        ReflectionUtil::setId($this->language, 1);
+        $this->language->setCode(self::TEST_LOCALE);
+        $this->language->setLocalFilesLanguage(false);
 
-        $this->translationManager = $this
-            ->getMockBuilder(TranslationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
-
-        $language = new Language();
+        $languageRepository = $this->createMock(LanguageRepository::class);
+        $languageRepository->expects(self::any())
+            ->method('findOneBy')
+            ->willReturn($this->language);
 
         $connection = $this->createMock(Connection::class);
-        $this->em->expects($this->any())->method('getConnection')->willReturn($connection);
 
-        $entityRepository = $this->createMock(EntityRepository::class);
-        $entityRepository->expects($this->any())->method('findOneBy')->willReturn($language);
-        $this->em->expects($this->any())->method('getRepository')->willReturn($entityRepository);
+        $this->em->expects(self::any())
+            ->method('getConnection')
+            ->willReturn($connection);
+        $this->em->expects(self::any())
+            ->method('getRepository')
+            ->with(Translation::class)
+            ->willReturn($this->translationRepository);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(Translation::class)
+            ->willReturn($this->em);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->willReturnMap([
+                [TranslationKey::class, null, $this->translationKeyRepository],
+                [Language::class, null, $languageRepository]
+            ]);
 
         $this->persister = new DatabasePersister(
-            $this->registry,
-            $this->translationManager
-        );
-    }
-
-    protected function tearDown()
-    {
-        unset(
-            $this->em,
-            $this->persister,
+            $doctrine,
             $this->translationManager,
-            $this->registry
+            $this->fileBasedLanguageHelper
         );
     }
 
-    public function testPersist()
+    public function testPersist(): void
     {
-        $this->em->expects($this->once())->method('beginTransaction');
-        $this->em->expects($this->once())->method('commit');
-        $this->em->expects($this->never())->method('rollback');
+        $this->em->expects(self::once())
+            ->method('beginTransaction');
+        $this->em->expects(self::once())
+            ->method('commit');
+        $this->em->expects(self::never())
+            ->method('rollback');
 
-        $this->translationManager->expects($this->once())->method('invalidateCache')->with($this->testLocale);
-        $this->translationManager->expects($this->once())->method('clear');
+        $this->translationRepository->expects(self::once())
+            ->method('getTranslationsData')
+            ->with($this->language->getId())
+            ->willReturn([]);
 
-        $this->persister->persist($this->testLocale, $this->testData);
+        $this->translationKeyRepository->expects(self::exactly(2))
+            ->method('getTranslationKeysData')
+            ->willReturn([]);
+
+        $this->translationManager->expects(self::once())
+            ->method('invalidateCache')
+            ->with(self::TEST_LOCALE);
+        $this->translationManager->expects(self::once())
+            ->method('clear');
+
+        $this->fileBasedLanguageHelper->expects(self::once())
+            ->method('isFileBasedLocale')
+            ->with(self::TEST_LOCALE)
+            ->willReturn(false);
+
+        $this->em->expects(self::never())
+            ->method('persist');
+        $this->em->expects(self::never())
+            ->method('flush');
+
+        $this->persister->persist(self::TEST_LOCALE, self::TEST_DATA, Translation::SCOPE_SYSTEM);
     }
 
-    public function testExceptionScenario()
+    public function testExceptionScenario(): void
     {
-        $exceptionClass = '\LogicException';
-        $this->expectException($exceptionClass);
-        $exception = new $exceptionClass();
+        $this->expectException(\LogicException::class);
 
-        $this->em->expects($this->once())->method('beginTransaction');
-        $this->em->expects($this->once())->method('commit')->will($this->throwException($exception));
-        $this->em->expects($this->once())->method('rollback');
+        $this->em->expects(self::once())
+            ->method('beginTransaction');
+        $this->em->expects(self::once())
+            ->method('commit')
+            ->willThrowException(new \LogicException());
+        $this->em->expects(self::once())
+            ->method('rollback');
 
-        $this->translationManager->expects($this->never())->method('invalidateCache');
-        $this->translationManager->expects($this->never())->method('clear');
+        $this->translationRepository->expects(self::once())
+            ->method('getTranslationsData')
+            ->with($this->language->getId())
+            ->willReturn([]);
 
-        $this->persister->persist($this->testLocale, $this->testData);
+        $this->translationKeyRepository->expects(self::exactly(2))
+            ->method('getTranslationKeysData')
+            ->willReturn([]);
+
+        $this->translationManager->expects(self::never())
+            ->method('invalidateCache');
+        $this->translationManager->expects(self::never())
+            ->method('clear');
+
+        $this->fileBasedLanguageHelper->expects(self::once())
+            ->method('isFileBasedLocale')
+            ->with(self::TEST_LOCALE)
+            ->willReturn(false);
+
+        $this->persister->persist(self::TEST_LOCALE, self::TEST_DATA, Translation::SCOPE_SYSTEM);
+    }
+
+    public function testPersistWithFilesBasedLocale(): void
+    {
+        $this->em->expects(self::once())
+            ->method('beginTransaction');
+        $this->em->expects(self::once())
+            ->method('commit');
+        $this->em->expects(self::never())
+            ->method('rollback');
+
+        $this->translationRepository->expects(self::once())
+            ->method('getTranslationsData')
+            ->with($this->language->getId())
+            ->willReturn([]);
+
+        $this->translationKeyRepository->expects(self::exactly(2))
+            ->method('getTranslationKeysData')
+            ->willReturn([]);
+
+        $this->translationManager->expects(self::once())
+            ->method('invalidateCache')
+            ->with(self::TEST_LOCALE);
+        $this->translationManager->expects(self::once())
+            ->method('clear');
+
+        $this->fileBasedLanguageHelper->expects(self::once())
+            ->method('isFileBasedLocale')
+            ->with(self::TEST_LOCALE)
+            ->willReturn(true);
+
+        $this->em->expects(self::once())
+            ->method('persist')
+            ->with($this->language);
+        $this->em->expects(self::once())
+            ->method('flush');
+
+        $this->persister->persist(self::TEST_LOCALE, self::TEST_DATA, Translation::SCOPE_SYSTEM);
+
+        self::assertTrue($this->language->isLocalFilesLanguage());
+    }
+
+    public function testPersistWithNonSystemScope(): void
+    {
+        $this->em->expects(self::once())
+            ->method('beginTransaction');
+        $this->em->expects(self::once())
+            ->method('commit');
+        $this->em->expects(self::never())
+            ->method('rollback');
+
+        $this->translationRepository->expects(self::once())
+            ->method('getTranslationsData')
+            ->with($this->language->getId())
+            ->willReturn([]);
+
+        $this->translationKeyRepository->expects(self::exactly(2))
+            ->method('getTranslationKeysData')
+            ->willReturn([]);
+
+        $this->translationManager->expects(self::once())
+            ->method('invalidateCache')
+            ->with(self::TEST_LOCALE);
+        $this->translationManager->expects(self::once())
+            ->method('clear');
+
+        $this->fileBasedLanguageHelper->expects(self::never())
+            ->method('isFileBasedLocale');
+
+        $this->em->expects(self::never())
+            ->method('persist');
+        $this->em->expects(self::never())
+            ->method('flush');
+
+        $this->persister->persist(self::TEST_LOCALE, self::TEST_DATA);
+
+        self::assertFalse($this->language->isLocalFilesLanguage());
     }
 }

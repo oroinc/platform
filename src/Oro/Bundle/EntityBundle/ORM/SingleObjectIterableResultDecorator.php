@@ -17,9 +17,6 @@ class SingleObjectIterableResultDecorator implements \Iterator
      */
     protected $iterableResult;
 
-    /**
-     * @param IterableResult $iterableResult
-     */
     public function __construct(IterableResult $iterableResult)
     {
         $this->iterableResult = $iterableResult;
@@ -30,7 +27,7 @@ class SingleObjectIterableResultDecorator implements \Iterator
      *
      * @throws HydrationException
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->iterableResult->rewind();
     }
@@ -38,27 +35,24 @@ class SingleObjectIterableResultDecorator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
-        $next = $this->iterableResult->next();
-        return is_array($next)
-            ? reset($next)
-            : $next;
+        $this->iterableResult->next();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         $current = $this->iterableResult->current();
-        return reset($current);
+        return is_iterable($current)? reset($current):$current;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->iterableResult->key();
     }
@@ -66,7 +60,7 @@ class SingleObjectIterableResultDecorator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->iterableResult->valid();
     }

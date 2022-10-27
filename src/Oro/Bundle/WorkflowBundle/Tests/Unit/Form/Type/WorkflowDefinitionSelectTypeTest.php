@@ -15,33 +15,30 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    const WORKFLOW_ENTITY_NAME = 'stdClass';
+    private const WORKFLOW_ENTITY_NAME = 'stdClass';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
-    protected $workflowRegistry;
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflowRegistry;
+
+    /** @var WorkflowDefinition[] */
+    private $definitions = [];
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var WorkflowDefinitionSelectType */
-    protected $type;
+    private $type;
 
-    /** @var array|WorkflowDefinition[] */
-    protected $definitions = [];
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
-
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->workflowRegistry = $this->getMockBuilder(WorkflowRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->translator = $this->createMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->type = new WorkflowDefinitionSelectType($this->workflowRegistry, $this->translator);
         parent::setUp();
@@ -101,14 +98,12 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @param FormInterface $form
-     * @param array $expectedOptions
-     * @param mixed $submittedData
-     * @param mixed $expectedData
-     */
-    protected function assertFormSubmit(FormInterface $form, array $expectedOptions, $submittedData, $expectedData)
-    {
+    private function assertFormSubmit(
+        FormInterface $form,
+        array $expectedOptions,
+        mixed $submittedData,
+        mixed $expectedData
+    ): void {
         $formConfig = $form->getConfig();
         foreach ($expectedOptions as $key => $value) {
             $this->assertTrue($formConfig->hasOption($key));
@@ -120,6 +115,7 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
         $form->submit($submittedData);
 
         $this->assertTrue($form->isValid());
+        $this->assertTrue($form->isSynchronized());
         $this->assertEquals($expectedData, $form->getData());
     }
 
@@ -130,21 +126,16 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider incorrectOptionsDataProvider
-     *
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Either "workflow_name" or "workflow_entity_class" must be set
-     *
-     * @param $options
      */
     public function testNormalizersException(array $options)
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Either "workflow_name" or "workflow_entity_class" must be set');
+
         $this->factory->create(WorkflowDefinitionSelectType::class, null, $options);
     }
 
-    /**
-     * @return array
-     */
-    public function incorrectOptionsDataProvider()
+    public function incorrectOptionsDataProvider(): array
     {
         return [
             [
@@ -178,18 +169,18 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array|Workflow[]
+     * @return Workflow[]
      */
-    protected function getWorkflows()
+    private function getWorkflows(): array
     {
         $definitions = $this->getDefinitions();
         $workflows = [];
 
         foreach ($definitions as $definition) {
-            $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $workflow->expects($this->any())->method('getDefinition')->willReturn($definition);
+            $workflow = $this->createMock(Workflow::class);
+            $workflow->expects($this->any())
+                ->method('getDefinition')
+                ->willReturn($definition);
 
             $workflows[] = $workflow;
         }
@@ -198,18 +189,18 @@ class WorkflowDefinitionSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array|WorkflowDefinition[]
+     * @return WorkflowDefinition[]
      */
-    protected function getDefinitions()
+    private function getDefinitions(): array
     {
         if (!$this->definitions) {
             $this->definitions = [
                 'wf_42' => $this->getEntity(
-                    'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition',
+                    WorkflowDefinition::class,
                     ['name' => 'wf_42', 'label' => 'label42']
                 ),
                 'wf_100' => $this->getEntity(
-                    'Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition',
+                    WorkflowDefinition::class,
                     ['name' => 'wf_100', 'label' => 'label100']
                 )
             ];

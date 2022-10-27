@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Form\Provider;
 
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Generates a tooltip text for the system configured password complexity requirements
@@ -11,6 +11,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class PasswordTooltipProvider
 {
     const BASE = 'oro.user.password_complexity.';
+    const SPECIAL_CHARS_LIST = '!"#$%&\'()*+,-./:;<=>?@[\]^_`{|}~';
     const UNRESTRICTED = self::BASE . 'unrestricted';
     const MIN_LENGTH = 'min_length';
     const LOWER_CASE = 'lower_case';
@@ -36,10 +37,6 @@ class PasswordTooltipProvider
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param PasswordComplexityConfigProvider $configProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(PasswordComplexityConfigProvider $configProvider, TranslatorInterface $translator)
     {
         $this->configProvider = $configProvider;
@@ -62,6 +59,12 @@ class PasswordTooltipProvider
             $transKey = self::BASE . implode(self::SEPARATOR, $parts);
         }
 
-        return $this->translator->trans($transKey, ['{{ length }}' => $this->configProvider->getMinLength()]);
+        return $this->translator->trans(
+            $transKey,
+            [
+                '{{ length }}' => $this->configProvider->getMinLength(),
+                '{{ specialChars }}' => self::SPECIAL_CHARS_LIST
+            ]
+        );
     }
 }

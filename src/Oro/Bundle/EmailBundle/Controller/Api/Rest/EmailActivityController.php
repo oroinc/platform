@@ -2,11 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityApiEntityManager;
@@ -16,15 +12,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @RouteResource("email_activity_relation")
- * @NamePrefix("oro_api_")
+ * REST API controller for email activities.
  */
 class EmailActivityController extends RestGetController
 {
     /**
      * Get entities where an email found by specified filters is an activity.
-     *
-     * @Get("/activities/emails/relations")
      *
      * @QueryParam(
      *      name="page",
@@ -128,7 +121,7 @@ class EmailActivityController extends RestGetController
         );
 
         if ($emailId === null) {
-            return $this->buildResponse('', self::ACTION_READ, ['result' => null], Codes::HTTP_NOT_FOUND);
+            return $this->buildResponse('', self::ACTION_READ, ['result' => null], Response::HTTP_NOT_FOUND);
         }
 
         $page     = (int)$request->get('page', 1);

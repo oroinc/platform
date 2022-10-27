@@ -13,18 +13,18 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 class UserEmailGridListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var UserEmailGridListener */
-    protected $listener;
+    private $listener;
 
     /** @var EmailQueryFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $queryFactory;
+    private $queryFactory;
 
     /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    private $featureChecker;
 
     /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datagrid;
+    private $datagrid;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->queryFactory = $this->createMock(EmailQueryFactory::class);
         $this->featureChecker = $this->createMock(FeatureChecker::class);
@@ -42,24 +42,32 @@ class UserEmailGridListenerTest extends \PHPUnit\Framework\TestCase
             ->method('isFeatureEnabled')
             ->with('test-email-feature', null)
             ->willReturn(false);
-        $this->datagrid->expects($this->never())->method('getDatasource');
+        $this->datagrid->expects($this->never())
+            ->method('getDatasource');
 
         $this->listener->onBuildAfter(new BuildAfter($this->datagrid));
     }
 
     public function testOnBuildAfter()
     {
-        $this->featureChecker->expects($this->once())->method('isFeatureEnabled')->willReturn(true);
+        $this->featureChecker->expects($this->once())
+            ->method('isFeatureEnabled')
+            ->willReturn(true);
         $dataSource = $this->createMock(OrmDatasource::class);
-        $this->datagrid->expects($this->once())->method('getDatasource')->willReturn($dataSource);
+        $this->datagrid->expects($this->once())
+            ->method('getDatasource')
+            ->willReturn($dataSource);
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $countQueryBuilder = $this->createMock(QueryBuilder::class);
-        $dataSource->expects($this->once())->method('getQueryBuilder')->willReturn($queryBuilder);
-        $dataSource->expects($this->once())->method('getCountQb')->willReturn($countQueryBuilder);
-        $this->queryFactory->expects($this->exactly(2))->method('applyAcl')->withConsecutive(
-            [$queryBuilder],
-            [$countQueryBuilder]
-        );
+        $dataSource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilder);
+        $dataSource->expects($this->once())
+            ->method('getCountQb')
+            ->willReturn($countQueryBuilder);
+        $this->queryFactory->expects($this->exactly(2))
+            ->method('applyAcl')
+            ->withConsecutive([$queryBuilder], [$countQueryBuilder]);
 
         $this->listener->onBuildAfter(new BuildAfter($this->datagrid));
     }

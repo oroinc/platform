@@ -2,31 +2,26 @@
 
 namespace Oro\Bundle\ImapBundle\Async;
 
+use Oro\Bundle\ImapBundle\Async\Topic\ClearInactiveMailboxTopic;
 use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that clears inactive mailbox.
+ */
 class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var ImapClearManager */
-    private $clearManager;
+    private ImapClearManager $clearManager;
 
-    /** @var JobRunner */
-    private $jobRunner;
+    private JobRunner $jobRunner;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @param ImapClearManager $clearManager
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
     public function __construct(ImapClearManager $clearManager, JobRunner $jobRunner, LoggerInterface $logger)
     {
         $this->clearManager = $clearManager;
@@ -43,14 +38,14 @@ class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface,
 
         $originId = null;
 
-        $data = JSON::decode($message->getBody());
+        $data = $message->getBody();
         if (isset($data['id'])) {
             $originId = $data['id'];
         }
 
         $this->jobRunner->runUnique(
             $message->getMessageId(),
-            Topics::CLEAR_INACTIVE_MAILBOX,
+            ClearInactiveMailboxTopic::getName(),
             function () use ($originId) {
                 $this->clearManager->clear($originId);
 
@@ -66,6 +61,6 @@ class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface,
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::CLEAR_INACTIVE_MAILBOX];
+        return [ClearInactiveMailboxTopic::getName()];
     }
 }

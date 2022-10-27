@@ -2,6 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Collection;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+
+/**
+ * The collection of additional entities included into API request for such actions
+ * as "create", "update", "update_subresource", etc.
+ */
 class IncludedEntityCollection implements \Countable, \IteratorAggregate
 {
     /** @var KeyObjectCollection */
@@ -10,7 +16,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     /** @var array [key => [entity class, entity id], ...] */
     private $keys = [];
 
-    /** @var array|null [entity class, entity id, entity] */
+    /** @var array|null [entity class, entity id, entity, metadata] */
     private $primaryEntity;
 
     public function __construct()
@@ -26,7 +32,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      */
     public function setPrimaryEntityId($entityClass, $entityId)
     {
-        $this->primaryEntity = [$entityClass, $entityId, null];
+        $this->primaryEntity = [$entityClass, $entityId, null, null];
     }
 
     /**
@@ -49,24 +55,38 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     /**
      * Sets the primary entity.
      *
-     * @param object $entity
+     * @param object|null         $entity
+     * @param EntityMetadata|null $metadata
      */
-    public function setPrimaryEntity($entity)
+    public function setPrimaryEntity($entity, ?EntityMetadata $metadata)
     {
         if (null === $this->primaryEntity) {
             throw new \LogicException('The primary entity identifier must be set before.');
         }
 
         $this->primaryEntity[2] = $entity;
+        $this->primaryEntity[3] = $metadata;
     }
 
     /**
      * Gets the primary entity.
+     *
+     * @return object|null
      */
     public function getPrimaryEntity()
     {
         return null !== $this->primaryEntity
             ? $this->primaryEntity[2]
+            : null;
+    }
+
+    /**
+     * Gets the primary entity.
+     */
+    public function getPrimaryEntityMetadata(): ?EntityMetadata
+    {
+        return null !== $this->primaryEntity
+            ? $this->primaryEntity[3]
             : null;
     }
 
@@ -122,7 +142,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->collection->count();
     }
@@ -158,7 +178,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      *
      * @param object $object
      *
-     * @return IncludedEntityData
+     * @return IncludedEntityData|null
      */
     public function getData($object)
     {
@@ -176,7 +196,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     {
         $key = $this->collection->getKey($object);
 
-        return null !== $key && array_key_exists($key, $this->keys)
+        return null !== $key && \array_key_exists($key, $this->keys)
             ? $this->keys[$key][0]
             : null;
     }
@@ -192,9 +212,19 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
     {
         $key = $this->collection->getKey($object);
 
-        return null !== $key && array_key_exists($key, $this->keys)
+        return null !== $key && \array_key_exists($key, $this->keys)
             ? $this->keys[$key][1]
             : null;
+    }
+
+    /**
+     * Gets all entities from the collection.
+     *
+     * @return object[]
+     */
+    public function getAll()
+    {
+        return array_values($this->collection->getAll());
     }
 
     /**
@@ -202,7 +232,7 @@ class IncludedEntityCollection implements \Countable, \IteratorAggregate
      *
      * @return \Traversable
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator(array_values($this->collection->getAll()));
     }

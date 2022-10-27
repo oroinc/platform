@@ -16,9 +16,6 @@ class FormattingSelectType extends AbstractType
      */
     private $provider;
 
-    /**
-     * @param LocalizationChoicesProvider $provider
-     */
     public function __construct(LocalizationChoicesProvider $provider)
     {
         $this->provider = $provider;

@@ -1,8 +1,13 @@
 <div class="comment-title">
-    <% if (avatarUrl) { %>
-        <img class="comment-title-avatar" src="<%- avatarUrl %>" />
+    <% if (typeof(avatarPicture) !== "undefined" && avatarPicture && avatarPicture.src) { %>
+        <picture>
+            <% _.each(avatarPicture.sources, function(source) { %>
+            <source srcset="<%- source.srcset %>" type="<%- source.type %>">
+            <% }); %>
+            <img class="comment-title-avatar" src="<%- avatarPicture.src %>">
+        </picture>
     <% } else { %>
-        <div class="comment-title-avatar no-avatar" />
+    <div class="comment-title-avatar no-avatar"></div>
     <% } %>
 </div>
 
@@ -22,30 +27,33 @@
     <div class="comment-body"><%= message %></div>
     <% if (attachmentURL) { %>
     <div class="comment-attachments">
-        <div class="attachment-item">
+        <div class="attachment-item attachment-item--note">
             <div class="thumbnail">
-            <% if (attachmentThumbnail) { %>
-                <a href="<%- attachmentURL %>" data-gallery="comment-view-<%- relationId %>" class="no-hash" title="<%- attachmentFileName %>">
-                    <span class="thumbnail" style="background: url('<%- attachmentThumbnail %>') 50% 50% no-repeat;"></span>
+            <% if (attachmentThumbnailPicture && attachmentThumbnailPicture.src) { %>
+                <a href="<%- attachmentURL.url %>" data-gallery="comment-view-<%- relationId %>" class="no-hash" title="<%- attachmentFileName %>" data-sources="<%- JSON.stringify(attachmentURL.sources) %>">
+                    <picture>
+                        <% _.each(attachmentThumbnailPicture.sources, function(source) { %>
+                        <source srcset="<%- source.srcset %>" type="<%- source.type %>">
+                        <% }); %>
+                        <img src="<%- attachmentThumbnailPicture.src %>" class="thumbnail" />
+                    </picture>
                 </a>
             <% } else { %>
-                    <i class="fa <%- attachmentIcon %> fa-3x"></i>
+                    <span class="fa <%- attachmentIcon %> fa-offset-none" aria-hidden="true"></span>
             <% } %>
             </div>
             <div class="dropdown link-to-record">
                 <% var attachmentTogglerId = _.uniqueId('dropdown-') %>
-                <a class="no-hash dropdown-toggle dropdown-toggle--no-caret file-menu" id="<%- attachmentTogglerId %>" href="#" role="button"
+                <a class="no-hash dropdown-toggle dropdown-toggle--no-caret file-menu attachment-item__filename" id="<%- attachmentTogglerId %>" href="#" role="button"
                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="fa <%- attachmentIcon %>" aria-hidden="true"></span> <%- attachmentFileName %>
                 </a>
                 <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="<%- attachmentTogglerId %>">
                     <li>
-                    <a class="dropdown-item no-hash" tabindex="-1" href="<%- attachmentURL %>">
-                        <%= _.__('oro.comment.attachment.download') %><span>(<%- attachmentSize %>)</span>
+                    <a class="dropdown-item no-hash" tabindex="-1" href="<%- attachmentURL.downloadUrl %>">
+                        <%- _.__('oro.comment.attachment.download') %><span>(<%- attachmentSize %>)</span>
                     </a>
-                    <% if (attachmentThumbnail) { %>
-                        <a class="dropdown-item view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL %>"><%= _.__('oro.comment.attachment.view') %></a>
-                    <% } %>
+                    <a class="dropdown-item view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL.url %>"><%- _.__('oro.comment.attachment.view') %></a>
                     </li>
                 </ul>
             </div>
@@ -58,23 +66,30 @@
     <% if (hasActions) { %>
     <div class="more-bar-holder">
         <% var actionsTogglerId = _.uniqueId('dropdown-') %>
-        <div class="dropdown"><button data-toggle="dropdown" class="btn btn-light dropdown-toggle dropdown-toggle--no-caret" id="<%- actionsTogglerId %>"
-                                 data-placement="left-start" aria-haspopup="true" aria-expanded="false" aria-label="<%- _.__('oro.comment.actions_label') %>">
-            <span class="fa fa-ellipsis-h" aria-hidden="true"></span></button>
+        <div class="dropdown">
+            <button data-toggle="dropdown"
+                    class="comment-actions__trigger btn btn-icon btn-light-custom"
+                    id="<%- actionsTogglerId %>"
+                    data-placement="left-start"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    aria-label="<%- _.__('oro.comment.actions_label') %>">
+                <span class="fa-ellipsis-h icon" aria-hidden="true"></span>
+            </button>
             <ul class="dropdown-menu launchers-dropdown-menu" role="menu" aria-labelledby="<%- actionsTogglerId %>">
                 <li>
                     <ul class="launchers-list">
                         <% if (editable) { %>
                         <li class="launcher-item mode-icon-only">
-                            <button class="btn btn-icon btn-light action mode-icon-only item-edit-button" title="<%= _.__('oro.comment.action.update') %>">
-                                <span class="fa-pencil-square-o hide-text" aria-hidden="true"><%= _.__('oro.comment.action.update') %></span>
+                            <button class="btn btn-icon btn-light action mode-icon-only item-edit-button" title="<%- _.__('oro.comment.action.update') %>">
+                                <span class="fa-pencil-square-o hide-text" aria-hidden="true"><%- _.__('oro.comment.action.update') %></span>
                             </button>
                         </li>
                         <% } %>
                         <% if (removable) { %>
                         <li class="launcher-item mode-icon-only">
-                            <button class="btn btn-icon btn-light action mode-icon-only item-remove-button" title="<%= _.__('oro.comment.action.delete') %>">
-                                <span class="fa-trash-o hide-text" aria-hidden="true"><%= _.__('oro.comment.action.delete') %></span>
+                            <button class="btn btn-icon btn-light action mode-icon-only item-remove-button" title="<%- _.__('oro.comment.action.delete') %>">
+                                <span class="fa-trash-o hide-text" aria-hidden="true"><%- _.__('oro.comment.action.delete') %></span>
                             </button>
                         </li>
                         <% } %>

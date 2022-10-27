@@ -2,31 +2,33 @@
 
 namespace Oro\Component\Config;
 
+/**
+ * Represents a state for cumulative resource loaders.
+ */
 class CumulativeResourceManager
 {
-    /**
-     * The singleton instance
-     *
-     * @var CumulativeResourceManager
-     */
+    /** @var CumulativeResourceManager */
     private static $instance;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $appRootDir;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $bundles = [];
 
+    /** @var array */
+    private $bundleDirs = [];
+
+    /** @var array */
+    private $bundleAppDirs = [];
+
+    /** @var array */
+    private $dirs = [];
+
     /**
-     * Returns the singleton instance
-     *
-     * @return CumulativeResourceManager
+     * Gets a singleton instance of the cumulative resource manager.
      */
-    public static function getInstance()
+    public static function getInstance(): CumulativeResourceManager
     {
         if (null === self::$instance) {
             self::$instance = new self();
@@ -36,42 +38,44 @@ class CumulativeResourceManager
     }
 
     /**
-     * A private constructor to prevent create an instance of this class explicitly
+     * A private constructor to prevent create an instance of this class explicitly.
      */
     private function __construct()
     {
     }
 
     /**
-     * Clears state of this manager
-     *
-     * @return CumulativeResourceManager
+     * Clears the state of this manager.
      */
-    public function clear()
+    public function clear(): CumulativeResourceManager
     {
         $this->appRootDir = null;
         $this->bundles = [];
+        $this->bundleDirs = [];
+        $this->bundleAppDirs = [];
+        $this->dirs = [];
 
         return $this;
     }
 
     /**
-     * Gets list of available bundles
+     * Gets a list of available bundles with Application like a virtual bundle.
      *
-     * @return array
+     * @return array [bundle name => bundle class, ...]
      */
-    public function getBundles()
+    public function getBundles(): array
     {
         return $this->bundles;
     }
 
     /**
-     * Sets list of available bundles
+     * Sets a list of available bundles.
      *
-     * @param array $bundles
+     * @param array $bundles [bundle name => bundle class, ...]
+     *
      * @return CumulativeResourceManager
      */
-    public function setBundles($bundles)
+    public function setBundles(array $bundles): CumulativeResourceManager
     {
         $this->bundles = $bundles;
 
@@ -79,25 +83,72 @@ class CumulativeResourceManager
     }
 
     /**
-     * Gets application root directory
-     *
-     * @return string
+     * Gets the application root directory.
      */
-    public function getAppRootDir()
+    public function getAppRootDir(): ?string
     {
         return $this->appRootDir;
     }
 
     /**
-     * Sets application root directory
-     *
-     * @param string $appRootDir
-     * @return CumulativeResourceManager
+     * Sets the application root directory.
      */
-    public function setAppRootDir($appRootDir)
+    public function setAppRootDir(?string $appRootDir): CumulativeResourceManager
     {
         $this->appRootDir = $appRootDir;
 
         return $this;
+    }
+
+    /**
+     * Gets a directory for the given bundle.
+     */
+    public function getBundleDir(string $bundleClass): string
+    {
+        if (isset($this->bundleDirs[$bundleClass])) {
+            return $this->bundleDirs[$bundleClass];
+        }
+
+        $bundleDir = \dirname((new \ReflectionClass($bundleClass))->getFileName());
+        $this->bundleDirs[$bundleClass] = $bundleDir;
+
+        return $bundleDir;
+    }
+
+    /**
+     * Gets a directory for the given bundle in the application directory.
+     */
+    public function getBundleAppDir(string $bundleName): string
+    {
+        if (isset($this->bundleAppDirs[$bundleName])) {
+            return $this->bundleAppDirs[$bundleName];
+        }
+
+        $appRootDir = $this->getAppRootDir();
+        $bundleAppDir = $this->appRootDir && $this->isDir($this->appRootDir)
+            ? $appRootDir . '/Resources/' . $bundleName
+            : '';
+        $this->bundleAppDirs[$bundleName] = $bundleAppDir;
+
+        return $bundleAppDir;
+    }
+
+    /**
+     * Checks if the given path is a directory.
+     */
+    public function isDir(string $path): bool
+    {
+        if (!$path) {
+            return false;
+        }
+
+        if (isset($this->dirs[$path])) {
+            return $this->dirs[$path];
+        }
+
+        $isDir = \is_dir($path);
+        $this->dirs[$path] = $isDir;
+
+        return $isDir;
     }
 }

@@ -11,8 +11,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Assembles attributes collection for the specified workflow configuration.
+ */
 class AttributeAssembler extends BaseAbstractAssembler
 {
     /**
@@ -25,10 +28,6 @@ class AttributeAssembler extends BaseAbstractAssembler
      */
     protected $translator;
 
-    /**
-     * @param AttributeGuesser $attributeGuesser
-     * @param TranslatorInterface $translator
-     */
     public function __construct(AttributeGuesser $attributeGuesser, TranslatorInterface $translator)
     {
         $this->attributeGuesser = $attributeGuesser;
@@ -115,9 +114,10 @@ class AttributeAssembler extends BaseAbstractAssembler
         $attribute->setName($name);
         $attribute->setLabel($options['label']);
         $attribute->setType($options['type']);
-        $attribute->setEntityAcl($this->getOption($options, 'entity_acl', array()));
+        $attribute->setEntityAcl($this->getOption($options, 'entity_acl', []));
         $attribute->setPropertyPath($this->getOption($options, 'property_path'));
-        $attribute->setOptions($this->getOption($options, 'options', array()));
+        $attribute->setOptions($this->getOption($options, 'options', []));
+        $attribute->setDefault($this->getOption($options, 'default', null));
 
         $this->validateAttribute($attribute);
 
@@ -170,7 +170,7 @@ class AttributeAssembler extends BaseAbstractAssembler
     {
         $domain = WorkflowTranslationHelper::TRANSLATION_DOMAIN;
 
-        if ($this->translator->trans($options['label'], [], $domain) === $options['label']) {
+        if ($this->translator->trans((string) $options['label'], [], $domain) === $options['label']) {
             $options['label'] = $attributeParameters['label'];
         }
 
@@ -178,7 +178,6 @@ class AttributeAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param array $options
      * @throws AssemblerException
      */
     protected function assertAttributeEntityAcl(array $options)
@@ -195,7 +194,6 @@ class AttributeAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param BaseAttribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function validateAttribute(BaseAttribute $attribute)
@@ -211,7 +209,6 @@ class AttributeAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param BaseAttribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function assertAttributeHasValidType(BaseAttribute $attribute)

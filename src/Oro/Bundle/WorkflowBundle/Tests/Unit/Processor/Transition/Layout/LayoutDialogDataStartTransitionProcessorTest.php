@@ -15,32 +15,34 @@ use Symfony\Component\HttpFoundation\Request;
 class LayoutDialogDataStartTransitionProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LayoutDialogDataStartTransitionProcessor */
-    protected $processor;
+    private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->processor = new LayoutDialogDataStartTransitionProcessor();
     }
 
     public function testData()
     {
-        /** @var WorkflowItem|\PHPUnit\Framework\MockObject\MockObject $workflowItem */
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->any())->method('getWorkflowName')->willReturn('test_workflow');
+        $workflowItem->expects($this->any())
+            ->method('getWorkflowName')
+            ->willReturn('test_workflow');
 
-        /** @var Transition|\PHPUnit\Framework\MockObject\MockObject $transition */
         $transition = $this->createMock(Transition::class);
 
-        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())->method('get')->with('entityId', 0)->willReturn(42);
+        $request->expects($this->once())
+            ->method('get')
+            ->with('entityId', 0)
+            ->willReturn(42);
 
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $formView */
         $formView = $this->createMock(FormView::class);
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())->method('createView')->willReturn($formView);
+        $form->expects($this->once())
+            ->method('createView')
+            ->willReturn($formView);
 
         $context = new TransitionContext();
         $context->setResultType(new LayoutDialogResultType('route_name'));
@@ -74,13 +76,13 @@ class LayoutDialogDataStartTransitionProcessorTest extends \PHPUnit\Framework\Te
 
     public function skipUnsupportedResultTypeContext()
     {
-        /** @var TransitionContext|\PHPUnit\Framework\MockObject\MockObject $context */
         $context = $this->createMock(TransitionContext::class);
         $context->expects($this->once())
             ->method('getResultType')
             ->willReturn($this->createMock(TransitActionResultTypeInterface::class));
 
-        $context->expects($this->never())->method('getWorkflowName');
+        $context->expects($this->never())
+            ->method('getWorkflowName');
 
         $this->processor->process($context);
     }

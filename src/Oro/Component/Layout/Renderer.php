@@ -13,31 +13,16 @@ use Symfony\Component\Form\FormView;
  */
 class Renderer implements FormRendererInterface
 {
-    const CACHE_KEY_VAR = 'unique_block_prefix';
+    protected const CACHE_KEY_VAR = 'unique_block_prefix';
 
-    /**
-     * @var FormRendererEngineInterface
-     */
-    protected $engine;
+    protected FormRendererEngineInterface $engine;
 
-    /**
-     * @var array
-     */
-    private $blockNameHierarchyMap = [];
+    protected array $blockNameHierarchyMap = [];
 
-    /**
-     * @var array
-     */
-    private $hierarchyLevelMap = [];
+    protected array $hierarchyLevelMap = [];
 
-    /**
-     * @var array
-     */
-    private $variableStack = [];
+    protected array $variableStack = [];
 
-    /**
-     * @param FormRendererEngineInterface $engine
-     */
     public function __construct(FormRendererEngineInterface $engine)
     {
         $this->engine = $engine;
@@ -54,9 +39,9 @@ class Renderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function setTheme(FormView $view, $themes)
+    public function setTheme(FormView $view, $themes, $useDefaultThemes = true)
     {
-        $this->engine->setTheme($view, $themes);
+        $this->engine->setTheme($view, $themes, $useDefaultThemes);
     }
 
     /**
@@ -129,6 +114,7 @@ class Renderer implements FormRendererInterface
     /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
      * {@inheritdoc}
      */
@@ -139,7 +125,7 @@ class Renderer implements FormRendererInterface
         $renderParentBlock = false
     ) {
         $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
-        $viewAndSuffixCacheKey = $viewCacheKey . $blockNameSuffix;
+        $viewAndSuffixCacheKey = $viewCacheKey . '_' . $blockNameSuffix;
 
         if (!isset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey])) {
             // INITIAL CALL

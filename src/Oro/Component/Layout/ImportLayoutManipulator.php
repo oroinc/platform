@@ -1,11 +1,15 @@
 <?php
 
-
 namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Model\LayoutUpdateImport;
 
+/**
+ * Layout imports manipulator. See the layout architecture overview.
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ImportLayoutManipulator implements LayoutManipulatorInterface
 {
     const ROOT_PLACEHOLDER = '__root';
@@ -26,10 +30,6 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
      */
     protected $import;
 
-    /**
-     * @param LayoutManipulatorInterface $layoutManipulator
-     * @param LayoutUpdateImport $import
-     */
     public function __construct(LayoutManipulatorInterface $layoutManipulator, LayoutUpdateImport $import)
     {
         $this->layoutManipulator = $layoutManipulator;
@@ -276,7 +276,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
      */
     protected function hasNamespacePlaceholder($id)
     {
-        return strpos($id, self::NAMESPACE_PLACEHOLDER) === 0 && $id !== self::ROOT_PLACEHOLDER;
+        return str_starts_with($id, self::NAMESPACE_PLACEHOLDER) && self::ROOT_PLACEHOLDER !== $id;
     }
 
     /**
@@ -287,7 +287,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
      */
     protected function replaceNamespace(&$id, $namespace = null)
     {
-        if ($this->hasNamespacePlaceholder($id)) {
+        if ($id !== null && $this->hasNamespacePlaceholder($id)) {
             $replacement = '';
             if ($namespace === null) {
                 $namespace = $this->getNamespace($this->import);

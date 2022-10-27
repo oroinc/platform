@@ -2,29 +2,25 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Oro\Bundle\ActivityListBundle\EventListener\ActivityListPostUpMigrationListener;
+use Oro\Bundle\ActivityListBundle\Migration\ActivityListMigration;
+use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class ActivityListPostUpMigrationListenerTest extends \PHPUnit\Framework\TestCase
 {
     public function testOnPostUp()
     {
-        $provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $activityListExtension = $this
-            ->getMockBuilder('Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $metadataHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $nameGenerator = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $provider = $this->createMock(ActivityListChainProvider::class);
+        $activityListExtension = $this->createMock(ActivityListExtension::class);
+        $metadataHelper = $this->createMock(EntityMetadataHelper::class);
+        $nameGenerator = $this->createMock(ExtendDbIdentifierNameGenerator::class);
+        $configManager = $this->createMock(ConfigManager::class);
 
         $listener = new ActivityListPostUpMigrationListener(
             $provider,
@@ -33,14 +29,12 @@ class ActivityListPostUpMigrationListenerTest extends \PHPUnit\Framework\TestCas
             $nameGenerator,
             $configManager
         );
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $connection = $this->createMock(Connection::class);
 
         $event = new PostMigrationEvent($connection);
         $listener->onPostUp($event);
         $migration = $event->getMigrations()[0];
 
-        $this->assertInstanceOf('Oro\Bundle\ActivityListBundle\Migration\ActivityListMigration', $migration);
+        $this->assertInstanceOf(ActivityListMigration::class, $migration);
     }
 }

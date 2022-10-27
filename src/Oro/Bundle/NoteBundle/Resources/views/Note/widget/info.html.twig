@@ -1,6 +1,6 @@
 {# Activity action template #}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroActivityBundle::macros.html.twig' as AC %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroActivity/macros.html.twig' as AC %}
 
 <div class="widget-content form-horizontal box-content row-fluid">
     <div class="responsive-block">
@@ -16,25 +16,31 @@
             <label class="control-label">
                 {{ 'Attachment'|trans }}
             </label>
-            <div class="attachment-item">
+            <div class="attachment-item attachment-item--note">
                 <div class="thumbnail">
-                    {% if attachment.attachmentThumbnail  %}
-                        <a href="{{ attachment.attachmentURL }}" data-gallery="note-view-{{ entity.id }}" class="no-hash" title="{{ attachment.attachmentFileName }}">
-                            <span class="thumbnail" style="background: url('{{ attachment.attachmentThumbnail  }}') 50% 50% no-repeat;"></span>
+                    {% if attachment.attachmentThumbnailPicture.src  %}
+                        <a href="{{ attachment.attachmentURL.url }}" data-gallery="note-view-{{ entity.id }}" class="no-hash" title="{{ attachment.attachmentFileName|e('html_attr') }}" data-sources="{{ attachment.attachmentURL.sources|json_encode }}">
+                            {% include '@OroAttachment/Twig/picture.html.twig' with {
+                                sources: attachment.attachmentThumbnailPicture.sources,
+                                img_attrs: {
+                                    src: attachment.attachmentThumbnailPicture.src,
+                                    class: "thumbnail"
+                                }
+                            } %}
                         </a>
                     {% else  %}
-                        <span class="fa {{ attachment.attachmentIcon }} fa-3x" aria-hidden="true"></span>
+                        <span class="fa {{ attachment.attachmentIcon }} fa-offset-none" aria-hidden="true"></span>
                     {% endif  %}
                 </div>
                 <div class="dropdown link-to-record">
                     {% set togglerId = 'dropdown-'|uniqid %}
-                    <a id="{{ togglerId }}" class="no-hash dropdown-toggle dropdown-toggle--no-caret file-menu" href="#" role="button" data-toggle="dropdown"
+                    <a id="{{ togglerId }}" class="no-hash attachment-item__filename dropdown-toggle dropdown-toggle--no-caret file-menu" href="#" role="button" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">
                         <span class="fa {{ attachment.attachmentIcon }}" aria-hidden="true"></span> {{ attachment.attachmentFileName }}
                     </a>
                     <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="{{ togglerId }}">
                         <li>
-                            <a class="dropdown-item no-hash" tabindex="-1" href="{{ attachment.attachmentURL }}">
+                            <a class="dropdown-item no-hash" tabindex="-1" href="{{ attachment.attachmentURL.downloadUrl }}">
                                 {{ 'oro.translation.action.download'|trans }} <span>{{ attachment.attachmentSize }}</span>
                             </a>
                         </li>

@@ -2,16 +2,16 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'undersc
 ], function(__, routing, DialogWidget, _) {
     'use strict';
 
-    var ConfigurationWidget = DialogWidget.extend({
+    const ConfigurationWidget = DialogWidget.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function ConfigurationWidget() {
-            ConfigurationWidget.__super__.constructor.apply(this, arguments);
+        constructor: function ConfigurationWidget(options) {
+            ConfigurationWidget.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (typeof options.widget === 'undefined') {
@@ -27,14 +27,14 @@ define(['orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'undersc
                     title: __('oro.dashboard.widget_configuration_label') + ' - ' + options.widget.options.title,
                     modal: true,
                     minHeight: 50,
-                    minWidth: 680,
+                    minWidth: 380,
                     resizable: false,
                     width: 'auto'
                 },
                 options.widget.options.configurationDialogOptions || {}
             );
 
-            ConfigurationWidget.__super__.initialize.apply(this, arguments);
+            ConfigurationWidget.__super__.initialize.call(this, options);
         }
     });
 

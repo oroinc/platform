@@ -6,7 +6,7 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 class DomainObjectStub implements DomainObjectInterface
 {
-    const IDENTIFIER = 'identifier';
+    public const IDENTIFIER = 'identifier';
 
     /**
      * {@inheritDoc}

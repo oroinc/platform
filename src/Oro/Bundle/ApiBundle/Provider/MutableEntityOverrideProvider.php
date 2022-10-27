@@ -19,10 +19,6 @@ class MutableEntityOverrideProvider implements EntityOverrideProviderInterface
         $this->substitutions = $substitutions;
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $substituteEntityClass
-     */
     public function addSubstitution(string $entityClass, string $substituteEntityClass): void
     {
         $this->substitutions[$entityClass] = $substituteEntityClass;
@@ -38,5 +34,18 @@ class MutableEntityOverrideProvider implements EntityOverrideProviderInterface
         }
 
         return $this->substitutions[$entityClass];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityClass(string $substituteClass): ?string
+    {
+        $entityClass = \array_search($substituteClass, $this->substitutions, true);
+        if (false === $entityClass) {
+            return null;
+        }
+
+        return $entityClass;
     }
 }

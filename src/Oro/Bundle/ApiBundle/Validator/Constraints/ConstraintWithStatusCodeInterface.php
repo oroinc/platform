@@ -10,8 +10,6 @@ interface ConstraintWithStatusCodeInterface
 {
     /**
      * Returns HTTP status code that should be returned if the constraint is not satisfied.
-     *
-     * @return int
      */
-    public function getStatusCode();
+    public function getStatusCode(): int;
 }

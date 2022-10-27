@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
 
 /**
  * Represents a context in which AccessRuleWalker works in.
  */
-class AccessRuleWalkerContext implements \Serializable
+class AccessRuleWalkerContext
 {
+    /** @var AccessRuleExecutor Not serializable */
+    private $accessRuleExecutor;
+
     /** @var string */
     private $permission;
 
@@ -21,31 +24,36 @@ class AccessRuleWalkerContext implements \Serializable
     /** @var integer */
     private $organizationId;
 
-    /** @var ContainerInterface Not serialized */
-    private $container;
-
     /** @var array [option name => option value, ...] */
     private $options = [];
 
     /**
-     * @param ContainerInterface $container
+     * @param AccessRuleExecutor $accessRuleExecutor
      * @param string             $permission
      * @param string             $userClass
      * @param null               $userId
      * @param null               $organizationId
      */
     public function __construct(
-        ContainerInterface $container,
+        AccessRuleExecutor $accessRuleExecutor,
         $permission = 'VIEW',
         $userClass = '',
         $userId = null,
         $organizationId = null
     ) {
+        $this->accessRuleExecutor = $accessRuleExecutor;
         $this->permission = $permission;
-        $this->container = $container;
         $this->userClass = $userClass;
         $this->userId = $userId;
         $this->organizationId = $organizationId;
+    }
+
+    /**
+     * Gets the access rule executor.
+     */
+    public function getAccessRuleExecutor(): AccessRuleExecutor
+    {
+        return $this->accessRuleExecutor;
     }
 
     /**
@@ -53,7 +61,7 @@ class AccessRuleWalkerContext implements \Serializable
      *
      * @return string
      */
-    public function getPermission(): string
+    public function getPermission(): ?string
     {
         return $this->permission;
     }
@@ -63,15 +71,13 @@ class AccessRuleWalkerContext implements \Serializable
      *
      * @return string
      */
-    public function getUserClass(): string
+    public function getUserClass(): ?string
     {
         return $this->userClass;
     }
 
     /**
      * Returns current logged user id.
-     *
-     * @return int|null
      */
     public function getUserId(): ?int
     {
@@ -80,8 +86,6 @@ class AccessRuleWalkerContext implements \Serializable
 
     /**
      * Returns organization id.
-     *
-     * @return int|null
      */
     public function getOrganizationId(): ?int
     {
@@ -89,21 +93,15 @@ class AccessRuleWalkerContext implements \Serializable
     }
 
     /**
-     * Returns container instance.
-     *
-     * @return ContainerInterface
+     * Sets organization id.
      */
-    public function getContainer(): ContainerInterface
+    public function setOrganizationId(int $organizationId): void
     {
-        return $this->container;
+        $this->organizationId = $organizationId;
     }
 
     /**
      * Returns true if the additional parameter exists.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
     public function hasOption(string $key): bool
     {
@@ -138,7 +136,7 @@ class AccessRuleWalkerContext implements \Serializable
     }
 
     /**
-     * Sets the additional option.
+     * Sets an additional option.
      *
      * @param string $key
      * @param mixed  $value
@@ -150,36 +148,26 @@ class AccessRuleWalkerContext implements \Serializable
 
     /**
      * Removes an additional option.
-     *
-     * @param string $key
      */
     public function removeOption(string $key): void
     {
         unset($this->options[$key]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return \json_encode(
-            \array_merge(
-                $this->options,
-                [
-                    'permission'      => $this->permission,
-                    'user_class'      => $this->userClass,
-                    'user_id'         => $this->userId,
-                    'organization_id' => $this->organizationId,
-                ]
-            )
+        return array_merge(
+            $this->options,
+            [
+                'permission'      => $this->permission,
+                'user_class'      => $this->userClass,
+                'user_id'         => $this->userId,
+                'organization_id' => $this->organizationId,
+            ]
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         throw new \RuntimeException('Not supported');
     }

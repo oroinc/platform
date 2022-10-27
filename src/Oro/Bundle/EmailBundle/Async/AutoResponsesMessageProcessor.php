@@ -1,6 +1,8 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Async;
 
+use Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponsesTopic;
+use Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponseTopic;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -8,9 +10,10 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that sends auto responses for multiple emails.
+ */
 class AutoResponsesMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -23,21 +26,10 @@ class AutoResponsesMessageProcessor implements MessageProcessorInterface, TopicS
      */
     private $jobRunner;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @param MessageProducerInterface $producer
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
-    public function __construct(MessageProducerInterface $producer, JobRunner $jobRunner, LoggerInterface $logger)
+    public function __construct(MessageProducerInterface $producer, JobRunner $jobRunner)
     {
         $this->producer = $producer;
         $this->jobRunner = $jobRunner;
-        $this->logger = $logger;
     }
 
     /**
@@ -45,13 +37,7 @@ class AutoResponsesMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
-
-        if (! isset($data['ids']) || ! is_array($data['ids'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $data = $message->getBody();
 
         asort($data['ids']);
         $jobName = sprintf(
@@ -68,10 +54,13 @@ class AutoResponsesMessageProcessor implements MessageProcessorInterface, TopicS
                     $jobRunner->createDelayed(
                         sprintf('%s:%s', 'oro.email.send_auto_response', $id),
                         function (JobRunner $jobRunner, Job $child) use ($id) {
-                            $this->producer->send(Topics::SEND_AUTO_RESPONSE, [
-                                'id' => $id,
-                                'jobId' => $child->getId(),
-                            ]);
+                            $this->producer->send(
+                                SendAutoResponseTopic::getName(),
+                                [
+                                    'id' => $id,
+                                    'jobId' => $child->getId(),
+                                ]
+                            );
                         }
                     );
                 }
@@ -88,6 +77,6 @@ class AutoResponsesMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::SEND_AUTO_RESPONSES];
+        return [SendAutoResponsesTopic::getName()];
     }
 }

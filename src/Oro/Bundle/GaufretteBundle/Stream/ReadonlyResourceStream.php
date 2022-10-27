@@ -6,16 +6,14 @@ use Gaufrette\Stream;
 use Gaufrette\StreamMode;
 
 /**
- * Gaufrette stream that allow to read from resource
+ * Provides read-only access to a resource that is stored in Gaufrette file system.
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ReadonlyResourceStream implements Stream
 {
     /** @var resource */
     private $resource;
 
-    /**
-     * @param $resource
-     */
     public function __construct($resource)
     {
         $this->resource = $resource;

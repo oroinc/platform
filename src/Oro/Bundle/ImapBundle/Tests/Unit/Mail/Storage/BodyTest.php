@@ -2,87 +2,80 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
+use Laminas\Mail\Header\ContentType;
+use Laminas\Mail\Header\HeaderInterface;
+use Laminas\Mail\Headers;
+use Laminas\Mail\Storage\Part;
 use Oro\Bundle\ImapBundle\Mail\Storage\Body;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 
 class BodyTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Part|\PHPUnit\Framework\MockObject\MockObject */
     private $part;
 
     /** @var Body */
     private $body;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->part = $this->getMockBuilder('Zend\Mail\Storage\Part')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->part = $this->createMock(Part::class);
 
         $this->body = new Body($this->part);
     }
 
     public function testGetHeaders()
     {
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()->getMock();
-        $headers->expects($this->any())->method('has')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Content-Type', true],
-                        ['Content-Transfer-Encoding', true]
-                    ]
-                )
-            );
+        $headers = $this->createMock(Headers::class);
+        $headers->expects($this->any())
+            ->method('has')
+            ->willReturnMap([
+                ['Content-Type', true],
+                ['Content-Transfer-Encoding', true]
+            ]);
 
-        $this->part
-            ->expects($this->once())
+        $this->part->expects($this->once())
             ->method('getHeaders')
-            ->will($this->returnValue($headers));
+            ->willReturn($headers);
 
         $result = $this->body->getHeaders();
 
-        $this->assertTrue($headers === $result);
+        $this->assertSame($headers, $result);
     }
 
     public function testGetHeader()
     {
-        $header = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()->getMock();
-        $header->expects($this->any())->method('has')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Content-Type', true],
-                        ['Content-Transfer-Encoding', true]
-                    ]
-                )
-            );
+        $header = $this->createMock(Headers::class);
+        $header->expects($this->any())
+            ->method('has')
+            ->willReturnMap([
+                ['Content-Type', true],
+                ['Content-Transfer-Encoding', true]
+            ]);
 
-        $this->part
-            ->expects($this->once())
+        $this->part->expects($this->once())
             ->method('getHeader')
-            ->with($this->equalTo('SomeHeader'), $this->equalTo('string'))
-            ->will($this->returnValue($header));
+            ->with('SomeHeader', 'string')
+            ->willReturn($header);
 
         $result = $this->body->getHeader('SomeHeader', 'string');
 
-        $this->assertTrue($header === $result);
+        $this->assertSame($header, $result);
     }
 
     public function testGetContentSinglePartText()
     {
-        $contentValue            = 'testContent';
-        $contentType             = 'type/testContentType';
+        $contentValue = 'testContent';
+        $contentType = 'type/testContentType';
         $contentTransferEncoding = 'testContentTransferEncoding';
-        $contentEncoding         = 'testEncoding';
+        $contentEncoding = 'testEncoding';
 
-        $this->part->expects($this->once())->method('isMultipart')
-            ->will($this->returnValue(false));
+        $this->part->expects($this->once())
+            ->method('isMultipart')
+            ->willReturn(false);
 
         $this->preparePartMock($this->part, $contentValue, $contentType, $contentTransferEncoding, $contentEncoding);
-        $result   = $this->body->getContent(Body::FORMAT_TEXT);
+        $result = $this->body->getContent(Body::FORMAT_TEXT);
         $expected = new Content($contentValue, $contentType, $contentTransferEncoding, $contentEncoding);
 
         $this->assertEquals($expected, $result);
@@ -90,16 +83,17 @@ class BodyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetContentSinglePartHtml()
     {
-        $contentValue            = '<p>testContent</p>';
-        $contentType             = 'type/testContentType';
+        $contentValue = '<p>testContent</p>';
+        $contentType = 'type/testContentType';
         $contentTransferEncoding = 'testContentTransferEncoding';
-        $contentEncoding         = 'testEncoding';
+        $contentEncoding = 'testEncoding';
 
-        $this->part->expects($this->once())->method('isMultipart')
-            ->will($this->returnValue(false));
+        $this->part->expects($this->once())
+            ->method('isMultipart')
+            ->willReturn(false);
 
         $this->preparePartMock($this->part, $contentValue, $contentType, $contentTransferEncoding, $contentEncoding);
-        $result   = $this->body->getContent(Body::FORMAT_HTML);
+        $result = $this->body->getContent(Body::FORMAT_HTML);
         $expected = new Content($contentValue, $contentType, $contentTransferEncoding, $contentEncoding);
 
         $this->assertEquals($expected, $result);
@@ -107,20 +101,19 @@ class BodyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetContentMultipartText()
     {
-        $this->part->expects($this->any())->method('isMultipart')
-            ->will($this->returnValue(true));
+        $this->part->expects($this->any())
+            ->method('isMultipart')
+            ->willReturn(true);
 
-        $part1 = $this->getMockBuilder('Zend\Mail\Storage\Part')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $part2 = $this->getMockBuilder('Zend\Mail\Storage\Part')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $part1 = $this->createMock(Part::class);
+        $part2 = $this->createMock(Part::class);
 
-        $part1->expects($this->any())->method('isMultipart')
-            ->will($this->returnValue(false));
-        $part2->expects($this->any())->method('isMultipart')
-            ->will($this->returnValue(false));
+        $part1->expects($this->any())
+            ->method('isMultipart')
+            ->willReturn(false);
+        $part2->expects($this->any())
+            ->method('isMultipart')
+            ->willReturn(false);
 
         $this->mockIterator($this->part, $part1, $part2);
         $this->preparePartMock($part1, 'part1Content', 'text/plain', '8Bit', 'ISO-8859-1');
@@ -145,13 +138,14 @@ class BodyTest extends \PHPUnit\Framework\TestCase
     {
         $obj->expects($this->exactly(3))
             ->method('current')
-            ->will(
-                $this->onConsecutiveCalls($iterationResult1, $iterationResult1, $iterationResult2)
-            );
-        $obj->expects($this->any())->method('next');
-        $obj->expects($this->any())->method('rewind');
-        $obj->expects($this->exactly(3))->method('valid')
-            ->will($this->onConsecutiveCalls(true, true, true));
+            ->willReturnOnConsecutiveCalls($iterationResult1, $iterationResult1, $iterationResult2);
+        $obj->expects($this->any())
+            ->method('next');
+        $obj->expects($this->any())
+            ->method('rewind');
+        $obj->expects($this->exactly(3))
+            ->method('valid')
+            ->willReturnOnConsecutiveCalls(true, true, true);
     }
 
     private function preparePartMock(
@@ -161,42 +155,40 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         $contentTransferEncoding,
         $contentEncoding
     ) {
-        $headers = $this->getMockBuilder('Zend\Mail\Headers')
-            ->disableOriginalConstructor()->getMock();
+        $headers = $this->createMock(Headers::class);
 
-        $headers->expects($this->any())->method('has')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Content-Type', true],
-                        ['Content-Transfer-Encoding', true]
-                    ]
-                )
-            );
+        $headers->expects($this->any())
+            ->method('has')
+            ->willReturnMap([
+                ['Content-Type', true],
+                ['Content-Transfer-Encoding', true]
+            ]);
 
-        $obj->expects($this->any())->method('getHeaders')
-            ->will($this->returnValue($headers));
-        $obj->expects($this->once())->method('getContent')
-            ->will($this->returnValue($contentValue));
+        $obj->expects($this->any())
+            ->method('getHeaders')
+            ->willReturn($headers);
+        $obj->expects($this->once())
+            ->method('getContent')
+            ->willReturn($contentValue);
 
-        $contentTypeHeader = $this->createMock('Zend\Mail\Header\ContentType');
-        $contentTypeHeader->expects($this->any())->method('getType')
-            ->will($this->returnValue($contentType));
-        $contentTypeHeader->expects($this->any())->method('getParameter')
-            ->will($this->returnValue($contentEncoding));
+        $contentTypeHeader = $this->createMock(ContentType::class);
+        $contentTypeHeader->expects($this->any())
+            ->method('getType')
+            ->willReturn($contentType);
+        $contentTypeHeader->expects($this->any())
+            ->method('getParameter')
+            ->willReturn($contentEncoding);
 
-        $contentEncodingHeader = $this->createMock('Zend\Mail\Header\HeaderInterface');
-        $contentEncodingHeader->expects($this->any())->method('getFieldValue')
-            ->will($this->returnValue($contentTransferEncoding));
+        $contentEncodingHeader = $this->createMock(HeaderInterface::class);
+        $contentEncodingHeader->expects($this->any())
+            ->method('getFieldValue')
+            ->willReturn($contentTransferEncoding);
 
-        $obj->expects($this->any())->method('getHeader')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Content-Type', null, $contentTypeHeader],
-                        ['Content-Transfer-Encoding', null, $contentEncodingHeader]
-                    ]
-                )
-            );
+        $obj->expects($this->any())
+            ->method('getHeader')
+            ->willReturnMap([
+                ['Content-Type', null, $contentTypeHeader],
+                ['Content-Transfer-Encoding', null, $contentEncodingHeader]
+            ]);
     }
 }

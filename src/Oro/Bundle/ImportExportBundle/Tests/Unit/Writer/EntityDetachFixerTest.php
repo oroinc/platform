@@ -4,6 +4,8 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -13,31 +15,27 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
-    protected $entityManager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FieldHelper */
-    protected $fieldHelper;
+    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldHelper;
 
     /** @var EntityDetachFixer */
-    protected $fixer;
+    private $fixer;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $this->entityManager = $this->createMock('Doctrine\ORM\EntityManager');
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->fieldHelper = $this->createMock(FieldHelper::class);
 
-        $this->doctrineHelper = $this->createMock('Oro\Bundle\EntityBundle\ORM\DoctrineHelper');
-        $this->doctrineHelper->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($this->entityManager));
-
-        $this->fieldHelper = $this->createMock('Oro\Bundle\EntityBundle\Helper\FieldHelper');
+            ->willReturn($this->entityManager);
 
         $this->fixer = new EntityDetachFixer(
-            $this->doctrineHelper,
+            $doctrineHelper,
             $this->fieldHelper,
             PropertyAccess::createPropertyAccessor()
         );
@@ -52,79 +50,106 @@ class EntityDetachFixerTest extends \PHPUnit\Framework\TestCase
         $this->fixer->fixEntityAssociationFields($entity, -1);
     }
 
-    /**
-     * @dataProvider valueDataProvider
-     * @param mixed $fieldValue
-     */
-    public function testFixEntityAssociationFieldsEntity($fieldValue)
+    public function testEntityWithoutRelations()
+    {
+        $entity = new \stdClass();
+
+        $this->fieldHelper->expects($this->once())
+            ->method('getRelations')
+            ->with(get_class($entity))
+            ->willReturn([]);
+
+        $this->entityManager->expects($this->never())
+            ->method('getUnitOfWork');
+
+        $this->fixer->fixEntityAssociationFields($entity);
+    }
+
+    public function testFixEntityAssociationFields()
     {
         $entity = new EntityStub();
-        $entity->setReadable($fieldValue);
-
-        if ($fieldValue instanceof ArrayCollection) {
-            $linkedEntity = $fieldValue->getIterator()->offsetGet(0);
-        } else {
-            $linkedEntity = $fieldValue;
-        }
+        $entity->setEntity(new EntityStub())
+            ->setNewCollection(new ArrayCollection([new EntityStub()]))
+            ->setDirtyPersistentCollection($this->createPersistentCollection(true, false))
+            ->setInitializedPersistentCollection($this->createPersistentCollection(false, true))
+            ->setCleanNotInitializedPersistentCollection($this->createPersistentCollection(false, false));
 
         $this->fieldHelper->expects($this->once())
             ->method('getRelations')
             ->with(get_class($entity))
             ->willReturn(
                 [
-                    ['name' => 'readable'],
+                    ['name' => 'entity'],
+                    ['name' => 'newCollection'],
+                    ['name' => 'dirtyPersistentCollection'],
+                    ['name' => 'initializedPersistentCollection'],
+                    ['name' => 'cleanNotInitializedPersistentCollection'],
                     ['name' => 'notReadable']
                 ]
             );
 
-        $metadata = $this->createMock('Doctrine\ORM\Mapping\ClassMetadata');
-        $metadata->expects($this->once())
+        $metadata = $this->createMock(ClassMetadata::class);
+        $metadata->expects($this->exactly(4))
             ->method('getIdentifierValues')
-            ->with($linkedEntity)
-            ->will($this->returnValue('id'));
+            ->withAnyParameters()
+            ->willReturn('id');
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects($this->exactly(4))
             ->method('getClassMetadata')
-            ->with(\stdClass::class)
+            ->with(EntityStub::class)
             ->willReturn($metadata);
 
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow->expects($this->once())
+        $uow = $this->createMock(UnitOfWork::class);
+        $uow->expects($this->exactly(4))
             ->method('getEntityState')
-            ->with($linkedEntity)
             ->willReturn(UnitOfWork::STATE_DETACHED);
 
-        $this->entityManager->expects($this->once())
+        // 4 entity check + 2 check inside PersistentCollection on set entity
+        $this->entityManager->expects($this->exactly(6))
             ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->willReturn($uow);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects($this->exactly(4))
             ->method('getReference')
-            ->with('stdClass', 'id')
-            ->willReturnCallback(
-                function () use ($entity) {
-                    $entity->reloaded = true;
-                    return $entity;
-                }
-            );
-        $this->fixer->fixEntityAssociationFields($entity, 0);
-        if ($fieldValue instanceof ArrayCollection) {
-            $this->assertTrue($entity->getReadable()->getIterator()->offsetGet(0)->reloaded);
-        } else {
-            $this->assertTrue($entity->getReadable()->reloaded);
-        }
+            ->with(EntityStub::class, 'id')
+            ->willReturnCallback(function () {
+                $entity = new EntityStub();
+                $entity->reloaded = true;
+
+                return $entity;
+            });
+
+        $uow->expects($this->never())
+            ->method('loadCollection');
+
+        $this->fixer->fixEntityAssociationFields($entity);
+
+        $this->assertTrue($entity->getEntity()->reloaded);
+
+        $this->assertCount(1, $entity->getNewCollection());
+        $this->assertTrue($entity->getNewCollection()->first()->reloaded);
+
+        $this->assertCount(1, $entity->getDirtyPersistentCollection());
+        $this->assertTrue($entity->getDirtyPersistentCollection()->first()->reloaded);
+
+        $this->assertCount(1, $entity->getInitializedPersistentCollection());
+        $this->assertTrue($entity->getInitializedPersistentCollection()->first()->reloaded);
+
+        $this->assertCount(1, $entity->getCleanNotInitializedPersistentCollection());
+        $this->assertFalse($entity->getCleanNotInitializedPersistentCollection()->first()->reloaded);
     }
 
-    /**
-     * @return array
-     */
-    public function valueDataProvider()
+    private function createPersistentCollection(bool $isDirty, bool $isInitialized): PersistentCollection
     {
-        $entity = new \stdClass();
-        $collection = new ArrayCollection([$entity]);
+        $changedPersistentCollection = new PersistentCollection(
+            $this->entityManager,
+            null,
+            new ArrayCollection([new EntityStub()])
+        );
 
-        return [[new \stdClass()], [$collection]];
+        $changedPersistentCollection->setDirty($isDirty);
+        $changedPersistentCollection->setInitialized($isInitialized);
+
+        return $changedPersistentCollection;
     }
 }

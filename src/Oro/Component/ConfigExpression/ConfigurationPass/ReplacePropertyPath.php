@@ -49,7 +49,7 @@ class ReplacePropertyPath implements ConfigurationPassInterface
      */
     protected function isStringPropertyPath($path)
     {
-        return is_string($path) && preg_match('/^\\\?\$\.?[a-zA-Z_\x7f-\xff][\.a-zA-Z0-9_\x7f-\xff\[\]]*$/', $path);
+        return is_string($path) && preg_match('/^\\\?\$\.?[a-zA-Z\_\x7f-\xff][\.a-zA-Z0-9\_\x7f-\xff\[\]]*$/', $path);
     }
 
     /**
@@ -63,7 +63,7 @@ class ReplacePropertyPath implements ConfigurationPassInterface
         if ($pos === 0) {
             $property = substr($value, 1);
 
-            if (0 === strpos($property, '.')) {
+            if (str_starts_with($property, '.')) {
                 $property = substr($property, 1);
             } elseif ($this->prefix) {
                 $property = $this->prefix . '.' .  $property;

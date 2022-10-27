@@ -14,7 +14,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
     /** @var NormalizeIdFilterKey */
     private $processor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -64,10 +64,54 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         $this->assertFilters($filters, $this->context->getFilters());
     }
 
+    public function testProcessForNotManageableEntityWithIdFilterAndAnotherFilterWithIdPropertyPathEqualsToId()
+    {
+        $className = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $config->setIdentifierFieldNames(['id']);
+        $config->addField('id');
+
+        $filters = [
+            'id'       => [
+                'expectedKey'         => 'id',
+                'expectedDescription' => 'Filter records by the identifier field'
+            ],
+            'category' => [
+                'property_path'       => 'id',
+                'expectedKey'         => 'category',
+                'expectedDescription' => null
+            ]
+        ];
+
+        foreach ($filters as $fieldName => $item) {
+            $filter = new ComparisonFilter('integer');
+            $filter->setField($fieldName);
+            if (isset($item['property_path'])) {
+                $filter->setField($item['property_path']);
+            }
+            $this->context->getFilters()->add($fieldName, $filter);
+        }
+
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+
+        foreach ($this->context->getFilters() as $filterKey => $filterDefinition) {
+            self::assertArrayHasKey($filterKey, $filters);
+            $expectedFilter = $filters[$filterKey];
+            self::assertEquals($expectedFilter['expectedKey'], $filterKey, $filterKey);
+            self::assertEquals(
+                $expectedFilter['expectedDescription'],
+                $filterDefinition->getDescription(),
+                'Description for ' . $filterKey
+            );
+        }
+    }
+
     /**
      * @dataProvider processProvider
      */
-    public function testProcessForManageableEntityWithoutConfig($className, $filters)
+    public function testProcessForManageableEntityWithoutConfig(string $className, array $filters)
     {
         foreach (array_keys($filters) as $fieldName) {
             $filter = new ComparisonFilter('integer');
@@ -85,7 +129,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @dataProvider processProvider
      */
-    public function testProcessForManageableEntityWithConfig($className, $filters)
+    public function testProcessForManageableEntityWithConfig(string $className, array $filters)
     {
         $config = new EntityDefinitionConfig();
         $idFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($className);
@@ -113,7 +157,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         $config->addField('renamedId')->setPropertyPath('id');
 
         $filters = [
-            'id'   => [
+            'id' => [
                 'expectedKey'         => 'id',
                 'expectedDescription' => 'Filter records by the identifier field'
             ]
@@ -132,7 +176,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         $this->assertFilters($filters, $this->context->getFilters());
     }
 
-    public function processProvider()
+    public function processProvider(): array
     {
         return [
             [
@@ -164,11 +208,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         ];
     }
 
-    /**
-     * @param array            $expectedFilters
-     * @param FilterCollection $actualFilters
-     */
-    private function assertFilters(array $expectedFilters, FilterCollection $actualFilters)
+    private function assertFilters(array $expectedFilters, FilterCollection $actualFilters): void
     {
         foreach ($actualFilters as $filterKey => $filterDefinition) {
             $fieldName = $filterDefinition->getField();

@@ -60,9 +60,11 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 new EmptyConstraint(),
                 new StickLeftLocationDirective())
         );
-        this.buildCornerAxises();
+        // turned off building corner axises to simplify graph
+        // this.buildCornerAxises();
         this.buildCenterAxises();
         this.buildCenterLinesBetweenNodes();
+        this.mergeExtraCenterAxises();
         this.createAxises();
         this.buildMergeRequests();
         this.mergeAxises();
@@ -89,8 +91,8 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @returns {Path}
      */
     Graph.prototype.getPathFrom = function(rect, direction) {
-        var center = rect.center;
-        var node;
+        const center = rect.center;
+        let node;
         switch (direction.id) {
             case directions.BOTTOM_TO_TOP.id:
                 node = this.getNodeAt(new Point2d(center.x, center.y - 1));
@@ -121,8 +123,8 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @returns {Rectangle}
      */
     Graph.prototype.getRectByCid = function(cid) {
-        for (var i = 0; i < this.rectangles.length; i++) {
-            var rect = this.rectangles[i];
+        for (let i = 0; i < this.rectangles.length; i++) {
+            const rect = this.rectangles[i];
             if (rect.cid === cid) {
                 return rect;
             }
@@ -134,7 +136,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Draws graph
      */
     Graph.prototype.draw = function() {
-        var i;
+        let i;
         this.outerRect.draw('red');
         function drawFn(item) {
             return item.draw('cyan');
@@ -148,7 +150,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
         for (i = this.rectangles.length - 1; i >= 0; i--) {
             this.rectangles[i].draw('black');
         }
-        for (var key in this.nodes) {
+        for (const key in this.nodes) {
             if (this.nodes.hasOwnProperty(key)) {
                 this.nodes[key].draw('black');
             }
@@ -159,8 +161,8 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Divides all axises into horizontal and vertical ones
      */
     Graph.prototype.createAxises = function() {
-        for (var i = 0; i < this.baseAxises.length; i++) {
-            var axis = this.baseAxises[i];
+        for (let i = 0; i < this.baseAxises.length; i++) {
+            const axis = this.baseAxises[i];
             if (axis.isVertical) {
                 this.verticalAxises.push(axis);
             } else if (axis.a.y === axis.b.y) {
@@ -175,7 +177,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @param {Axis} axis
      */
     Graph.prototype.removeAxis = function(axis) {
-        var index;
+        let index;
         if ((index = this.horizontalAxises.indexOf(axis)) !== -1) {
             this.horizontalAxises.splice(index, 1);
             return;
@@ -189,10 +191,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Processes merge axises queue
      */
     Graph.prototype.mergeAxises = function() {
-        var i;
-        var j;
+        let i;
+        let j;
         for (i = 0; i < this.mergeAxisesQueue.length; i++) {
-            var queue = this.mergeAxisesQueue[i];
+            const queue = this.mergeAxisesQueue[i];
             for (j = queue.length - 1; j >= 1; j--) {
                 queue[j - 1].merge(queue[j]);
                 this.removeAxis(queue[j]);
@@ -206,7 +208,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * - sort axises
      */
     Graph.prototype.finalizeAxises = function() {
-        var i;
+        let i;
         for (i = this.verticalAxises.length - 1; i >= 0; i--) {
             this.verticalAxises[i].sortNodes();
             this.verticalAxises[i].finalize();
@@ -227,14 +229,14 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Prepares information about axis connection between each other
      */
     Graph.prototype.buildAxisConnectionInfo = function() {
-        var i;
-        var j;
-        var node;
-        var connectionToLeft;
-        var nodeAtLeft;
-        var connectionToRight;
-        var nodeAtRight;
-        var axis;
+        let i;
+        let j;
+        let node;
+        let connectionToLeft;
+        let nodeAtLeft;
+        let connectionToRight;
+        let nodeAtRight;
+        let axis;
 
         for (i = 0; i < this.horizontalAxises.length; i++) {
             axis = this.horizontalAxises[i];
@@ -291,9 +293,9 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Adds axises around initial rectangles
      */
     Graph.prototype.buildCornerAxises = function() {
-        for (var i = this.rectangles.length - 1; i >= 0; i--) {
-            var rect = this.rectangles[i];
-            var defs = [
+        for (let i = this.rectangles.length - 1; i >= 0; i--) {
+            const rect = this.rectangles[i];
+            const defs = [
                 {
                     vectorA: new Vector2d(rect.left, rect.top, directions.TOP_TO_BOTTOM),
                     vectorB: new Vector2d(rect.left, rect.bottom, directions.BOTTOM_TO_TOP),
@@ -323,10 +325,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                     locationDirective: new StickLeftLocationDirective()
                 }
             ];
-            for (var j = defs.length - 1; j >= 0; j--) {
-                var def = defs[j];
-                var closestRectCrossPoint1 = this.findClosestRectCross(def.vectorA, rect);
-                var closestRectCrossPoint2 = this.findClosestRectCross(def.vectorB, rect);
+            for (let j = defs.length - 1; j >= 0; j--) {
+                const def = defs[j];
+                const closestRectCrossPoint1 = this.findClosestRectCross(def.vectorA, rect);
+                const closestRectCrossPoint2 = this.findClosestRectCross(def.vectorB, rect);
                 this.baseAxises.push(
                     BaseAxis.createFromInterval(
                         new Interval2d(closestRectCrossPoint1, closestRectCrossPoint2),
@@ -343,10 +345,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Adds axises which go through center of initial rectangle
      */
     Graph.prototype.buildCenterAxises = function() {
-        for (var i = this.rectangles.length - 1; i >= 0; i--) {
-            var rect = this.rectangles[i];
-            var center = rect.center;
-            var defs = [
+        for (let i = this.rectangles.length - 1; i >= 0; i--) {
+            const rect = this.rectangles[i];
+            const center = rect.center;
+            const defs = [
                 {
                     vector: new Vector2d(center.x, center.y + 1, directions.TOP_TO_BOTTOM),
                     leftConstraint: new LeftSimpleConstraint(rect.left),
@@ -372,15 +374,17 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                     locationDirective: new CenterLocationDirective()
                 }
             ];
-            for (var j = defs.length - 1; j >= 0; j--) {
-                var def = defs[j];
-                var closestRectCrossPoint = this.findClosestRectCross(def.vector, rect);
-                var axis = new BaseAxis(def.vector.start, closestRectCrossPoint, this, 1, def.leftConstraint,
+            for (let j = defs.length - 1; j >= 0; j--) {
+                const def = defs[j];
+                const closestRectCrossPoint = this.findClosestRectCross(def.vector, rect);
+                const axis = new BaseAxis(def.vector.start, closestRectCrossPoint, this, 1, def.leftConstraint,
                     def.rightConstraint, def.locationDirective);
-                var secondaryAxis = new BaseAxis(def.vector.start, def.vector.start, this, 1, new EmptyConstraint(),
-                    new EmptyConstraint(), new CenterLocationDirective());
-                secondaryAxis.isVertical = !axis.isVertical;
-                this.baseAxises.push(axis, secondaryAxis);
+                // removed "one-pixel axis"
+                // const secondaryAxis = new BaseAxis(def.vector.start, def.vector.start, this, 1, new EmptyConstraint(),
+                //     new EmptyConstraint(), new CenterLocationDirective());
+                // secondaryAxis.isVertical = !axis.isVertical;
+                // this.baseAxises.push(axis, secondaryAxis);
+                this.baseAxises.push(axis);
             }
         }
     };
@@ -390,9 +394,9 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @param {Function} fn
      */
     Graph.prototype.eachRectanglePair = function(fn) {
-        for (var i = this.rectangles.length - 1; i >= 0; i--) {
-            var rect1 = this.rectangles[i];
-            for (var j = i - 1; j >= 0; j--) {
+        for (let i = this.rectangles.length - 1; i > 0; i--) {
+            const rect1 = this.rectangles[i];
+            for (let j = i - 1; j >= 0; j--) {
                 fn(rect1, this.rectangles[j]);
             }
         }
@@ -419,13 +423,107 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
     };
 
     /**
+     * Groups central axises within same area and replaces them with single axis
+     */
+    Graph.prototype.mergeExtraCenterAxises = function() {
+        const maxDelta = this.centerLineMinimalRequiredWidth;
+
+        this.baseAxises
+            .filter(function(axis) {
+                // filter only axises that are build between nodes
+                return axis.leftConstraint instanceof LeftSimpleConstraint &&
+                    axis.rightConstraint instanceof RightSimpleConstraint &&
+                    axis.locationDirective instanceof CenterLocationDirective;
+            })
+            .reduce(function(groups, axis, i, axises) {
+                // groups compatible central axises
+                let group;
+                let compatibleAxis;
+                const even = axis.isVertical ? 'y' : 'x';
+                const varying = axis.isVertical ? 'x' : 'y';
+
+                // looks for compatible axis
+                for (let j = axises.length - 1; j > i && !compatibleAxis; j--) {
+                    if (
+                        axises[j].a[even] === axis.a[even] &&
+                        axises[j].b[even] === axis.b[even] &&
+                        (
+                            Math.max(axises[j].a[varying], axis.a[varying]) -
+                            Math.min(axises[j].a[varying], axis.a[varying])
+                        ) <= maxDelta
+                    ) {
+                        compatibleAxis = axises[j];
+                    }
+                }
+
+                if (compatibleAxis) {
+                    // check if group already exists
+                    for (let n = 0; n < groups.length; n++) {
+                        if (groups[n].indexOf(compatibleAxis) !== -1) {
+                            group = groups[n];
+                            break;
+                        }
+                    }
+
+                    if (group) {
+                        // add the axis to existing group
+                        group.push(axis);
+                    } else {
+                        // create new group
+                        groups.push([axis, compatibleAxis]);
+                    }
+                }
+
+                return groups;
+            }, [])
+            .forEach(function(group) {
+                const axis = group[0];
+                // defines limits for common constraint
+                const constraint = group.slice(1).reduce(function(constraint, axis) {
+                    return {
+                        left: Math.min(axis.leftConstraint.recomendedStart, constraint.left),
+                        right: Math.max(axis.rightConstraint.recomendedStart, constraint.right)
+                    };
+                }, {
+                    left: axis.leftConstraint.recomendedStart,
+                    right: axis.rightConstraint.recomendedStart
+                });
+
+                // removes axises of group
+                group.forEach(function(axis) {
+                    this.baseAxises.splice(this.baseAxises.indexOf(axis), 1);
+                }.bind(this));
+
+                // create replacement axis
+                const pointA = {};
+                const pointB = {};
+                const even = axis.isVertical ? 'y' : 'x';
+                const varying = axis.isVertical ? 'x' : 'y';
+
+                pointA[even] = axis.a[even];
+                pointB[even] = axis.b[even];
+                pointA[varying] = pointB[varying] = constraint.left + (constraint.right - constraint.left) / 2;
+
+                this.baseAxises.push(new BaseAxis(
+                    new Point2d(pointA.x, pointA.y),
+                    new Point2d(pointB.x, pointB.y),
+                    this,
+                    settings.centerAxisCostMultiplier,
+                    new LeftSimpleConstraint(constraint.left),
+                    new RightSimpleConstraint(constraint.right),
+                    new CenterLocationDirective()
+                ));
+            }.bind(this));
+    };
+
+    /**
      * Adds single axis between rectangles
      */
     Graph.prototype.buildSingleCenterLine = function(aRect, bRect, coordinate, a, b, min, max) {
-        var aVector = new Vector2d(a.center.x, a.center.y, a.a.sub(a.b).rot270().unitVector);
-        var bVector = new Vector2d(b.center.x, b.center.y, b.a.sub(b.b).rot90().unitVector);
-        var crossRect = new Rectangle(Math.min(a.center.x, b.center.x), Math.min(a.center.y, b.center.y), 1, 1);
-        var crossLine;
+        const aVector = new Vector2d(a.center.x, a.center.y, a.a.sub(a.b).rot270().unitVector);
+        const bVector = new Vector2d(b.center.x, b.center.y, b.a.sub(b.b).rot90().unitVector);
+        const crossRect = new Rectangle(Math.min(a.center.x, b.center.x), Math.min(a.center.y, b.center.y), 1, 1);
+        let crossLine;
         crossRect.right = Math.max(a.center.x, b.center.x);
         crossRect.bottom = Math.max(a.center.y, b.center.y);
         if (this.rectangleIntersectsAnyRectangle(crossRect)) {
@@ -436,12 +534,12 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
         } else {
             crossLine = new Line2d(Infinity, coordinate);
         }
-        var intersectionA = crossLine.intersection(aVector.line);
-        var intersectionB = crossLine.intersection(bVector.line);
-        var vector1 = new Vector2d(intersectionA.x, intersectionA.y, aVector.direction.rot90());
-        var vector2 = new Vector2d(intersectionB.x, intersectionB.y, bVector.direction.rot90());
-        var closestRectCrossPoint1 = this.findClosestRectCross(vector1, null);
-        var closestRectCrossPoint2 = this.findClosestRectCross(vector2, null);
+        const intersectionA = crossLine.intersection(aVector.line);
+        const intersectionB = crossLine.intersection(bVector.line);
+        const vector1 = new Vector2d(intersectionA.x, intersectionA.y, aVector.direction.rot90());
+        const vector2 = new Vector2d(intersectionB.x, intersectionB.y, bVector.direction.rot90());
+        const closestRectCrossPoint1 = this.findClosestRectCross(vector1, null);
+        const closestRectCrossPoint2 = this.findClosestRectCross(vector2, null);
         this.baseAxises.push(new BaseAxis(closestRectCrossPoint1, closestRectCrossPoint2, this,
             settings.centerAxisCostMultiplier, new LeftSimpleConstraint(min),
             new RightSimpleConstraint(max), new CenterLocationDirective()));
@@ -450,12 +548,12 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
         /*
          * add all nodes at axises cross points
          */
-        var node;
-        var i;
-        var j;
-        var hAxis;
-        var vAxis;
-        var crossPoint;
+        let node;
+        let i;
+        let j;
+        let hAxis;
+        let vAxis;
+        let crossPoint;
         for (i = this.horizontalAxises.length - 1; i >= 0; i--) {
             hAxis = this.horizontalAxises[i];
             for (j = this.verticalAxises.length - 1; j >= 0; j--) {
@@ -478,21 +576,21 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Build nodes at endpoints
      */
     Graph.prototype.buildNodesAtEndPoints = function() {
-        var newVerticalAxises = this.buildNodesAtEndPointsVertical();
-        var newHorizontalAxises = this.buildNodesAtEndPointsHorizontal();
-        this.verticalAxises.push.apply(this.verticalAxises, newVerticalAxises);
-        this.horizontalAxises.push.apply(this.horizontalAxises, newHorizontalAxises);
+        const newVerticalAxises = this.buildNodesAtEndPointsVertical();
+        const newHorizontalAxises = this.buildNodesAtEndPointsHorizontal();
+        this.verticalAxises.push(...newVerticalAxises);
+        this.horizontalAxises.push(...newHorizontalAxises);
     };
 
     /**
      * Build nodes at endpoints on horizontal axises
      */
     Graph.prototype.buildNodesAtEndPointsHorizontal = function() {
-        var node;
-        var newAxis;
-        var i;
-        var hAxis;
-        var newVerticalAxises = [];
+        let node;
+        let newAxis;
+        let i;
+        let hAxis;
+        const newVerticalAxises = [];
         for (i = this.horizontalAxises.length - 1; i >= 0; i--) {
             hAxis = this.horizontalAxises[i];
             node = this.getNodeAt(hAxis.a);
@@ -525,11 +623,11 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Build nodes at endpoints on vertical axises
      */
     Graph.prototype.buildNodesAtEndPointsVertical = function() {
-        var node;
-        var newAxis;
-        var i;
-        var vAxis;
-        var newHorizontalAxises = [];
+        let node;
+        let newAxis;
+        let i;
+        let vAxis;
+        const newHorizontalAxises = [];
         for (i = this.verticalAxises.length - 1; i >= 0; i--) {
             vAxis = this.verticalAxises[i];
             node = this.getNodeAt(vAxis.a);
@@ -562,13 +660,13 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Prepares merge axises requests
      */
     Graph.prototype.buildMergeRequests = function() {
-        for (var i = this.horizontalAxises.length - 1; i >= 0; i--) {
-            var hAxis = this.horizontalAxises[i];
-            for (var j = this.verticalAxises.length - 1; j >= 0; j--) {
-                var vAxis = this.verticalAxises[j];
-                var crossPoint = hAxis.getCrossPoint(vAxis);
+        for (let i = this.horizontalAxises.length - 1; i >= 0; i--) {
+            const hAxis = this.horizontalAxises[i];
+            for (let j = this.verticalAxises.length - 1; j >= 0; j--) {
+                const vAxis = this.verticalAxises[j];
+                const crossPoint = hAxis.getCrossPoint(vAxis);
                 if (crossPoint) {
-                    var node = this.getNodeAt(crossPoint);
+                    const node = this.getNodeAt(crossPoint);
                     if (node.stale) {
                         if (node.hAxis !== hAxis) {
                             this.addMergeRequest(node.hAxis, hAxis);
@@ -589,10 +687,10 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Adds single merge axis request. Takes care about queue structure
      */
     Graph.prototype.addMergeRequest = function(a, b) {
-        var foundAQueue;
-        var foundBQueue;
-        var i;
-        var queue;
+        let foundAQueue;
+        let foundBQueue;
+        let i;
+        let queue;
         for (i = this.mergeAxisesQueue.length - 1; i >= 0; i--) {
             queue = this.mergeAxisesQueue[i];
             if (queue.indexOf(a) !== -1) {
@@ -619,7 +717,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
         } else {
             if (foundBQueue) {
                 // must merge
-                foundAQueue.push.apply(foundAQueue, foundBQueue);
+                foundAQueue.push(...foundBQueue);
                 this.mergeAxisesQueue.splice(this.mergeAxisesQueue.indexOf(foundBQueue), 1);
             } else {
                 foundAQueue.push(b);
@@ -633,7 +731,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @returns {NodePoint}
      */
     Graph.prototype.getNodeAt = function(point) {
-        var node = this.nodes[point.id];
+        let node = this.nodes[point.id];
         if (!node) {
             node = new NodePoint(point.x, point.y);
             this.nodes[point.id] = node;
@@ -649,14 +747,14 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @returns {*}
      */
     Graph.prototype.findClosestRectCross = function(vector, ignoreRect) {
-        var closestDistance = Infinity;
-        var closestPoint = null;
-        for (var i = this.rectangles.length - 1; i >= 0; i--) {
-            var rect = this.rectangles[i];
+        let closestDistance = Infinity;
+        let closestPoint = null;
+        for (let i = this.rectangles.length - 1; i >= 0; i--) {
+            const rect = this.rectangles[i];
             if (rect === ignoreRect) {
                 continue;
             }
-            var crossPoint = vector.getCrossPointWithRect(rect);
+            const crossPoint = vector.getCrossPointWithRect(rect);
             if (crossPoint && closestDistance > crossPoint.distanceTo(vector.start)) {
                 closestPoint = crossPoint;
                 closestDistance = crossPoint.distanceTo(vector.start);
@@ -664,7 +762,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
         }
         if (closestDistance === Infinity) {
             this.outerRect.eachSide(function(side) {
-                var crossPoint;
+                let crossPoint;
                 if ((crossPoint = vector.getCrossPointWithInterval(side))) {
                     if (vector.start.distanceTo(crossPoint) < closestDistance) {
                         closestPoint = crossPoint;
@@ -687,11 +785,11 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @returns {boolean}
      */
     Graph.prototype.rectangleIntersectsAnyRectangle = function(rectangle, ignoreRect) {
-        for (var i = this.rectangles.length - 1; i >= 0; i--) {
+        for (let i = this.rectangles.length - 1; i >= 0; i--) {
             if (this.rectangles[i] === ignoreRect) {
                 continue;
             }
-            var intersection = rectangle.intersection(this.rectangles[i]);
+            const intersection = rectangle.intersection(this.rectangles[i]);
             // non-inclusive
             if (intersection !== null && intersection.width !== 0 && intersection.height !== 0) {
                 return true;
@@ -706,11 +804,11 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @param {Path} path
      */
     Graph.prototype.updateWithPath = function(path) {
-        var connections = path.allConnections;
-        var axises = [];
-        var i;
-        var conn;
-        var prev;
+        let connections = path.allConnections;
+        const axises = [];
+        let i;
+        let conn;
+        let prev;
         for (i = 0; i < connections.length; i++) {
             conn = connections[i];
             if (axises.indexOf(conn.axis) === -1) {
@@ -731,7 +829,7 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
                 // corner
                 // all connections are used on corner
                 // this will avoid double corner use
-                var midNode = conn.a === prev.a || conn.a === prev.b ? conn.a : conn.b;
+                const midNode = conn.a === prev.a || conn.a === prev.b ? conn.a : conn.b;
                 midNode.eachConnection(function(conn) {
                     conn.traversable = false;
                 });
@@ -744,12 +842,12 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * Locates axises to be able get valid path points
      */
     Graph.prototype.locateAxises = function() {
-        var i;
-        var j;
-        var axis;
-        var clones;
-        var current;
-        var clone;
+        let i;
+        let j;
+        let axis;
+        let clones;
+        let current;
+        let clone;
         for (i = this.verticalAxises.length - 1; i >= 0; i--) {
             axis = this.verticalAxises[i];
             clones = axis.allClones;
@@ -787,8 +885,8 @@ define(['./settings', './directions', './vector2d', './constraint/simple/empty-c
      * @returns {boolean}
      */
     Graph.prototype.isConnectionUnderRect = function(interval) {
-        for (var i = this.rectangles.length - 1; i >= 0; i--) {
-            var rect = this.rectangles[i];
+        for (let i = this.rectangles.length - 1; i >= 0; i--) {
+            const rect = this.rectangles[i];
             if (rect.containsPoint(interval.a) || rect.containsPoint(interval.b)) {
                 return true;
             }

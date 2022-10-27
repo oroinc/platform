@@ -3,25 +3,23 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\FieldConfigInterface;
 use Symfony\Component\Validator\Constraint;
 
 /**
  * Represents a field configuration inside "actions" section.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ActionFieldConfig implements FieldConfigInterface
 {
-    /** @var bool|null */
-    protected $exclude;
-
-    /** @var array */
-    protected $items = [];
+    private ?bool $exclude = null;
+    private array $items = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = ConfigUtil::convertItemsToArray($this->items);
         if (true === $this->exclude) {
@@ -40,17 +38,17 @@ class ActionFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Indicates whether the configuration attribute exists.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the configuration value.
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (!\array_key_exists($key, $this->items)) {
             return $defaultValue;
@@ -60,9 +58,9 @@ class ActionFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the configuration value.
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
             $this->items[$key] = $value;
@@ -72,43 +70,37 @@ class ActionFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Removes the configuration value.
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets names of all configuration attributes.
+     *
+     * @return string[]
      */
-    public function keys()
+    public function keys(): array
     {
-        return \array_keys($this->items);
+        return array_keys($this->items);
     }
 
     /**
      * Indicates whether the exclusion flag is set explicitly.
-     *
-     * @return bool
      */
-    public function hasExcluded()
+    public function hasExcluded(): bool
     {
         return null !== $this->exclude;
     }
 
     /**
      * Indicates whether the exclusion flag.
-     *
-     * @return bool
      */
-    public function isExcluded()
+    public function isExcluded(): bool
     {
-        if (null === $this->exclude) {
-            return false;
-        }
-
-        return $this->exclude;
+        return $this->exclude ?? false;
     }
 
     /**
@@ -116,7 +108,7 @@ class ActionFieldConfig implements FieldConfigInterface
      *
      * @param bool|null $exclude The exclude flag or NULL to remove this option
      */
-    public function setExcluded($exclude = true)
+    public function setExcluded(?bool $exclude = true): void
     {
         $this->exclude = $exclude;
     }
@@ -124,10 +116,8 @@ class ActionFieldConfig implements FieldConfigInterface
     /**
      * Indicates whether the direction option is set explicitly.
      * If this option is not set, both the request and the response can contain this field.
-     *
-     * @return bool
      */
-    public function hasDirection()
+    public function hasDirection(): bool
     {
         return $this->has(ConfigUtil::DIRECTION);
     }
@@ -146,14 +136,14 @@ class ActionFieldConfig implements FieldConfigInterface
      * @param string|null $direction Can be "input-only", "output-only", "bidirectional"
      *                               or NULL to remove this option and use default behaviour for it
      */
-    public function setDirection($direction)
+    public function setDirection(?string $direction): void
     {
         if ($direction) {
             if (ConfigUtil::DIRECTION_INPUT_ONLY !== $direction
                 && ConfigUtil::DIRECTION_OUTPUT_ONLY !== $direction
                 && ConfigUtil::DIRECTION_BIDIRECTIONAL !== $direction
             ) {
-                throw new \InvalidArgumentException(\sprintf(
+                throw new \InvalidArgumentException(sprintf(
                     'The possible values for the direction are "%s", "%s" or "%s".',
                     ConfigUtil::DIRECTION_INPUT_ONLY,
                     ConfigUtil::DIRECTION_OUTPUT_ONLY,
@@ -168,10 +158,8 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Indicates whether the request data can contain this field.
-     *
-     * @return bool
      */
-    public function isInput()
+    public function isInput(): bool
     {
         if (!\array_key_exists(ConfigUtil::DIRECTION, $this->items)) {
             return true;
@@ -186,10 +174,8 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Indicates whether the response data can contain this field.
-     *
-     * @return bool
      */
-    public function isOutput()
+    public function isOutput(): bool
     {
         if (!\array_key_exists(ConfigUtil::DIRECTION, $this->items)) {
             return true;
@@ -204,22 +190,16 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Indicates whether the path of the field value exists.
-     *
-     * @return bool
      */
-    public function hasPropertyPath()
+    public function hasPropertyPath(): bool
     {
         return $this->has(ConfigUtil::PROPERTY_PATH);
     }
 
     /**
      * Gets the path of the field value.
-     *
-     * @param string|null $defaultValue
-     *
-     * @return string|null
      */
-    public function getPropertyPath($defaultValue = null)
+    public function getPropertyPath(string $defaultValue = null): ?string
     {
         if (empty($this->items[ConfigUtil::PROPERTY_PATH])) {
             return $defaultValue;
@@ -230,10 +210,8 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Sets the path of the field value.
-     *
-     * @param string|null $propertyPath
      */
-    public function setPropertyPath($propertyPath = null)
+    public function setPropertyPath(string $propertyPath = null): void
     {
         if ($propertyPath) {
             $this->items[ConfigUtil::PROPERTY_PATH] = $propertyPath;
@@ -244,20 +222,16 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Gets the form type.
-     *
-     * @return string|null
      */
-    public function getFormType()
+    public function getFormType(): ?string
     {
         return $this->get(ConfigUtil::FORM_TYPE);
     }
 
     /**
      * Sets the form type.
-     *
-     * @param string|null $formType
      */
-    public function setFormType($formType)
+    public function setFormType(?string $formType): void
     {
         if ($formType) {
             $this->items[ConfigUtil::FORM_TYPE] = $formType;
@@ -268,20 +242,16 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Gets the form options.
-     *
-     * @return array|null
      */
-    public function getFormOptions()
+    public function getFormOptions(): ?array
     {
         return $this->get(ConfigUtil::FORM_OPTIONS);
     }
 
     /**
      * Sets the form options.
-     *
-     * @param array|null $formOptions
      */
-    public function setFormOptions($formOptions)
+    public function setFormOptions(?array $formOptions): void
     {
         if ($formOptions) {
             $this->items[ConfigUtil::FORM_OPTIONS] = $formOptions;
@@ -292,11 +262,8 @@ class ActionFieldConfig implements FieldConfigInterface
 
     /**
      * Sets a form option. If an option is already exist its value will be replaced with new value.
-     *
-     * @param string $name  The name of an option
-     * @param mixed  $value The value of an option
      */
-    public function setFormOption($name, $value)
+    public function setFormOption(string $name, mixed $value): void
     {
         $formOptions = $this->getFormOptions();
         $formOptions[$name] = $value;
@@ -306,27 +273,78 @@ class ActionFieldConfig implements FieldConfigInterface
     /**
      * Gets existing validation constraints from the form options.
      *
-     * @return Constraint[]|null
+     * @return array|null [Constraint object or [constraint name or class => constraint options, ...], ...]
      */
-    public function getFormConstraints()
+    public function getFormConstraints(): ?array
     {
-        $formOptions = $this->getFormOptions();
-        if (empty($formOptions) || !\array_key_exists('constraints', $formOptions)) {
-            return null;
-        }
-
-        return $formOptions['constraints'];
+        return FormConstraintUtil::getFormConstraints($this->getFormOptions());
     }
 
     /**
      * Adds a validation constraint to the form options.
-     *
-     * @param Constraint $constraint
      */
-    public function addFormConstraint(Constraint $constraint)
+    public function addFormConstraint(Constraint $constraint): void
     {
-        $formOptions = $this->getFormOptions();
-        $formOptions['constraints'][] = $constraint;
-        $this->setFormOptions($formOptions);
+        $this->setFormOptions(FormConstraintUtil::addFormConstraint($this->getFormOptions(), $constraint));
+    }
+
+    /**
+     * Removes a validation constraint from the form options by its class.
+     */
+    public function removeFormConstraint(string $constraintClass): void
+    {
+        $this->setFormOptions(FormConstraintUtil::removeFormConstraint($this->getFormOptions(), $constraintClass));
+    }
+
+    /**
+     * Indicates whether a post processor is set.
+     */
+    public function hasPostProcessor(): bool
+    {
+        return $this->has(ConfigUtil::POST_PROCESSOR);
+    }
+
+    /**
+     * Gets the type of a post processor.
+     */
+    public function getPostProcessor(): ?string
+    {
+        return $this->get(ConfigUtil::POST_PROCESSOR);
+    }
+
+    /**
+     * Sets the type of a post processor.
+     */
+    public function setPostProcessor(?string $type): void
+    {
+        $this->items[ConfigUtil::POST_PROCESSOR] = $type ?: null;
+    }
+
+    /**
+     * Removes a post processor.
+     */
+    public function removePostProcessor(): void
+    {
+        unset($this->items[ConfigUtil::POST_PROCESSOR]);
+    }
+
+    /**
+     * Gets the options for a post processor.
+     */
+    public function getPostProcessorOptions(): ?array
+    {
+        return $this->get(ConfigUtil::POST_PROCESSOR_OPTIONS);
+    }
+
+    /**
+     * Sets the options for a post processor.
+     */
+    public function setPostProcessorOptions(?array $options): void
+    {
+        if ($options) {
+            $this->items[ConfigUtil::POST_PROCESSOR_OPTIONS] = $options;
+        } else {
+            unset($this->items[ConfigUtil::POST_PROCESSOR_OPTIONS]);
+        }
     }
 }

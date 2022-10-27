@@ -1,14 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'backgrid',
-    '../select-state-model',
-    'oroui/js/app/views/base/view',
-    'tpl!orodatagrid/templates/datagrid/select-all-header-cell.html'
-], function($, _, Backgrid, SelectStateModel, BaseView, template) {
+define(function(require) {
     'use strict';
 
-    var SelectAllHeaderCell;
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Backgrid = require('backgrid');
+    const SelectStateModel = require('../select-state-model');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const template = require('tpl-loader!orodatagrid/templates/datagrid/select-all-header-cell.html');
 
     /**
      * Contains mass-selection logic
@@ -22,7 +20,11 @@ define([
      * @class   orodatagrid.datagrid.headerCell.SelectAllHeaderCell
      * @extends BaseView
      */
-    SelectAllHeaderCell = BaseView.extend({
+    const SelectAllHeaderCell = BaseView.extend({
+        optionNames: ['column'],
+
+        _attributes: Backgrid.Cell.prototype._attributes,
+
         keepElement: false,
         /** @property */
         className: 'select-all-header-cell renderable',
@@ -35,10 +37,10 @@ define([
         selectState: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        constructor: function SelectAllHeaderCell() {
-            SelectAllHeaderCell.__super__.constructor.apply(this, arguments);
+        constructor: function SelectAllHeaderCell(options) {
+            SelectAllHeaderCell.__super__.constructor.call(this, options);
         },
 
         /**
@@ -50,8 +52,7 @@ define([
          * @param {Backbone.Collection} options.collection
          */
         initialize: function(options) {
-            var debouncedUpdateState = _.bind(_.debounce(this.updateState, 50), this);
-            this.column = options.column;
+            const debouncedUpdateState = _.debounce(this.updateState.bind(this), 50);
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
@@ -60,7 +61,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -68,7 +69,7 @@ define([
             }
             delete this.selectState;
             delete this.column;
-            SelectAllHeaderCell.__super__.dispose.apply(this, arguments);
+            SelectAllHeaderCell.__super__.dispose.call(this);
         },
 
         /**
@@ -95,9 +96,9 @@ define([
         delegateEvents: function(events) {
             SelectAllHeaderCell.__super__.delegateEvents.call(this, events);
             // binds event handlers directly to dropdown-menu, because the menu can be attached to document body
-            this.$('.dropdown-menu').on('click' + this.eventNamespace(), _.bind(this.onDropdownClick, this));
+            this.$('.dropdown-menu').on('click' + this.eventNamespace(), this.onDropdownClick.bind(this));
             // binds event handlers directly to checkbox, because a toggle-dropdown stops event propagation
-            this.$('[data-select]:checkbox').on('click' + this.eventNamespace(), _.bind(this.onCheckboxClick, this));
+            this.$('[data-select]:checkbox').on('click' + this.eventNamespace(), this.onCheckboxClick.bind(this));
             return this;
         },
 
@@ -119,7 +120,7 @@ define([
         },
 
         onDropdownClick: function(e) {
-            var $el = $(e.target);
+            const $el = $(e.target);
             if ($el.is('[data-select-all]')) {
                 // Handles click on selectAll button
                 this.collection.trigger('backgrid:selectAll');

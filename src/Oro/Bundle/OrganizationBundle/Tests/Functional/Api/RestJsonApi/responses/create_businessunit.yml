@@ -1,0 +1,21 @@
+data:
+    type: businessunits
+    id: new
+    attributes:
+        extend_description: null
+        name: 'test bu'
+        phone: null
+        website: null
+        email: null
+        fax: null
+    relationships:
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@organization->id)>'
+        users:
+            data: []
+        owner:
+            data:
+                type: businessunits
+                id: '<toString(@business_unit->id)>'

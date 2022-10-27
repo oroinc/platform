@@ -1,40 +1,49 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ThemeBundle\Command;
 
 use Oro\Bundle\ThemeBundle\Model\Theme;
 use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ThemeCommand extends ContainerAwareCommand
+/**
+ * Lists available themes.
+ */
+class ThemeCommand extends Command
 {
-    /**
-     * @var ThemeRegistry
-     */
-    protected $themeRegistry;
+    /** @var string */
+    protected static $defaultName = 'oro:theme:list';
 
-    /**
-     * {@inheritdoc}
-     */
+    private ThemeRegistry $themeRegistry;
+
+    public function __construct(ThemeRegistry $themeRegistry)
+    {
+        $this->themeRegistry = $themeRegistry;
+        parent::__construct();
+    }
+
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setName('oro:theme:list')
-            ->setDescription('List of all available themes');
+            ->setDescription('Lists available themes.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command lists available themes.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        $this->themeRegistry = $this->getContainer()->get('oro_theme.registry');
-    }
-
-    /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -49,9 +58,11 @@ class ThemeCommand extends ContainerAwareCommand
         } else {
             $output->writeln('<info>No themes are available.</info>');
         }
+
+        return 0;
     }
 
-    protected function outputTheme(OutputInterface $output, Theme $theme, $isActive)
+    protected function outputTheme(OutputInterface $output, Theme $theme, bool $isActive): void
     {
         if ($isActive) {
             $output->writeln(sprintf('<comment>%s</comment> (active)', $theme->getName()));
@@ -75,15 +86,6 @@ class ThemeCommand extends ContainerAwareCommand
             $output->writeln(sprintf(' - <info>screenshot:</info> %s', $theme->getScreenshot()));
         }
 
-        if ($theme->getStyles()) {
-            if (count($theme->getStyles()) > 1) {
-                $output->writeln(' - <info>styles:</info>');
-                foreach ($theme->getStyles() as $style) {
-                    $output->writeln(sprintf('     - %s', $style));
-                }
-            } else {
-                $output->writeln(sprintf(' - <info>styles:</info> %s', current($theme->getStyles())));
-            }
-        }
+        $output->writeln(sprintf(' - <info>rtl_support:</info> %s', $theme->isRtlSupport() ? 'Yes' : 'No'));
     }
 }

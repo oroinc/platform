@@ -6,22 +6,21 @@ use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
 use Symfony\Component\Config\FileLocatorInterface;
 
+/**
+ * The formatter that builds <img src="data:..."> tag for an image.
+ */
 class ImageEncodedFormatter implements FormatterInterface
 {
-    const WIDTH_ATTRIBUTE  = 'width';
-    const HEIGHT_ATTRIBUTE = 'height';
-    const ALT_ATTRIBUTE    = 'alt';
+    private const WIDTH_ATTRIBUTE  = 'width';
+    private const HEIGHT_ATTRIBUTE = 'height';
+    private const ALT_ATTRIBUTE    = 'alt';
 
     /** @var FileManager */
-    protected $fileManager;
+    private $fileManager;
 
     /** @var FileLocatorInterface */
-    protected $fileLocator;
+    private $fileLocator;
 
-    /**
-     * @param FileManager          $fileManager
-     * @param FileLocatorInterface $fileLocator
-     */
     public function __construct(FileManager $fileManager, FileLocatorInterface $fileLocator)
     {
         $this->fileManager = $fileManager;
@@ -31,17 +30,9 @@ class ImageEncodedFormatter implements FormatterInterface
     /**
      * {@inheritdoc}
      */
-    public function getFormatterName()
+    public function format($value, array $formatterArguments = [])
     {
-        return 'image_encoded';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function format($parameter, array $formatterArguments = [])
-    {
-        $altValue = $parameter->getOriginalFilename();
+        $altValue = $value->getOriginalFilename();
         if (array_key_exists(self::ALT_ATTRIBUTE, $formatterArguments)) {
             $altValue = $formatterArguments[self::ALT_ATTRIBUTE];
         }
@@ -64,7 +55,7 @@ class ImageEncodedFormatter implements FormatterInterface
             );
         }
 
-        return $this->getData($parameter->getMimeType(), $this->fileManager->getContent($parameter), $parameters);
+        return $this->getData($value->getMimeType(), $this->fileManager->getContent($value), $parameters);
     }
 
     /**
@@ -79,29 +70,13 @@ class ImageEncodedFormatter implements FormatterInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getSupportedTypes()
-    {
-        return ['image'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isDefaultFormatter()
-    {
-        return true;
-    }
-
-    /**
      * @param string $mimeType
      * @param string $content
      * @param string $parameters
      *
      * @return string
      */
-    protected function getData($mimeType, $content, $parameters = '')
+    private function getData($mimeType, $content, $parameters = '')
     {
         return sprintf(
             '<img src="data:%s;base64,%s" %s/>',

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
@@ -38,7 +37,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
         WorkflowDefinitionCloner::mergeDefinition($definition, $sourceDefinition);
 
         $this->assertSameMainFields($definition, $sourceDefinition);
-        
+
         $this->assertEquals($definition, $sourceDefinition);
         $this->assertNotSame($definition, $sourceDefinition);
 
@@ -47,11 +46,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
         $this->assertObjectsDefinitions($definition, $sourceDefinition);
     }
 
-    /**
-     * @param WorkflowDefinition $definition1
-     * @param WorkflowDefinition $definition2
-     */
-    protected function assertSameMainFields(WorkflowDefinition $definition1, WorkflowDefinition $definition2)
+    private function assertSameMainFields(WorkflowDefinition $definition1, WorkflowDefinition $definition2)
     {
         $this->assertSame($definition1->getName(), $definition2->getName());
         $this->assertSame($definition1->getLabel(), $definition2->getLabel());
@@ -69,9 +64,9 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param WorkflowDefinition $definition1
      * @param WorkflowDefinition $definition2
-     * @param bool|false $isCopy
+     * @param bool               $isCopy
      */
-    protected function assertObjectsDefinitions(
+    private function assertObjectsDefinitions(
         WorkflowDefinition $definition1,
         WorkflowDefinition $definition2,
         $isCopy = false
@@ -107,7 +102,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return WorkflowDefinition
      */
-    protected function createDefinition()
+    private function createDefinition()
     {
         $step1 = new WorkflowStep();
         $step1->setName('step1');
