@@ -66,7 +66,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $requestData = [
             'data' => []
         ];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(true);
 
         $this->context->setRequestData($requestData);
@@ -82,7 +82,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $requestData = [
             'data' => []
         ];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
 
         $this->context->setRequestData($requestData);

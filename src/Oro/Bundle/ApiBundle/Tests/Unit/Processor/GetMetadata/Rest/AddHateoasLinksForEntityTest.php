@@ -49,7 +49,7 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
     public function testProcessWhenSelfLinkAlreadyExistsInEntityMetadata()
     {
         $existingSelfLinkMetadata = new ExternalLinkMetadata('url');
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityMetadata->addLink('self', $existingSelfLinkMetadata);
 
         $this->resourcesProvider->expects(self::never())
@@ -64,8 +64,7 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
 
     public function testProcessWhenSelfLinkDoesNotExistInEntityMetadata()
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName('Test\Entity');
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
@@ -90,8 +89,7 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
 
     public function testProcessWhenSelfLinkDoesNotExistInEntityMetadataAndGetActionExcluded()
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName('Test\Entity');
+        $entityMetadata = new EntityMetadata('Test\Entity');
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')

@@ -1,3 +1,5 @@
+@ticket-BB-11878
+
 Feature: Create segment
   In order to manage segments
   As administrator
@@ -54,3 +56,11 @@ Feature: Create segment
       | segment_name |
       | Segment 1    |
       | segmENT 1    |
+
+  Scenario: Check Records Limit validation
+    When I go to Reports & Segments/ Manage Segments
+    And I click "Create Segment"
+    And I fill "Segment Form" with:
+      | Records Limit | 21474836479 |
+    Then I should see validation errors:
+      | Records Limit | This value should be between 0 and 2,147,483,647. |

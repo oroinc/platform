@@ -2,31 +2,46 @@
 
 namespace Oro\Bundle\ApiBundle\Migrations\Schema;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Symfony\Component\Lock\Store\StoreFactory;
 
 /**
  * Creates all database tables required for ApiBundle.
  */
-class OroApiBundleInstaller implements Installation
+class OroApiBundleInstaller implements Installation, ConnectionAwareInterface
 {
+    private Connection $connection;
+
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     */
+    public function setConnection(Connection $connection): void
+    {
+        $this->connection = $connection;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
         $this->createOroApiAsyncOperationTable($schema);
         $this->createOroApiAsyncDataTable($schema);
+        $this->createBatchApiLockTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroApiAsyncOperationForeignKeys($schema);
@@ -68,6 +83,22 @@ class OroApiBundleInstaller implements Installation
         $table->addColumn('updated_at', 'integer');
         $table->addColumn('checksum', 'string', ['length' => 32]);
         $table->setPrimaryKey(['name']);
+    }
+
+    /**
+     * Create table for Batch API locks.
+     */
+    private function createBatchApiLockTable(Schema $schema): void
+    {
+        /**
+         * the lock table is not needed for PostgreSql database because the PostgreSql advisory locks are used
+         * @see \Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension::configureBatchApiLock
+         */
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+            return;
+        }
+
+        StoreFactory::createStore($this->connection)->configureSchema($schema);
     }
 
     /**

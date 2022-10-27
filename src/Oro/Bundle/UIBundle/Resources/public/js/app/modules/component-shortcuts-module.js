@@ -16,13 +16,6 @@ ComponentShortcutsManager.add('jquery', {
     scalarOption: 'widgetModule'
 });
 
-ComponentShortcutsManager.add('collapse', {
-    moduleName: 'oroui/js/app/components/jquery-widget-component',
-    options: {
-        widgetModule: 'oroui/js/widget/collapse-widget'
-    }
-});
-
 ComponentShortcutsManager.add('responsive-tabs', {
     moduleName: 'oroui/js/app/components/tabs-component',
     scalarOption: 'useDropdown'

@@ -12,17 +12,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RouteLinkMetadata extends LinkMetadata
 {
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var string */
-    private $routeName;
-
+    private UrlGeneratorInterface $urlGenerator;
+    private string $routeName;
     /** @var array [parameter name => parameter property path or NULL if it equals to the name, ...] */
-    private $routeParams;
-
+    private array $routeParams;
     /** @var array [parameter name => scalar value, ...] */
-    private $defaultParams;
+    private array $defaultParams;
 
     /**
      * @param UrlGeneratorInterface $urlGenerator  The instance of a URL generator.
@@ -51,9 +46,9 @@ class RouteLinkMetadata extends LinkMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = parent::toArray();
         $result['route_name'] = $this->routeName;

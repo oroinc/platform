@@ -67,7 +67,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
         $resourceConfig->getDefinition()->addField('association1')->setExcluded();
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $association = new AssociationMetadata();
         $association->setName('association1');
         $association->setTargetClassName('Test\Association1Target');
@@ -117,7 +117,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toOneAssociation = new AssociationMetadata();
         $toOneAssociation->setName('association1');
         $toOneAssociation->setTargetClassName('Test\Association1Target');
@@ -183,7 +183,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toManyAssociation = new AssociationMetadata();
         $toManyAssociation->setName('association1');
         $toManyAssociation->setTargetClassName('Test\Association1Target');
@@ -249,7 +249,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toOneAssociation = new AssociationMetadata();
         $toOneAssociation->setName('association1');
         $toOneAssociation->setTargetClassName('Test\Association1Target');
@@ -312,7 +312,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toManyAssociation = new AssociationMetadata();
         $toManyAssociation->setName('association1');
         $toManyAssociation->setTargetClassName('Test\Association1Target');
@@ -374,7 +374,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toOneAssociation = new AssociationMetadata();
         $toOneAssociation->setName('association1');
         $toOneAssociation->setTargetClassName('Test\Association1Target');
@@ -438,7 +438,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toManyAssociation = new AssociationMetadata();
         $toManyAssociation->setName('association1');
         $toManyAssociation->setTargetClassName('Test\Association1Target');
@@ -500,7 +500,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toOneAssociation = new AssociationMetadata();
         $toOneAssociation->setName('association1');
         $toOneAssociation->setTargetClassName('Test\Association1Target');
@@ -565,7 +565,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toManyAssociation = new AssociationMetadata();
         $toManyAssociation->setName('association1');
         $toManyAssociation->setTargetClassName('Test\Association1Target');
@@ -703,7 +703,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
         $resourceConfig->getDefinition()->addField('association1')->setDataType($dataType);
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $association = new AssociationMetadata();
         $association->setName('association1');
         $association->setTargetClassName('Test\Association1Target');
@@ -762,7 +762,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toOneAssociation = new AssociationMetadata();
         $toOneAssociation->setName('association1');
         $toOneAssociation->setTargetClassName('Test\Association1Target');
@@ -824,7 +824,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $toManyAssociation = new AssociationMetadata();
         $toManyAssociation->setName('association1');
         $toManyAssociation->setTargetClassName('Test\Association1Target');
@@ -885,7 +885,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $association = new AssociationMetadata();
         $association->setName('association1');
         $association->setTargetClassName('Test\AssociationTarget');
@@ -934,7 +934,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $association = new AssociationMetadata();
         $association->setName('association1');
         $association->setTargetClassName(EntityIdentifier::class);
@@ -998,7 +998,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $association = new AssociationMetadata();
         $association->setName('association1');
         $association->setTargetClassName(EntityIdentifier::class);
@@ -1062,7 +1062,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $association = new AssociationMetadata();
         $association->setName('association1');
         $association->setTargetClassName(Entity\User::class);
@@ -1126,7 +1126,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $association = new AssociationMetadata();
         $association->setName('association1');
         $association->setTargetClassName(Entity\User::class);
@@ -1196,7 +1196,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
 
         $resourceConfig = new Config();
         $resourceConfig->setDefinition(new EntityDefinitionConfig());
-        $resourceMetadata = new EntityMetadata();
+        $resourceMetadata = new EntityMetadata('Test\Entity');
         $association = new AssociationMetadata();
         $association->setName('association1');
         $association->setTargetClassName(Entity\User::class);

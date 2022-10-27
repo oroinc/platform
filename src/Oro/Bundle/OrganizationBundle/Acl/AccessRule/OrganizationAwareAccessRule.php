@@ -2,34 +2,24 @@
 
 namespace Oro\Bundle\OrganizationBundle\Acl\AccessRule;
 
+use Oro\Bundle\OrganizationBundle\Provider\OrganizationRestrictionProviderInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\NullComparison;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 /**
  * Denies access to entities that do not belong to the current organization.
  */
 class OrganizationAwareAccessRule implements AccessRuleInterface
 {
-    private TokenAccessorInterface $tokenAccessor;
+    private OrganizationRestrictionProviderInterface $organizationRestrictionProvider;
     private string $organizationFieldName;
-    private bool $isOrganizationOptional = false;
 
     public function __construct(
-        TokenAccessorInterface $tokenAccessor,
+        OrganizationRestrictionProviderInterface $organizationRestrictionProvider,
         string $organizationFieldName = 'organization'
     ) {
-        $this->tokenAccessor = $tokenAccessor;
+        $this->organizationRestrictionProvider = $organizationRestrictionProvider;
         $this->organizationFieldName = $organizationFieldName;
-    }
-
-    public function setOrganizationOptional(bool $isOrganizationOptional): void
-    {
-        $this->isOrganizationOptional = $isOrganizationOptional;
     }
 
     /**
@@ -37,7 +27,7 @@ class OrganizationAwareAccessRule implements AccessRuleInterface
      */
     public function isApplicable(Criteria $criteria): bool
     {
-        return null !== $this->tokenAccessor->getOrganizationId();
+        return true;
     }
 
     /**
@@ -45,17 +35,10 @@ class OrganizationAwareAccessRule implements AccessRuleInterface
      */
     public function process(Criteria $criteria): void
     {
-        $expr = new Comparison(
-            new Path($this->organizationFieldName, $criteria->getAlias()),
-            Comparison::EQ,
-            $this->tokenAccessor->getOrganizationId()
+        $this->organizationRestrictionProvider->applyOrganizationRestrictionsToAccessRuleCriteria(
+            $criteria,
+            null,
+            $this->organizationFieldName
         );
-        if ($this->isOrganizationOptional) {
-            $expr = new CompositeExpression(
-                CompositeExpression::TYPE_OR,
-                [$expr, new NullComparison(new Path($this->organizationFieldName, $criteria->getAlias()))]
-            );
-        }
-        $criteria->andExpression($expr);
     }
 }

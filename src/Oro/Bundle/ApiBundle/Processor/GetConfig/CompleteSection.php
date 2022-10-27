@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
-use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\EntitySerializer\EntityConfigInterface;
 
 /**
  * The base class for processors that make sure that all supported filters and sorters

@@ -19,26 +19,16 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class TargetMetadataAccessor implements TargetMetadataAccessorInterface
 {
-    /** @var string */
-    private $version;
-
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var MetadataProvider */
-    private $metadataProvider;
-
+    private string $version;
+    private RequestType $requestType;
+    private MetadataProvider $metadataProvider;
     /** @var MetadataExtraInterface[] */
-    private $metadataExtras;
-
-    /** @var ConfigProvider */
-    private $configProvider;
-
+    private array $metadataExtras;
+    private ConfigProvider $configProvider;
     /** @var ConfigExtraInterface[] */
-    private $configExtras;
-
+    private array $configExtras;
     /** @var array [association path => ConfigExtraInterface[], ...] */
-    private $processedConfigExtras = [];
+    private array $processedConfigExtras = [];
 
     /**
      * @param string                   $version
@@ -65,7 +55,7 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getTargetMetadata(string $targetClassName, ?string $associationPath): ?EntityMetadata
     {

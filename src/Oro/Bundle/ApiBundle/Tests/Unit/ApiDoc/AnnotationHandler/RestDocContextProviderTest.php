@@ -394,7 +394,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetMetadata()
     {
         $context = $this->createMock(Context::class);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $context->expects(self::once())
             ->method('getMetadata')
             ->willReturn($metadata);

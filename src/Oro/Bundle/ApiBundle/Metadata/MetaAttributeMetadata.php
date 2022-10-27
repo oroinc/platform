@@ -10,14 +10,9 @@ use Oro\Component\ChainProcessor\ToArrayInterface;
  */
 class MetaAttributeMetadata implements ToArrayInterface
 {
-    /** @var string */
-    private $name;
-
-    /** @var string */
-    private $propertyPath;
-
-    /** @var string */
-    private $dataType;
+    private string $name;
+    private ?string $propertyPath;
+    private ?string $dataType;
 
     /**
      * @param string      $name         The name of the meta property in the result data.
@@ -37,11 +32,9 @@ class MetaAttributeMetadata implements ToArrayInterface
     }
 
     /**
-     * Gets a native PHP array representation of the object.
-     *
-     * @return array [key => value, ...]
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = ['name' => $this->name];
         if ($this->propertyPath) {
@@ -64,24 +57,16 @@ class MetaAttributeMetadata implements ToArrayInterface
 
     /**
      * Gets the name of the meta property in source data.
-     *
-     * @return string The property path.
      */
-    public function getPropertyPath()
+    public function getPropertyPath(): ?string
     {
-        if (null === $this->propertyPath) {
-            return $this->getName();
-        }
-
-        return $this->propertyPath;
+        return $this->propertyPath ?? $this->getName();
     }
 
     /**
      * Gets the data-type of the meta property.
-     *
-     * @return string
      */
-    public function getDataType()
+    public function getDataType(): ?string
     {
         return $this->dataType;
     }

@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 
 class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestCase
 {
-    private const CLASS_NAME = 'Oro\Bundle\CatalogBundle\Tests\Unit\Stub\TestEntity1';
+    private const CLASS_NAME = 'Test\Entity';
     private const FIELD_NAME = 'testField';
     private const MIME_TYPES = ['testType1', 'testType2'];
 

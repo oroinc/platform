@@ -36,7 +36,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
 
     public function testProcessWithoutErrors()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->errorCompleter->expects(self::never())
             ->method('complete');
@@ -47,7 +47,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
 
     public function testProcess()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $error = Error::createByException(new \Exception('some exception'));
 

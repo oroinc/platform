@@ -13,14 +13,14 @@ Feature: File-Based localization languages
     When I click "Add Language" in modal window
     Then I should see "Language has been added" flash message
     And I should see following grid:
-      | Language           | Status   | Updates          |
-      | English            | Enabled  |                  |
-      | fr_FR_file_based   | Disabled |                  |
-      | Estonian (Estonia) | Disabled | Can be installed |
+      | Language                     | Status   | Updates          |
+      | English                      | Enabled  |                  |
+      | French (France) File Based   | Disabled |                  |
+      | Estonian (Estonia)           | Disabled | Can be installed |
     And I should see following actions for English in grid:
       | Upload Translation File   |
       | Download Translation File |
-    And I should see following actions for fr_FR_file_based in grid:
+    And I should see following actions for French (France) File Based in grid:
       | Enable                    |
       | Upload Translation File   |
       | Download Translation File |

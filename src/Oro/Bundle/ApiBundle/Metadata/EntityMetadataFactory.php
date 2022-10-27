@@ -14,14 +14,13 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  */
 class EntityMetadataFactory
 {
-    private const TYPE          = 'type';
-    private const NULLABLE      = 'nullable';
-    private const LENGTH        = 'length';
+    private const TYPE = 'type';
+    private const NULLABLE = 'nullable';
+    private const LENGTH = 'length';
     private const TARGET_ENTITY = 'targetEntity';
-    private const JOIN_COLUMNS  = 'joinColumns';
+    private const JOIN_COLUMNS = 'joinColumns';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -30,8 +29,7 @@ class EntityMetadataFactory
 
     public function createEntityMetadata(ClassMetadata $classMetadata): EntityMetadata
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($classMetadata->name);
+        $entityMetadata = new EntityMetadata($classMetadata->name);
         $entityMetadata->setIdentifierFieldNames($classMetadata->getIdentifierFieldNames());
         $entityMetadata->setHasIdentifierGenerator($classMetadata->usesIdGenerator());
         $entityMetadata->setInheritedType(!$classMetadata->isInheritanceTypeNone());
@@ -72,7 +70,7 @@ class EntityMetadataFactory
             $fieldType = $this->getFieldType($mapping);
         }
         if (!$fieldType) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The data type for "%s::%s" is not defined.',
                 $classMetadata->name,
                 $fieldName
@@ -123,7 +121,7 @@ class EntityMetadataFactory
             $associationMetadata->setDataType($associationDataType);
         } else {
             $targetIdFields = $targetMetadata->getIdentifierFieldNames();
-            if (count($targetIdFields) === 1) {
+            if (\count($targetIdFields) === 1) {
                 $associationMetadata->setDataType(
                     $this->getFieldType($targetMetadata->getFieldMapping(\reset($targetIdFields)))
                 );
@@ -189,7 +187,7 @@ class EntityMetadataFactory
     private function getTargetClassMetadata(ClassMetadata $classMetadata, string $propertyPath): array
     {
         $path = ConfigUtil::explodePropertyPath($propertyPath);
-        if (count($path) === 1) {
+        if (\count($path) === 1) {
             return [$classMetadata, $propertyPath];
         }
 
@@ -205,9 +203,9 @@ class EntityMetadataFactory
             );
         }
         if (null === $targetClassMetadata) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'Cannot find metadata by path "%s" starting with class "%s"',
-                \implode(ConfigUtil::PATH_DELIMITER, $path),
+                implode(ConfigUtil::PATH_DELIMITER, $path),
                 $classMetadata->name
             ));
         }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Config;
+namespace Oro\Component\EntitySerializer;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -12,15 +12,12 @@ class FindFieldUtil
     /**
      * Finds a field by its name or property path.
      * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
-     *
-     * @param FieldConfigInterface[] $fields
-     * @param string                 $fieldName
-     * @param bool                   $findByPropertyPath
-     *
-     * @return FieldConfigInterface|null
      */
-    public static function doFindField(array $fields, $fieldName, $findByPropertyPath = false)
-    {
+    public static function doFindField(
+        array $fields,
+        string $fieldName,
+        bool $findByPropertyPath = false
+    ): ?FieldConfigInterface {
         if (isset($fields[$fieldName])) {
             $field = $fields[$fieldName];
             if (!$findByPropertyPath) {
@@ -52,7 +49,7 @@ class FindFieldUtil
      *
      * @return string|null
      */
-    public static function doFindFieldNameByPropertyPath(array $fields, $propertyPath)
+    public static function doFindFieldNameByPropertyPath(array $fields, string $propertyPath): ?string
     {
         if (isset($fields[$propertyPath])) {
             $fieldPropertyPath = $fields[$propertyPath]->getPropertyPath();
@@ -70,7 +67,7 @@ class FindFieldUtil
      *
      * @return string|null
      */
-    private static function findFieldNameByPropertyPath(array $fields, $propertyPath)
+    private static function findFieldNameByPropertyPath(array $fields, string $propertyPath): ?string
     {
         foreach ($fields as $fieldName => $field) {
             $fieldPropertyPath = $field->getPropertyPath();

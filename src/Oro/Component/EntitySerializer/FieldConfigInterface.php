@@ -1,39 +1,33 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Config;
+namespace Oro\Component\EntitySerializer;
 
 /**
  * An interface for configuration sections that represent a field.
  */
-interface FieldConfigInterface extends ConfigBagInterface
+interface FieldConfigInterface
 {
     /**
      * Indicates whether the exclusion flag is set explicitly.
-     *
-     * @return bool
      */
-    public function hasExcluded();
+    public function hasExcluded(): bool;
 
     /**
      * Indicates whether the field should be excluded.
-     *
-     * @return bool
      */
-    public function isExcluded();
+    public function isExcluded(): bool;
 
     /**
      * Sets a flag indicates whether the field should be excluded.
      *
-     * @param bool $exclude
+     * @param bool|null $exclude The exclude flag or NULL to remove this option
      */
-    public function setExcluded($exclude = true);
+    public function setExcluded(?bool $exclude = true): void;
 
     /**
      * Indicates whether the path of the field value exists.
-     *
-     * @return bool
      */
-    public function hasPropertyPath();
+    public function hasPropertyPath(): bool;
 
     /**
      * Gets the path of the field value.
@@ -42,12 +36,12 @@ interface FieldConfigInterface extends ConfigBagInterface
      *
      * @return string|null
      */
-    public function getPropertyPath($defaultValue = null);
+    public function getPropertyPath(string $defaultValue = null): ?string;
 
     /**
      * Sets the path of the field value.
      *
      * @param string|null $propertyPath
      */
-    public function setPropertyPath($propertyPath = null);
+    public function setPropertyPath(string $propertyPath = null): void;
 }

@@ -40,7 +40,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
     public function testProcessContextWithoutErrorsOnEmptyResult()
     {
         $result = null;
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->errorCompleterRegistry->expects(self::never())
             ->method('getErrorCompleter');
@@ -65,7 +65,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
     public function testProcessContextWithoutErrorsOnNonEmptyResult()
     {
         $result = [new \stdClass()];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->errorCompleterRegistry->expects(self::never())
             ->method('getErrorCompleter');
@@ -89,7 +89,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
     public function testProcessContextWithoutErrorsAndWithInfoRecords()
     {
         $result = [new \stdClass()];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $infoRecords = ['' => ['key' => 'value']];
 
         $this->errorCompleterRegistry->expects(self::never())

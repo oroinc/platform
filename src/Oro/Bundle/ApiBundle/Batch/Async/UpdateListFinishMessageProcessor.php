@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Async;
 
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListFinishTopic;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\IncludeMapManager;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchError;
@@ -12,8 +13,6 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
 /**
  * Finishes the processing of API batch update request.
@@ -35,23 +34,18 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
     /** @var FileNameProvider */
     private $fileNameProvider;
 
-    /** @var LoggerInterface */
-    private $logger;
-
     public function __construct(
         UpdateListProcessingHelper $processingHelper,
         AsyncOperationManager $operationManager,
         FileManager $fileManager,
         IncludeMapManager $includeMapManager,
-        FileNameProvider $fileNameProvider,
-        LoggerInterface $logger
+        FileNameProvider $fileNameProvider
     ) {
         $this->processingHelper = $processingHelper;
         $this->operationManager = $operationManager;
         $this->fileManager = $fileManager;
         $this->includeMapManager = $includeMapManager;
         $this->fileNameProvider = $fileNameProvider;
-        $this->logger = $logger;
     }
 
     /**
@@ -59,7 +53,7 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::UPDATE_LIST_FINISH];
+        return [UpdateListFinishTopic::getName()];
     }
 
     /**
@@ -68,21 +62,10 @@ class UpdateListFinishMessageProcessor implements MessageProcessorInterface, Top
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $startTimestamp = microtime(true);
-        $body = JSON::decode($message->getBody());
-        if (!isset(
-            $body['operationId'],
-            $body['entityClass'],
-            $body['requestType'],
-            $body['version'],
-            $body['fileName']
-        )) {
-            $this->logger->critical('Got invalid message.');
+        $messageBody = $message->getBody();
 
-            return self::REJECT;
-        }
-
-        $operationId = $body['operationId'];
-        $this->handleNotProcessedIncludedItems($operationId, $body['fileName']);
+        $operationId = $messageBody['operationId'];
+        $this->handleNotProcessedIncludedItems($operationId, $messageBody['fileName']);
         $this->processingHelper->safeDeleteFile(
             $this->fileNameProvider->getInfoFileName($operationId)
         );

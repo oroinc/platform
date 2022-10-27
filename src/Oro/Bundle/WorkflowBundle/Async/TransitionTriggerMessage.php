@@ -3,100 +3,47 @@
 namespace Oro\Bundle\WorkflowBundle\Async;
 
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
-use Oro\Component\MessageQueue\Util\JSON;
 
+/**
+ * Transition trigger message DTO.
+ */
 class TransitionTriggerMessage
 {
-    const TRANSITION_TRIGGER = 'transitionTrigger';
-    const MAIN_ENTITY = 'mainEntity';
+    public const TRANSITION_TRIGGER = 'transitionTrigger';
+    public const MAIN_ENTITY = 'mainEntity';
 
-    /** @var int */
-    protected $triggerId;
+    protected ?int $triggerId;
 
-    /** @var mixed */
-    protected $mainEntityId;
+    protected array|string|int|null $mainEntityId;
 
-    /**
-     * @param int $triggerId
-     * @param mixed $mainEntityId
-     */
-    protected function __construct($triggerId, $mainEntityId)
+    protected function __construct(?int $triggerId, array|string|int|null $mainEntityId)
     {
         $this->triggerId = $triggerId;
         $this->mainEntityId = $mainEntityId;
     }
 
-    /**
-     * @param BaseTransitionTrigger $trigger
-     * @param mixed $mainEntityId
-     * @return static
-     */
-    public static function create(BaseTransitionTrigger $trigger, $mainEntityId = null)
+    public static function create(BaseTransitionTrigger $trigger, array|string|int|null $mainEntityId = null): static
     {
         return new static($trigger->getId(), $mainEntityId);
     }
 
-    /**
-     * @param string $json
-     * @return static
-     * @throws \InvalidArgumentException
-     */
-    public static function createFromJson($json)
+    public static function createFromArray(array $data): static
     {
-        $data = self::jsonToArray($json);
-
-        return new static(
-            static::getValue($data, self::TRANSITION_TRIGGER),
-            static::getValue($data, self::MAIN_ENTITY)
-        );
+        return new static($data[self::TRANSITION_TRIGGER] ?? null, $data[self::MAIN_ENTITY] ?? null);
     }
 
-    /**
-     * @return int
-     */
-    public function getTriggerId()
+    public function getTriggerId(): ?int
     {
-        return (int)$this->triggerId;
+        return $this->triggerId;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getMainEntityId()
+    public function getMainEntityId(): array|string|int|null
     {
         return $this->mainEntityId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [self::TRANSITION_TRIGGER => $this->triggerId, self::MAIN_ENTITY => $this->mainEntityId];
-    }
-
-    /**
-     * @param string $json
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    protected static function jsonToArray($json)
-    {
-        $data = JSON::decode($json);
-        if (!is_array($data) || !$data) {
-            throw new \InvalidArgumentException('Given json should not be empty');
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param array $array
-     * @param string $key
-     * @return mixed|null
-     */
-    protected static function getValue(array $array, $key)
-    {
-        return array_key_exists($key, $array) ? $array[$key] : null;
     }
 }

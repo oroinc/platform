@@ -15,6 +15,10 @@ Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
             - Type:
                 type: integer
                 groups: [Imap]
+            - Range:
+                min: 0
+                max: 65535
+                groups: [Imap]
         smtpHost:
             - NotBlank: { groups: [Smtp] }
             - Length:
@@ -26,6 +30,10 @@ Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
             - NotBlank: { groups: [Smtp] }
             - Type:
                 type: integer
+                groups: [Smtp]
+            - Range:
+                min: 0
+                max: 65535
                 groups: [Smtp]
         imapEncryption:
             - Choice:

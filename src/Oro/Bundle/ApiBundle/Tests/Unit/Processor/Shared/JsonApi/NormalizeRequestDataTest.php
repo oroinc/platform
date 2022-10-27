@@ -57,9 +57,8 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setAcceptableTargetClassNames([$targetClass]);
         $associationMetadata->setIsCollection($isCollection);
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata($targetClass);
         $associationTargetMetadata->setIdentifierFieldNames(['id']);
-        $associationTargetMetadata->setClassName($targetClass);
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         return $associationMetadata;
@@ -150,7 +149,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addMetaProperty(new MetaPropertyMetadata('meta1'));
         $metadata->addAssociation(
@@ -222,7 +221,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
@@ -282,7 +281,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->valueNormalizer->expects(self::any())
@@ -354,7 +353,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', 'Test\AnotherUser', false)
@@ -435,7 +434,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $toOneRelation = $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', EntityIdentifier::class, false)
@@ -511,7 +510,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $toOneRelation = $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', EntityIdentifier::class, false)
@@ -599,7 +598,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
@@ -684,7 +683,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
@@ -758,7 +757,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $includedEntities = new IncludedEntityCollection();
         $includedEntities->add(new \stdClass(), 'Test\User', 'INCLUDED1', new IncludedEntityData('/included/0', 0));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addAssociation(
             $this->createAssociationMetadata('association', 'Test\User', false)
@@ -805,7 +804,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $includedEntities = new IncludedEntityCollection();
         $includedEntities->setPrimaryEntityId('Test\User', 'PRIMARY1');
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addAssociation(
             $this->createAssociationMetadata('association', 'Test\User', false)
@@ -840,7 +839,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $requestData = ['meta' => ['foo' => 'bar']];
 
         $this->context->setRequestData($requestData);
-        $this->context->setMetadata(new EntityMetadata());
+        $this->context->setMetadata(new EntityMetadata('Test\Entity'));
         $this->processor->process($this->context);
 
         self::assertSame($requestData['meta'], $this->context->getRequestData());
@@ -852,7 +851,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $requestData = ['another' => ['foo' => 'bar']];
 
         $this->context->setRequestData($requestData);
-        $this->context->setMetadata(new EntityMetadata());
+        $this->context->setMetadata(new EntityMetadata('Test\Entity'));
         $this->processor->process($this->context);
 
         self::assertSame($requestData, $this->context->getRequestData());

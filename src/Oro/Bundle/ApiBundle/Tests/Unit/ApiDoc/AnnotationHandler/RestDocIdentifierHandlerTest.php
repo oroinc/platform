@@ -54,7 +54,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route');
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $description = null;
 
         $metadata->setIdentifierFieldNames(['id']);
@@ -87,7 +87,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route');
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $description = 'ID field description';
 
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
@@ -123,7 +123,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route');
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $description = null;
 
         $metadata->setIdentifierFieldNames([]);

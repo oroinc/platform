@@ -1,9 +1,9 @@
 <div class="sql-query-container">
-    <a id="<%- togglerId %>" role="button" data-role="show-sql-query-link" class="collapsed btn btn-light show-sql-query" data-toggle="collapse" href="#<%- collapseId %>" title="Expand" data-expanded-title="<%- collapseLabel %>" data-collapsed-title="<%- expandLabel %>" aria-expanded="false" aria-controls="<%- collapseId %>">
+    <a id="<%- togglerId %>" role="button" data-role="show-sql-query-link" class="collapsed btn btn-light show-sql-query" data-toggle="collapse" href="#<%- collapseId %>" title="Expand" aria-expanded="false" aria-controls="<%- collapseId %>">
         <span class="fa-icon fa-minus-square-o"></span>
         <span class="collapse-text"><%- collapseLabel %></span><span class="expand-text"><%- expandLabel %></span>
     </a>
-    <div id="<%- collapseId %>" class="sql-query-box collapse" aria-labelledby="<%- togglerId %>">
+    <div id="<%- collapseId %>" data-expanded-title="<%- collapseLabel %>" data-collapsed-title="<%- expandLabel %>" class="sql-query-box collapse" aria-labelledby="<%- togglerId %>">
         <pre id="<%- copyTargetElementId %>" class="sql-query-code" data-role="sql-query"><%- sql %></pre>
         <a href="#" role="button" data-role="copy-sql-query" class="btn" title="<%- _.__('Copy to Clipboard') %>"><span class="fa-copy"></span><%- _.__('Copy to Clipboard') %></a>
     </div>

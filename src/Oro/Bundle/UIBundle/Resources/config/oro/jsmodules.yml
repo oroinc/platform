@@ -66,6 +66,7 @@ app-modules:
     - oroui/js/app/modules/messenger-module
     - oroui/js/app/modules/resizable-area-module
     - oroui/js/app/modules/responsive-layout-module
+    - oroui/js/app/modules/swipeable-module
     - oroui/js/app/modules/template-macros-module
     - oroui/js/app/modules/viewport-module
     - oroui/js/app/modules/widgets-module
@@ -132,7 +133,6 @@ dynamic-imports:
         - oroui/js/app/views/page/organization-switch-view
         - oroui/js/app/views/page/user-menu-view
         - oroui/js/app/views/sticky-element/sticky-element-view
-        - oroui/js/app/views/swipeable-view
         - oroui/js/content-processor/pinned-dropdown-button
         - oroui/js/delete-confirmation
         - oroui/js/desktop/side-menu
@@ -146,8 +146,6 @@ dynamic-imports:
         - oroui/js/standart-confirmation
         - oroui/js/tools/api-accessor
         - oroui/js/tools/search-api-accessor
-        - oroui/js/widget/collapse-group-widget
-        - oroui/js/widget/collapse-widget
         - underscore
     jstree:
         - oroui/js/app/views/jstree/base-tree-view

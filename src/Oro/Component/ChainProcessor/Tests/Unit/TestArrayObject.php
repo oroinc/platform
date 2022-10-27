@@ -6,8 +6,7 @@ use Oro\Component\ChainProcessor\ToArrayInterface;
 
 class TestArrayObject implements ToArrayInterface
 {
-    /** @var array */
-    protected $items;
+    private array $items;
 
     public function __construct(array $items)
     {
@@ -15,9 +14,9 @@ class TestArrayObject implements ToArrayInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->items;
     }

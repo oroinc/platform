@@ -10,13 +10,11 @@ use Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException;
 class ExternalLinkMetadata extends LinkMetadata
 {
     /** @var string URL template; parameters must be enclosed with curly brackets, e.g. http://test.com?entity={id} */
-    private $urlTemplate;
-
+    private string $urlTemplate;
     /** @var array [parameter name => parameter property path or NULL if it equals to the name, ...] */
-    private $urlParams;
-
+    private array $urlParams;
     /** @var array [parameter name => scalar value, ...] */
-    private $defaultParams;
+    private array $defaultParams;
 
     /**
      * @param string $urlTemplate   The URL template. It can contains "{param}" placeholders
@@ -42,9 +40,9 @@ class ExternalLinkMetadata extends LinkMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = parent::toArray();
         $result['url_template'] = $this->urlTemplate;
@@ -59,7 +57,7 @@ class ExternalLinkMetadata extends LinkMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getHref(DataAccessorInterface $dataAccessor): ?string
     {

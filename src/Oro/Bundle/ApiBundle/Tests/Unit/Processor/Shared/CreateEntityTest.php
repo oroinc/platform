@@ -87,7 +87,7 @@ class CreateEntityTest extends FormProcessorTestCase
         $entityClass = Entity\Product::class;
         $entity = new $entityClass();
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(true);
 
         $this->doctrineHelper->expects(self::any())
@@ -114,7 +114,7 @@ class CreateEntityTest extends FormProcessorTestCase
         $entityId = 123;
         $entity = new $entityClass();
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
 
         $this->doctrineHelper->expects(self::any())
@@ -144,7 +144,7 @@ class CreateEntityTest extends FormProcessorTestCase
         $entityClass = Entity\Product::class;
         $entityId = 123;
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
 
         $this->doctrineHelper->expects(self::any())
@@ -195,7 +195,7 @@ class CreateEntityTest extends FormProcessorTestCase
         $entity = new $parentResourceClass();
         $config = new EntityDefinitionConfig();
         $config->setParentResourceClass($parentResourceClass);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(true);
 
         $this->doctrineHelper->expects(self::any())

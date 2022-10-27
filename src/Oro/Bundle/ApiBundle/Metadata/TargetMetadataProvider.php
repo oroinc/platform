@@ -9,21 +9,14 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface;
  */
 class TargetMetadataProvider
 {
-    /** @var ObjectAccessorInterface */
-    private $objectAccessor;
+    private ObjectAccessorInterface $objectAccessor;
 
     public function __construct(ObjectAccessorInterface $objectAccessor)
     {
         $this->objectAccessor = $objectAccessor;
     }
 
-    /**
-     * @param mixed          $object
-     * @param EntityMetadata $entityMetadata
-     *
-     * @return EntityMetadata
-     */
-    public function getTargetMetadata($object, EntityMetadata $entityMetadata): EntityMetadata
+    public function getTargetMetadata(mixed $object, EntityMetadata $entityMetadata): EntityMetadata
     {
         $objectClassName = $this->objectAccessor->getClassName($object);
         if (!$objectClassName) {
@@ -37,14 +30,10 @@ class TargetMetadataProvider
         return $entityMetadata->getEntityMetadata($objectClassName) ?? $entityMetadata;
     }
 
-    /**
-     * @param mixed               $object
-     * @param AssociationMetadata $associationMetadata
-     *
-     * @return EntityMetadata|null
-     */
-    public function getAssociationTargetMetadata($object, AssociationMetadata $associationMetadata): ?EntityMetadata
-    {
+    public function getAssociationTargetMetadata(
+        mixed $object,
+        AssociationMetadata $associationMetadata
+    ): ?EntityMetadata {
         if (null === $object || \is_scalar($object)) {
             return $associationMetadata->getTargetMetadata();
         }
@@ -65,13 +54,7 @@ class TargetMetadataProvider
         return $targetMetadata;
     }
 
-    /**
-     * @param mixed          $object
-     * @param EntityMetadata $entityMetadata
-     *
-     * @return bool
-     */
-    private function hasIdentifierFieldsOnly($object, EntityMetadata $entityMetadata): bool
+    private function hasIdentifierFieldsOnly(mixed $object, EntityMetadata $entityMetadata): bool
     {
         $identifierFieldNames = $entityMetadata->getIdentifierFieldNames();
         $properties = $this->objectAccessor->toArray($object);

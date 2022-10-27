@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Batch\Async;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -50,7 +50,7 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::UPDATE_LIST_START_CHUNK_JOBS];
+        return [UpdateListStartChunkJobsTopic::getName()];
     }
 
     /**
@@ -67,28 +67,17 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $startTimestamp = microtime(true);
-        $body = JSON::decode($message->getBody());
-        if (!isset(
-            $body['operationId'],
-            $body['entityClass'],
-            $body['requestType'],
-            $body['version'],
-            $body['rootJobId']
-        )) {
-            $this->logger->critical('Got invalid message.');
+        $messageBody = $message->getBody();
 
-            return self::REJECT;
-        }
-
-        $rootJob = $this->getJobRepository()->findJobById((int)$body['rootJobId']);
+        $rootJob = $this->getJobRepository()->findJobById($messageBody['rootJobId']);
         if (null === $rootJob) {
             $this->logger->critical('The root job does not exist.');
 
             return self::REJECT;
         }
 
-        $operationId = $body['operationId'];
-        $firstChunkFileIndex = $body['firstChunkFileIndex'] ?? 0;
+        $operationId = $messageBody['operationId'];
+        $firstChunkFileIndex = $messageBody['firstChunkFileIndex'];
         $chunkFiles = $this->processingHelper->loadChunkIndex($operationId);
         $chunkFileToJobIdMap = $this->processingHelper->loadChunkJobIndex($operationId);
         $maxChunkFileIndex = count($chunkFiles) - 1;
@@ -107,7 +96,7 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
 
                 return self::REJECT;
             }
-            $this->processingHelper->sendProcessChunkMessage($body, $job, $chunkFiles[$nextChunkFileIndex]);
+            $this->processingHelper->sendProcessChunkMessage($messageBody, $job, $chunkFiles[$nextChunkFileIndex]);
             $nextChunkFileIndex++;
         }
 
@@ -115,9 +104,9 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
             // do the next iteration
             $this->processingHelper->sendMessageToStartChunkJobs(
                 $rootJob,
-                $body,
+                $messageBody,
                 $nextChunkFileIndex,
-                $this->processingHelper->calculateAggregateTime($startTimestamp, $body['aggregateTime'] ?? 0)
+                $this->processingHelper->calculateAggregateTime($startTimestamp, $messageBody['aggregateTime'])
             );
         } else {
             // all messages that start chunk jobs were sent
@@ -125,7 +114,7 @@ class UpdateListStartChunkJobsMessageProcessor implements MessageProcessorInterf
             $this->processingHelper->deleteChunkJobIndex($operationId);
             $this->operationManager->incrementAggregateTime(
                 $operationId,
-                $this->processingHelper->calculateAggregateTime($startTimestamp, $body['aggregateTime'] ?? 0)
+                $this->processingHelper->calculateAggregateTime($startTimestamp, $messageBody['aggregateTime'])
             );
         }
 

@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 abstract class LinkMetadata implements LinkMetadataInterface
 {
     /** @var MetaAttributeMetadata[] */
-    private $metaProperties = [];
+    private array $metaProperties = [];
 
     /**
      * Gets the link's URL based on the given result data.
@@ -34,9 +34,9 @@ abstract class LinkMetadata implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = [];
         $metaProperties = ConfigUtil::convertPropertiesToArray($this->metaProperties);
@@ -48,7 +48,7 @@ abstract class LinkMetadata implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetaProperties(): array
     {
@@ -56,7 +56,7 @@ abstract class LinkMetadata implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasMetaProperty(string $metaPropertyName): bool
     {
@@ -64,19 +64,15 @@ abstract class LinkMetadata implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetaProperty(string $metaPropertyName): ?MetaAttributeMetadata
     {
-        if (!isset($this->metaProperties[$metaPropertyName])) {
-            return null;
-        }
-
-        return $this->metaProperties[$metaPropertyName];
+        return $this->metaProperties[$metaPropertyName] ?? null;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function addMetaProperty(MetaAttributeMetadata $metaProperty): MetaAttributeMetadata
     {
@@ -86,7 +82,7 @@ abstract class LinkMetadata implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function removeMetaProperty(string $metaPropertyName): void
     {

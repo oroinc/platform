@@ -154,7 +154,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['test' => 'ASC'], $entityConfig->getOrderBy());
         $this->assertEquals(['order_by' => ['test' => 'ASC']], $entityConfig->toArray());
 
-        $entityConfig->setOrderBy();
+        $entityConfig->setOrderBy([]);
         $this->assertEquals([], $entityConfig->getOrderBy());
         $this->assertEquals([], $entityConfig->toArray());
     }
@@ -168,7 +168,7 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(123, $entityConfig->getMaxResults());
         $this->assertEquals(['max_results' => 123], $entityConfig->toArray());
 
-        $entityConfig->setMaxResults();
+        $entityConfig->setMaxResults(null);
         $this->assertNull($entityConfig->getMaxResults());
         $this->assertEquals([], $entityConfig->toArray());
     }
@@ -257,12 +257,13 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $entityConfig = new EntityConfig();
         $this->assertNull($entityConfig->getPostSerializeHandler());
 
-        $handler = 'test';
+        $handler = function (array $item, array $context) : array {
+        };
         $entityConfig->setPostSerializeHandler($handler);
         $this->assertSame($handler, $entityConfig->getPostSerializeHandler());
-        $this->assertEquals(['post_serialize' => 'test'], $entityConfig->toArray());
+        $this->assertEquals(['post_serialize' => $handler], $entityConfig->toArray());
 
-        $entityConfig->setPostSerializeHandler();
+        $entityConfig->setPostSerializeHandler(null);
         $this->assertNull($entityConfig->getPostSerializeHandler());
         $this->assertEquals([], $entityConfig->toArray());
     }
@@ -272,12 +273,13 @@ class EntityConfigTest extends \PHPUnit\Framework\TestCase
         $entityConfig = new EntityConfig();
         $this->assertNull($entityConfig->getPostSerializeCollectionHandler());
 
-        $handler = 'test';
+        $handler = function (array $items, array $context) : array {
+        };
         $entityConfig->setPostSerializeCollectionHandler($handler);
         $this->assertSame($handler, $entityConfig->getPostSerializeCollectionHandler());
-        $this->assertEquals(['post_serialize_collection' => 'test'], $entityConfig->toArray());
+        $this->assertEquals(['post_serialize_collection' => $handler], $entityConfig->toArray());
 
-        $entityConfig->setPostSerializeCollectionHandler();
+        $entityConfig->setPostSerializeCollectionHandler(null);
         $this->assertNull($entityConfig->getPostSerializeCollectionHandler());
         $this->assertEquals([], $entityConfig->toArray());
     }

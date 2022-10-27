@@ -172,7 +172,7 @@ class IncludeMapManager
             return new IncludedData($this->itemKeyBuilder, $includeAccessor, $this->fileLockManager);
         }
 
-        return $this->doWithLock(
+        return $this->doWithReadLock(
             $this->fileNameProvider->getIncludeIndexFileName($operationId),
             function () use ($fileManager, $operationId, $includeAccessor, $relationships) {
                 $loadedItems = [];
@@ -236,14 +236,6 @@ class IncludeMapManager
                     $includedItems,
                     $processedItems
                 );
-            },
-            function ($indexFileName) {
-                $this->logger->warning(sprintf(
-                    'Not possible to get included items now because the lock cannot be acquired for the "%s" file.',
-                    $indexFileName
-                ));
-
-                return null;
             }
         );
     }
@@ -257,7 +249,7 @@ class IncludeMapManager
      */
     public function moveToProcessed(FileManager $fileManager, int $operationId, array $dataToMove): void
     {
-        $this->doWithLock(
+        $this->doWithMoveToProcessedLock(
             $this->fileNameProvider->getIncludeIndexFileName($operationId),
             function () use ($fileManager, $operationId, $dataToMove) {
                 $indexData = $this->loadIndexData($fileManager, $operationId);
@@ -291,17 +283,7 @@ class IncludeMapManager
                 }
                 $this->saveProcessedIndexData($fileManager, $operationId, $processedIndexData);
                 $this->saveIndexData($fileManager, $operationId, $indexData);
-            },
-            function ($indexFileName) {
-                throw new RuntimeException(
-                    sprintf(
-                        'Not possible to move included items to processed'
-                            . ' because the lock cannot be acquired for the "%s" file.',
-                        $indexFileName
-                    )
-                );
-            },
-            false
+            }
         );
     }
 
@@ -626,21 +608,38 @@ class IncludeMapManager
         return $lockFileNames;
     }
 
-    private function doWithLock(
-        string $indexFileName,
-        callable $closure,
-        callable $failLockClosure,
-        bool $readLock = true
-    ) {
-        $lockFileName = $readLock
-            ? $this->acquireReadLock($indexFileName)
-            : $this->acquireMoveToProcessedLock($indexFileName);
+    private function doWithReadLock(string $indexFileName, callable $closure): ?IncludedData
+    {
+        $lockFileName = $this->acquireReadLock($indexFileName);
         if (!$lockFileName) {
-            return $failLockClosure($indexFileName);
+            $this->logger->warning(sprintf(
+                'Not possible to get included items now because the lock cannot be acquired for the "%s" file.',
+                $indexFileName
+            ));
+
+            return null;
         }
 
         try {
             return $closure();
+        } finally {
+            $this->fileLockManager->releaseLock($lockFileName);
+        }
+    }
+
+    private function doWithMoveToProcessedLock(string $indexFileName, callable $closure): void
+    {
+        $lockFileName = $this->acquireMoveToProcessedLock($indexFileName);
+        if (!$lockFileName) {
+            throw new RuntimeException(sprintf(
+                'Not possible to move included items to processed'
+                . ' because the lock cannot be acquired for the "%s" file.',
+                $indexFileName
+            ));
+        }
+
+        try {
+            $closure();
         } finally {
             $this->fileLockManager->releaseLock($lockFileName);
         }

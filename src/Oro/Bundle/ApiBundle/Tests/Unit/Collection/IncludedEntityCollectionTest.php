@@ -68,7 +68,7 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $entityId = '123';
         $entity = new \stdClass();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata(get_class($entity));
         $this->collection->setPrimaryEntityId($entityClass, $entityId);
         $this->collection->setPrimaryEntity($entity, $metadata);
         self::assertTrue($this->collection->isPrimaryEntity('Test\Class', '123'));
@@ -79,7 +79,7 @@ class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
     public function testShouldBePossibleToGetAlreadySetPrimaryEntity()
     {
         $entity = new \stdClass();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata(get_class($entity));
         $this->collection->setPrimaryEntityId('Test\Class', '123');
         $this->collection->setPrimaryEntity($entity, $metadata);
         self::assertSame($entity, $this->collection->getPrimaryEntity());

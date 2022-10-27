@@ -39,7 +39,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testAddNestedAssociation()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -56,7 +56,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         $targetClass = 'Test\TargetClass';
         $field->setTargetClass($targetClass);
 
-        $targetEntityMetadata = new EntityMetadata();
+        $targetEntityMetadata = new EntityMetadata('Test\Entity');
 
         $this->metadataHelper->expects(self::once())
             ->method('setPropertyPath')
@@ -93,7 +93,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testAddNestedAssociationWhenDataTypeIsNotSetForIdField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -109,7 +109,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         $targetClass = 'Test\TargetClass';
         $field->setTargetClass($targetClass);
 
-        $targetEntityMetadata = new EntityMetadata();
+        $targetEntityMetadata = new EntityMetadata('Test\Entity');
 
         $this->metadataHelper->expects(self::once())
             ->method('setPropertyPath')
@@ -151,7 +151,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
             . ' Parent Field: Test\Class::testField.'
         );
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -175,7 +175,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
             'A property path should be configured for the "__class__" field. Parent Field: Test\Class::testField.'
         );
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -200,7 +200,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
             'The "__class__" field should not be an association. Parent Field: Test\Class::testField.'
         );
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -227,7 +227,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
             'The "id" field should be configured for the nested association. Parent Field: Test\Class::testField.'
         );
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -253,7 +253,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
             'A property path should be configured for the "id" field. Parent Field: Test\Class::testField.'
         );
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -280,7 +280,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
             'The "id" field should not be an association. Parent Field: Test\Class::testField.'
         );
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();

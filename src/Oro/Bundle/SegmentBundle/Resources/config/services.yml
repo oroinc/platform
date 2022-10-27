@@ -7,13 +7,11 @@ services:
         class: Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_segment.query.dynamic_segment.query_builder'
             - '@oro_security.owner.ownership_metadata_provider'
             - '@oro_entity.orm.native_query_executor_helper'
-
-    Oro\Bundle\SegmentBundle\Entity\Manager\StaticSegmentManager:
-        alias: oro_segment.static_segment_manager
+            - '@oro_organization.organization_restriction_provider'
 
     oro_segment.segment_manager:
         class: Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager

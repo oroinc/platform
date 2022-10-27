@@ -330,6 +330,42 @@ class CompositeIdentifierTest extends RestJsonApiTestCase
         );
     }
 
+    public function testGetListFilterByAssociationWithCompositeIdentifier()
+    {
+        self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[parent]' => $this->getEntityId('item 1', 1)]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type'          => $entityType,
+                        'id'            => $this->getEntityId('item 3', 3),
+                        'attributes'    => [
+                            'name' => 'Item 3'
+                        ],
+                        'relationships' => [
+                            'parent'   => [
+                                'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1', 1)]
+                            ],
+                            'children' => [
+                                'data' => [
+                                    ['type' => $entityType, 'id' => $this->getEntityId('item 2', 2)]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
     public function testGet()
     {
         self::markTestSkipped('BAP-15595: Need to fix EntitySerializer to work with composite identifier');

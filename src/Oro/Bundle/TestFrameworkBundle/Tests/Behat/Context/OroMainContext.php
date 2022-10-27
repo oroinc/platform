@@ -1315,8 +1315,9 @@ class OroMainContext extends MinkContext implements
         self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
         $function = <<<JS
 (function(){
-    var scrollableElement = jQuery('section.widget-content').parent();
-    scrollableElement.scrollTop(scrollableElement.height());
+    var contentElement = jQuery('section.widget-content');
+    var scrollableElement = contentElement.parent();
+    scrollableElement.scrollTop(contentElement.outerHeight());
 })()
 JS;
 
@@ -2888,5 +2889,22 @@ JS;
     public function assertFieldContains($field, $value)
     {
         parent::assertFieldContains($field, $value);
+    }
+
+    /**
+     * Click on button or link if it is present on page
+     * Example: Given I click "Edit" if present
+     * Example: When I click "Save and Close" if present
+     *
+     * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)" if present$/
+     *
+     * @param string $button
+     * @throws \Behat\Mink\Exception\ElementNotFoundException
+     */
+    public function pressButtonIfPresent($button)
+    {
+        if ($this->isElementVisible($button)) {
+            $this->pressButton($button);
+        }
     }
 }

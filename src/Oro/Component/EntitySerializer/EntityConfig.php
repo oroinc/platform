@@ -8,23 +8,17 @@ namespace Oro\Component\EntitySerializer;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityConfig
+class EntityConfig implements EntityConfigInterface
 {
-    /** @var string|null */
-    protected $exclusionPolicy;
-
-    /** @var array */
-    protected $items = [];
-
+    protected ?string $exclusionPolicy = null;
+    protected array $items = [];
     /** @var FieldConfig[] */
-    protected $fields = [];
+    protected array $fields = [];
 
     /**
      * Gets a native PHP array representation of the entity configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = $this->items;
         if (null !== $this->exclusionPolicy && ConfigUtil::EXCLUSION_POLICY_NONE !== $this->exclusionPolicy) {
@@ -41,10 +35,8 @@ class EntityConfig
 
     /**
      * Indicates whether the entity does not have a configuration.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return
             null === $this->exclusionPolicy
@@ -62,26 +54,17 @@ class EntityConfig
     }
 
     /**
-     * Checks whether the configuration attribute exists.
-     *
-     * @param string $key
-     *
-     * @return bool
+     * Indicates whether the configuration attribute exists.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
      * Gets the configuration value.
-     *
-     * @param string $key
-     * @param mixed  $defaultValue
-     *
-     * @return mixed
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (!\array_key_exists($key, $this->items)) {
             return $defaultValue;
@@ -92,23 +75,36 @@ class EntityConfig
 
     /**
      * Sets the configuration value.
-     *
-     * @param string $key
-     * @param mixed  $value
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         $this->items[$key] = $value;
     }
 
     /**
      * Removes the configuration value.
-     *
-     * @param string $key
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
+    }
+
+    /**
+     * Gets names of all configuration attributes.
+     *
+     * @return string[]
+     */
+    public function keys(): array
+    {
+        return array_keys($this->items);
+    }
+
+    /**
+     * Indicates whether the configuration of at least one field exists.
+     */
+    public function hasFields(): bool
+    {
+        return !empty($this->fields);
     }
 
     /**
@@ -116,44 +112,63 @@ class EntityConfig
      *
      * @return FieldConfig[] [field name => config, ...]
      */
-    public function getFields()
+    public function getFields(): array
     {
         return $this->fields;
     }
 
     /**
      * Checks whether the configuration of a field exists.
-     *
-     * @param string $fieldName
-     *
-     * @return bool
      */
-    public function hasField($fieldName)
+    public function hasField(string $fieldName): bool
     {
         return isset($this->fields[$fieldName]);
     }
 
     /**
      * Gets the configuration of a field.
-     *
-     * @param string $fieldName
-     *
-     * @return FieldConfig|null
      */
-    public function getField($fieldName)
+    public function getField(string $fieldName): ?FieldConfig
     {
         return $this->fields[$fieldName] ?? null;
     }
 
     /**
-     * Adds the configuration of a field.
-     *
-     * @param string           $fieldName
-     * @param FieldConfig|null $field
-     *
-     * @return FieldConfig
+     * Gets the configuration of existing field or adds new field with a given name.
      */
-    public function addField($fieldName, $field = null)
+    public function getOrAddField(string $fieldName): FieldConfig
+    {
+        $field = $this->getField($fieldName);
+        if (null === $field) {
+            $field = $this->addField($fieldName);
+        }
+
+        return $field;
+    }
+
+    /**
+     * Finds the configuration of the field by its name or property path.
+     * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
+     */
+    public function findField(string $fieldName, bool $findByPropertyPath = false): ?FieldConfig
+    {
+        return FindFieldUtil::doFindField($this->fields, $fieldName, $findByPropertyPath);
+    }
+
+    /**
+     * Finds the name of the field by its property path.
+     * This method can be useful when a field was renamed and you need to find
+     * the name of the result field by the name defined in an entity.
+     */
+    public function findFieldNameByPropertyPath(string $propertyPath): ?string
+    {
+        return FindFieldUtil::doFindFieldNameByPropertyPath($this->fields, $propertyPath);
+    }
+
+    /**
+     * Adds the configuration of a field.
+     */
+    public function addField(string $fieldName, ?FieldConfigInterface $field = null): FieldConfig
     {
         if (null === $field) {
             $field = new FieldConfig();
@@ -166,12 +181,18 @@ class EntityConfig
 
     /**
      * Removes the configuration of a field.
-     *
-     * @param string $fieldName
      */
-    public function removeField($fieldName)
+    public function removeField(string $fieldName): void
     {
         unset($this->fields[$fieldName]);
+    }
+
+    /**
+     * Indicates whether the exclusion policy is set explicitly.
+     */
+    public function hasExclusionPolicy(): bool
+    {
+        return null !== $this->exclusionPolicy;
     }
 
     /**
@@ -179,13 +200,9 @@ class EntityConfig
      *
      * @return string An exclusion strategy, e.g. "none" or "all"
      */
-    public function getExclusionPolicy()
+    public function getExclusionPolicy(): string
     {
-        if (null === $this->exclusionPolicy) {
-            return ConfigUtil::EXCLUSION_POLICY_NONE;
-        }
-
-        return $this->exclusionPolicy;
+        return $this->exclusionPolicy ?? ConfigUtil::EXCLUSION_POLICY_NONE;
     }
 
     /**
@@ -194,17 +211,15 @@ class EntityConfig
      * @param string|null $exclusionPolicy An exclusion strategy, e.g. "none" or "all",
      *                                     or NULL to remove this option
      */
-    public function setExclusionPolicy($exclusionPolicy)
+    public function setExclusionPolicy(?string $exclusionPolicy): void
     {
         $this->exclusionPolicy = $exclusionPolicy;
     }
 
     /**
      * Indicates whether all fields are not configured explicitly should be excluded.
-     *
-     * @return bool
      */
-    public function isExcludeAll()
+    public function isExcludeAll(): bool
     {
         return ConfigUtil::EXCLUSION_POLICY_ALL === $this->exclusionPolicy;
     }
@@ -212,7 +227,7 @@ class EntityConfig
     /**
      * Sets the exclusion strategy to exclude all fields are not configured explicitly.
      */
-    public function setExcludeAll()
+    public function setExcludeAll(): void
     {
         $this->exclusionPolicy = ConfigUtil::EXCLUSION_POLICY_ALL;
     }
@@ -220,17 +235,15 @@ class EntityConfig
     /**
      * Sets the exclusion strategy to exclude only fields are marked as excluded.
      */
-    public function setExcludeNone()
+    public function setExcludeNone(): void
     {
         $this->exclusionPolicy = ConfigUtil::EXCLUSION_POLICY_NONE;
     }
 
     /**
      * Indicates whether using of Doctrine partial objects is enabled.
-     *
-     * @return bool
      */
-    public function isPartialLoadEnabled()
+    public function isPartialLoadEnabled(): bool
     {
         return !$this->get(ConfigUtil::DISABLE_PARTIAL_LOAD, false);
     }
@@ -238,7 +251,7 @@ class EntityConfig
     /**
      * Allows using of Doctrine partial objects.
      */
-    public function enablePartialLoad()
+    public function enablePartialLoad(): void
     {
         unset($this->items[ConfigUtil::DISABLE_PARTIAL_LOAD]);
     }
@@ -246,7 +259,7 @@ class EntityConfig
     /**
      * Prohibits using of Doctrine partial objects.
      */
-    public function disablePartialLoad()
+    public function disablePartialLoad(): void
     {
         $this->items[ConfigUtil::DISABLE_PARTIAL_LOAD] = true;
     }
@@ -259,7 +272,7 @@ class EntityConfig
      *
      * @return array [field name => direction, ...]
      */
-    public function getOrderBy()
+    public function getOrderBy(): array
     {
         return $this->get(ConfigUtil::ORDER_BY, []);
     }
@@ -272,7 +285,7 @@ class EntityConfig
      *
      * @param array $orderBy [field name => direction, ...]
      */
-    public function setOrderBy(array $orderBy = [])
+    public function setOrderBy(array $orderBy): void
     {
         if ($orderBy) {
             $this->items[ConfigUtil::ORDER_BY] = $orderBy;
@@ -286,7 +299,7 @@ class EntityConfig
      *
      * @return int|null The requested maximum number of items or NULL if not limited
      */
-    public function getMaxResults()
+    public function getMaxResults(): ?int
     {
         return $this->get(ConfigUtil::MAX_RESULTS);
     }
@@ -296,7 +309,7 @@ class EntityConfig
      *
      * @param int|null $maxResults The maximum number of items or NULL to set unlimited
      */
-    public function setMaxResults($maxResults = null)
+    public function setMaxResults(?int $maxResults): void
     {
         if (null === $maxResults || $maxResults < 0) {
             unset($this->items[ConfigUtil::MAX_RESULTS]);
@@ -310,10 +323,8 @@ class EntityConfig
      * key "_" {@see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY}
      * and value ['has_more' => true] {@see \Oro\Component\EntitySerializer\ConfigUtil::HAS_MORE}
      * should be added to a collection if it has more records than it was requested.
-     *
-     * @return bool
      */
-    public function getHasMore()
+    public function getHasMore(): bool
     {
         return (bool)$this->get(ConfigUtil::HAS_MORE, false);
     }
@@ -323,10 +334,8 @@ class EntityConfig
      * key "_" {@see \Oro\Component\EntitySerializer\ConfigUtil::INFO_RECORD_KEY}
      * and value ['has_more' => true] {@see \Oro\Component\EntitySerializer\ConfigUtil::HAS_MORE}
      * should be added to a collection if it has more records than it was requested.
-     *
-     * @param bool $hasMore
      */
-    public function setHasMore($hasMore)
+    public function setHasMore(bool $hasMore): void
     {
         if ($hasMore) {
             $this->items[ConfigUtil::HAS_MORE] = true;
@@ -338,21 +347,16 @@ class EntityConfig
     /**
      * Gets Doctrine query hints.
      * Each hint can be a string or an associative array with "name" and "value" keys.
-     *
-     * @return array
      */
-    public function getHints()
+    public function getHints(): array
     {
         return $this->get(ConfigUtil::HINTS, []);
     }
 
     /**
      * Adds Doctrine query hint.
-     *
-     * @param string $name  The name of the hint
-     * @param mixed  $value The value of the hint
      */
-    public function addHint($name, $value = null)
+    public function addHint(string $name, mixed $value = null): void
     {
         $hints = $this->getHints();
         if (null === $value) {
@@ -367,11 +371,9 @@ class EntityConfig
     /**
      * Adds Doctrine query hint.
      *
-     * @param string $name  The name of the hint
-     * @param mixed  $value The value of the hint
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function removeHint($name, $value = null)
+    public function removeHint(string $name, mixed $value = null): void
     {
         $hints = $this->getHints();
         $toRemove = [];
@@ -455,9 +457,9 @@ class EntityConfig
     /**
      * Gets a handler that should be used to modify serialized data for a single item.
      *
-     * @return callable|null
+     * @return callable|null function (array $item, array $context) : array
      */
-    public function getPostSerializeHandler()
+    public function getPostSerializeHandler(): ?callable
     {
         return $this->get(ConfigUtil::POST_SERIALIZE);
     }
@@ -467,7 +469,7 @@ class EntityConfig
      *
      * @param callable|null $handler function (array $item, array $context) : array
      */
-    public function setPostSerializeHandler($handler = null)
+    public function setPostSerializeHandler(?callable $handler): void
     {
         if (null !== $handler) {
             $this->items[ConfigUtil::POST_SERIALIZE] = $handler;
@@ -479,9 +481,9 @@ class EntityConfig
     /**
      * Gets a handler that should be used to modify serialized data for a list of items.
      *
-     * @return callable|null
+     * @return callable|null function (array $items, array $context) : array
      */
-    public function getPostSerializeCollectionHandler()
+    public function getPostSerializeCollectionHandler(): ?callable
     {
         return $this->get(ConfigUtil::POST_SERIALIZE_COLLECTION);
     }
@@ -496,7 +498,7 @@ class EntityConfig
      *
      * @param callable|null $handler function (array $items, array $context) : array
      */
-    public function setPostSerializeCollectionHandler($handler = null)
+    public function setPostSerializeCollectionHandler(?callable $handler): void
     {
         if (null !== $handler) {
             $this->items[ConfigUtil::POST_SERIALIZE_COLLECTION] = $handler;

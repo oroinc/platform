@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Async;
 
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessChunkMessageProcessor;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
 use Oro\Bundle\ApiBundle\Batch\Encoder\DataEncoderInterface;
@@ -19,10 +19,11 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -33,25 +34,28 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobRunner */
+    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRunner;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
+    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobManager;
+
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
     private $fileManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|BatchUpdateHandler */
+    /** @var BatchUpdateHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $handler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataEncoderRegistry */
+    /** @var DataEncoderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $dataEncoderRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper */
+    /** @var UpdateListProcessingHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $processingHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileLockManager */
+    /** @var FileLockManager|\PHPUnit\Framework\MockObject\MockObject */
     private $fileLockManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     /** @var UpdateListProcessChunkMessageProcessor */
@@ -60,6 +64,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
         $this->fileManager = $this->createMock(FileManager::class);
         $this->handler = $this->createMock(BatchUpdateHandler::class);
         $this->dataEncoderRegistry = $this->createMock(DataEncoderRegistry::class);
@@ -69,6 +74,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
 
         $this->processor = new UpdateListProcessChunkMessageProcessor(
             $this->jobRunner,
+            $this->jobManager,
             $this->fileManager,
             $this->handler,
             $this->dataEncoderRegistry,
@@ -82,13 +88,9 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
 
     private function getMessage(array $body, string $messageId = ''): MessageInterface
     {
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
-            ->method('getBody')
-            ->willReturn(JSON::encode($body));
-        $message->expects(self::any())
-            ->method('getMessageId')
-            ->willReturn($messageId);
+        $message = new Message();
+        $message->setBody($body);
+        $message->setMessageId($messageId);
 
         return $message;
     }
@@ -105,28 +107,15 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         return $summary;
     }
 
-    public function testGetSubscribedTopics()
+    public function testGetSubscribedTopics(): void
     {
         self::assertEquals(
-            [Topics::UPDATE_LIST_PROCESS_CHUNK],
+            [UpdateListProcessChunkTopic::getName()],
             UpdateListProcessChunkMessageProcessor::getSubscribedTopics()
         );
     }
 
-    public function testShouldRejectInvalidMessage()
-    {
-        $message = $this->getMessage(['key' => 'value']);
-
-        $this->logger->expects(self::once())
-            ->method('critical')
-            ->with('Got invalid message.');
-
-        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectWhenUnexpectedErrorOccurred()
+    public function testShouldRejectWhenUnexpectedErrorOccurred(): void
     {
         $jobId = 456;
         $fileName = 'chunkFile';
@@ -139,7 +128,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ]);
         $processorAggregateTime = 11;
         $summaryData = [
@@ -190,7 +180,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function testShouldRejectWhenLoadChunkDataFailed()
+    public function testShouldRejectWhenLoadChunkDataFailed(): void
     {
         $jobId = 456;
         $fileName = 'chunkFile';
@@ -203,7 +193,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ]);
         $processorAggregateTime = 11;
         $summaryData = [
@@ -254,7 +245,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function testShouldRejectWhenLoadedChunkDataWasNotProcessed()
+    public function testShouldRejectWhenLoadedChunkDataWasNotProcessed(): void
     {
         $jobId = 456;
         $fileName = 'chunkFile';
@@ -267,7 +258,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ]);
         $processorAggregateTime = 11;
         $summaryData = [
@@ -318,7 +310,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function testProcessOneItemInChunk()
+    public function testProcessOneItemInChunk(): void
     {
         $jobId = 456;
         $fileName = 'chunkFile';
@@ -331,7 +323,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ]);
         $processorAggregateTime = 11;
         $summaryData = [
@@ -382,7 +375,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function testProcessSeveralItemsInChunk()
+    public function testProcessSeveralItemsInChunk(): void
     {
         $jobId = 456;
         $fileName = 'chunkFile';
@@ -395,7 +388,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ]);
         $processorAggregateTime = 11;
         $summaryData = [
@@ -451,7 +445,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrorsAndDataEncoderNotFound()
+    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrorsAndDataEncoderNotFound(): void
     {
         $jobId = 456;
         $requestType = ['testRequest'];
@@ -465,7 +459,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ]);
         $processorAggregateTime = 11;
         $summaryData = [
@@ -542,7 +537,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ]);
         $processorAggregateTime = 11;
         $summaryData = [
@@ -623,7 +619,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrorsAndFailedUpdateChunkCount()
+    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrorsAndFailedUpdateChunkCount(): void
     {
         $jobId = 456;
         $operationId = 123;
@@ -638,7 +634,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ]);
         $processorAggregateTime = 11;
         $summaryData = [
@@ -724,7 +721,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrors()
+    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrors(): void
     {
         $jobId = 456;
         $operationId = 123;
@@ -739,7 +736,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ];
         $message = $this->getMessage($body);
         $processorAggregateTime = 11;
@@ -842,7 +840,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function testProcessExtraChunk()
+    public function testProcessExtraChunk(): void
     {
         $jobId = 456;
         $fileName = 'chunkFile';
@@ -911,7 +909,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
      * @dataProvider processWhenRetryRequestedDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWhenRetryRequested(string $jobName, string $retryJobName, bool $extraChunk)
+    public function testProcessWhenRetryRequested(string $jobName, string $retryJobName, bool $extraChunk): void
     {
         $jobId = 456;
         $operationId = 123;
@@ -928,7 +926,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => $fileIndex,
             'firstRecordOffset' => $firstRecordOffset,
-            'sectionName'       => $sectionName
+            'sectionName'       => $sectionName,
+            'extra_chunk'       => false,
         ];
         if ($extraChunk) {
             $body['extra_chunk'] = true;
@@ -995,6 +994,11 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
 
                 return $startCallback($this->jobRunner, $job);
             });
+        $this->jobManager->expects(self::once())
+            ->method('saveJob')
+            ->willReturnCallback(function (Job $job) {
+                self::assertEquals(['retryReason' => 'test retry reason'], $job->getData());
+            });
         $this->processingHelper->expects(self::once())
             ->method('sendProcessChunkMessage')
             ->with(
@@ -1030,7 +1034,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         ];
     }
 
-    public function testProcessAfterRetry()
+    public function testProcessAfterRetry(): void
     {
         $jobId = 456;
         $fileName = 'chunkFile';
@@ -1043,7 +1047,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'fileName'          => $fileName,
             'fileIndex'         => 10,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test'
+            'sectionName'       => 'test',
+            'extra_chunk'       => false,
         ]);
         $previousAggregateTime = 100;
         $processorAggregateTime = 11;

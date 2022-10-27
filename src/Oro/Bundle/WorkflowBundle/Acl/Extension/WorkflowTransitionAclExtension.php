@@ -141,7 +141,7 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
      * Process start transition. For the start transitions with init options return null class cause this transition
      * will start from the entity from the init options.
      *
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getObjectClassName($object)
     {

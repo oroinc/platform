@@ -122,7 +122,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField($this->createFieldMetadata('field1'));
         $metadata->addField($this->createFieldMetadata('field2'));
         $metadata->addField($this->createFieldMetadata('field3'));
@@ -149,7 +149,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata = new EntityMetadata('Test\Entity');
         $expectedMetadata->addField($this->createFieldMetadata('field1'));
         $expectedMetadata->addField($this->createFieldMetadata('field3'));
         $expectedMetadata->addAssociation(
@@ -174,7 +174,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField($this->createFieldMetadata('field1'));
         $metadata->addField($this->createFieldMetadata('field2'));
 
@@ -188,7 +188,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setWithExcludedProperties(true);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
+        $expectedMetadata = new EntityMetadata('Test\Entity');
         $expectedMetadata->addField($this->createFieldMetadata('field1'));
         $expectedMetadata->addField($this->createFieldMetadata('field2'));
 
@@ -205,8 +205,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addField($this->createFieldMetadata('field1'));
 
         $this->doctrineHelper->expects(self::once())
@@ -218,8 +217,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $expectedMetadata->addField($this->createFieldMetadata('field1'));
 
         self::assertEquals($expectedMetadata, $this->context->getResult());
@@ -237,8 +235,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addField($this->createFieldMetadata('field2'));
 
         $this->doctrineHelper->expects(self::once())
@@ -250,8 +247,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $expectedMetadata->addField($this->createFieldMetadata('field2'));
 
         self::assertEquals($expectedMetadata, $this->context->getResult());
@@ -269,8 +265,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addAssociation(
             $this->createAssociationMetadata('association3', 'Test\Association3Target')
         );
@@ -284,8 +279,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $expectedMetadata->addAssociation(
             $this->createAssociationMetadata('association3', 'Test\Association3Target')
         );
@@ -305,8 +299,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addAssociation(
             $this->createAssociationMetadata('association3', 'Test\Association3Target')
         );
@@ -320,8 +313,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $expectedMetadata->addAssociation(
             $this->createAssociationMetadata('association3', 'Test\Association3Target')
         );
@@ -352,8 +344,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addAssociation(
             $this->createAssociationMetadata('association411', 'Test\Association411Target')
         );
@@ -383,8 +374,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ->with('id')
             ->willReturn(['type' => 'integer']);
 
-        $association411TargetMetadata = new EntityMetadata();
-        $association411TargetMetadata->setClassName('Test\Association411Target');
+        $association411TargetMetadata = new EntityMetadata('Test\Association411Target');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -415,8 +405,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $expectedAssociation4 = $this->createAssociationMetadata(
             'association4',
             'Test\Association411Target',
@@ -446,8 +435,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
 
         $association51ClassMetadata = $this->getClassMetadataMock('Test\Association51Target');
         $association51ClassMetadata->expects(self::once())
@@ -476,8 +464,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $expectedField5 = $expectedMetadata->addField($this->createFieldMetadata('field5', 'string'));
         $expectedField5->setPropertyPath('association51.field511');
 
@@ -496,8 +483,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -512,8 +498,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
 
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
@@ -545,8 +530,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addAssociation(
             $this->createAssociationMetadata(
                 'association1',
@@ -583,8 +567,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ->with('id')
             ->willReturn(['type' => 'integer']);
 
-        $association11TargetMetadata = new EntityMetadata();
-        $association11TargetMetadata->setClassName('Test\Association11Target');
+        $association11TargetMetadata = new EntityMetadata('Test\Association11Target');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -619,8 +602,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $expectedLinkedAssociation1 = $this->createAssociationMetadata(
             'linkedAssociation1',
             'Test\Association11Target',
@@ -667,8 +649,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addAssociation(
             $this->createAssociationMetadata(
                 'association1',
@@ -705,8 +686,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ->with('id')
             ->willReturn(['type' => 'integer']);
 
-        $association11TargetMetadata = new EntityMetadata();
-        $association11TargetMetadata->setClassName('Test\Association11Target');
+        $association11TargetMetadata = new EntityMetadata('Test\Association11Target');
 
         $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntityClass')
@@ -741,8 +721,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         $this->context->setResult($metadata);
         $this->processor->process($this->context);
 
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(self::TEST_CLASS_NAME);
+        $expectedMetadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $expectedLinkedAssociation1 = $this->createAssociationMetadata(
             'linkedAssociation1',
             'Test\Association11Target',
@@ -783,8 +762,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addAssociation(
             $this->createAssociationMetadata(
                 'association1',
@@ -795,7 +773,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
                 ['Test\Association1Target2', 'Test\Association1Target2']
             )
         );
-        $association1Metadata = new EntityMetadata();
+        $association1Metadata = new EntityMetadata('Test\Entity');
         $association1Metadata->addAssociation(
             $this->createAssociationMetadata(
                 'association11',
@@ -876,8 +854,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addAssociation(
             $this->createAssociationMetadata(
                 'targetAssociation',
@@ -888,8 +865,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             )
         );
 
-        $targetMetadata = new EntityMetadata();
-        $targetMetadata->setClassName('Test\AssociationTarget');
+        $targetMetadata = new EntityMetadata('Test\AssociationTarget');
         $targetMetadata->addField(
             $this->createFieldMetadata('field11', 'string')
         );
@@ -962,8 +938,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         ];
         $configObject = $this->createConfigObject($config);
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(self::TEST_CLASS_NAME);
+        $metadata = new EntityMetadata(self::TEST_CLASS_NAME);
         $metadata->addAssociation(
             $this->createAssociationMetadata(
                 'targetAssociation',
@@ -974,8 +949,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             )
         );
 
-        $targetMetadata = new EntityMetadata();
-        $targetMetadata->setClassName('Test\AssociationTarget');
+        $targetMetadata = new EntityMetadata('Test\AssociationTarget');
         $targetMetadata->addField(
             $this->createFieldMetadata('field11', 'string')
         );

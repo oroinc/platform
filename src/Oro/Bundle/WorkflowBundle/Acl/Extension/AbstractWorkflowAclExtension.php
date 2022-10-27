@@ -32,7 +32,7 @@ abstract class AbstractWorkflowAclExtension extends AbstractSimpleAccessLevelAcl
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getObjectClassName($object)
     {

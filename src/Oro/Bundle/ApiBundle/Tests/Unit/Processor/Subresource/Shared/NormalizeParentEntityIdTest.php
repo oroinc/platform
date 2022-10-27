@@ -47,7 +47,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('123');
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
 
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -64,7 +64,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('123');
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
 
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -88,7 +88,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('test');
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
 
         $this->entityIdTransformer->expects(self::once())
             ->method('reverseTransform')

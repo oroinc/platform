@@ -45,8 +45,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setIsCollection($isCollection);
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName($targetClass);
+        $associationTargetMetadata = new EntityMetadata($targetClass);
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         return $associationMetadata;
@@ -54,7 +53,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeDataForAssociationWithoutMetadata()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
 
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
@@ -75,7 +74,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeDataForToOneAssociation()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata = $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', false)
         );
@@ -104,7 +103,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeEmptyDataForToOneAssociation()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', false)
         );
@@ -128,7 +127,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeDataForToManyAssociation()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata = $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', true)
         );
@@ -165,7 +164,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeEmptyDataForToManyAssociation()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', true)
         );
@@ -189,7 +188,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithInvalidIdentifierForToOneAssociation()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', false)
         );
@@ -225,7 +224,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithInvalidIdentifiersForToManyAssociation()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', true)
         );
@@ -270,7 +269,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithNotResolvedIdentifierForToOneAssociation()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', false)
         );
@@ -304,7 +303,7 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithNotResolvedIdentifiersForToManyAssociation()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(
             $this->createAssociationMetadata(self::ASSOCIATION_NAME, 'Test\Class', true)
         );

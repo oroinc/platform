@@ -9,24 +9,19 @@ interface EntityIdMetadataInterface
 {
     /**
      * Gets FQCN of an entity.
-     *
-     * @return string
      */
-    public function getClassName();
+    public function getClassName(): string;
 
     /**
      * Gets identifier field names.
      *
      * @return string[]
      */
-    public function getIdentifierFieldNames();
+    public function getIdentifierFieldNames(): array;
 
     /**
-     * Gets the name of the given property in the source entity.
-     *
-     * @param string $propertyName
-     *
-     * @return string|null The property path or NULL if the property does not exist.
+     * Gets the path of the given property in the source entity.
+     * Returns NULL if the property does not exist.
      */
-    public function getPropertyPath($propertyName);
+    public function getPropertyPath(string $propertyName): ?string;
 }

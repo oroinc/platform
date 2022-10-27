@@ -57,14 +57,25 @@ $.widget('ui.sortable', $.ui.sortable, {
             return;
         }
 
-        event.stopPropagation();
-        event.preventDefault();
+        if (!$(event.target).is(this.options.touchElements)) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
 
         // Set the flag to prevent other widgets from inheriting the touch event
         touchHandled = true;
 
         // Simulate the mousedown event
         simulateMouseEvent(event, 'mousedown');
+    },
+
+    _getCreateOptions: function() {
+        const options = this._super() || {};
+
+        // Allows trigger 'touchstart' and 'touchend' events on elements matching the selector while sorting
+        options.touchElements = 'a, a *, button, button *';
+
+        return options;
     },
 
     /**
@@ -93,8 +104,10 @@ $.widget('ui.sortable', $.ui.sortable, {
             return;
         }
 
-        event.stopPropagation();
-        event.preventDefault();
+        if (!$(event.target).is(this.options.touchElements)) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
 
         // Simulate the mouseup event
 

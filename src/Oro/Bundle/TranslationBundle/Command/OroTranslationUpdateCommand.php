@@ -197,7 +197,11 @@ HELP
 
     private function getLanguageName(Language $language): string
     {
-        return Locales::getName($language->getCode(), 'en') ?? $language->getCode();
+        if (Locales::exists($language->getCode())) {
+            return Locales::getName($language->getCode(), 'en');
+        }
+
+        return $language->getCode();
     }
 
     private function findLanguage(string $langCode): ?Language

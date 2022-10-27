@@ -193,6 +193,11 @@ services:
         tags:
             - { name: oro_entity.delete_handler_extension, entity: Oro\Bundle\OrganizationBundle\Entity\Organization }
 
+    oro_organization.organization_restriction_provider:
+        class: Oro\Bundle\OrganizationBundle\Provider\OrganizationRestrictionProvider
+        arguments:
+            - '@oro_security.token_accessor'
+
     oro_organization.validator.owner:
         class: Oro\Bundle\OrganizationBundle\Validator\Constraints\OwnerValidator
         arguments:

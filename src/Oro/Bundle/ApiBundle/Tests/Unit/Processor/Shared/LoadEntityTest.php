@@ -78,7 +78,7 @@ class LoadEntityTest extends GetProcessorTestCase
         $entityId = 123;
         $entity = new \stdClass();
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -118,7 +118,7 @@ class LoadEntityTest extends GetProcessorTestCase
         $entityClass = 'Test\Entity';
         $entityId = 123;
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -174,7 +174,7 @@ class LoadEntityTest extends GetProcessorTestCase
         $entityClass = 'Test\Entity';
         $entityId = 123;
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -230,7 +230,7 @@ class LoadEntityTest extends GetProcessorTestCase
         $entity = new \stdClass();
         $config = new EntityDefinitionConfig();
         $config->setParentResourceClass($parentEntityClass);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')

@@ -259,7 +259,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $targetEntityClass = 'Test\TargetClass';
         $resource = new ApiResource($entityClass);
         $subresources = $this->getApiResourceSubresources($resource);
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
         $association->setTargetClassName($targetEntityClass);
         $association->setAcceptableTargetClassNames([$targetEntityClass]);
@@ -303,7 +303,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $targetEntityClass = 'Test\TargetClass';
         $resource = new ApiResource($entityClass);
         $subresources = $this->getApiResourceSubresources($resource);
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
         $association->setTargetClassName($targetEntityClass);
         $association->setAcceptableTargetClassNames([$targetEntityClass]);
@@ -357,7 +357,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $targetEntityClass = 'Test\TargetClass';
         $resource = new ApiResource($entityClass);
         $subresources = $this->getApiResourceSubresources($resource);
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('renamedAssociation1'));
         $association->setPropertyPath('association1');
         $association->setTargetClassName($targetEntityClass);

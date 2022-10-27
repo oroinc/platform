@@ -66,7 +66,11 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
     {
         $this->languageRepository->expects(self::once())
             ->method('findAll')
-            ->willReturn([$this->getLanguage('en_US'), $this->getLanguage('uk_UA')]);
+            ->willReturn([
+                $this->getLanguage('en_US'),
+                $this->getLanguage('uk_UA'),
+                $this->getLanguage('en_plastimo')
+            ]);
         $this->fileBasedLanguageHelper->expects(self::never())
             ->method('isFileBasedLocale');
 
@@ -157,7 +161,7 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteWithAllOption(): void
     {
-        $codes = ['de_DE', 'fr_FR', 'uk_UA'];
+        $codes = ['de_DE', 'fr_FR', 'uk_UA', 'en_plastimo'];
 
         $this->languageRepository->expects(self::once())
             ->method('findAll')
@@ -170,20 +174,22 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
         $this->languageRepository->expects(self::never())
             ->method('findOneBy');
 
-        $this->fileBasedLanguageHelper->expects(self::exactly(3))
+        $this->fileBasedLanguageHelper->expects(self::exactly(4))
             ->method('isFileBasedLocale')
             ->willReturnMap([
                 [$codes[0], false],
                 [$codes[1], false],
-                [$codes[2], false]
+                [$codes[2], false],
+                [$codes[3], false],
             ]);
 
-        $this->translationDownloader->expects(self::exactly(3))
+        $this->translationDownloader->expects(self::exactly(4))
             ->method('fetchLanguageMetrics')
             ->willReturnMap([
                 [$codes[0], ['code' => $codes[0], 'translationStatus' => 99, 'lastBuildDate' => new \DateTime()]],
                 [$codes[1], null], // no translations available
                 [$codes[2], ['code' => $codes[1], 'translationStatus' => 99, 'lastBuildDate' => new \DateTime()]],
+                [$codes[3], null],
             ]);
 
         $this->translationDownloader->expects(self::exactly(2))
@@ -205,11 +211,12 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
         $commandTester = $this->doExecuteCommand($this->command, ['--all' => true]);
 
         self::assertSame(0, $commandTester->getStatusCode());
+        $nonAvailableTranslations = [1, 3];
         foreach ($codes as $index => $langCode) {
-            $langName = Locales::getName($langCode, 'en');
+            $langName = Locales::exists($langCode) ? Locales::getName($langCode, 'en') : $langCode;
             $this->assertOutputContains($commandTester, sprintf('%s (%s):', $langName, $langCode));
             $this->assertOutputContains($commandTester, 'Checking availability...');
-            if (1 === $index) {
+            if (\in_array($index, $nonAvailableTranslations, true)) {
                 $this->assertOutputContains(
                     $commandTester,
                     sprintf('No "%s" (%s) translations are available for download.', $langName, $langCode)

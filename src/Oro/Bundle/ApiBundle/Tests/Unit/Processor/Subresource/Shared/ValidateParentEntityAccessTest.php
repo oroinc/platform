@@ -46,7 +46,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
     public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig()
     {
         $parentConfig = new EntityDefinitionConfig();
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::never())
             ->method('getManageableEntityClass');
@@ -84,7 +84,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -133,7 +133,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -191,7 +191,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -247,7 +247,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')

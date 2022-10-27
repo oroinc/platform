@@ -1,0 +1,30 @@
+workflows:
+    first_workflow_with_triggers:
+        entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
+        start_step: first_step
+        defaults:
+            active: true
+        steps:
+            first_step:
+                order: 1
+                allowed_transitions: ['__start__', 'second_transition']
+            second_step:
+                order: 2
+                is_final: false
+        attributes: []
+        transitions:
+            second_transition:
+                step_to: second_step
+                transition_definition: second_transition_definition
+                frontend_options:
+                    icon: bar
+                triggers:
+                    -
+                        event: update
+                        entity_class: 'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity'
+                        field: name
+                        queued: true
+                    -
+                        cron: '*/1 * * * *'
+        transition_definitions:
+            second_transition_definition: []

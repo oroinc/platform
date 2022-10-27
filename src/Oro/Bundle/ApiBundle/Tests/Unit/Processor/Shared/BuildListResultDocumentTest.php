@@ -40,7 +40,7 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
     public function testProcessContextWithoutErrorsOnEmptyResult()
     {
         $result = [];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->errorCompleterRegistry->expects(self::never())
             ->method('getErrorCompleter');
@@ -64,7 +64,7 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
     public function testProcessContextWithoutErrorsOnNonEmptyResult()
     {
         $result = [new \stdClass()];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->errorCompleterRegistry->expects(self::never())
             ->method('getErrorCompleter');
@@ -88,7 +88,7 @@ class BuildListResultDocumentTest extends GetListProcessorTestCase
     public function testProcessContextWithoutErrorsAndWithInfoRecords()
     {
         $result = [new \stdClass()];
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $infoRecords = ['' => ['key' => 'value']];
 
         $this->errorCompleterRegistry->expects(self::never())

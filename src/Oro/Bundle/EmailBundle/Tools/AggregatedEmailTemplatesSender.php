@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Provider\LocalizedTemplateProvider;
 use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -30,16 +31,20 @@ class AggregatedEmailTemplatesSender implements LoggerAwareInterface
 
     private EmailModelSender $emailModelSender;
 
+    private EntityOwnerAccessor $entityOwnerAccessor;
+
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LocalizedTemplateProvider $localizedTemplateProvider,
         EmailOriginHelper $emailOriginHelper,
-        EmailModelSender $emailModelSender
+        EmailModelSender $emailModelSender,
+        EntityOwnerAccessor $entityOwnerAccessor
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->localizedTemplateProvider = $localizedTemplateProvider;
         $this->emailOriginHelper = $emailOriginHelper;
         $this->emailModelSender = $emailModelSender;
+        $this->entityOwnerAccessor = $entityOwnerAccessor;
     }
 
     /**
@@ -66,6 +71,7 @@ class AggregatedEmailTemplatesSender implements LoggerAwareInterface
             array_merge(['entity' => $entity], $templateParams)
         );
 
+        $entityOrganization = $this->entityOwnerAccessor->getOrganization($entity);
         $emailUsers = [];
         foreach ($templateCollection as $localizedTemplateDTO) {
             $emailTemplate = $localizedTemplateDTO->getEmailTemplate();
@@ -76,6 +82,9 @@ class AggregatedEmailTemplatesSender implements LoggerAwareInterface
             $emailModel->setSubject($emailTemplate->getSubject());
             $emailModel->setBody($emailTemplate->getContent());
             $emailModel->setType($emailTemplate->getType() === EmailTemplate::CONTENT_TYPE_HTML ? 'html' : 'text');
+            if ($entityOrganization) {
+                $emailModel->setOrganization($entityOrganization);
+            }
 
             try {
                 $emailOrigin = $this->emailOriginHelper->getEmailOrigin(

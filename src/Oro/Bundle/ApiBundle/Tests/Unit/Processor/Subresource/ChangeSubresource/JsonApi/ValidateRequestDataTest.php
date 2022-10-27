@@ -35,7 +35,7 @@ class ValidateRequestDataTest extends ChangeSubresourceProcessorTestCase
             'meta' => ['foo' => 'bar']
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->setRequestData($requestData);
         $this->context->setMetadata($metadata);
@@ -50,7 +50,7 @@ class ValidateRequestDataTest extends ChangeSubresourceProcessorTestCase
     {
         $requestData = [];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->setRequestData($requestData);
         $this->context->setMetadata($metadata);
@@ -75,7 +75,7 @@ class ValidateRequestDataTest extends ChangeSubresourceProcessorTestCase
             'data' => ['type' => 'products', 'id' => '123', 'attributes' => ['foo' => 'bar']]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->context->setRequestData($requestData);
@@ -95,7 +95,7 @@ class ValidateRequestDataTest extends ChangeSubresourceProcessorTestCase
             ]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->context->setRequestData($requestData);
@@ -111,7 +111,7 @@ class ValidateRequestDataTest extends ChangeSubresourceProcessorTestCase
     {
         $requestData = ['data' => null];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->context->setRequestData($requestData);
@@ -135,7 +135,7 @@ class ValidateRequestDataTest extends ChangeSubresourceProcessorTestCase
     {
         $requestData = ['data' => null];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->context->setRequestData($requestData);

@@ -31,7 +31,7 @@ class EntityMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddMetaPropertyMetadata()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
         $field->setPropertyPath('propertyPath');
@@ -62,7 +62,7 @@ class EntityMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddMetaPropertyMetadataWhenResultNameExistsInConfig()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('string');
         $field->setMetaPropertyResultName('resultName');
@@ -93,7 +93,7 @@ class EntityMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddFieldMetadata()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityMetadata->setIdentifierFieldNames(['id']);
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
@@ -125,7 +125,7 @@ class EntityMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddAssociationMetadata()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
         $field->setPropertyPath('propertyPath');

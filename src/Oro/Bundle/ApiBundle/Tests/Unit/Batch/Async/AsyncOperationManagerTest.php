@@ -22,16 +22,16 @@ use Psr\Log\LoggerInterface;
  */
 class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
     private $fileManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorManager */
+    /** @var ErrorManager|\PHPUnit\Framework\MockObject\MockObject */
     private $errorManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     /** @var AsyncOperationManager */

@@ -65,12 +65,12 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntityData = new IncludedEntityData('/included/0', 0);
         $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
 
-        $createMetadata = new EntityMetadata();
+        $createMetadata = new EntityMetadata('Test\Entity');
         $createMetadata->setIdentifierFieldNames(['id']);
         $includedEntityData->setMetadata($createMetadata);
 
         $getResult = ['normalizedKey' => 'normalizedValue'];
-        $getMetadata = new EntityMetadata();
+        $getMetadata = new EntityMetadata('Test\Entity');
         $getMetadata->set('metadata_key', 'metadata_value');
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
@@ -144,12 +144,12 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntityData = new IncludedEntityData('/included/0', 0, true);
         $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
 
-        $createMetadata = new EntityMetadata();
+        $createMetadata = new EntityMetadata('Test\Entity');
         $createMetadata->setIdentifierFieldNames(['id']);
         $includedEntityData->setMetadata($createMetadata);
 
         $getResult = ['normalizedKey' => 'normalizedValue'];
-        $getMetadata = new EntityMetadata();
+        $getMetadata = new EntityMetadata('Test\Entity');
         $getMetadata->set('metadata_key', 'metadata_value');
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
@@ -223,7 +223,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $includedEntityData = new IncludedEntityData('/included/0', 0, true);
         $includedEntities->add($includedEntity, $includedEntityClass, $includedEntityId, $includedEntityData);
 
-        $createMetadata = new EntityMetadata();
+        $createMetadata = new EntityMetadata('Test\Entity');
         $createMetadata->setIdentifierFieldNames(['id']);
         $includedEntityData->setMetadata($createMetadata);
 

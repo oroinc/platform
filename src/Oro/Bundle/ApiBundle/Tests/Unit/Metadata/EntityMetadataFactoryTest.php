@@ -27,8 +27,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
 
     public function testCreateEntityMetadata()
     {
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(Entity\Product::class);
+        $expectedMetadata = new EntityMetadata(Entity\Product::class);
         $expectedMetadata->setIdentifierFieldNames(['id']);
         $expectedMetadata->setHasIdentifierGenerator(true);
         $expectedMetadata->setInheritedType(false);
@@ -42,8 +41,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
 
     public function testCreateEntityMetadataForEntityWithCompositeIdentifier()
     {
-        $expectedMetadata = new EntityMetadata();
-        $expectedMetadata->setClassName(Entity\CompositeKeyEntity::class);
+        $expectedMetadata = new EntityMetadata(Entity\CompositeKeyEntity::class);
         $expectedMetadata->setIdentifierFieldNames(['id', 'title']);
         $expectedMetadata->setHasIdentifierGenerator(false);
         $expectedMetadata->setInheritedType(false);

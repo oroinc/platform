@@ -42,7 +42,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
             'meta' => ['foo' => 'bar']
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->setRequestData($requestData);
         $this->context->setMetadata($metadata);
@@ -56,7 +56,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
     {
         $requestData = [];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->setRequestData($requestData);
         $this->context->setMetadata($metadata);
@@ -80,7 +80,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
             'data' => ['id' => '1', 'type' => 'products', 'attributes' => ['foo' => 'bar']]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->valueNormalizer->expects(self::once())
@@ -104,7 +104,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
             'data' => ['type' => 'test', 'id' => '1', 'attributes' => ['foo' => 'bar']]
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->valueNormalizer->expects(self::any())

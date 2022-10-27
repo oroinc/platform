@@ -1,7 +1,8 @@
 import __ from 'orotranslation/js/translator';
 
 const defaultParam = {
-    message: 'Please add at least one item'
+    message: 'Please add at least one item',
+    selector: 'input'
 };
 
 /**
@@ -9,10 +10,10 @@ const defaultParam = {
  */
 export default [
     'NotBlankGroup',
-    function(value, element) {
-        const collectionName = element.getAttribute('data-collection-name');
-        const collectionElement = element.closest(`[data-collection="${collectionName}"]`);
-        return [...collectionElement.querySelectorAll('input')].some(item => item.value);
+    function(value, element, param) {
+        param = Object.assign({}, defaultParam, param);
+        const collectionElement = element.closest('[data-prototype-name]');
+        return [...collectionElement.querySelectorAll(param.selector)].some(item => item.value);
     },
     function(param) {
         param = Object.assign({}, defaultParam, param);

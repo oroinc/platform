@@ -24,8 +24,9 @@ Oro\Bundle\SegmentBundle\Entity\Segment:
         recordsLimit:
             - Type:
                 type: integer
-            - GreaterThan:
-                value: 0
+            - Range:
+                min: 0
+                max: 2147483647
         entity:
             - NotBlank:     ~
             - Length:

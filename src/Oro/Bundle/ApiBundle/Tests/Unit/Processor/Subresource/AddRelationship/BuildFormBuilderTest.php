@@ -63,7 +63,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())

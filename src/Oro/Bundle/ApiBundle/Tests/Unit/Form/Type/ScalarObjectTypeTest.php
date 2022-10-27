@@ -44,7 +44,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testSubmitWhenNoApiContext()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -77,7 +77,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObject()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -116,7 +116,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObjectWhenValueIsNotSubmitted()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -155,7 +155,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObjectWhenSubmittedValueIsNull()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -194,7 +194,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObjectWhenSubmittedValueIsNullAndRequiredOptionIsFalse()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -234,7 +234,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testUpdateNestedObject()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -275,7 +275,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testUpdateNestedObjectWhenValueIsNotSubmitted()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -315,7 +315,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testUpdateNestedObjectWhenSubmittedValueIsNull()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -356,7 +356,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObjectWithRenamedField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedValue'))->setPropertyPath('value');
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -395,7 +395,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObjectWithFormOptions()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedValue'));
         $metadata->addField(new FieldMetadata('currency'));
 

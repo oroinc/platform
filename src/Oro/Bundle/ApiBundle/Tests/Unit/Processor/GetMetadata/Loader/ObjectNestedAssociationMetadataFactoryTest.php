@@ -35,7 +35,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
 
     public function testCreateAndAddNestedAssociationMetadataForExcludedTargetField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -48,7 +48,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
         $targetField->setExcluded();
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         $this->nestedAssociationMetadataHelper->expects(self::once())
@@ -79,7 +79,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
 
     public function testCreateAndAddNestedAssociationMetadataForExcludedTargetFieldWithExcludedProperties()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -92,7 +92,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
         $targetField->setExcluded();
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new FieldMetadata();
 
@@ -138,7 +138,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
 
     public function testCreateAndAddNestedAssociationMetadataForField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -150,7 +150,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
         $targetField = $targetConfig->addField($targetFieldName);
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new FieldMetadata();
 
@@ -196,7 +196,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
 
     public function testCreateAndAddNestedAssociationMetadataForMetaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -209,7 +209,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
         $targetField->setMetaProperty(true);
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new MetaPropertyMetadata();
 

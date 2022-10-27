@@ -135,7 +135,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('id', new FilterValue('id', 'predefinedId'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $idField = new FieldMetadata('id');
         $idField->setPropertyPath('idField');
@@ -175,10 +175,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('AssociationTargetClass');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $metadata->addAssociation($associationMetadata);
 
@@ -217,10 +216,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1,predefinedId2'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('AssociationTargetClass');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $metadata->addAssociation($associationMetadata);
 
@@ -261,10 +259,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1..predefinedId2'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('AssociationTargetClass');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $metadata->addAssociation($associationMetadata);
 
@@ -370,10 +367,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('AssociationTargetClass');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationTargetMetadata->setIdentifierFieldNames(['id']);
         $associationTargetMetadata->addField(new FieldMetadata('id'))->setDataType(DataType::INTEGER);
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
@@ -421,10 +417,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('AssociationTargetClass');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationTargetMetadata->setIdentifierFieldNames(['id']);
         $associationTargetMetadata->addField(new FieldMetadata('id'))->setDataType(DataType::STRING);
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
@@ -472,10 +467,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('AssociationTargetClass');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationTargetMetadata->setIdentifierFieldNames(['id1', 'id2']);
         $associationTargetMetadata->addField(new FieldMetadata('id1'))->setDataType(DataType::STRING);
         $associationTargetMetadata->addField(new FieldMetadata('id2'))->setDataType(DataType::INTEGER);
@@ -525,10 +519,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1,predefinedId2'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('AssociationTargetClass');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationTargetMetadata->setIdentifierFieldNames(['id']);
         $associationTargetMetadata->addField(new FieldMetadata('id'))->setDataType(DataType::INTEGER);
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
@@ -579,10 +572,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1..predefinedId2'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('AssociationTargetClass');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationTargetMetadata->setIdentifierFieldNames(['id']);
         $associationTargetMetadata->addField(new FieldMetadata('id'))->setDataType(DataType::INTEGER);
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
@@ -637,10 +629,9 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $filterValues = $this->context->getFilterValues();
         $filterValues->set('association', new FilterValue('association', 'predefinedId1..predefinedId2'));
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata('associationField');
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('AssociationTargetClass');
+        $associationTargetMetadata = new EntityMetadata('AssociationTargetClass');
         $associationTargetMetadata->setIdentifierFieldNames(['id']);
         $associationTargetMetadata->addField(new FieldMetadata('id'))->setDataType(DataType::INTEGER);
         $associationMetadata->setTargetMetadata($associationTargetMetadata);

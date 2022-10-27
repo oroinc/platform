@@ -81,7 +81,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         $parentClass = 'Test\Class';
         $parentId = 123;
         $parentConfig = new EntityDefinitionConfig();
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentEntity = new \stdClass();
 
         $this->doctrineHelper->expects(self::once())
@@ -122,7 +122,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         $parentClass = 'Test\Class';
         $parentId = 123;
         $parentConfig = new EntityDefinitionConfig();
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -178,7 +178,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         $parentClass = 'Test\Class';
         $parentId = 123;
         $parentConfig = new EntityDefinitionConfig();
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -232,7 +232,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
         $parentResourceClass = 'Test\ParentResourceClass';
         $parentId = 123;
         $parentConfig = new EntityDefinitionConfig();
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentEntity = new \stdClass();
 
         $this->doctrineHelper->expects(self::once())

@@ -5,6 +5,7 @@ define(function(require, exports, module) {
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const Backgrid = require('backgrid');
+    const tools = require('oroui/js/tools');
     let config = require('module-config').default(module.id);
 
     config = _.extend({
@@ -103,8 +104,6 @@ define(function(require, exports, module) {
         events: {
             'click': '_showDropdown',
             'keydown .dropdown-menu': 'onKeydown',
-            'mouseover .dropdown-toggle': '_showDropdown',
-            'mouseleave .dropleft.show': '_hideDropdown',
             'click .dropdown-close .fa-close': '_hideDropdown'
         },
 
@@ -148,6 +147,20 @@ define(function(require, exports, module) {
             this.listenTo(this.model, 'change:action_configuration', this.onActionConfigChange);
 
             this.subviews.push(...this.actions);
+        },
+
+        /**
+         * @inheritdoc
+         */
+        delegateEvents(events) {
+            ActionCell.__super__.delegateEvents.call(this, events);
+
+            if (!tools.isTouchDevice()) {
+                this.$el.on(`mouseover${this.eventNamespace()}`, '.dropdown-toggle', this._showDropdown.bind(this));
+                this.$el.on(`mouseleave${this.eventNamespace()}`, '.dropleft.show', this._hideDropdown.bind(this));
+            }
+
+            return this;
         },
 
         /**

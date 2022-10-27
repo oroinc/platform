@@ -50,7 +50,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testBuildFormForField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'));
 
         $config = new EntityDefinitionConfig();
@@ -73,7 +73,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testBuildFormForRenamedField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedName'))
             ->setPropertyPath('name');
 
@@ -97,7 +97,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testBuildFormForFieldWithFormType()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('id'));
 
         $config = new EntityDefinitionConfig();
@@ -120,7 +120,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testBuildFormForFieldWithFormOptions()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedName'));
 
         $config = new EntityDefinitionConfig();
@@ -143,7 +143,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testBuildFormForIgnoredField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'))
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
@@ -167,7 +167,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testBuildFormForFieldIgnoredOnlyForGetActions()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'));
 
         $config = new EntityDefinitionConfig();
@@ -191,7 +191,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testBuildFormForAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation(new AssociationMetadata('owner'))->setDataType('integer');
 
         $config = new EntityDefinitionConfig();
@@ -217,7 +217,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObject()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -248,7 +248,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObjectWhenValueIsNotSubmitted()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -279,7 +279,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObjectWhenSubmittedValueIsNull()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -310,7 +310,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testCreateNestedObjectWhenSubmittedValueIsEmptyArray()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -341,7 +341,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testUpdateNestedObject()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -374,7 +374,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testUpdateNestedObjectWhenValueIsNotSubmitted()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 
@@ -407,7 +407,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
 
     public function testUpdateNestedObjectWhenSubmittedValueIsEmptyArray()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
         $metadata->addField(new FieldMetadata('currency'));
 

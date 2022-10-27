@@ -30,8 +30,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = 123;
         $entity = $this->createMock(Entity\Group::class);
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -46,8 +45,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = 123;
         $entity = new Entity\EntityWithoutGettersAndSetters();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -59,8 +57,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['id' => 123, 'title' => 'test'];
         $entity = $this->createMock(Entity\CompositeKeyEntity::class);
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -79,8 +76,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['renamedId' => 123, 'renamedTitle' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
         $entityMetadata->addField(new FieldMetadata('renamedTitle'))->setPropertyPath('title');
@@ -94,8 +90,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = 123;
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -116,8 +111,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['id' => 123, 'title1' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -137,8 +131,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityId = ['id' => 123, 'title1' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName(get_class($entity));
+        $entityMetadata = new EntityMetadata(get_class($entity));
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title1'));
@@ -158,8 +151,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\User::class;
         $entityId = 123;
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -182,8 +174,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\User::class;
         $entityId = 123;
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['renamedId']);
         $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
 
@@ -212,8 +203,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 
         $entityClass = Entity\User::class;
         $entityId = [1, 2];
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id']);
         $entityMetadata->addField(new FieldMetadata('id'));
 
@@ -227,8 +217,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['id' => 123, 'title' => 'test'];
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -256,8 +245,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['renamedId' => 123, 'renamedTitle' => 'test'];
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['renamedId', 'renamedTitle']);
         $entityMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
         $entityMetadata->addField(new FieldMetadata('renamedTitle'))->setPropertyPath('title');
@@ -291,8 +279,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = 123;
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));
@@ -313,8 +300,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['id' => 123];
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames(['id', 'title']);
         $entityMetadata->addField(new FieldMetadata('id'));
         $entityMetadata->addField(new FieldMetadata('title'));

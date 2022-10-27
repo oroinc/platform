@@ -44,7 +44,7 @@ class SetPrimaryEntityTest extends FormProcessorTestCase
     public function testProcessWithPrimaryEntity()
     {
         $primaryEntity = new \stdClass();
-        $primaryEntityMetadata = new EntityMetadata();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
         $includedEntities = new IncludedEntityCollection();
         $includedEntities->setPrimaryEntityId('Test\Class', '123');
 

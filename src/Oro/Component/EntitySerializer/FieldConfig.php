@@ -7,25 +7,16 @@ use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterf
 /**
  * Represents the configuration of an entity field.
  */
-class FieldConfig
+class FieldConfig implements FieldConfigInterface
 {
-    /** @var bool|null */
-    protected $exclude;
-
-    /** @var array */
-    protected $items = [];
-
-    /** @var EntityConfig|null */
-    private $targetEntity;
+    protected ?bool $exclude = null;
+    protected array $items = [];
+    private ?EntityConfig $targetEntity = null;
 
     /**
      * Gets a native PHP array representation of the field configuration.
-     *
-     * @param bool $excludeTargetEntity
-     *
-     * @return array
      */
-    public function toArray($excludeTargetEntity = false)
+    public function toArray(bool $excludeTargetEntity = false): array
     {
         $result = $this->items;
         if (true === $this->exclude) {
@@ -40,10 +31,8 @@ class FieldConfig
 
     /**
      * Indicates whether the field does not have a configuration.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return
             null === $this->exclude
@@ -63,26 +52,17 @@ class FieldConfig
     }
 
     /**
-     * Checks whether the configuration attribute exists.
-     *
-     * @param string $key
-     *
-     * @return bool
+     * Indicates whether the configuration attribute exists.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
      * Gets the configuration value.
-     *
-     * @param string $key
-     * @param mixed  $defaultValue
-     *
-     * @return mixed
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (!\array_key_exists($key, $this->items)) {
             return $defaultValue;
@@ -93,31 +73,34 @@ class FieldConfig
 
     /**
      * Sets the configuration value.
-     *
-     * @param string $key
-     * @param mixed  $value
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         $this->items[$key] = $value;
     }
 
     /**
      * Removes the configuration value.
-     *
-     * @param string $key
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
 
     /**
-     * Gets the configuration of the target entity if the field represents an association with another entity.
+     * Gets names of all configuration attributes.
      *
-     * @return EntityConfig|null
+     * @return string[]
      */
-    public function getTargetEntity()
+    public function keys(): array
+    {
+        return array_keys($this->items);
+    }
+
+    /**
+     * Gets the configuration of the target entity if the field represents an association with another entity.
+     */
+    public function getTargetEntity(): ?EntityConfig
     {
         return $this->targetEntity;
     }
@@ -125,12 +108,8 @@ class FieldConfig
     /**
      * Sets the configuration of the target entity.
      * Use this method only if the field represents an association with another entity.
-     *
-     * @param EntityConfig|null $targetEntity
-     *
-     * @return EntityConfig|null
      */
-    public function setTargetEntity($targetEntity = null)
+    public function setTargetEntity(EntityConfig $targetEntity = null): ?EntityConfig
     {
         $this->targetEntity = $targetEntity;
 
@@ -138,17 +117,19 @@ class FieldConfig
     }
 
     /**
-     * Indicates whether the field should be excluded.
-     *
-     * @return bool
+     * Indicates whether the exclusion flag is set explicitly.
      */
-    public function isExcluded()
+    public function hasExcluded(): bool
     {
-        if (null === $this->exclude) {
-            return false;
-        }
+        return null !== $this->exclude;
+    }
 
-        return $this->exclude;
+    /**
+     * Indicates whether the field should be excluded.
+     */
+    public function isExcluded(): bool
+    {
+        return $this->exclude ?? false;
     }
 
     /**
@@ -156,17 +137,15 @@ class FieldConfig
      *
      * @param bool|null $exclude The exclude flag or NULL to remove this option
      */
-    public function setExcluded($exclude = true)
+    public function setExcluded(?bool $exclude = true): void
     {
         $this->exclude = $exclude;
     }
 
     /**
      * Indicates whether the target entity should be collapsed.
-     *
-     * @return bool
      */
-    public function isCollapsed()
+    public function isCollapsed(): bool
     {
         if (!\array_key_exists(ConfigUtil::COLLAPSE, $this->items)) {
             return false;
@@ -177,10 +156,8 @@ class FieldConfig
 
     /**
      * Sets a flag indicates whether the target entity should be collapsed.
-     *
-     * @param bool $collapse
      */
-    public function setCollapsed($collapse = true)
+    public function setCollapsed(bool $collapse = true): void
     {
         if ($collapse) {
             $this->items[ConfigUtil::COLLAPSE] = $collapse;
@@ -190,13 +167,17 @@ class FieldConfig
     }
 
     /**
-     * Gets the path of the field value.
-     *
-     * @param string|null $defaultValue
-     *
-     * @return string|null
+     * Indicates whether the path of the field value exists.
      */
-    public function getPropertyPath($defaultValue = null)
+    public function hasPropertyPath(): bool
+    {
+        return $this->has(ConfigUtil::PROPERTY_PATH);
+    }
+
+    /**
+     * Gets the path of the field value.
+     */
+    public function getPropertyPath(string $defaultValue = null): ?string
     {
         if (empty($this->items[ConfigUtil::PROPERTY_PATH])) {
             return $defaultValue;
@@ -207,10 +188,8 @@ class FieldConfig
 
     /**
      * Sets the path of the field value.
-     *
-     * @param string|null $propertyPath
      */
-    public function setPropertyPath($propertyPath = null)
+    public function setPropertyPath(string $propertyPath = null): void
     {
         if ($propertyPath) {
             $this->items[ConfigUtil::PROPERTY_PATH] = $propertyPath;
@@ -229,7 +208,7 @@ class FieldConfig
      *               {@see \Symfony\Component\Form\DataTransformerInterface},
      *               or function ($value, $config, $context) : mixed.
      */
-    public function getDataTransformers()
+    public function getDataTransformers(): array
     {
         if (!\array_key_exists(ConfigUtil::DATA_TRANSFORMER, $this->items)) {
             return [];
@@ -248,11 +227,10 @@ class FieldConfig
      *
      * Please note that these data transformers work only during loading of data
      * and they are applicable only to fields. For associations they do not work.
-     *
-     * @param string|callable|DataTransformerInterface|FormDataTransformerInterface $dataTransformer
      */
-    public function addDataTransformer($dataTransformer)
-    {
+    public function addDataTransformer(
+        string|callable|DataTransformerInterface|FormDataTransformerInterface $dataTransformer
+    ): void {
         $transformers = $this->getDataTransformers();
         $transformers[] = $dataTransformer;
         $this->items[ConfigUtil::DATA_TRANSFORMER] = $transformers;

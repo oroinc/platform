@@ -69,66 +69,47 @@ class CalendarTest extends TestCase
     /**
      * @dataProvider getMonthNamesDataProvider
      */
-    public function testGetMonthNames(?string $width, ?string $locale, array $expected, $defaultLocale = null)
+    public function testGetMonthNames(?string $width, ?string $locale, $defaultLocale = null)
     {
         $this->calendar->setLocale($locale);
         if (null !== $defaultLocale) {
             \Locale::setDefault($defaultLocale);
         }
-        $this->assertEquals($expected, $this->calendar->getMonthNames($width), '');
+
+        $actual = $this->calendar->getMonthNames($width);
+        $this->assertCount(12, $actual);
+
+        $widthToPatternMap = [
+            Calendar::WIDTH_ABBREVIATED => 'LLL',
+            Calendar::WIDTH_SHORT => 'LLL',
+            Calendar::WIDTH_NARROW => 'LLLLL',
+            Calendar::WIDTH_WIDE => 'LLLL'
+        ];
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
+            'UTC',
+            \IntlDateFormatter::GREGORIAN,
+            $widthToPatternMap[$width ? : Calendar::WIDTH_WIDE]
+        );
+
+        foreach ($actual as $monthNum => $monthName) {
+            $expected = $formatter->format(\DateTime::createFromFormat('n', $monthNum));
+            $this->assertEquals($expected, $actual[$monthNum], 'Incorrect month for month #' . $monthNum);
+        }
     }
 
     public function getMonthNamesDataProvider(): array
     {
         return [
-            'default wide, default locale' => [
-                null,
-                null,
-                [
-                    1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July',
-                    'August', 'September', 'October', 'November', 'December',
-                ],
-                'en_US'
-            ],
-            'wide, en_US' => [
-                Calendar::WIDTH_WIDE,
-                'en_US',
-                [
-                    1 => 'January', 'February', 'March', 'April', 'May', 'June', 'July',
-                    'August', 'September', 'October', 'November', 'December',
-                ]
-            ],
-            'abbreviated, en_US' => [
-                Calendar::WIDTH_ABBREVIATED,
-                'en_US',
-                [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            ],
-            'short, en_US' => [
-                Calendar::WIDTH_SHORT,
-                'en_US',
-                [1 => 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-            ],
-            'narrow, en_US' => [
-                Calendar::WIDTH_NARROW,
-                'en_US',
-                [1 => 'J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
-            ],
-            'wide, it_IT' => [
-                Calendar::WIDTH_WIDE,
-                'it_IT',
-                [
-                    1 => 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio',
-                    'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre',
-                ]
-            ],
-            'wide, id_ID' => [
-                Calendar::WIDTH_WIDE,
-                'id_ID',
-                [
-                    1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli',
-                    'Agustus', 'September', 'Oktober', 'November', 'Desember',
-                ]
-            ],
+            'default wide, default locale' => [null, null, 'en_US'],
+            'wide, en_US' => [Calendar::WIDTH_WIDE, 'en_US'],
+            'abbreviated, en_US' => [Calendar::WIDTH_ABBREVIATED, 'en_US'],
+            'short, en_US' => [Calendar::WIDTH_SHORT, 'en_US'],
+            'narrow, en_US' => [Calendar::WIDTH_NARROW, 'en_US'],
+            'wide, it_IT' => [Calendar::WIDTH_WIDE, 'it_IT'],
+            'wide, id_ID' => [Calendar::WIDTH_WIDE, 'id_ID'],
         ];
     }
 

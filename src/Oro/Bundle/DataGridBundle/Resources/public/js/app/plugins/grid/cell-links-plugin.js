@@ -38,13 +38,13 @@ const CellLinksPlugin = BasePlugin.extend({
         const Cell = column.get('cell');
         const clickRowActionLink = this.clickRowActionLink;
 
-        const extended = Cell.extend({
+        const PatchedCell = Cell.extend({
             rowUrl: null,
 
             main: this.main,
 
             delegateEvents() {
-                Cell.__super__.delegateEvents.call(this);
+                PatchedCell.__super__.delegateEvents.call(this);
                 this.rowUrl = clickRowActionLink ? this.model.get(clickRowActionLink) : false;
 
                 if (this.rowUrl) {
@@ -121,7 +121,7 @@ const CellLinksPlugin = BasePlugin.extend({
         });
 
         column.set({
-            cell: extended,
+            cell: PatchedCell,
             oldCell: Cell
         });
     }
