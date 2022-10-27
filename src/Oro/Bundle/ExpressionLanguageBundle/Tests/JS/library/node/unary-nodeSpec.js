@@ -1,79 +1,75 @@
-define(function(require) {
-    'use strict';
+import UnaryNode from 'oroexpressionlanguage/js/library/node/unary-node';
+import ConstantNode from 'oroexpressionlanguage/js/library/node/constant-node';
+import Compiler from 'oroexpressionlanguage/js/library/compiler';
 
-    var UnaryNode = require('oroexpressionlanguage/js/library/node/unary-node');
-    var ConstantNode = require('oroexpressionlanguage/js/library/node/constant-node');
-    var Compiler = require('oroexpressionlanguage/js/library/compiler');
+describe('oroexpressionlanguage/js/library/node/unary-node', () => {
+    let compiler;
 
-    describe('oroexpressionlanguage/js/library/node/unary-node', function() {
-        var compiler;
+    beforeEach(() => {
+        compiler = new Compiler({});
+    });
 
-        beforeEach(function() {
-            compiler = new Compiler({});
+    describe('negative', () => {
+        let node;
+        beforeEach(() => {
+            node = new UnaryNode('-', new ConstantNode(1));
         });
 
-        describe('negative', function() {
-            var node;
-            beforeEach(function() {
-                node = new UnaryNode('-', new ConstantNode(1));
-            });
-
-            it('evaluation', function() {
-                expect(node.evaluate({}, {})).toEqual(-1);
-            });
-
-            it('compilation', function() {
-                node.compile(compiler);
-                expect(compiler.getSource()).toBe('(-1)');
-            });
+        it('evaluation', () => {
+            expect(node.evaluate({}, {})).toEqual(-1);
         });
 
-        describe('positive', function() {
-            var node;
-            beforeEach(function() {
-                node = new UnaryNode('+', new ConstantNode(3));
-            });
+        it('compilation', () => {
+            node.compile(compiler);
+            expect(compiler.getSource()).toBe('(-1)');
+        });
+    });
 
-            it('evaluation', function() {
-                expect(node.evaluate({}, {})).toEqual(3);
-            });
-
-            it('compilation', function() {
-                node.compile(compiler);
-                expect(compiler.getSource()).toBe('(+3)');
-            });
+    describe('positive', () => {
+        let node;
+        beforeEach(() => {
+            node = new UnaryNode('+', new ConstantNode(3));
         });
 
-        describe('negation over !', function() {
-            var node;
-            beforeEach(function() {
-                node = new UnaryNode('!', new ConstantNode(true));
-            });
-
-            it('evaluation', function() {
-                expect(node.evaluate({}, {})).toEqual(false);
-            });
-
-            it('compilation', function() {
-                node.compile(compiler);
-                expect(compiler.getSource()).toBe('(!true)');
-            });
+        it('evaluation', () => {
+            expect(node.evaluate({}, {})).toEqual(3);
         });
 
-        describe('negation over "not"', function() {
-            var node;
-            beforeEach(function() {
-                node = new UnaryNode('not', new ConstantNode(true));
-            });
+        it('compilation', () => {
+            node.compile(compiler);
+            expect(compiler.getSource()).toBe('(+3)');
+        });
+    });
 
-            it('evaluation', function() {
-                expect(node.evaluate({}, {})).toEqual(false);
-            });
+    describe('negation over !', () => {
+        let node;
+        beforeEach(() => {
+            node = new UnaryNode('!', new ConstantNode(true));
+        });
 
-            it('compilation', function() {
-                node.compile(compiler);
-                expect(compiler.getSource()).toBe('(!true)');
-            });
+        it('evaluation', () => {
+            expect(node.evaluate({}, {})).toEqual(false);
+        });
+
+        it('compilation', () => {
+            node.compile(compiler);
+            expect(compiler.getSource()).toBe('(!true)');
+        });
+    });
+
+    describe('negation over "not"', () => {
+        let node;
+        beforeEach(() => {
+            node = new UnaryNode('not', new ConstantNode(true));
+        });
+
+        it('evaluation', () => {
+            expect(node.evaluate({}, {})).toEqual(false);
+        });
+
+        it('compilation', () => {
+            node.compile(compiler);
+            expect(compiler.getSource()).toBe('(!true)');
         });
     });
 });

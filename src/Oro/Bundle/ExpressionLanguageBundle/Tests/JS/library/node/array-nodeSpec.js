@@ -1,27 +1,23 @@
-define(function(require) {
-    'use strict';
+import ArrayNode from 'oroexpressionlanguage/js/library/node/array-node';
+import ConstantNode from 'oroexpressionlanguage/js/library/node/constant-node';
+import Compiler from 'oroexpressionlanguage/js/library/compiler';
 
-    var ArrayNode = require('oroexpressionlanguage/js/library/node/array-node');
-    var ConstantNode = require('oroexpressionlanguage/js/library/node/constant-node');
-    var Compiler = require('oroexpressionlanguage/js/library/compiler');
+describe('oroexpressionlanguage/js/library/node/array-node', () => {
+    let arrayNode;
 
-    describe('oroexpressionlanguage/js/library/node/array-node', function() {
-        var arrayNode;
+    beforeEach(() => {
+        arrayNode = new ArrayNode();
+        arrayNode.addElement(new ConstantNode('a'), new ConstantNode('b'));
+        arrayNode.addElement(new ConstantNode('b'));
+    });
 
-        beforeEach(function() {
-            arrayNode = new ArrayNode();
-            arrayNode.addElement(new ConstantNode('a'), new ConstantNode('b'));
-            arrayNode.addElement(new ConstantNode('b'));
-        });
+    it('evaluation', function() {
+        expect(arrayNode.evaluate()).toEqual({b: 'a', 0: 'b'});
+    });
 
-        it('evaluation', function() {
-            expect(arrayNode.evaluate()).toEqual({b: 'a', 0: 'b'});
-        });
-
-        it('compilation', function() {
-            var compiler = new Compiler({});
-            arrayNode.compile(compiler);
-            expect(compiler.getSource()).toBe('{"b": "a", 0: "b"}');
-        });
+    it('compilation', () => {
+        const compiler = new Compiler({});
+        arrayNode.compile(compiler);
+        expect(compiler.getSource()).toBe('{"b": "a", 0: "b"}');
     });
 });

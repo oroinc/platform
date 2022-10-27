@@ -1,15 +1,15 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var Backbone = require('backbone');
-    var requirejsExposure = require('requirejs-exposure');
-    var data = JSON.parse(require('text!./Fixture/aggregated-field-condition/entities.json'));
-    var filters = JSON.parse(require('text!./Fixture/aggregated-field-condition/filters.json'));
-    var columnsData = JSON.parse(require('text!./Fixture/aggregated-field-condition/columnsData.json'));
-    var FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
-    var FieldChoiceMock = require('./Fixture/field-condition/field-choice-mock');
-    var AggregatedFieldConditionView = require('oroquerydesigner/js/app/views/aggregated-field-condition-view');
+    const $ = require('jquery');
+    const Backbone = require('backbone');
+    const jsmoduleExposure = require('jsmodule-exposure');
+    const data = require('./Fixture/aggregated-field-condition/entities.json');
+    const filters = require('./Fixture/aggregated-field-condition/filters.json');
+    const columnsData = require('./Fixture/aggregated-field-condition/columnsData.json');
+    const FieldConditionView = require('oroquerydesigner/js/app/views/field-condition-view');
+    const FieldChoiceMock = require('./Fixture/field-condition/field-choice-mock');
+    const AggregatedFieldConditionView = require('oroquerydesigner/js/app/views/aggregated-field-condition-view');
     require('jasmine-jquery');
 
     const exposure = jsmoduleExposure.disclose('oroquerydesigner/js/app/views/field-condition-view');
@@ -28,9 +28,6 @@ define(function(require) {
                     filters: filters,
                     columnsCollection: columnsCollection,
                     fieldChoice: {
-                        select2: {
-                            formatSelectionTemplateSelector: '#format-selection-template'
-                        },
                         entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                     }
                 });
@@ -82,9 +79,6 @@ define(function(require) {
                     filters: filters,
                     columnsCollection: columnsCollection,
                     fieldChoice: {
-                        select2: {
-                            formatSelectionTemplateSelector: '#format-selection-template'
-                        },
                         entity: 'Oro\\Bundle\\AccountBundle\\Entity\\Account'
                     },
                     value: initialValue

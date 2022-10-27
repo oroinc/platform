@@ -5,7 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     require('bootstrap');
     const BaseView = require('oroui/js/app/views/base/view');
-    const ExpressionEditorUtil = require('oroform/js/expression-editor-util');
+    const ExpressionEditorUtil = require('oroform/js/expression-editor-util').default;
     const Typeahead = $.fn.typeahead.Constructor;
 
     const ExpressionEditorView = BaseView.extend({
@@ -74,7 +74,7 @@ define(function(require) {
          * @inheritdoc
          */
         initialize: function(options) {
-            var utilOptions = _.pick(options,
+            const utilOptions = _.pick(options,
                 'itemLevelLimit', 'allowedOperations', 'operations', 'rootEntities', 'entityDataProvider');
             utilOptions.dataSourceNames = _.keys(options.dataSource);
             this.util = new ExpressionEditorUtil(utilOptions);
@@ -87,7 +87,7 @@ define(function(require) {
                 this.$el.attr('dir', 'ltr');
             }
 
-            return ExpressionEditorView.__super__.initialize.apply(this, arguments);
+            return ExpressionEditorView.__super__.initialize.call(this, options);
         },
 
         render: function() {
@@ -242,7 +242,7 @@ define(function(require) {
 
             this.$el.after(dataSource.$widget).trigger('content:changed');
 
-            dataSource.$field.on('change', (e) => {
+            dataSource.$field.on('change', e => {
                 if (!dataSource.active) {
                     return;
                 }
@@ -265,7 +265,7 @@ define(function(require) {
         _toggleDataSource: function() {
             this._hideDataSources();
 
-            var dataSourceKey = this.autocompleteData.dataSourceKey;
+            const dataSourceKey = this.autocompleteData.dataSourceKey;
 
             if (
                 this.autocompleteData.itemsType !== 'datasource' || _.isEmpty(dataSourceKey) ||
@@ -274,7 +274,7 @@ define(function(require) {
                 return;
             }
 
-            var dataSourceValue = this.autocompleteData.dataSourceValue;
+            const dataSourceValue = this.autocompleteData.dataSourceValue;
 
             this.autocompleteData.items = {}; // hide autocomplete list
 

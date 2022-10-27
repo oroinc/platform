@@ -257,6 +257,7 @@
             "Oro\\Bundle\\EntityExtendBundle\\": "src/Oro/Bundle/EntityExtendBundle",
             "Oro\\Bundle\\EntityMergeBundle\\": "src/Oro/Bundle/EntityMergeBundle",
             "Oro\\Bundle\\EntityPaginationBundle\\": "src/Oro/Bundle/EntityPaginationBundle",
+            "Oro\\Bundle\\ExpressionLanguageBundle\\": "src/Oro/Bundle/ExpressionLanguageBundle",
             "Oro\\Bundle\\FeatureToggleBundle\\": "src/Oro/Bundle/FeatureToggleBundle",
             "Oro\\Bundle\\FilterBundle\\": "src/Oro/Bundle/FilterBundle",
             "Oro\\Bundle\\FormBundle\\": "src/Oro/Bundle/FormBundle",

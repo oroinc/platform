@@ -1,24 +1,20 @@
-define(function(require) {
-    'use strict';
+import NameNode from 'oroexpressionlanguage/js/library/node/name-node';
+import Compiler from 'oroexpressionlanguage/js/library/compiler';
 
-    var NameNode = require('oroexpressionlanguage/js/library/node/name-node');
-    var Compiler = require('oroexpressionlanguage/js/library/compiler');
+describe('oroexpressionlanguage/js/library/node/name-node', () => {
+    let node;
 
-    describe('oroexpressionlanguage/js/library/node/name-node', function() {
-        var node;
+    beforeEach(() => {
+        node = new NameNode('foo');
+    });
 
-        beforeEach(function() {
-            node = new NameNode('foo');
-        });
+    it('evaluation', () => {
+        expect(node.evaluate({}, {foo: 'bar'})).toBe('bar');
+    });
 
-        it('evaluation', function() {
-            expect(node.evaluate({}, {foo: 'bar'})).toBe('bar');
-        });
-
-        it('compilation', function() {
-            var compiler = new Compiler({});
-            node.compile(compiler);
-            expect(compiler.getSource()).toBe('foo');
-        });
+    it('compilation', () => {
+        const compiler = new Compiler({});
+        node.compile(compiler);
+        expect(compiler.getSource()).toBe('foo');
     });
 });

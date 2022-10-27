@@ -1,23 +1,19 @@
-define(function(require) {
-    'use strict';
+import ArgumentsNode from 'oroexpressionlanguage/js/library/node/arguments-node';
+import ConstantNode from 'oroexpressionlanguage/js/library/node/constant-node';
+import Compiler from 'oroexpressionlanguage/js/library/compiler';
 
-    var ArgumentsNode = require('oroexpressionlanguage/js/library/node/arguments-node');
-    var ConstantNode = require('oroexpressionlanguage/js/library/node/constant-node');
-    var Compiler = require('oroexpressionlanguage/js/library/compiler');
+describe('oroexpressionlanguage/js/library/node/arguments-node', () => {
+    let argumentsNode;
 
-    describe('oroexpressionlanguage/js/library/node/arguments-node', function() {
-        var argumentsNode;
+    beforeEach(() => {
+        argumentsNode = new ArgumentsNode();
+        argumentsNode.addElement(new ConstantNode('a'), new ConstantNode('b'));
+        argumentsNode.addElement(new ConstantNode('b'));
+    });
 
-        beforeEach(function() {
-            argumentsNode = new ArgumentsNode();
-            argumentsNode.addElement(new ConstantNode('a'), new ConstantNode('b'));
-            argumentsNode.addElement(new ConstantNode('b'));
-        });
-
-        it('compilation', function() {
-            var compiler = new Compiler({});
-            argumentsNode.compile(compiler);
-            expect(compiler.getSource()).toBe('"a", "b"');
-        });
+    it('compilation', () => {
+        const compiler = new Compiler({});
+        argumentsNode.compile(compiler);
+        expect(compiler.getSource()).toBe('"a", "b"');
     });
 });

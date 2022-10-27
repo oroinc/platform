@@ -425,7 +425,7 @@ define(function(require) {
         });
 
         describe('whitelist of field filter', function() {
-            var fields;
+            let fields;
 
             beforeEach(function(done) {
                 EntityStructureDataProvider.createDataProvider({
@@ -437,7 +437,7 @@ define(function(require) {
                         }
                     }
                 }, applicant1).then(function(provider) {
-                    var chain = provider.pathToEntityChain();
+                    const chain = provider.pathToEntityChain();
                     fields = chain[0].entity.fields;
                     done();
                 });
@@ -455,7 +455,7 @@ define(function(require) {
         });
 
         describe('restrictive whitelist of field filter', function() {
-            var fields;
+            let fields;
 
             beforeEach(function(done) {
                 EntityStructureDataProvider.createDataProvider({
@@ -468,7 +468,7 @@ define(function(require) {
                         }
                     }
                 }, applicant1).then(function(provider) {
-                    var chain = provider.pathToEntityChain();
+                    const chain = provider.pathToEntityChain();
                     fields = chain[0].entity.fields;
                     done();
                 });
@@ -483,7 +483,7 @@ define(function(require) {
         });
 
         describe('blacklist of field filter', function() {
-            var fields;
+            let fields;
 
             beforeEach(function(done) {
                 EntityStructureDataProvider.createDataProvider({
@@ -494,7 +494,7 @@ define(function(require) {
                         }
                     }
                 }, applicant1).then(function(provider) {
-                    var chain = provider.pathToEntityChain();
+                    const chain = provider.pathToEntityChain();
                     fields = chain[0].entity.fields;
                     done();
                 });
@@ -553,7 +553,7 @@ define(function(require) {
         });
 
         describe('fields data update', function() {
-            var fields;
+            let fields;
 
             beforeEach(function(done) {
                 EntityStructureDataProvider.createDataProvider({
@@ -565,7 +565,7 @@ define(function(require) {
                         }
                     }
                 }, applicant1).then(function(provider) {
-                    var chain = provider.pathToEntityChain();
+                    const chain = provider.pathToEntityChain();
                     fields = chain[0].entity.fields;
                     done();
                 });
@@ -580,7 +580,7 @@ define(function(require) {
         });
 
         describe('entity tree', function() {
-            var provider;
+            let provider;
 
             beforeEach(function(done) {
                 EntityStructureDataProvider.createDataProvider({}, applicant1).then(function(dataProvider) {
@@ -616,7 +616,7 @@ define(function(require) {
 
             it('filter affects tree', function() {
                 provider.setExcludeRules([{relationType: 'manyToMany'}]);
-                var node = provider.entityTree.user.roles;
+                const node = provider.entityTree.user.roles;
 
                 expect(node).not.toEqual(jasmine.objectContaining(
                     {users: jasmine.any(Object)}
@@ -627,7 +627,7 @@ define(function(require) {
             });
 
             it('entity node by alias has special properties', function() {
-                var node = provider.entityTree.user;
+                const node = provider.entityTree.user;
 
                 expect(node).toEqual(jasmine.objectContaining({
                     __isEntity: true,
@@ -642,7 +642,7 @@ define(function(require) {
             });
 
             it('entity node by class name has special properties', function() {
-                var node = provider.entityTree['Oro\\Bundle\\UserBundle\\Entity\\Group'];
+                const node = provider.entityTree['Oro\\Bundle\\UserBundle\\Entity\\Group'];
 
                 expect(node).toEqual(jasmine.objectContaining({
                     __isEntity: true,
@@ -656,7 +656,7 @@ define(function(require) {
             });
 
             it('relation-field node has special properties', function() {
-                var node = provider.entityTree.user.roles;
+                const node = provider.entityTree.user.roles;
 
                 expect(node).toEqual(jasmine.objectContaining({
                     __isEntity: true,
@@ -689,7 +689,7 @@ define(function(require) {
             });
 
             it('field node has special properties', function() {
-                var node = provider.entityTree.user.roles.id;
+                const node = provider.entityTree.user.roles.id;
 
                 expect(node).toEqual(jasmine.objectContaining({
                     __isEntity: false,
@@ -709,7 +709,7 @@ define(function(require) {
             });
 
             it('returns entity node from property path string', function() {
-                var node = provider.getEntityTreeNodeByPropertyPath('user');
+                const node = provider.getEntityTreeNodeByPropertyPath('user');
 
                 expect(node).toEqual(jasmine.objectContaining({
                     __isEntity: true,
@@ -727,7 +727,7 @@ define(function(require) {
             });
 
             it('returns relation-field node from property path string', function() {
-                var node = provider.getEntityTreeNodeByPropertyPath('user.roles');
+                const node = provider.getEntityTreeNodeByPropertyPath('user.roles');
 
                 expect(node).toEqual(jasmine.objectContaining({
                     'role': jasmine.objectContaining({__isEntity: false, __isField: true}),
@@ -759,7 +759,7 @@ define(function(require) {
             });
 
             it('returns field node from property path string', function() {
-                var node = provider.getEntityTreeNodeByPropertyPath('user.roles.id');
+                const node = provider.getEntityTreeNodeByPropertyPath('user.roles.id');
 
                 expect(node).toEqual(jasmine.objectContaining({
                     __isEntity: false,

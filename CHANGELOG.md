@@ -64,12 +64,12 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 ### Added
 
 #### EntityBundle
-* Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L903-L947) (see [documentation](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#get-entity-tree-node-by-property-path))
-* Added magic property `entityTree` to `EntityStructureDataProvider` [[?]](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-structure-data-provider.js#L1061-L1079) (see [documentation](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/EntityBundle/Resources/doc/client-side/entity-structure-data-provider.md#entity-tree)) that allows walk through entity fields tree
-* Added JS `EntityTreeNode` [[?]](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/EntityBundle/Resources/public/js/app/services/entity-tree-node.js) that used by `EntityStructureDataProvider`
+* Added method `getEntityTreeNodeByPropertyPath` to JS `EntityStructureDataProvider` (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider#get-entitytreenode-by-property-path))
+* Added magic property `entityTree` to `EntityStructureDataProvider` (see [documentation](https://doc.oroinc.com/master/bundles/platform/EntityBundle/entity-structure-data-provider#entity-tree)) that allows walk through entity fields tree
+* Added JS `EntityTreeNode` that is used in `EntityStructureDataProvider`
 
 #### FormBundle
-* Added JS `ExpressionEditorComponent` [[?]](https://github.com/oroinc/platform/tree/3.2.0/src/Oro/Bundle/FormBundle/Resources/public/js/app/components/expression-editor-component.js) (see [documentation](https://github.com/oroinc/platform/blob/3.2.0/src/Oro/Bundle/FormBundle/Resources/doc/reference/expression-editor.md#component) that used instead regular `ViewComponent` in formtype options of rule editor. It's designed to prepare instance of `EntityStructureDataProvider` and create instance of `ExpressionEditorView`
+* Added JS `ExpressionEditorComponent` (see [documentation](https://doc.oroinc.com/master/bundles/platform/FormBundle/expression-editor#expressioneditorcomponent) that used instead regular `ViewComponent` in formtype options of rule editor. It's designed to prepare instance of `EntityStructureDataProvider` and create instance of `ExpressionEditorView`
   expression-editor-component.js
 
 #### UIBundle

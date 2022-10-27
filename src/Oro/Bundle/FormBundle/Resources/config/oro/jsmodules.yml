@@ -24,6 +24,7 @@ dynamic-imports:
         - oro/select2-grid-component
         - oro/select2-relation-component
         - oro/select2-tree-autocomplete-component
+        - oroform/js/app/components/expression-editor-component
         - oroform/js/app/components/inline-editable-view-component
         - oroform/js/app/components/select-create-inline-type-async-component
         - oroform/js/app/components/select-create-inline-type-component

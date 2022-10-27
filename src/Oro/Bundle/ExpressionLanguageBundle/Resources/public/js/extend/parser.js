@@ -1,53 +1,36 @@
-define(function(require) {
-    'use strict';
+import BinaryNode from './node/binary-node';
+import Token from 'oroexpressionlanguage/js/library/token';
+import OriginalParser from 'oroexpressionlanguage/js/library/parser';
 
-    var BinaryNode = require('oroexpressionlanguage/js/extend/node/binary-node');
-    var OriginalParser = require('oroexpressionlanguage/js/library/parser');
-    var Token = require('oroexpressionlanguage/js/library/token');
-
+class Parser extends OriginalParser {
     /**
      * @inheritdoc
      */
-    function Parser(functions) {
-        Parser.__super__.constructor.call(this, functions);
-    }
+    parseExpression(precedence = 0) {
+        let expr = this.getPrimary();
+        let token = this.stream.current;
 
-    Parser.prototype = Object.create(OriginalParser.prototype);
-    Parser.__super__ = OriginalParser.prototype;
+        while (
+            token.test(Token.OPERATOR_TYPE) &&
+            token.value in Parser.BINARY_OPERATORS &&
+            Parser.BINARY_OPERATORS[token.value].precedence >= precedence
+        ) {
+            const operator = Parser.BINARY_OPERATORS[token.value];
+            this.stream.next();
+            const precedence1 = Parser.OPERATOR_LEFT === operator.associativity
+                ? operator.precedence + 1 : operator.precedence;
+            const expr1 = this.parseExpression(precedence1);
+            expr = new BinaryNode(token.value, expr, expr1);
 
-    Object.assign(Parser.prototype, {
-        constructor: Parser,
-
-        /**
-         * @inheritdoc
-         */
-        parseExpression: function(precedence) {
-            precedence = precedence || 0;
-            var expr = this.getPrimary();
-            var token = this.stream.current;
-
-            while (
-                token.test(Token.OPERATOR_TYPE) &&
-                token.value in this.binaryOperators &&
-                this.binaryOperators[token.value].precedence >= precedence
-            ) {
-                var operator = this.binaryOperators[token.value];
-                this.stream.next();
-                var precedence1 = this.OPERATOR_LEFT === operator.associativity
-                    ? operator.precedence + 1 : operator.precedence;
-                var expr1 = this.parseExpression(precedence1);
-                expr = new BinaryNode(token.value, expr, expr1);
-
-                token = this.stream.current;
-            }
-
-            if (0 === precedence) {
-                return this.parseConditionalExpression(expr);
-            }
-
-            return expr;
+            token = this.stream.current;
         }
-    });
 
-    return Parser;
-});
+        if (0 === precedence) {
+            return this.parseConditionalExpression(expr);
+        }
+
+        return expr;
+    }
+}
+
+export default Parser;

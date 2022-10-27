@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
-    var $ = require('jquery');
-    var nodeProperties = {
+    const _ = require('underscore');
+    const $ = require('jquery');
+    const nodeProperties = {
         __isField: {
             get: function() {
                 return '__field' in this;
@@ -22,10 +22,10 @@ define(function(require) {
     };
 
     function _prepareNode(node) {
-        var properties = nodeProperties;
+        let properties = nodeProperties;
 
         if ('__field' in node) {
-            var fieldData = _.clone(node.__field);
+            const fieldData = _.clone(node.__field);
             properties = _.extend({}, properties, {
                 __field: {
                     get: function() {
@@ -47,9 +47,9 @@ define(function(require) {
 
     EntityStructureDataProviderMock.prototype = {
         getEntityTreeNodeByPropertyPath: function(propertyPath) {
-            var parts = propertyPath.split('.');
-            var node = this.entityTree[parts[0]];
-            for (var i = 1; node && i < parts.length; i++) {
+            const parts = propertyPath.split('.');
+            let node = this.entityTree[parts[0]];
+            for (let i = 1; node && i < parts.length; i++) {
                 node = node[parts[i]];
             }
             return node;

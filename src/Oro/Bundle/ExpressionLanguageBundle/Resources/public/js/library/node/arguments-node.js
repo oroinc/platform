@@ -1,25 +1,20 @@
-define(function(require) {
-    'use strict';
+import ArrayNode from './array-node';
 
-    var ArrayNode = require('oroexpressionlanguage/js/library/node/array-node');
-
-    function ArgumentsNode() {
-        ArgumentsNode.__super__.constructor.call(this);
+class ArgumentsNode extends ArrayNode {
+    /**
+     * @inheritDoc
+     */
+    evaluate(functions, values) {
+        return this.getKeyValuePairs()
+            .map(pair => pair.value.evaluate(functions, values));
     }
 
-    ArgumentsNode.prototype = Object.create(ArrayNode.prototype);
-    ArgumentsNode.__super__ = ArrayNode.prototype;
+    /**
+     * @inheritDoc
+     */
+    compile(compiler) {
+        this.compileArguments(compiler, false);
+    }
+}
 
-    Object.assign(ArgumentsNode.prototype, {
-        constructor: ArgumentsNode,
-
-        /**
-         * @inheritDoc
-         */
-        compile: function(compiler) {
-            this.compileArguments(compiler, false);
-        }
-    });
-
-    return ArgumentsNode;
-});
+export default ArgumentsNode;

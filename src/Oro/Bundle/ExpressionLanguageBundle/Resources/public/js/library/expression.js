@@ -1,25 +1,19 @@
-define(function() {
-    'use strict';
-
+class Expression {
     /**
-     * @param {string} expression  An expression
+     * @param {string} expression An expression
      */
-    function Expression(expression) {
+    constructor(expression) {
         this.expression = String(expression);
     }
 
-    Expression.prototype = {
-        constructor: Expression,
+    /**
+     * Returns the expression.
+     *
+     * @return {string}
+     */
+    toString() {
+        return this.expression;
+    }
+}
 
-        /**
-         * Returns the expression.
-         *
-         * @return {string}
-         */
-        toString: function() {
-            return this.expression;
-        }
-    };
-
-    return Expression;
-});
+export default Expression;

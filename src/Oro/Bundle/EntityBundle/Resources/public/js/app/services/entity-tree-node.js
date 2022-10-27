@@ -1,7 +1,7 @@
 define(function(require) {
     'use strict';
 
-    var _ = require('underscore');
+    const _ = require('underscore');
 
     /**
      * Implements access over getter properties and allows to iterate entity over its fields
@@ -32,7 +32,7 @@ define(function(require) {
                 if (deepsLimit === 0 || !this.__isEntity || this.__entity.fields.length === 0) {
                     return false;
                 }
-                var scalarField = _.findWhere(this, {__isEntity: false});
+                let scalarField = _.findWhere(this, {__isEntity: false});
                 if (!scalarField) {
                     scalarField = _.find(this, function(node) {
                         return node.__hasScalarFieldsInSubtree(deepsLimit - 1);

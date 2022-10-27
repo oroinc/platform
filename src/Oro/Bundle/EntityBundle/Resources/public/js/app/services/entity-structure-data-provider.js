@@ -4,7 +4,7 @@ define(function(require) {
     const _ = require('underscore');
     const EntityError = require('oroentity/js/entity-error');
     const errorHandler = require('oroentity/js/app/services/entity-structure-error-handler');
-    var EntityTreeNode = require('oroentity/js/app/services/entity-tree-node');
+    const EntityTreeNode = require('oroentity/js/app/services/entity-tree-node');
     /** @type {Registry} */
     const registry = require('oroui/js/app/services/registry');
     const EntityStructuresCollection = require('oroentity/js/app/models/entitystructures-collection');
@@ -310,7 +310,7 @@ define(function(require) {
             if (!(presetName in EntityStructureDataProvider._filterPresets)) {
                 throw new TypeError('Filter preset `' + presetName + '` is not defined');
             }
-            var filterConfig = EntityStructureDataProvider._filterPresets[presetName];
+            const filterConfig = EntityStructureDataProvider._filterPresets[presetName];
             this._configureFilter(_.defaults(filterConfig, EntityStructureDataProvider._filterConfigDefaults));
         },
 
@@ -394,7 +394,7 @@ define(function(require) {
          * @protected
          */
         _filterEntityFields: function(entityData) {
-            var entityClassName = entityData.className;
+            const entityClassName = entityData.className;
             if (!_.isEmpty(this.fieldFilterers)) {
                 entityData.fields = _.filter(entityData.fields, function(field) {
                     return this._isWhitelistedField(entityClassName, field) ||
@@ -455,7 +455,7 @@ define(function(require) {
          * @protected
          */
         _extractEntityData: function(entityModel) {
-            var entityData = entityModel.getAttributes();
+            const entityData = entityModel.getAttributes();
             entityData.fields = entityData.fields.map(this._extractFieldData.bind(this, entityData));
             this._filterEntityFields(entityData);
             this._applyEntityFieldsUpdates(entityData);
@@ -490,7 +490,7 @@ define(function(require) {
             }
             Object.defineProperty(fieldData, 'relatedEntity', {
                 get: _.partial(function(provider) {
-                    var relatedEntityModel;
+                    let relatedEntityModel;
                     if (this.relatedEntityName && this.relationType) {
                         relatedEntityModel = provider.collection.getEntityModelByClassName(this.relatedEntityName);
                     }
@@ -513,14 +513,14 @@ define(function(require) {
          * @protected
          */
         _applyEntityFieldsUpdates: function(entityData) {
-            var fields = entityData.fields;
-            var fieldsDataUpdate = _.result(this.fieldsDataUpdate, entityData.className);
+            const fields = entityData.fields;
+            const fieldsDataUpdate = _.result(this.fieldsDataUpdate, entityData.className);
             if (!fieldsDataUpdate) {
                 return;
             }
             _.each(fieldsDataUpdate, function(fieldUpdate, fieldName) {
                 fieldUpdate = _.defaults({name: fieldName}, _.omit(fieldUpdate, 'entity', 'relatedEntity'));
-                var field = _.findWhere(fields, {name: fieldName});
+                const field = _.findWhere(fields, {name: fieldName});
                 if (field) {
                     _.extend(field, fieldUpdate);
                 } else {
@@ -833,11 +833,11 @@ define(function(require) {
          * @protected
          */
         _getEntityTree: function() {
-            var entityTree = {};
-            var properties = {};
+            const entityTree = {};
+            const properties = {};
 
             this.collection.each(function(entityModel) {
-                var entityName = entityModel.get('alias') || entityModel.get('className');
+                const entityName = entityModel.get('alias') || entityModel.get('className');
                 properties[entityName] = {
                     get: this._getEntityTreeNode.bind(this, entityModel),
                     enumerable: true
@@ -858,7 +858,7 @@ define(function(require) {
          * @protected
          */
         _getEntityTreeNode: function(entityModel, fieldName) {
-            var properties = this._getEntityTreeNodeProperties(entityModel, fieldName);
+            const properties = this._getEntityTreeNodeProperties(entityModel, fieldName);
             return new EntityTreeNode(properties);
         },
 
@@ -871,13 +871,13 @@ define(function(require) {
          * @protected
          */
         _getEntityTreeNodeProperties: function(entityModel, fieldName) {
-            var properties = {};
-            var entityData = this._extractEntityData(entityModel);
+            const properties = {};
+            const entityData = this._extractEntityData(entityModel);
 
             if (fieldName) {
-                var fieldData = _.find(entityData.fields, {name: fieldName});
+                const fieldData = _.find(entityData.fields, {name: fieldName});
                 if (fieldData.relatedEntityName) {
-                    var relatedEntityModel = this.collection.getEntityModelByClassName(fieldData.relatedEntityName);
+                    const relatedEntityModel = this.collection.getEntityModelByClassName(fieldData.relatedEntityName);
                     if (relatedEntityModel) {
                         _.extend(properties, this._getEntityTreeNodeProperties(relatedEntityModel));
                     }
@@ -885,7 +885,7 @@ define(function(require) {
                 _.extend(properties, {
                     __field: {
                         get: function() {
-                            var entityData = this._extractEntityData(entityModel);
+                            const entityData = this._extractEntityData(entityModel);
                             return _.find(entityData.fields, {name: fieldName});
                         }.bind(this)
                     }
@@ -919,18 +919,16 @@ define(function(require) {
          * @return {Object|undefined}
          */
         getEntityTreeNodeByPropertyPath: function(propertyPath) {
-            var fieldName;
-            var fieldData;
-            var entityModel;
-            var entity;
-            var path;
+            let fieldName;
+            let fieldData;
+            let entityModel;
 
             if (!propertyPath) {
                 return;
             }
 
-            path = propertyPath.split('.');
-            entity = path.shift();
+            const path = propertyPath.split('.');
+            const entity = path.shift();
             entityModel = this.collection.getEntityModelByClassName(entity);
             if (!entityModel) {
                 entityModel = this.collection.find({alias: entity});

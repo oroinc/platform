@@ -1,13 +1,12 @@
 define(function(require) {
     'use strict';
 
-    var ExpressionEditorComponent;
-    var _ = require('underscore');
-    var ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
-    var EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
-    var BaseComponent = require('oroui/js/app/components/base/component');
+    const _ = require('underscore');
+    const ExpressionEditorView = require('oroform/js/app/views/expression-editor-view');
+    const EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
+    const BaseComponent = require('oroui/js/app/components/base/component');
 
-    ExpressionEditorComponent = BaseComponent.extend({
+    const ExpressionEditorComponent = BaseComponent.extend({
         /**
          * @inheritDoc
          */
@@ -39,7 +38,7 @@ define(function(require) {
          * @param {EntityStructureDataProvider} provider
          */
         initExpressionEditorView: function(options, provider) {
-            var viewOptions = _.extend({
+            const viewOptions = _.extend({
                 el: options._sourceElement,
                 autoRender: true,
                 entityDataProvider: provider

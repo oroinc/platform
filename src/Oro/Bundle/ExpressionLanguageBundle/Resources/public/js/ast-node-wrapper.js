@@ -1,85 +1,69 @@
-define(function() {
-    'use strict';
-
+class ASTNodeWrapper {
     /**
      * @param {Node} node - instance of Node from ExpressionLanguage library
-     * @param {ASTNodeWrapper} parent - instance of ASTNodeWrapper that contain parent Node
+     * @param {ASTNodeWrapper?} parent - instance of ASTNodeWrapper that contain parent Node
      */
-    function ASTNodeWrapper(node, parent) {
-        this.parent = parent || null;
+    constructor(node, parent = null) {
+        /** @type {ASTNodeWrapper} */
+        this.parent = parent;
+        /** @type {Node} */
         this.originNode = node;
-        this.children = node.nodes.map(function(child) {
-            return new ASTNodeWrapper(child, this);
-        }.bind(this));
+        /** @type {Array.<ASTNodeWrapper>} */
+        this.children = node.nodes.map(child => new ASTNodeWrapper(child, this));
     }
 
-    ASTNodeWrapper.prototype = {
-        constructor: ASTNodeWrapper,
+    /**
+     * @param {string} name - name of attribute of original node
+     * @return {string|number}
+     */
+    attr(name) {
+        return this.originNode.attrs[name];
+    }
 
-        /** @type {ASTNodeWrapper} */
-        parent: null,
+    /**
+     * @param {number} index
+     * @return {ASTNodeWrapper}
+     */
+    child(index) {
+        return this.children[index];
+    }
 
-        /** @type {Node} */
-        originNode: null,
+    /**
+     * Checks if its original node is instance of the constructor
+     *
+     * @param {Function} constructor
+     * @return {boolean}
+     */
+    instanceOf(constructor) {
+        return this.originNode instanceof constructor;
+    }
 
-        /** @type {Array.<ASTNodeWrapper>} */
-        children: null,
-
-        /**
-         * @param {string} name - name of attribute of original node
-         * @return {string|number}
-         */
-        attr: function(name) {
-            return this.originNode.attrs[name];
-        },
-
-        /**
-         * @param {number} index
-         * @return {ASTNodeWrapper}
-         */
-        child: function(index) {
-            return this.children[index];
-        },
-
-        /**
-         * Checks if its original node is instance of the constructor
-         *
-         * @param {Function} constructor
-         * @return {boolean}
-         */
-        instanceOf: function(constructor) {
-            return this.originNode instanceof constructor;
-        },
-
-        /**
-         * Goes through its tree and collect all nodes that returns true from the callback
-         *
-         * @param {function(ASTNodeWrapper):boolean} callback - function that gets instance of ASTNodeWrapper and has to return true of false
-         * @return {Array.<ASTNodeWrapper>}
-         */
-        findAll: function(callback) {
-            var results = [];
-            if (callback(this)) {
-                results.push(this);
-            }
-            for (var i = 0; i < this.children.length; i++) {
-                results = results.concat(this.children[i].findAll(callback));
-            }
-            return results;
-        },
-
-        /**
-         * Goes through its tree and collect all nodes that contains original node that are instances of the constructor
-         *
-         * @param {Function} constructor
-         * @return {Array.<ASTNodeWrapper>}
-         */
-        findInstancesOf: function(constructor) {
-            return this.findAll(function(node) {
-                return node.instanceOf(constructor);
-            });
+    /**
+     * Goes through its tree and collect all nodes that returns true from the callback
+     *
+     * @param {function(ASTNodeWrapper):boolean} callback - function that gets instance of ASTNodeWrapper and has to return true of false
+     * @return {Array.<ASTNodeWrapper>}
+     */
+    findAll(callback) {
+        let results = [];
+        if (callback(this)) {
+            results.push(this);
         }
-    };
+        for (let i = 0; i < this.children.length; i++) {
+            results = results.concat(this.children[i].findAll(callback));
+        }
+        return results;
+    }
 
-    return ASTNodeWrapper;
-});
+    /**
+     * Goes through its tree and collect all nodes that contains original node that are instances of the constructor
+     *
+     * @param {Function} constructor
+     * @return {Array.<ASTNodeWrapper>}
+     */
+    findInstancesOf(constructor) {
+        return this.findAll(node => node.instanceOf(constructor));
+    }
+}
+
+export default ASTNodeWrapper;

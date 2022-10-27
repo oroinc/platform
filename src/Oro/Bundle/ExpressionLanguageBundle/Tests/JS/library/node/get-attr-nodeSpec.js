@@ -1,133 +1,131 @@
-define(function(require) {
-    'use strict';
+import GetAttrNode from 'oroexpressionlanguage/js/library/node/get-attr-node';
+import NameNode from 'oroexpressionlanguage/js/library/node/name-node';
+import ConstantNode from 'oroexpressionlanguage/js/library/node/constant-node';
+import ArrayNode from 'oroexpressionlanguage/js/library/node/array-node';
+import ArgumentsNode from 'oroexpressionlanguage/js/library/node/arguments-node';
+import Compiler from 'oroexpressionlanguage/js/library/compiler';
 
-    var GetAttrNode = require('oroexpressionlanguage/js/library/node/get-attr-node');
-    var NameNode = require('oroexpressionlanguage/js/library/node/name-node');
-    var ConstantNode = require('oroexpressionlanguage/js/library/node/constant-node');
-    var ArrayNode = require('oroexpressionlanguage/js/library/node/array-node');
-    var Compiler = require('oroexpressionlanguage/js/library/compiler');
+describe('oroexpressionlanguage/js/library/node/get-attr-node', () => {
+    let compiler;
 
-    function Obj() {
-        this.foo = 'bar';
-        this.quz = function() {
-            return 'baz';
-        };
-    }
+    beforeEach(() => {
+        compiler = new Compiler({});
+    });
 
-    describe('oroexpressionlanguage/js/library/node/get-attr-node', function() {
-        var argsNode;
-        var compiler;
-
-        beforeEach(function() {
-            compiler = new Compiler({});
-            argsNode = new ArrayNode();
-            argsNode.addElement(new ConstantNode('a'), new ConstantNode('b'));
-            argsNode.addElement(new ConstantNode('b'));
+    describe('array call by numeric index', () => {
+        let node;
+        beforeEach(() => {
+            node = new GetAttrNode(
+                new NameNode('foo'),
+                new ConstantNode(0),
+                new ArgumentsNode(),
+                GetAttrNode.ARRAY_CALL
+            );
         });
 
-        describe('array call by numeric index', function() {
-            var node;
-            beforeEach(function() {
-                node = new GetAttrNode(
-                    new NameNode('foo'),
-                    new ConstantNode(0),
-                    argsNode,
-                    GetAttrNode.ARRAY_CALL
-                );
-            });
-
-            it('evaluation', function() {
-                expect(node.evaluate({}, {foo: {b: 'a', 0: 'b'}})).toEqual('b');
-            });
-
-            it('compilation', function() {
-                node.compile(compiler);
-                expect(compiler.getSource()).toBe('foo[0]');
-            });
+        it('evaluation', () => {
+            expect(node.evaluate({}, {foo: {b: 'a', 0: 'b'}})).toEqual('b');
         });
 
-        describe('array call by string index', function() {
-            var node;
-            beforeEach(function() {
-                node = new GetAttrNode(
-                    new NameNode('foo'),
-                    new ConstantNode('b'),
-                    argsNode,
-                    GetAttrNode.ARRAY_CALL
-                );
-            });
+        it('compilation', () => {
+            node.compile(compiler);
+            expect(compiler.getSource()).toBe('foo[0]');
+        });
+    });
 
-            it('evaluation', function() {
-                expect(node.evaluate({}, {foo: {b: 'a', 0: 'b'}})).toEqual('a');
-            });
-
-            it('compilation', function() {
-                node.compile(compiler);
-                expect(compiler.getSource()).toBe('foo["b"]');
-            });
+    describe('array call by string index', () => {
+        let node;
+        beforeEach(() => {
+            node = new GetAttrNode(
+                new NameNode('foo'),
+                new ConstantNode('b'),
+                new ArgumentsNode(),
+                GetAttrNode.ARRAY_CALL
+            );
         });
 
-        describe('property call', function() {
-            var node;
-            beforeEach(function() {
-                node = new GetAttrNode(
-                    new NameNode('foo'),
-                    new ConstantNode('foo'),
-                    argsNode,
-                    GetAttrNode.PROPERTY_CALL
-                );
-            });
-
-            it('evaluation', function() {
-                expect(node.evaluate({}, {foo: new Obj()})).toEqual('bar');
-            });
-
-            it('compilation', function() {
-                node.compile(compiler);
-                expect(compiler.getSource()).toBe('foo.foo');
-            });
+        it('evaluation', () => {
+            expect(node.evaluate({}, {foo: {b: 'a', 0: 'b'}})).toEqual('a');
         });
 
-        describe('method call', function() {
-            var node;
-            beforeEach(function() {
-                node = new GetAttrNode(
-                    new NameNode('foo'),
-                    new ConstantNode('quz'),
-                    argsNode,
-                    GetAttrNode.METHOD_CALL
-                );
-            });
+        it('compilation', () => {
+            node.compile(compiler);
+            expect(compiler.getSource()).toBe('foo["b"]');
+        });
+    });
 
-            it('evaluation', function() {
-                expect(node.evaluate({}, {foo: new Obj()})).toEqual('baz');
-            });
-
-            it('compilation', function() {
-                node.compile(compiler);
-                expect(compiler.getSource()).toBe('foo.quz({"b": "a", 0: "b"})');
-            });
+    describe('property call', () => {
+        let node;
+        beforeEach(() => {
+            node = new GetAttrNode(
+                new NameNode('foo'),
+                new ConstantNode('foo'),
+                new ArgumentsNode(),
+                GetAttrNode.PROPERTY_CALL
+            );
         });
 
-        describe('property call by variable name', function() {
-            var node;
-            beforeEach(function() {
-                node = new GetAttrNode(
-                    new NameNode('foo'),
-                    new NameNode('index'),
-                    argsNode,
-                    GetAttrNode.ARRAY_CALL
-                );
-            });
+        it('evaluation', () => {
+            expect(node.evaluate({}, {foo: {foo: 'bar'}})).toEqual('bar');
+        });
 
-            it('evaluation', function() {
-                expect(node.evaluate({}, {foo: {b: 'a', 0: 'b'}, index: 'b'})).toEqual('a');
-            });
+        it('compilation', () => {
+            node.compile(compiler);
+            expect(compiler.getSource()).toBe('foo.foo');
+        });
+    });
 
-            it('compilation', function() {
-                node.compile(compiler);
-                expect(compiler.getSource()).toBe('foo[index]');
-            });
+    describe('method call', () => {
+        let node;
+        beforeEach(() => {
+            node = new GetAttrNode(
+                new NameNode('foo'),
+                new ConstantNode('quz'),
+                (() => {
+                    const arrayNode = new ArrayNode();
+                    arrayNode.addElement(new ConstantNode('a'), new ConstantNode('b'));
+                    arrayNode.addElement(new ConstantNode('b'));
+                    const argsNode = new ArgumentsNode();
+                    argsNode.addElement(arrayNode);
+                    return argsNode;
+                })(),
+                GetAttrNode.METHOD_CALL
+            );
+        });
+
+        it('evaluation', () => {
+            const obj = {
+                quz(param) {
+                    return `${param.b},${param[0]}`;
+                }
+            };
+            expect(node.evaluate({}, {foo: obj})).toEqual('a,b');
+        });
+
+        it('compilation', () => {
+            node.compile(compiler);
+            expect(compiler.getSource()).toBe('foo.quz({"b": "a", 0: "b"})');
+        });
+    });
+
+    describe('property call by variable name', () => {
+        let node;
+        beforeEach(() => {
+            node = new GetAttrNode(
+                new NameNode('foo'),
+                new NameNode('index'),
+                new ArgumentsNode(),
+                GetAttrNode.ARRAY_CALL
+            );
+        });
+
+        it('evaluation', () => {
+            expect(node.evaluate({}, {foo: {b: 'a', 0: 'b'}, index: 'b'})).toEqual('a');
+        });
+
+        it('compilation', () => {
+            node.compile(compiler);
+            expect(compiler.getSource()).toBe('foo[index]');
         });
     });
 });
