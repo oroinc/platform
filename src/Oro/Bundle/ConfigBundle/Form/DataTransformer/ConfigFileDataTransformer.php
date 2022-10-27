@@ -49,7 +49,12 @@ class ConfigFileDataTransformer implements DataTransformerInterface
             return null;
         }
 
-        return $this->doctrineHelper->getEntityRepositoryForClass(File::class)->find($value);
+        $file = $this->doctrineHelper->getEntityRepositoryForClass(File::class)->find($value);
+        if ($file) {
+            $this->doctrineHelper->getManager()->detach($file);
+        }
+
+        return $file;
     }
 
     /**

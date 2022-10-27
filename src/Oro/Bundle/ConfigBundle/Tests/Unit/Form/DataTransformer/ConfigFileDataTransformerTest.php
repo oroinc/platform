@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -56,10 +57,20 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
             ->with(self::FILE_ID)
             ->willReturn($file);
 
+        $entityManager = $this->createMock(ObjectManager::class);
+        $entityManager
+            ->expects($this->once())
+            ->method('detach');
+
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with(File::class)
             ->willReturn($repo);
+
+        $this->doctrineHelper
+            ->expects(self::once())
+            ->method('getManager')
+            ->willReturn($entityManager);
 
         $transformedFile = $this->transformer->transform(self::FILE_ID);
 
