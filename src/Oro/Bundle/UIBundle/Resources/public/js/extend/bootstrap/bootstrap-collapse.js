@@ -212,7 +212,10 @@ define(function(require) {
                     );
                 }
             });
-        });
+        })
+        // expand a collapse to show validation message within
+        .on('validate-element', '.collapse:hidden', event => $(event.currentTarget).collapse('show'));
+
     mediator.on('layout:reposition', _.debounce(() => {
         $(document).find('[data-toggle="collapse"]').each(function(index, el) {
             const $collapse = $($(el).attr('data-target') || $(el).attr('href'));
