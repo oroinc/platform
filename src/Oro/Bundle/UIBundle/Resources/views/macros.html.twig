@@ -1124,7 +1124,7 @@
     {% if span %}
         <div class="{{ span }}">
     {% endif %#}
-    <div class="{{ spanClass }}">
+    <div class="{{ spanClass }} clearfix">
     {% if title|length %}<h5 class="user-fieldset"><span>{{ title }}</span></h5>{% endif %}
     {% for dataBlock in data %}
         {{ dataBlock|raw }}
