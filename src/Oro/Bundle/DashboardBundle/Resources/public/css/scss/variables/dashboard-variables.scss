@@ -4,8 +4,6 @@ $dashboard-container-border: 1px solid $primary-860 !default;
 
 $dashboard-container-title-background-color: $primary-inverse !default;
 
-$dashboard-action-icon: $fa-var-minus-square-o !default;
-$dashboard-action-icon-collapsed: $fa-var-plus-square-o !default;
 $dashboard-action-padding: 0 6px !default;
 $dashboard-wrapper-bg: $primary-900 !default;
 $dashboard-widget-bg: $primary-inverse !default;
@@ -22,7 +20,6 @@ $dashboard-widget-placeholder-background: $primary-860 !default;
 $dashboard-widget-placeholder-border: 2px dashed $primary-700 !default;
 $dashboard-widget-placeholder-color: $primary-600 !default;
 $dashboard-widget-configuration-border: 1px solid $primary-750 !default;
-$dashboard-widget-configuration-collapsed-margin-top: 10px !default;
 $dashboard-widget-configuration-action-cell-min-width: 88px !default;
 $dashboard-configuration-items-table-margin-y: $form-container-control-row-space !default;
 $dashboard-configuration-items-btn-color: $primary-700 !default;

@@ -4,5 +4,7 @@
 <input class="invisible validation-holder" type="checkbox"
        name="<%- 'condition_item_' + Date.now() %>"
        data-validation="<%- JSON.stringify(validation) %>"
-<% if (!_.isEmpty(value)) { %>checked<% } %> />
+       data-validation-force
+       <% if (!_.isEmpty(value)) { %>checked<% } %>
+>
 <% } %>

@@ -1,59 +1,68 @@
+<% var collapseId = _.uniqueId('collapse-') %>
 <div class="box-type1 dashboard-widget <%-headerClass %><%- allowEdit ? ' editable' : '' %>" data-layout="separate">
     <div class="widget-header clearfix">
-        <div class="actions-container">
-            <div class="collapse-expand-action-container">
-                <button class="btn btn-icon btn-light-custom collapse-action<%- collapsed ? ' collapsed' : '' %>"
-                    data-collapsed-title="<%- _.__('Expand') %>"
-                    data-expanded-title="<%- _.__('Collapse') %>"
-                    aria-label="<%- _.__('Expand') %> / <%- _.__('Collapse') %>"
-                >
-                    <span class="fa-icon collapse-action-icon" aria-hidden="true"></span>
-                </button>
-            </div>
+        <div class="collapse-expand-action-container">
+            <button class="btn btn-icon btn-light-custom"
+                    data-toggle="collapse"
+                    data-target="#<%- collapseId %>"
+                    aria-controls="<%- collapseId %>"
+                    title="<%- expanded ? _.__('Collapse') : _.__('Expand') %>"
+                    data-title
+            >
+                <span class="fa-icon <%- expanded ? 'fa-minus-square-o' : 'fa-plus-square-o' %>"
+                      aria-hidden="true" data-icon></span>
+            </button>
         </div>
         <div class="title sortable widget-title" title="<%- title %>"><%- title %></div>
         <div class="widget-actions-container"></div>
-        <div class="actions-container">
-            <div class="default-actions-container">
-                <% if (showConfig) { %>
-                <% var dashboardActionId = _.uniqueId('dashboard-action-') %>
-                <div class="dropdown action-wrapper">
-                    <button id="<%- dashboardActionId %>"
-                            class="btn btn-icon btn-light-custom dropdown-toggle dropdown-toggle--no-caret"
-                            data-toggle="dropdown"
-                            aria-label="<%- _.__('oro.dashboard.show_more_actions') %>"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                            data-placement="bottom-end"
-                            data-modifiers="<%- JSON.stringify({offset: {offset: '0,-10', order: 700}}) %>"
-                    >
-                        <span class="fa-ellipsis-h" aria-hidden="true"></span>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="<%- dashboardActionId %>">
-                        <li>
-                            <a class="configure-action dropdown-item" href="#" role="button"
-                               title="<%- _.__('oro.dashboard.widget.configure') %>">
-                                <span class="fa-cog hide-text" aria-hidden="true"></span> <%- _.__('oro.dashboard.widget.configure') %>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="remove-action dropdown-item" href="#" role="button"
-                               title="<%- _.__('oro.dashboard.widget.remove') %>">
-                                <span class="fa-trash-o hide-text" aria-hidden="true"></span> <%- _.__('oro.dashboard.widget.remove') %>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <% } else { %>
-                <span class="action-wrapper">
-                    <button class="btn-link remove-action"
-                            aria-label="<%- _.__('oro.dashboard.widget.remove') %>">
-                        <span class="fa-trash-o" aria-hidden="true"></span>
-                    </button>
-                </span>
-                <% } %>
+        <div class="default-actions-container">
+            <% if (showConfig) { %>
+            <% var dashboardActionId = _.uniqueId('dashboard-action-') %>
+            <div class="dropdown action-wrapper">
+                <button id="<%- dashboardActionId %>"
+                        class="btn btn-icon btn-light-custom dropdown-toggle dropdown-toggle--no-caret"
+                        data-toggle="dropdown"
+                        aria-label="<%- _.__('oro.dashboard.show_more_actions') %>"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        data-placement="bottom-end"
+                        data-modifiers="<%- JSON.stringify({offset: {offset: '0,-10', order: 700}}) %>"
+                >
+                    <span class="fa-ellipsis-h" aria-hidden="true"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="<%- dashboardActionId %>">
+                    <li>
+                        <a class="dropdown-item" href="#" role="button"
+                           data-configure-action
+                           title="<%- _.__('oro.dashboard.widget.configure') %>">
+                            <span class="fa-cog hide-text" aria-hidden="true"></span> <%- _.__('oro.dashboard.widget.configure') %>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#" role="button"
+                           data-remove-action
+                           title="<%- _.__('oro.dashboard.widget.remove') %>">
+                            <span class="fa-trash-o hide-text" aria-hidden="true"></span> <%- _.__('oro.dashboard.widget.remove') %>
+                        </a>
+                    </li>
+                </ul>
             </div>
+            <% } else { %>
+            <span class="action-wrapper">
+                <button class="btn-link"
+                        data-remove-action
+                        aria-label="<%- _.__('oro.dashboard.widget.remove') %>">
+                    <span class="fa-trash-o" aria-hidden="true"></span>
+                </button>
+            </span>
+            <% } %>
         </div>
     </div>
-    <div class="row-fluid <%- contentClasses.join(' ') %>"></div>
+    <div id="<%- collapseId %>"
+         class="row-fluid collapse<% if (expanded) { %> show<% } %> <%- contentClasses.join(' ') %>"
+         data-trigger-icon-show-class="fa-minus-square-o"
+         data-trigger-icon-hide-class="fa-plus-square-o"
+         data-collapsed-title="<%- _.__('Expand') %>"
+         data-expanded-title="<%- _.__('Collapse') %>"
+    ></div>
 </div>

@@ -102,18 +102,6 @@
             }
         }
 
-        .actions-container {
-            .collapse-action {
-                .collapse-action-icon {
-                    @include fa-icon($dashboard-action-icon);
-                }
-
-                &.collapsed .collapse-action-icon {
-                    @include fa-icon($dashboard-action-icon-collapsed);
-                }
-            }
-        }
-
         .widget-actions-container,
         .default-actions-container {
             line-height: 1;
@@ -217,12 +205,6 @@
         text-align: center;
 
         border-radius: 3px;
-    }
-
-    .dashboard-widget.collapsed {
-        .row-fluid {
-            border-top: none;
-        }
     }
 
     .collapse-expand-action-container {
@@ -445,14 +427,8 @@
 
         line-height: $form-horizontal-control-label-line-height;
 
-        .collapse-toggler.collapsed .expanded-text,
-        .collapse-toggler:not(.collapsed) .collapsed-text {
-            display: none;
-        }
-
-        .collapse,
-        .collapsing {
-            margin-top: $dashboard-widget-configuration-collapsed-margin-top;
+        .dashboard-query-filter {
+            padding-top: $content-padding-small;
         }
     }
 }
