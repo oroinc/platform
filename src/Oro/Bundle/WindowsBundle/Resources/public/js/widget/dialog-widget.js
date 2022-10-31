@@ -551,6 +551,7 @@ define(function(require, exports, module) {
             if (!tools.isMobile()) {
                 // on mobile devices without setting these properties modal dialogs cannot be scrolled
                 this.widget.find('.scrollable-container').each(function() {
+                    $(this).prop({prevScrollTop: $(this).scrollTop()});
                     $(this).css('max-height', '');
                 });
             }
@@ -569,6 +570,12 @@ define(function(require, exports, module) {
 
                     if (height) {
                         $el.css('max-height', height);
+
+                        const restoredScrollTop = $el.prop('prevScrollTop');
+
+                        if (restoredScrollTop) {
+                            $el.scrollTop(restoredScrollTop);
+                        }
                     }
                 });
             }
