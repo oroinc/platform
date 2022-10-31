@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
@@ -64,6 +65,9 @@ class IterableResultFactory implements IterableResultFactoryInterface
 
         $identifierField = $this->getIdentifierField($actionConfiguration);
         $objectIdentifier = $this->getObjectIdentifier($actionConfiguration);
+        //Query may have aggregation and sort criteria by non aggregated columns
+        //which will cause fatal error, so let's replace it to the predictable criteria
+        $qb->orderBy($identifierField, Criteria::ASC);
 
         if ($selectedItems->getValues()) {
             $valueWhereCondition =
