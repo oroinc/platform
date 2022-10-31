@@ -43,12 +43,14 @@ class EmailTemplateSelectTypeTest extends \PHPUnit\Framework\TestCase
         $optionKey = 'testKey';
 
         $formConfigMock = $this->createMock(FormConfigInterface::class);
-        $formConfigMock->expects($this->exactly(3))
+        $formConfigMock->expects($this->exactly(5))
             ->method('getOption')
             ->willReturnMap([
                 ['depends_on_parent_field', null, $optionKey],
                 ['data_route', null, 'test'],
                 ['data_route_parameter', null, 'id'],
+                ['includeNonEntity', null, 0],
+                ['includeSystemTemplates', null, 1]
             ]);
 
         $formMock = $this->createMock(Form::class);

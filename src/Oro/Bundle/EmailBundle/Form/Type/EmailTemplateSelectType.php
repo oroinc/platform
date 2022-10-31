@@ -9,6 +9,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form Type for selecting email template
+ */
 class EmailTemplateSelectType extends AbstractType
 {
     /**
@@ -56,7 +59,9 @@ class EmailTemplateSelectType extends AbstractType
                 'empty_data'              => null,
                 'required'                => true,
                 'data_route'              => 'oro_api_get_emailtemplates',
-                'data_route_parameter'    => 'entityName'
+                'data_route_parameter'    => 'entityName',
+                'includeNonEntity'        => false,
+                'includeSystemTemplates'  => true
             )
         );
         $resolver->setNormalizer('configs', $configsNormalizer);
@@ -71,6 +76,8 @@ class EmailTemplateSelectType extends AbstractType
         $view->vars['depends_on_parent_field'] = $config->getOption('depends_on_parent_field');
         $view->vars['data_route'] = $config->getOption('data_route');
         $view->vars['data_route_parameter'] = $config->getOption('data_route_parameter');
+        $view->vars['includeNonEntity'] = (bool)$config->getOption('includeNonEntity');
+        $view->vars['includeSystemTemplates'] = (bool)$config->getOption('includeSystemTemplates');
     }
 
     /**
