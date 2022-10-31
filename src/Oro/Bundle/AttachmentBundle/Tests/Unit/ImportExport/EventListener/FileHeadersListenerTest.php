@@ -24,6 +24,9 @@ class FileHeadersListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn('SampleEntity');
         $event->expects($this->never())
             ->method('addHeader');
+        $event->expects($this->any())
+            ->method('isFullData')
+            ->willReturn(true);
 
         $this->listener->afterLoadEntityRulesAndBackendHeaders($event);
     }
@@ -42,6 +45,9 @@ class FileHeadersListenerTest extends \PHPUnit\Framework\TestCase
         $event->expects($this->once())
             ->method('setRule')
             ->with('UUID', ['value' => 'uuid', 'order' => 30]);
+        $event->expects($this->any())
+            ->method('isFullData')
+            ->willReturn(true);
 
         $this->listener->afterLoadEntityRulesAndBackendHeaders($event);
     }
@@ -64,6 +70,9 @@ class FileHeadersListenerTest extends \PHPUnit\Framework\TestCase
                 ['URI', ['value' => 'uri', 'order' => 20]],
                 ['UUID', ['value' => 'uuid', 'order' => 30]]
             );
+        $event->expects($this->any())
+            ->method('isFullData')
+            ->willReturn(true);
 
         $this->listener->afterLoadEntityRulesAndBackendHeaders($event);
     }
