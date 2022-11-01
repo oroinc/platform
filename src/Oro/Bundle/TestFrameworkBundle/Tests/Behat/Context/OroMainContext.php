@@ -1288,6 +1288,7 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButtonInModalWindow($button)
     {
+        /** @var NodeElement $modalWindow */
         $modalWindow = $this->spin(function () {
             return $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
         }, 5);
