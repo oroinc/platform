@@ -366,6 +366,40 @@ JS;
         return null;
     }
 
+    /**
+     * @param bool $force
+     * @return UiDialog
+     */
+    public function openCreateEntityPopup($force = false)
+    {
+        $entitySelect = $this->getParent()->getParent();
+        $entityCreateButton = $entitySelect->find('css', '.entity-create-btn');
+        $this->spin(function () use ($entitySelect) {
+            return $entitySelect->find('css', '.select2-container');
+        }, 10);
+        $entityCreateButton->focus();
+        if ($entityCreateButton->isVisible()) {
+            if ($force) {
+                $this->getDriver()->executeJsOnXpath($entityCreateButton->getXpath(), '{{ELEMENT}}.click()');
+            } else {
+                $entityCreateButton->click();
+            }
+            $this->getDriver()->waitForAjax();
+
+            $dialogs = array_filter(
+                $this->elementFactory->findAllElements('UiDialog'),
+                function (UiDialog $dialog) {
+                    return $dialog->isValid() && $dialog->isVisible();
+                }
+            );
+            if ($dialogs) {
+                return end($dialogs);
+            }
+        }
+
+        return null;
+    }
+
     public function clear()
     {
         $close = $this->getParent()->find('css', '.select2-search-choice-close');
