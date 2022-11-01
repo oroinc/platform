@@ -34,15 +34,13 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /** @var CriteriaConnector */
     private $criteriaConnector;
 
-    /** @var QueryExpressionVisitorFactory */
-    private $expressionVisitorFactory;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->entityClassResolver = new EntityClassResolver($this->doctrine);
-        $this->expressionVisitorFactory = new QueryExpressionVisitorFactory(
+
+        $expressionVisitorFactory = new QueryExpressionVisitorFactory(
             [
                 'NOT' => new Expression\NotCompositeExpression(),
                 'AND' => new Expression\AndCompositeExpression(),
@@ -61,6 +59,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             ],
             $this->entityClassResolver
         );
+
         $this->criteriaConnector = new CriteriaConnector(
             new CriteriaNormalizer(
                 $this->doctrineHelper,
@@ -68,7 +67,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
                 new OptimizeJoinsFieldVisitorFactory(new OptimizeJoinsDecisionMaker())
             ),
             new CriteriaPlaceholdersResolver(),
-            $this->expressionVisitorFactory,
+            $expressionVisitorFactory,
             $this->entityClassResolver
         );
     }

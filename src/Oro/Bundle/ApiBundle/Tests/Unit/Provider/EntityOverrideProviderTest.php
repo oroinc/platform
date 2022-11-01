@@ -7,21 +7,19 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
 
 class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCache */
-    private $configCache;
-
     /** @var EntityOverrideProvider */
     private $entityOverrideProvider;
 
     protected function setUp(): void
     {
-        $this->configCache = $this->createMock(ConfigCache::class);
-        $this->configCache->expects(self::once())
+        $configCache = $this->createMock(ConfigCache::class);
+        $configCache->expects(self::once())
             ->method('getSubstitutions')
             ->willReturn([
                 'Test\Entity1' => 'Test\Entity2'
             ]);
-        $this->entityOverrideProvider = new EntityOverrideProvider($this->configCache);
+
+        $this->entityOverrideProvider = new EntityOverrideProvider($configCache);
     }
 
     public function testGetSubstituteEntityClass()

@@ -7,18 +7,13 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class TestConfig
 {
-    /** @var string|null */
-    private $exclusionPolicy;
-
-    /** @var array */
-    private $items = [];
+    private ?string $exclusionPolicy = null;
+    private array $items = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = $this->items;
         if (null !== $this->exclusionPolicy && ConfigUtil::EXCLUSION_POLICY_NONE !== $this->exclusionPolicy) {
@@ -30,10 +25,8 @@ class TestConfig
 
     /**
      * Indicates whether the entity does not have a configuration.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return
             null === $this->exclusionPolicy
@@ -42,10 +35,8 @@ class TestConfig
 
     /**
      * Indicates whether the exclusion policy is set explicitly.
-     *
-     * @return bool
      */
-    public function hasExclusionPolicy()
+    public function hasExclusionPolicy(): bool
     {
         return null !== $this->exclusionPolicy;
     }
@@ -55,13 +46,9 @@ class TestConfig
      *
      * @return string An exclusion strategy, e.g. "none" or "all"
      */
-    public function getExclusionPolicy()
+    public function getExclusionPolicy(): string
     {
-        if (null === $this->exclusionPolicy) {
-            return 'none';
-        }
-
-        return $this->exclusionPolicy;
+        return $this->exclusionPolicy ?? 'none';
     }
 
     /**
@@ -70,17 +57,15 @@ class TestConfig
      * @param string|null $exclusionPolicy An exclusion strategy, e.g. "none" or "all",
      *                                     or NULL to remove this option
      */
-    public function setExclusionPolicy($exclusionPolicy)
+    public function setExclusionPolicy(?string $exclusionPolicy): void
     {
         $this->exclusionPolicy = $exclusionPolicy;
     }
 
     /**
      * Indicates whether all fields are not configured explicitly should be excluded.
-     *
-     * @return bool
      */
-    public function isExcludeAll()
+    public function isExcludeAll(): bool
     {
         return 'all' === $this->exclusionPolicy;
     }
@@ -88,7 +73,7 @@ class TestConfig
     /**
      * Sets the exclusion strategy to exclude all fields are not configured explicitly.
      */
-    public function setExcludeAll()
+    public function setExcludeAll(): void
     {
         $this->exclusionPolicy = 'all';
     }
@@ -96,41 +81,31 @@ class TestConfig
     /**
      * Sets the exclusion strategy to exclude only fields are marked as excluded.
      */
-    public function setExcludeNone()
+    public function setExcludeNone(): void
     {
         $this->exclusionPolicy = 'none';
     }
 
     /**
      * Indicates whether the description attribute exists.
-     *
-     * @return bool
      */
-    public function hasDescription()
+    public function hasDescription(): bool
     {
         return \array_key_exists('description', $this->items);
     }
 
     /**
      * Gets the value of the description attribute.
-     *
-     * @return string|Label|null
      */
-    public function getDescription()
+    public function getDescription(): string|Label|null
     {
-        if (!\array_key_exists('description', $this->items)) {
-            return null;
-        }
-
-        return $this->items['description'];
+        return $this->items['description'] ?? null;
     }
 
     /**
      * Sets the value of the description attribute.
-     *
-     * @param string|Label|null $description
      */
-    public function setDescription($description)
+    public function setDescription(string|Label|null $description): void
     {
         if ($description) {
             $this->items['description'] = $description;
@@ -141,39 +116,24 @@ class TestConfig
 
     /**
      * Checks whether the configuration attribute exists.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
      * Gets the configuration value.
-     *
-     * @param string $key
-     *
-     * @return mixed
      */
-    public function get($key)
+    public function get(string $key): mixed
     {
-        if (!\array_key_exists($key, $this->items)) {
-            return null;
-        }
-
-        return $this->items[$key];
+        return $this->items[$key] ?? null;
     }
 
     /**
      * Sets the configuration value.
-     *
-     * @param string $key
-     * @param mixed  $value
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
             $this->items[$key] = $value;
@@ -184,10 +144,8 @@ class TestConfig
 
     /**
      * Removes the configuration value.
-     *
-     * @param string $key
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
@@ -197,7 +155,7 @@ class TestConfig
      *
      * @return string[]
      */
-    public function keys()
+    public function keys(): array
     {
         return \array_keys($this->items);
     }

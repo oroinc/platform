@@ -8,13 +8,9 @@ use Oro\Bundle\ApiBundle\Util\QueryModifierInterface;
 use Oro\Bundle\ApiBundle\Util\QueryModifierRegistry;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Psr\Container\ContainerInterface;
 
 class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|QueryModifierInterface */
     private $queryModifier1;
 
@@ -29,7 +25,7 @@ class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
         $this->queryModifier1 = $this->createMock(QueryModifierInterface::class);
         $this->queryModifier2 = $this->createMock(QueryModifierInterface::class);
 
-        $this->container = TestContainerBuilder::create()
+        $container = TestContainerBuilder::create()
             ->add('query_modifier1', $this->queryModifier1)
             ->add('query_modifier2', $this->queryModifier2)
             ->getContainer($this);
@@ -39,7 +35,7 @@ class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
                 ['query_modifier1', 'json_api'],
                 ['query_modifier2', null]
             ],
-            $this->container,
+            $container,
             new RequestExpressionMatcher()
         );
     }

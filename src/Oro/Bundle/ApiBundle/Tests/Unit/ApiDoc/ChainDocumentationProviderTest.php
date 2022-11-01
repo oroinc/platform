@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\ApiDoc\DocumentationProviderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Psr\Container\ContainerInterface;
 
 class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,9 +19,6 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentationProviderInterface */
     private $provider3;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
-
     /** @var ChainDocumentationProvider */
     private $chainProvider;
 
@@ -31,7 +27,8 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider1 = $this->createMock(DocumentationProviderInterface::class);
         $this->provider2 = $this->createMock(DocumentationProviderInterface::class);
         $this->provider3 = $this->createMock(DocumentationProviderInterface::class);
-        $this->container = TestContainerBuilder::create()
+
+        $container = TestContainerBuilder::create()
             ->add('provider1', $this->provider1)
             ->add('provider2', $this->provider2)
             ->add('provider3', $this->provider3)
@@ -39,7 +36,7 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->chainProvider = new ChainDocumentationProvider(
             [['provider1', null], ['provider2', null], ['provider3', 'rest']],
-            $this->container,
+            $container,
             new RequestExpressionMatcher()
         );
     }

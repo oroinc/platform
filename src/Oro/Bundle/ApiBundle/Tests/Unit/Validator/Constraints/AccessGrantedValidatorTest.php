@@ -19,7 +19,7 @@ class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
-    protected function createValidator()
+    protected function createValidator(): AccessGrantedValidator
     {
         return new AccessGrantedValidator($this->authorizationChecker);
     }
