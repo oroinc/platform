@@ -1,7 +1,9 @@
-define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
-], function(_, Backbone, AbstractWidgetView) {
+define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
+    const Backbone = require('backbone');
+    const AbstractWidgetView = require('oroui/js/widget/abstract-widget');
     const $ = Backbone.$;
 
     /**

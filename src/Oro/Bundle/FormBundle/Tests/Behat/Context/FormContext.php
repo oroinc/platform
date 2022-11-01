@@ -81,6 +81,19 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $field->openSelectEntityPopup();
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * @When /^(?:|I )open create entity popup for field "(?P<fieldName>[\w\s]*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )open create entity popup for field "(?P<fieldName>[\w\s]*)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iOpenCreateEntityPopup($fieldName, $formName = "OroForm")
+    {
+        /** @var Select2Entity $field */
+        $field = $this->getFieldInForm($fieldName, $formName);
+        $field->openCreateEntityPopup();
+    }
+
     /**
      * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" field in form "(?P<formName>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )clear "(?P<fieldName>[\w\s]*)" field$/
