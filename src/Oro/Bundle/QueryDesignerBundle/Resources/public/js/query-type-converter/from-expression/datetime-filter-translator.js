@@ -1,38 +1,26 @@
-define(function(require) {
-    'use strict';
+import DateFilterTranslatorFromExpression from './date-filter-translator';
 
-    var _ = require('underscore');
-    var DateFilterTranslator =
-        require('oroquerydesigner/js/query-type-converter/from-expression/date-filter-translator');
-    var datePartMap = DateFilterTranslator.prototype.partMap;
+const DATE_PART_MAP = DateFilterTranslatorFromExpression.PART_MAP;
+
+/**
+ * @inheritDoc
+ */
+class DatetimeFilterTranslatorFromExpression extends DateFilterTranslatorFromExpression {
+    /**
+     * @inheritDoc
+     */
+    static TYPE = 'datetime';
 
     /**
      * @inheritDoc
      */
-    var DatetimeFilterTranslator = function DatetimeFilterTranslatorFromExpression() {
-        DatetimeFilterTranslator.__super__.constructor.apply(this, arguments);
+    static PART_MAP = {
+        ...DATE_PART_MAP,
+        value: {
+            ...DATE_PART_MAP.value,
+            valuePattern: /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/
+        }
     };
+}
 
-    DatetimeFilterTranslator.prototype = Object.create(DateFilterTranslator.prototype);
-    DatetimeFilterTranslator.__super__ = DateFilterTranslator.prototype;
-
-    Object.assign(DatetimeFilterTranslator.prototype, {
-        constructor: DatetimeFilterTranslator,
-
-        /**
-         * @inheritDoc
-         */
-        filterType: 'datetime',
-
-        /**
-         * @inheritDoc
-         */
-        partMap: _.defaults({
-            value: _.defaults({
-                valuePattern: /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/
-            }, datePartMap.value)
-        }, datePartMap)
-    });
-
-    return DatetimeFilterTranslator;
-});
+export default DatetimeFilterTranslatorFromExpression;

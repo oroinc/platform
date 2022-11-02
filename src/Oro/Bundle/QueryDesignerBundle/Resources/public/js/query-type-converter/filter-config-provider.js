@@ -1,27 +1,25 @@
 define(function(require) {
     'use strict';
 
-    var FilterConfigProvider;
-    var tools = require('oroui/js/tools');
-    var _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
+    const _ = require('underscore');
 
-    /**
-     * @param {Object} options
-     * @constructor
-     * @throws TypeError if filtersOptions is missing
-     */
-    FilterConfigProvider = function FilterConfigProvider(options) {
-        if (!options) {
-            throw new TypeError('`filtersOptions` is required');
+    class FilterConfigProvider {
+        /**
+         * @param {Object} options
+         * @constructor
+         * @throws TypeError if filtersOptions is missing
+         */
+        constructor(options) {
+            if (!options) {
+                throw new TypeError('`filtersOptions` is required');
+            }
+
+            this.filters = options.filters;
+            this.hierarchy = options.hierarchy;
+            this.filterModules = {};
         }
-
-        this.filters = options.filters;
-        this.hierarchy = options.hierarchy;
-        this.filterModules = {};
-    };
-
-    FilterConfigProvider.prototype = {
-        constructor: FilterConfigProvider,
 
         /**
          * Collect filters modules
@@ -29,26 +27,27 @@ define(function(require) {
          * @returns {Promise}
          * @protected
          */
-        loadInitModules: function() {
-            var modules = [];
+        loadInitModules() {
+            const modules = [];
 
-            _.each(this.filters, function(filterConfig) {
+            this.filters.forEach(filterConfig => {
                 if (filterConfig.init_module) {
                     modules.push(filterConfig.init_module);
                 }
-            }, this);
+            });
 
-            return tools.loadModules(_.object(modules, modules), function(modules) {
-                this.filterModules = modules;
-            }, this);
-        },
+            return loadModules(Object.fromEntries(modules.map(name => [name, name])))
+                .then(modules => {
+                    this.filterModules = modules;
+                });
+        }
 
         /**
          * @param {Object} fieldSignature
          * @returns {Object}
          * @throws TypeError if fieldSignature is missing
          */
-        getApplicableFilterConfig: function(fieldSignature) {
+        getApplicableFilterConfig(fieldSignature) {
             if (!fieldSignature) {
                 throw new TypeError('`fieldSignature` is required');
             }
@@ -58,25 +57,25 @@ define(function(require) {
                 return fieldSignature.filter;
             }
 
-            var matchApplicable = function(applicable, fieldSignature) {
-                var hierarchy = this.hierarchy[fieldSignature.entity];
-                return _.find(applicable, function(item) {
-                    return _.every(item, function(value, key) {
+            const matchApplicable = (applicable, fieldSignature) => {
+                const hierarchy = this.hierarchy[fieldSignature.entity];
+                return _.find(applicable, item => {
+                    return _.every(item, (value, key) => {
                         if (key === 'entity' && hierarchy.length) {
                             return _.indexOf(hierarchy, fieldSignature[key]);
                         }
                         return fieldSignature[key] === value;
                     });
                 });
-            }.bind(this);
+            };
 
-            var matchedBy = {};
-            var filterId = null;
+            let matchedBy = {};
+            let filterId = null;
 
-            _.each(this.filters, function(filterConfig, id) {
+            this.filters.forEach((filterConfig, id) => {
                 if (!_.isEmpty(filterConfig.applicable)) {
                     // check if a filter conforms the given criteria
-                    var matched = matchApplicable(filterConfig.applicable, fieldSignature);
+                    const matched = matchApplicable(filterConfig.applicable, fieldSignature);
 
                     if (matched && (
                         // new rule is more exact
@@ -98,32 +97,32 @@ define(function(require) {
                 return null;
             }
 
-            var filterConfig = tools.deepClone(this.filters[filterId]);
-            var optionsResolver = this.filterModules[filterConfig.init_module];
+            const filterConfig = tools.deepClone(this.filters[filterId]);
+            const optionsResolver = this.filterModules[filterConfig.init_module];
 
             if (_.isFunction(optionsResolver)) {
                 optionsResolver(filterConfig, fieldSignature);
             }
 
             return filterConfig;
-        },
+        }
 
         /**
-         * @param {String} filterType
+         * @param {String} type
          * @returns {array}
          */
-        getFilterConfigsByType: function(filterType) {
-            return _.where(this.filters, {type: filterType});
-        },
+        getFilterConfigsByType(type) {
+            return _.where(this.filters, {type});
+        }
 
         /**
          * @param {string} filterName
          * @returns {Object}
          */
-        getFilterConfigByName: function(filterName) {
+        getFilterConfigByName(filterName) {
             return _.findWhere(this.filters, {name: filterName});
         }
-    };
+    }
 
     /**
      * @export oroquerydesigner/js/query-type-converter/filter-config-provider

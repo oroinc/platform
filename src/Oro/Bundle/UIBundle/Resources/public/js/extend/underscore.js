@@ -104,7 +104,7 @@ define(['underscore', 'asap'], function(_, asap) {
         /**
          * Registers macros with Name Space, e.g.
          *     _.macros('oroui', {
-         *         renderPhone: require('tpl!oroui/templates/macros/phone.html')
+         *         renderPhone: require('tpl-loader!oroui/templates/macros/phone.html')
          *     });
          *
          * Imports macros object from Name Space, accessible inside templates

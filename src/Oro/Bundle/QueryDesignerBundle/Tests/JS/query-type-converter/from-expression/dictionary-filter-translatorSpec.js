@@ -1,125 +1,115 @@
-define(function(require) {
-    'use strict';
+import DictionaryFilterTranslatorFromExpression
+    from 'oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator';
+import FieldIdTranslatorFromExpression
+    from 'oroquerydesigner/js/query-type-converter/from-expression/field-id-translator';
+import {BinaryNode, ConstantNode, NameNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import 'lib/jasmine-oro';
 
-    var _ = require('underscore');
-    var DictionaryFilterTranslator =
-        require('oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator');
-    var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/from-expression/field-id-translator');
-    var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
-    var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var NameNode = ExpressionLanguageLibrary.NameNode;
-    var createArrayNode = ExpressionLanguageLibrary.tools.createArrayNode;
-    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
+const {createArrayNode, createGetAttrNode} = tools;
 
-    describe('oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator', function() {
-        var translator;
-        var entityStructureDataProviderMock;
-        var filterConfigProviderMock;
+describe('oroquerydesigner/js/query-type-converter/from-expression/dictionary-filter-translator', () => {
+    let translator;
+    let entityStructureDataProviderMock;
+    let filterConfigProviderMock;
 
-        beforeEach(function() {
-            entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
-                jasmine.createSpy('getPathByRelativePropertyPath').and.returnValue('bar'),
-                jasmine.createSpy('getFieldSignatureSafely'),
-                jasmine.combineSpyObj('rootEntity', [
-                    jasmine.createSpy('get').and.returnValue('foo')
-                ])
-            ]);
-            filterConfigProviderMock = jasmine.createSpyObj('filterConfigProvider', ['getApplicableFilterConfig']);
+    beforeEach(() => {
+        entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
+            jasmine.createSpy('getPathByRelativePropertyPath').and.returnValue('bar'),
+            jasmine.createSpy('getFieldSignatureSafely'),
+            jasmine.combineSpyObj('rootEntity', [
+                jasmine.createSpy('get').and.returnValue('foo')
+            ])
+        ]);
+        filterConfigProviderMock = jasmine.createSpyObj('filterConfigProvider', ['getApplicableFilterConfig']);
 
-            translator = new DictionaryFilterTranslator(
-                new FieldIdTranslator(entityStructureDataProviderMock),
-                filterConfigProviderMock
-            );
+        translator = new DictionaryFilterTranslatorFromExpression(
+            new FieldIdTranslatorFromExpression(entityStructureDataProviderMock),
+            filterConfigProviderMock
+        );
+    });
+
+    describe('rejects node structure because', () => {
+        const cases = {
+            'improper AST':
+                [new ConstantNode('test')],
+            'unsupported operation':
+                [new BinaryNode('>=', createGetAttrNode('foo.bar'), createArrayNode([1, 2]))],
+            'improper left operand AST':
+                [new BinaryNode('in', new ConstantNode('test'), createArrayNode([1, 2]))],
+            'improper right operand AST':
+                [new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('test'))],
+            'improper AST values in right operand':
+                [new BinaryNode('in', createGetAttrNode('foo.bar'), createArrayNode([new NameNode('foo'), 2]))]
+        };
+
+        jasmine.itEachCase(cases, ast => {
+            expect(translator.tryToTranslate(ast)).toBe(null);
+            expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('valid node structure', () => {
+        let node;
+
+        beforeEach(() => {
+            node = new BinaryNode('in', createGetAttrNode('foo.bar'), createArrayNode(['1', '2']));
         });
 
-        describe('rejects node structure because', function() {
-            var cases = {
-                'improper AST':
-                    new ConstantNode('test'),
-                'unsupported operation':
-                    new BinaryNode('>=', createGetAttrNode('foo.bar'), createArrayNode([1, 2])),
-                'improper left operand AST':
-                    new BinaryNode('in', new ConstantNode('test'), createArrayNode([1, 2])),
-                'improper right operand AST':
-                    new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('test')),
-                'improper AST values in right operand':
-                    new BinaryNode('in', createGetAttrNode('foo.bar'), createArrayNode([new NameNode('foo'), 2]))
-            };
-
-            _.each(cases, function(ast, caseName) {
-                it(caseName, function() {
-                    expect(translator.tryToTranslate(ast)).toBe(null);
-                    expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
-                });
-            });
-        });
-
-        describe('valid node structure', function() {
-            var node;
-
-            beforeEach(function() {
-                node = new BinaryNode('in', createGetAttrNode('foo.bar'), createArrayNode(['1', '2']));
-            });
-
-            var cases = {
-                'improper filter type': {
-                    filterConfig: {type: 'number'},
-                    expected: null
+        const cases = {
+            'improper filter type': [
+                {type: 'number'},
+                null
+            ],
+            'unavailable operation in filter config': [
+                {
+                    type: 'dictionary',
+                    name: 'enum',
+                    choices: [{value: '2'}, {value: '3'}]
                 },
-                'unavailable operation in filter config': {
-                    filterConfig: {
-                        type: 'dictionary',
-                        name: 'enum',
-                        choices: [{value: '2'}, {value: '3'}]
-                    },
-                    expected: null
+                null
+            ],
+            'successful translation': [
+                {
+                    type: 'dictionary',
+                    name: 'enum',
+                    choices: [{value: '1'}, {value: '2'}]
                 },
-                'successful translation': {
-                    filterConfig: {
-                        type: 'dictionary',
-                        name: 'enum',
-                        choices: [{value: '1'}, {value: '2'}]
-                    },
-                    expected: {
-                        columnName: 'bar',
-                        criterion: {
-                            filter: 'enum',
-                            data: {
-                                type: '1',
-                                value: ['1', '2']
-                            }
-                        }
-                    }
-                },
-                'successful translation with extra params': {
-                    filterConfig: {
-                        type: 'dictionary',
-                        name: 'tag',
-                        choices: [{value: '1'}, {value: '2'}],
-                        filterParams: {'class': 'Oro\\TagClass', 'entityClass': 'Oro\\BarClass'}
-                    },
-                    expected: {
-                        columnName: 'bar',
-                        criterion: {
-                            filter: 'tag',
-                            data: {
-                                type: '1',
-                                value: ['1', '2'],
-                                params: {'class': 'Oro\\TagClass', 'entityClass': 'Oro\\BarClass'}
-                            }
+                {
+                    columnName: 'bar',
+                    criterion: {
+                        filter: 'enum',
+                        data: {
+                            type: '1',
+                            value: ['1', '2']
                         }
                     }
                 }
-            };
+            ],
+            'successful translation with extra params': [
+                {
+                    type: 'dictionary',
+                    name: 'tag',
+                    choices: [{value: '1'}, {value: '2'}],
+                    filterParams: {'class': 'Oro\\TagClass', 'entityClass': 'Oro\\BarClass'}
+                },
+                {
+                    columnName: 'bar',
+                    criterion: {
+                        filter: 'tag',
+                        data: {
+                            type: '1',
+                            value: ['1', '2'],
+                            params: {'class': 'Oro\\TagClass', 'entityClass': 'Oro\\BarClass'}
+                        }
+                    }
+                }
+            ]
+        };
 
-            _.each(cases, function(caseData, caseName) {
-                it(caseName, function() {
-                    filterConfigProviderMock.getApplicableFilterConfig.and.returnValue(caseData.filterConfig);
-                    expect(translator.tryToTranslate(node)).toEqual(caseData.expected);
-                    expect(entityStructureDataProviderMock.getFieldSignatureSafely).toHaveBeenCalledWith('bar');
-                });
-            });
+        jasmine.itEachCase(cases, (filterConfig, condition) => {
+            filterConfigProviderMock.getApplicableFilterConfig.and.returnValue(filterConfig);
+            expect(translator.tryToTranslate(node)).toEqual(condition);
+            expect(entityStructureDataProviderMock.getFieldSignatureSafely).toHaveBeenCalledWith('bar');
         });
     });
 });

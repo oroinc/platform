@@ -1,120 +1,102 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import AbstractFilterTranslatorFromExpression from './abstract-filter-translator';
+import BooleanFilterTranslatorToExpression from '../to-expression/boolean-filter-translator';
+import {BinaryNode, ConstantNode, GetAttrNode, UnaryNode} from 'oroexpressionlanguage/js/expression-language-library';
 
-    var _ = require('underscore');
-    var AbstractFilterTranslator =
-        require('oroquerydesigner/js/query-type-converter/from-expression/abstract-filter-translator');
-    var BooleanFilterTranslatorToExpression =
-        require('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator');
-    var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
-    var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var GetAttrNode = ExpressionLanguageLibrary.GetAttrNode;
-    var UnaryNode = ExpressionLanguageLibrary.UnaryNode;
+/**
+ * @inheritDoc
+ */
+class BooleanFilterTranslatorFromExpression extends AbstractFilterTranslatorFromExpression {
+    /**
+     * @inheritDoc
+     */
+    static TYPE = 'boolean';
+
+    /**
+     * Resolved binary operations
+     * @type {Array}
+     */
+    static BINARY_OPERATORS = ['=', '=='];
+
+    /**
+     * Resolved unary operations
+     * @type {Array}
+     */
+    static UNARY_OPERATORS = ['!', 'not'];
 
     /**
      * @inheritDoc
      */
-    var BooleanFilterTranslator = function BooleanFilterTranslatorFromExpression() {
-        BooleanFilterTranslator.__super__.constructor.apply(this, arguments);
-    };
+    static VALUE_MAP = BooleanFilterTranslatorToExpression.VALUE_MAP;
 
-    BooleanFilterTranslator.prototype = Object.create(AbstractFilterTranslator.prototype);
-    BooleanFilterTranslator.__super__ = AbstractFilterTranslator.prototype;
+    /**
+     * @inheritDoc
+     */
+    resolveFieldAST(node) {
+        if (node instanceof GetAttrNode) {
+            return node;
+        } else {
+            return node.nodes[0];
+        }
+    }
 
-    Object.assign(BooleanFilterTranslator.prototype, {
-        constructor: BooleanFilterTranslator,
+    /**
+     * @inheritDoc
+     */
+    checkOperation(filterConfig, operatorParams) {
+        return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.value) !== -1;
+    }
 
-        /**
-         * @inheritDoc
-         */
-        filterType: 'boolean',
-
-        /**
-         * Resolved binary operations
-         * @type {Array}
-         */
-        binaryOperators: ['=', '=='],
-
-        /**
-         * Resolved unary operations
-         * @type {Array}
-         */
-        unaryOperators: ['!', 'not'],
-
-        /**
-         * @inheritDoc
-         */
-        valueMap: BooleanFilterTranslatorToExpression.prototype.valueMap,
-
-        /**
-         * @inheritDoc
-         */
-        resolveFieldAST: function(node) {
-            if (node instanceof GetAttrNode) {
-                return node;
-            } else {
-                return node.nodes[0];
-            }
-        },
-
-        /**
-         * @inheritDoc
-         */
-        checkOperation: function(filterConfig, operatorParams) {
-            return _.pluck(filterConfig.choices, 'value').indexOf(operatorParams.value) !== -1;
-        },
-
-        /**
-         * @inheritDoc
-         */
-        resolveOperatorParams: function(node) {
-            var params = null;
-            if (node instanceof BinaryNode &&
-                this.binaryOperators.indexOf(node.attrs.operator) !== -1 &&
-                node.nodes[0] instanceof GetAttrNode &&
-                node.nodes[1] instanceof ConstantNode &&
-                _.isBoolean(node.nodes[1].attrs.value)
-            ) {
-                params = {
-                    value: node.nodes[1].attrs.value
-                };
-            } else if (node instanceof UnaryNode &&
-                this.unaryOperators.indexOf(node.attrs.operator) !== -1
-            ) {
-                params = {
-                    value: false
-                };
-            } else if (node instanceof GetAttrNode) {
-                params = {
-                    value: true
-                };
-            }
-
-            if (params) {
-                params.value = this.valueMap[String(params.value)];
-            }
-
-            return params;
-        },
-
-        /**
-         * @inheritDoc
-         */
-        translate: function(node, filterConfig, operatorParams) {
-            var fieldId = this.fieldIdTranslator.translate(this.resolveFieldAST(node));
-
-            return {
-                columnName: fieldId,
-                criterion: {
-                    filter: filterConfig.name,
-                    data: {
-                        value: operatorParams.value
-                    }
-                }
+    /**
+     * @inheritDoc
+     */
+    resolveOperatorParams(node) {
+        let params = null;
+        if (node instanceof BinaryNode &&
+            this.constructor.BINARY_OPERATORS.indexOf(node.attrs.operator) !== -1 &&
+            node.nodes[0] instanceof GetAttrNode &&
+            node.nodes[1] instanceof ConstantNode &&
+            typeof node.nodes[1].attrs.value === 'boolean'
+        ) {
+            params = {
+                value: node.nodes[1].attrs.value
+            };
+        } else if (
+            node instanceof UnaryNode &&
+            this.constructor.UNARY_OPERATORS.indexOf(node.attrs.operator) !== -1
+        ) {
+            params = {
+                value: false
+            };
+        } else if (node instanceof GetAttrNode) {
+            params = {
+                value: true
             };
         }
-    });
 
-    return BooleanFilterTranslator;
-});
+        if (params) {
+            params.value = this.constructor.VALUE_MAP[String(params.value)];
+        }
+
+        return params;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    translate(node, filterConfig, operatorParams) {
+        const fieldId = this.fieldIdTranslator.translate(this.resolveFieldAST(node));
+
+        return {
+            columnName: fieldId,
+            criterion: {
+                filter: filterConfig.name,
+                data: {
+                    value: operatorParams.value
+                }
+            }
+        };
+    }
+}
+
+export default BooleanFilterTranslatorFromExpression;

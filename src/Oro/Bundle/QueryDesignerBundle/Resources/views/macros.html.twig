@@ -305,7 +305,7 @@
     @param array    params.options - options for js-component
 #}
 {% macro query_type_converter(params) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     <div {{ UI.renderPageComponentAttributes({
         module: 'oroquerydesigner/js/app/components/query-type-converter-component',
         name: 'query-type-converter'

@@ -1,62 +1,58 @@
-define(function(require) {
-    'use strict';
+import BooleanFilterTranslatorToExpression
+    from 'oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator';
+import {BinaryNode, ConstantNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import 'lib/jasmine-oro';
 
-    var BooleanFilterTranslator =
-        require('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator');
-    var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
-    var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
+const {createGetAttrNode} = tools;
 
-    describe('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator', function() {
-        var translator;
-        var filterConfig = {
-            type: 'boolean',
-            name: 'boolean',
-            choices: [
-                {value: '1'},
-                {value: '2'}
+describe('oroquerydesigner/js/query-type-converter/to-expression/boolean-filter-translator', () => {
+    let translator;
+    const filterConfig = {
+        type: 'boolean',
+        name: 'boolean',
+        choices: [
+            {value: '1'},
+            {value: '2'}
+        ]
+    };
+
+    beforeEach(() => {
+        translator = new BooleanFilterTranslatorToExpression(filterConfig);
+    });
+
+    describe('can not translate filter value', () => {
+        const cases = {
+            'when incorrect value type': [
+                {value: ['1', '2']}
+            ],
+            'when unknown value': [
+                {value: '3'}
             ]
         };
 
-        beforeEach(function() {
-            translator = new BooleanFilterTranslator(filterConfig);
+        jasmine.itEachCase(cases, filterValue => {
+            expect(translator.test(filterValue)).toBe(false);
         });
+    });
 
-        describe('can not translate filter value', function() {
-            var cases = {
-                'when incorrect value type': [
-                    {value: ['1', '2']}
-                ],
-                'when unknown value': [
-                    {value: '3'}
-                ]
-            };
+    describe('translate filter value', () => {
+        const createLeftOperand = createGetAttrNode.bind(null, 'foo.bar');
+        const cases = {
+            'when field value is `yes`': [
+                {value: '1'},
+                new BinaryNode('=', createLeftOperand(), new ConstantNode(true))
+            ],
+            'when field value is `no`': [
+                {value: '2'},
+                new BinaryNode('=', createLeftOperand(), new ConstantNode(false))
+            ]
+        };
 
-            jasmine.itEachCase(cases, function(filterValue) {
-                expect(translator.test(filterValue)).toBe(false);
-            });
-        });
+        jasmine.itEachCase(cases, (filterValue, expectedAST) => {
+            const leftOperand = createLeftOperand();
 
-        describe('translate filter value', function() {
-            var createLeftOperand = createGetAttrNode.bind(null, 'foo.bar');
-            var cases = {
-                'when field value is `yes`': [
-                    {value: '1'},
-                    new BinaryNode('=', createLeftOperand(), new ConstantNode(true))
-                ],
-                'when field value is `no`': [
-                    {value: '2'},
-                    new BinaryNode('=', createLeftOperand(), new ConstantNode(false))
-                ]
-            };
-
-            jasmine.itEachCase(cases, function(filterValue, expectedAST) {
-                var leftOperand = createLeftOperand();
-
-                expect(translator.test(filterValue)).toBe(true);
-                expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
-            });
+            expect(translator.test(filterValue)).toBe(true);
+            expect(translator.translate(leftOperand, filterValue)).toEqual(expectedAST);
         });
     });
 });

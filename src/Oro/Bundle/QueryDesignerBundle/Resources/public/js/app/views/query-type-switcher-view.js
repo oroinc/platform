@@ -1,34 +1,28 @@
-define(function(require) {
-    'use strict';
+import BaseView from 'oroui/js/app/views/base/view';
+import template from 'tpl-loader!oroquerydesigner/templates/query-type-switcher.html';
 
-    var QueryTypeSwitcherView;
-    var BaseView = require('oroui/js/app/views/base/view');
-    var template = require('tpl!oroquerydesigner/templates/query-type-switcher.html');
+const QueryTypeSwitcherView = BaseView.extend({
 
-    QueryTypeSwitcherView = BaseView.extend({
+    template: template,
 
-        template: template,
+    events: {
+        'click .btn': 'onClick'
+    },
 
-        events: {
-            'click .btn': 'onClick'
-        },
+    listen: {
+        'change model': 'render'
+    },
 
-        listen: {
-            'change model': 'render'
-        },
+    /**
+     * @inheritDoc
+     */
+    constructor: function QueryTypeSwitcherView(...args) {
+        QueryTypeSwitcherView.__super__.constructor.call(this, ...args);
+    },
 
-        /**
-         * @inheritDoc
-         */
-        constructor: function QueryTypeSwitcherView() {
-            QueryTypeSwitcherView.__super__.constructor.apply(this, arguments);
-        },
-
-        onClick: function() {
-            this.trigger('switch');
-        }
-    });
-
-    return QueryTypeSwitcherView;
+    onClick() {
+        this.trigger('switch');
+    }
 });
 
+export default QueryTypeSwitcherView;

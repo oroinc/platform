@@ -1,598 +1,590 @@
-define(function(require) {
-    'use strict';
+import DateFilterTranslatorFromExpression
+    from 'oroquerydesigner/js/query-type-converter/from-expression/date-filter-translator';
+import FieldIdTranslatorFromExpression
+    from 'oroquerydesigner/js/query-type-converter/from-expression/field-id-translator';
+import {ArrayNode, BinaryNode, ConstantNode, tools} from 'oroexpressionlanguage/js/expression-language-library';
+import 'lib/jasmine-oro';
 
-    var _ = require('underscore');
-    var DateFilterTranslator =
-        require('oroquerydesigner/js/query-type-converter/from-expression/date-filter-translator');
-    var FieldIdTranslator = require('oroquerydesigner/js/query-type-converter/from-expression/field-id-translator');
-    var ExpressionLanguageLibrary = require('oroexpressionlanguage/js/expression-language-library');
-    var ArrayNode = ExpressionLanguageLibrary.ArrayNode;
-    var BinaryNode = ExpressionLanguageLibrary.BinaryNode;
-    var ConstantNode = ExpressionLanguageLibrary.ConstantNode;
-    var createFunctionNode = ExpressionLanguageLibrary.tools.createFunctionNode;
-    var createGetAttrNode = ExpressionLanguageLibrary.tools.createGetAttrNode;
+const {createFunctionNode, createGetAttrNode} = tools;
 
-    describe('oroquerydesigner/js/query-type-converter/from-expression/date-filter-translator', function() {
-        var translator;
-        var entityStructureDataProviderMock;
-        var filterConfigProviderMock;
+describe('oroquerydesigner/js/query-type-converter/from-expression/date-filter-translator', () => {
+    let translator;
+    let entityStructureDataProviderMock;
+    let filterConfigProviderMock;
 
-        beforeEach(function() {
-            entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
-                jasmine.createSpy('getPathByRelativePropertyPath').and.returnValue('bar'),
-                jasmine.createSpy('getFieldSignatureSafely'),
-                jasmine.combineSpyObj('rootEntity', [
-                    jasmine.createSpy('get').and.returnValue('foo')
-                ])
-            ]);
+    beforeEach(() => {
+        entityStructureDataProviderMock = jasmine.combineSpyObj('entityStructureDataProvider', [
+            jasmine.createSpy('getPathByRelativePropertyPath').and.returnValue('bar'),
+            jasmine.createSpy('getFieldSignatureSafely'),
+            jasmine.combineSpyObj('rootEntity', [
+                jasmine.createSpy('get').and.returnValue('foo')
+            ])
+        ]);
 
-            filterConfigProviderMock = jasmine.createSpyObj('filterConfigProvider', ['getApplicableFilterConfig']);
+        filterConfigProviderMock = jasmine.createSpyObj('filterConfigProvider', ['getApplicableFilterConfig']);
 
-            translator = new DateFilterTranslator(
-                new FieldIdTranslator(entityStructureDataProviderMock),
-                filterConfigProviderMock
-            );
+        translator = new DateFilterTranslatorFromExpression(
+            new FieldIdTranslatorFromExpression(entityStructureDataProviderMock),
+            filterConfigProviderMock
+        );
+    });
+
+    describe('rejects node structure because', () => {
+        const cases = {
+            'improper AST': [
+                new ConstantNode('test')
+            ],
+            'unsupported operation': [
+                new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03'))
+            ],
+            'improper left operand AST': [
+                new BinaryNode('=', new ConstantNode('test'), new ConstantNode('2018-04-03'))
+            ],
+            'unsupported function call in left operand (unsupported date part)': [
+                new BinaryNode('=',
+                    createFunctionNode('dateISO', [createGetAttrNode('foo.bar')]),
+                    new ConstantNode('2018-04-03')
+                )
+            ],
+            'improper right operand AST': [
+                new BinaryNode('=', createGetAttrNode('foo.bar'), new ArrayNode())
+            ],
+            'improper value of right operand': [
+                new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('Apr 3, 2018'))
+            ],
+            'unsupported function call in right operand (unsupported variable)': [
+                new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('rightNow'))
+            ],
+            'different fields in the between operation': [
+                new BinaryNode('and',
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
+                    new BinaryNode('<=', createGetAttrNode('foo.qux'), new ConstantNode('2018-04-07'))
+                )
+            ],
+            'invalid pair operators in the not between operation': [
+                new BinaryNode('and',
+                    new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-07'))
+                )
+            ]
+        };
+
+        jasmine.itEachCase(cases, ast => {
+            expect(translator.tryToTranslate(ast)).toBe(null);
+            expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
         });
+    });
 
-        describe('rejects node structure because', function() {
-            var cases = {
-                'improper AST': [
-                    new ConstantNode('test')
+    describe('valid node structure', () => {
+        beforeEach(() => {
+            filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                type: 'date',
+                name: 'date',
+                choices: [
+                    {value: '1'},
+                    {value: '2'},
+                    {value: '3'},
+                    {value: '4'},
+                    {value: '5'},
+                    {value: '6'}
                 ],
-                'unsupported operation': [
-                    new BinaryNode('in', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03'))
-                ],
-                'improper left operand AST': [
-                    new BinaryNode('=', new ConstantNode('test'), new ConstantNode('2018-04-03'))
-                ],
-                'unsupported function call in left operand (unsupported date part)': [
-                    new BinaryNode('=',
-                        createFunctionNode('dateISO', [createGetAttrNode('foo.bar')]),
-                        new ConstantNode('2018-04-03')
-                    )
-                ],
-                'improper right operand AST': [
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ArrayNode())
-                ],
-                'improper value of right operand': [
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('Apr 3, 2018'))
-                ],
-                'unsupported function call in right operand (unsupported variable)': [
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('rightNow'))
-                ],
-                'different fields in the between operation': [
-                    new BinaryNode('and',
-                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
-                        new BinaryNode('<=', createGetAttrNode('foo.qux'), new ConstantNode('2018-04-07'))
-                    )
-                ],
-                'invalid pair operators in the not between operation': [
-                    new BinaryNode('and',
-                        new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-03')),
-                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-04-07'))
-                    )
-                ]
-            };
-
-            jasmine.itEachCase(cases, function(ast) {
-                expect(translator.tryToTranslate(ast)).toBe(null);
-                expect(entityStructureDataProviderMock.getFieldSignatureSafely).not.toHaveBeenCalled();
-            });
-        });
-
-        describe('valid node structure', function() {
-            beforeEach(function() {
-                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
-                    type: 'date',
-                    name: 'date',
-                    choices: [
-                        {value: '1'},
-                        {value: '2'},
-                        {value: '3'},
-                        {value: '4'},
-                        {value: '5'},
-                        {value: '6'}
-                    ],
-                    dateParts: {
-                        value: 'value',
-                        dayofweek: 'day of week',
-                        week: 'week',
-                        day: 'day of month',
-                        month: 'month',
-                        quarter: 'quarter',
-                        dayofyear: 'day of year',
-                        year: 'year'
-                    },
-                    externalWidgetOptions: {
-                        dateVars: {
-                            value: {
-                                1: 'now',
-                                2: 'today',
-                                3: 'start of the week',
-                                4: 'start of the month',
-                                5: 'start of the quarter',
-                                6: 'start of the year',
-                                17: 'current month without year',
-                                29: 'this day without year'
-                            },
-                            dayofweek: {
-                                10: 'current day'
-                            },
-                            week: {
-                                11: 'current week'
-                            },
-                            day: {
-                                10: 'current day'
-                            },
-                            month: {
-                                12: 'current month',
-                                16: 'first month of quarter'
-                            },
-                            quarter: {
-                                13: 'current quarter'
-                            },
-                            dayofyear: {
-                                10: 'current day',
-                                15: 'first day of quarter'
-                            },
-                            year: {
-                                14: 'current year'
-                            }
+                dateParts: {
+                    value: 'value',
+                    dayofweek: 'day of week',
+                    week: 'week',
+                    day: 'day of month',
+                    month: 'month',
+                    quarter: 'quarter',
+                    dayofyear: 'day of year',
+                    year: 'year'
+                },
+                externalWidgetOptions: {
+                    dateVars: {
+                        value: {
+                            1: 'now',
+                            2: 'today',
+                            3: 'start of the week',
+                            4: 'start of the month',
+                            5: 'start of the quarter',
+                            6: 'start of the year',
+                            17: 'current month without year',
+                            29: 'this day without year'
+                        },
+                        dayofweek: {
+                            10: 'current day'
+                        },
+                        week: {
+                            11: 'current week'
+                        },
+                        day: {
+                            10: 'current day'
+                        },
+                        month: {
+                            12: 'current month',
+                            16: 'first month of quarter'
+                        },
+                        quarter: {
+                            13: 'current quarter'
+                        },
+                        dayofyear: {
+                            10: 'current day',
+                            15: 'first day of quarter'
+                        },
+                        year: {
+                            14: 'current year'
                         }
                     }
-                });
+                }
             });
+        });
 
-            var cases = {
-                'value part between start and end dates': [
-                    // expected condition filter data
-                    {
-                        type: '1',
-                        value: {start: '2018-03-01', end: '2018-03-31'},
-                        part: 'value'
-                    },
-                    // provided AST
-                    new BinaryNode(
-                        'and',
-                        new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01')),
-                        new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
-                    )
-                ],
-                'value part not between start and end dates': [
-                    {
-                        type: '2',
-                        value: {start: '2018-03-01', end: '2018-03-31'},
-                        part: 'value'
-                    },
-                    new BinaryNode(
-                        'and',
-                        new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01')),
-                        new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
-                    )
-                ],
-                'value part later than the date': [
-                    {
-                        type: '3',
-                        value: {start: '2018-03-01', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
-                ],
-                'value part earlier than the date': [
-                    {
-                        type: '4',
-                        value: {start: '', end: '2018-03-31'},
-                        part: 'value'
-                    },
+        const cases = {
+            'value part between start and end dates': [
+                // expected condition filter data
+                {
+                    type: '1',
+                    value: {start: '2018-03-01', end: '2018-03-31'},
+                    part: 'value'
+                },
+                // provided AST
+                new BinaryNode(
+                    'and',
+                    new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01')),
                     new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
-                ],
-                'value part equals to the date': [
-                    {
-                        type: '5',
-                        value: {start: '2018-03-01', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
-                ],
-                'value part not equals to the date': [
-                    {
-                        type: '6',
-                        value: {start: '', end: '2018-03-31'},
-                        part: 'value'
-                    },
-                    new BinaryNode('!=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
-                ],
-                'value part equals to now': [
-                    {
-                        type: '5',
-                        value: {start: '{{1}}', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('now'))
-                ],
-                'value part equals to today': [
-                    {
-                        type: '5',
-                        value: {start: '{{2}}', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('today'))
-                ],
-                'value part equals to start of the week': [
-                    {
-                        type: '5',
-                        value: {start: '{{3}}', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheWeek'))
-                ],
-                'value part equals to start of the month': [
-                    {
-                        type: '5',
-                        value: {start: '{{4}}', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheMonth'))
-                ],
-                'value part equals to start of the quarter': [
-                    {
-                        type: '5',
-                        value: {start: '{{5}}', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheQuarter'))
-                ],
-                'value part equals to start of the year': [
-                    {
-                        type: '5',
-                        value: {start: '{{6}}', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheYear'))
-                ],
-                'value part equals to current month without year': [
-                    {
-                        type: '5',
-                        value: {start: '{{17}}', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('currentMonthWithoutYear'))
-                ],
-                'value part equals to this day without year': [
-                    {
-                        type: '5',
-                        value: {start: '{{29}}', end: ''},
-                        part: 'value'
-                    },
-                    new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('thisDayWithoutYear'))
-                ],
-                'day of week part equals to value': [
-                    {
-                        type: '5',
-                        value: {start: '7', end: ''},
-                        part: 'dayofweek'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('dayOfWeek', [createGetAttrNode('foo.bar')]),
-                        new ConstantNode('7')
-                    )
-                ],
-                'day of week part equals to current day of week': [
-                    {
-                        type: '5',
-                        value: {start: '{{10}}', end: ''},
-                        part: 'dayofweek'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('dayOfWeek', [createGetAttrNode('foo.bar')]),
-                        createFunctionNode('currentDayOfWeek')
-                    )
-                ],
-                'week part equals to value': [
-                    {
-                        type: '5',
-                        value: {start: '5', end: ''},
-                        part: 'week'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('week', [createGetAttrNode('foo.bar')]),
-                        new ConstantNode('5')
-                    )
-                ],
-                'week part equals to current week': [
-                    {
-                        type: '5',
-                        value: {start: '{{11}}', end: ''},
-                        part: 'week'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('week', [createGetAttrNode('foo.bar')]),
-                        createFunctionNode('currentWeek')
-                    )
-                ],
-                'day of month part equals to value': [
-                    {
-                        type: '5',
-                        value: {start: '1', end: ''},
-                        part: 'day'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('dayOfMonth', [createGetAttrNode('foo.bar')]),
-                        new ConstantNode('1')
-                    )
-                ],
-                'day of month part equals to current day of month': [
-                    {
-                        type: '5',
-                        value: {start: '{{10}}', end: ''},
-                        part: 'day'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('dayOfMonth', [createGetAttrNode('foo.bar')]),
-                        createFunctionNode('currentDayOfMonth')
-                    )
-                ],
-                'month part equals to value': [
-                    {
-                        type: '5',
-                        value: {start: '2', end: ''},
-                        part: 'month'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('month', [createGetAttrNode('foo.bar')]),
-                        new ConstantNode('2')
-                    )
-                ],
-                'month part equals to current month': [
-                    {
-                        type: '5',
-                        value: {start: '{{12}}', end: ''},
-                        part: 'month'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('month', [createGetAttrNode('foo.bar')]),
-                        createFunctionNode('currentMonth')
-                    )
-                ],
-                'month part equals to first month of current quarter': [
-                    {
-                        type: '5',
-                        value: {start: '{{16}}', end: ''},
-                        part: 'month'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('month', [createGetAttrNode('foo.bar')]),
-                        createFunctionNode('firstMonthOfCurrentQuarter')
-                    )
-                ],
-                'quarter part equals to value': [
-                    {
-                        type: '5',
-                        value: {start: '1', end: ''},
-                        part: 'quarter'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('quarter', [createGetAttrNode('foo.bar')]),
-                        new ConstantNode('1')
-                    )
-                ],
-                'quarter part equals to current quarter': [
-                    {
-                        type: '5',
-                        value: {start: '{{13}}', end: ''},
-                        part: 'quarter'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('quarter', [createGetAttrNode('foo.bar')]),
-                        createFunctionNode('currentQuarter')
-                    )
-                ],
-                'day of year part equals to value': [
-                    {
-                        type: '5',
-                        value: {start: '32', end: ''},
-                        part: 'dayofyear'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('dayOfYear', [createGetAttrNode('foo.bar')]),
-                        new ConstantNode('32')
-                    )
-                ],
-                'day of year part equals to current day of year': [
-                    {
-                        type: '5',
-                        value: {start: '{{10}}', end: ''},
-                        part: 'dayofyear'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('dayOfYear', [createGetAttrNode('foo.bar')]),
-                        createFunctionNode('currentDayOfYear')
-                    )
-                ],
-                'day of year part equals to first day of current quarter': [
-                    {
-                        type: '5',
-                        value: {start: '{{15}}', end: ''},
-                        part: 'dayofyear'
-                    },
-                    new BinaryNode('=',
-                        createFunctionNode('dayOfYear', [createGetAttrNode('foo.bar')]),
-                        createFunctionNode('firstDayOfCurrentQuarter')
-                    )
-                ],
-                'year part equals to value': [
-                    {
-                        type: '5',
-                        value: {start: '1981', end: ''},
-                        part: 'year'
-                    },
-                    new BinaryNode('=',
+                )
+            ],
+            'value part not between start and end dates': [
+                {
+                    type: '2',
+                    value: {start: '2018-03-01', end: '2018-03-31'},
+                    part: 'value'
+                },
+                new BinaryNode(
+                    'and',
+                    new BinaryNode('<', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01')),
+                    new BinaryNode('>', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
+                )
+            ],
+            'value part later than the date': [
+                {
+                    type: '3',
+                    value: {start: '2018-03-01', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('>=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
+            ],
+            'value part earlier than the date': [
+                {
+                    type: '4',
+                    value: {start: '', end: '2018-03-31'},
+                    part: 'value'
+                },
+                new BinaryNode('<=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
+            ],
+            'value part equals to the date': [
+                {
+                    type: '5',
+                    value: {start: '2018-03-01', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'))
+            ],
+            'value part not equals to the date': [
+                {
+                    type: '6',
+                    value: {start: '', end: '2018-03-31'},
+                    part: 'value'
+                },
+                new BinaryNode('!=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-31'))
+            ],
+            'value part equals to now': [
+                {
+                    type: '5',
+                    value: {start: '{{1}}', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('now'))
+            ],
+            'value part equals to today': [
+                {
+                    type: '5',
+                    value: {start: '{{2}}', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('today'))
+            ],
+            'value part equals to start of the week': [
+                {
+                    type: '5',
+                    value: {start: '{{3}}', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheWeek'))
+            ],
+            'value part equals to start of the month': [
+                {
+                    type: '5',
+                    value: {start: '{{4}}', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheMonth'))
+            ],
+            'value part equals to start of the quarter': [
+                {
+                    type: '5',
+                    value: {start: '{{5}}', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheQuarter'))
+            ],
+            'value part equals to start of the year': [
+                {
+                    type: '5',
+                    value: {start: '{{6}}', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('startOfTheYear'))
+            ],
+            'value part equals to current month without year': [
+                {
+                    type: '5',
+                    value: {start: '{{17}}', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('currentMonthWithoutYear'))
+            ],
+            'value part equals to this day without year': [
+                {
+                    type: '5',
+                    value: {start: '{{29}}', end: ''},
+                    part: 'value'
+                },
+                new BinaryNode('=', createGetAttrNode('foo.bar'), createFunctionNode('thisDayWithoutYear'))
+            ],
+            'day of week part equals to value': [
+                {
+                    type: '5',
+                    value: {start: '7', end: ''},
+                    part: 'dayofweek'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('dayOfWeek', [createGetAttrNode('foo.bar')]),
+                    new ConstantNode('7')
+                )
+            ],
+            'day of week part equals to current day of week': [
+                {
+                    type: '5',
+                    value: {start: '{{10}}', end: ''},
+                    part: 'dayofweek'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('dayOfWeek', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('currentDayOfWeek')
+                )
+            ],
+            'week part equals to value': [
+                {
+                    type: '5',
+                    value: {start: '5', end: ''},
+                    part: 'week'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('week', [createGetAttrNode('foo.bar')]),
+                    new ConstantNode('5')
+                )
+            ],
+            'week part equals to current week': [
+                {
+                    type: '5',
+                    value: {start: '{{11}}', end: ''},
+                    part: 'week'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('week', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('currentWeek')
+                )
+            ],
+            'day of month part equals to value': [
+                {
+                    type: '5',
+                    value: {start: '1', end: ''},
+                    part: 'day'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('dayOfMonth', [createGetAttrNode('foo.bar')]),
+                    new ConstantNode('1')
+                )
+            ],
+            'day of month part equals to current day of month': [
+                {
+                    type: '5',
+                    value: {start: '{{10}}', end: ''},
+                    part: 'day'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('dayOfMonth', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('currentDayOfMonth')
+                )
+            ],
+            'month part equals to value': [
+                {
+                    type: '5',
+                    value: {start: '2', end: ''},
+                    part: 'month'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                    new ConstantNode('2')
+                )
+            ],
+            'month part equals to current month': [
+                {
+                    type: '5',
+                    value: {start: '{{12}}', end: ''},
+                    part: 'month'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('currentMonth')
+                )
+            ],
+            'month part equals to first month of current quarter': [
+                {
+                    type: '5',
+                    value: {start: '{{16}}', end: ''},
+                    part: 'month'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('firstMonthOfCurrentQuarter')
+                )
+            ],
+            'quarter part equals to value': [
+                {
+                    type: '5',
+                    value: {start: '1', end: ''},
+                    part: 'quarter'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('quarter', [createGetAttrNode('foo.bar')]),
+                    new ConstantNode('1')
+                )
+            ],
+            'quarter part equals to current quarter': [
+                {
+                    type: '5',
+                    value: {start: '{{13}}', end: ''},
+                    part: 'quarter'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('quarter', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('currentQuarter')
+                )
+            ],
+            'day of year part equals to value': [
+                {
+                    type: '5',
+                    value: {start: '32', end: ''},
+                    part: 'dayofyear'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('dayOfYear', [createGetAttrNode('foo.bar')]),
+                    new ConstantNode('32')
+                )
+            ],
+            'day of year part equals to current day of year': [
+                {
+                    type: '5',
+                    value: {start: '{{10}}', end: ''},
+                    part: 'dayofyear'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('dayOfYear', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('currentDayOfYear')
+                )
+            ],
+            'day of year part equals to first day of current quarter': [
+                {
+                    type: '5',
+                    value: {start: '{{15}}', end: ''},
+                    part: 'dayofyear'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('dayOfYear', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('firstDayOfCurrentQuarter')
+                )
+            ],
+            'year part equals to value': [
+                {
+                    type: '5',
+                    value: {start: '1981', end: ''},
+                    part: 'year'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('year', [createGetAttrNode('foo.bar')]),
+                    new ConstantNode('1981')
+                )
+            ],
+            'year part equals to current year': [
+                {
+                    type: '5',
+                    value: {start: '{{14}}', end: ''},
+                    part: 'year'
+                },
+                new BinaryNode('=',
+                    createFunctionNode('year', [createGetAttrNode('foo.bar')]),
+                    createFunctionNode('currentYear')
+                )
+            ],
+            'year part between some year and current year': [
+                {
+                    type: '1',
+                    value: {start: '1981', end: '{{14}}'},
+                    part: 'year'
+                },
+                new BinaryNode(
+                    'and',
+                    new BinaryNode('>=',
                         createFunctionNode('year', [createGetAttrNode('foo.bar')]),
                         new ConstantNode('1981')
-                    )
-                ],
-                'year part equals to current year': [
-                    {
-                        type: '5',
-                        value: {start: '{{14}}', end: ''},
-                        part: 'year'
-                    },
-                    new BinaryNode('=',
+                    ),
+                    new BinaryNode('<=',
                         createFunctionNode('year', [createGetAttrNode('foo.bar')]),
                         createFunctionNode('currentYear')
                     )
-                ],
-                'year part between some year and current year': [
-                    {
-                        type: '1',
-                        value: {start: '1981', end: '{{14}}'},
-                        part: 'year'
-                    },
-                    new BinaryNode(
-                        'and',
-                        new BinaryNode('>=',
-                            createFunctionNode('year', [createGetAttrNode('foo.bar')]),
-                            new ConstantNode('1981')
-                        ),
-                        new BinaryNode('<=',
-                            createFunctionNode('year', [createGetAttrNode('foo.bar')]),
-                            createFunctionNode('currentYear')
-                        )
-                    )
-                ]
-            };
+                )
+            ]
+        };
 
-            _.each(cases, function(testCase, caseName) {
-                it(caseName, function() {
-                    var expectedCondition = {
-                        columnName: 'bar',
-                        criterion: {
-                            filter: 'date',
-                            data: testCase[0]
-                        }
-                    };
-                    expect(translator.tryToTranslate(testCase[1])).toEqual(expectedCondition);
-                });
+        jasmine.itEachCase(cases, (filterValue, ast) => {
+            const expectedCondition = {
+                columnName: 'bar',
+                criterion: {
+                    filter: 'date',
+                    data: filterValue
+                }
+            };
+            expect(translator.tryToTranslate(ast)).toEqual(expectedCondition);
+        });
+    });
+
+    describe('filter config is taken in account', () => {
+        it('unavailable filter criteria', () => {
+            filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                type: 'date',
+                name: 'date',
+                choices: [
+                    {value: '1'}
+                ],
+                dateParts: {
+                    value: 'value'
+                }
             });
+            const ast = new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'));
+            expect(translator.tryToTranslate(ast)).toEqual(null);
         });
 
-        describe('filter config is taken in account', function() {
-            it('unavailable filter criteria', function() {
-                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
-                    type: 'date',
-                    name: 'date',
-                    choices: [
-                        {value: '1'}
-                    ],
-                    dateParts: {
-                        value: 'value'
-                    }
-                });
-                var ast = new BinaryNode('=', createGetAttrNode('foo.bar'), new ConstantNode('2018-03-01'));
-                expect(translator.tryToTranslate(ast)).toEqual(null);
+        it('unavailable date part', () => {
+            filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                type: 'date',
+                name: 'date',
+                choices: [
+                    {value: '5'}
+                ],
+                dateParts: {
+                    value: 'value'
+                }
             });
+            const ast = new BinaryNode('=',
+                createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                new ConstantNode('1')
+            );
+            expect(translator.tryToTranslate(ast)).toEqual(null);
+        });
 
-            it('unavailable date part', function() {
-                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
-                    type: 'date',
-                    name: 'date',
-                    choices: [
-                        {value: '5'}
-                    ],
-                    dateParts: {
-                        value: 'value'
-                    }
-                });
-                var ast = new BinaryNode('=',
-                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
-                    new ConstantNode('1')
-                );
-                expect(translator.tryToTranslate(ast)).toEqual(null);
+        it('variables are not allowed', () => {
+            filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                type: 'date',
+                name: 'date',
+                choices: [
+                    {value: '5'}
+                ],
+                dateParts: {
+                    value: 'value',
+                    month: 'month'
+                }
             });
+            const ast = new BinaryNode('=',
+                createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                createFunctionNode('firstMonthOfCurrentQuarter')
+            );
+            expect(translator.tryToTranslate(ast)).toEqual(null);
+        });
 
-            it('variables are not allowed', function() {
-                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
-                    type: 'date',
-                    name: 'date',
-                    choices: [
-                        {value: '5'}
-                    ],
-                    dateParts: {
-                        value: 'value',
-                        month: 'month'
-                    }
-                });
-                var ast = new BinaryNode('=',
-                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
-                    createFunctionNode('firstMonthOfCurrentQuarter')
-                );
-                expect(translator.tryToTranslate(ast)).toEqual(null);
-            });
-
-            it('unavailable date variable', function() {
-                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
-                    type: 'date',
-                    name: 'date',
-                    choices: [
-                        {value: '5'}
-                    ],
-                    dateParts: {
-                        value: 'value',
-                        month: 'month'
-                    },
-                    externalWidgetOptions: {
-                        dateVars: {
-                            month: {
-                                12: 'current month'
-                            }
+        it('unavailable date variable', () => {
+            filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                type: 'date',
+                name: 'date',
+                choices: [
+                    {value: '5'}
+                ],
+                dateParts: {
+                    value: 'value',
+                    month: 'month'
+                },
+                externalWidgetOptions: {
+                    dateVars: {
+                        month: {
+                            12: 'current month'
                         }
                     }
-                });
-                var ast = new BinaryNode('=',
-                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
-                    createFunctionNode('firstMonthOfCurrentQuarter')
-                );
-                expect(translator.tryToTranslate(ast)).toEqual(null);
+                }
             });
+            const ast = new BinaryNode('=',
+                createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                createFunctionNode('firstMonthOfCurrentQuarter')
+            );
+            expect(translator.tryToTranslate(ast)).toEqual(null);
+        });
 
-            it('available date part and variable', function() {
-                filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
-                    type: 'date',
-                    name: 'date',
-                    choices: [
-                        {value: '5'}
-                    ],
-                    dateParts: {
-                        value: 'value',
-                        month: 'month'
-                    },
-                    externalWidgetOptions: {
-                        dateVars: {
-                            month: {
-                                12: 'current month',
-                                16: 'first month of quarter'
-                            }
+        it('available date part and variable', () => {
+            filterConfigProviderMock.getApplicableFilterConfig.and.returnValue({
+                type: 'date',
+                name: 'date',
+                choices: [
+                    {value: '5'}
+                ],
+                dateParts: {
+                    value: 'value',
+                    month: 'month'
+                },
+                externalWidgetOptions: {
+                    dateVars: {
+                        month: {
+                            12: 'current month',
+                            16: 'first month of quarter'
                         }
                     }
-                });
-                var ast = new BinaryNode('=',
-                    createFunctionNode('month', [createGetAttrNode('foo.bar')]),
-                    createFunctionNode('firstMonthOfCurrentQuarter')
-                );
-                expect(translator.tryToTranslate(ast)).toEqual({
-                    columnName: 'bar',
-                    criterion: {
-                        filter: 'date',
-                        data: {
-                            type: '5',
-                            part: 'month',
-                            value: {
-                                start: '{{16}}',
-                                end: ''
-                            }
+                }
+            });
+            const ast = new BinaryNode('=',
+                createFunctionNode('month', [createGetAttrNode('foo.bar')]),
+                createFunctionNode('firstMonthOfCurrentQuarter')
+            );
+            expect(translator.tryToTranslate(ast)).toEqual({
+                columnName: 'bar',
+                criterion: {
+                    filter: 'date',
+                    data: {
+                        type: '5',
+                        part: 'month',
+                        value: {
+                            start: '{{16}}',
+                            end: ''
                         }
                     }
-                });
+                }
             });
         });
     });

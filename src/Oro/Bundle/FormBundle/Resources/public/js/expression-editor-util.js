@@ -44,7 +44,7 @@ const ExpressionEditorUtil = BaseClass.extend({
         operations: {
             math: ['+', '-', '%', '*', '/'],
             bool: ['and', 'or'],
-            equality: ['=', '==', '!='], // @todo '==' or '=' ?
+            equality: ['==', '!='], // @todo '==' or '=' ?
             compare: ['>', '<', '<=', '>='],
             inclusion: ['in', 'not in'],
             like: ['matches']

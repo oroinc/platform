@@ -18,7 +18,7 @@ class Parser extends OriginalParser {
             token.test(Token.OPERATOR_TYPE) &&
             token.value in Parser.BINARY_OPERATORS &&
             Parser.BINARY_OPERATORS[token.value].precedence >= precedence
-            ) {
+        ) {
             const operator = Parser.BINARY_OPERATORS[token.value];
             this.stream.next();
             const precedence1 = Parser.OPERATOR_LEFT === operator.associativity

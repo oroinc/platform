@@ -14,7 +14,7 @@ define(function(require) {
 
         constructor: function FieldChoiceMock(options) {
             FieldChoiceMock.lastCreatedInstance = this;
-            this.data = _.clone(_data);
+            this.data = {..._data};
             spyOn(this, 'setValue').and.callThrough();
             FieldChoiceMock.__super__.constructor.call(this, options);
         },

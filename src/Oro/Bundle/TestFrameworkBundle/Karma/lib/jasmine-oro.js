@@ -28,16 +28,14 @@
             var methodName;
 
             if (j$.isSpy(prop)) {
-                methodName = prop.and.identity();
-                prop.and.identity = function() {
-                    return baseName + '.' + methodName;
-                };
+                methodName = prop.and.identity;
+                prop.and.identity = `${baseName}.${methodName}`;
                 obj[methodName] = prop;
                 spiesWereSet = true;
             } else if (j$.isObject_(prop)) {
                 for (var propName in prop) {
                     if (prop.hasOwnProperty(propName) && j$.isSpy(prop[propName])) {
-                        var identity = prop[propName].and.identity();
+                        var identity = prop[propName].and.identity;
                         methodName = identity.substr(0, identity.indexOf('.'));
                         obj[methodName] = prop;
                         spiesWereSet = true;

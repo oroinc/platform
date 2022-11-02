@@ -284,7 +284,7 @@ define(function(require) {
          * @param {string} className class name of entity, like 'Oro\Bundle\UserBundle\Entity\User'
          */
         setRootEntityClassName: function(className) {
-            var prevRootEntity = this.rootEntity;
+            const prevRootEntity = this.rootEntity;
             this.rootEntityClassName = className || void 0;
             this.rootEntity = className ? this.collection.getEntityModelByClassName(className) : null;
             if (prevRootEntity !== this.rootEntity) {
