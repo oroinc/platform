@@ -6,6 +6,7 @@ use Oro\Bundle\LocaleBundle\Formatter\FormattingCodeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\LanguageCodeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Intl\Locales;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -46,7 +47,7 @@ class FormattingCodeFormatterTest extends TestCase
             ->with('N/A')
             ->willReturn('N/A');
 
-        $this->localeSettings->expects($value ? $this->once() : $this->never())
+        $this->localeSettings->expects(Locales::exists($value) ? $this->once() : $this->never())
             ->method('getLanguage')
             ->willReturn('en');
 
