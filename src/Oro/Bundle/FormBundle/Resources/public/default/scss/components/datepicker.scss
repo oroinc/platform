@@ -21,6 +21,17 @@
         display: $datepicker-input-display;
         max-width: $datepicker-input-max-width;
         padding-left: $datepicker-input-padding-left;
+        position: $datepicker-input-position;
+
+        &::-webkit-calendar-picker-indicator {
+            width: $datepicker-input-padding-left;
+            height: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: auto;
+            bottom: 0;
+        }
     }
 
     &--form-mode {

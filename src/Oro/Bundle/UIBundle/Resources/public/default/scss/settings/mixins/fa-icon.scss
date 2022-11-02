@@ -17,7 +17,7 @@
             $content: '#{$icon}';
         }
 
-        &:#{$state} {
+        &::#{$state} {
             content: $content;
             font-family: $icon-font;
 
